@@ -1,0 +1,34 @@
+{
+  "minigames": [
+    {
+      "id": "quick_guess",
+      "name": "Quick Guess",
+      "description": "Guess numbers as fast as possible within 10 seconds to score points and earn Nebula!",
+      "rewardMultiplier": 2.0
+    },
+    {
+      "id": "reaction_test",
+      "name": "Reaction Test",
+      "description": "Test your reflexes! Tap instantly when the signal turns green.",
+      "rewardMultiplier": 3.0
+    },
+    {
+      "id": "lucky_number",
+      "name": "Lucky Number Box",
+      "description": "Choose one of three mystery boxes to find the jackpot Nebula prize.",
+      "rewardMultiplier": 2.5
+    },
+    {
+      "id": "memory_match",
+      "name": "Memory Digit Sequence",
+      "description": "Memorize a sequence of glowing digits and repeat it back correctly.",
+      "rewardMultiplier": 4.0
+    },
+    {
+      "id": "number_rush",
+      "name": "Number Rush",
+      "description": "Tap numbers in ascending order from 1 to 5 as fast as you can.",
+      "rewardMultiplier": 3.5
+    }
+  ]
+}

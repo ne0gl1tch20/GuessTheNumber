@@ -1,0 +1,31 @@
+{
+  "upgrades": [
+    {
+      "id": "ultra_money_boost",
+      "name": "Cosmic Wealth",
+      "description": "Massively multiplies money earnings based on Ultra level.",
+      "maxLevel": 20,
+      "baseCost": "5",
+      "costMultiplier": 2.5,
+      "effectPerLevel": 2.0
+    },
+    {
+      "id": "ultra_gain_boost",
+      "name": "Eternal Expansion",
+      "description": "Increases Ultra currency gain from resets (up to 2,000 cap).",
+      "maxLevel": 10,
+      "baseCost": "25",
+      "costMultiplier": 3.0,
+      "effectPerLevel": 0.5
+    },
+    {
+      "id": "ultra_nebula_boost",
+      "name": "Nebula Resonance",
+      "description": "Boosts Nebula rewards from Arcade and achievements.",
+      "maxLevel": 15,
+      "baseCost": "10",
+      "costMultiplier": 2.2,
+      "effectPerLevel": 1.0
+    }
+  ]
+}

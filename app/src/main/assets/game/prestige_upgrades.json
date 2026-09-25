@@ -1,0 +1,31 @@
+{
+  "upgrades": [
+    {
+      "id": "prestige_money_boost",
+      "name": "Prestige Wealth",
+      "description": "Permanently boosts money earnings based on Prestige level.",
+      "maxLevel": 50,
+      "baseCost": "10",
+      "costMultiplier": 1.6,
+      "effectPerLevel": 0.5
+    },
+    {
+      "id": "prestige_gain_boost",
+      "name": "Prestige Catalyst",
+      "description": "Increases Prestige currency gain from resets.",
+      "maxLevel": 25,
+      "baseCost": "50",
+      "costMultiplier": 2.0,
+      "effectPerLevel": 0.2
+    },
+    {
+      "id": "prestige_starting_capital",
+      "name": "Prestige Endowment",
+      "description": "Starts you off with extra money after resetting.",
+      "maxLevel": 30,
+      "baseCost": "25",
+      "costMultiplier": 1.8,
+      "effectPerLevel": 1000.0
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "shopItems": [
+    {
+      "id": "auto_clicker_basic",
+      "name": "Auto Clicker",
+      "description": "Automatically guesses target number every second.",
+      "nebulaCost": 25
+    },
+    {
+      "id": "nebula_boost",
+      "name": "Nebula Crystal",
+      "description": "Permanently increases Nebula gains by 2x.",
+      "nebulaCost": 50
+    },
+    {
+      "id": "golden_guess",
+      "name": "Golden Guess Pass",
+      "description": "Guarantees critical rewards on every 10th guess.",
+      "nebulaCost": 100
+    }
+  ]
+}

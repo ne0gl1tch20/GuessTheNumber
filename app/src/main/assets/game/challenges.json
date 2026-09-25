@@ -1,0 +1,10 @@
+{
+  "challenges": [
+    {
+      "id": "daily_guess_50",
+      "name": "Daily Number Challenge",
+      "description": "Make 50 correct guesses today.",
+      "rewardNebula": 30
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "startingMoney": "0",
+  "startingRangeMin": 1,
+  "startingRangeMax": 100,
+  "criticalChance": 0.05,
+  "maxUltraCap": 2000,
+  "autoClickerIncomePerSec": "500"
+}

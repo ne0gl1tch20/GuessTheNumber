@@ -1,0 +1,22 @@
+{
+  "achievements": [
+    {
+      "id": "correct_10",
+      "name": "Novice Guesser",
+      "description": "Successfully guess the number 10 times.",
+      "rewardNebula": 10
+    },
+    {
+      "id": "streak_5",
+      "name": "Streak Master",
+      "description": "Achieve a winning guess streak of 5.",
+      "rewardNebula": 25
+    },
+    {
+      "id": "millionaire",
+      "name": "Number Millionaire",
+      "description": "Accumulate 1,000,000 money.",
+      "rewardNebula": 50
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "upgrades": [
+    {
+      "id": "reward_multiplier",
+      "name": "Reward Multiplier",
+      "description": "Increases money earned per correct guess.",
+      "maxLevel": 100,
+      "baseCost": "100",
+      "costMultiplier": 1.5,
+      "effectPerLevel": 0.25
+    },
+    {
+      "id": "better_range",
+      "name": "Better Guess Range",
+      "description": "Narrows the max target number range.",
+      "maxLevel": 20,
+      "baseCost": "500",
+      "costMultiplier": 2.0,
+      "effectPerLevel": 1.0
+    },
+    {
+      "id": "critical_boost",
+      "name": "Critical Eye",
+      "description": "Increases critical hit chance for massive payouts.",
+      "maxLevel": 50,
+      "baseCost": "1000",
+      "costMultiplier": 1.8,
+      "effectPerLevel": 0.01
+    },
+    {
+      "id": "starting_money_boost",
+      "name": "Startup Capital",
+      "description": "Increases baseline earnings on resets.",
+      "maxLevel": 25,
+      "baseCost": "2500",
+      "costMultiplier": 2.2,
+      "effectPerLevel": 100.0
+    },
+    {
+      "id": "auto_efficiency",
+      "name": "Auto Processor",
+      "description": "Speeds up auto-guessing efficiency.",
+      "maxLevel": 30,
+      "baseCost": "5000",
+      "costMultiplier": 2.1,
+      "effectPerLevel": 0.1
+    },
+    {
+      "id": "prestige_boost",
+      "name": "Prestige Resonance",
+      "description": "Boosts Prestige currency gain multiplier.",
+      "maxLevel": 40,
+      "baseCost": "10000",
+      "costMultiplier": 2.5,
+      "effectPerLevel": 0.5
+    },
+    {
+      "id": "lucky_multiplier",
+      "name": "Lucky Streak",
+      "description": "Enhances streak rewards and combo bonuses.",
+      "maxLevel": 20,
+      "baseCost": "15000",
+      "costMultiplier": 2.3,
+      "effectPerLevel": 0.2
+    },
+    {
+      "id": "critical_multiplier",
+      "name": "Critical Surge",
+      "description": "Multiplies critical hit payout power.",
+      "maxLevel": 25,
+      "baseCost": "25000",
+      "costMultiplier": 2.4,
+      "effectPerLevel": 0.5
+    },
+    {
+      "id": "auto_income_boost",
+      "name": "Auto Revenue Generator",
+      "description": "Boosts automated passive income generation.",
+      "maxLevel": 50,
+      "baseCost": "50000",
+      "costMultiplier": 2.2,
+      "effectPerLevel": 50.0
+    },
+    {
+      "id": "ultra_efficiency",
+      "name": "Cosmic Catalyst",
+      "description": "Amplifies Ultra reset currency rewards.",
+      "maxLevel": 20,
+      "baseCost": "100000",
+      "costMultiplier": 3.0,
+      "effectPerLevel": 1.0
+    },
+    {
+      "id": "discount_bargain",
+      "name": "Upgrade Discount",
+      "description": "Reduces cost scaling across all upgrades.",
+      "maxLevel": 15,
+      "baseCost": "200000",
+      "costMultiplier": 2.8,
+      "effectPerLevel": 0.05
+    }
+  ]
+}

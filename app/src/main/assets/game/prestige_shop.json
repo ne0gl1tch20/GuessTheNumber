@@ -1,0 +1,16 @@
+{
+  "shopItems": [
+    {
+      "id": "prestige_auto_speed",
+      "name": "Quantum Auto-Guess",
+      "description": "Increases auto-clicker guessing frequency by 50%.",
+      "cost": 100
+    },
+    {
+      "id": "prestige_luck_charm",
+      "name": "Prestige Luck Charm",
+      "description": "Increases critical guess chance by 5%.",
+      "cost": 250
+    }
+  ]
+}

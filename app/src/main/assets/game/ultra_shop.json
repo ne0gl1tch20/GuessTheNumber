@@ -1,0 +1,22 @@
+{
+  "shopItems": [
+    {
+      "id": "ultra_universal_harmony",
+      "name": "Universal Harmony",
+      "description": "Guarantees critical rewards on every correct guess.",
+      "cost": 500
+    },
+    {
+      "id": "ultra_infinite_multiplier",
+      "name": "Infinite Singularity",
+      "description": "Permanently doubles all currency gains.",
+      "cost": 1000
+    },
+    {
+      "id": "ultra_flex_badge",
+      "name": "THE FLEX BADGE",
+      "description": "The ultimate symbol of prestige and supreme wealth in the universe.",
+      "cost": 10000
+    }
+  ]
+}
