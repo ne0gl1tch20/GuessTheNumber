@@ -1,6 +1,22 @@
 # 🚀 Guess The Number Simulator - Changelog
 
-## v1.3 (Current Release)
+## v1.5 (Current Release)
+- ✨ **Smart Number Formatting**: Added support for Scientific, Engineering, Standard Short Scale, and Alpha Suffixes number notations in Settings.
+- ✨ **Quick-Buy Multipliers & Max-Buy**: Added `1x`, `10x`, `100x`, and `MAX` buy multipliers in UpgradeShop.
+- ✨ **Offline Progress & Summary Modal**: Enhanced offline earnings calculation and summary modal on app startup.
+- ✨ **Export/Import Save Backups**: Added Base64 encrypted save string export and import in Settings.
+- ✨ **Audio & Haptic Fine-Tuning**: Added master volume sliders, sound effects, vibration, and reduce flashes toggles.
+- ✨ **Markdown Changelog Parser**: Changelog dialog now parses and formats markdown headers and list items.
+- ✨ **Developer Process & Logic Inspector**: Added dedicated developer process and variable inspection screen in Dev Settings.
+- ✨ **Achievements & Perks Navigation**: Integrated achievements and active perks into the More navigation screen.
+
+## v1.4
+- ✨ **Scaling Reset Requirements**: Prestige and Ultra money requirements now scale up progressively with each reset (Prestige scales by $2.5\times$ and Ultra by $5.0\times$ per reset).
+- ✨ **UI Bug Fixes & QoL**: Fixed cramped buy multiplier buttons in the upgrades screen and added current money balance display.
+- ✨ **Prestige & Ultra Requirements & Reset Info**: Updated Ultra requirements to require both Money and 1,000 Prestige. Added explicit reset info text on Prestige and Ultra screens detailing reset costs, scaling, and reset contents.
+- ✨ **Quick-Buy Multipliers (`1x`, `10x`, `100x`, `MAX`)**: Added interactive buy multiplier filter chips and multi-level cost scaling to the Upgrade screen.
+
+## v1.3
 - ✨ Added a welcoming startup loading screen with circular progress animation to safely catch up and validate save state on app launch.
 - 🛠️ Fixed Dev Settings Save Editor error message ("Failed to apply invalid save json") when submitting invalid save JSON strings.
 - 🎨 Converted dev settings action buttons (Run, Load Current Save, Apply Save JSON) into space-saving icon buttons.

@@ -95,6 +95,26 @@ fun SettingsScreen(
                 }
             }
 
+            // Number Notation Selector
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Number Notation", style = MaterialTheme.typography.bodyLarge)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf("Standard", "Scientific", "Engineering").forEach { notation ->
+                            FilterChip(
+                                selected = settings.numberNotation == notation,
+                                onClick = { onUpdateSettings(settings.copy(numberNotation = notation)) },
+                                label = { Text(notation) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

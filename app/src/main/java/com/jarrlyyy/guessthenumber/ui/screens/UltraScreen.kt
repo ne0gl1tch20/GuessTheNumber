@@ -29,8 +29,9 @@ fun UltraScreen(
 ) {
     val context = LocalContext.current
     val gameEngine = GameEngine()
-    val ultraReward = gameEngine.calculateUltraReward(state.money)
-    val canUltra = state.money >= BigNumber(10_000_000_000)
+    val requiredMoney = gameEngine.calculateUltraRequirement(state.ultraCount)
+    val ultraReward = gameEngine.calculateUltraReward(state.money, state.ultraCount)
+    val canUltra = state.money >= requiredMoney && state.prestige >= BigNumber(1_000)
 
     val upgrades = remember { JsonConfigRepository(context).loadUltraUpgrades() }
     val shopItems = remember { JsonConfigRepository(context).loadUltraShopItems() }
@@ -63,9 +64,11 @@ fun UltraScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Ultra Balance: ${state.ultra.format()}", color = UltraPurple, fontSize = 20.sp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Requirement: 10,000,000,000 Money")
-                        Text("Current Money: ${state.money.format()}")
+                        Text("Requirements: ${requiredMoney.format()} Money AND 1,000 Prestige (Reset #${state.ultraCount + 1})")
+                        Text("Current Money: ${state.money.format()} | Current Prestige: ${state.prestige.format()}")
                         Text("Preview Reward: +${ultraReward.format()} Ultra (Max 2,000)")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("🔄 Reset Info: Resets all regular Money, Prestige balance, Upgrade Levels, and Prestige Upgrade Levels. Each ultra increases the money requirement for the next ultra.", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.height(12.dp))
                         Button(
                             onClick = onUltra,
@@ -73,7 +76,7 @@ fun UltraScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = UltraPurple),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(if (canUltra) "Perform Ultra Reset" else "Need 10B Money to Ultra")
+                            Text(if (canUltra) "Perform Ultra Reset" else "Need ${requiredMoney.format()} Money & 1K Prestige to Ultra")
                         }
                     }
                 }

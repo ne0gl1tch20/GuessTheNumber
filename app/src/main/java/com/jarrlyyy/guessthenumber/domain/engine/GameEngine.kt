@@ -83,20 +83,40 @@ class GameEngine(private val rng: Random = Random.Default) {
         }
     }
 
-    fun calculatePrestigeReward(money: BigNumber): BigNumber {
-        // Prestige formula: sqrt(Money / 5e7)
+    fun calculatePrestigeRequirement(prestigeCount: Long): BigNumber {
+        // Base requirement is 50M, increases by 2.5x per prestige reset
+        val base = 50_000_000.0
+        val multiplier = Math.pow(2.5, prestigeCount.toDouble())
+        return BigNumber(base * multiplier)
+    }
+
+    fun calculateUltraRequirement(ultraCount: Long): BigNumber {
+        // Base requirement is 10B, increases by 5.0x per ultra reset
+        val base = 10_000_000_000.0
+        val multiplier = Math.pow(5.0, ultraCount.toDouble())
+        return BigNumber(base * multiplier)
+    }
+
+    fun calculatePrestigeReward(money: BigNumber, prestigeCount: Long): BigNumber {
+        val req = calculatePrestigeRequirement(prestigeCount).value.toDouble()
         val m = money.value.toDouble()
-        if (m < 50_000_000.0) return BigNumber.ZERO
-        val p = sqrt(m / 50_000_000.0)
+        if (m < req) return BigNumber.ZERO
+        val p = sqrt(m / req)
         return BigNumber(p).floor()
     }
 
-    fun calculateUltraReward(money: BigNumber): BigNumber {
-        // Ultra formula: log10(Money / 1e10), capped at 2000 per reset
+    fun calculateUltraReward(money: BigNumber, ultraCount: Long): BigNumber {
+        val req = calculateUltraRequirement(ultraCount).value.toDouble()
         val m = money.value.toDouble()
-        if (m < 10_000_000_000.0) return BigNumber.ZERO
-        val u = log10(m / 10_000_000_000.0) * 100.0
+        if (m < req) return BigNumber.ZERO
+        val u = log10(m / req) * 100.0
         val capped = minOf(u, 2000.0)
         return BigNumber(capped).floor()
     }
+
+    @Deprecated("Legacy overload")
+    fun calculatePrestigeReward(money: BigNumber): BigNumber = calculatePrestigeReward(money, 0L)
+
+    @Deprecated("Legacy overload")
+    fun calculateUltraReward(money: BigNumber): BigNumber = calculateUltraReward(money, 0L)
 }

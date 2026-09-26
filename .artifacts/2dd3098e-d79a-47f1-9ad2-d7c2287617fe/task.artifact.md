@@ -1,0 +1,12 @@
+- `[/]` 1. Implement Smart Number Formatting & Notation Toggles in BigNumber and SettingsScreen
+- `[ ]` 2. Implement Quick-Buy Multipliers & Max-Buy Buttons in UpgradeShop and GameViewModel
+- `[ ]` 3. Implement Save Export/Import JSON Backups and Audio/Haptic Settings in SaveManager and SettingsScreen
+- `[ ]` 4. Implement Offline Progress Summary Modal & Calculation
+- `[ ]` 5. Implement Prestige Talent Tree / Talent Web
+- `[ ]` 6. Implement Daily Seeded Challenge Mode & Mutators
+- `[ ]` 7. Implement Combo Streaks & AI Automated Guessing Bots
+- `[ ]` 8. Enhance Stats Dashboard & Run History Analytics
+- `[ ]` 9. Implement Markdown parsing for Changelog popup
+- `[ ]` 10. Implement Developer Process & Variable Inspector Screen
+- `[ ]` 11. Implement Achievements screen and logic integrated into More navigation
+- `[ ]` 12. Verify via unit tests and build check, then update changelog and memory md

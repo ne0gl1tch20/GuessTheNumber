@@ -82,7 +82,8 @@ class MainActivity : ComponentActivity() {
                         onDismissCrash = { viewModel.dismissCrash() },
                         offlineGains = offlineGains,
                         onDismissOfflineGains = { viewModel.dismissOfflineGains() },
-                        onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) }
+                        onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) },
+                        onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) }
                     )
                 }
             }

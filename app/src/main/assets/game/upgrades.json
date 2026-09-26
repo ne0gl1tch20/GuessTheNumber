@@ -4,7 +4,7 @@
       "id": "reward_multiplier",
       "name": "Reward Multiplier",
       "description": "Increases money earned per correct guess.",
-      "maxLevel": 100,
+      "maxLevel": 999999,
       "baseCost": "100",
       "costMultiplier": 1.5,
       "effectPerLevel": 0.25

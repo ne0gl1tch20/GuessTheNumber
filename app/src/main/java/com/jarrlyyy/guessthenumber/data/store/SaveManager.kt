@@ -109,9 +109,19 @@ class SaveManager(private val context: Context) {
         return if (raw.isNotEmpty()) encrypt(raw) else ""
     }
 
-    suspend fun importSave(encryptedString: String): Boolean {
-        val jsonString = decrypt(encryptedString)
-        if (jsonString.isEmpty() || !validateSave(jsonString)) return false
+    suspend fun importSave(inputString: String): Boolean {
+        // Try decrypting first, if it fails or isn't base64 encrypted, try treating inputString as raw JSON
+        val jsonString = if (validateSave(inputString)) {
+            inputString
+        } else {
+            val decrypted = decrypt(inputString)
+            if (decrypted.isNotEmpty() && validateSave(decrypted)) {
+                decrypted
+            } else {
+                return false
+            }
+        }
+
         return try {
             val state = json.decodeFromString<GameState>(jsonString)
             saveGame(state)

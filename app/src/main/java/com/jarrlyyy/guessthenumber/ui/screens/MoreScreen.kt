@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.ui.navigation.Screen
 import com.jarrlyyy.guessthenumber.ui.theme.PrestigeBlue
 import com.jarrlyyy.guessthenumber.ui.theme.UltraPurple
 import java.io.File
@@ -31,9 +32,7 @@ fun MoreScreen(
     onStopMusic: () -> Unit
 ) {
     val context = LocalContext.current
-    var showChangelog by remember { mutableStateOf(false) }
     var showMusicDialog by remember { mutableStateOf(false) }
-    var changelogText by remember { mutableStateOf("") }
 
     val currentMusicPath = state.settings.backgroundMusicPath
 
@@ -119,7 +118,14 @@ fun MoreScreen(
             }
 
             item {
-                Button(onClick = { showChangelog = true }, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = { onNavigate("achievements") }, modifier = Modifier.fillMaxWidth()) {
+                    Icon(imageVector = Icons.Default.EmojiEvents, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Achievements & Perks", fontSize = 16.sp)
+                }
+            }
+            item {
+                Button(onClick = { onNavigate(Screen.ChangelogViewer.route) }, modifier = Modifier.fillMaxWidth()) {
                     Icon(imageVector = Icons.Default.Info, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Changelog", fontSize = 16.sp)
@@ -239,31 +245,5 @@ fun MoreScreen(
         )
     }
 
-    if (showChangelog) {
-        if (changelogText.isEmpty()) {
-            changelogText = try {
-                context.assets.open("changelogs.md").bufferedReader().use { it.readText() }
-            } catch (_: Exception) {
-                "Failed to load changelogs.md"
-            }
-        }
-        AlertDialog(
-            onDismissRequest = { showChangelog = false },
-            title = { Text("Changelog") },
-            text = {
-                Box(modifier = Modifier.height(300.dp)) {
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        item {
-                            Text(changelogText, fontSize = 14.sp)
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                Button(onClick = { showChangelog = false }) {
-                    Text("Close")
-                }
-            }
-        )
-    }
+
 }

@@ -46,7 +46,7 @@ fun TutorialScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = when (step) {
-                            1 -> "Guess the secret target number correctly to earn Money. Every initial correct guess awards at least +10 money!"
+                            1 -> "Guess the secret target number correctly to earn Money. Every initial correct guess awards some money!"
                             2 -> "Spend your hard-earned money on Upgrades in the Upgrades tab to multiply rewards and narrow down guessing ranges."
                             else -> "Reach high milestones to perform Prestige and Ultra resets, unlocking Nebula currency and Arcade minigames!"
                         },

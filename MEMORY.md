@@ -1,7 +1,7 @@
 # Project Memory: Gamified Guess the Number Simulator
 
 ## Project Overview
-A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy (1. Ultra, 2. Prestige located behind More Hub navigation buttons leading to dedicated Prestige and Ultra screens featuring JSON data-driven upgrade trees and shops), anti-cheat protection, offline progression, JSON data-driven assets (`upgrades.json`, `shop_items.json`, `prestige_upgrades.json`, `prestige_shop.json`, `ultra_upgrades.json`, `ultra_shop.json`), startup loading splash screen for safe save data synchronization, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box with search/filter/pause/resume/export, non-crash log storage saving to Android/data files, command autocomplete while typing dev commands, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.3`.
+A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy (1. Ultra, 2. Prestige located behind More Hub navigation buttons leading to dedicated Prestige and Ultra screens featuring JSON data-driven upgrade trees and shops), anti-cheat protection, offline progression, JSON data-driven assets (`upgrades.json`, `shop_items.json`, `prestige_upgrades.json`, `prestige_shop.json`, `ultra_upgrades.json`, `ultra_shop.json`), startup loading splash screen for safe save data synchronization, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box with search/filter/pause/resume/export, non-crash log storage saving to Android/data files, command autocomplete while typing dev commands, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.5`.
 
 ## Architecture & Package Structure (`com.jarrlyyy.guessthenumber`)
 - **`domain.model`**: `BigNumber`, `GameState`, `GameStatistics`, `GameSettings`, `UpgradeDef`, `ShopItemDef`, `AchievementDef`, `LogEntry`.
@@ -17,8 +17,19 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - **`ui.screens`**: `PlayScreen`, `UpgradeScreen`, `ShopScreen`, `MoreScreen`, `PrestigeScreen`, `UltraScreen`, `ArcadeScreen`, `StatsScreen`, `SettingsScreen`, `AboutScreen`, `DevSettingsScreen`, `TutorialScreen`, `CrashRecoveryScreen`.
 - **`ui.viewmodel`**: `GameViewModel`.
 
+## Bug Fixes & Improvements in v1.5 (QoL and Logic Features)
+- Added **Smart Number Formatting** (Scientific, Engineering, Standard Short Scale, Alpha Suffixes).
+- Added **Quick-Buy Multipliers & Max-Buy** (`1x`, `10x`, `100x`, `MAX`) in UpgradeShop.
+- Added **Offline Progress & Summary Modal** calculating earnings and minigame tickets during absence.
+- Added **Save Export/Import Backup** with Base64 encrypted JSON strings in Settings.
+- Added **Audio & Haptic Fine-Tuning** (Master volume sliders, SFX, vibration, and reduce flashes mode).
+- Added **Markdown Changelog Parser** for changelog popups.
+- Added **Developer Process & Logic Inspector** screen in Dev Settings to inspect active variables, background loops, and game state.
+- Added **Achievements & Perks Navigation** integrated into the More navigation hub.
+- Bumped app version code to `5` and version name to `1.5`.
+
 ## Key Features & Systems Implemented
-1. **BigNumber System**: Arbitrary precision decimal representation with canonical suffixes.
+1. **BigNumber System**: Arbitrary precision decimal representation with canonical suffixes and multiple notation support.
 2. **Game Engine & Reset Hierarchy**:
    - **Ultra Reset** (Tier 1 Ultimate: requires 10B Money, awards Ultra, max 2,000 cap; accessed via Ultra Hub screen with JSON upgrade tree and shop).
    - **Prestige Reset** (Tier 2 Standard: requires 50M Money, awards Prestige; accessed via Prestige Hub screen with JSON upgrade tree and shop).

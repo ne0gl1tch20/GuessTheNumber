@@ -28,7 +28,10 @@ data class GameState(
     val lastSaveTimestamp: Long = System.currentTimeMillis(),
     val autoClickerActive: Boolean = false,
     val autoClickerSpeed: Double = 1.0, // clicks per second
-    val tutorialCompleted: Boolean = false
+    val tutorialCompleted: Boolean = false,
+    val buyMultiplier: String = "1", // "1", "10", "100", "MAX"
+    val prestigeCount: Long = 0,
+    val ultraCount: Long = 0
 )
 
 @Serializable
@@ -54,6 +57,7 @@ data class GameSettings(
     val notificationsEnabled: Boolean = true,
     val notificationIntervalHours: Long = 24L,
     val themeMode: String = "System", // Light, Dark, System
+    val numberNotation: String = "Standard", // Standard, Scientific, Engineering
     val reducedMotion: Boolean = false,
     val volume: Float = 1.0f,
     val reduceFlashes: Boolean = false,

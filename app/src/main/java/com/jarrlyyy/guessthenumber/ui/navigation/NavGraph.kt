@@ -40,7 +40,8 @@ fun NavGraph(
     onDismissCrash: () -> Unit,
     offlineGains: BigNumber?,
     onDismissOfflineGains: () -> Unit,
-    onEarnMinigameReward: (Long, BigNumber) -> Unit
+    onEarnMinigameReward: (Long, BigNumber) -> Unit,
+    onUpdateMultiplier: (String) -> Unit
 ) {
     if (!state.tutorialCompleted) {
         TutorialScreen(onComplete = onCompleteTutorial)
@@ -104,7 +105,11 @@ fun NavGraph(
                 PlayScreen(state = state, onMakeGuess = onMakeGuess)
             }
             composable(Screen.Upgrade.route) {
-                UpgradeScreen(state = state, onBuyUpgrade = onBuyUpgrade)
+                UpgradeScreen(
+                    state = state,
+                    onBuyUpgrade = onBuyUpgrade,
+                    onUpdateMultiplier = onUpdateMultiplier
+                )
             }
             composable(Screen.Shop.route) {
                 ShopScreen(state = state, onBuyShopItem = onBuyShopItem)
@@ -156,6 +161,26 @@ fun NavGraph(
                     onExecuteCommand = onExecuteDevCommand,
                     onImportSave = onImportSave,
                     onUpdateSettings = onUpdateSettings,
+                    onNavigate = { route -> navController.navigate(route) },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable("process_inspector") {
+                ProcessInspectorScreen(
+                    state = state,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable("achievements") {
+                AchievementsScreen(
+                    state = state,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.ChangelogViewer.route) {
+                MarkdownViewerScreen(
+                    assetFileName = "changelogs.md",
+                    title = "Changelog",
                     onBack = { navController.popBackStack() }
                 )
             }

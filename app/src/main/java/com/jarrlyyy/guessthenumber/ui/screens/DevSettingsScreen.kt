@@ -11,10 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,6 +36,7 @@ fun DevSettingsScreen(
     onExecuteCommand: (String) -> String,
     onImportSave: (String, (Boolean) -> Unit) -> Unit,
     onUpdateSettings: (GameSettings) -> Unit,
+    onNavigate: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -110,7 +108,20 @@ fun DevSettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Section 0: Log Storage Setting
+            // Section 0: Process Inspector Navigation Button
+            item {
+                Button(
+                    onClick = { onNavigate("process_inspector") },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Open Variable & Process Inspector", fontSize = 16.sp)
+                }
+            }
+
+            // Section 0.5: Log Storage Setting
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

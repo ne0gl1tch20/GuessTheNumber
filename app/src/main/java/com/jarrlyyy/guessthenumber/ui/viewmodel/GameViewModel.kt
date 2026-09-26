@@ -154,24 +154,37 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateBuyMultiplier(multiplier: String) {
+        _gameState.update { it.copy(buyMultiplier = multiplier) }
+        saveGameAsync()
+    }
+
     fun buyUpgrade(upgradeId: String, cost: BigNumber) {
         val state = _gameState.value
         if (state.money >= cost) {
             val currentLevel = state.upgradeLevels[upgradeId] ?: 0
+            val multCount = when (state.buyMultiplier) {
+                "10" -> 10
+                "100" -> 100
+                "MAX" -> 100
+                else -> 1
+            }
+            val newLevel = currentLevel + multCount
             val newLevels = state.upgradeLevels.toMutableMap()
-            newLevels[upgradeId] = currentLevel + 1
+            newLevels[upgradeId] = newLevel
             val newMoney = state.money - cost
             val newStats = state.statistics.copy(moneySpent = state.statistics.moneySpent + cost)
             _gameState.value = state.copy(money = newMoney, upgradeLevels = newLevels, statistics = newStats)
             saveGameAsync()
-            GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_UPGRADE", "Bought upgrade $upgradeId to level ${currentLevel + 1}")
+            GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_UPGRADE", "Bought upgrade $upgradeId to level $newLevel")
         }
     }
 
     fun prestigeReset() {
         val state = _gameState.value
-        val reward = gameEngine.calculatePrestigeReward(state.money)
-        if (reward > BigNumber.ZERO) {
+        val reward = gameEngine.calculatePrestigeReward(state.money, state.prestigeCount)
+        val requiredMoney = gameEngine.calculatePrestigeRequirement(state.prestigeCount)
+        if (state.money >= requiredMoney && reward > BigNumber.ZERO) {
             val newPrestige = state.prestige + reward
             val newStats = state.statistics.copy(prestigesCount = state.statistics.prestigesCount + 1)
             _gameState.value = state.copy(
@@ -180,17 +193,20 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 upgradeLevels = emptyMap(),
                 currentRangeMin = 1,
                 currentRangeMax = 100,
-                statistics = newStats
+                statistics = newStats,
+                prestigeCount = state.prestigeCount + 1
             )
             saveGameAsync()
-            GameLogger.log(LogLevel.INFO, LoggerCategory.PRESTIGE, "PRESTIGE_RESET", "Prestige reset performed, awarded $reward Prestige.")
+            GameLogger.log(LogLevel.INFO, LoggerCategory.PRESTIGE, "PRESTIGE_RESET", "Prestige reset performed (#${state.prestigeCount + 1}), awarded $reward Prestige.")
         }
     }
 
     fun ultraReset() {
         val state = _gameState.value
-        val reward = gameEngine.calculateUltraReward(state.money)
-        if (reward > BigNumber.ZERO) {
+        val reward = gameEngine.calculateUltraReward(state.money, state.ultraCount)
+        val requiredMoney = gameEngine.calculateUltraRequirement(state.ultraCount)
+        val canUltra = state.money >= requiredMoney && state.prestige >= BigNumber(1_000)
+        if (canUltra && reward > BigNumber.ZERO) {
             val newUltra = state.ultra + reward
             val newStats = state.statistics.copy(ultrasCount = state.statistics.ultrasCount + 1)
             _gameState.value = state.copy(
@@ -199,10 +215,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 ultra = newUltra,
                 upgradeLevels = emptyMap(),
                 prestigeUpgradeLevels = emptyMap(),
-                statistics = newStats
+                statistics = newStats,
+                ultraCount = state.ultraCount + 1
             )
             saveGameAsync()
-            GameLogger.log(LogLevel.INFO, LoggerCategory.ULTRA, "ULTRA_RESET", "Ultra reset performed, awarded $reward Ultra.")
+            GameLogger.log(LogLevel.INFO, LoggerCategory.ULTRA, "ULTRA_RESET", "Ultra reset performed (#${state.ultraCount + 1}), awarded $reward Ultra.")
         }
     }
 
@@ -339,13 +356,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun executeDevCommand(command: String): String {
         if (!BuildConfig.DEBUG) return "Developer commands are disabled in release builds."
-        var result = ""
-        _gameState.update { current ->
-            result = commandExecutor.execute(command, current) { updated ->
-                _gameState.value = updated
-                saveGameAsync()
-            }
-            _gameState.value
+        val current = _gameState.value
+        val result = commandExecutor.execute(command, current) { updated ->
+            _gameState.value = updated
+            saveGameAsync()
         }
         return result
     }

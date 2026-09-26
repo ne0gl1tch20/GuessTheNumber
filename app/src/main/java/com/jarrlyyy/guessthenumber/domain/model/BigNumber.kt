@@ -9,6 +9,7 @@ import kotlinx.serialization.encoding.Encoder
 import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode
+import java.util.Locale
 
 @Serializable(with = BigNumberSerializer::class)
 data class BigNumber(val value: BigDecimal) : Comparable<BigNumber> {
@@ -42,25 +43,39 @@ data class BigNumber(val value: BigDecimal) : Comparable<BigNumber> {
     fun min(other: BigNumber): BigNumber = if (this <= other) this else other
     fun floor(): BigNumber = BigNumber(this.value.setScale(0, RoundingMode.FLOOR))
 
-    fun format(): String {
+    fun format(notation: String = "Standard"): String {
         if (value.compareTo(BigDecimal.ZERO) == 0) return "0"
         if (value.compareTo(BigDecimal.ONE) < 0) {
             return value.setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
         }
         val exponent = value.precision() - value.scale() - 1
-        if (exponent < 3) {
-            return value.setScale(0, RoundingMode.HALF_UP).toPlainString()
-        }
-        val suffixIndex = exponent / 3
-        val remainder = exponent % 3
-        val divisor = BigDecimal.TEN.pow(exponent - remainder)
-        val scaled = value.divide(divisor, 2, RoundingMode.HALF_UP)
+        
+        when (notation) {
+            "Scientific" -> {
+                return String.format(Locale.US, "%.2e", value)
+            }
+            "Engineering" -> {
+                val engExp = (exponent / 3) * 3
+                val divisor = BigDecimal.TEN.pow(engExp)
+                val scaled = value.divide(divisor, 2, RoundingMode.HALF_UP)
+                return "${scaled.stripTrailingZeros().toPlainString()}e$engExp"
+            }
+            else -> {
+                if (exponent < 3) {
+                    return value.setScale(0, RoundingMode.HALF_UP).toPlainString()
+                }
+                val suffixIndex = exponent / 3
+                val remainder = exponent % 3
+                val divisor = BigDecimal.TEN.pow(exponent - remainder)
+                val scaled = value.divide(divisor, 2, RoundingMode.HALF_UP)
 
-        val suffix = getSuffix(suffixIndex)
-        return if (suffix != null) {
-            "${scaled.stripTrailingZeros().toPlainString()}$suffix"
-        } else {
-            String.format(java.util.Locale.US, "%.2e", value)
+                val suffix = getSuffix(suffixIndex)
+                return if (suffix != null) {
+                    "${scaled.stripTrailingZeros().toPlainString()}$suffix"
+                } else {
+                    String.format(Locale.US, "%.2e", value)
+                }
+            }
         }
     }
 

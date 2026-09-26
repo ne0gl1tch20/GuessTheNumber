@@ -30,8 +30,9 @@ fun PrestigeScreen(
 ) {
     val context = LocalContext.current
     val gameEngine = GameEngine()
-    val prestigeReward = gameEngine.calculatePrestigeReward(state.money)
-    val canPrestige = state.money >= BigNumber(50_000_000)
+    val requiredMoney = gameEngine.calculatePrestigeRequirement(state.prestigeCount)
+    val prestigeReward = gameEngine.calculatePrestigeReward(state.money, state.prestigeCount)
+    val canPrestige = state.money >= requiredMoney
 
     val upgrades = remember { JsonConfigRepository(context).loadPrestigeUpgrades() }
     val shopItems = remember { JsonConfigRepository(context).loadPrestigeShopItems() }
@@ -64,9 +65,11 @@ fun PrestigeScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Prestige Balance: ${state.prestige.format()}", color = PrestigeBlue, fontSize = 20.sp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Requirement: 50,000,000 Money")
+                        Text("Requirement: ${requiredMoney.format()} Money (Reset #${state.prestigeCount + 1})")
                         Text("Current Money: ${state.money.format()}")
                         Text("Preview Reward: +${prestigeReward.format()} Prestige")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("🔄 Reset Info: Resets all regular Money, Upgrade Levels, and resets guessing range back to 1-100. Each prestige increases the money requirement for the next prestige.", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.height(12.dp))
                         Button(
                             onClick = onPrestige,
@@ -74,7 +77,7 @@ fun PrestigeScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = PrestigeBlue),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(if (canPrestige) "Perform Prestige Reset" else "Need 50M Money to Prestige")
+                            Text(if (canPrestige) "Perform Prestige Reset" else "Need ${requiredMoney.format()} Money to Prestige")
                         }
                     }
                 }
