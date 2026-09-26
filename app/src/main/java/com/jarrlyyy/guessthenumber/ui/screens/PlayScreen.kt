@@ -63,10 +63,14 @@ fun PlayScreen(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Default.Star, contentDescription = "Money", tint = MoneyGold)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Money: ${state.money.format()}", color = MoneyGold, fontSize = 18.sp)
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Default.Star, contentDescription = "Money", tint = MoneyGold)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Money: ${state.money.format()}", color = MoneyGold, fontSize = 18.sp)
+                        }
+                        val baseIncome = if (state.autoClickerActive) (state.autoClickerSpeed * 500.0).toLong() else 0L
+                        Text("${baseIncome}/s", color = MoneyGold, fontSize = 14.sp, style = MaterialTheme.typography.bodyMedium)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

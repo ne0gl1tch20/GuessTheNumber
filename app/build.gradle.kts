@@ -8,14 +8,14 @@ plugins {
 
 android {
     namespace = "com.jarrlyyy.guessthenumber"
-    compileSdk = 34
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.jarrlyyy.guessthenumber"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 4
-        versionName = "1.4"
+        targetSdk = 35
+        versionCode = 5
+        versionName = "1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -75,6 +75,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation(libs.androidx.glance)
+    implementation(libs.androidx.glance.appwidget)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

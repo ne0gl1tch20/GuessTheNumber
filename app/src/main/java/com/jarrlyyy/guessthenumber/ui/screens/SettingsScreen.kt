@@ -79,17 +79,35 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Theme Appearance", style = MaterialTheme.typography.bodyLarge)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    var expanded by remember { mutableStateOf(false) }
+                    val themeOptions = listOf("System", "Dark", "Light", "AMOLED")
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        listOf("System", "Dark", "Light").forEach { mode ->
-                            FilterChip(
-                                selected = settings.themeMode == mode,
-                                onClick = { onUpdateSettings(settings.copy(themeMode = mode)) },
-                                label = { Text(mode) },
-                                modifier = Modifier.weight(1f)
-                            )
+                        OutlinedTextField(
+                            value = settings.themeMode,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            themeOptions.forEach { mode ->
+                                DropdownMenuItem(
+                                    text = { Text(mode) },
+                                    onClick = {
+                                        onUpdateSettings(settings.copy(themeMode = mode))
+                                        expanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -99,17 +117,35 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Number Notation", style = MaterialTheme.typography.bodyLarge)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    var expanded by remember { mutableStateOf(false) }
+                    val notationOptions = listOf("Standard", "Scientific", "Engineering")
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        listOf("Standard", "Scientific", "Engineering").forEach { notation ->
-                            FilterChip(
-                                selected = settings.numberNotation == notation,
-                                onClick = { onUpdateSettings(settings.copy(numberNotation = notation)) },
-                                label = { Text(notation) },
-                                modifier = Modifier.weight(1f)
-                            )
+                        OutlinedTextField(
+                            value = settings.numberNotation,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            notationOptions.forEach { notation ->
+                                DropdownMenuItem(
+                                    text = { Text(notation) },
+                                    onClick = {
+                                        onUpdateSettings(settings.copy(numberNotation = notation))
+                                        expanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -146,15 +182,36 @@ fun SettingsScreen(
             if (settings.notificationsEnabled) {
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Reminder Frequency: ${settings.notificationIntervalHours} Hours", style = MaterialTheme.typography.bodyMedium)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                            listOf(12L, 24L, 48L).forEach { hours ->
-                                FilterChip(
-                                    selected = settings.notificationIntervalHours == hours,
-                                    onClick = { onUpdateSettings(settings.copy(notificationIntervalHours = hours)) },
-                                    label = { Text("${hours}h") },
-                                    modifier = Modifier.weight(1f)
-                                )
+                        Text("Reminder Frequency", style = MaterialTheme.typography.bodyMedium)
+                        var expanded by remember { mutableStateOf(false) }
+                        val intervalOptions = listOf(12L, 24L, 48L)
+                        ExposedDropdownMenuBox(
+                            expanded = expanded,
+                            onExpandedChange = { expanded = it },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            OutlinedTextField(
+                                value = "${settings.notificationIntervalHours} Hours",
+                                onValueChange = {},
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                modifier = Modifier
+                                    .menuAnchor()
+                                    .fillMaxWidth()
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                intervalOptions.forEach { hours ->
+                                    DropdownMenuItem(
+                                        text = { Text("$hours Hours") },
+                                        onClick = {
+                                            onUpdateSettings(settings.copy(notificationIntervalHours = hours))
+                                            expanded = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }

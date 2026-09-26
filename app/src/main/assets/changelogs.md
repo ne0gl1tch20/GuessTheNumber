@@ -1,6 +1,17 @@
 # 🚀 Guess The Number Simulator - Changelog
 
-## v1.5 (Current Release)
+## v1.6 (Advanced Features Release)
+- ✨ **Settings Dropdowns & AMOLED Mode**: Converted theme appearance, number notation, and reminder frequency selector buttons into clean Material 3 dropdown menus, and added pure black AMOLED theme mode.
+- ✨ **Money Generation Rate Display**: Added live money generation rate (`/s`) indicator right below the money balance on the Play screen.
+- ✨ **Advanced Idle Automation & AI Guessing Bots**: Implemented autonomous background guessing bots with adjustable speed and auto-clicker optimization.
+- ✨ **Prestige Talent Web / Skill Tree**: Added interconnected Prestige talent nodes (`TalentScreen`) providing passive velocity, critical, and reward multipliers.
+- ✨ **Interactive Android Home Screen Widgets (Jetpack Glance)**: Implemented Glance-based app widgets (`GuessWidget`) supporting real-time currency display and quick-guess action triggers.
+- ✨ **Gameplay Mutators & Daily Seeded Challenges**: Added customizable difficulty mutators (Hardcore, Hyper Speed, Blindfolded) and daily seeded challenge claims.
+- ✨ **Combo Streaks & High-Stakes "Lucky Guess" Staking**: Added high-stakes 50/50 staking mode (`StakingScreen`) with streak multiplier bonuses.
+- ✨ **Save Export/Import & Cloud Backup UI**: Created a dedicated Cloud Backup and encrypted save transfer UI (`CloudBackupScreen`).
+- 🎨 **Polished M3 UI**: Ensured all advanced feature screens are scrollable, well-spaced, and free of clipping or cramping.
+
+## v1.5
 - ✨ **Smart Number Formatting**: Added support for Scientific, Engineering, Standard Short Scale, and Alpha Suffixes number notations in Settings.
 - ✨ **Quick-Buy Multipliers & Max-Buy**: Added `1x`, `10x`, `100x`, and `MAX` buy multipliers in UpgradeShop.
 - ✨ **Offline Progress & Summary Modal**: Enhanced offline earnings calculation and summary modal on app startup.

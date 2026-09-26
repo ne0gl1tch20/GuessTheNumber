@@ -3,9 +3,14 @@ package com.jarrlyyy.guessthenumber.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -57,27 +62,46 @@ fun UpgradeScreen(
                 }
             }
 
-            // Multiplier Selector Row
+            // Multiplier Selector Row (Dropdown)
             item {
+                var expanded by remember { mutableStateOf(false) }
+                val multipliers = listOf("1", "10", "100", "MAX")
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Buy Multiplier:", style = MaterialTheme.typography.titleMedium)
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier.wrapContentWidth()
+                    
+                    Box(
+                        modifier = Modifier.wrapContentSize(Alignment.TopEnd)
                     ) {
-                        listOf("1", "10", "100", "MAX").forEach { mult ->
-                            FilterChip(
-                                selected = state.buyMultiplier == mult,
-                                onClick = { onUpdateMultiplier(mult) },
-                                label = { Text(mult, fontSize = 10.sp) },
-                                modifier = Modifier
-                                    .defaultMinSize(minWidth = 28.dp)
-                                    .padding(horizontal = 0.dp)
+                        OutlinedButton(
+                            onClick = { expanded = true },
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text("${state.buyMultiplier}x", fontSize = 14.sp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = "Dropdown"
                             )
+                        }
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            multipliers.forEach { mult ->
+                                DropdownMenuItem(
+                                    text = { Text("$mult x", fontSize = 14.sp) },
+                                    onClick = {
+                                        onUpdateMultiplier(mult)
+                                        expanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
