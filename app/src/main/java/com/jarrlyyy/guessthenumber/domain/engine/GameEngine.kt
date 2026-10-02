@@ -21,14 +21,17 @@ data class GuessResult(
 class GameEngine(private val rng: Random = Random.Default) {
 
     fun processGuess(state: GameState, guess: Long): GuessResult {
+        // Validate target range bounds
+        val clampedGuess = guess.coerceIn(state.currentRangeMin, state.currentRangeMax)
         val feedback = when {
-            guess < state.targetNumber -> GuessFeedback.TOO_LOW
-            guess > state.targetNumber -> GuessFeedback.TOO_HIGH
+            clampedGuess < state.targetNumber -> GuessFeedback.TOO_LOW
+            clampedGuess > state.targetNumber -> GuessFeedback.TOO_HIGH
             else -> GuessFeedback.CORRECT
         }
 
         if (feedback == GuessFeedback.CORRECT) {
-            val isCrit = rng.nextDouble() < 0.05 // 5% critical chance
+            val critChance = 0.05 + ((state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0) * 0.01)
+            val isCrit = rng.nextDouble() < critChance
             val baseReward = BigNumber(100) * BigNumber(state.currentRangeMax)
             val streakMultiplier = BigNumber(1.0 + (state.streak * 0.1))
             val critMultiplier = if (isCrit) BigNumber(5) else BigNumber.ONE
@@ -37,7 +40,11 @@ class GameEngine(private val rng: Random = Random.Default) {
             val rewardMultiplierLevel = state.upgradeLevels["reward_multiplier"] ?: 0
             val upgradeMult = BigNumber(1.0 + (rewardMultiplierLevel * 0.25))
 
-            val calculatedReward = baseReward * streakMultiplier * critMultiplier * upgradeMult
+            // Talents & Mutators multiplier integration
+            val talentMult = if (state.shopPurchases.contains("talent_reward_1") || state.upgradeLevels.containsKey("talent_reward_1")) BigNumber(1.5) else BigNumber.ONE
+            val mutatorMult = if (state.shopPurchases.contains("mut_hardcore")) BigNumber(2.0) else BigNumber.ONE
+
+            val calculatedReward = baseReward * streakMultiplier * critMultiplier * upgradeMult * talentMult * mutatorMult
             val totalReward = maxOf(BigNumber(10), calculatedReward)
             val newMoney = state.money + totalReward
             val newStreak = state.streak + 1
@@ -70,11 +77,15 @@ class GameEngine(private val rng: Random = Random.Default) {
             return GuessResult(feedback, totalReward, isCrit, newStreak, updatedState)
         } else {
             val newAttempts = state.attempts + 1
+            val taxPenalty = if (state.shopPurchases.contains("mut_tax")) state.money * BigNumber(0.05) else BigNumber.ZERO
+            val newMoney = maxOf(BigNumber.ZERO, state.money - taxPenalty)
+
             val newStats = state.statistics.copy(
                 totalGuesses = state.statistics.totalGuesses + 1,
                 failedGuesses = state.statistics.failedGuesses + 1
             )
             val updatedState = state.copy(
+                money = newMoney,
                 attempts = newAttempts,
                 streak = 0,
                 statistics = newStats
@@ -84,14 +95,12 @@ class GameEngine(private val rng: Random = Random.Default) {
     }
 
     fun calculatePrestigeRequirement(prestigeCount: Long): BigNumber {
-        // Base requirement is 50M, increases by 2.5x per prestige reset
         val base = 50_000_000.0
         val multiplier = Math.pow(2.5, prestigeCount.toDouble())
         return BigNumber(base * multiplier)
     }
 
     fun calculateUltraRequirement(ultraCount: Long): BigNumber {
-        // Base requirement is 10B, increases by 5.0x per ultra reset
         val base = 10_000_000_000.0
         val multiplier = Math.pow(5.0, ultraCount.toDouble())
         return BigNumber(base * multiplier)
@@ -112,6 +121,19 @@ class GameEngine(private val rng: Random = Random.Default) {
         val u = log10(m / req) * 100.0
         val capped = minOf(u, 2000.0)
         return BigNumber(capped).floor()
+    }
+
+    fun claimChallenge(state: GameState, challengeId: String, rewardNebula: Long): Pair<GameState, Boolean> {
+        if (state.completedChallenges.contains(challengeId)) {
+            return Pair(state, false)
+        }
+        val newCompleted = state.completedChallenges + challengeId
+        val newNebula = state.nebula + BigNumber(rewardNebula)
+        val updated = state.copy(
+            completedChallenges = newCompleted,
+            nebula = newNebula
+        )
+        return Pair(updated, true)
     }
 
     @Deprecated("Legacy overload")

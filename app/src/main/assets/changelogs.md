@@ -1,6 +1,11 @@
 # 🚀 Guess The Number Simulator - Changelog
 
-## v1.6 (Advanced Features Release & Material Expressive Overhaul)
+## v1.7 (Security & Integrity Hardening Pass)
+- ✨ **Expressive Material 3 Detailed Statistics**: Redesigned the Stastistics Screen with Material Expressive design principles, featuring a prominent hero accuracy gauge card, financial metrics cards, active and best streak counters, reset metadata, session playtime duration, and icon-badged detail breakdown rows.
+- 🛡️ **Authoritative Game Engine & Save Integrity**: Overhauled `GameEngine`, `AntiCheatService`, and `SaveManager` to strictly validate and sanitize all game state operations, preventing negative currency exploits, invalid upgrade levels, and corrupted BigNumbers.
+- 🔒 **Robust Save Validation & Migration**: Implemented rigorous JSON validation rejecting tampered saves, impossible ranges, and corrupted timestamps.
+- ⏰ **Precise Anti-Time-Travel & Rate Limiting**: Added backward-clock tampering detection with a 24-hour penalty while supporting normal forward time synchronization and preventing rapid input abuse without disrupting automation.
+- 🧪 **Comprehensive Unit Test Suite**: Added comprehensive local unit tests covering guess resolution, reward calculations, criticals/streaks, upgrades, prestige/ultra, talents, mutators, challenge duplicate claims, save validation, and anti-time-travel.
 - 🛠️ **Performance Fixes**: Fixed app freeze and ANR when selecting the **MAX** buy multiplier with uncapped upgrades (such as Reward Multiplier) by optimizing affordable level and cost calculations.
 - ✨ **Material 3 Expressive & Organic Animations**: Overhauled the entire app UI with Google's Material Expressive design system, featuring organic spring-physics interactions, scale-down press effects, and smooth micro-animations.
 - ✨ **Uncramped Currency & Stats Dashboard**: Redesigned the Play screen header with spacious, dedicated surface bubble cards for Prestige, Ultra, and Nebula metrics.

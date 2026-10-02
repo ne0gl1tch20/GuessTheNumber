@@ -14,8 +14,8 @@ android {
         applicationId = "com.jarrlyyy.guessthenumber"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.6"
+        versionCode = 6
+        versionName = "1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.androidx.glance.appwidget)
 
     testImplementation(libs.junit)
+    testImplementation("org.robolectric:robolectric:4.11.1")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

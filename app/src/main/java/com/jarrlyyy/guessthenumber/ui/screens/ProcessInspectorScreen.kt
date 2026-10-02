@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -23,12 +25,13 @@ fun ProcessInspectorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Variable & Process Inspector") },
+                title = { Text("Variable & Process Inspector", style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
     ) { padding ->
@@ -40,59 +43,111 @@ fun ProcessInspectorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text("Active Background Processes & Loops", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text("Active Background Processes & Loops", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
 
             item {
-                Surface(
+                Card(
                     modifier = Modifier.fillMaxWidth(),
-                    color = Color(0xFF1E1E1E),
-                    shape = MaterialTheme.shapes.medium
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    elevation = CardDefaults.cardElevation(0.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        ProcessRow(name = "Auto-Clicker Loop", active = state.autoClickerActive, detail = "Speed: ${state.autoClickerSpeed} clicks/sec")
-                        ProcessRow(name = "Auto-Save Worker", active = true, detail = "Interval: Every 30 seconds")
-                        ProcessRow(name = "Playtime Timer", active = true, detail = "Elapsed: ${state.statistics.playtimeSeconds}s")
-                        ProcessRow(name = "WorkManager Notifications", active = state.settings.notificationsEnabled, detail = "Frequency: ${state.settings.notificationIntervalHours}h")
+                        ProcessCardRow(name = "Auto-Clicker Loop", active = state.autoClickerActive, detail = "Speed: ${state.autoClickerSpeed} clicks/sec", icon = Icons.Default.Autorenew)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                        ProcessCardRow(name = "Auto-Save Worker", active = true, detail = "Interval: Every 30 seconds", icon = Icons.Default.Save)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                        ProcessCardRow(name = "Playtime Timer", active = true, detail = "Elapsed: ${state.statistics.playtimeSeconds}s", icon = Icons.Default.Schedule)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                        ProcessCardRow(name = "WorkManager Notifications", active = state.settings.notificationsEnabled, detail = "Frequency: ${state.settings.notificationIntervalHours}h", icon = Icons.Default.Notifications)
                     }
                 }
             }
 
             item {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Runtime Game State Variables", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Complete Runtime Game State Variables", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
 
+            // Grouped Material 3 Variable Cards
             item {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color(0xFF1E1E1E),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        VariableRow(key = "Money", value = state.money.format())
-                        VariableRow(key = "Prestige", value = state.prestige.format())
-                        VariableRow(key = "Ultra", value = state.ultra.format())
-                        VariableRow(key = "Nebula", value = state.nebula.format())
-                        VariableRow(key = "Current Range", value = "${state.currentRangeMin} .. ${state.currentRangeMax}")
-                        VariableRow(key = "Target Number", value = state.targetNumber.toString())
-                        VariableRow(key = "Current Streak", value = state.streak.toString())
-                        VariableRow(key = "Best Streak", value = state.bestStreak.toString())
-                        VariableRow(key = "Buy Multiplier", value = state.buyMultiplier)
-                        VariableRow(key = "Number Notation", value = state.settings.numberNotation)
-                        VariableRow(key = "Theme Mode", value = state.settings.themeMode)
-                        VariableRow(key = "Sound Enabled", value = state.settings.soundEnabled.toString())
-                        VariableRow(key = "Vibration Enabled", value = state.settings.vibrationEnabled.toString())
-                        VariableRow(key = "Total Guesses", value = state.statistics.totalGuesses.toString())
-                        VariableRow(key = "Correct Guesses", value = state.statistics.correctGuesses.toString())
-                        VariableRow(key = "Prestiges Count", value = state.statistics.prestigesCount.toString())
-                        VariableRow(key = "Ultras Count", value = state.statistics.ultrasCount.toString())
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    // Currencies & Resets
+                    VariableGroupCard(title = "Currencies & Economy", icon = Icons.Default.MonetizationOn) {
+                        VariableRowItem(key = "Money", value = state.money.format())
+                        VariableRowItem(key = "Prestige", value = state.prestige.format())
+                        VariableRowItem(key = "Ultra", value = state.ultra.format())
+                        VariableRowItem(key = "Nebula", value = state.nebula.format())
+                        VariableRowItem(key = "Money Earned", value = state.statistics.moneyEarned.format())
+                        VariableRowItem(key = "Money Spent", value = state.statistics.moneySpent.format())
+                    }
+
+                    // Guessing Engine & Game State
+                    VariableGroupCard(title = "Guessing Engine & Ranges", icon = Icons.Default.Casino) {
+                        VariableRowItem(key = "Current Range Min", value = state.currentRangeMin.toString())
+                        VariableRowItem(key = "Current Range Max", value = state.currentRangeMax.toString())
+                        VariableRowItem(key = "Target Number", value = state.targetNumber.toString())
+                        VariableRowItem(key = "Total Attempts", value = state.attempts.toString())
+                        VariableRowItem(key = "Correct Guesses (State)", value = state.correctGuesses.toString())
+                        VariableRowItem(key = "Current Streak", value = state.streak.toString())
+                        VariableRowItem(key = "Best Streak", value = state.bestStreak.toString())
+                        VariableRowItem(key = "Buy Multiplier", value = state.buyMultiplier)
+                        VariableRowItem(key = "Auto-Clicker Active", value = state.autoClickerActive.toString())
+                        VariableRowItem(key = "Auto-Clicker Speed", value = "${state.autoClickerSpeed}")
+                        VariableRowItem(key = "Tutorial Completed", value = state.tutorialCompleted.toString())
+                    }
+
+                    // Statistics & Counts
+                    VariableGroupCard(title = "Statistics & Counters", icon = Icons.Default.Analytics) {
+                        VariableRowItem(key = "Total Guesses (Stats)", value = state.statistics.totalGuesses.toString())
+                        VariableRowItem(key = "Correct Guesses (Stats)", value = state.statistics.correctGuesses.toString())
+                        VariableRowItem(key = "Failed Guesses", value = state.statistics.failedGuesses.toString())
+                        VariableRowItem(key = "Prestiges Count", value = state.statistics.prestigesCount.toString())
+                        VariableRowItem(key = "Ultras Count", value = state.statistics.ultrasCount.toString())
+                        VariableRowItem(key = "Nebula Earned", value = state.statistics.nebulaEarned.toString())
+                        VariableRowItem(key = "Playtime Seconds", value = "${state.statistics.playtimeSeconds}s")
+                        VariableRowItem(key = "Arcade Played", value = "${state.statistics.arcadePlayed}")
+                        VariableRowItem(key = "Arcade Best Scores", value = state.statistics.arcadeBestScores.toString())
+                    }
+
+                    // Settings & Preferences
+                    VariableGroupCard(title = "Settings & Preferences", icon = Icons.Default.Settings) {
+                        VariableRowItem(key = "Music Enabled", value = state.settings.musicEnabled.toString())
+                        VariableRowItem(key = "Sound Enabled", value = state.settings.soundEnabled.toString())
+                        VariableRowItem(key = "Vibration Enabled", value = state.settings.vibrationEnabled.toString())
+                        VariableRowItem(key = "Notifications Enabled", value = state.settings.notificationsEnabled.toString())
+                        VariableRowItem(key = "Notification Interval", value = "${state.settings.notificationIntervalHours}h")
+                        VariableRowItem(key = "Theme Mode", value = state.settings.themeMode)
+                        VariableRowItem(key = "Number Notation", value = state.settings.numberNotation)
+                        VariableRowItem(key = "Reduced Motion", value = state.settings.reducedMotion.toString())
+                        VariableRowItem(key = "Volume Level", value = "${state.settings.volume}")
+                        VariableRowItem(key = "Reduce Flashes", value = state.settings.reduceFlashes.toString())
+                        VariableRowItem(key = "Save Logs to Storage", value = state.settings.saveLogsToStorage.toString())
+                        VariableRowItem(key = "Background Music Path", value = state.settings.backgroundMusicPath ?: "None")
+                    }
+
+                    // Collections & Maps
+                    VariableGroupCard(title = "Collections & Upgrades", icon = Icons.Default.Category) {
+                        VariableRowItem(key = "Upgrade Levels Count", value = "${state.upgradeLevels.size} items (${state.upgradeLevels})")
+                        VariableRowItem(key = "Prestige Upgrades Count", value = "${state.prestigeUpgradeLevels.size} items")
+                        VariableRowItem(key = "Ultra Upgrades Count", value = "${state.ultraUpgradeLevels.size} items")
+                        VariableRowItem(key = "Shop Purchases", value = "${state.shopPurchases.size} items")
+                        VariableRowItem(key = "Prestige Purchases", value = "${state.prestigeShopPurchases.size} items")
+                        VariableRowItem(key = "Ultra Purchases", value = "${state.ultraShopPurchases.size} items")
+                        VariableRowItem(key = "Achievements Unlocked", value = "${state.achievements.size} items")
+                        VariableRowItem(key = "Completed Challenges", value = "${state.completedChallenges.size} items")
+                    }
+
+                    // Meta Timestamps & Anti-Cheat
+                    VariableGroupCard(title = "Meta Timestamps & Anti-Cheat", icon = Icons.Default.Security) {
+                        VariableRowItem(key = "Last Save Timestamp", value = state.lastSaveTimestamp.toString())
+                        VariableRowItem(key = "Last Saved Version", value = state.lastSavedVersion)
+                        VariableRowItem(key = "Time Travel Penalty Until", value = state.timeTravelPenaltyUntil.toString())
+                        VariableRowItem(key = "Prestige Count (Root)", value = state.prestigeCount.toString())
+                        VariableRowItem(key = "Ultra Count (Root)", value = state.ultraCount.toString())
                     }
                 }
             }
@@ -101,32 +156,90 @@ fun ProcessInspectorScreen(
 }
 
 @Composable
-fun ProcessRow(name: String, active: Boolean, detail: String) {
+fun ProcessCardRow(name: String, active: Boolean, detail: String, icon: ImageVector) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
-            Text(name, color = Color(0xFF50FA7B), fontFamily = FontFamily.Monospace, fontSize = 13.sp)
-            Text(detail, color = Color(0xFF888888), fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f)
+        ) {
+            Surface(
+                shape = MaterialTheme.shapes.small,
+                color = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.size(36.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(imageVector = icon, contentDescription = null, tint = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
+                }
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
-        Text(
-            text = if (active) "[RUNNING]" else "[STOPPED]",
-            color = if (active) Color(0xFF50FA7B) else Color(0xFFFF5555),
-            fontFamily = FontFamily.Monospace,
-            fontSize = 12.sp
-        )
+        Surface(
+            shape = MaterialTheme.shapes.extraSmall,
+            color = if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.errorContainer
+        ) {
+            Text(
+                text = if (active) "RUNNING" else "STOPPED",
+                style = MaterialTheme.typography.labelMedium,
+                color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            )
+        }
     }
 }
 
 @Composable
-fun VariableRow(key: String, value: String) {
+fun VariableGroupCard(title: String, icon: ImageVector, content: @Composable ColumnScope.() -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(0.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            content()
+        }
+    }
+}
+
+@Composable
+fun VariableRowItem(key: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("$key:", color = Color(0xFF8BE9FD), fontFamily = FontFamily.Monospace, fontSize = 12.sp)
-        Text(value, color = Color(0xFFF8F8F2), fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+        Text(
+            text = key,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontFamily = FontFamily.Monospace
+        )
     }
 }
