@@ -7,24 +7,25 @@ An advanced, feature-rich incremental and arcade Android game built with **Jetpa
 ## 🚀 Key Features
 
 ### 1. **Core Gameplay & Incremental Mechanics**
-- **Number Guessing / Incremental Engine**: Earn points/currency by guessing numbers or progressing through incremental multipliers and automation.
-- **Upgrades & Progression**: Buy standard upgrades (`upgrades.json`), prestige upgrades (`prestige_upgrades.json`), and ultra upgrades (`ultra_upgrades.json`) via JSON configuration files.
-- **Prestige & Ultra Systems**: Reset or ascend through multiple layers of prestige to unlock powerful multipliers and custom shops.
-- **Achievements & Challenges**: Track milestones and complete specific challenges to earn rewards.
+- **Number Guessing / Incremental Engine**: Earn currency by guessing numbers, accelerated by fluid quick-buy multipliers (`1x`, `10x`, `100x`, `MAX`) and autonomous background guessing bots.
+- **Upgrades & Progression**: Buy standard upgrades (`upgrades.json`), prestige upgrades (`prestige_upgrades.json`), ultra upgrades (`ultra_upgrades.json`), and interconnected Prestige Talent Web skill nodes (`talents.json`) via JSON configuration files.
+- **Prestige & Ultra Systems**: Reset or ascend through multiple layers of prestige with scaling requirements and custom shops.
+- **Achievements & Challenges**: Track milestones, complete daily seeded challenges with Nebula rewards, and play high-stakes 50/50 staking mode (`StakingScreen`).
 - **Arcade Minigames**: Integrated side activities and minigames (`minigames.json`) to keep gameplay engaging.
 
 ### 2. **Architecture & Tech Stack**
-- **UI Toolkit**: 100% Jetpack Compose with Material 3 design and extended Material icons.
-- **Navigation**: Jetpack Navigation Compose (`NavGraph.kt`, `Screen.kt`).
-- **State Management**: Reactive state handling using `GameViewModel.kt`, Coroutines, and Flows, backed by a persistent `SaveManager.kt`.
+- **UI Toolkit**: 100% Jetpack Compose with Google's **Material 3 Expressive** design system, organic spring-physics micro-animations, and pure black AMOLED mode.
+- **Navigation**: Jetpack Navigation Compose (`NavGraph.kt`, `Screen.kt`) with smooth horizontal swiping between tabs.
+- **State Management**: Reactive state handling using `GameViewModel.kt`, Coroutines, and Flows, backed by a persistent `SaveManager.kt` supporting encrypted save export/import and cloud backup.
 - **Data & Configuration**: JSON-driven configuration repository (`JsonConfigRepository.kt`) for items, upgrades, achievements, and challenges.
-- **Custom Numeric Model**: Supports extremely large numbers using a robust custom `BigNumber` data model.
+- **Custom Numeric Model**: Supports extremely large numbers using a robust custom `BigNumber` data model with multiple number notations (Scientific, Engineering, Short Scale, Alpha Suffixes).
 
 ### 3. **Utilities & Advanced Systems**
-- **Anti-Cheat Service**: Protects game progression against unauthorized manipulation.
+- **Anti-Cheat & Time-Travel Protection**: Protects game progression against unauthorized manipulation and time cheating.
 - **Background Audio & Notifications**: Ambient background music manager and WorkManager-based notifications/reminders (`GameReminderWorker.kt`, `NotificationHelper.kt`).
 - **Crash Recovery & Logging**: Comprehensive in-app crash handler (`AppErrorHandler.kt`) and a custom game logger (`GameLogger.kt`) with dedicated inspection screens.
-- **Developer Tools**: Feature-packed developer console, settings, and process inspector for testing and debugging.
+- **Android Home Screen Widgets**: Glance-based app widgets (`GuessWidget`) supporting real-time currency display and quick-guess action triggers.
+- **Developer Tools**: Feature-packed developer console with dev commands (`/timeskip`, `/max_upgrades`, etc.), raw JSON save editor, and process inspector.
 
 ---
 
