@@ -1,0 +1,28 @@
+{
+  "mutators": [
+    {
+      "id": "mut_hardcore",
+      "name": "Hardcore Range",
+      "description": "Guessing range is doubled. Rewards ×2.",
+      "rewardMultiplier": 2.0
+    },
+    {
+      "id": "mut_speed",
+      "name": "Hyper Speed",
+      "description": "Auto-clicker speed ×3, but earnings halved.",
+      "rewardMultiplier": 1.5
+    },
+    {
+      "id": "mut_blind",
+      "name": "Blindfolded Oracle",
+      "description": "No lower/higher feedback indicators. Rewards ×5.",
+      "rewardMultiplier": 5.0
+    },
+    {
+      "id": "mut_tax",
+      "name": "Heavy Taxation",
+      "description": "Each wrong guess costs 5% of current money. Rewards ×10.",
+      "rewardMultiplier": 10.0
+    }
+  ]
+}

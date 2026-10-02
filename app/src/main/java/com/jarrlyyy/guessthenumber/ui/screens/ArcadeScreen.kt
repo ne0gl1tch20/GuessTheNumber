@@ -34,12 +34,13 @@ fun ArcadeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Arcade Minigames") },
+                title = { Text("Arcade Minigames • Expressive") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             )
         }
     ) { padding ->
@@ -48,16 +49,26 @@ fun ArcadeScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(minigames) { minigame ->
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(minigame.name, fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
-                        Text(minigame.description, fontSize = 14.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = { activeMinigame = minigame }) {
-                            Text("Play ${minigame.name}")
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text(minigame.name, fontSize = 20.sp, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(minigame.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = { activeMinigame = minigame },
+                            shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Play ${minigame.name}", style = MaterialTheme.typography.titleMedium)
                         }
                     }
                 }

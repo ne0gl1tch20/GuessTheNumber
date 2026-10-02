@@ -16,9 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.navigation.Screen
-import com.jarrlyyy.guessthenumber.ui.theme.PrestigeBlue
-import com.jarrlyyy.guessthenumber.ui.theme.UltraPurple
 import java.io.File
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +56,12 @@ fun MoreScreen(
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("More Hub & Navigation") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("More Hub", style = MaterialTheme.typography.titleMedium) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
+            )
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -67,54 +71,57 @@ fun MoreScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text("Reset Tiers & Hubs", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text("Reset Tiers & Hubs", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
 
             item {
                 Button(
                     onClick = { onNavigate("ultra") },
-                    colors = ButtonDefaults.buttonColors(containerColor = UltraPurple),
-                    modifier = Modifier.fillMaxWidth()
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer, contentColor = MaterialTheme.colorScheme.onTertiaryContainer),
+                    modifier = Modifier.fillMaxWidth().height(52.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Star, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Ultra Hub & Upgrades", fontSize = 16.sp)
+                    Text("Ultra Hub & Upgrades", style = MaterialTheme.typography.titleMedium)
                 }
             }
 
             item {
                 Button(
                     onClick = { onNavigate("prestige") },
-                    colors = ButtonDefaults.buttonColors(containerColor = PrestigeBlue),
-                    modifier = Modifier.fillMaxWidth()
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer),
+                    modifier = Modifier.fillMaxWidth().height(52.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Star, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Prestige Hub & Upgrades", fontSize = 16.sp)
+                    Text("Prestige Hub & Upgrades", style = MaterialTheme.typography.titleMedium)
                 }
             }
 
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Audio & Features", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text("Audio & Features", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
 
             item {
                 Button(
                     onClick = { showMusicDialog = true },
-                    modifier = Modifier.fillMaxWidth()
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.fillMaxWidth().height(52.dp)
                 ) {
                     Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Background Music Player", fontSize = 16.sp)
+                    Text("Background Music Player", style = MaterialTheme.typography.titleMedium)
                 }
             }
 
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("General Navigation", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text("General Navigation", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
 
             item {
@@ -122,6 +129,20 @@ fun MoreScreen(
                     Icon(imageVector = Icons.Default.EmojiEvents, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Achievements & Perks", fontSize = 16.sp)
+                }
+            }
+            item {
+                Button(onClick = { onNavigate("talent") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer)) {
+                    Icon(imageVector = Icons.Default.AccountTree, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Prestige Talent Web", fontSize = 16.sp)
+                }
+            }
+            item {
+                Button(onClick = { onNavigate("mutators") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer)) {
+                    Icon(imageVector = Icons.Default.Tune, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Mutators & Seeded Challenges", fontSize = 16.sp)
                 }
             }
             item {

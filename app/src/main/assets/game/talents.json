@@ -1,0 +1,46 @@
+{
+  "talents": [
+    {
+      "id": "talent_speed_1",
+      "name": "Velocity Boost I",
+      "description": "Increases Auto-Clicker speed by +25%",
+      "cost": 100,
+      "requiredParentId": null
+    },
+    {
+      "id": "talent_speed_2",
+      "name": "Velocity Boost II",
+      "description": "Increases Auto-Clicker speed by +50%",
+      "cost": 500,
+      "requiredParentId": "talent_speed_1"
+    },
+    {
+      "id": "talent_crit_1",
+      "name": "Critical Precision I",
+      "description": "Increases Critical Guess chance by +5%",
+      "cost": 250,
+      "requiredParentId": null
+    },
+    {
+      "id": "talent_crit_2",
+      "name": "Critical Precision II",
+      "description": "Increases Critical Guess chance by +15%",
+      "cost": 1000,
+      "requiredParentId": "talent_crit_1"
+    },
+    {
+      "id": "talent_reward_1",
+      "name": "Nebula Resonance",
+      "description": "Boosts all Money earnings by +50%",
+      "cost": 2500,
+      "requiredParentId": "talent_crit_2"
+    },
+    {
+      "id": "talent_master_1",
+      "name": "Omniscient Oracle",
+      "description": "Guarantees next guess hints and doubles prestige gains",
+      "cost": 10000,
+      "requiredParentId": "talent_reward_1"
+    }
+  ]
+}

@@ -26,6 +26,8 @@ data class GameState(
     val statistics: GameStatistics = GameStatistics(),
     val settings: GameSettings = GameSettings(),
     val lastSaveTimestamp: Long = System.currentTimeMillis(),
+    val lastSavedVersion: String = "1.5",
+    val timeTravelPenaltyUntil: Long = 0L,
     val autoClickerActive: Boolean = false,
     val autoClickerSpeed: Double = 1.0, // clicks per second
     val tutorialCompleted: Boolean = false,

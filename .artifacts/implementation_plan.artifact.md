@@ -1,51 +1,41 @@
-# Implementation Plan: New Advanced Features for Guess The Number
+# Implementation Plan - Advanced Game Logic & QoL Features
 
-This implementation plan covers the addition of six major feature sets to **Guess The Number**:
-1. Advanced Idle Automation & AI Guessing Bots
-2. Prestige Talent Web / Skill Tree
-3. Interactive Android Home Screen Widgets (Jetpack Glance)
-4. Gameplay Mutators & Daily Seeded Challenges
-5. Combo Streaks & High-Stakes "Lucky Guess" Staking
-6. Save Export/Import & Cloud Backup UI
+We will expand **Guess The Number** with deep progression mechanics, strategic gameplay depth, and powerful Quality of Life (QoL) features.
 
----
+## Proposed Features
+
+1. **Quick-Buy Multipliers & Max-Buy** (`1x`, `10x`, `100x`, `MAX`) in upgrade screens (`UpgradeScreen`, `PrestigeScreen`, `UltraScreen`).
+2. **Offline Earnings & Progress Modal** tracking time away, idle currency generated, and milestones reached upon app resume.
+3. **Save Export & Import (JSON / Base64)** in `SettingsScreen` and `SaveManager` for safe cross-device backup and restoration.
+4. **Prestige Skill Tree / Talent Web** allowing branching passive paths (Precision, Abundance, Fortune).
+5. **Daily Seeded Challenges & Mutators** providing daily competitive runs with unique rulesets (Blindfolded, Limited Fuel, Taxes).
+6. **Interactive Android Home Screen Widget** displaying current streak, active multipliers, and idle generation rate.
 
 ## Proposed Changes
 
-### 1. Advanced Idle Automation & AI Guessing Bots
-- **[MODIFY]** `app/src/main/assets/game/upgrades.json`: Add bot tiers and automation upgrade definitions.
-- **[MODIFY]** `app/src/main/java/com/jarrlyyy/guessthenumber/domain/model/GameState.kt`: Add AI bot level state and bot parameters.
-- **[MODIFY]** `app/src/main/java/com/jarrlyyy/guessthenumber/ui/viewmodel/GameViewModel.kt`: Implement automated binary search guessing loop when bot is active.
+### [Domain & Data Models]
+- **[NEW]** [TalentTree.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/domain/model/TalentTree.kt): Data structures for prestige talent nodes and unlock states.
+- **[NEW]** [ChallengeMode.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/domain/model/ChallengeMode.kt): Seeded daily challenge rules and mutators.
+- **[MODIFY]** [GameState.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/domain/model/GameState.kt): Add fields for offline timestamp, talent unlocks, buy multiplier preference, and challenge progress.
 
-### 2. Prestige Talent Web / Skill Tree
-- **[NEW]** `app/src/main/assets/game/talent_tree.json`: Define talent nodes (Path of Precision, Path of Abundance, Path of Fortune) and prerequisites.
-- **[MODIFY]** `app/src/main/java/com/jarrlyyy/guessthenumber/domain/model/GameState.kt`: Add unlocked talents map/set.
-- **[NEW]** `app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/TalentTreeScreen.kt`: Build interactive visual 2D skill tree screen.
-- **[MODIFY]** `app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/Screen.kt` & `NavGraph.kt`: Register talent tree screen route.
+### [Save & Offline Progression]
+- **[MODIFY]** [SaveManager.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/data/store/SaveManager.kt): Add export/import string logic and offline earnings calculation.
 
-### 3. Interactive Android Home Screen Widgets
-- **[NEW]** `app/src/main/java/com/jarrlyyy/guessthenumber/widget/GameWidget.kt`: Implement Jetpack Glance AppWidget provider and UI layout.
-- **[MODIFY]** `app/src/main/AndroidManifest.xml`: Register AppWidget receiver.
+### [UI & ViewModels]
+- **[MODIFY]** [GameViewModel.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/viewmodel/GameViewModel.kt): Handle buy multipliers (`1x`/`10x`/`MAX`), offline earnings summary state, talent tree spending, and challenge mode execution.
+- **[MODIFY]** [UpgradeScreen.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/UpgradeScreen.kt): Add multiplier toggle buttons.
+- **[NEW]** [TalentScreen.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/TalentScreen.kt): Interactive skill tree UI.
+- **[NEW]** [ChallengeScreen.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/ChallengeScreen.kt): Daily seeded challenge and mutators UI.
+- **[MODIFY]** [SettingsScreen.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/SettingsScreen.kt): Add Save Export/Import options.
 
-### 4. Gameplay Mutators & Daily Seeded Challenges
-- **[MODIFY]** `app/src/main/assets/game/challenges.json`: Add mutator definitions (Blindfolded, Limited Fuel, Daily Seeded Run).
-- **[MODIFY]** `app/src/main/java/com/jarrlyyy/guessthenumber/domain/model/GameState.kt`: Add challenge seed and active mutator state.
-- **[MODIFY]** `app/src/main/java/com/jarrlyyy/guessthenumber/domain/engine/GameEngine.kt` & `GameViewModel.kt`: Handle seeded PRNG and mutator rule checks (warmer/colder, guess limits).
-
-### 5. Combo Streaks & High-Stakes "Lucky Guess" Staking
-- **[MODIFY]** `app/src/main/java/com/jarrlyyy/guessthenumber/domain/model/GameState.kt`: Add staking toggle and multiplier streak tracking.
-- **[MODIFY]** `app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/PlayScreen.kt` & `GameViewModel.kt`: Add staking UI toggles and multiplier feedback logic.
-
-### 6. Save Export/Import & Cloud Backup UI
-- **[MODIFY]** `app/src/main/java/com/jarrlyyy/guessthenumber/data/store/SaveManager.kt`: Add export to Base64 JSON string and import validation methods.
-- **[MODIFY]** `app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/SettingsScreen.kt`: Add backup export/import dialogs and clipboard actions.
-
----
+### [Widgets]
+- **[NEW]** [GuessWidget.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/widget/GuessWidget.kt): Glance widget for streak and idle progress.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run unit tests (`gradlew test`) to verify game logic, save serialization, and binary search bot correctness.
+- Run Gradle build (`app:assembleDebug`) to verify compilation.
+- Unit tests for save export/import, offline earnings calculation, and buy multiplier cost formulas.
 
 ### Manual Verification
-- Deploy the app to check UI responsiveness, test talent tree node unlocks, verify widget updates, and test save export/import strings.
+- Deploy to device/emulator to test buy multipliers, export/import save backup, talent tree purchases, and offline earnings popup.

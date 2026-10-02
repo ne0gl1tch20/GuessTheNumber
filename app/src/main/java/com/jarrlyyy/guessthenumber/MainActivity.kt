@@ -31,6 +31,9 @@ class MainActivity : ComponentActivity() {
             val isLoadingSave by viewModel.isLoadingSave.collectAsState()
             val hasPreviousCrash by viewModel.hasPreviousCrash.collectAsState()
             val offlineGains by viewModel.offlineGains.collectAsState()
+            val showChangelogPopup by viewModel.showChangelogPopup.collectAsState()
+            val showTimeTravelPopup by viewModel.showTimeTravelPopup.collectAsState()
+            val timeTravelSeconds by viewModel.timeTravelSeconds.collectAsState()
             val isPlayingMusic by viewModel.isPlayingMusic.collectAsState()
 
             GuessTheNumberTheme(themeMode = state.settings.themeMode) {
@@ -82,6 +85,11 @@ class MainActivity : ComponentActivity() {
                         onDismissCrash = { viewModel.dismissCrash() },
                         offlineGains = offlineGains,
                         onDismissOfflineGains = { viewModel.dismissOfflineGains() },
+                        showChangelogPopup = showChangelogPopup,
+                        onDismissChangelog = { viewModel.dismissChangelogPopup() },
+                        showTimeTravelPopup = showTimeTravelPopup,
+                        timeTravelSeconds = timeTravelSeconds,
+                        onDismissTimeTravel = { viewModel.dismissTimeTravelPopup() },
                         onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) },
                         onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) }
                     )

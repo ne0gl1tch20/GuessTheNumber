@@ -1,15 +1,17 @@
 # 🚀 Guess The Number Simulator - Changelog
 
-## v1.6 (Advanced Features Release)
+## v1.6 (Advanced Features Release & Material Expressive Overhaul)
+- 🛠️ **Performance Fixes**: Fixed app freeze and ANR when selecting the **MAX** buy multiplier with uncapped upgrades (such as Reward Multiplier) by optimizing affordable level and cost calculations.
+- ✨ **Material 3 Expressive & Organic Animations**: Overhauled the entire app UI with Google's Material Expressive design system, featuring organic spring-physics interactions, scale-down press effects, and smooth micro-animations.
+- ✨ **Uncramped Currency & Stats Dashboard**: Redesigned the Play screen header with spacious, dedicated surface bubble cards for Prestige, Ultra, and Nebula metrics.
 - ✨ **Settings Dropdowns & AMOLED Mode**: Converted theme appearance, number notation, and reminder frequency selector buttons into clean Material 3 dropdown menus, and added pure black AMOLED theme mode.
 - ✨ **Money Generation Rate Display**: Added live money generation rate (`/s`) indicator right below the money balance on the Play screen.
 - ✨ **Advanced Idle Automation & AI Guessing Bots**: Implemented autonomous background guessing bots with adjustable speed and auto-clicker optimization.
-- ✨ **Prestige Talent Web / Skill Tree**: Added interconnected Prestige talent nodes (`TalentScreen`) providing passive velocity, critical, and reward multipliers.
+- ✨ **Prestige Talent Web & Mutators Polish**: Fixed UI rendering bugs (latex symbols fixed to clean multiplier icons like `×2`, `×3`, `×5`), added robust data-driven talent nodes (`talents.json`) with higher prestige costs, and fully integrated daily seeded challenges with Nebula rewards.
+- ✨ **Adaptive Max-Buy Upgrades**: Enhanced upgrade scaling to support fluid `1x`, `10x`, `100x`, and `MAX` calculations based on current currency and max level caps.
 - ✨ **Interactive Android Home Screen Widgets (Jetpack Glance)**: Implemented Glance-based app widgets (`GuessWidget`) supporting real-time currency display and quick-guess action triggers.
-- ✨ **Gameplay Mutators & Daily Seeded Challenges**: Added customizable difficulty mutators (Hardcore, Hyper Speed, Blindfolded) and daily seeded challenge claims.
 - ✨ **Combo Streaks & High-Stakes "Lucky Guess" Staking**: Added high-stakes 50/50 staking mode (`StakingScreen`) with streak multiplier bonuses.
 - ✨ **Save Export/Import & Cloud Backup UI**: Created a dedicated Cloud Backup and encrypted save transfer UI (`CloudBackupScreen`).
-- 🎨 **Polished M3 UI**: Ensured all advanced feature screens are scrollable, well-spaced, and free of clipping or cramping.
 
 ## v1.5
 - ✨ **Smart Number Formatting**: Added support for Scientific, Engineering, Standard Short Scale, and Alpha Suffixes number notations in Settings.

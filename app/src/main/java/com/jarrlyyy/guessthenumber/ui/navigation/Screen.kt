@@ -17,6 +17,8 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object Prestige : Screen("prestige", "Prestige", Icons.Default.Star)
     object Ultra : Screen("ultra", "Ultra", Icons.Default.Lock)
     object Achievements : Screen("achievements", "Achievements", Icons.Default.EmojiEvents)
+    object Talent : Screen("talent", "Talent Web", Icons.Default.AccountTree)
+    object Mutators : Screen("mutators", "Mutators", Icons.Default.Tune)
     object ProcessInspector : Screen("process_inspector", "Process Inspector", Icons.Default.Memory)
     object ChangelogViewer : Screen("changelog_viewer", "Changelog", Icons.Default.Info)
 }

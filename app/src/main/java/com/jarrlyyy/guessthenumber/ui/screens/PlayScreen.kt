@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -13,12 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
-import com.jarrlyyy.guessthenumber.ui.theme.NebulaPink
-import com.jarrlyyy.guessthenumber.ui.theme.PrestigeBlue
-import com.jarrlyyy.guessthenumber.ui.theme.UltraPurple
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,9 +29,9 @@ fun PlayScreen(
     val infiniteTransition = rememberInfiniteTransition(label = "moe_pulse")
     val scalePulse by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.03f,
+        targetValue = 1.02f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = FastOutSlowInEasing),
+            animation = tween(1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "pulse"
@@ -43,7 +40,8 @@ fun PlayScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Guess The Number Simulator") }
+                title = { Text("Guess The Number", style = MaterialTheme.typography.titleMedium) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
     ) { padding ->
@@ -51,99 +49,210 @@ fun PlayScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Currencies Header
-            Card(
+            // Material 3 Expressive Hero Card with Organic Pulsing
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .scale(scalePulse),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                shape = MaterialTheme.shapes.extraLarge,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                tonalElevation = 6.dp
             ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Default.Star, contentDescription = "Money", tint = MoneyGold)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Money: ${state.money.format()}", color = MoneyGold, fontSize = 18.sp)
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(imageVector = Icons.Default.Star, contentDescription = "Money", tint = MoneyGold, modifier = Modifier.size(28.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            AnimatedContent(targetState = state.money.format(), label = "MoneyAnimation") { moneyStr ->
+                                Text(
+                                    text = "Money: $moneyStr",
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                            }
                         }
                         val baseIncome = if (state.autoClickerActive) (state.autoClickerSpeed * 500.0).toLong() else 0L
-                        Text("${baseIncome}/s", color = MoneyGold, fontSize = 14.sp, style = MaterialTheme.typography.bodyMedium)
+                        Surface(
+                            shape = MaterialTheme.shapes.small,
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.25f),
+                            tonalElevation = 2.dp
+                        ) {
+                            Text(
+                                text = "+${baseIncome}/s",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                style = MaterialTheme.typography.labelMedium,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                            )
+                        }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Default.Star, contentDescription = "Prestige", tint = PrestigeBlue, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text("Prestige: ${state.prestige.format()}", color = PrestigeBlue, fontSize = 13.sp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Uncramped stats row with distinct distinct surface containers for Prestige, Ultra, and Nebula
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            shape = MaterialTheme.shapes.small,
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.25f)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Prestige",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = state.prestige.format(),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    maxLines = 1
+                                )
+                            }
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Default.Star, contentDescription = "Ultra", tint = UltraPurple, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text("Ultra: ${state.ultra.format()}", color = UltraPurple, fontSize = 13.sp)
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            shape = MaterialTheme.shapes.small,
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.25f)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Ultra",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = state.ultra.format(),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    maxLines = 1
+                                )
+                            }
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Default.Favorite, contentDescription = "Nebula", tint = NebulaPink, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text("Nebula: ${state.nebula.format()}", color = NebulaPink, fontSize = 13.sp)
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            shape = MaterialTheme.shapes.small,
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.25f)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Nebula",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = state.nebula.format(),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    maxLines = 1
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Game Play Area
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Range: ${state.currentRangeMin} - ${state.currentRangeMax}", fontSize = 20.sp, style = MaterialTheme.typography.titleMedium)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Streak: ${state.streak} (Best: ${state.bestStreak})", fontSize = 16.sp)
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = lastFeedback,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                OutlinedTextField(
-                    value = guessInput,
-                    onValueChange = { guessInput = it },
-                    label = { Text("Enter your guess") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    keyboardActions = KeyboardActions(onDone = {
-                        val g = guessInput.toLongOrNull()
-                        if (g != null) {
-                            onMakeGuess(g)
-                            lastFeedback = if (g < state.targetNumber) "📈 Too Low!" else if (g > state.targetNumber) "📉 Too High!" else "✨ Correct! Earned reward!"
-                            guessInput = ""
-                        }
-                    }),
-                    singleLine = true
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-                        val g = guessInput.toLongOrNull()
-                        if (g != null) {
-                            onMakeGuess(g)
-                            lastFeedback = if (g < state.targetNumber) "📈 Too Low!" else if (g > state.targetNumber) "📉 Too High!" else "✨ Correct! Earned reward!"
-                            guessInput = ""
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(0.6f)
+            // Google-style M3 Expressive Action Card Container
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                tonalElevation = 3.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("GUESS")
+                    Text(
+                        text = "Range: ${state.currentRangeMin} - ${state.currentRangeMax}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "Streak: ${state.streak} (Best: ${state.bestStreak})",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    AnimatedContent(targetState = lastFeedback, label = "FeedbackAnimation") { feedback ->
+                        Text(
+                            text = feedback,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = guessInput,
+                        onValueChange = { guessInput = it },
+                        label = { Text("Enter your guess") },
+                        shape = MaterialTheme.shapes.medium,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardActions = KeyboardActions(onDone = {
+                            val g = guessInput.toLongOrNull()
+                            if (g != null) {
+                                onMakeGuess(g)
+                                lastFeedback = if (g < state.targetNumber) "📈 Too Low!" else if (g > state.targetNumber) "📉 Too High!" else "✨ Correct! Earned reward!"
+                                guessInput = ""
+                            }
+                        }),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = {
+                            val g = guessInput.toLongOrNull()
+                            if (g != null) {
+                                onMakeGuess(g)
+                                lastFeedback = if (g < state.targetNumber) "📈 Too Low!" else if (g > state.targetNumber) "📉 Too High!" else "✨ Correct! Earned reward!"
+                                guessInput = ""
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = MaterialTheme.shapes.extraLarge,
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(imageVector = Icons.Default.Check, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("GUESS NUMBER", style = MaterialTheme.typography.titleMedium)
+                    }
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

@@ -23,7 +23,7 @@ class CommandExecutor {
         GameLogger.log(LogLevel.INFO, LoggerCategory.COMMAND, "EXEC_COMMAND", "Executing: $commandLine")
 
         return when (cmd) {
-            "/help" -> "Available commands:\n/give [money|prestige|ultra|nebula|all] <amount>\n/set [money|prestige|ultra|nebula] <amount>\n/reset [progression|prestige|ultra|all]\n/timeskip <seconds>\n/max_upgrades\n/unlock_all\n/win\n/speed <multiplier>\n/stats\n/matrix\n/konami\n/moneyprinter\n/easteregg\n/crash_test"
+            "/help" -> "Available commands:\n/give [money|prestige|ultra|nebula|all] <amount>\n/set [money|prestige|ultra|nebula] <amount>\n/reset [progression|prestige|ultra|all]\n/timeskip <seconds>\n/test antitimetravel\n/max_upgrades\n/unlock_all\n/win\n/speed <multiplier>\n/stats\n/matrix\n/konami\n/moneyprinter\n/easteregg\n/crash_test"
             
             "/give" -> {
                 if (args.size < 2) return "Usage: /give <currency> <amount>"
@@ -154,6 +154,23 @@ class CommandExecutor {
                 )
                 onStateUpdate(newState)
                 "Forced win! +10,000 Money awarded, streak is now $newStreak."
+            }
+
+            "/test" -> {
+                val sub = args.getOrNull(0)?.lowercase()
+                if (sub == "antitimetravel" || sub == "time_travel") {
+                    val fakePastSave = System.currentTimeMillis() + 86400000L // 24 hours in future
+                    val penaltyUntil = System.currentTimeMillis() + (24 * 60 * 60 * 1000L)
+                    val newState = currentState.copy(
+                        lastSaveTimestamp = fakePastSave,
+                        timeTravelPenaltyUntil = penaltyUntil,
+                        autoClickerActive = false
+                    )
+                    onStateUpdate(newState)
+                    "🧪 Anti-time travel simulated! Device clock is now set behind last save. 24-hour penalty applied."
+                } else {
+                    "Usage: /test antitimetravel"
+                }
             }
 
             "/speed", "/clickspeed" -> {

@@ -16,10 +16,12 @@ import com.jarrlyyy.guessthenumber.data.notification.GameReminderWorker
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
 import com.jarrlyyy.guessthenumber.domain.engine.AntiCheatService
+import com.jarrlyyy.guessthenumber.domain.engine.AntiTimeTravelService
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -52,6 +54,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val _offlineGains = MutableStateFlow<BigNumber?>(null)
     val offlineGains: StateFlow<BigNumber?> = _offlineGains.asStateFlow()
 
+    private val _showChangelogPopup = MutableStateFlow(false)
+    val showChangelogPopup: StateFlow<Boolean> = _showChangelogPopup.asStateFlow()
+
+    private val _showTimeTravelPopup = MutableStateFlow(false)
+    val showTimeTravelPopup: StateFlow<Boolean> = _showTimeTravelPopup.asStateFlow()
+    private val _timeTravelSeconds = MutableStateFlow(0L)
+    val timeTravelSeconds: StateFlow<Long> = _timeTravelSeconds.asStateFlow()
+
     private var autoClickerJob: Job? = null
     private var saveJob: Job? = null
     private var timerJob: Job? = null
@@ -70,33 +80,48 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val loaded = saveManager.loadGame()
             val sanitized = AntiCheatService.sanitizeCurrency(loaded)
-            val timeChecked = AntiCheatService.validateTimeJump(sanitized)
+            
+            // Check version change: if lastSavedVersion != current app versionName ("1.6"), show changelogs first before offline earnings
+            val currentVersion = BuildConfig.VERSION_NAME
+            val isNewVersion = sanitized.lastSavedVersion != currentVersion
 
-            val now = System.currentTimeMillis()
-            val deltaSeconds = (now - timeChecked.lastSaveTimestamp) / 1000
-            var finalState = timeChecked
+            // Check time travel & sudden forward/backward leaps via AntiTimeTravelService
+            val timeTravelCheck = AntiTimeTravelService.checkTimeTravel(sanitized)
+            val timeTravelDetected = timeTravelCheck.timeTravelDetected
+            val timeDiffSeconds = timeTravelCheck.timeDifferenceSeconds
 
-            if (deltaSeconds > 60 && timeChecked.autoClickerActive) {
+            var timeCheckedState = timeTravelCheck.updatedState.copy(
+                lastSavedVersion = currentVersion
+            )
+
+            val deltaSeconds = if (!timeTravelDetected) (System.currentTimeMillis() - sanitized.lastSaveTimestamp) / 1000L else 0L
+            var finalState = timeCheckedState
+
+            if (!timeTravelDetected && deltaSeconds > 60 && timeCheckedState.autoClickerActive) {
                 val maxOfflineSeconds = 28800L
                 val effectiveSeconds = minOf(deltaSeconds, maxOfflineSeconds)
                 val earningsPerSec = BigNumber(500)
                 val totalOfflineEarnings = earningsPerSec * BigNumber(effectiveSeconds.toDouble())
                 
-                finalState = timeChecked.copy(
-                    money = timeChecked.money + totalOfflineEarnings,
-                    lastSaveTimestamp = now
+                finalState = timeCheckedState.copy(
+                    money = timeCheckedState.money + totalOfflineEarnings
                 )
                 withContext(Dispatchers.Main) {
                     _offlineGains.value = totalOfflineEarnings
                 }
                 GameLogger.log(LogLevel.INFO, LoggerCategory.AUTOCLICKER, "OFFLINE_GAINS", "Earned $totalOfflineEarnings while offline for $effectiveSeconds seconds.")
-            } else {
-                finalState = timeChecked.copy(lastSaveTimestamp = now)
             }
 
             withContext(Dispatchers.Main) {
                 _gameState.value = finalState
                 _isLoadingSave.value = false
+                if (timeTravelDetected) {
+                    _showTimeTravelPopup.value = true
+                    _timeTravelSeconds.value = timeDiffSeconds
+                } else if (isNewVersion) {
+                    _showChangelogPopup.value = true
+                }
+
                 if (!finalState.settings.backgroundMusicPath.isNullOrEmpty()) {
                     backgroundMusicManager.setSourceAndPlay(null)
                 }
@@ -118,6 +143,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun dismissOfflineGains() {
         _offlineGains.value = null
+    }
+
+    fun dismissChangelogPopup() {
+        _showChangelogPopup.value = false
+    }
+
+    fun dismissTimeTravelPopup() {
+        _showTimeTravelPopup.value = false
     }
 
     fun makeGuess(guess: Long) {
@@ -163,13 +196,32 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val state = _gameState.value
         if (state.money >= cost) {
             val currentLevel = state.upgradeLevels[upgradeId] ?: 0
+            val upgradeDef = JsonConfigRepository(getApplication()).loadUpgrades().find { it.id == upgradeId }
+            val maxLevel = upgradeDef?.maxLevel ?: 999999
             val multCount = when (state.buyMultiplier) {
-                "10" -> 10
-                "100" -> 100
-                "MAX" -> 100
-                else -> 1
+                "10" -> minOf(10, maxLevel - currentLevel)
+                "100" -> minOf(100, maxLevel - currentLevel)
+                "MAX" -> {
+                    val base = BigNumber(upgradeDef?.baseCost ?: "100")
+                    val mult = BigNumber(upgradeDef?.costMultiplier ?: 1.5)
+                    var count = 0
+                    var totalCost = BigNumber.ZERO
+                    var currLevel = currentLevel
+                    while (currLevel < maxLevel) {
+                        val c = base * mult.pow(currLevel)
+                        if (state.money >= totalCost + c) {
+                            totalCost += c
+                            count++
+                            currLevel++
+                        } else {
+                            break
+                        }
+                    }
+                    maxOf(1, count)
+                }
+                else -> minOf(1, maxLevel - currentLevel)
             }
-            val newLevel = currentLevel + multCount
+            val newLevel = minOf(maxLevel, currentLevel + multCount)
             val newLevels = state.upgradeLevels.toMutableMap()
             newLevels[upgradeId] = newLevel
             val newMoney = state.money - cost

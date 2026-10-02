@@ -1,21 +1,18 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -32,32 +29,88 @@ fun UpgradeScreen(
     val upgrades = remember {
         JsonConfigRepository(context).loadUpgrades()
     }
+    
+    // Remember upgrade costs and affordability for all upgrade levels in state to avoid heavy recalculations during UI composition
+    val computedUpgradeCosts = remember(state.upgradeLevels, state.buyMultiplier, state.money) {
+        upgrades.associate { upgrade ->
+            val level = state.upgradeLevels[upgrade.id] ?: 0
+            val maxLevel = upgrade.maxLevel
+            val base = BigNumber(upgrade.baseCost)
+            val mult = BigNumber(upgrade.costMultiplier)
+            
+            val effectiveLevels = when (state.buyMultiplier) {
+                "10" -> minOf(10, maxLevel - level)
+                "100" -> minOf(100, maxLevel - level)
+                "MAX" -> {
+                    // Calculate how many levels we can afford with current money without freezing
+                    var count = 0
+                    var totalCost = BigNumber.ZERO
+                    var currentCurLevel = level
+                    while (currentCurLevel < maxLevel) {
+                        val cost = base * mult.pow(currentCurLevel)
+                        if (state.money >= totalCost + cost) {
+                            totalCost += cost
+                            count++
+                            currentCurLevel++
+                        } else {
+                            break
+                        }
+                    }
+                    if (count == 0 && level < maxLevel && state.money >= base * mult.pow(level)) {
+                        1
+                    } else {
+                        count
+                    }
+                }
+                else -> minOf(1, maxLevel - level)
+            }
+            
+            var totalCost = BigNumber.ZERO
+            val levelsToBuy = maxOf(1, effectiveLevels)
+            for (i in 0 until levelsToBuy) {
+                totalCost += base * mult.pow(level + i)
+            }
+            upgrade.id to totalCost
+        }
+    }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Upgrades") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Upgrades", style = MaterialTheme.typography.titleMedium) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
+            )
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Balance / Currency Header Card
+            // Material 3 Expressive Balance Header Card
             item {
-                Card(
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    tonalElevation = 6.dp
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(20.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Available Balance", style = MaterialTheme.typography.titleMedium)
-                        Text("${state.money.format()} Money", color = MoneyGold, fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                        Column {
+                            Text("Available Money", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            AnimatedContent(targetState = state.money.format(), label = "UpgradeMoneyAnimation") { moneyStr ->
+                                Text("$moneyStr Money", color = MoneyGold, style = MaterialTheme.typography.titleLarge)
+                            }
+                        }
+                        Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null, tint = MoneyGold, modifier = Modifier.size(32.dp))
                     }
                 }
             }
@@ -79,9 +132,10 @@ fun UpgradeScreen(
                     ) {
                         OutlinedButton(
                             onClick = { expanded = true },
+                            shape = MaterialTheme.shapes.medium,
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                         ) {
-                            Text("${state.buyMultiplier}x", fontSize = 14.sp)
+                            Text("${state.buyMultiplier}x", style = MaterialTheme.typography.labelLarge)
                             Spacer(modifier = Modifier.width(8.dp))
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
@@ -95,7 +149,7 @@ fun UpgradeScreen(
                         ) {
                             multipliers.forEach { mult ->
                                 DropdownMenuItem(
-                                    text = { Text("$mult x", fontSize = 14.sp) },
+                                    text = { Text("$mult x", style = MaterialTheme.typography.bodyMedium) },
                                     onClick = {
                                         onUpdateMultiplier(mult)
                                         expanded = false
@@ -109,30 +163,17 @@ fun UpgradeScreen(
                 HorizontalDivider()
             }
 
-            items(upgrades) { upgrade ->
+            items(upgrades, key = { it.id }) { upgrade ->
                 val level = state.upgradeLevels[upgrade.id] ?: 0
-                val multCount = when (state.buyMultiplier) {
-                    "10" -> 10
-                    "100" -> 100
-                    "MAX" -> 100
-                    else -> 1
-                }
-                val effectiveLevels = minOf(multCount, upgrade.maxLevel - level)
-                
-                // Calculate total cost for effectiveLevels
-                var totalCost = BigNumber.ZERO
-                var tempLevel = level
-                for (i in 0 until effectiveLevels) {
-                    totalCost += BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(tempLevel)
-                    tempLevel++
-                }
-                if (effectiveLevels <= 0) totalCost = BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(level)
-
+                val totalCost = computedUpgradeCosts[upgrade.id] ?: BigNumber.ZERO
                 val canAfford = state.money >= totalCost
 
-                Card(
+                // Material 3 Expressive Upgrade Card
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(4.dp)
+                    shape = MaterialTheme.shapes.large,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    tonalElevation = 2.dp
                 ) {
                     Row(
                         modifier = Modifier
@@ -143,21 +184,34 @@ fun UpgradeScreen(
                     ) {
                         val isMaxed = level >= upgrade.maxLevel
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(upgrade.name, fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
-                            Text(upgrade.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text("Level: $level / ${if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel}", fontSize = 12.sp)
-                            if (isMaxed) {
-                                Text("MAXED OUT", fontSize = 14.sp, color = MaterialTheme.colorScheme.secondary)
-                            } else {
-                                Text("Cost (${if (state.buyMultiplier == "MAX") "Max" else "${state.buyMultiplier}x"}): ${totalCost.format()}", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
+                            Text(upgrade.name, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(upgrade.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Surface(
+                                shape = MaterialTheme.shapes.extraSmall,
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                            ) {
+                                Text(
+                                    text = "Level: $level / ${if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel}",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                )
+                            }
+                            if (!isMaxed) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text("Cost (${state.buyMultiplier}x): ${totalCost.format()}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
+                        Spacer(modifier = Modifier.width(12.dp))
                         Button(
                             onClick = { onBuyUpgrade(upgrade.id, totalCost) },
-                            enabled = canAfford && !isMaxed
+                            enabled = canAfford && !isMaxed,
+                            shape = MaterialTheme.shapes.medium,
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
-                            Text(if (isMaxed) "MAX" else "Buy")
+                            Text(if (isMaxed) "MAX" else "Buy", style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }

@@ -87,7 +87,7 @@ fun UltraScreen(
                 Text("Ultra Upgrade Tree (JSON Driven)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
 
-            items(upgrades) { upgrade ->
+            items(upgrades, key = { it.id }) { upgrade ->
                 val level = state.ultraUpgradeLevels[upgrade.id] ?: 0
                 val cost = BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(level)
                 val canAfford = state.ultra >= cost
@@ -124,7 +124,7 @@ fun UltraScreen(
                 Text("Ultra Shop (JSON Driven)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
 
-            items(shopItems) { item ->
+            items(shopItems, key = { it.id }) { item ->
                 val purchased = state.ultraShopPurchases.contains(item.id)
                 val canAfford = state.ultra >= BigNumber(item.cost)
 

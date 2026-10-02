@@ -32,10 +32,12 @@ fun TalentScreen(
     onBack: () -> Unit
 ) {
     val talents = listOf(
-        TalentNode("talent_speed_1", "Velocity Boost", "Increases Auto-Clicker speed by +25%", 10),
-        TalentNode("talent_crit_1", "Critical Precision", "Increases Critical Guess chance by +5%", 25, "talent_speed_1"),
-        TalentNode("talent_reward_1", "Nebula Resonance", "Boosts all Money earnings by +50%", 50, "talent_crit_1"),
-        TalentNode("talent_master_1", "Omniscient Oracle", "Guarantees next guess hints", 100, "talent_reward_1")
+        TalentNode("talent_speed_1", "Velocity Boost I", "Increases Auto-Clicker speed by +25%", 100),
+        TalentNode("talent_speed_2", "Velocity Boost II", "Increases Auto-Clicker speed by +50%", 500, "talent_speed_1"),
+        TalentNode("talent_crit_1", "Critical Precision I", "Increases Critical Guess chance by +5%", 250),
+        TalentNode("talent_crit_2", "Critical Precision II", "Increases Critical Guess chance by +15%", 1000, "talent_crit_1"),
+        TalentNode("talent_reward_1", "Nebula Resonance", "Boosts all Money earnings by +50%", 2500, "talent_crit_2"),
+        TalentNode("talent_master_1", "Omniscient Oracle", "Guarantees next guess hints and doubles prestige gains", 10000, "talent_reward_1")
     )
 
     Scaffold(

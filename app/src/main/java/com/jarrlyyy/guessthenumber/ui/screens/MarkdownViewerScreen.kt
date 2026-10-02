@@ -11,37 +11,71 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@Composable
 fun parseMarkdownInline(text: String): AnnotatedString {
-    return buildAnnotatedString {
-        val regex = Regex("\\*\\*(.*?)\\*\\*|\\*(.*?)\\*")
-        var lastIndex = 0
-        val matchResults = regex.findAll(text)
-        for (match in matchResults) {
-            val range = match.range
-            if (range.first > lastIndex) {
-                append(text.substring(lastIndex, range.first))
-            }
-            val boldText = match.groups[1]?.value
-            val italicText = match.groups[2]?.value
-            if (boldText != null) {
-                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append(boldText)
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val secondaryColor = MaterialTheme.colorScheme.secondary
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+
+    return remember(text, primaryColor, secondaryColor, onSurfaceColor) {
+        buildAnnotatedString {
+            val regex = Regex("(\\*\\*(.*?)\\*\\*|__(.*?)__|\\*(.*?)\\*|_(.*?)_|`(.*?)`|\\$(.*?)\\$)")
+            var lastIndex = 0
+            val matchResults = regex.findAll(text)
+            for (match in matchResults) {
+                val range = match.range
+                if (range.first > lastIndex) {
+                    append(text.substring(lastIndex, range.first))
                 }
-            } else if (italicText != null) {
-                withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                    append(italicText)
+                val boldAsterisk = match.groups[2]?.value
+                val boldUnderscore = match.groups[3]?.value
+                val italicAsterisk = match.groups[4]?.value
+                val italicUnderscore = match.groups[5]?.value
+                val inlineCode = match.groups[6]?.value
+                val latexMath = match.groups[7]?.value
+
+                val boldText = boldAsterisk ?: boldUnderscore
+                val italicText = italicAsterisk ?: italicUnderscore
+
+                if (boldText != null) {
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = onSurfaceColor)) {
+                        append(boldText)
+                    }
+                } else if (italicText != null) {
+                    withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = onSurfaceColor)) {
+                        append(italicText)
+                    }
+                } else if (inlineCode != null) {
+                    withStyle(SpanStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp, color = primaryColor)) {
+                        append(inlineCode)
+                    }
+                } else if (latexMath != null) {
+                    val formattedMath = latexMath
+                        .replace("\\times", "×")
+                        .replace("\\cdot", "·")
+                        .replace("\\to", "→")
+                        .replace("\\div", "÷")
+                        .replace("\\pm", "±")
+                        .replace("\\leq", "≤")
+                        .replace("\\geq", "≥")
+                    withStyle(SpanStyle(fontStyle = FontStyle.Italic, fontWeight = FontWeight.Medium, color = secondaryColor)) {
+                        append(formattedMath)
+                    }
+                } else {
+                    append(match.value)
                 }
+                lastIndex = range.last + 1
             }
-            lastIndex = range.last + 1
-        }
-        if (lastIndex < text.length) {
-            append(text.substring(lastIndex))
+            if (lastIndex < text.length) {
+                append(text.substring(lastIndex))
+            }
         }
     }
 }
@@ -85,7 +119,7 @@ fun MarkdownViewerScreen(
             val lines = markdownText.lines()
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(lines.size) { index ->
                     val line = lines[index]
@@ -95,7 +129,7 @@ fun MarkdownViewerScreen(
                             Text(
                                 text = parseMarkdownInline(trimmed.removePrefix("# ")),
                                 style = MaterialTheme.typography.titleLarge,
-                                fontSize = 20.sp,
+                                fontSize = 22.sp,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -103,7 +137,7 @@ fun MarkdownViewerScreen(
                             Text(
                                 text = parseMarkdownInline(trimmed.removePrefix("## ")),
                                 style = MaterialTheme.typography.titleMedium,
-                                fontSize = 16.sp,
+                                fontSize = 18.sp,
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
@@ -111,20 +145,21 @@ fun MarkdownViewerScreen(
                             Text(
                                 text = parseMarkdownInline(trimmed.removePrefix("### ")),
                                 style = MaterialTheme.typography.titleSmall,
-                                fontSize = 14.sp,
+                                fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.tertiary
                             )
                         }
                         trimmed.startsWith("- ") || trimmed.startsWith("* ") -> {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text("•", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
+                                Text("•", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                                 Text(
                                     text = parseMarkdownInline(trimmed.removePrefix("- ").removePrefix("* ")),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    fontSize = 14.sp
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -135,9 +170,11 @@ fun MarkdownViewerScreen(
                             Text(
                                 text = parseMarkdownInline(trimmed),
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontSize = 14.sp
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
+                        
                     }
                 }
             }

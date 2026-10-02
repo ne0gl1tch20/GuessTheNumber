@@ -88,7 +88,7 @@ fun PrestigeScreen(
                 Text("Prestige Upgrade Tree (JSON Driven)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
 
-            items(upgrades) { upgrade ->
+            items(upgrades, key = { it.id }) { upgrade ->
                 val level = state.prestigeUpgradeLevels[upgrade.id] ?: 0
                 val cost = BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(level)
                 val canAfford = state.prestige >= cost
@@ -125,7 +125,7 @@ fun PrestigeScreen(
                 Text("Prestige Shop (JSON Driven)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
 
-            items(shopItems) { item ->
+            items(shopItems, key = { it.id }) { item ->
                 val purchased = state.prestigeShopPurchases.contains(item.id)
                 val canAfford = state.prestige >= BigNumber(item.cost)
 

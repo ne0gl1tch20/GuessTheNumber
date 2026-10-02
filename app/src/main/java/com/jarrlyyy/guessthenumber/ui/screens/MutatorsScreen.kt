@@ -38,9 +38,9 @@ fun MutatorsScreen(
     onBack: () -> Unit
 ) {
     val mutators = listOf(
-        MutatorDef("mut_hardcore", "Hardcore Range", "Guessing range is doubled. Rewards $\\times 2$.", 2.0),
-        MutatorDef("mut_speed", "Hyper Speed", "Auto-clicker speed $\\times 3$, but earnings halved.", 1.5),
-        MutatorDef("mut_blind", "Blindfolded Oracle", "No lower/higher feedback indicators. Rewards $\\times 5$.", 5.0)
+        MutatorDef("mut_hardcore", "Hardcore Range", "Guessing range is doubled. Rewards ×2.", 2.0),
+        MutatorDef("mut_speed", "Hyper Speed", "Auto-clicker speed ×3, but earnings halved.", 1.5),
+        MutatorDef("mut_blind", "Blindfolded Oracle", "No lower/higher feedback indicators. Rewards ×5.", 5.0)
     )
 
     val challenges = listOf(
