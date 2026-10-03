@@ -207,37 +207,47 @@ fun ReactionTestDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Uni
 
 @Composable
 fun LuckyNumberDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit) {
-    var chosen by remember { mutableStateOf(false) }
+    var chosenBox by remember { mutableStateOf<Int?>(null) }
+    val winningBox = remember { Random.nextInt(1, 4) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Lucky Number Box") },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                if (!chosen) {
-                    Text("Choose one of three mystery boxes:", fontSize = 16.sp)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (chosenBox == null) {
+                    Text("Choose one of three mystery boxes to find the jackpot Nebula prize:", fontSize = 16.sp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally), modifier = Modifier.fillMaxWidth()) {
                         for (i in 1..3) {
-                            Button(onClick = {
-                                chosen = true
-                            }) {
-                                Text("Box $i")
+                            Button(
+                                onClick = {
+                                    chosenBox = i
+                                },
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+                            ) {
+                                Text("Box $i", fontSize = 16.sp)
                             }
                         }
                     }
                 } else {
-                    Text("You opened the box and won 1 Nebula!", fontSize = 18.sp)
+                    if (chosenBox == winningBox) {
+                        Text("🎉 Jackpot! Box $chosenBox was the lucky box! Won 1 Nebula & 5,000 Money!", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+                    } else {
+                        Text("❌ Box $chosenBox was empty! The winning box was Box $winningBox. Better luck next time!", fontSize = 16.sp, color = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         },
         confirmButton = {
-            if (chosen) {
+            if (chosenBox != null) {
                 Button(onClick = {
-                    onReward(1L, BigNumber(5000))
+                    if (chosenBox == winningBox) {
+                        onReward(1L, BigNumber(5000))
+                    }
                     onDismiss()
                 }) {
-                    Text("Collect")
+                    Text(if (chosenBox == winningBox) "Claim Reward" else "Close")
                 }
             }
         }

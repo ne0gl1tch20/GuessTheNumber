@@ -131,14 +131,14 @@ fun ProcessInspectorScreen(
 
                     // Collections & Maps
                     VariableGroupCard(title = "Collections & Upgrades", icon = Icons.Default.Category) {
-                        VariableRowItem(key = "Upgrade Levels Count", value = "${state.upgradeLevels.size} items (${state.upgradeLevels})")
-                        VariableRowItem(key = "Prestige Upgrades Count", value = "${state.prestigeUpgradeLevels.size} items")
-                        VariableRowItem(key = "Ultra Upgrades Count", value = "${state.ultraUpgradeLevels.size} items")
-                        VariableRowItem(key = "Shop Purchases", value = "${state.shopPurchases.size} items")
-                        VariableRowItem(key = "Prestige Purchases", value = "${state.prestigeShopPurchases.size} items")
-                        VariableRowItem(key = "Ultra Purchases", value = "${state.ultraShopPurchases.size} items")
-                        VariableRowItem(key = "Achievements Unlocked", value = "${state.achievements.size} items")
-                        VariableRowItem(key = "Completed Challenges", value = "${state.completedChallenges.size} items")
+                        VariableRowItem(key = "Upgrade Levels Count", value = "${state.upgradeLevels.size} items\n${state.upgradeLevels.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }}")
+                        VariableRowItem(key = "Prestige Upgrades Count", value = "${state.prestigeUpgradeLevels.size} items\n${state.prestigeUpgradeLevels.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }}")
+                        VariableRowItem(key = "Ultra Upgrades Count", value = "${state.ultraUpgradeLevels.size} items\n${state.ultraUpgradeLevels.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }}")
+                        VariableRowItem(key = "Shop Purchases", value = "${state.shopPurchases.size} items\n${state.shopPurchases}")
+                        VariableRowItem(key = "Prestige Purchases", value = "${state.prestigeShopPurchases.size} items\n${state.prestigeShopPurchases}")
+                        VariableRowItem(key = "Ultra Purchases", value = "${state.ultraShopPurchases.size} items\n${state.ultraShopPurchases}")
+                        VariableRowItem(key = "Achievements Unlocked", value = "${state.achievements.size} items\n${state.achievements}")
+                        VariableRowItem(key = "Completed Challenges", value = "${state.completedChallenges.size} items\n${state.completedChallenges}")
                     }
 
                     // Meta Timestamps & Anti-Cheat
@@ -223,20 +223,18 @@ fun VariableGroupCard(title: String, icon: ImageVector, content: @Composable Col
 
 @Composable
 fun VariableRowItem(key: String, value: String) {
-    Row(
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
             text = key,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface,
             fontFamily = FontFamily.Monospace

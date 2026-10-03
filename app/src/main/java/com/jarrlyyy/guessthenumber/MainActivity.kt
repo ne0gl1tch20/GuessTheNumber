@@ -91,7 +91,9 @@ class MainActivity : ComponentActivity() {
                         timeTravelSeconds = timeTravelSeconds,
                         onDismissTimeTravel = { viewModel.dismissTimeTravelPopup() },
                         onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) },
-                        onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) }
+                        onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) },
+                        onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
+                        viewModel = viewModel
                     )
                 }
             }

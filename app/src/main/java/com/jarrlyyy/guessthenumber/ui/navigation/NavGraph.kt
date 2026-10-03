@@ -16,6 +16,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.screens.*
+import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 
 
 @Composable
@@ -51,7 +52,9 @@ fun NavGraph(
     timeTravelSeconds: Long,
     onDismissTimeTravel: () -> Unit,
     onEarnMinigameReward: (Long, BigNumber) -> Unit,
-    onUpdateMultiplier: (String) -> Unit
+    onUpdateMultiplier: (String) -> Unit,
+    onClaimLiveOpsEventReward: (String) -> Unit,
+    viewModel: GameViewModel
 ) {
     if (!state.tutorialCompleted) {
         TutorialScreen(onComplete = onCompleteTutorial)
@@ -83,8 +86,8 @@ fun NavGraph(
     } else if (showChangelogPopup) {
         AlertDialog(
             onDismissRequest = onDismissChangelog,
-            title = { Text("🚀 What's New in v1.6!") },
-            text = { Text("A new version of Guess The Number is installed! Check out the changelog for details on widgets, anti-time-travel, and advanced features.") },
+            title = { Text("🚀 What's New in v1.8!") },
+            text = { Text("A new version of Guess The Number is installed! Check out the changelog for details on 3 Save Slots and updates.") },
             confirmButton = {
                 Button(onClick = {
                     onDismissChangelog()
@@ -215,6 +218,12 @@ fun NavGraph(
                     onBack = { navController.popBackStack() }
                 )
             }
+            composable(Screen.SaveSlots.route) {
+                SaveSlotsScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
             composable("process_inspector") {
                 ProcessInspectorScreen(
                     state = state,
@@ -224,6 +233,13 @@ fun NavGraph(
             composable("achievements") {
                 AchievementsScreen(
                     state = state,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable("live_ops") {
+                LiveOpsScreen(
+                    state = state,
+                    onClaimReward = onClaimLiveOpsEventReward,
                     onBack = { navController.popBackStack() }
                 )
             }

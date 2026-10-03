@@ -14,6 +14,7 @@ import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.data.notification.GameReminderWorker
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
+import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
 import com.jarrlyyy.guessthenumber.domain.engine.AntiCheatService
 import com.jarrlyyy.guessthenumber.domain.engine.AntiTimeTravelService
@@ -62,6 +63,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val _timeTravelSeconds = MutableStateFlow(0L)
     val timeTravelSeconds: StateFlow<Long> = _timeTravelSeconds.asStateFlow()
 
+    private val _activeSlot = MutableStateFlow(1)
+    val activeSlot: StateFlow<Int> = _activeSlot.asStateFlow()
+
+    private val _hasLegacySave = MutableStateFlow(false)
+    val hasLegacySave: StateFlow<Boolean> = _hasLegacySave.asStateFlow()
+
     private var autoClickerJob: Job? = null
     private var saveJob: Job? = null
     private var timerJob: Job? = null
@@ -76,16 +83,25 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         startAutoClicker()
     }
 
-    private fun loadGame() {
+    fun loadGame(slot: Int = -1) {
         viewModelScope.launch(Dispatchers.IO) {
-            val loaded = saveManager.loadGame()
+            val targetSlot = if (slot in 1..3) slot else saveManager.getActiveSlot()
+            saveManager.setActiveSlot(targetSlot)
+            _activeSlot.value = targetSlot
+
+            val legacyCheck = saveManager.hasLegacySave()
+            if (legacyCheck) {
+                withContext(Dispatchers.Main) {
+                    _hasLegacySave.value = true
+                }
+            }
+
+            val loaded = saveManager.loadGame(targetSlot)
             val sanitized = AntiCheatService.sanitizeCurrency(loaded)
             
-            // Check version change: if lastSavedVersion != current app versionName ("1.6"), show changelogs first before offline earnings
             val currentVersion = BuildConfig.VERSION_NAME
             val isNewVersion = sanitized.lastSavedVersion != currentVersion
 
-            // Check time travel & sudden forward/backward leaps via AntiTimeTravelService
             val timeTravelCheck = AntiTimeTravelService.checkTimeTravel(sanitized)
             val timeTravelDetected = timeTravelCheck.timeTravelDetected
             val timeDiffSeconds = timeTravelCheck.timeDifferenceSeconds
@@ -109,7 +125,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 withContext(Dispatchers.Main) {
                     _offlineGains.value = totalOfflineEarnings
                 }
-                GameLogger.log(LogLevel.INFO, LoggerCategory.AUTOCLICKER, "OFFLINE_GAINS", "Earned $totalOfflineEarnings while offline for $effectiveSeconds seconds.")
+                GameLogger.log(LogLevel.INFO, LoggerCategory.AUTOCLICKER, "OFFLINE_GAINS", "Earned $totalOfflineEarnings while offline for $effectiveSeconds seconds in slot $targetSlot.")
             }
 
             withContext(Dispatchers.Main) {
@@ -118,39 +134,48 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 if (timeTravelDetected) {
                     _showTimeTravelPopup.value = true
                     _timeTravelSeconds.value = timeDiffSeconds
-                } else if (isNewVersion) {
-                    _showChangelogPopup.value = true
                 }
-
-                if (!finalState.settings.backgroundMusicPath.isNullOrEmpty()) {
-                    backgroundMusicManager.setSourceAndPlay(null)
+                if (isNewVersion && !timeTravelDetected) {
+                    _showChangelogPopup.value = true
                 }
             }
         }
     }
 
-    fun playBackgroundMusic() {
-        backgroundMusicManager.play()
+    suspend fun getSlotMetadata(slot: Int): SaveSlotMetadata {
+        return withContext(Dispatchers.IO) {
+            saveManager.getSlotMetadata(slot)
+        }
     }
 
-    fun pauseBackgroundMusic() {
-        backgroundMusicManager.pause()
+    fun switchSlot(slot: Int) {
+        if (slot in 1..3 && slot != _activeSlot.value) {
+            viewModelScope.launch(Dispatchers.IO) {
+                saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
+                loadGame(slot)
+            }
+        }
     }
 
-    fun stopBackgroundMusic() {
-        backgroundMusicManager.stop()
+    fun migrateLegacySave() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = saveManager.migrateLegacySaveToSlot1()
+            if (success) {
+                withContext(Dispatchers.Main) {
+                    _hasLegacySave.value = false
+                }
+                loadGame(1)
+            }
+        }
     }
 
-    fun dismissOfflineGains() {
-        _offlineGains.value = null
-    }
-
-    fun dismissChangelogPopup() {
-        _showChangelogPopup.value = false
-    }
-
-    fun dismissTimeTravelPopup() {
-        _showTimeTravelPopup.value = false
+    fun resetSlot(slot: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            saveManager.resetSlot(slot)
+            if (_activeSlot.value == slot) {
+                loadGame(slot)
+            }
+        }
     }
 
     fun makeGuess(guess: Long) {
@@ -340,7 +365,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun exportSave(onExported: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val json = saveManager.exportSave()
+            val json = saveManager.exportSave(_activeSlot.value)
             withContext(Dispatchers.Main) {
                 onExported(json)
             }
@@ -349,9 +374,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun importSave(json: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val success = saveManager.importSave(json)
+            val success = saveManager.importSave(json, _activeSlot.value)
             if (success) {
-                val loaded = saveManager.loadGame()
+                val loaded = saveManager.loadGame(_activeSlot.value)
                 val sanitized = AntiCheatService.sanitizeCurrency(loaded)
                 withContext(Dispatchers.Main) {
                     _gameState.value = sanitized
@@ -368,9 +393,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun resetData() {
         viewModelScope.launch(Dispatchers.IO) {
             saveManager.resetData()
-            val fresh = GameState()
+            loadGame(1)
             withContext(Dispatchers.Main) {
-                _gameState.value = fresh
                 backgroundMusicManager.stop()
             }
         }
@@ -406,6 +430,18 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "BG_MUSIC", "Updated background music path: $path")
     }
 
+    fun playBackgroundMusic() {
+        backgroundMusicManager.play()
+    }
+
+    fun pauseBackgroundMusic() {
+        backgroundMusicManager.pause()
+    }
+
+    fun stopBackgroundMusic() {
+        backgroundMusicManager.stop()
+    }
+
     fun executeDevCommand(command: String): String {
         if (!BuildConfig.DEBUG) return "Developer commands are disabled in release builds."
         val current = _gameState.value
@@ -437,9 +473,26 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "TUTORIAL_COMPLETE", "Tutorial completed by user.")
     }
 
+    fun dismissOfflineGains() {
+        _offlineGains.value = null
+    }
+
+    fun dismissChangelogPopup() {
+        _showChangelogPopup.value = false
+    }
+
+    fun dismissTimeTravelPopup() {
+        _showTimeTravelPopup.value = false
+    }
+
+    fun claimLiveOpsEventReward(eventId: String) {
+        // Handled or logged
+        GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "LIVEOPS_CLAIM", "Claimed event reward: $eventId")
+    }
+
     private fun saveGameAsync() {
         viewModelScope.launch(Dispatchers.IO) {
-            saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()))
+            saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
         }
     }
 
@@ -447,7 +500,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         saveJob = viewModelScope.launch(Dispatchers.IO) {
             while (true) {
                 delay(30000)
-                saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()))
+                saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
             }
         }
     }
@@ -492,7 +545,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         timerJob?.cancel()
         backgroundMusicManager.release()
         viewModelScope.launch(Dispatchers.IO) {
-            saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()))
+            saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
         }
     }
 }

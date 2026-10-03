@@ -33,7 +33,9 @@ data class GameState(
     val tutorialCompleted: Boolean = false,
     val buyMultiplier: String = "1", // "1", "10", "100", "MAX"
     val prestigeCount: Long = 0,
-    val ultraCount: Long = 0
+    val ultraCount: Long = 0,
+    val liveOpsClaims: Map<String, Int> = emptyMap(),
+    val permanentEventBoosts: Int = 0
 )
 
 @Serializable

@@ -21,4 +21,5 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object Mutators : Screen("mutators", "Mutators", Icons.Default.Tune)
     object ProcessInspector : Screen("process_inspector", "Process Inspector", Icons.Default.Memory)
     object ChangelogViewer : Screen("changelog_viewer", "Changelog", Icons.Default.Info)
+    object SaveSlots : Screen("save_slots", "Save Slots", Icons.Default.Save)
 }

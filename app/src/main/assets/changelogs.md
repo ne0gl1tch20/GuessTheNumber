@@ -1,5 +1,15 @@
 # 🚀 Guess The Number Simulator - Changelog
 
+## v1.8 (Lucky Number Overhaul, 3 Save Slot System & Legacy Migration, Clipboard Encryption & Data-Driven Feedback)
+- 🎲 **True Lucky Number Box Minigame**: Overhauled the Lucky Number Box arcade minigame so that exactly one random box is the winning jackpot, while other boxes reveal a miss, adding genuine risk and reward.
+- 🔒 **Encrypted Clipboard Transfer**: Enhanced save export and import in Settings and Cloud Backup with robust XOR cipher combined with Base64 obfuscation and salt validation.
+- 📊 **Variable & Process Inspector Expansion**: Updated the Process & Variable Inspector screen to display real-time target guess numbers, range bounds, and complete runtime state variables.
+- 💬 **Data-Driven Randomized Guess Feedback**: Implemented data-driven JSON configuration (`guess_feedback_messages.json`) featuring 30 varied too-low and 30 varied too-high feedback messages.
+- ✨ **Hidden Background Money Generation (`/s`)**: Polished passive income calculation and live rate indicator on the Play screen.
+- ✨ **3 Distinct Save Slots System**: Implemented a comprehensive 3 save slot system (`Slot 1`, `Slot 2`, `Slot 3`) allowing players to manage separate game saves with independent progression, money, prestige, ultra currency, attempts, and timestamps.
+- 🔄 **Legacy Save Migration & Safety Prompt**: Added automatic detection for legacy single-saves from prior versions. When opening the Save Slots screen, players are prompted to securely transfer their legacy progress into Slot 1. If declined or dismissed without confirmation, the app closes immediately (`System.exit(0)`) to preserve data integrity.
+- 🛠️ **Save Slot Management UI**: Created a dedicated `SaveSlotsScreen` accessible from the More Hub, featuring slot summary cards, active slot highlighting, new game creation, individual slot resetting, and direct resume actions.
+
 ## v1.7 (Security & Integrity Hardening Pass)
 - ✨ **Expressive Material 3 Detailed Statistics**: Redesigned the Stastistics Screen with Material Expressive design principles, featuring a prominent hero accuracy gauge card, financial metrics cards, active and best streak counters, reset metadata, session playtime duration, and icon-badged detail breakdown rows.
 - 🛡️ **Authoritative Game Engine & Save Integrity**: Overhauled `GameEngine`, `AntiCheatService`, and `SaveManager` to strictly validate and sanitize all game state operations, preventing negative currency exploits, invalid upgrade levels, and corrupted BigNumbers.

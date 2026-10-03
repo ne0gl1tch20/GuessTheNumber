@@ -42,6 +42,12 @@ data class MinigameConfigRoot(val minigames: List<MinigameDef>)
 data class ChallengeDef(val id: String, val name: String, val description: String, val rewardNebula: Long)
 @Serializable
 data class ChallengeConfigRoot(val challenges: List<ChallengeDef>)
+@Serializable
+data class FeedbackMessagesRoot(
+    val tooLowMessages: List<String>,
+    val tooHighMessages: List<String>,
+    val guessTipsAndClues: List<String> = emptyList()
+)
 
 class JsonConfigRepository(private val context: Context) {
     private val json = Json { ignoreUnknownKeys = true }
@@ -143,6 +149,19 @@ class JsonConfigRepository(private val context: Context) {
             json.decodeFromString<UltraShopConfigRoot>(jsonString).shopItems
         } catch (e: Exception) {
             emptyList()
+        }
+    }
+
+    fun loadFeedbackMessages(): FeedbackMessagesRoot {
+        return try {
+            val inputStream = context.assets.open("game/guess_feedback_messages.json")
+            val jsonString = inputStream.bufferedReader().use { it.readText() }
+            json.decodeFromString<FeedbackMessagesRoot>(jsonString)
+        } catch (e: Exception) {
+            FeedbackMessagesRoot(
+                listOf("Too low! Try higher."),
+                listOf("Too high! Try lower.")
+            )
         }
     }
 }

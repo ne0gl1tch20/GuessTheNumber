@@ -103,7 +103,20 @@ fun MoreScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Audio & Features", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text("Audio & Save Management", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            }
+
+            item {
+                Button(
+                    onClick = { onNavigate(Screen.SaveSlots.route) },
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer),
+                    modifier = Modifier.fillMaxWidth().height(52.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Save, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Save Slots", style = MaterialTheme.typography.titleMedium)
+                }
             }
 
             item {
@@ -132,7 +145,14 @@ fun MoreScreen(
                 }
             }
             item {
-                Button(onClick = { onNavigate("talent") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer)) {
+                Button(onClick = { onNavigate("live_ops") }, modifier = Modifier.fillMaxWidth()) {
+                    Icon(imageVector = Icons.Default.Event, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Seasonal Events", fontSize = 16.sp)
+                }
+            }
+            item {
+                Button(onClick = { onNavigate("talent") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer)) {
                     Icon(imageVector = Icons.Default.AccountTree, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Prestige Talent Web", fontSize = 16.sp)
