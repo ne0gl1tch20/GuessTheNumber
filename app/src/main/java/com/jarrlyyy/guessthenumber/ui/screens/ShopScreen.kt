@@ -24,14 +24,16 @@ fun ShopScreen(
     onBuyShopItem: (String, Long) -> Unit
 ) {
     val context = LocalContext.current
+    val configRepo = remember(state.settings.locale) { JsonConfigRepository(context, state.settings.locale) }
+    val locale = configRepo.localeManager
     val shopItems = remember {
-        JsonConfigRepository(context).loadShopItems()
+        configRepo.loadShopItems()
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Nebula Shop", style = MaterialTheme.typography.titleMedium) },
+                title = { Text(locale.getString("shop_title", "Nebula Shop"), style = MaterialTheme.typography.titleMedium) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }

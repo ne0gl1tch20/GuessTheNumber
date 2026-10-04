@@ -23,6 +23,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
+import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -37,14 +38,25 @@ import java.io.File
 
 class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val saveManager = SaveManager(application)
+    private val _gameState = MutableStateFlow(GameState())
+    val gameState: StateFlow<GameState> = _gameState.asStateFlow()
+
+    private var configRepository = JsonConfigRepository(application, _gameState.value.settings.locale)
+    val localeManager: LocaleManager
+        get() = configRepository.localeManager
+
+    private fun updateLocaleRepo(localeTag: String) {
+        configRepository = JsonConfigRepository(getApplication(), localeTag)
+    }
+
     private val gameEngine = GameEngine()
     private val commandExecutor = CommandExecutor()
     private val backgroundMusicManager = BackgroundMusicManager(application)
 
     val isPlayingMusic: StateFlow<Boolean> = backgroundMusicManager.isPlaying
-
-    private val _gameState = MutableStateFlow(GameState())
-    val gameState: StateFlow<GameState> = _gameState.asStateFlow()
+    val musicCurrentPosition: StateFlow<Int> = backgroundMusicManager.currentPosition
+    val musicDuration: StateFlow<Int> = backgroundMusicManager.duration
+    val musicAlbumArt: StateFlow<android.graphics.Bitmap?> = backgroundMusicManager.albumArt
 
     private val _isLoadingSave = MutableStateFlow(true)
     val isLoadingSave: StateFlow<Boolean> = _isLoadingSave.asStateFlow()
@@ -98,11 +110,24 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             val loaded = saveManager.loadGame(targetSlot)
             val sanitized = AntiCheatService.sanitizeCurrency(loaded)
+
+            // Auto-detect system locale on fresh boot if default en-US is set
+            val effectiveSanitized = if (sanitized.settings.locale == "en-US") {
+                val systemTag = java.util.Locale.getDefault().toLanguageTag()
+                if (systemTag.startsWith("fil", ignoreCase = true) || systemTag.startsWith("tl", ignoreCase = true)) {
+                    sanitized.copy(settings = sanitized.settings.copy(locale = "fil-PH"))
+                } else {
+                    sanitized
+                }
+            } else {
+                sanitized
+            }
+            updateLocaleRepo(effectiveSanitized.settings.locale)
             
             val currentVersion = BuildConfig.VERSION_NAME
-            val isNewVersion = sanitized.lastSavedVersion != currentVersion
+            val isNewVersion = effectiveSanitized.lastSavedVersion != currentVersion
 
-            val timeTravelCheck = AntiTimeTravelService.checkTimeTravel(sanitized)
+            val timeTravelCheck = AntiTimeTravelService.checkTimeTravel(effectiveSanitized)
             val timeTravelDetected = timeTravelCheck.timeTravelDetected
             val timeDiffSeconds = timeTravelCheck.timeDifferenceSeconds
 
@@ -110,7 +135,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 lastSavedVersion = currentVersion
             )
 
-            val deltaSeconds = if (!timeTravelDetected) (System.currentTimeMillis() - sanitized.lastSaveTimestamp) / 1000L else 0L
+            val deltaSeconds = if (!timeTravelDetected) (System.currentTimeMillis() - effectiveSanitized.lastSaveTimestamp) / 1000L else 0L
             var finalState = timeCheckedState
 
             if (!timeTravelDetected && deltaSeconds > 60 && timeCheckedState.autoClickerActive) {
@@ -402,6 +427,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateSettings(newSettings: GameSettings) {
         val oldEnabled = _gameState.value.settings.notificationsEnabled
+        if (newSettings.locale != _gameState.value.settings.locale) {
+            updateLocaleRepo(newSettings.locale)
+        }
         _gameState.update { it.copy(settings = newSettings) }
         GameLogger.configureStorage(File(getApplication<Application>().filesDir, "game_logs.txt"), newSettings.saveLogsToStorage)
         saveGameAsync()
@@ -440,6 +468,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun stopBackgroundMusic() {
         backgroundMusicManager.stop()
+    }
+
+    fun seekBackgroundMusic(position: Int) {
+        backgroundMusicManager.seekTo(position)
     }
 
     fun executeDevCommand(command: String): String {

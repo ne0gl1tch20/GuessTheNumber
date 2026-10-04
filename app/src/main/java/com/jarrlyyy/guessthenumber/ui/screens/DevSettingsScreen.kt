@@ -3,7 +3,12 @@ package com.jarrlyyy.guessthenumber.ui.screens
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
+import java.io.File
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -44,6 +49,9 @@ fun DevSettingsScreen(
     var saveJsonEditorInput by remember { mutableStateOf("") }
     var logSearchQuery by remember { mutableStateOf("") }
     var isPaused by remember { mutableStateOf(false) }
+
+    val configRepo = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale) }
+    val locale = configRepo.localeManager
     
     val logs by GameLogger.logFlow.collectAsState(initial = emptyList())
     val jsonSerializer = remember { Json { ignoreUnknownKeys = true; prettyPrint = true } }
@@ -121,23 +129,67 @@ fun DevSettingsScreen(
                 }
             }
 
-            // Section 0.5: Log Storage Setting
+            // Section 0.5: Log Storage Setting & Zip/Share
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("Save non-crash logs to storage", style = MaterialTheme.typography.titleMedium, fontSize = 16.sp)
-                        Text("Saves game logs to Android/data files directory", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Switch(
-                        checked = state.settings.saveLogsToStorage,
-                        onCheckedChange = { enabled ->
-                            onUpdateSettings(state.settings.copy(saveLogsToStorage = enabled))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Save non-crash logs to storage", style = MaterialTheme.typography.titleMedium, fontSize = 16.sp)
+                            Text("Saves game logs to Android/data files directory", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                    )
+                        Switch(
+                            checked = state.settings.saveLogsToStorage,
+                            onCheckedChange = { enabled ->
+                                onUpdateSettings(state.settings.copy(saveLogsToStorage = enabled))
+                            }
+                        )
+                    }
+
+                    Button(
+                        onClick = {
+                            try {
+                                val zipFile = File(context.cacheDir, "game_logs_${System.currentTimeMillis()}.zip")
+                                ZipOutputStream(FileOutputStream(zipFile)).use { zos ->
+                                    val logFile = File(context.filesDir, "game_logs.txt")
+                                    if (logFile.exists()) {
+                                        zos.putNextEntry(ZipEntry(logFile.name))
+                                        logFile.inputStream().use { it.copyTo(zos) }
+                                        zos.closeEntry()
+                                    }
+                                    val memLogs = GameLogger.exportLogs()
+                                    if (memLogs.isNotBlank()) {
+                                        zos.putNextEntry(ZipEntry("in_memory_logs.txt"))
+                                        zos.write(memLogs.toByteArray())
+                                        zos.closeEntry()
+                                    }
+                                }
+                                val uri = androidx.core.content.FileProvider.getUriForFile(
+                                    context,
+                                    "${context.packageName}.fileprovider",
+                                    zipFile
+                                )
+                                val sendIntent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_STREAM, uri)
+                                    type = "application/zip"
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                val shareIntent = Intent.createChooser(sendIntent, "Share Zipped Logs")
+                                context.startActivity(shareIntent)
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Failed to zip and share logs: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Zip & Share Logs from Storage", fontSize = 14.sp)
+                    }
                 }
             }
 
@@ -311,6 +363,35 @@ fun DevSettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
+                }
+            }
+
+            // Test Locales Section
+            item {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(locale.getString("test_locales", "Test Locales"), fontSize = 16.sp, style = MaterialTheme.typography.titleMedium)
+                        Text(locale.getString("test"), fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
+                        Text(locale.getString("test_locales_desc", "Switch active locale temporarily. Resets to device default on app restart."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(onClick = {
+                                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                                    androidx.core.os.LocaleListCompat.forLanguageTags("en-US")
+                                )
+                                Toast.makeText(context, locale.getString("switched_locale_us_toast", "Switched locale to English (US)"), Toast.LENGTH_SHORT).show()
+                            }) {
+                                Text(locale.getString("english_us", "English (US)"))
+                            }
+                            Button(onClick = {
+                                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                                    androidx.core.os.LocaleListCompat.forLanguageTags("fil-PH")
+                                )
+                                Toast.makeText(context, locale.getString("switched_locale_fil_toast", "Inilipat ang wika sa Filipino"), Toast.LENGTH_SHORT).show()
+                            }) {
+                                Text(locale.getString("filipino", "Filipino"))
+                            }
+                        }
+                    }
                 }
             }
 

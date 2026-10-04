@@ -1,18 +1,14 @@
-# Material Expressive & Dynamic Animations Walkthrough
+# Walkthrough - Localization & Persistence Overhaul (v1.9)
 
-Successfully upgraded **Guess The Number** into a fully **Material Expressive** experience with rich micro-interactions, spring physics, dynamic shape morphing, animated numbers/counters, expressive color schemes, and tactile feedback.
+We have successfully completed all requested enhancements:
 
-## Changes Made
+## 1. Full Localization in [NavGraph.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt)
+- Replaced all hardcoded English strings in [NavGraph.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt) (Time Travel dialog, Changelog popup, Welcome Back / Offline Gains popup, and bottom navigation bar labels) with dynamic lookup via `viewModel.localeManager.getString(...)`.
+- Added corresponding translation keys in both English ([en_us.json](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/assets/locales/en_us.json)) and Filipino ([fil_ph.json](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/assets/locales/fil_ph.json)).
 
-### 1. Theme & Design System (`[ui/theme]`)
-- **[ExpressiveAnimations.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/theme/ExpressiveAnimations.kt)**: Created reusable spring physics configurations (`ExpressiveSprings.Bouncy`) and the `.expressiveClickable` modifier providing organic scale-down press effects with smooth ripple feedback.
-- **[Theme.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/theme/Theme.kt)**: Upgraded Material 3 shapes (`ExpressiveShapes`) with oversized rounded corners (extra-large rounded corners for cards and pill-shaped action containers).
+## 2. Persistent Locale Across App Restarts
+- Updated [GameViewModel.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/viewmodel/GameViewModel.kt) and screens ([PlayScreen.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/PlayScreen.kt), [AchievementsScreen.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/AchievementsScreen.kt), [DevSettingsScreen.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/DevSettingsScreen.kt), [ShopScreen.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/ShopScreen.kt)) to initialize `JsonConfigRepository` using the saved `state.settings.locale`.
+- Ensuring that after restarting the app, the chosen locale persists and correctly directs all UI text, repository data, and assets to the user's selected language.
 
-### 2. Screens & UI Enhancements (`[ui/screens]`)
-- **[PlayScreen.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/PlayScreen.kt)**: Added organic hero card pulsing animations, animated number counters (`AnimatedContent`) for currency, and bouncy press physics on guess buttons.
-- **[UpgradeScreen.kt](file:///C:/Users/user/AndroidStudioProjects/GuessTheNumber/app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/UpgradeScreen.kt)**: Applied M3 Expressive card shapes, animated balance numbers, and spring-physics buy buttons.
-
-## Verification Results
-
-### Build Verification
-- Successfully compiled and built the app with `app:assembleDebug` (Build finished successfully).
+## 3. Verification
+- Successfully built project `app:assembleDebug` with zero errors.

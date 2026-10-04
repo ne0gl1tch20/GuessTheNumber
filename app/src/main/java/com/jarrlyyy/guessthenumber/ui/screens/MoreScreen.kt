@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,9 +27,13 @@ fun MoreScreen(
     onNavigate: (String) -> Unit,
     onUpdateBackgroundMusic: (String?) -> Unit,
     isPlayingMusic: Boolean,
+    musicCurrentPosition: Int,
+    musicDuration: Int,
+    musicAlbumArt: android.graphics.Bitmap?,
     onPlayMusic: () -> Unit,
     onPauseMusic: () -> Unit,
-    onStopMusic: () -> Unit
+    onStopMusic: () -> Unit,
+    onSeekMusic: (Int) -> Unit
 ) {
     val context = LocalContext.current
     var showMusicDialog by remember { mutableStateOf(false) }
@@ -215,13 +220,29 @@ fun MoreScreen(
             onDismissRequest = { showMusicDialog = false },
             title = { Text("🎵 Background Music Player") },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Select an audio file (MP3/WAV) to save and play in the background across all screens.")
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Select an audio file (MP3/WAV) to save and play across all screens.")
                     Text(
-                        text = if (currentMusicPath != null) "Current File: ${File(currentMusicPath).name}" else "No music file selected.",
+                        text = if (currentMusicPath != null) "File: ${File(currentMusicPath).name}" else "No music file selected.",
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.primary
                     )
+
+                    // Album Art Display if available
+                    if (musicAlbumArt != null) {
+                        androidx.compose.foundation.Image(
+                            bitmap = musicAlbumArt.asImageBitmap(),
+                            contentDescription = "Album Art",
+                            modifier = Modifier
+                                .size(120.dp)
+                                .padding(4.dp),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                        )
+                    }
+
                     OutlinedButton(
                         onClick = { audioPickerLauncher.launch(arrayOf("audio/*")) },
                         modifier = Modifier.fillMaxWidth()
@@ -231,16 +252,60 @@ fun MoreScreen(
                         Text("Select Audio File")
                     }
 
+                    // Sliding Progress Bar
+                    val maxDur = if (musicDuration > 0) musicDuration.toFloat() else 1f
+                    var sliderPos by remember(musicCurrentPosition) { mutableStateOf(musicCurrentPosition.toFloat()) }
+                    var isSeeking by remember { mutableStateOf(false) }
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Slider(
+                            value = if (isSeeking) sliderPos else musicCurrentPosition.toFloat(),
+                            onValueChange = {
+                                isSeeking = true
+                                sliderPos = it
+                            },
+                            onValueChangeFinished = {
+                                isSeeking = false
+                                onSeekMusic(sliderPos.toInt())
+                            },
+                            valueRange = 0f..maxDur
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            val currentPosSec = (if (isSeeking) sliderPos.toInt() else musicCurrentPosition) / 1000
+                            val totalDurSec = musicDuration / 1000
+                            Text(
+                                text = String.format(java.util.Locale.US, "%d:%02d", currentPosSec / 60, currentPosSec % 60),
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = String.format(java.util.Locale.US, "%d:%02d", totalDurSec / 60, totalDurSec % 60),
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    // Play/Pause and Stop Controls
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Play/Toggle Button
                         FilledIconButton(
                             onClick = {
                                 if (currentMusicPath != null && File(currentMusicPath).exists()) {
-                                    onPlayMusic()
-                                    Toast.makeText(context, "Playing background music...", Toast.LENGTH_SHORT).show()
+                                    if (isPlayingMusic) {
+                                        onPauseMusic()
+                                        Toast.makeText(context, "Paused background music", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        onPlayMusic()
+                                        Toast.makeText(context, "Playing background music...", Toast.LENGTH_SHORT).show()
+                                    }
                                 } else {
                                     Toast.makeText(context, "Please select an audio file first!", Toast.LENGTH_SHORT).show()
                                 }
@@ -249,23 +314,22 @@ fun MoreScreen(
                                 containerColor = if (isPlayingMusic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                             )
                         ) {
-                            Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "Play")
+                            Icon(
+                                imageVector = if (isPlayingMusic) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                contentDescription = if (isPlayingMusic) "Pause" else "Play"
+                            )
                         }
 
-                        FilledIconButton(
-                            onClick = {
-                                onPauseMusic()
-                                Toast.makeText(context, "Paused background music", Toast.LENGTH_SHORT).show()
-                            }
-                        ) {
-                            Icon(imageVector = Icons.Default.Pause, contentDescription = "Pause")
-                        }
-
+                        // Stop Button
                         FilledIconButton(
                             onClick = {
                                 onStopMusic()
                                 Toast.makeText(context, "Stopped background music", Toast.LENGTH_SHORT).show()
-                            }
+                            },
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            )
                         ) {
                             Icon(imageVector = Icons.Default.Stop, contentDescription = "Stop")
                         }

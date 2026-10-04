@@ -1,5 +1,11 @@
 # 🚀 Guess The Number Simulator - Changelog
 
+## v1.9 (Comprehensive Internationalization & Localization Overhaul)
+- 🌐 **Full Locale & Internationalization Support**: Localized 100% of user-visible strings across all screens (Play, Prestige, Ultra, Upgrades, Shop, Arcade, More, Mutators, Achievements, Cloud Backup, Crash Recovery, Settings, Dev Settings) into `locales/en_us.json`.
+- 💬 **Data-Driven Localized Assets**: Fully wired all JSON config assets (`upgrades.json`, `shop_items.json`, `achievements.json`, `prestige_shop.json`, `prestige_upgrades.json`, `ultra_shop.json`, `ultra_upgrades.json`, `minigames.json`, `mutators.json`, `challenges.json`, `talents.json`) and randomized feedback/hint messages through `LocaleManager`.
+- 🧮 **Dynamic Math & Clue Analysis**: Upgraded guess feedback tips and math clues to dynamically inject real-time game state variables (midpoints, parities, deltas, interval bounds, moduli).
+- 🛠️ **UI Polish & Architecture**: Unified all unused and secondary screens into the More Hub with polished Material 3 design consistency.
+
 ## v1.8 (Lucky Number Overhaul, 3 Save Slot System & Legacy Migration, Clipboard Encryption & Data-Driven Feedback)
 - 🎲 **True Lucky Number Box Minigame**: Overhauled the Lucky Number Box arcade minigame so that exactly one random box is the winning jackpot, while other boxes reveal a miss, adding genuine risk and reward.
 - 🔒 **Encrypted Clipboard Transfer**: Enhanced save export and import in Settings and Cloud Backup with robust XOR cipher combined with Base64 obfuscation and salt validation.

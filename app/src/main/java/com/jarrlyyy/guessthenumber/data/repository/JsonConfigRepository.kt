@@ -43,14 +43,32 @@ data class ChallengeDef(val id: String, val name: String, val description: Strin
 @Serializable
 data class ChallengeConfigRoot(val challenges: List<ChallengeDef>)
 @Serializable
+data class TalentDef(val id: String, val name: String, val description: String, val cost: Long, val requiredParentId: String? = null)
+@Serializable
+data class TalentConfigRoot(val talents: List<TalentDef>)
+@Serializable
 data class FeedbackMessagesRoot(
     val tooLowMessages: List<String>,
     val tooHighMessages: List<String>,
     val guessTipsAndClues: List<String> = emptyList()
 )
 
-class JsonConfigRepository(private val context: Context) {
+class JsonConfigRepository(private val context: Context, private val localeTag: String = "en-US") {
     private val json = Json { ignoreUnknownKeys = true }
+    val localeManager = LocaleManager(context)
+
+    init {
+        kotlinx.coroutines.runBlocking {
+            val systemLocale = java.util.Locale.getDefault().toLanguageTag()
+            val effectiveTag = if (localeTag == "en-US" && systemLocale.startsWith("fil", ignoreCase = true)) {
+                "fil-PH"
+            } else {
+                localeTag
+            }
+            val fileName = if (effectiveTag.startsWith("fil", ignoreCase = true)) "locales/fil_ph.json" else "locales/en_us.json"
+            localeManager.loadLocale(fileName)
+        }
+    }
 
     fun loadGameConfig(): GameConfig {
         return try {
@@ -66,7 +84,13 @@ class JsonConfigRepository(private val context: Context) {
         return try {
             val inputStream = context.assets.open("game/upgrades.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<UpgradeConfigRoot>(jsonString).upgrades
+            val raw = json.decodeFromString<UpgradeConfigRoot>(jsonString).upgrades
+            raw.map { up ->
+                up.copy(
+                    name = localeManager.getString("upgrade_${up.id}_name", up.name),
+                    description = localeManager.getString("upgrade_${up.id}_desc", up.description)
+                )
+            }
         } catch (e: Exception) {
             emptyList()
         }
@@ -76,7 +100,13 @@ class JsonConfigRepository(private val context: Context) {
         return try {
             val inputStream = context.assets.open("game/shop_items.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<ShopConfigRoot>(jsonString).shopItems
+            val raw = json.decodeFromString<ShopConfigRoot>(jsonString).shopItems
+            raw.map { item ->
+                item.copy(
+                    name = localeManager.getString("shop_item_${item.id}_name", item.name),
+                    description = localeManager.getString("shop_item_${item.id}_desc", item.description)
+                )
+            }
         } catch (e: Exception) {
             emptyList()
         }
@@ -86,7 +116,13 @@ class JsonConfigRepository(private val context: Context) {
         return try {
             val inputStream = context.assets.open("game/achievements.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<AchievementConfigRoot>(jsonString).achievements
+            val raw = json.decodeFromString<AchievementConfigRoot>(jsonString).achievements
+            raw.map { ach ->
+                ach.copy(
+                    name = localeManager.getString("achievement_${ach.id}_name", ach.name),
+                    description = localeManager.getString("achievement_${ach.id}_desc", ach.description)
+                )
+            }
         } catch (e: Exception) {
             emptyList()
         }
@@ -96,7 +132,13 @@ class JsonConfigRepository(private val context: Context) {
         return try {
             val inputStream = context.assets.open("game/minigames.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<MinigameConfigRoot>(jsonString).minigames
+            val raw = json.decodeFromString<MinigameConfigRoot>(jsonString).minigames
+            raw.map { mg ->
+                mg.copy(
+                    name = localeManager.getString("minigame_${mg.id}_name", mg.name),
+                    description = localeManager.getString("minigame_${mg.id}_desc", mg.description)
+                )
+            }
         } catch (e: Exception) {
             emptyList()
         }
@@ -106,7 +148,13 @@ class JsonConfigRepository(private val context: Context) {
         return try {
             val inputStream = context.assets.open("game/challenges.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<ChallengeConfigRoot>(jsonString).challenges
+            val raw = json.decodeFromString<ChallengeConfigRoot>(jsonString).challenges
+            raw.map { ch ->
+                ch.copy(
+                    name = localeManager.getString("challenge_${ch.id}_name", ch.name),
+                    description = localeManager.getString("challenge_${ch.id}_desc", ch.description)
+                )
+            }
         } catch (e: Exception) {
             emptyList()
         }
@@ -116,7 +164,13 @@ class JsonConfigRepository(private val context: Context) {
         return try {
             val inputStream = context.assets.open("game/prestige_upgrades.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<UpgradeConfigRoot>(jsonString).upgrades
+            val raw = json.decodeFromString<UpgradeConfigRoot>(jsonString).upgrades
+            raw.map { up ->
+                up.copy(
+                    name = localeManager.getString("prestige_${up.id}_name", up.name),
+                    description = localeManager.getString("prestige_${up.id}_desc", up.description)
+                )
+            }
         } catch (e: Exception) {
             emptyList()
         }
@@ -126,7 +180,13 @@ class JsonConfigRepository(private val context: Context) {
         return try {
             val inputStream = context.assets.open("game/prestige_shop.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<PrestigeShopConfigRoot>(jsonString).shopItems
+            val raw = json.decodeFromString<PrestigeShopConfigRoot>(jsonString).shopItems
+            raw.map { item ->
+                item.copy(
+                    name = localeManager.getString("prestige_shop_${item.id}_name", item.name),
+                    description = localeManager.getString("prestige_shop_${item.id}_desc", item.description)
+                )
+            }
         } catch (e: Exception) {
             emptyList()
         }
@@ -136,7 +196,13 @@ class JsonConfigRepository(private val context: Context) {
         return try {
             val inputStream = context.assets.open("game/ultra_upgrades.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<UpgradeConfigRoot>(jsonString).upgrades
+            val raw = json.decodeFromString<UpgradeConfigRoot>(jsonString).upgrades
+            raw.map { up ->
+                up.copy(
+                    name = localeManager.getString("ultra_${up.id}_name", up.name),
+                    description = localeManager.getString("ultra_${up.id}_desc", up.description)
+                )
+            }
         } catch (e: Exception) {
             emptyList()
         }
@@ -146,14 +212,38 @@ class JsonConfigRepository(private val context: Context) {
         return try {
             val inputStream = context.assets.open("game/ultra_shop.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<UltraShopConfigRoot>(jsonString).shopItems
+            val raw = json.decodeFromString<UltraShopConfigRoot>(jsonString).shopItems
+            raw.map { item ->
+                item.copy(
+                    name = localeManager.getString("ultra_shop_${item.id}_name", item.name),
+                    description = localeManager.getString("ultra_shop_${item.id}_desc", item.description)
+                )
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+
+
+    fun loadTalents(): List<TalentDef> {
+        return try {
+            val inputStream = context.assets.open("game/talents.json")
+            val jsonString = inputStream.bufferedReader().use { it.readText() }
+            val raw = json.decodeFromString<TalentConfigRoot>(jsonString).talents
+            raw.map { t ->
+                t.copy(
+                    name = localeManager.getString("talent_${t.id}_name", t.name),
+                    description = localeManager.getString("talent_${t.id}_desc", t.description)
+                )
+            }
         } catch (e: Exception) {
             emptyList()
         }
     }
 
     fun loadFeedbackMessages(): FeedbackMessagesRoot {
-        return try {
+        val root = try {
             val inputStream = context.assets.open("game/guess_feedback_messages.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             json.decodeFromString<FeedbackMessagesRoot>(jsonString)
@@ -163,5 +253,17 @@ class JsonConfigRepository(private val context: Context) {
                 listOf("Too high! Try lower.")
             )
         }
+
+        return FeedbackMessagesRoot(
+            tooLowMessages = root.tooLowMessages.mapIndexed { index, defaultMsg ->
+                localeManager.getString("feedback_toolow_$index", defaultMsg)
+            },
+            tooHighMessages = root.tooHighMessages.mapIndexed { index, defaultMsg ->
+                localeManager.getString("feedback_toohigh_$index", defaultMsg)
+            },
+            guessTipsAndClues = root.guessTipsAndClues.mapIndexed { index, defaultMsg ->
+                localeManager.getString("feedback_tip_$index", defaultMsg)
+            }
+        )
     }
 }

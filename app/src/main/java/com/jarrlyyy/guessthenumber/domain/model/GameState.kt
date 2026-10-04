@@ -62,6 +62,7 @@ data class GameSettings(
     val notificationIntervalHours: Long = 24L,
     val themeMode: String = "System", // Light, Dark, System
     val numberNotation: String = "Standard", // Standard, Scientific, Engineering
+    val locale: String = "en-US", // en-US, fil-PH
     val reducedMotion: Boolean = false,
     val volume: Float = 1.0f,
     val reduceFlashes: Boolean = false,

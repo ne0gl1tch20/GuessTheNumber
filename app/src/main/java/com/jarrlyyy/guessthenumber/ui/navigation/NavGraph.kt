@@ -38,9 +38,13 @@ fun NavGraph(
     onUpdateSettings: (GameSettings) -> Unit,
     onUpdateBackgroundMusic: (String?) -> Unit,
     isPlayingMusic: Boolean,
+    musicCurrentPosition: Int,
+    musicDuration: Int,
+    musicAlbumArt: android.graphics.Bitmap?,
     onPlayMusic: () -> Unit,
     onPauseMusic: () -> Unit,
     onStopMusic: () -> Unit,
+    onSeekMusic: (Int) -> Unit,
     onCompleteTutorial: () -> Unit,
     hasPreviousCrash: Boolean,
     onDismissCrash: () -> Unit,
@@ -61,6 +65,7 @@ fun NavGraph(
         return
     }
 
+    val locale = viewModel.localeManager
     val navController = rememberNavController()
     val items = listOf(Screen.Play, Screen.Upgrade, Screen.Shop, Screen.More)
 
@@ -75,41 +80,41 @@ fun NavGraph(
     if (showTimeTravelPopup) {
         AlertDialog(
             onDismissRequest = onDismissTimeTravel,
-            title = { Text("⏳ Time Travel Detected!") },
-            text = { Text("It seems like the time has changed since the last time you played (device clock is $timeTravelSeconds seconds behind last save). As a consequence, auto-clicker and passive generation have been temporarily paused for 24 hours.") },
+            title = { Text(locale.getString("time_travel_title", "⏳ Time Travel Detected!")) },
+            text = { Text(locale.getString("time_travel_text", "It seems like the time has changed since the last time you played (device clock is %d seconds behind last save). As a consequence, auto-clicker and passive generation have been temporarily paused for 24 hours.", timeTravelSeconds)) },
             confirmButton = {
                 Button(onClick = onDismissTimeTravel) {
-                    Text("Understood")
+                    Text(locale.getString("understood", "Understood"))
                 }
             }
         )
     } else if (showChangelogPopup) {
         AlertDialog(
             onDismissRequest = onDismissChangelog,
-            title = { Text("🚀 What's New in v1.8!") },
-            text = { Text("A new version of Guess The Number is installed! Check out the changelog for details on 3 Save Slots and updates.") },
+            title = { Text(locale.getString("changelog_popup_title", "🚀 What's New in v1.9!")) },
+            text = { Text(locale.getString("changelog_popup_text", "A new version of Guess The Number is installed! Check out the changelog for details on Internationalization, Localization, and updates.")) },
             confirmButton = {
                 Button(onClick = {
                     onDismissChangelog()
                     navController.navigate(Screen.ChangelogViewer.route)
                 }) {
-                    Text("View Changelog")
+                    Text(locale.getString("view_changelog", "View Changelog"))
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismissChangelog) {
-                    Text("Dismiss")
+                    Text(locale.getString("dismiss", "Dismiss"))
                 }
             }
         )
     } else if (offlineGains != null && offlineGains > BigNumber.ZERO) {
         AlertDialog(
             onDismissRequest = onDismissOfflineGains,
-            title = { Text("🌙 Welcome Back!") },
-            text = { Text("While you were away, your auto-clicker generated ${offlineGains.format()} money!") },
+            title = { Text(locale.getString("welcome_back_title", "🌙 Welcome Back!")) },
+            text = { Text(locale.getString("offline_gains_text", "While you were away, your auto-clicker generated %s money!", offlineGains.format())) },
             confirmButton = {
                 Button(onClick = onDismissOfflineGains) {
-                    Text("Collect")
+                    Text(locale.getString("collect", "Collect"))
                 }
             }
         )
@@ -123,9 +128,16 @@ fun NavGraph(
                     tonalElevation = 8.dp
                 ) {
                     items.forEach { screen ->
+                        val labelText = when (screen.route) {
+                            Screen.Play.route -> locale.getString("nav_play", "Play")
+                            Screen.Upgrade.route -> locale.getString("nav_upgrade", "Upgrades")
+                            Screen.Shop.route -> locale.getString("nav_shop", "Shop")
+                            Screen.More.route -> locale.getString("nav_more", "More")
+                            else -> screen.title
+                        }
                         NavigationBarItem(
-                            icon = { Icon(imageVector = screen.icon, contentDescription = screen.title) },
-                            label = { Text(screen.title) },
+                            icon = { Icon(imageVector = screen.icon, contentDescription = labelText) },
+                            label = { Text(labelText) },
                             selected = currentRoute == screen.route,
                             onClick = {
                                 if (currentRoute != screen.route) {
@@ -173,9 +185,13 @@ fun NavGraph(
                     onNavigate = { route -> navController.navigate(route) },
                     onUpdateBackgroundMusic = onUpdateBackgroundMusic,
                     isPlayingMusic = isPlayingMusic,
+                    musicCurrentPosition = musicCurrentPosition,
+                    musicDuration = musicDuration,
+                    musicAlbumArt = musicAlbumArt,
                     onPlayMusic = onPlayMusic,
                     onPauseMusic = onPauseMusic,
-                    onStopMusic = onStopMusic
+                    onStopMusic = onStopMusic,
+                    onSeekMusic = onSeekMusic
                 )
             }
             composable(Screen.Prestige.route) {
@@ -206,7 +222,7 @@ fun NavGraph(
                 SettingsScreen(state = state, onExportSave = onExportSave, onImportSave = onImportSave, onResetData = onResetData, onUpdateSettings = onUpdateSettings, onBack = { navController.popBackStack() })
             }
             composable(Screen.About.route) {
-                AboutScreen(onBack = { navController.popBackStack() })
+                AboutScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
             }
             composable(Screen.DevSettings.route) {
                 DevSettingsScreen(

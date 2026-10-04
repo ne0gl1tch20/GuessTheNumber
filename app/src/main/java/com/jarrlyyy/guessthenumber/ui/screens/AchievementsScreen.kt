@@ -26,17 +26,19 @@ fun AchievementsScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val configRepo = remember(state.settings.locale) { JsonConfigRepository(context, state.settings.locale) }
+    val locale = configRepo.localeManager
     val achievements = remember {
-        JsonConfigRepository(context).loadAchievements()
+        configRepo.loadAchievements()
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Achievements & Perks") },
+                title = { Text(locale.getString("achievements_title", "Achievements & Perks")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 }
             )

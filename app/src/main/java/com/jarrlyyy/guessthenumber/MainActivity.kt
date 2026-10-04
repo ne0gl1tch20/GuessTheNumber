@@ -35,8 +35,12 @@ class MainActivity : ComponentActivity() {
             val showTimeTravelPopup by viewModel.showTimeTravelPopup.collectAsState()
             val timeTravelSeconds by viewModel.timeTravelSeconds.collectAsState()
             val isPlayingMusic by viewModel.isPlayingMusic.collectAsState()
+            val musicCurrentPosition by viewModel.musicCurrentPosition.collectAsState()
+            val musicDuration by viewModel.musicDuration.collectAsState()
+            val musicAlbumArt by viewModel.musicAlbumArt.collectAsState()
 
             GuessTheNumberTheme(themeMode = state.settings.themeMode) {
+                val locale = viewModel.localeManager
                 if (isLoadingSave) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -52,7 +56,7 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 CircularProgressIndicator()
                                 Text(
-                                    text = "Loading save data...",
+                                    text = locale.getString("loading_save_data", "Loading save data..."),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                             }
@@ -77,9 +81,13 @@ class MainActivity : ComponentActivity() {
                         onUpdateSettings = { viewModel.updateSettings(it) },
                         onUpdateBackgroundMusic = { viewModel.updateBackgroundMusicPath(it) },
                         isPlayingMusic = isPlayingMusic,
+                        musicCurrentPosition = musicCurrentPosition,
+                        musicDuration = musicDuration,
+                        musicAlbumArt = musicAlbumArt,
                         onPlayMusic = { viewModel.playBackgroundMusic() },
                         onPauseMusic = { viewModel.pauseBackgroundMusic() },
                         onStopMusic = { viewModel.stopBackgroundMusic() },
+                        onSeekMusic = { viewModel.seekBackgroundMusic(it) },
                         onCompleteTutorial = { viewModel.completeTutorial() },
                         hasPreviousCrash = hasPreviousCrash,
                         onDismissCrash = { viewModel.dismissCrash() },

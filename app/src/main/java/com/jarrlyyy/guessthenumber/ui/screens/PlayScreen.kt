@@ -26,10 +26,12 @@ fun PlayScreen(
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     var guessInput by remember { mutableStateOf("") }
-    var lastFeedback by remember { mutableStateOf("Guess a number between ${state.currentRangeMin} and ${state.currentRangeMax}") }
+    val configRepository = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale) }
+    val locale = configRepository.localeManager
+    var lastFeedback by remember { mutableStateOf(locale.getString("guess_prompt", "Guess a number between ${state.currentRangeMin} and ${state.currentRangeMax}")) }
 
     val feedbackRoot = remember {
-        com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context).loadFeedbackMessages()
+        configRepository.loadFeedbackMessages()
     }
 
     val infiniteTransition = rememberInfiniteTransition(label = "moe_pulse")
@@ -46,7 +48,7 @@ fun PlayScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Guess The Number", style = MaterialTheme.typography.titleMedium) },
+                title = { Text(locale.getString("play_title", "Guess The Number"), style = MaterialTheme.typography.titleMedium) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
@@ -93,7 +95,8 @@ fun PlayScreen(
                             val upgradeMult = 1.0 + ((state.upgradeLevels["reward_multiplier"] ?: 0) * 0.25)
                             val prestigeMult = 1.0 + (state.prestige.value.toDouble() * 0.5)
                             val ultraMult = 1.0 + (state.ultra.value.toDouble() * 2.0)
-                            val totalIncomePerSec = (autoClickerRate * upgradeMult * prestigeMult * ultraMult).toLong()
+                            val totalIncomePerSecBig = com.jarrlyyy.guessthenumber.domain.model.BigNumber(autoClickerRate * upgradeMult * prestigeMult * ultraMult)
+                            val formattedIncome = totalIncomePerSecBig.format()
 
                             Surface(
                                 shape = MaterialTheme.shapes.small,
@@ -101,7 +104,7 @@ fun PlayScreen(
                                 tonalElevation = 2.dp
                             ) {
                                 Text(
-                                    text = "+${totalIncomePerSec}/s",
+                                    text = "+$formattedIncome/s",
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     style = MaterialTheme.typography.labelMedium,
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
@@ -204,13 +207,13 @@ fun PlayScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Range: ${state.currentRangeMin} - ${state.currentRangeMax}",
+                            text = locale.getString("play_range_format", "Range: %d - %d", state.currentRangeMin, state.currentRangeMax),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Streak: ${state.streak} (Best: ${state.bestStreak})",
+                            text = locale.getString("play_streak_format", "Streak: %d (Best: %d)", state.streak, state.bestStreak),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -229,7 +232,7 @@ fun PlayScreen(
                         OutlinedTextField(
                             value = guessInput,
                             onValueChange = { guessInput = it },
-                            label = { Text("Enter your guess") },
+                            label = { Text(locale.getString("play_enter_guess", "Enter your guess")) },
                             shape = MaterialTheme.shapes.medium,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             keyboardActions = KeyboardActions(onDone = {
@@ -238,12 +241,62 @@ fun PlayScreen(
                                     onMakeGuess(g)
                                     lastFeedback = if (g < state.targetNumber) {
                                         val lowMsg = feedbackRoot.tooLowMessages.randomOrNull() ?: "📈 Too Low!"
-                                        val tipMsg = feedbackRoot.guessTipsAndClues.randomOrNull() ?: ""
-                                        "$lowMsg\n\n$tipMsg"
+                                        val randomTipTemplate = feedbackRoot.guessTipsAndClues.randomOrNull() ?: "💡 Binary search midpoint: %d"
+                                        val midpoint = (state.currentRangeMin + state.currentRangeMax) / 2
+                                        val diff = kotlin.math.abs(state.targetNumber - g)
+                                        val parity = if (state.targetNumber % 2L == 0L) "even" else "odd"
+                                        val mod10 = (state.targetNumber % 10L).toInt()
+                                        val sqrtVal = kotlin.math.sqrt(state.targetNumber.toDouble()).toInt()
+                                        val formattedTip = try {
+                                            String.format(
+                                                java.util.Locale.US,
+                                                randomTipTemplate,
+                                                midpoint,
+                                                state.currentRangeMin,
+                                                state.currentRangeMax,
+                                                midpoint,
+                                                diff.toInt(),
+                                                if (g < midpoint) "lower" else "upper",
+                                                parity,
+                                                3,
+                                                mod10,
+                                                diff.toInt(),
+                                                sqrtVal
+                                            )
+                                        } catch (e: Exception) {
+                                            randomTipTemplate
+                                        }
+                                        "$lowMsg\n\n$formattedTip"
                                     } else if (g > state.targetNumber) {
-                                        feedbackRoot.tooHighMessages.randomOrNull() ?: "📉 Too High!"
+                                        val highMsg = feedbackRoot.tooHighMessages.randomOrNull() ?: "📉 Too High!"
+                                        val randomTipTemplate = feedbackRoot.guessTipsAndClues.randomOrNull() ?: "💡 Binary search midpoint: %d"
+                                        val midpoint = (state.currentRangeMin + state.currentRangeMax) / 2
+                                        val diff = kotlin.math.abs(state.targetNumber - g)
+                                        val parity = if (state.targetNumber % 2L == 0L) "even" else "odd"
+                                        val mod10 = (state.targetNumber % 10L).toInt()
+                                        val sqrtVal = kotlin.math.sqrt(state.targetNumber.toDouble()).toInt()
+                                        val formattedTip = try {
+                                            String.format(
+                                                java.util.Locale.US,
+                                                randomTipTemplate,
+                                                midpoint,
+                                                state.currentRangeMin,
+                                                state.currentRangeMax,
+                                                midpoint,
+                                                diff.toInt(),
+                                                if (g < midpoint) "lower" else "upper",
+                                                parity,
+                                                3,
+                                                mod10,
+                                                diff.toInt(),
+                                                sqrtVal
+                                            )
+                                        } catch (e: Exception) {
+                                            randomTipTemplate
+                                        }
+                                        "$highMsg\n\n$formattedTip"
                                     } else {
-                                        "✨ Correct! Earned reward!"
+                                        "✨ Correct! You guessed the secret number!"
                                     }
                                     guessInput = ""
                                 }
@@ -261,12 +314,62 @@ fun PlayScreen(
                                     onMakeGuess(g)
                                     lastFeedback = if (g < state.targetNumber) {
                                         val lowMsg = feedbackRoot.tooLowMessages.randomOrNull() ?: "📈 Too Low!"
-                                        val tipMsg = feedbackRoot.guessTipsAndClues.randomOrNull() ?: ""
-                                        "$lowMsg\n\n$tipMsg"
+                                        val randomTipTemplate = feedbackRoot.guessTipsAndClues.randomOrNull() ?: "💡 Binary search midpoint: %d"
+                                        val midpoint = (state.currentRangeMin + state.currentRangeMax) / 2
+                                        val diff = kotlin.math.abs(state.targetNumber - g)
+                                        val parity = if (state.targetNumber % 2L == 0L) "even" else "odd"
+                                        val mod10 = (state.targetNumber % 10L).toInt()
+                                        val sqrtVal = kotlin.math.sqrt(state.targetNumber.toDouble()).toInt()
+                                        val formattedTip = try {
+                                            String.format(
+                                                java.util.Locale.US,
+                                                randomTipTemplate,
+                                                midpoint,
+                                                state.currentRangeMin,
+                                                state.currentRangeMax,
+                                                midpoint,
+                                                diff.toInt(),
+                                                if (g < midpoint) "lower" else "upper",
+                                                parity,
+                                                3,
+                                                mod10,
+                                                diff.toInt(),
+                                                sqrtVal
+                                            )
+                                        } catch (e: Exception) {
+                                            randomTipTemplate
+                                        }
+                                        "$lowMsg\n\n$formattedTip"
                                     } else if (g > state.targetNumber) {
-                                        feedbackRoot.tooHighMessages.randomOrNull() ?: "📉 Too High!"
+                                        val highMsg = feedbackRoot.tooHighMessages.randomOrNull() ?: "📉 Too High!"
+                                        val randomTipTemplate = feedbackRoot.guessTipsAndClues.randomOrNull() ?: "💡 Binary search midpoint: %d"
+                                        val midpoint = (state.currentRangeMin + state.currentRangeMax) / 2
+                                        val diff = kotlin.math.abs(state.targetNumber - g)
+                                        val parity = if (state.targetNumber % 2L == 0L) "even" else "odd"
+                                        val mod10 = (state.targetNumber % 10L).toInt()
+                                        val sqrtVal = kotlin.math.sqrt(state.targetNumber.toDouble()).toInt()
+                                        val formattedTip = try {
+                                            String.format(
+                                                java.util.Locale.US,
+                                                randomTipTemplate,
+                                                midpoint,
+                                                state.currentRangeMin,
+                                                state.currentRangeMax,
+                                                midpoint,
+                                                diff.toInt(),
+                                                if (g < midpoint) "lower" else "upper",
+                                                parity,
+                                                3,
+                                                mod10,
+                                                diff.toInt(),
+                                                sqrtVal
+                                            )
+                                        } catch (e: Exception) {
+                                            randomTipTemplate
+                                        }
+                                        "$highMsg\n\n$formattedTip"
                                     } else {
-                                        "✨ Correct! Earned reward!"
+                                        locale.getString("play_correct_guess", "✨ Correct! You guessed the secret number!")
                                     }
                                     guessInput = ""
                                 }
@@ -279,7 +382,7 @@ fun PlayScreen(
                         ) {
                             Icon(imageVector = Icons.Default.Check, contentDescription = null, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("GUESS NUMBER", style = MaterialTheme.typography.titleMedium)
+                            Text(locale.getString("play_guess_button", "GUESS NUMBER"), style = MaterialTheme.typography.titleMedium)
                         }
 
                         if (BuildConfig.DEBUG) {
@@ -303,7 +406,7 @@ fun PlayScreen(
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "You are using the debug build. It is not for normal use.",
+                                        text = locale.getString("play_debug_warning", "You are using the debug build. It is not for normal use."),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onErrorContainer
                                     )

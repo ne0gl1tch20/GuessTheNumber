@@ -75,7 +75,45 @@ fun SettingsScreen(
                 Text("Game Preferences", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
             }
 
-            // Theme Selector
+            // Language Selector Dropdown
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Language / Wika", style = MaterialTheme.typography.bodyLarge)
+                    var expanded by remember { mutableStateOf(false) }
+                    val languageMap = mapOf("en-US" to "English (US)", "fil-PH" to "Filipino")
+                    val currentLangName = languageMap[settings.locale] ?: "English (US)"
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        OutlinedTextField(
+                            value = currentLangName,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            languageMap.forEach { (code, name) ->
+                                DropdownMenuItem(
+                                    text = { Text(name) },
+                                    onClick = {
+                                        onUpdateSettings(settings.copy(locale = code))
+                                        Toast.makeText(context, "Language changed. Restart app to take effect.", Toast.LENGTH_SHORT).show()
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Theme Appearance", style = MaterialTheme.typography.bodyLarge)
