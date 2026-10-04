@@ -74,8 +74,22 @@ fun AboutScreen(
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(lib.name, fontSize = 16.sp, style = MaterialTheme.typography.titleSmall)
-                        Text(locale.getString("about_library_author_format", lib.author), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(locale.getString("about_library_license_format", lib.license), fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            String.format(
+                                locale.getString("about_library_author_format", "Author: %s"),
+                                lib.author
+                            ),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            String.format(
+                                locale.getString("about_library_license_format", "License: %s"),
+                                lib.license
+                            ),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
