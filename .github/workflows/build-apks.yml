@@ -2,7 +2,7 @@ name: Build Android APKs (Debug & Release)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "fix/about-license-formatting" ]
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
