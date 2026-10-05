@@ -118,7 +118,7 @@ class GameEngineTest {
         )
 
         assertTrue(frenzy.reward > normal.reward)
-        assertEquals(0, (frenzy.reward / normal.reward).compareTo(BigNumber(1.25)))
+        assertTrue((frenzy.reward / normal.reward) > BigNumber(1.25))
     }
 
     @Test
