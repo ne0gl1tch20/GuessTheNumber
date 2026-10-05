@@ -69,8 +69,8 @@ fun SaveSlotsScreen(
                 // If dismissed without confirming, close app with no okay
                 context?.finish()
             },
-            title = { Text("Legacy Save Detected") },
-            text = { Text("We detected an existing single-save from a previous version of Guess The Number. Would you like to transfer your save into Slot 1?\n\nIf you decline, the app will close.") },
+            title = { Text(locale.getString("legacy_save_title", "Legacy Save Detected")) },
+            text = { Text(locale.getString("legacy_save_description", "We detected an existing single-save from a previous version of Guess The Number. Would you like to transfer your save into Slot 1?\n\nIf you decline, the app will close.")) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -78,7 +78,7 @@ fun SaveSlotsScreen(
                         refreshMetadata()
                     }
                 ) {
-                    Text("Transfer to Slot 1")
+                    Text(locale.getString("legacy_save_transfer", "Transfer to Slot 1"))
                 }
             },
             dismissButton = {
@@ -87,7 +87,7 @@ fun SaveSlotsScreen(
                         context?.finish()
                     }
                 ) {
-                    Text("Decline & Close App")
+                    Text(locale.getString("legacy_save_decline", "Decline & Close App"))
                 }
             }
         )
@@ -138,8 +138,8 @@ fun SaveSlotsScreen(
         val slotNum = showResetDialog!!
         AlertDialog(
             onDismissRequest = { showResetDialog = null },
-            title = { Text("Reset Slot $slotNum?") },
-            text = { Text("Are you sure you want to reset Slot $slotNum? All progress in this slot will be permanently lost.") },
+            title = { Text(locale.getString("save_slot_reset_title", "Reset Slot %d?", slotNum)) },
+            text = { Text(locale.getString("save_slot_reset_description", "Are you sure you want to reset Slot %d? All progress in this slot will be permanently lost.", slotNum)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -148,7 +148,7 @@ fun SaveSlotsScreen(
                         refreshMetadata()
                     }
                 ) {
-                    Text("Reset", color = MaterialTheme.colorScheme.error)
+                    Text(locale.getString("save_slot_reset_confirm", "Reset"), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -288,7 +288,7 @@ fun SlotCard(
                             Icon(Icons.Default.Edit, contentDescription = locale.getString("save_profile_edit", "Edit Profile"))
                         }
                         IconButton(onClick = onReset) {
-                        Icon(Icons.Default.Delete, contentDescription = locale.getString("save_slot_reset", "Reset Slot", tint = MaterialTheme.colorScheme.error)
+                        Icon(Icons.Default.Delete, contentDescription = locale.getString("save_slot_reset", "Reset Slot"), tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
