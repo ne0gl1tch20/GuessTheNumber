@@ -97,5 +97,6 @@ data class AchievementDef(
     val id: String,
     val name: String,
     val description: String,
-    val rewardNebula: Long
+    val rewardNebula: Long,
+    val tier: String = "bronze"
 )
