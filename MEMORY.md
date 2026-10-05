@@ -1,6 +1,9 @@
 # Project Memory: Gamified Guess the Number Simulator (v1.12 Update)
 
 ## Project Overview
+
+**Current player-facing pitch:** Start with a simple number guess, then build a run around upgrades, Frenzy streaks, random events, achievement tiers, cosmetics, stackable mutators, and custom challenges. v1.12 is intended to feel like a game you can keep poking at because every run can be pushed, optimized, or made weird in a different way. 🎮✨
+
 A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.12`.
 
 ## Strict Project Rules: Localization & Open-Source Licenses
@@ -31,7 +34,11 @@ A fully polished, feature-complete Android incremental game combining classic gu
 6. **Prestige Talent Web / Skill Tree**: Interconnected Prestige talent nodes (`TalentScreen`) providing passive velocity, critical, and reward multipliers.
 7. **Interactive Android Home Screen Widgets (Jetpack Glance)**: Glance-based app widgets (`GuessWidget`) supporting real-time currency display and quick-guess action triggers.
 8. **Gameplay Mutators & Daily Seeded Challenges**: Customizable difficulty mutators (Hardcore, Hyper Speed, Blindfolded) and daily seeded challenge claims (`MutatorsScreen`).
-9. **Weekly Challenges**: Weekly challenge sets rotate through varied goal types including correct guesses, streaks, money, guess volume, Prestige, Ultra, Frenzy, and playtime, with week-scoped claim IDs and varied Nebula rewards.\n10. **Random Events**: Occasional varied events trigger about once per minute check with a 35% roll, offering Cash Burst, Nebula Rain, Jackpot, Streak Surge, Range Shuffle, Tax Refund, or rare Cosmic Gift effects with localized notices.\n11. **Achievement Tier System**: 27 localized achievements across Bronze, Silver, Gold, and Diamond tiers, with milestone-based unlock checks and escalating Nebula rewards.\n12. **Combo / Frenzy System**: Consecutive correct guesses retain the existing streak combo and unlock Frenzy tiers every 5 correct guesses, adding a 25% reward multiplier per tier up to 5x.\n13. **High-Stakes "Lucky Guess" Staking**: High-stakes 50/50 staking mode (`StakingScreen`) with streak multiplier bonuses.
+9. **Weekly Challenges**: Weekly challenge sets rotate through varied goal types including correct guesses, streaks, money, guess volume, Prestige, Ultra, Frenzy, and playtime, with week-scoped claim IDs and varied Nebula rewards.
+10. **Random Events**: Occasional varied events trigger about once per minute check with a 35% roll, offering Cash Burst, Nebula Rain, Jackpot, Streak Surge, Range Shuffle, Tax Refund, or rare Cosmic Gift effects with localized notices.
+11. **Achievement Tier System**: 27 localized achievements across Bronze, Silver, Gold, and Diamond tiers, with milestone-based unlock checks and escalating Nebula rewards.
+12. **Combo / Frenzy System**: Consecutive correct guesses retain the existing streak combo and unlock Frenzy tiers every 5 correct guesses, adding a 25% reward multiplier per tier up to 5x.
+13. **High-Stakes "Lucky Guess" Staking**: High-stakes 50/50 staking mode (`StakingScreen`) with streak multiplier bonuses.
 10. **Save Export/Import & Cloud Backup UI**: Dedicated Cloud Backup and encrypted save transfer UI (`CloudBackupScreen`).
 11. **GitHub Actions APK Build Pipeline (`.github/workflows/build-apks.yml`)**: Manual APK build workflow running on `ubuntu-latest` through `workflow_dispatch` only that sets up JDK 17, sets up Gradle with caching, executes `./gradlew assembleDebug` and `./gradlew assembleRelease` (producing unsigned release APK), and uploads both APK variants (`GuessTheNumber-debug` and `GuessTheNumber-release`) as GitHub Actions artifacts.
 
@@ -44,7 +51,7 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - Added unit tests for combined mutator multipliers and Hardcore range scaling.
 - App version bumped to versionCode 11 / versionName 1.12.
 - Phase 15 adds full validation and migration coverage for the v1.12 state shape, including mutator sanitization, cosmetic ownership/equip state, challenge claim persistence, localization validation, and manual CI build verification.
-- Phase 15 implementation is complete. Manual CI APK build is being run now at the user's request; CI remains manual-only outside this requested run.
+- Phase 15 implementation is complete. CI remains manual-only via GitHub Actions `workflow_dispatch`; the next build should be used to verify the current v1.12 code after the latest UI and documentation polish.
 
 ## v1.10 Maintenance Notes
 ## Phase 6 Gameplay Mechanics
