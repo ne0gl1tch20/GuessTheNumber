@@ -20,6 +20,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Validate Localizations
+        run: python3 tools/validate_locales.py
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
