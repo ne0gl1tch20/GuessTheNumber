@@ -448,5 +448,12 @@
   "save_profile_name": "Profile Name",
   "save_profile_name_limit": "Up to 24 characters",
   "save_profile_icon": "Profile Icon",
-  "save_profile_save": "Save"
+  "save_profile_save": "Save",
+  "legacy_save_title": "Legacy Save Detected",
+  "legacy_save_description": "We detected an existing single-save from a previous version of Guess The Number. Would you like to transfer your save into Slot 1?\n\nIf you decline, the app will close.",
+  "legacy_save_transfer": "Transfer to Slot 1",
+  "legacy_save_decline": "Decline & Close App",
+  "save_slot_reset_title": "Reset Slot %d?",
+  "save_slot_reset_description": "Are you sure you want to reset Slot %d? All progress in this slot will be permanently lost.",
+  "save_slot_reset_confirm": "Reset"
 }
