@@ -1,4 +1,10 @@
 # 🚀 Guess The Number Simulator - Changelog
+## v1.10 (Difficulty Gameplay Mechanics)
+- 🎚️ **Difficulty Mechanics**: Classic, Hard, and Extreme now have distinct range sizes, reward multipliers, and incorrect-guess money penalties.
+- 📈 **Difficulty-Aware Ranges**: Better Range upgrades now scale from each difficulty's own base range.
+- 🔄 **Reset Consistency**: Prestige resets preserve the selected difficulty's range.
+- 🧪 **Engine Tests**: Added coverage for difficulty penalties, rewards, and range behavior.
+
 
 ## v1.9 (Comprehensive Internationalization & Localization Overhaul)
 - 🌐 **Full Locale & Internationalization Support**: Localized 100% of user-visible strings across all screens (Play, Prestige, Ultra, Upgrades, Shop, Arcade, More, Mutators, Achievements, Cloud Backup, Crash Recovery, Settings, Dev Settings) into `locales/en_us.json`.
