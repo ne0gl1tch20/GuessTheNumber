@@ -296,6 +296,47 @@ class SaveManager(private val context: Context) {
         }
     }
 
+    suspend fun createFreshSlot(slot: Int, difficultyId: String): Boolean {
+        if (slot !in 1..MAX_SAVE_SLOTS || !Difficulty.isValid(difficultyId)) return false
+
+        val targetSlot = slot
+        return try {
+            val prefs = context.saveDataStore.data.first()
+            val existing = prefs[getSaveKey(targetSlot)]
+            if (!existing.isNullOrEmpty() && validateSave(existing)) {
+                return false
+            }
+
+            val freshState = GameState(
+                difficultyId = difficultyId,
+                lastSaveTimestamp = System.currentTimeMillis()
+            )
+            val freshJson = json.encodeToString(freshState)
+
+            context.saveDataStore.edit { p ->
+                p.remove(getBackupKey(targetSlot))
+                p[getSaveKey(targetSlot)] = freshJson
+                p[activeSlotKey] = targetSlot
+            }
+
+            GameLogger.log(
+                LogLevel.INFO,
+                LoggerCategory.SAVE,
+                "CREATE_FRESH_SLOT",
+                "Created fresh save in slot $targetSlot with difficulty $difficultyId."
+            )
+            true
+        } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.ERROR,
+                LoggerCategory.SAVE,
+                "CREATE_FRESH_SLOT_ERROR",
+                "Failed to create fresh save in slot $targetSlot: ${e.message}"
+            )
+            false
+        }
+    }
+
     suspend fun duplicateSlot(sourceSlot: Int, targetSlot: Int): Boolean {
         val source = sourceSlot.coerceIn(1, MAX_SAVE_SLOTS)
         val target = targetSlot.coerceIn(1, MAX_SAVE_SLOTS)
