@@ -23,6 +23,7 @@ import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 fun NavGraph(
     state: GameState,
     onMakeGuess: (Long) -> Unit,
+    incomePerSecond: BigNumber,
     onBuyUpgrade: (String, BigNumber) -> Unit,
     onBuyShopItem: (String, Long) -> Unit,
     onBuyPrestigeUpgrade: (String, BigNumber) -> Unit,
@@ -167,7 +168,7 @@ fun NavGraph(
             popExitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { 100 }) }
         ) {
             composable(Screen.Play.route) {
-                PlayScreen(state = state, onMakeGuess = onMakeGuess)
+                PlayScreen(state = state, onMakeGuess = onMakeGuess, incomePerSecond = incomePerSecond)
             }
             composable(Screen.Upgrade.route) {
                 UpgradeScreen(
