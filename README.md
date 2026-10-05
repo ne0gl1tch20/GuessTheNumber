@@ -1,5 +1,3 @@
-# Guess The Number (Incremental & Arcade Edition) — v1.11
-
 # Guess The Number (Incremental & Arcade Edition)
 
 An advanced, feature-rich incremental and arcade Android game built with **Jetpack Compose** and **Kotlin**. Beyond a simple number-guessing mechanic, this app incorporates deep incremental layers (upgrades, prestige, ultra prestige, achievements, minigames, challenges, and arcade modes), extensive logging, audio management, and developer tools.
