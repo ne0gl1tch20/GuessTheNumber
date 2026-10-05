@@ -53,7 +53,7 @@ class GameEngine(private val rng: Random = Random.Default) {
     fun mutatorRewardMultiplier(state: GameState): BigNumber {
         val active = validateMutators(state.activeMutators)
         var multiplier = 1.0
-        if ("mut_hardcore" in state.activeMutators) multiplier *= HARDCORE_MULTIPLIER
+        if ("mut_hardcore" in active) multiplier *= HARDCORE_MULTIPLIER
         if ("mut_speed" in active) multiplier *= SPEED_MULTIPLIER
         if ("mut_blind" in active) multiplier *= BLIND_MULTIPLIER
         if ("mut_tax" in active) multiplier *= TAX_MULTIPLIER
