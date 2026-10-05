@@ -465,4 +465,13 @@
   "nav_upgrade": "Upgrades",
   "nav_shop": "Shop",
   "nav_more": "More"
+,
+  "save_slot_title": "Slot %d",
+  "save_slot_active": "(Active)",
+  "save_slot_empty": "Empty Slot",
+  "save_slot_start_new": "Start New Game",
+  "save_slot_difficulty": "Difficulty",
+  "difficulty_classic": "Classic",
+  "difficulty_hard": "Hard",
+  "difficulty_extreme": "Extreme"
 }
