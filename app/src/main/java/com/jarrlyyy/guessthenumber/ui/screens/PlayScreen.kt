@@ -280,7 +280,9 @@ fun PlayScreen(
                                 val g = guessInput.toLongOrNull()
                                 if (g != null) {
                                     onMakeGuess(g)
-                                    lastFeedback = if (g < state.targetNumber) {
+                                    lastFeedback = if ("mut_blind" in state.activeMutators) {
+                                        locale.getString("blind_feedback", "Feedback hidden by Blindfolded Oracle.")
+                                    } else if (g < state.targetNumber) {
                                         val lowMsg = feedbackRoot.tooLowMessages.randomOrNull() ?: "📈 Too Low!"
                                         val randomTipTemplate = feedbackRoot.guessTipsAndClues.randomOrNull() ?: "💡 Binary search midpoint: %d"
                                         val midpoint = (state.currentRangeMin + state.currentRangeMax) / 2
