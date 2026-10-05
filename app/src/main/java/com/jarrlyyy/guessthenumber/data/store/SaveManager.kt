@@ -33,7 +33,8 @@ data class SaveSlotMetadata(
     val ultra: BigNumber = BigNumber.ZERO,
     val attempts: Long = 0L,
     val correctGuesses: Long = 0L,
-    val lastSaveTimestamp: Long = 0L
+    val lastSaveTimestamp: Long = 0L,
+    val hasBackup: Boolean = false
 )
 
 class SaveManager(private val context: Context) {
@@ -107,7 +108,8 @@ class SaveManager(private val context: Context) {
                     ultra = state.ultra,
                     attempts = state.attempts,
                     correctGuesses = state.correctGuesses,
-                    lastSaveTimestamp = state.lastSaveTimestamp
+                    lastSaveTimestamp = state.lastSaveTimestamp,
+                    hasBackup = prefs[getBackupKey(s)]?.let { validateSave(it) } == true
                 )
             } else {
                 SaveSlotMetadata(slotIndex = s, isEmpty = true)
@@ -288,6 +290,46 @@ class SaveManager(private val context: Context) {
             saveGame(state, targetSlot)
             true
         } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun duplicateSlot(sourceSlot: Int, targetSlot: Int): Boolean {
+        val source = sourceSlot.coerceIn(1, MAX_SAVE_SLOTS)
+        val target = targetSlot.coerceIn(1, MAX_SAVE_SLOTS)
+        if (source == target) return false
+        return try {
+            val prefs = context.saveDataStore.data.first()
+            val sourceJson = prefs[getSaveKey(source)] ?: return false
+            if (!validateSave(sourceJson)) return false
+            if (!prefs[getSaveKey(target)].isNullOrEmpty()) return false
+            context.saveDataStore.edit { p ->
+                p[getSaveKey(target)] = sourceJson
+                prefs[getBackupKey(source)]?.let { p[getBackupKey(target)] = it }
+            }
+            GameLogger.log(LogLevel.INFO, LoggerCategory.SAVE, "DUPLICATE_SLOT", "Duplicated slot $source to slot $target.")
+            true
+        } catch (e: Exception) {
+            GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "DUPLICATE_SLOT_ERROR", "Failed to duplicate slot $source to slot $target: ${e.message}")
+            false
+        }
+    }
+
+    suspend fun restoreBackup(slot: Int): Boolean {
+        val s = slot.coerceIn(1, MAX_SAVE_SLOTS)
+        return try {
+            val prefs = context.saveDataStore.data.first()
+            val current = prefs[getSaveKey(s)] ?: return false
+            val backup = prefs[getBackupKey(s)] ?: return false
+            if (!validateSave(current) || !validateSave(backup)) return false
+            context.saveDataStore.edit { p ->
+                p[getSaveKey(s)] = backup
+                p[getBackupKey(s)] = current
+            }
+            GameLogger.log(LogLevel.WARN, LoggerCategory.SAVE, "RESTORE_BACKUP", "Restored slot $s from its backup.")
+            true
+        } catch (e: Exception) {
+            GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "RESTORE_BACKUP_ERROR", "Failed to restore backup for slot $s: ${e.message}")
             false
         }
     }
