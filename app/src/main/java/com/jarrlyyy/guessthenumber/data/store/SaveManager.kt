@@ -18,6 +18,8 @@ import java.math.BigDecimal
 
 val Context.saveDataStore by preferencesDataStore(name = "game_save_prefs")
 
+const val MAX_SAVE_SLOTS = 10
+
 data class SaveSlotMetadata(
     val slotIndex: Int,
     val isEmpty: Boolean,
@@ -41,12 +43,12 @@ class SaveManager(private val context: Context) {
 
     suspend fun getActiveSlot(): Int {
         val prefs = context.saveDataStore.data.first()
-        return prefs[activeSlotKey] ?: 1
+        return (prefs[activeSlotKey] ?: 1).coerceIn(1, MAX_SAVE_SLOTS)
     }
 
     suspend fun setActiveSlot(slot: Int) {
         context.saveDataStore.edit { prefs ->
-            prefs[activeSlotKey] = slot.coerceIn(1, 3)
+            prefs[activeSlotKey] = slot.coerceIn(1, MAX_SAVE_SLOTS)
         }
     }
 
@@ -83,7 +85,7 @@ class SaveManager(private val context: Context) {
     }
 
     suspend fun getSlotMetadata(slot: Int): SaveSlotMetadata {
-        val s = slot.coerceIn(1, 3)
+        val s = slot.coerceIn(1, MAX_SAVE_SLOTS)
         return try {
             val prefs = context.saveDataStore.data.first()
             val jsonString = prefs[getSaveKey(s)]
@@ -108,7 +110,7 @@ class SaveManager(private val context: Context) {
     }
 
     suspend fun saveGame(state: GameState, slot: Int = -1): Boolean {
-        val targetSlot = if (slot in 1..3) slot else getActiveSlot()
+        val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot()
         val sKey = getSaveKey(targetSlot)
         val bKey = getBackupKey(targetSlot)
         return try {
@@ -129,7 +131,7 @@ class SaveManager(private val context: Context) {
     }
 
     suspend fun loadGame(slot: Int = -1): GameState {
-        val targetSlot = if (slot in 1..3) slot else getActiveSlot()
+        val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot()
         val sKey = getSaveKey(targetSlot)
         val bKey = getBackupKey(targetSlot)
         return try {
@@ -246,14 +248,14 @@ class SaveManager(private val context: Context) {
     }
 
     suspend fun exportSave(slot: Int = -1): String {
-        val targetSlot = if (slot in 1..3) slot else getActiveSlot()
+        val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot()
         val prefs = context.saveDataStore.data.first()
         val raw = prefs[getSaveKey(targetSlot)] ?: ""
         return if (raw.isNotEmpty()) encrypt(raw) else ""
     }
 
     suspend fun importSave(inputString: String, slot: Int = -1): Boolean {
-        val targetSlot = if (slot in 1..3) slot else getActiveSlot()
+        val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot()
         val jsonString = if (validateSave(inputString)) {
             inputString
         } else {
@@ -275,7 +277,7 @@ class SaveManager(private val context: Context) {
     }
 
     suspend fun resetSlot(slot: Int) {
-        val s = slot.coerceIn(1, 3)
+        val s = slot.coerceIn(1, MAX_SAVE_SLOTS)
         context.saveDataStore.edit { prefs ->
             prefs.remove(getSaveKey(s))
             prefs.remove(getBackupKey(s))
