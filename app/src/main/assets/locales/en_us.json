@@ -413,7 +413,7 @@
   "time_travel_title": "⏳ Time Travel Detected!",
   "time_travel_text": "It seems like the time has changed since the last time you played (device clock is %d seconds behind last save). As a consequence, auto-clicker and passive generation have been temporarily paused for 24 hours.",
   "understood": "Understood",
-  "changelog_popup_title": "🚀 What's New in v1.9!",
+  "changelog_popup_title": "🚀 What's New in v1.10!",
   "changelog_popup_text": "A new version of Guess The Number is installed! Check out the changelog for details on Internationalization, Localization, and updates.",
   "view_changelog": "View Changelog",
   "dismiss": "Dismiss",
