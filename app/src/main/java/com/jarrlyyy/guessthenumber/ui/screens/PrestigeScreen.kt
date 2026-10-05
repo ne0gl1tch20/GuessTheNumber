@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,6 +26,7 @@ fun PrestigeScreen(
     state: GameState,
     onPrestige: () -> Unit,
     onBuyPrestigeUpgrade: (String, BigNumber) -> Unit,
+    onUpdateMultiplier: (String) -> Unit = {},
     onBuyPrestigeShopItem: (String, Long) -> Unit,
     onBack: () -> Unit
 ) {
@@ -87,33 +89,67 @@ fun PrestigeScreen(
             item {
                 Text("Prestige Upgrade Tree (JSON Driven)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
-
+            item {
+                var expanded by remember { mutableStateOf(false) }
+                val multipliers = listOf("1", "10", "100", "MAX")
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text("Buy Multiplier:", style = MaterialTheme.typography.titleMedium)
+                    Box(Modifier.wrapContentSize(Alignment.TopEnd)) {
+                        OutlinedButton(onClick = { expanded = true }) {
+                            Text("${state.buyMultiplier}x")
+                            Spacer(Modifier.width(8.dp))
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
+                        }
+                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                            multipliers.forEach { mult ->
+                                DropdownMenuItem(text = { Text("$mult x") }, onClick = { onUpdateMultiplier(mult); expanded = false })
+                            }
+                        }
+                    }
+                }
+                HorizontalDivider()
+            }
             items(upgrades, key = { it.id }) { upgrade ->
                 val level = state.prestigeUpgradeLevels[upgrade.id] ?: 0
-                val cost = BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(level)
-                val canAfford = state.prestige >= cost
-
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
+                val isMaxed = level >= upgrade.maxLevel
+                val levelsToBuy = when (state.buyMultiplier) {
+                    "10" -> minOf(10, upgrade.maxLevel - level)
+                    "100" -> minOf(100, upgrade.maxLevel - level)
+                    "MAX" -> {
+                        var count = 0
+                        var total = BigNumber.ZERO
+                        var current = level
+                        val base = BigNumber(upgrade.baseCost)
+                        val mult = BigNumber(upgrade.costMultiplier)
+                        while (current < upgrade.maxLevel) {
+                            val next = base * mult.pow(current)
+                            if (state.prestige < total + next) break
+                            total += next
+                            count++
+                            current++
+                        }
+                        count
+                    }
+                    else -> minOf(1, upgrade.maxLevel - level)
+                }
+                val totalCost = if (levelsToBuy > 0) {
+                    (0 until levelsToBuy).fold(BigNumber.ZERO) { total, index ->
+                        total + BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(level + index)
+                    }
+                } else BigNumber.ZERO
+                val canAfford = !isMaxed && levelsToBuy > 0 && state.prestige >= totalCost
+                Card(Modifier.fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
                             Text(upgrade.name, fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
                             Text(upgrade.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(Modifier.height(4.dp))
                             Text("Level: $level / ${upgrade.maxLevel}", fontSize = 12.sp)
-                            Text("Cost: ${cost.format()} Prestige", fontSize = 14.sp, color = PrestigeBlue)
+                            if (isMaxed) Text("MAXED", fontSize = 14.sp, color = PrestigeBlue)
+                            else Text("Cost (${state.buyMultiplier}x): ${totalCost.format()} Prestige", fontSize = 14.sp, color = PrestigeBlue)
                         }
-                        Button(
-                            onClick = { onBuyPrestigeUpgrade(upgrade.id, cost) },
-                            enabled = canAfford && level < upgrade.maxLevel,
-                            colors = ButtonDefaults.buttonColors(containerColor = PrestigeBlue)
-                        ) {
-                            Text("Buy")
+                        Button(onClick = { onBuyPrestigeUpgrade(upgrade.id, totalCost) }, enabled = canAfford, colors = ButtonDefaults.buttonColors(containerColor = PrestigeBlue)) {
+                            Text(if (isMaxed) "MAXED" else "Buy")
                         }
                     }
                 }
