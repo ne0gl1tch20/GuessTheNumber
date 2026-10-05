@@ -1,6 +1,8 @@
 # Guess The Number (Incremental & Arcade Edition)
 
-An advanced, feature-rich incremental and arcade Android game built with **Jetpack Compose** and **Kotlin**. Beyond a simple number-guessing mechanic, this app incorporates deep incremental layers (upgrades, prestige, ultra prestige, achievements, minigames, challenges, and arcade modes), extensive logging, audio management, and developer tools.
+An advanced, feature-rich incremental and arcade Android game built with **Jetpack Compose** and **Kotlin**. Start with a simple number guess, then turn it into a full progression loop: build upgrades, chase streaks, trigger Frenzy, discover events, collect cosmetics, stack mutators, and create challenges that make your next run feel different.
+
+**Why try it?** 🎮 You can play casually, optimize an automation build, hunt achievement tiers, or make a ridiculous custom mutator challenge. There is always another upgrade, reset, challenge, or combination waiting in the next run.
 
 ---
 
@@ -16,6 +18,14 @@ An advanced, feature-rich incremental and arcade Android game built with **Jetpa
 - **Combo / Frenzy System**: Consecutive correct guesses build streaks, with Frenzy tiers adding escalating reward multipliers up to 5x.
 - **Achievements & Challenges**: Track milestones, complete daily seeded challenges with Nebula rewards, and play high-stakes 50/50 staking mode (`StakingScreen`).
 - **Arcade Minigames**: Integrated side activities and minigames (`minigames.json`) to keep gameplay engaging.
+
+### 🎯 **What You Can Do Right Now**
+- 🔥 **Build a streak and hit Frenzy**: Keep landing correct guesses to push your reward multiplier higher.
+- 🧩 **Make your own challenge**: Combine mutators, choose a goal, set a target, and chase the Nebula reward.
+- ✨ **Collect cosmetics**: Browse the shop by category and equip cosmetics as your collection grows.
+- 🏆 **Climb achievement tiers**: Work through Bronze, Silver, Gold, and Diamond milestones.
+- 🎲 **React to random events**: Keep playing and see what the next event throws at your run.
+- 💾 **Keep multiple runs**: Use the expanded save-slot system for separate profiles and difficulty choices.
 
 ### 2. **Architecture & Tech Stack**
 - **UI Toolkit**: 100% Jetpack Compose with Google's **Material 3 Expressive** design system, organic spring-physics micro-animations, and pure black AMOLED mode.
