@@ -548,30 +548,60 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         saveGameAsync()
     }
 
+    private fun bulkUpgradeCount(upgrade: com.jarrlyyy.guessthenumber.domain.model.UpgradeDef, currentLevel: Int, currency: BigNumber): Int {
+        if (currentLevel >= upgrade.maxLevel) return 0
+        return when (_gameState.value.buyMultiplier) {
+            "10" -> minOf(10, upgrade.maxLevel - currentLevel)
+            "100" -> minOf(100, upgrade.maxLevel - currentLevel)
+            "MAX" -> {
+                var count = 0
+                var totalCost = BigNumber.ZERO
+                var level = currentLevel
+                val base = BigNumber(upgrade.baseCost)
+                val mult = BigNumber(upgrade.costMultiplier)
+                while (level < upgrade.maxLevel) {
+                    val nextCost = base * mult.pow(level)
+                    if (currency < totalCost + nextCost) break
+                    totalCost += nextCost
+                    count++
+                    level++
+                }
+                count
+            }
+            else -> 1
+        }
+    }
+
     fun buyPrestigeUpgrade(upgradeId: String, cost: BigNumber) {
         val state = _gameState.value
-        if (state.prestige >= cost) {
-            val currentLevel = state.prestigeUpgradeLevels[upgradeId] ?: 0
-            val newLevels = state.prestigeUpgradeLevels.toMutableMap()
-            newLevels[upgradeId] = currentLevel + 1
-            val newPrestige = state.prestige - cost
-            _gameState.value = state.copy(prestige = newPrestige, prestigeUpgradeLevels = newLevels)
-            saveGameAsync()
-            GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_PRESTIGE_UPGRADE", "Bought prestige upgrade $upgradeId to level ${currentLevel + 1}")
-        }
+        val upgrade = JsonConfigRepository(getApplication()).loadPrestigeUpgrades().find { it.id == upgradeId } ?: return
+        val currentLevel = state.prestigeUpgradeLevels[upgradeId] ?: 0
+        val count = bulkUpgradeCount(upgrade, currentLevel, state.prestige)
+        if (count <= 0 || state.prestige < cost) return
+
+        val newLevel = minOf(upgrade.maxLevel, currentLevel + count)
+        val newLevels = state.prestigeUpgradeLevels.toMutableMap()
+        newLevels[upgradeId] = newLevel
+        val newPrestige = state.prestige - cost
+        _gameState.value = state.copy(prestige = newPrestige, prestigeUpgradeLevels = newLevels)
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_PRESTIGE_UPGRADE", "Bought prestige upgrade $upgradeId to level $newLevel")
     }
 
     fun buyUltraUpgrade(upgradeId: String, cost: BigNumber) {
         val state = _gameState.value
-        if (state.ultra >= cost) {
-            val currentLevel = state.ultraUpgradeLevels[upgradeId] ?: 0
-            val newLevels = state.ultraUpgradeLevels.toMutableMap()
-            newLevels[upgradeId] = currentLevel + 1
-            val newUltra = state.ultra - cost
-            _gameState.value = state.copy(ultra = newUltra, ultraUpgradeLevels = newLevels)
-            saveGameAsync()
-            GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_ULTRA_UPGRADE", "Bought ultra upgrade $upgradeId to level ${currentLevel + 1}")
-        }
+        val upgrade = JsonConfigRepository(getApplication()).loadUltraUpgrades().find { it.id == upgradeId } ?: return
+        val currentLevel = state.ultraUpgradeLevels[upgradeId] ?: 0
+        val count = bulkUpgradeCount(upgrade, currentLevel, state.ultra)
+        if (count <= 0 || state.ultra < cost) return
+
+        val newLevel = minOf(upgrade.maxLevel, currentLevel + count)
+        val newLevels = state.ultraUpgradeLevels.toMutableMap()
+        newLevels[upgradeId] = newLevel
+        val newUltra = state.ultra - cost
+        _gameState.value = state.copy(ultra = newUltra, ultraUpgradeLevels = newLevels)
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_ULTRA_UPGRADE", "Bought ultra upgrade $upgradeId to level $newLevel")
     }
 
     fun buyPrestigeShopItem(itemId: String, cost: Long) {
