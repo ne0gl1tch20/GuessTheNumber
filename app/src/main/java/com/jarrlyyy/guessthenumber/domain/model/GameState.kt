@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.domain.model
 
+import com.jarrlyyy.guessthenumber.BuildConfig
+
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -31,7 +33,7 @@ data class GameState(
     val statistics: GameStatistics = GameStatistics(),
     val settings: GameSettings = GameSettings(),
     val lastSaveTimestamp: Long = System.currentTimeMillis(),
-    val lastSavedVersion: String = "1.12",
+    val lastSavedVersion: String = BuildConfig.VERSION_NAME,
     val timeTravelPenaltyUntil: Long = 0L,
     val autoClickerActive: Boolean = false,
     val autoClickerSpeed: Double = 1.0, // clicks per second
