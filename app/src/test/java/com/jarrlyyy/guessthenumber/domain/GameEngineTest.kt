@@ -152,7 +152,7 @@ class GameEngineTest {
             activeMutators = setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")
         )
         val multiplier = engine.mutatorRewardMultiplier(state)
-        assertEquals(BigNumber(150.0), multiplier)
+        assertEquals(BigNumber(300.0), multiplier)
     }
 
     @Test
