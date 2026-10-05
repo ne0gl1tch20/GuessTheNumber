@@ -518,5 +518,20 @@
   "achievement_tier_bronze": "Bronze",
   "achievement_tier_silver": "Silver",
   "achievement_tier_gold": "Gold",
-  "achievement_tier_diamond": "Diamond"
+  "achievement_tier_diamond": "Diamond",
+  "random_event_active": "⚡ Random Event: %s",
+  "random_event_cash_burst_name": "Pagsabog ng Pera",
+  "random_event_cash_burst_desc": "Biglang dumami ang pera! Makakakuha ka ng bonus batay sa kasalukuyan mong pera.",
+  "random_event_nebula_rain_name": "Ulan ng Nebula",
+  "random_event_nebula_rain_desc": "Bumabagsak ang mga kristal ng Nebula! Kunin ang bonus bago ito mawala.",
+  "random_event_jackpot_name": "Jackpot",
+  "random_event_jackpot_desc": "🎰 JACKPOT! Isang malaking gantimpala batay sa kasalukuyang saklaw ang mapupunta sa iyo.",
+  "random_event_streak_surge_name": "Biglang Streak",
+  "random_event_streak_surge_desc": "Biglang lumakas ang combo mo. Nadagdagan ng 2 ang iyong streak!",
+  "random_event_range_shuffle_name": "Halo ng Saklaw",
+  "random_event_range_shuffle_desc": "Gumalaw ang target! Naitakda muli ang nakatagong numero sa kasalukuyang saklaw.",
+  "random_event_tax_refund_name": "Balik-Buwis",
+  "random_event_tax_refund_desc": "May utang sa iyo ang laro. Makakakuha ka ng refund batay sa iyong nagastos.",
+  "random_event_cosmic_gift_name": "Regalong Kosmiko",
+  "random_event_cosmic_gift_desc": "🌌 Isang bihirang regalong kosmiko ang nagbibigay sa iyo ng 100 Nebula."
 }
