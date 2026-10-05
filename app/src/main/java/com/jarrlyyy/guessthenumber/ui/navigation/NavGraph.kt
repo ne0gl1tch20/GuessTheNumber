@@ -202,6 +202,7 @@ fun NavGraph(
                     state = state,
                     onPrestige = onPrestige,
                     onBuyPrestigeUpgrade = onBuyPrestigeUpgrade,
+                    onUpdateMultiplier = onUpdateMultiplier,
                     onBuyPrestigeShopItem = onBuyPrestigeShopItem,
                     onBack = { navController.popBackStack() }
                 )
@@ -211,6 +212,7 @@ fun NavGraph(
                     state = state,
                     onUltra = onUltra,
                     onBuyUltraUpgrade = onBuyUltraUpgrade,
+                    onUpdateMultiplier = onUpdateMultiplier,
                     onBuyUltraShopItem = onBuyUltraShopItem,
                     onBack = { navController.popBackStack() }
                 )
