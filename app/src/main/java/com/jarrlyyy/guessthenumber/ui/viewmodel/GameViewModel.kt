@@ -225,15 +225,19 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun updateSlotProfile(slot: Int, name: String, iconId: String) {
         if (slot !in 1..MAX_SAVE_SLOTS || !SaveProfile.isValidIcon(iconId)) return
         viewModelScope.launch(Dispatchers.IO) {
-            val metadata = saveManager.getSlotMetadata(slot)
-            if (metadata.isEmpty) return@launch
-            val state = saveManager.loadGame(slot)
-            val updated = state.copy(
-                profileName = name.trim().take(24),
-                profileIconId = iconId
-            )
-            saveManager.saveGame(updated, slot)
-            loadGame(_activeSlot.value)
+            slotOperationMutex.withLock {
+                val metadata = saveManager.getSlotMetadata(slot)
+                if (metadata.isEmpty) return@withLock
+                val state = saveManager.loadGame(slot)
+                val updated = state.copy(
+                    profileName = name.trim().take(24),
+                    profileIconId = iconId
+                )
+                saveManager.saveGame(updated, slot)
+                if (_activeSlot.value == slot) {
+                    _gameState.value = AntiCheatService.sanitizeCurrency(updated)
+                }
+            }
         }
     }
 
@@ -259,7 +263,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun migrateLegacySave() {
         viewModelScope.launch(Dispatchers.IO) {
-            val success = saveManager.migrateLegacySaveToSlot1()
+            val success = slotOperationMutex.withLock {
+                saveManager.migrateLegacySaveToSlot1()
+            }
             if (success) {
                 withContext(Dispatchers.Main) {
                     _hasLegacySave.value = false
