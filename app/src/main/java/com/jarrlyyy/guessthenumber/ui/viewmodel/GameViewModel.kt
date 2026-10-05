@@ -642,7 +642,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun setMutatorActive(id: String, active: Boolean) {
-        val current = _gameState.value.activeMutators.toMutableSet()
+        val current = gameEngine.validateMutators(_gameState.value.activeMutators).toMutableSet()
         if (active) current.add(id) else current.remove(id)
         _gameState.value = gameEngine.applyMutatorSet(_gameState.value, current)
         saveGameAsync()
