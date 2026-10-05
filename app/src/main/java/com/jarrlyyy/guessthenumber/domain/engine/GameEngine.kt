@@ -26,7 +26,7 @@ class GameEngine(private val rng: Random = Random.Default) {
         const val FRENZY_BONUS_PER_TIER = 0.25
         const val FRENZY_MAX_MULTIPLIER = 5.0
         private const val HARDCORE_MULTIPLIER = 2.0
-        private const val SPEED_MULTIPLIER = 1.5
+        private const val SPEED_MULTIPLIER = 3.0
         private const val BLIND_MULTIPLIER = 5.0
         private const val TAX_MULTIPLIER = 10.0
     }
