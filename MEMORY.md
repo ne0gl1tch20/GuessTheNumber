@@ -33,7 +33,7 @@ A fully polished, feature-complete Android incremental game combining classic gu
 8. **Gameplay Mutators & Daily Seeded Challenges**: Customizable difficulty mutators (Hardcore, Hyper Speed, Blindfolded) and daily seeded challenge claims (`MutatorsScreen`).
 9. **Combo Streaks & High-Stakes "Lucky Guess" Staking**: High-stakes 50/50 staking mode (`StakingScreen`) with streak multiplier bonuses.
 10. **Save Export/Import & Cloud Backup UI**: Dedicated Cloud Backup and encrypted save transfer UI (`CloudBackupScreen`).
-11. **GitHub Actions APK Build Pipeline (`.github/workflows/build-apks.yml`)**: Automated CI/CD workflow running on `ubuntu-latest` (supporting `push` to `main` and `workflow_dispatch`) that sets up JDK 17, sets up Gradle with caching, executes `./gradlew assembleDebug` and `./gradlew assembleRelease` (producing unsigned release APK), and uploads both APK variants (`GuessTheNumber-debug` and `GuessTheNumber-release`) as GitHub Actions artifacts.
+11. **GitHub Actions APK Build Pipeline (`.github/workflows/build-apks.yml`)**: Manual APK build workflow running on `ubuntu-latest` through `workflow_dispatch` only that sets up JDK 17, sets up Gradle with caching, executes `./gradlew assembleDebug` and `./gradlew assembleRelease` (producing unsigned release APK), and uploads both APK variants (`GuessTheNumber-debug` and `GuessTheNumber-release`) as GitHub Actions artifacts.
 
 ## v1.10 Maintenance Notes
 ## Phase 6 Gameplay Mechanics
@@ -45,6 +45,8 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - Save sanitization and Prestige reset now preserve the selected difficulty's range.
 - Added unit coverage for difficulty penalties, rewards, and range behavior.
 - Phase 6 changes were committed without starting a new APK build to conserve CI usage.
+- Phase 7 implemented a feedback-driven `GuessingBot` using binary search. The auto-clicker now guesses without reading the hidden target and updates its search bounds from TOO_LOW / TOO_HIGH / CORRECT feedback.
+- Added `GuessingBotTest` coverage and localized the auto-clicker description in English and Filipino.
 
 - Fixed `AboutScreen` open-source license attribution formatting so author and license placeholders render their actual values.
 - Added Phase 5 slot duplication and backup restoration workflow.
