@@ -439,10 +439,55 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             val newPurchases = state.shopPurchases + itemId
             val newNebula = state.nebula - cost
             val autoActive = if (itemId == "auto_clicker_basic") true else state.autoClickerActive
-            _gameState.value = state.copy(nebula = newNebula, shopPurchases = newPurchases, autoClickerActive = autoActive)
+            val cosmetic = if (itemId.startsWith("cosmetic_")) itemId else state.equippedCosmeticId
+            _gameState.value = state.copy(
+                nebula = newNebula,
+                shopPurchases = newPurchases,
+                equippedCosmeticId = cosmetic,
+                autoClickerActive = autoActive
+            )
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.SHOP, "BUY_SHOP", "Purchased shop item $itemId")
         }
+    }
+
+    fun equipCosmetic(itemId: String) {
+        val state = _gameState.value
+        if (!itemId.startsWith("cosmetic_") || itemId !in state.shopPurchases) return
+        _gameState.value = state.copy(equippedCosmeticId = itemId)
+        saveGameAsync()
+    }
+
+    fun setMutatorActive(mutatorId: String, active: Boolean) {
+        val state = _gameState.value
+        val valid = setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")
+        if (mutatorId !in valid) return
+        val next = state.activeMutators.toMutableSet().apply {
+            if (active) add(mutatorId) else remove(mutatorId)
+        }.toSet()
+        val rangeMax = gameEngine.getRangeMax(state.copy(activeMutators = next))
+        val target = if (rangeMax >= 1L) kotlin.random.Random.nextLong(1L, rangeMax + 1L) else 1L
+        val updated = state.copy(
+            activeMutators = next,
+            currentRangeMax = rangeMax,
+            targetNumber = target
+        )
+        _gameState.value = updated
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.SHOP, "MUTATOR_TOGGLE", "Mutator $mutatorId active=$active")
+    }
+
+    fun activateChallengeBuilder(mutators: Set<String>) {
+        val state = _gameState.value
+        val valid = setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")
+        val selected = mutators.intersect(valid)
+        val next = state.copy(activeMutators = selected)
+        val rangeMax = gameEngine.getRangeMax(next)
+        _gameState.value = next.copy(
+            currentRangeMax = rangeMax,
+            targetNumber = kotlin.random.Random.nextLong(1L, rangeMax + 1L)
+        )
+        saveGameAsync()
     }
 
     fun buyPrestigeUpgrade(upgradeId: String, cost: BigNumber) {
@@ -698,8 +743,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         autoClickerJob = viewModelScope.launch(Dispatchers.Default) {
             while (true) {
                 val state = _gameState.value
-                val delayMillis = if (state.autoClickerActive && state.autoClickerSpeed > 0.0) {
-                    (1000.0 / state.autoClickerSpeed).toLong()
+                val effectiveSpeed = state.autoClickerSpeed * if ("mut_speed" in state.activeMutators) 3.0 else 1.0
+                val delayMillis = if (state.autoClickerActive && effectiveSpeed > 0.0) {
+                    (1000.0 / effectiveSpeed).toLong()
                 } else {
                     1000L
                 }
