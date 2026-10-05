@@ -18,13 +18,11 @@
   "mutators": "Mutators",
   "prestige": "Prestige",
   "save_slots": "Save Slots",
-
   "guess_prompt": "Enter your guess:",
   "submit_guess": "Submit",
   "correct_guess": "Correct! You guessed the number!",
   "too_low": "Too low! Try a higher number.",
   "too_high": "Too high! Try a lower number.",
-
   "settings_title": "Game Settings",
   "sound_effects": "Sound Effects",
   "background_music": "Background Music",
@@ -40,7 +38,6 @@
   "game_preferences": "Game Preferences",
   "notifications": "Notifications",
   "cloud_backup_title": "Cloud Backup & Sync",
-
   "shop_title": "Nebula Shop",
   "buy": "Buy",
   "purchased": "Purchased",
@@ -49,7 +46,6 @@
   "cost": "Cost: %s Nebula",
   "owned": "Owned",
   "acquire": "Acquire",
-
   "achievements_title": "Achievements & Perks",
   "locked": "Locked",
   "unlocked": "Unlocked",
@@ -58,14 +54,12 @@
   "achievement_unlocked_format": "Unlocked: %d / %d",
   "achievement_progress_desc": "Unlocking achievements grants permanent Nebula rewards and passive perks!",
   "reward_format": "Reward: +%s Nebula",
-
   "achievement_correct_10_name": "Novice Guesser",
   "achievement_correct_10_desc": "Successfully guess the number 10 times.",
   "achievement_streak_5_name": "Streak Master",
   "achievement_streak_5_desc": "Achieve a winning guess streak of 5.",
   "achievement_millionaire_name": "Number Millionaire",
   "achievement_millionaire_desc": "Accumulate 1,000,000 money.",
-
   "upgrade_reward_multiplier_name": "Reward Multiplier",
   "upgrade_reward_multiplier_desc": "Increases money earned per correct guess.",
   "upgrade_better_range_name": "Better Guess Range",
@@ -88,40 +82,34 @@
   "upgrade_ultra_efficiency_desc": "Amplifies Ultra reset currency rewards.",
   "upgrade_discount_bargain_name": "Upgrade Discount",
   "upgrade_discount_bargain_desc": "Reduces cost scaling across all upgrades.",
-
   "prestige_money_boost_name": "Prestige Wealth",
   "prestige_money_boost_desc": "Permanently boosts money earnings based on Prestige level.",
   "prestige_gain_boost_name": "Prestige Catalyst",
   "prestige_gain_boost_desc": "Increases Prestige currency gain from resets.",
   "prestige_starting_capital_name": "Prestige Endowment",
   "prestige_starting_capital_desc": "Starts you off with extra money after resetting.",
-
   "ultra_money_boost_name": "Cosmic Wealth",
   "ultra_money_boost_desc": "Massively multiplies money earnings based on Ultra level.",
   "ultra_gain_boost_name": "Eternal Expansion",
   "ultra_gain_boost_desc": "Increases Ultra currency gain from resets (up to 2,000 cap).",
   "ultra_nebula_boost_name": "Nebula Resonance",
   "ultra_nebula_boost_desc": "Boosts Nebula rewards from Arcade and achievements.",
-
   "shop_item_auto_clicker_basic_name": "Auto Clicker",
   "shop_item_auto_clicker_basic_desc": "Automatically guesses target number every second.",
   "shop_item_nebula_boost_name": "Nebula Crystal",
   "shop_item_nebula_boost_desc": "Permanently increases Nebula gains by 2x.",
   "shop_item_golden_guess_name": "Golden Guess Pass",
   "shop_item_golden_guess_desc": "Guarantees critical rewards on every 10th guess.",
-
   "prestige_shop_prestige_auto_speed_name": "Quantum Auto-Guess",
   "prestige_shop_prestige_auto_speed_desc": "Increases auto-clicker guessing frequency by 50%.",
   "prestige_shop_prestige_luck_charm_name": "Prestige Luck Charm",
   "prestige_shop_prestige_luck_charm_desc": "Increases critical guess chance by 5%.",
-
   "ultra_shop_ultra_universal_harmony_name": "Universal Harmony",
   "ultra_shop_ultra_universal_harmony_desc": "Guarantees critical rewards on every correct guess.",
   "ultra_shop_ultra_infinite_multiplier_name": "Infinite Singularity",
   "ultra_shop_ultra_infinite_multiplier_desc": "Permanently doubles all currency gains.",
   "ultra_shop_ultra_flex_badge_name": "THE FLEX BADGE",
   "ultra_shop_ultra_flex_badge_desc": "The ultimate symbol of prestige and supreme wealth in the universe.",
-
   "minigame_quick_guess_name": "Quick Guess",
   "minigame_quick_guess_desc": "Guess numbers as fast as possible within 10 seconds to score points and earn Nebula!",
   "minigame_reaction_test_name": "Reaction Test",
@@ -132,7 +120,6 @@
   "minigame_memory_match_desc": "Memorize a sequence of glowing digits and repeat it back correctly.",
   "minigame_number_rush_name": "Number Rush",
   "minigame_number_rush_desc": "Tap numbers in ascending order from 1 to 5 as fast as you can.",
-
   "mutator_mut_hardcore_name": "Hardcore Range",
   "mutator_mut_hardcore_desc": "Guessing range is doubled. Rewards ×2.",
   "mutator_mut_speed_name": "Hyper Speed",
@@ -141,10 +128,8 @@
   "mutator_mut_blind_desc": "No lower/higher feedback indicators. Rewards ×5.",
   "mutator_mut_tax_name": "Heavy Taxation",
   "mutator_mut_tax_desc": "Each wrong guess costs 5% of current money. Rewards ×10.",
-
   "challenge_daily_guess_50_name": "Daily Number Challenge",
   "challenge_daily_guess_50_desc": "Make 50 correct guesses today.",
-
   "talent_talent_speed_1_name": "Velocity Boost I",
   "talent_talent_speed_1_desc": "Increases Auto-Clicker speed by +25%",
   "talent_talent_speed_2_name": "Velocity Boost II",
@@ -157,13 +142,11 @@
   "talent_talent_reward_1_desc": "Boosts all Money earnings by +50%",
   "talent_talent_master_1_name": "Omniscient Oracle",
   "talent_talent_master_1_desc": "Guarantees next guess hints and doubles prestige gains",
-
   "more_title": "More Features",
   "stats": "Statistics",
   "talents": "Talents",
   "staking": "Staking",
   "changelog": "Changelog",
-
   "about_title": "About & Open Source Licenses",
   "about_header": "Gamified Guess the Number Simulator",
   "about_version_format": "Version: %s (%d)",
@@ -172,7 +155,6 @@
   "about_library_author_format": "Author: %s",
   "about_library_license_format": "License: %s",
   "back": "Back",
-
   "feedback_toolow_0": "Your guess is way too low! Aim higher into the stars.",
   "feedback_toolow_1": "Too low! Try a loftier number.",
   "feedback_toolow_2": "Higher! That number is sitting in the abyss.",
@@ -203,7 +185,6 @@
   "feedback_toolow_27": "Too low! Scale the heights.",
   "feedback_toolow_28": "Under par! Go higher.",
   "feedback_toolow_29": "Too low! Aim for the peaks.",
-
   "feedback_toohigh_0": "Way too high! Pull back your estimate.",
   "feedback_toohigh_1": "Too high! Aim lower on the scale.",
   "feedback_toohigh_2": "Lower! That number is in orbit.",
@@ -234,7 +215,6 @@
   "feedback_toohigh_27": "Too high! Descend the peaks.",
   "feedback_toohigh_28": "Over par! Go lower.",
   "feedback_toohigh_29": "Too high! Aim for the valleys.",
-
   "feedback_tip_0": "💡 Binary Search Strategy: Try guessing %d (the exact midpoint of %d and %d) to instantly eliminate half the remaining search space.",
   "feedback_tip_1": "💡 Range Analysis: The target number is strictly greater than the arithmetic mean (%d) of your current search bracket.",
   "feedback_tip_2": "💡 Range Analysis: The target number is strictly less than the arithmetic mean (%d) of your current search bracket.",
@@ -290,7 +270,6 @@
   "feedback_tip_52": "💡 Combinatorial Clue: Index offset from lower bound is %d.",
   "feedback_tip_53": "💡 Binary Search Strategy: Pivot test at %d.",
   "feedback_tip_54": "💡 Target Locked: Final convergence coordinate calculated at %d.",
-
   "play_title": "Guess The Number",
   "play_range_format": "Range: %d - %d",
   "play_streak_format": "Streak: %d (Best: %d)",
@@ -298,7 +277,6 @@
   "play_guess_button": "GUESS NUMBER",
   "play_correct_guess": "✨ Correct! You guessed the secret number!",
   "play_debug_warning": "You are using the debug build. It is not for normal use.",
-
   "prestige_hub_title": "Prestige Hub & Upgrades",
   "prestige_balance_format": "Prestige Balance: %s",
   "prestige_requirement_format": "Requirement: %s Money (Reset #%d)",
@@ -310,36 +288,27 @@
   "prestige_upgrade_tree_title": "Prestige Upgrade Tree (JSON Driven)",
   "prestige_shop_title": "Prestige Shop (JSON Driven)",
   "level_format": "Level: %d / %d",
-  "buy": "Buy",
-  "owned": "Owned",
-
   "mutators_title": "Mutators & Seeded Challenges",
   "gameplay_mutators_title": "Gameplay Mutators",
   "reward_multiplier_format": "Reward Multiplier: %.1fx",
   "disable": "Disable",
   "activate": "Activate",
   "daily_seeded_challenges_title": "Daily Seeded Challenges",
-
   "completed": "Completed",
   "claim": "Claim",
-
   "more_title_hub": "More Hub",
   "reset_tiers_title": "Reset Tiers & Hubs",
   "ultra_hub_title": "Ultra Hub & Upgrades",
   "prestige_hub_button": "Prestige Hub & Upgrades",
   "audio_save_management_title": "Audio & Save Management",
-  "save_slots": "Save Slots",
   "background_music_player": "Background Music Player",
   "general_navigation_title": "General Navigation",
   "seasonal_events": "Seasonal Events",
   "prestige_talent_web": "Prestige Talent Web",
   "mutators_seeded_challenges": "Mutators & Seeded Challenges",
-  "changelog": "Changelog",
   "arcade_minigames": "Arcade Minigames",
   "statistics": "Statistics",
-  "settings": "Settings",
   "about_licenses": "About & Licenses",
-  "dev_settings": "Dev Settings",
   "background_music_dialog_title": "🎵 Background Music Player",
   "background_music_dialog_desc": "Select an audio file (MP3/WAV) to save and play across all screens.",
   "no_music_selected": "No music file selected.",
@@ -354,7 +323,6 @@
   "playing_music_toast": "Playing background music...",
   "select_audio_first_toast": "Please select an audio file first!",
   "stopped_music_toast": "Stopped background music",
-
   "arcade_title": "Arcade Minigames • Expressive",
   "play_minigame_format": "Play %s",
   "quick_guess_title": "Quick Guess Minigame",
@@ -384,7 +352,6 @@
   "number_rush_title": "Number Rush",
   "tap_numbers_order_format": "Tap numbers in order: %d to 5",
   "rush_completed": "Rush Completed Successfully! Won 1 Nebula!",
-
   "crash_recovery_title": "⚠️ Unexpected Crash Detected",
   "crash_recovery_desc": "The game encountered an unexpected error during the previous session and has safely recovered your last valid progress.",
   "crash_diagnostic_logs": "Crash Diagnostic Logs",
@@ -393,7 +360,6 @@
   "continue_playing": "Continue Playing",
   "logs_copied_toast": "Crash logs copied to clipboard!",
   "share_crash_logs_chooser": "Share Crash Logs",
-
   "cloud_backup_hub_title": "Save Export / Import & Cloud Backup",
   "cloud_backup_transfer_title": "Cloud Backup & Transfer",
   "cloud_backup_transfer_desc": "Export your encrypted save string to back up your progress across devices or securely restore from a backup string.",
@@ -403,7 +369,6 @@
   "backup_copied_toast": "Encrypted save string copied to clipboard!",
   "backup_restored_toast": "Cloud backup restored successfully!",
   "invalid_backup_toast": "Invalid backup string!",
-
   "dev_settings_title": "Developer Settings & Console",
   "open_process_inspector": "Open Variable & Process Inspector",
   "save_non_crash_logs": "Save non-crash logs to storage",
@@ -428,7 +393,6 @@
   "logs_copied_console_toast": "Logs copied to clipboard",
   "switched_locale_us_toast": "Switched locale to English (US)",
   "reset_locale_default_toast": "Reset locale to Device Default",
-
   "live_ops_screen_title": "Seasonal Events",
   "event_perks_title": "Event Perks & Permanent Bonuses",
   "permanent_bonus_level_format": "Permanent Bonus Level: +%d (Grants permanent money & currency multipliers across saves!)",
@@ -437,20 +401,15 @@
   "claims_label": "Claims: %d / %d",
   "max_claimed": "Max Claimed",
   "claim_reward_nebula": "Claim Reward (+10 Nebula)",
-
   "talent_screen_title": "Prestige Talent Web",
   "prestige_balance_talent_format": "Prestige Balance: %s",
   "talent_screen_desc": "Unlock interconnected talent nodes using Prestige to acquire permanent gameplay buffs.",
   "locked_requires_parent": "Locked: Requires parent talent",
   "unlock": "Unlock",
-
-  "achievement_progress_title": "Achievement Progress",
   "achievement_unlocked_count_format": "Unlocked: %d / %d",
   "achievement_unlocked_desc": "Unlocking achievements grants permanent Nebula rewards and passive perks!",
   "reward_nebula_format": "Reward: +%d Nebula",
-
   "loading_save_data": "Loading save data...",
-
   "time_travel_title": "⏳ Time Travel Detected!",
   "time_travel_text": "It seems like the time has changed since the last time you played (device clock is %d seconds behind last save). As a consequence, auto-clicker and passive generation have been temporarily paused for 24 hours.",
   "understood": "Understood",
@@ -464,8 +423,7 @@
   "nav_play": "Play",
   "nav_upgrade": "Upgrades",
   "nav_shop": "Shop",
-  "nav_more": "More"
-,
+  "nav_more": "More",
   "save_slot_title": "Slot %d",
   "save_slot_active": "(Active)",
   "save_slot_empty": "Empty Slot",
@@ -473,5 +431,7 @@
   "save_slot_difficulty": "Difficulty",
   "difficulty_classic": "Classic",
   "difficulty_hard": "Hard",
-  "difficulty_extreme": "Extreme"
+  "difficulty_extreme": "Extreme",
+  "filipino": "Filipino",
+  "switched_locale_fil_toast": "Switched language to Filipino"
 }
