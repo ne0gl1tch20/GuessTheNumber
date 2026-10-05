@@ -222,6 +222,32 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun duplicateSlot(sourceSlot: Int, targetSlot: Int, onResult: (Boolean) -> Unit) {
+        if (sourceSlot !in 1..MAX_SAVE_SLOTS || targetSlot !in 1..MAX_SAVE_SLOTS) {
+            onResult(false)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = saveManager.duplicateSlot(sourceSlot, targetSlot)
+            withContext(Dispatchers.Main) { onResult(success) }
+        }
+    }
+
+    fun restoreBackup(slot: Int, onResult: (Boolean) -> Unit) {
+        if (slot !in 1..MAX_SAVE_SLOTS) {
+            onResult(false)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = saveManager.restoreBackup(slot)
+            if (success && _activeSlot.value == slot) {
+                val loaded = saveManager.loadGame(slot)
+                _gameState.value = AntiCheatService.sanitizeCurrency(loaded)
+            }
+            withContext(Dispatchers.Main) { onResult(success) }
+        }
+    }
+
     fun resetSlot(slot: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             saveManager.resetSlot(slot)
