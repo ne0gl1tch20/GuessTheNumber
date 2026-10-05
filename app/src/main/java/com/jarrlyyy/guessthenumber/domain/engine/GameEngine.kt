@@ -59,6 +59,12 @@ class GameEngine(private val rng: Random = Random.Default) {
         return BigNumber(multiplier)
     }
 
+    fun validateMutators(mutators: Set<String>): Set<String> =
+        mutators.intersect(setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax"))
+
+    fun applyMutatorSet(state: GameState, mutators: Set<String>): GameState =
+        state.copy(activeMutators = validateMutators(mutators))
+
     fun processGuess(state: GameState, guess: Long): GuessResult {
         // Validate target range bounds
         val clampedGuess = guess.coerceIn(state.currentRangeMin, state.currentRangeMax)
