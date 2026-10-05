@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GameState(
     val difficultyId: String = Difficulty.CLASSIC,
+    val profileName: String = "",
+    val profileIconId: String = SaveProfile.DEFAULT_ICON,
     val money: BigNumber = BigNumber.ZERO,
     val prestige: BigNumber = BigNumber.ZERO,
     val ultra: BigNumber = BigNumber.ZERO,
