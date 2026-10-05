@@ -38,7 +38,8 @@ data class GameState(
     val prestigeCount: Long = 0,
     val ultraCount: Long = 0,
     val liveOpsClaims: Map<String, Int> = emptyMap(),
-    val permanentEventBoosts: Int = 0
+    val permanentEventBoosts: Int = 0,
+    val lastRandomEventId: String? = null
 )
 
 @Serializable
