@@ -104,6 +104,7 @@ class MainActivity : ComponentActivity() {
                         onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) },
                         onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) },
                         onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
+                        onActivateChallengeBuilder = { ids -> viewModel.activateChallengeBuilder(ids) },
                         viewModel = viewModel
                     )
                 }
