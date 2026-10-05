@@ -12,6 +12,7 @@ import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -24,6 +25,8 @@ const val MAX_SAVE_SLOTS = 10
 data class SaveSlotMetadata(
     val slotIndex: Int,
     val difficultyId: String = Difficulty.CLASSIC,
+    val profileName: String = "",
+    val profileIconId: String = SaveProfile.DEFAULT_ICON,
     val isEmpty: Boolean,
     val money: BigNumber = BigNumber.ZERO,
     val prestige: BigNumber = BigNumber.ZERO,
@@ -97,6 +100,8 @@ class SaveManager(private val context: Context) {
                     slotIndex = s,
                     isEmpty = false,
                     difficultyId = if (Difficulty.isValid(state.difficultyId)) state.difficultyId else Difficulty.CLASSIC,
+                    profileName = state.profileName.take(24),
+                    profileIconId = if (SaveProfile.isValidIcon(state.profileIconId)) state.profileIconId else SaveProfile.DEFAULT_ICON,
                     money = state.money,
                     prestige = state.prestige,
                     ultra = state.ultra,
@@ -191,9 +196,13 @@ class SaveManager(private val context: Context) {
         val bestStreak = maxOf(0, state.bestStreak)
 
         val difficultyId = if (Difficulty.isValid(state.difficultyId)) state.difficultyId else Difficulty.CLASSIC
+        val profileName = state.profileName.trim().take(24)
+        val profileIconId = if (SaveProfile.isValidIcon(state.profileIconId)) state.profileIconId else SaveProfile.DEFAULT_ICON
 
         return state.copy(
             difficultyId = difficultyId,
+            profileName = profileName,
+            profileIconId = profileIconId,
             money = money,
             prestige = prestige,
             ultra = ultra,
