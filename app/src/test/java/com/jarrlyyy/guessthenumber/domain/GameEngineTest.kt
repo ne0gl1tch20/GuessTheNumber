@@ -95,6 +95,31 @@ class GameEngineTest {
     }
 
     @Test
+    fun testComboFrenzyMultiplierScalesAtFiveGuessTiers() {
+        val engine = GameEngine(Random(123))
+
+        assertEquals(BigNumber.ONE, engine.frenzyMultiplier(4))
+        assertEquals(BigNumber(1.25), engine.frenzyMultiplier(5))
+        assertEquals(BigNumber(1.5), engine.frenzyMultiplier(10))
+        assertEquals(BigNumber(5.0), engine.frenzyMultiplier(100))
+    }
+
+    @Test
+    fun testComboFrenzyIncreasesCorrectGuessReward() {
+        val normal = GameEngine(Random(123)).processGuess(
+            GameState(targetNumber = 50L, currentRangeMax = 100L, streak = 4),
+            50L
+        )
+        val frenzy = GameEngine(Random(123)).processGuess(
+            GameState(targetNumber = 50L, currentRangeMax = 100L, streak = 5),
+            50L
+        )
+
+        assertTrue(frenzy.reward > normal.reward)
+        assertEquals(BigNumber(1.25), frenzy.reward / normal.reward)
+    }
+
+    @Test
     fun testPrestigeAndUltraCalculations() {
         val engine = GameEngine()
         val moneyForPrestige = BigNumber(60_000_000.0)
