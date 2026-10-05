@@ -70,6 +70,7 @@ class MainActivity : ComponentActivity() {
                         incomePerSecond = incomePerSecond,
                         onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
                         onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
+                        onEquipCosmetic = { id -> viewModel.equipCosmetic(id) },
                         onBuyPrestigeUpgrade = { id, cost -> viewModel.buyPrestigeUpgrade(id, cost) },
                         onBuyPrestigeShopItem = { id, cost -> viewModel.buyPrestigeShopItem(id, cost) },
                         onBuyUltraUpgrade = { id, cost -> viewModel.buyUltraUpgrade(id, cost) },
