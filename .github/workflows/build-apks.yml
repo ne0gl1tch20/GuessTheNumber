@@ -3,10 +3,9 @@ name: Build Android APKs (Debug & Release)
 on:
   workflow_dispatch:
 
-
 jobs:
   build:
-    name: Build Debug and Release APKs
+    name: Validate, Test, and Build Debug/Release APKs
     runs-on: ubuntu-latest
 
     steps:
@@ -22,11 +21,20 @@ jobs:
       - name: Validate Localizations
         run: python3 tools/validate_locales.py
 
+      - name: Validate Version Metadata
+        run: python3 tools/validate_versions.py
+
+      - name: Audit Hardcoded UI Strings
+        run: python3 tools/validate_hardcoded_strings.py
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug
