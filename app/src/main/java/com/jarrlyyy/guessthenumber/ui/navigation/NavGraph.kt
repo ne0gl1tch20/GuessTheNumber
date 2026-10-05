@@ -60,6 +60,7 @@ fun NavGraph(
     onEarnMinigameReward: (Long, BigNumber) -> Unit,
     onUpdateMultiplier: (String) -> Unit,
     onClaimLiveOpsEventReward: (String) -> Unit,
+    onActivateChallengeBuilder: (Set<String>) -> Unit,
     viewModel: GameViewModel
 ) {
     if (!state.tutorialCompleted) {
@@ -271,7 +272,8 @@ fun NavGraph(
             composable("mutators") {
                 MutatorsScreen(
                     state = state,
-                    onSelectMutator = { id -> onBuyShopItem(id, 0L) },
+                    onSelectMutator = { id, active -> viewModel.setMutatorActive(id, active) },
+                    onActivateChallengeBuilder = onActivateChallengeBuilder,
                     onCompleteChallenge = { id, reward -> viewModel.claimChallenge(id, reward) },
                     onBack = { navController.popBackStack() }
                 )
