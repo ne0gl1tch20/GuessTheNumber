@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -146,18 +147,16 @@ fun MutatorsScreen(
             }
 
             item {
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    listOf("correct", "streak", "guesses", "money").forEachIndexed { index, kind ->
-                        SegmentedButton(
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(listOf("correct", "streak", "guesses", "money")) { kind ->
+                        FilterChip(
                             selected = challengeKind == kind,
                             onClick = {
                                 challengeKind = kind
                                 targetText = if (kind == "correct") "25" else if (kind == "streak") "10" else if (kind == "guesses") "100" else "1000000"
                             },
-                            shape = SegmentedButtonDefaults.itemShape(index = index, count = 4)
-                        ) {
-                            Text(locale.getString("builder_kind_${kind}", kind.replaceFirstChar { it.uppercase() }))
-                        }
+                            label = { Text(locale.getString("builder_kind_${kind}", kind)) }
+                        )
                     }
                 }
             }
