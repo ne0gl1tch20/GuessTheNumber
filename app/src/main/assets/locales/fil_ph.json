@@ -433,5 +433,20 @@
   "run": "Patakbuhin",
   "achievement_unlocked_count_format": "Naka-unlock: %d / %d",
   "achievement_unlocked_desc": "Ang pag-unlock ng mga achievement ay nagbibigay ng permanenteng Nebula rewards at passive perks!",
-  "reward_nebula_format": "Gantimpala: +%d Nebula"
+  "reward_nebula_format": "Gantimpala: +%d Nebula",
+  "save_slots_description": "Pumili ng save slot para maglaro o pamahalaan ang iyong mga laro.",
+  "save_slot_reset": "I-reset ang Slot",
+  "save_slot_money": "Pera: %s",
+  "save_slot_prestige_ultra": "Prestige: %s | Ultra: %s",
+  "save_slot_attempts_correct": "Mga Hula: %d | Tama: %d",
+  "save_slot_last_saved": "Huling Na-save: %s",
+  "save_slot_resume": "Ipagpatuloy ang Laro",
+  "save_slot_switch": "Lumipat sa Slot",
+  "save_slot_add": "Idagdag",
+  "save_profile_edit_title": "I-edit ang Save Profile",
+  "save_profile_edit": "I-edit ang Profile",
+  "save_profile_name": "Pangalan ng Profile",
+  "save_profile_name_limit": "Hanggang 24 na character",
+  "save_profile_icon": "Icon ng Profile",
+  "save_profile_save": "I-save"
 }
