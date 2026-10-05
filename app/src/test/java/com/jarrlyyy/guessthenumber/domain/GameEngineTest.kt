@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.domain
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import org.junit.Assert.*
 import org.junit.Test
@@ -33,6 +34,64 @@ class GameEngineTest {
         assertEquals(BigNumber.ZERO, result.reward)
         assertEquals(0, result.newStreak)
         assertEquals(0, result.newState.streak)
+    }
+
+
+
+    @Test
+    fun testDifficultyRangeAndWrongGuessPenalty() {
+        val engine = GameEngine(Random(123))
+
+        val hardState = GameState(
+            difficultyId = Difficulty.HARD,
+            money = BigNumber(100),
+            targetNumber = 120L,
+            currentRangeMax = 150L
+        )
+        val hardResult = engine.processGuess(hardState, 1L)
+
+        assertEquals(BigNumber(98), hardResult.newState.money)
+        assertEquals(150L, hardResult.newState.currentRangeMax)
+
+        val extremeState = GameState(
+            difficultyId = Difficulty.EXTREME,
+            money = BigNumber(100),
+            targetNumber = 200L,
+            currentRangeMax = 250L
+        )
+        val extremeResult = engine.processGuess(extremeState, 1L)
+
+        assertEquals(BigNumber(95), extremeResult.newState.money)
+        assertEquals(250L, extremeResult.newState.currentRangeMax)
+    }
+
+    @Test
+    fun testDifficultyCorrectGuessUsesDifficultyRangeAndReward() {
+        val classic = GameEngine(Random(123)).processGuess(
+            GameState(targetNumber = 50L, currentRangeMax = 100L),
+            50L
+        )
+        val hard = GameEngine(Random(123)).processGuess(
+            GameState(
+                difficultyId = Difficulty.HARD,
+                targetNumber = 75L,
+                currentRangeMax = 150L
+            ),
+            75L
+        )
+        val extreme = GameEngine(Random(123)).processGuess(
+            GameState(
+                difficultyId = Difficulty.EXTREME,
+                targetNumber = 125L,
+                currentRangeMax = 250L
+            ),
+            125L
+        )
+
+        assertTrue(hard.reward > classic.reward)
+        assertTrue(extreme.reward > hard.reward)
+        assertEquals(150L, hard.newState.currentRangeMax)
+        assertEquals(250L, extreme.newState.currentRangeMax)
     }
 
     @Test
