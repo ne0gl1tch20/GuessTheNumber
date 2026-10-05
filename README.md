@@ -1,4 +1,4 @@
-# Guess The Number (Incremental & Arcade Edition) — v1.10
+# Guess The Number (Incremental & Arcade Edition) — v1.11
 
 # Guess The Number (Incremental & Arcade Edition)
 
@@ -12,7 +12,7 @@ An advanced, feature-rich incremental and arcade Android game built with **Jetpa
 - **Number Guessing / Incremental Engine**: Earn currency by guessing numbers, accelerated by fluid quick-buy multipliers (`1x`, `10x`, `100x`, `MAX`) and autonomous background guessing bots.
 - **Upgrades & Progression**: Buy standard upgrades (`upgrades.json`), prestige upgrades (`prestige_upgrades.json`), ultra upgrades (`ultra_upgrades.json`), and interconnected Prestige Talent Web skill nodes (`talents.json`) via JSON configuration files.
 - **Prestige & Ultra Systems**: Reset or ascend through multiple layers of prestige with scaling requirements and custom shops.
-- **Achievements & Challenges**: Track milestones, complete daily seeded challenges with Nebula rewards, and play high-stakes 50/50 staking mode (`StakingScreen`).
+- **Combo / Frenzy System**: Consecutive correct guesses build streaks, with Frenzy tiers adding escalating reward multipliers up to 5x.\n- **Achievements & Challenges**: Track milestones, complete daily seeded challenges with Nebula rewards, and play high-stakes 50/50 staking mode (`StakingScreen`).
 - **Arcade Minigames**: Integrated side activities and minigames (`minigames.json`) to keep gameplay engaging.
 
 ### 2. **Architecture & Tech Stack**
