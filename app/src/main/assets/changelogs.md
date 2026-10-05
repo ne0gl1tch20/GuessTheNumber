@@ -12,7 +12,13 @@
 - 🧪 **Phase 15 Validation**: Added final state validation and migration-oriented tests before the v1.12 build.
 
 ## v1.11 (Weekly Challenges, Random Events, Achievement Tiers & Combo / Frenzy)
-- 📅 **Weekly Challenges**: Reworked the challenge system into rotating weekly sets with varied goal types and week-scoped claim IDs.\n- 🎯 **Challenge Variety**: Added accuracy, streak, money, guess volume, Prestige, Ultra, Frenzy, and playtime objectives with different Nebula rewards.\n- ⚡ **Random Events**: Added seven varied occasional events with cash, Nebula, streak, range, refund, and jackpot effects. Events are checked periodically rather than firing constantly.\n- 🌐 **Random Event Localization**: Added English and Filipino event names and descriptions.\n- 🏆 **Achievement Tiers**: Expanded the system to 27 achievements across Bronze, Silver, Gold, and Diamond tiers, with escalating Nebula rewards.\n- 🌐 **Achievement Localization**: Added localized names and descriptions for the expanded catalog in English and Filipino.\n- 🔥 **Combo Frenzy**: Consecutive correct guesses now unlock Frenzy tiers every 5-streak steps.
+- 📅 **Weekly Challenges**: Reworked the challenge system into rotating weekly sets with varied goal types and week-scoped claim IDs.
+- 🎯 **Challenge Variety**: Added accuracy, streak, money, guess volume, Prestige, Ultra, Frenzy, and playtime objectives with different Nebula rewards.
+- ⚡ **Random Events**: Added seven varied occasional events with cash, Nebula, streak, range, refund, and jackpot effects. Events are checked periodically rather than firing constantly.
+- 🌐 **Random Event Localization**: Added English and Filipino event names and descriptions.
+- 🏆 **Achievement Tiers**: Expanded the system to 27 achievements across Bronze, Silver, Gold, and Diamond tiers, with escalating Nebula rewards.
+- 🌐 **Achievement Localization**: Added localized names and descriptions for the expanded catalog in English and Filipino.
+- 🔥 **Combo Frenzy**: Consecutive correct guesses now unlock Frenzy tiers every 5-streak steps.
 - 📈 **Frenzy Rewards**: Each Frenzy tier adds a 25% reward multiplier, capped at 5x, on top of the existing streak multiplier.
 - ✨ **Live Frenzy Indicator**: The Play screen shows the active Frenzy multiplier once the streak reaches 5.
 - 🌐 **Localized Frenzy UI**: Added English and Filipino Frenzy text.
