@@ -26,6 +26,7 @@ fun NavGraph(
     incomePerSecond: BigNumber,
     onBuyUpgrade: (String, BigNumber) -> Unit,
     onBuyShopItem: (String, Long) -> Unit,
+    onEquipCosmetic: (String) -> Unit,
     onBuyPrestigeUpgrade: (String, BigNumber) -> Unit,
     onBuyPrestigeShopItem: (String, Long) -> Unit,
     onBuyUltraUpgrade: (String, BigNumber) -> Unit,
@@ -178,7 +179,7 @@ fun NavGraph(
                 )
             }
             composable(Screen.Shop.route) {
-                ShopScreen(state = state, onBuyShopItem = onBuyShopItem)
+                ShopScreen(state = state, onBuyShopItem = onBuyShopItem, onEquipCosmetic = onEquipCosmetic)
             }
             composable(Screen.More.route) {
                 MoreScreen(
