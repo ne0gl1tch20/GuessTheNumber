@@ -20,6 +20,7 @@ import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
 import com.jarrlyyy.guessthenumber.domain.engine.AntiCheatService
 import com.jarrlyyy.guessthenumber.domain.engine.AntiTimeTravelService
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
+import com.jarrlyyy.guessthenumber.domain.engine.GuessingBot
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
@@ -53,6 +54,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private val gameEngine = GameEngine()
+    private val guessingBot = GuessingBot()
     private val commandExecutor = CommandExecutor()
     private val backgroundMusicManager = BackgroundMusicManager(application)
 
@@ -155,6 +157,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 GameLogger.log(LogLevel.INFO, LoggerCategory.AUTOCLICKER, "OFFLINE_GAINS", "Earned $totalOfflineEarnings while offline for $effectiveSeconds seconds in slot $targetSlot.")
             }
+
+            guessingBot.reset(finalState.currentRangeMin, finalState.currentRangeMax)
 
             withContext(Dispatchers.Main) {
                 _gameState.value = finalState
@@ -259,7 +263,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun makeGuess(guess: Long) {
         if (!AntiCheatService.validateGuessRate()) return
-        val result = gameEngine.processGuess(_gameState.value, guess)
+        val currentState = _gameState.value
+        val result = gameEngine.processGuess(currentState, guess)
+        guessingBot.observeGuess(guess.coerceIn(currentState.currentRangeMin, currentState.currentRangeMax), result.feedback)
+        if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
+            guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
+        }
         _gameState.value = result.newState
         checkAchievements(result.newState)
         saveGameAsync()
@@ -352,6 +361,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 statistics = newStats,
                 prestigeCount = state.prestigeCount + 1
             )
+            guessingBot.reset(_gameState.value.currentRangeMin, _gameState.value.currentRangeMax)
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.PRESTIGE, "PRESTIGE_RESET", "Prestige reset performed (#${state.prestigeCount + 1}), awarded $reward Prestige.")
         }
@@ -374,6 +384,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 statistics = newStats,
                 ultraCount = state.ultraCount + 1
             )
+            guessingBot.reset(_gameState.value.currentRangeMin, _gameState.value.currentRangeMax)
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.ULTRA, "ULTRA_RESET", "Ultra reset performed (#${state.ultraCount + 1}), awarded $reward Ultra.")
         }
@@ -614,8 +625,15 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 delay(delayMillis)
                 val currentState = _gameState.value
                 if (currentState.autoClickerActive) {
-                    val guess = currentState.targetNumber
+                    val guess = guessingBot.nextGuess(
+                        currentState.currentRangeMin,
+                        currentState.currentRangeMax
+                    )
                     val result = gameEngine.processGuess(currentState, guess)
+                    guessingBot.observeGuess(guess, result.feedback)
+                    if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
+                        guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
+                    }
                     withContext(Dispatchers.Main) {
                         _gameState.value = result.newState
                     }
