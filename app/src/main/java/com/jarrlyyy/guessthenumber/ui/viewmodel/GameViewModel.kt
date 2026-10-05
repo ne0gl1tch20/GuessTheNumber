@@ -23,6 +23,7 @@ import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
+import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
@@ -182,6 +183,21 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             if (!metadata.isEmpty) return@launch
             saveManager.saveGame(GameState(difficultyId = difficultyId), slot)
             loadGame(slot)
+        }
+    }
+
+    fun updateSlotProfile(slot: Int, name: String, iconId: String) {
+        if (slot !in 1..MAX_SAVE_SLOTS || !SaveProfile.isValidIcon(iconId)) return
+        viewModelScope.launch(Dispatchers.IO) {
+            val metadata = saveManager.getSlotMetadata(slot)
+            if (metadata.isEmpty) return@launch
+            val state = saveManager.loadGame(slot)
+            val updated = state.copy(
+                profileName = name.trim().take(24),
+                profileIconId = iconId
+            )
+            saveManager.saveGame(updated, slot)
+            loadGame(_activeSlot.value)
         }
     }
 
