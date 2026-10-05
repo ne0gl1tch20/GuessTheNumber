@@ -174,16 +174,79 @@ class GameEngine(private val rng: Random = Random.Default) {
     }
 
     fun claimChallenge(state: GameState, challengeId: String, rewardNebula: Long): Pair<GameState, Boolean> {
-        if (state.completedChallenges.contains(challengeId)) {
+        if (challengeId in state.completedChallenges || !isValidChallengeReward(state, challengeId, rewardNebula)) {
             return Pair(state, false)
         }
-        val newCompleted = state.completedChallenges + challengeId
-        val newNebula = state.nebula + BigNumber(rewardNebula)
-        val updated = state.copy(
-            completedChallenges = newCompleted,
-            nebula = newNebula
+        return Pair(
+            state.copy(
+                completedChallenges = state.completedChallenges + challengeId,
+                nebula = state.nebula + BigNumber(rewardNebula)
+            ),
+            true
         )
-        return Pair(updated, true)
+    }
+
+    private fun isValidChallengeReward(state: GameState, challengeId: String, rewardNebula: Long): Boolean {
+        if (rewardNebula <= 0L) return false
+
+        if (challengeId.startsWith("weekly_")) {
+            val kind = challengeId.substringAfterLast('_')
+            val expectedReward = when (kind) {
+                "correct" -> 75L
+                "streak" -> 90L
+                "money" -> 100L
+                "guesses" -> 80L
+                "prestige" -> 125L
+                "ultra" -> 175L
+                "frenzy" -> 110L
+                "playtime" -> 95L
+                else -> return false
+            }
+            if (rewardNebula != expectedReward) return false
+            val progress = when (kind) {
+                "correct" -> state.correctGuesses
+                "streak" -> state.bestStreak.toLong()
+                "money" -> state.money.value.toLong()
+                "guesses" -> state.statistics.totalGuesses
+                "prestige" -> state.prestigeCount
+                "ultra" -> state.ultraCount
+                "frenzy" -> state.bestStreak.toLong()
+                "playtime" -> state.statistics.playtimeSeconds
+                else -> return false
+            }
+            val target = when (kind) {
+                "correct" -> 75L
+                "streak" -> 15L
+                "money" -> 10_000_000L
+                "guesses" -> 250L
+                "prestige" -> 2L
+                "ultra" -> 1L
+                "frenzy" -> 25L
+                "playtime" -> 3_600L
+                else -> return false
+            }
+            return progress >= target
+        }
+
+        if (challengeId.startsWith("builder_")) {
+            val parts = challengeId.removePrefix("builder_").split('_')
+            if (parts.size < 2) return false
+            val kind = parts[0]
+            val target = parts[1].toLongOrNull() ?: return false
+            val mutators = parts.drop(2)
+            val validMutators = setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")
+            if (target < 1L || mutators.any { it !in validMutators }) return false
+            if (rewardNebula != 50L + mutators.size * 50L) return false
+            val progress = when (kind) {
+                "correct" -> state.correctGuesses
+                "streak" -> state.bestStreak.toLong()
+                "guesses" -> state.statistics.totalGuesses
+                else -> state.money.value.toLong()
+            }
+            return progress >= target
+        }
+
+        return false
     }
 
     @Deprecated("Legacy overload")
