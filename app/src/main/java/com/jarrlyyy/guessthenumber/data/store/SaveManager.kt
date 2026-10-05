@@ -140,6 +140,27 @@ class SaveManager(private val context: Context) {
         }
     }
 
+    suspend fun updateGameAtomically(slot: Int = -1, transform: (GameState) -> GameState): GameState? {
+        val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot()
+        val sKey = getSaveKey(targetSlot)
+        val bKey = getBackupKey(targetSlot)
+        var updatedState: GameState? = null
+        return try {
+            context.saveDataStore.edit { prefs ->
+                val currentJson = prefs[sKey]
+                if (currentJson.isNullOrEmpty() || !validateSave(currentJson)) return@edit
+                val current = sanitizeLoadedState(json.decodeFromString<GameState>(currentJson))
+                val updated = transform(current).copy(lastSaveTimestamp = System.currentTimeMillis())
+                prefs[bKey] = currentJson
+                prefs[sKey] = json.encodeToString(updated)
+                updatedState = updated
+            }
+            updatedState
+        } catch (e: Exception) {
+            GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "ATOMIC_UPDATE_ERROR", "Failed atomic game update in slot $targetSlot: ${e.message}")
+            null
+        }
+    }
     suspend fun loadGame(slot: Int = -1): GameState {
         val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot()
         val sKey = getSaveKey(targetSlot)
