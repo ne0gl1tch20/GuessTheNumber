@@ -94,61 +94,75 @@ fun UltraScreen(
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text("Buy Multiplier:", style = MaterialTheme.typography.titleMedium)
                     Box(Modifier.wrapContentSize(Alignment.TopEnd)) {
-                        OutlinedButton(onClick = { expanded = true }) {
-                            Text("${state.buyMultiplier}x")
+                        OutlinedButton(onClick = { expanded = true }, shape = MaterialTheme.shapes.medium, contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
+                            Text("${state.buyMultiplier}x", style = MaterialTheme.typography.labelLarge)
                             Spacer(Modifier.width(8.dp))
                             Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
                         }
                         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                             multipliers.forEach { mult ->
-                                DropdownMenuItem(text = { Text("$mult x") }, onClick = { onUpdateMultiplier(mult); expanded = false })
+                                DropdownMenuItem(text = { Text("$mult x", style = MaterialTheme.typography.bodyMedium) }, onClick = { onUpdateMultiplier(mult); expanded = false })
                             }
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(4.dp))
                 HorizontalDivider()
             }
             items(upgrades, key = { it.id }) { upgrade ->
                 val level = state.ultraUpgradeLevels[upgrade.id] ?: 0
                 val isMaxed = level >= upgrade.maxLevel
-                val levelsToBuy = when (state.buyMultiplier) {
-                    "10" -> minOf(10, upgrade.maxLevel - level)
-                    "100" -> minOf(100, upgrade.maxLevel - level)
-                    "MAX" -> {
-                        var count = 0
-                        var total = BigNumber.ZERO
+                val totalCost = remember(level, state.buyMultiplier, state.ultra) {
+                    val base = BigNumber(upgrade.baseCost)
+                    val mult = BigNumber(upgrade.costMultiplier)
+                    var count = when (state.buyMultiplier) {
+                        "10" -> minOf(10, upgrade.maxLevel - level)
+                        "100" -> minOf(100, upgrade.maxLevel - level)
+                        "MAX" -> 0
+                        else -> minOf(1, upgrade.maxLevel - level)
+                    }
+                    if (state.buyMultiplier == "MAX") {
                         var current = level
-                        val base = BigNumber(upgrade.baseCost)
-                        val mult = BigNumber(upgrade.costMultiplier)
+                        var total = BigNumber.ZERO
                         while (current < upgrade.maxLevel) {
                             val next = base * mult.pow(current)
                             if (state.ultra < total + next) break
                             total += next
-                            count++
                             current++
+                            count++
                         }
-                        count
                     }
-                    else -> minOf(1, upgrade.maxLevel - level)
+                    if (count <= 0) {
+                        if (level < upgrade.maxLevel) base * mult.pow(level) else BigNumber.ZERO
+                    } else {
+                        (0 until count).fold(BigNumber.ZERO) { total, index ->
+                            total + base * mult.pow(level + index)
+                        }
+                    }
                 }
-                val totalCost = if (levelsToBuy > 0) {
-                    (0 until levelsToBuy).fold(BigNumber.ZERO) { total, index ->
-                        total + BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(level + index)
-                    }
-                } else BigNumber.ZERO
-                val canAfford = !isMaxed && levelsToBuy > 0 && state.ultra >= totalCost
-                Card(Modifier.fillMaxWidth()) {
+                val canAfford = !isMaxed && state.ultra >= totalCost
+
+                Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceVariant, tonalElevation = 2.dp) {
                     Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(upgrade.name, fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
-                            Text(upgrade.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Spacer(Modifier.height(4.dp))
-                            Text("Level: $level / ${upgrade.maxLevel}", fontSize = 12.sp)
-                            if (isMaxed) Text("MAXED", fontSize = 14.sp, color = UltraPurple)
-                            else Text("Cost (${state.buyMultiplier}x): ${totalCost.format()} Ultra", fontSize = 14.sp, color = UltraPurple)
+                            Text(upgrade.name, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                            Spacer(Modifier.height(2.dp))
+                            Text(upgrade.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(Modifier.height(6.dp))
+                            Surface(shape = MaterialTheme.shapes.extraSmall, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)) {
+                                Text("Level: " + level + " / " + if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+                            }
+                            if (!isMaxed) {
+                                Spacer(Modifier.height(4.dp))
+                                Text("Cost (${state.buyMultiplier}x): ${totalCost.format()} Ultra", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            } else {
+                                Spacer(Modifier.height(4.dp))
+                                Text("MAXED", style = MaterialTheme.typography.bodySmall, color = UltraPurple)
+                            }
                         }
-                        Button(onClick = { onBuyUltraUpgrade(upgrade.id, totalCost) }, enabled = canAfford, colors = ButtonDefaults.buttonColors(containerColor = UltraPurple)) {
-                            Text(if (isMaxed) "MAXED" else "Buy")
+                        Spacer(Modifier.width(12.dp))
+                        Button(onClick = { onBuyUltraUpgrade(upgrade.id, totalCost) }, enabled = canAfford, shape = MaterialTheme.shapes.medium, colors = ButtonDefaults.buttonColors(containerColor = UltraPurple)) {
+                            Text(if (isMaxed) "MAX" else "Buy", style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }
