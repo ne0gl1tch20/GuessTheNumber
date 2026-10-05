@@ -464,5 +464,6 @@
   "save_slot_restore": "Restore Backup",
   "save_slot_restore_title": "Restore Slot %d Backup?",
   "save_slot_restore_description": "Restore the previous backup for Slot %d? Your current save will become the backup.",
-  "save_slot_restore_confirm": "Restore"
+  "save_slot_restore_confirm": "Restore",
+  "frenzy_format": "🔥 Frenzy x%s"
 }
