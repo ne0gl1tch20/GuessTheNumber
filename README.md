@@ -1,3 +1,5 @@
+# Guess The Number (Incremental & Arcade Edition) — v1.10
+
 # Guess The Number (Incremental & Arcade Edition)
 
 An advanced, feature-rich incremental and arcade Android game built with **Jetpack Compose** and **Kotlin**. Beyond a simple number-guessing mechanic, this app incorporates deep incremental layers (upgrades, prestige, ultra prestige, achievements, minigames, challenges, and arcade modes), extensive logging, audio management, and developer tools.
@@ -60,4 +62,4 @@ com.jarrlyyy.guessthenumber/
 
 1. **Prerequisites**: Android Studio Jellyfish / Koala or later with Kotlin support and Android SDK 34.
 2. **Open Project**: Open the root folder `GuessTheNumber` in Android Studio.
-3. **Build & Run**: Sync Gradle and run the `app` module on an emulator or physical Android device (minSdk 26, targetSdk 34).
+3. **Build & Run**: Sync Gradle and run the `app` module on an emulator or physical Android device (minSdk 26, targetSdk 35).
