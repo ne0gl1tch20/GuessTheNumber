@@ -25,6 +25,10 @@ class GameEngine(private val rng: Random = Random.Default) {
         const val FRENZY_THRESHOLD = 5
         const val FRENZY_BONUS_PER_TIER = 0.25
         const val FRENZY_MAX_MULTIPLIER = 5.0
+        private const val HARDCORE_MULTIPLIER = 2.0
+        private const val SPEED_MULTIPLIER = 1.5
+        private const val BLIND_MULTIPLIER = 5.0
+        private const val TAX_MULTIPLIER = 10.0
     }
 
     fun frenzyMultiplier(streak: Int): BigNumber {
@@ -39,6 +43,21 @@ class GameEngine(private val rng: Random = Random.Default) {
 
     fun getInitialRangeMax(difficultyId: String): Long =
         Difficulty.baseRangeMax(difficultyId)
+
+    fun getRangeMax(state: GameState): Long {
+        val betterRangeLevel = state.upgradeLevels["better_range"] ?: 0
+        val base = Difficulty.rangeMax(state.difficultyId, betterRangeLevel)
+        return if ("mut_hardcore" in state.activeMutators) base * 2L else base
+    }
+
+    fun mutatorRewardMultiplier(state: GameState): BigNumber {
+        var multiplier = 1.0
+        if ("mut_hardcore" in state.activeMutators) multiplier *= HARDCORE_MULTIPLIER
+        if ("mut_speed" in state.activeMutators) multiplier *= SPEED_MULTIPLIER
+        if ("mut_blind" in state.activeMutators) multiplier *= BLIND_MULTIPLIER
+        if ("mut_tax" in state.activeMutators) multiplier *= TAX_MULTIPLIER
+        return BigNumber(multiplier)
+    }
 
     fun processGuess(state: GameState, guess: Long): GuessResult {
         // Validate target range bounds
@@ -63,7 +82,7 @@ class GameEngine(private val rng: Random = Random.Default) {
 
             // Talents & Mutators multiplier integration
             val talentMult = if (state.shopPurchases.contains("talent_reward_1") || state.upgradeLevels.containsKey("talent_reward_1")) BigNumber(1.5) else BigNumber.ONE
-            val mutatorMult = if (state.shopPurchases.contains("mut_hardcore")) BigNumber(2.0) else BigNumber.ONE
+            val mutatorMult = mutatorRewardMultiplier(state)
 
             val difficultyMultiplier = BigNumber(Difficulty.rewardMultiplier(state.difficultyId))
             val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier
@@ -75,7 +94,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             // Generate new target number
             val newMin = 1L
             val betterRangeLevel = state.upgradeLevels["better_range"] ?: 0
-            val newMax = Difficulty.rangeMax(state.difficultyId, betterRangeLevel)
+            val newMax = getRangeMax(state)
             val newTarget = rng.nextLong(newMin, newMax + 1)
 
             val newStats = state.statistics.copy(
@@ -100,7 +119,7 @@ class GameEngine(private val rng: Random = Random.Default) {
         } else {
             val newAttempts = state.attempts + 1
             val difficultyPenalty = state.money * BigNumber(Difficulty.wrongGuessPenalty(state.difficultyId))
-            val taxPenalty = if (state.shopPurchases.contains("mut_tax")) state.money * BigNumber(0.05) else BigNumber.ZERO
+            val taxPenalty = if ("mut_tax" in state.activeMutators) state.money * BigNumber(0.05) else BigNumber.ZERO
             val newMoney = maxOf(BigNumber.ZERO, state.money - difficultyPenalty - taxPenalty)
 
             val newStats = state.statistics.copy(
