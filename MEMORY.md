@@ -36,6 +36,16 @@ A fully polished, feature-complete Android incremental game combining classic gu
 11. **GitHub Actions APK Build Pipeline (`.github/workflows/build-apks.yml`)**: Automated CI/CD workflow running on `ubuntu-latest` (supporting `push` to `main` and `workflow_dispatch`) that sets up JDK 17, sets up Gradle with caching, executes `./gradlew assembleDebug` and `./gradlew assembleRelease` (producing unsigned release APK), and uploads both APK variants (`GuessTheNumber-debug` and `GuessTheNumber-release`) as GitHub Actions artifacts.
 
 ## v1.10 Maintenance Notes
+## Phase 6 Gameplay Mechanics
+- Added active difficulty tuning to the guessing engine.
+- **Classic**: range 1–100, no difficulty penalty, 1× reward multiplier.
+- **Hard**: range 1–150, 2% money loss on incorrect guesses, 1.5× reward multiplier.
+- **Extreme**: range 1–250, 5% money loss on incorrect guesses, 2.5× reward multiplier.
+- Difficulty range scaling respects the existing **Better Range** upgrade.
+- Save sanitization and Prestige reset now preserve the selected difficulty's range.
+- Added unit coverage for difficulty penalties, rewards, and range behavior.
+- Phase 6 changes were committed without starting a new APK build to conserve CI usage.
+
 - Fixed `AboutScreen` open-source license attribution formatting so author and license placeholders render their actual values.
 - Added Phase 5 slot duplication and backup restoration workflow.
 - Updated app version metadata to `versionCode 9` / `versionName 1.10`.
