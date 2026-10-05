@@ -641,6 +641,18 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         _hasPreviousCrash.value = false
     }
 
+    fun setMutatorActive(id: String, active: Boolean) {
+        val current = _gameState.value.activeMutators.toMutableSet()
+        if (active) current.add(id) else current.remove(id)
+        _gameState.value = gameEngine.applyMutatorSet(_gameState.value, current)
+        saveGameAsync()
+    }
+
+    fun activateChallengeBuilder(mutators: Set<String>) {
+        _gameState.value = gameEngine.applyMutatorSet(_gameState.value, mutators)
+        saveGameAsync()
+    }
+
     fun claimChallenge(challengeId: String, rewardNebula: Long) {
         val (updated, claimed) = gameEngine.claimChallenge(_gameState.value, challengeId, rewardNebula)
         if (claimed) {
