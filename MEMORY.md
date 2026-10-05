@@ -43,7 +43,8 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - Added English and Filipino localization for all new shop/cosmetic/challenge-builder UI text.
 - Added unit tests for combined mutator multipliers and Hardcore range scaling.
 - App version bumped to versionCode 11 / versionName 1.12.
-- No APK build was started; CI remains manual-only.
+- Phase 15 adds full validation and migration coverage for the v1.12 state shape, including mutator sanitization, cosmetic ownership/equip state, challenge claim persistence, localization validation, and manual CI build verification.
+- APK build was explicitly requested after Phase 15 implementation; CI remains manual-only outside this requested run.
 
 ## v1.10 Maintenance Notes
 ## Phase 6 Gameplay Mechanics
