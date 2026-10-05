@@ -10,6 +10,7 @@ import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.encodeToString
@@ -22,6 +23,7 @@ const val MAX_SAVE_SLOTS = 10
 
 data class SaveSlotMetadata(
     val slotIndex: Int,
+    val difficultyId: String = Difficulty.CLASSIC,
     val isEmpty: Boolean,
     val money: BigNumber = BigNumber.ZERO,
     val prestige: BigNumber = BigNumber.ZERO,
@@ -94,6 +96,7 @@ class SaveManager(private val context: Context) {
                 SaveSlotMetadata(
                     slotIndex = s,
                     isEmpty = false,
+                    difficultyId = if (Difficulty.isValid(state.difficultyId)) state.difficultyId else Difficulty.CLASSIC,
                     money = state.money,
                     prestige = state.prestige,
                     ultra = state.ultra,
@@ -158,7 +161,8 @@ class SaveManager(private val context: Context) {
     fun validateSave(jsonString: String): Boolean {
         return try {
             val state = json.decodeFromString<GameState>(jsonString)
-            state.money.value >= BigDecimal.ZERO &&
+            Difficulty.isValid(state.difficultyId) &&
+                    state.money.value >= BigDecimal.ZERO &&
                     state.prestige.value >= BigDecimal.ZERO &&
                     state.ultra.value >= BigDecimal.ZERO &&
                     state.nebula.value >= BigDecimal.ZERO &&
@@ -186,7 +190,10 @@ class SaveManager(private val context: Context) {
         val streak = maxOf(0, state.streak)
         val bestStreak = maxOf(0, state.bestStreak)
 
+        val difficultyId = if (Difficulty.isValid(state.difficultyId)) state.difficultyId else Difficulty.CLASSIC
+
         return state.copy(
+            difficultyId = difficultyId,
             money = money,
             prestige = prestige,
             ultra = ultra,
