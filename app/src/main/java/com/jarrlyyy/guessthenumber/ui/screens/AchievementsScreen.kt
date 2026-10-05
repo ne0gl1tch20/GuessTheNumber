@@ -28,7 +28,7 @@ fun AchievementsScreen(
     val context = LocalContext.current
     val configRepo = remember(state.settings.locale) { JsonConfigRepository(context, state.settings.locale) }
     val locale = configRepo.localeManager
-    val achievements = remember {
+    val achievements = remember(state.settings.locale) {
         configRepo.loadAchievements()
     }
 
@@ -62,15 +62,15 @@ fun AchievementsScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Text("Achievement Progress", style = MaterialTheme.typography.titleMedium)
+                        Text(locale.getString("achievement_progress_title", "Achievement Progress"), style = MaterialTheme.typography.titleMedium)
                         val unlockedCount = achievements.count { state.achievements.contains(it.id) }
                         Text(
-                            text = "Unlocked: $unlockedCount / ${achievements.size}",
+                            text = locale.getString("achievement_unlocked_format", "Unlocked: %d / %d", unlockedCount, achievements.size),
                             fontSize = 16.sp,
                             color = MoneyGold
                         )
                         Text(
-                            text = "Unlocking achievements grants permanent Nebula rewards and passive perks!",
+                            text = locale.getString("achievement_progress_desc", "Unlocking achievements grants permanent Nebula rewards and passive perks!"),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -107,7 +107,7 @@ fun AchievementsScreen(
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(achievement.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Reward: +${achievement.rewardNebula} Nebula", fontSize = 12.sp, color = MoneyGold)
+                            Text(locale.getString("reward_format", "Reward: +%s Nebula", achievement.rewardNebula), fontSize = 12.sp, color = MoneyGold)\n                            Text(locale.getString("achievement_tier_format", "Tier: %s", achievement.tier.replaceFirstChar { it.uppercase() }), fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                         }
                     }
                 }
