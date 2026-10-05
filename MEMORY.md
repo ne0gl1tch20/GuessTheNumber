@@ -1,7 +1,7 @@
-# Project Memory: Gamified Guess the Number Simulator (v1.11 Update)
+# Project Memory: Gamified Guess the Number Simulator (v1.12 Update)
 
 ## Project Overview
-A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.11`.
+A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.12`.
 
 ## Strict Project Rules: Localization & Open-Source Licenses
 - **EVERYTHING USER-VISIBLE MUST BE LOCALIZED**: Zero hardcoded user-visible strings (screen titles, buttons, dialogs, toasts, accessibility descriptions, achievements, upgrades, shop items, settings, dynamic text formatting with `%s`/`%d`) in Kotlin/Compose UI. All strings must reside in `assets/locales/en_us.json` and be fetched via `LocaleManager`.
@@ -34,6 +34,16 @@ A fully polished, feature-complete Android incremental game combining classic gu
 9. **Weekly Challenges**: Weekly challenge sets rotate through varied goal types including correct guesses, streaks, money, guess volume, Prestige, Ultra, Frenzy, and playtime, with week-scoped claim IDs and varied Nebula rewards.\n10. **Random Events**: Occasional varied events trigger about once per minute check with a 35% roll, offering Cash Burst, Nebula Rain, Jackpot, Streak Surge, Range Shuffle, Tax Refund, or rare Cosmic Gift effects with localized notices.\n11. **Achievement Tier System**: 27 localized achievements across Bronze, Silver, Gold, and Diamond tiers, with milestone-based unlock checks and escalating Nebula rewards.\n12. **Combo / Frenzy System**: Consecutive correct guesses retain the existing streak combo and unlock Frenzy tiers every 5 correct guesses, adding a 25% reward multiplier per tier up to 5x.\n13. **High-Stakes "Lucky Guess" Staking**: High-stakes 50/50 staking mode (`StakingScreen`) with streak multiplier bonuses.
 10. **Save Export/Import & Cloud Backup UI**: Dedicated Cloud Backup and encrypted save transfer UI (`CloudBackupScreen`).
 11. **GitHub Actions APK Build Pipeline (`.github/workflows/build-apks.yml`)**: Manual APK build workflow running on `ubuntu-latest` through `workflow_dispatch` only that sets up JDK 17, sets up Gradle with caching, executes `./gradlew assembleDebug` and `./gradlew assembleRelease` (producing unsigned release APK), and uploads both APK variants (`GuessTheNumber-debug` and `GuessTheNumber-release`) as GitHub Actions artifacts.
+
+## v1.12 Phase 13–14
+- **Phase 13 — Shop Categories & Cosmetics**: Added category and cosmetic metadata to ShopItemDef, categorized the Nebula Shop into All / Automation / Boosts / Cosmetics, and added three localized cosmetics (cosmetic_nebula_ring, cosmetic_starfield, cosmetic_pixel_glow).
+- Cosmetic purchases persist in shopPurchases and the currently equipped cosmetic is stored in equippedCosmeticId.
+- **Phase 14 — Mutator Combinations & Challenge Builder**: Added persistent activeMutators state and stackable mutator multipliers. Hardcore doubles the configured range, Hyper Speed triples effective auto-clicker speed, Blindfolded Oracle hides directional feedback, and Heavy Taxation applies its existing 5% wrong-guess penalty.
+- Added a Challenge Builder to MutatorsScreen with selectable mutator combinations, Correct / Streak / Guesses / Money goal types, editable targets, calculated Nebula rewards, activation, and one-time challenge claims.
+- Added English and Filipino localization for all new shop/cosmetic/challenge-builder UI text.
+- Added unit tests for combined mutator multipliers and Hardcore range scaling.
+- App version bumped to versionCode 11 / versionName 1.12.
+- No APK build was started; CI remains manual-only.
 
 ## v1.10 Maintenance Notes
 ## Phase 6 Gameplay Mechanics
