@@ -52,7 +52,7 @@ class GameEngineTest {
         )
         val hardResult = engine.processGuess(hardState, 1L)
 
-        assertEquals(BigNumber(98), hardResult.newState.money)
+        assertEquals(0, hardResult.newState.money.compareTo(BigNumber(98)))
         assertEquals(150L, hardResult.newState.currentRangeMax)
 
         val extremeState = GameState(
@@ -63,7 +63,7 @@ class GameEngineTest {
         )
         val extremeResult = engine.processGuess(extremeState, 1L)
 
-        assertEquals(BigNumber(95), extremeResult.newState.money)
+        assertEquals(0, extremeResult.newState.money.compareTo(BigNumber(95)))
         assertEquals(250L, extremeResult.newState.currentRangeMax)
     }
 
@@ -118,7 +118,7 @@ class GameEngineTest {
         )
 
         assertTrue(frenzy.reward > normal.reward)
-        assertEquals(BigNumber(1.25), frenzy.reward / normal.reward)
+        assertEquals(0, (frenzy.reward / normal.reward).compareTo(BigNumber(1.25)))
     }
 
     @Test
@@ -177,7 +177,7 @@ class GameEngineTest {
 
     @Test
     fun emptyMutatorSetReturnsBaseMultiplier() {
-        assertEquals(BigNumber.ONE, engine.mutatorRewardMultiplier(GameState()))
+        assertEquals(0, engine.mutatorRewardMultiplier(GameState()).compareTo(BigNumber.ONE))
     }
 
     @Test
