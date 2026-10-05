@@ -164,4 +164,16 @@ class GameEngineTest {
         assertEquals(200L, engine.getRangeMax(state))
     }
 
+    @Test
+    fun unknownMutatorsAreRemoved() {
+        val state = GameState(activeMutators = setOf("mut_hardcore", "unknown_mutator"))
+        val sanitized = engine.applyMutatorSet(state, state.activeMutators)
+        assertEquals(setOf("mut_hardcore"), sanitized.activeMutators)
+    }
+
+    @Test
+    fun emptyMutatorSetReturnsBaseMultiplier() {
+        assertEquals(BigNumber.ONE, engine.mutatorRewardMultiplier(GameState()))
+    }
+
 }
