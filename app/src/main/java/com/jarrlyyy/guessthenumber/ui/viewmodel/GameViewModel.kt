@@ -596,6 +596,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         _hasPreviousCrash.value = false
     }
 
+    fun claimChallenge(challengeId: String, rewardNebula: Long) {
+        val (updated, claimed) = gameEngine.claimChallenge(_gameState.value, challengeId, rewardNebula)
+        if (claimed) {
+            _gameState.value = updated
+            saveGameAsync()
+        }
+    }
+
     fun earnMinigameReward(nebulaReward: Long, moneyReward: BigNumber) {
         val state = _gameState.value
         _gameState.value = state.copy(
