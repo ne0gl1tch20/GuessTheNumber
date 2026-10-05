@@ -22,6 +22,8 @@ data class GameState(
     val prestigeUpgradeLevels: Map<String, Int> = emptyMap(),
     val ultraUpgradeLevels: Map<String, Int> = emptyMap(),
     val shopPurchases: Set<String> = emptySet(),
+    val equippedCosmeticId: String? = null,
+    val activeMutators: Set<String> = emptySet(),
     val prestigeShopPurchases: Set<String> = emptySet(),
     val ultraShopPurchases: Set<String> = emptySet(),
     val achievements: Set<String> = emptySet(),
@@ -91,7 +93,9 @@ data class ShopItemDef(
     val id: String,
     val name: String,
     val description: String,
-    val nebulaCost: Long
+    val nebulaCost: Long,
+    val category: String = "general",
+    val isCosmetic: Boolean = false
 )
 
 @Serializable
