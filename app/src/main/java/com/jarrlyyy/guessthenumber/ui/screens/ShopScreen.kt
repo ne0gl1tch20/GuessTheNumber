@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.ui.screens
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -73,25 +74,25 @@ fun ShopScreen(
             }
 
             item {
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    categories.forEachIndexed { index, category ->
-                        SegmentedButton(
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(categories) { category ->
+                        FilterChip(
                             selected = selectedCategory == category,
                             onClick = { selectedCategory = category },
-                            shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size)
-                        ) {
-                            Text(
-                                locale.getString(
-                                    "shop_category_$category",
-                                    when (category) {
-                                        "automation" -> "Automation"
-                                        "boosts" -> "Boosts"
-                                        "cosmetics" -> "Cosmetics"
-                                        else -> "All"
-                                    }
+                            label = {
+                                Text(
+                                    locale.getString(
+                                        "shop_category_${category}",
+                                        when (category) {
+                                            "automation" -> "Automation"
+                                            "boosts" -> "Boosts"
+                                            "cosmetics" -> "Cosmetics"
+                                            else -> "All"
+                                        }
+                                    )
                                 )
-                            )
-                        }
+                            }
+                        )
                     }
                 }
             }
