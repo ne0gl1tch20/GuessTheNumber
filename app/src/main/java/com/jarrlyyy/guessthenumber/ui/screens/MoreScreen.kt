@@ -139,21 +139,32 @@ fun MoreScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("General Navigation", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text("Latest Systems", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    "v1.10–v1.12 features",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
-
             item {
                 Button(onClick = { onNavigate("achievements") }, modifier = Modifier.fillMaxWidth()) {
                     Icon(imageVector = Icons.Default.EmojiEvents, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Achievements & Perks", fontSize = 16.sp)
+                    Text("Achievements & Tiers", fontSize = 16.sp)
                 }
             }
             item {
                 Button(onClick = { onNavigate("live_ops") }, modifier = Modifier.fillMaxWidth()) {
                     Icon(imageVector = Icons.Default.Event, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Seasonal Events", fontSize = 16.sp)
+                    Text("Random & Seasonal Events", fontSize = 16.sp)
+                }
+            }
+            item {
+                Button(onClick = { onNavigate("mutators") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer)) {
+                    Icon(imageVector = Icons.Default.Tune, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Mutators & Challenge Builder", fontSize = 16.sp)
                 }
             }
             item {
@@ -163,19 +174,11 @@ fun MoreScreen(
                     Text("Prestige Talent Web", fontSize = 16.sp)
                 }
             }
+
             item {
-                Button(onClick = { onNavigate("mutators") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer)) {
-                    Icon(imageVector = Icons.Default.Tune, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Mutators & Seeded Challenges", fontSize = 16.sp)
-                }
-            }
-            item {
-                Button(onClick = { onNavigate(Screen.ChangelogViewer.route) }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(imageVector = Icons.Default.Info, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Changelog", fontSize = 16.sp)
-                }
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Explore & Progress", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
             item {
                 Button(onClick = { onNavigate("arcade") }, modifier = Modifier.fillMaxWidth()) {
@@ -190,6 +193,19 @@ fun MoreScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Statistics", fontSize = 16.sp)
                 }
+            }
+            item {
+                Button(onClick = { onNavigate(Screen.ChangelogViewer.route) }, modifier = Modifier.fillMaxWidth()) {
+                    Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Changelog", fontSize = 16.sp)
+                }
+            }
+
+            item {
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("App & Developer", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
             item {
                 Button(onClick = { onNavigate("settings") }, modifier = Modifier.fillMaxWidth()) {
