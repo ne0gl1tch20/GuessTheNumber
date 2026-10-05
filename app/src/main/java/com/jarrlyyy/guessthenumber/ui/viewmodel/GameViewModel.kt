@@ -348,7 +348,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 prestige = newPrestige,
                 upgradeLevels = emptyMap(),
                 currentRangeMin = 1,
-                currentRangeMax = 100,
+                currentRangeMax = Difficulty.rangeMax(state.difficultyId, 0),
                 statistics = newStats,
                 prestigeCount = state.prestigeCount + 1
             )
