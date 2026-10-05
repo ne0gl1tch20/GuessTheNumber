@@ -1,6 +1,9 @@
 # 🚀 Guess The Number Simulator - Changelog
 
 ## v1.12 (Shop Categories, Cosmetics, Mutator Combinations & Challenge Builder)
+
+**Ready to play? v1.12 gives you more ways to build your run your way.** Customize your shop, unlock cosmetics, stack mutators, and create your own challenges. Then head back to Play and see how far your build can go. 🎮✨
+
 - 🛍️ **Shop Categories**: Reworked the Nebula Shop into filterable All, Automation, Boosts, and Cosmetics categories.
 - ✨ **Cosmetics**: Added purchasable profile cosmetics with persistent ownership and equip selection.
 - 🌐 **Cosmetic Localization**: Added English and Filipino names and descriptions for the new cosmetic catalog and shop controls.
