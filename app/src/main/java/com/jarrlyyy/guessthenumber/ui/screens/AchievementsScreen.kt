@@ -107,7 +107,15 @@ fun AchievementsScreen(
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(achievement.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text(locale.getString("reward_format", "Reward: +%s Nebula", achievement.rewardNebula), fontSize = 12.sp, color = MoneyGold)\n                            Text(locale.getString("achievement_tier_format", "Tier: %s", achievement.tier.replaceFirstChar { it.uppercase() }), fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                            Text(locale.getString("reward_format", "Reward: +%s Nebula", achievement.rewardNebula), fontSize = 12.sp, color = MoneyGold)\n                            Text(
+                                text = locale.getString(
+                                    "achievement_tier_format",
+                                    "Tier: %s",
+                                    locale.getString("achievement_tier_" + achievement.tier, achievement.tier)
+                                ),
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 }
