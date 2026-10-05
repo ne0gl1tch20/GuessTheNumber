@@ -35,3 +35,5 @@ object Difficulty {
         EXTREME -> 0.05
         else -> 0.0
     }
+
+}
