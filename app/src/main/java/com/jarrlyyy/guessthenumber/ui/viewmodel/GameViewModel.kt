@@ -674,7 +674,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 saveGameAsync()
                 GameLogger.log(
                     LogLevel.INFO,
-                    LoggerCategory.GAMEPLAY,
+                    LoggerCategory.GAME,
                     "RANDOM_EVENT",
                     "Random event triggered: " + event.type.name
                 )
