@@ -31,6 +31,7 @@ class MainActivity : ComponentActivity() {
             val isLoadingSave by viewModel.isLoadingSave.collectAsState()
             val hasPreviousCrash by viewModel.hasPreviousCrash.collectAsState()
             val offlineGains by viewModel.offlineGains.collectAsState()
+            val incomePerSecond by viewModel.incomePerSecond.collectAsState()
             val showChangelogPopup by viewModel.showChangelogPopup.collectAsState()
             val showTimeTravelPopup by viewModel.showTimeTravelPopup.collectAsState()
             val timeTravelSeconds by viewModel.timeTravelSeconds.collectAsState()
