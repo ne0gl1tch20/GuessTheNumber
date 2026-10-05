@@ -59,7 +59,7 @@ fun AboutScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(locale.getString("about_header", "Gamified Guess the Number Simulator"), fontSize = 20.sp, style = MaterialTheme.typography.titleLarge)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(locale.getString("about_version_format", versionName, versionCode), fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+                        Text(String.format(locale.getString("about_version_format"), versionName, versionCode), fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(locale.getString("about_description", "A polished Android incremental game combining classic guessing mechanics with deep prestige/ultra progression, anti-cheat protection, offline progression! Made with love by @jarrlyyy!"))
                     }
