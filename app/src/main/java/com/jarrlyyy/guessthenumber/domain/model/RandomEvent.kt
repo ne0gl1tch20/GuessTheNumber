@@ -109,6 +109,6 @@ class RandomEventEngine(
             }
         }
 
-        return RandomEventResult(type, updated)
+        return RandomEventResult(type, updated.copy(lastRandomEventId = type.name.lowercase()))
     }
 }
