@@ -1,5 +1,15 @@
 # 🚀 Guess The Number Simulator - Changelog
 
+## v1.12 (Shop Categories, Cosmetics, Mutator Combinations & Challenge Builder)
+- 🛍️ **Shop Categories**: Reworked the Nebula Shop into filterable All, Automation, Boosts, and Cosmetics categories.
+- ✨ **Cosmetics**: Added purchasable profile cosmetics with persistent ownership and equip selection.
+- 🌐 **Cosmetic Localization**: Added English and Filipino names and descriptions for the new cosmetic catalog and shop controls.
+- 🧩 **Mutator Combinations**: Mutators can now be activated together and their reward multipliers stack.
+- 🎯 **Mutator Gameplay Effects**: Hardcore expands the active range, Hyper Speed accelerates the auto-clicker, Blindfolded Oracle hides directional feedback, and Heavy Taxation applies its penalty.
+- 🛠️ **Challenge Builder**: Added custom challenge creation with selectable mutators, goal types, targets, calculated Nebula rewards, activation, and one-time claims.
+- 🌐 **Challenge Builder Localization**: Added English and Filipino builder controls and status text.
+- 🧪 **Mutator Tests**: Added unit coverage for stacked mutator rewards and Hardcore range expansion.
+
 ## v1.11 (Weekly Challenges, Random Events, Achievement Tiers & Combo / Frenzy)
 - 📅 **Weekly Challenges**: Reworked the challenge system into rotating weekly sets with varied goal types and week-scoped claim IDs.\n- 🎯 **Challenge Variety**: Added accuracy, streak, money, guess volume, Prestige, Ultra, Frenzy, and playtime objectives with different Nebula rewards.\n- ⚡ **Random Events**: Added seven varied occasional events with cash, Nebula, streak, range, refund, and jackpot effects. Events are checked periodically rather than firing constantly.\n- 🌐 **Random Event Localization**: Added English and Filipino event names and descriptions.\n- 🏆 **Achievement Tiers**: Expanded the system to 27 achievements across Bronze, Silver, Gold, and Diamond tiers, with escalating Nebula rewards.\n- 🌐 **Achievement Localization**: Added localized names and descriptions for the expanded catalog in English and Filipino.\n- 🔥 **Combo Frenzy**: Consecutive correct guesses now unlock Frenzy tiers every 5-streak steps.
 - 📈 **Frenzy Rewards**: Each Frenzy tier adds a 25% reward multiplier, capped at 5x, on top of the existing streak multiplier.
