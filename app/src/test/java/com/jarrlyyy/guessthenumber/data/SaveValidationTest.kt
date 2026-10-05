@@ -6,7 +6,7 @@ import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import org.junit.Assert.*
-import androidx.test.core.app.ApplicationProvider
+import org.robolectric.RuntimeEnvironment
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,7 +18,7 @@ class SaveValidationTest {
 
     @Test
     fun testFreshSlotDoesNotCloneAnotherSlot() = runBlocking {
-        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val context = RuntimeEnvironment.getApplication()
         val manager = SaveManager(context)
 
         val populated = GameState(
