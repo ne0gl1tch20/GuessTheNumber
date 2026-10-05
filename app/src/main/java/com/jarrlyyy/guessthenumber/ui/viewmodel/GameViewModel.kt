@@ -239,8 +239,19 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun switchSlot(slot: Int) {
         if (slot in 1..MAX_SAVE_SLOTS && slot != _activeSlot.value) {
             viewModelScope.launch(Dispatchers.IO) {
-                saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
-                loadGame(slot)
+                slotOperationMutex.withLock {
+                    val currentSlot = _activeSlot.value
+                    val currentState = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
+                    saveManager.saveGame(currentState, currentSlot)
+                    saveManager.setActiveSlot(slot)
+                    val loaded = saveManager.loadGame(slot)
+                    val sanitized = AntiCheatService.sanitizeCurrency(loaded)
+                    _activeSlot.value = slot
+                    _gameState.value = sanitized
+                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                    lastIncomeMeasurement = sanitized.money
+                    _incomePerSecond.value = BigNumber.ZERO
+                }
             }
         }
     }
@@ -274,20 +285,36 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            val success = saveManager.restoreBackup(slot)
-            if (success && _activeSlot.value == slot) {
-                val loaded = saveManager.loadGame(slot)
-                _gameState.value = AntiCheatService.sanitizeCurrency(loaded)
+            val success = slotOperationMutex.withLock {
+                val restored = saveManager.restoreBackup(slot)
+                if (restored && _activeSlot.value == slot) {
+                    val loaded = saveManager.loadGame(slot)
+                    val sanitized = AntiCheatService.sanitizeCurrency(loaded)
+                    _gameState.value = sanitized
+                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                    lastIncomeMeasurement = sanitized.money
+                    _incomePerSecond.value = BigNumber.ZERO
+                }
+                restored
             }
             withContext(Dispatchers.Main) { onResult(success) }
         }
     }
 
     fun resetSlot(slot: Int) {
+        if (slot !in 1..MAX_SAVE_SLOTS) return
         viewModelScope.launch(Dispatchers.IO) {
-            saveManager.resetSlot(slot)
-            if (_activeSlot.value == slot) {
-                loadGame(slot)
+            slotOperationMutex.withLock {
+                saveManager.resetSlot(slot)
+                if (_activeSlot.value == slot) {
+                    saveManager.setActiveSlot(slot)
+                    val fresh = GameState(lastSaveTimestamp = System.currentTimeMillis())
+                    saveManager.saveGame(fresh, slot)
+                    _gameState.value = fresh
+                    guessingBot.reset(fresh.currentRangeMin, fresh.currentRangeMax)
+                    lastIncomeMeasurement = fresh.money
+                    _incomePerSecond.value = BigNumber.ZERO
+                }
             }
         }
     }
