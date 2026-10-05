@@ -136,16 +136,18 @@ class GameEngineTest {
         val engine = GameEngine()
         val state = GameState()
         
-        val (state1, claimed1) = engine.claimChallenge(state, "daily_1", 50)
+        val eligible = state.copy(correctGuesses = 75)
+        val (state1, claimed1) = engine.claimChallenge(eligible, "weekly_2026_40_correct", 75)
         assertTrue(claimed1)
-        assertEquals(BigNumber(50), state1.nebula)
-        assertTrue(state1.completedChallenges.contains("daily_1"))
+        assertEquals(BigNumber(75), state1.nebula)
+        assertTrue(state1.completedChallenges.contains("weekly_2026_40_correct"))
 
-        val (_, claimed2) = engine.claimChallenge(state1, "daily_1", 50)
+        val (_, claimed2) = engine.claimChallenge(state1, "weekly_2026_40_correct", 75)
         assertFalse(claimed2)
     }
     @Test
     fun combinedMutatorsStackTheirRewardMultipliers() {
+        val engine = GameEngine()
         val state = GameState(
             currentRangeMax = 100,
             targetNumber = 50,
@@ -174,6 +176,19 @@ class GameEngineTest {
     @Test
     fun emptyMutatorSetReturnsBaseMultiplier() {
         assertEquals(BigNumber.ONE, engine.mutatorRewardMultiplier(GameState()))
+    }
+
+    @Test
+    fun invalidChallengeRewardCannotBeClaimed() {
+        val engine = GameEngine()
+        val eligible = GameState(correctGuesses = 75)
+        val (updated, claimed) = engine.claimChallenge(
+            eligible,
+            "weekly_2026_40_correct",
+            999999
+        )
+        assertFalse(claimed)
+        assertEquals(eligible, updated)
     }
 
 }
