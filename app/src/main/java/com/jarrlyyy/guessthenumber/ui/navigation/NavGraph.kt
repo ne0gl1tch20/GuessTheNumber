@@ -94,8 +94,8 @@ fun NavGraph(
     } else if (showChangelogPopup) {
         AlertDialog(
             onDismissRequest = onDismissChangelog,
-            title = { Text(locale.getString("changelog_popup_title", "🚀 What's New in v1.9!")) },
-            text = { Text(locale.getString("changelog_popup_text", "A new version of Guess The Number is installed! Check out the changelog for details on Internationalization, Localization, and updates.")) },
+            title = { Text(locale.getString("changelog_popup_title", "🚀 What's New in v1.12!")) },
+            text = { Text(locale.getString("changelog_popup_text", "Guess The Number v1.12 is installed! Check out the changelog for the latest features, polish, and fixes.")) },
             confirmButton = {
                 Button(onClick = {
                     onDismissChangelog()
