@@ -9,6 +9,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -45,6 +47,9 @@ fun SaveSlotsScreen(
 
     var showResetDialog by remember { mutableStateOf<Int?>(null) }
     var showProfileDialog by remember { mutableStateOf<Int?>(null) }
+    var showDuplicateDialog by remember { mutableStateOf<Int?>(null) }
+    var showRestoreDialog by remember { mutableStateOf<Int?>(null) }
+    var duplicateTarget by remember { mutableStateOf(0) }
     var profileNameDraft by remember { mutableStateOf("") }
     var profileIconDraft by remember { mutableStateOf(SaveProfile.DEFAULT_ICON) }
     val difficultySelections = remember { mutableStateMapOf<Int, String>() }
@@ -88,6 +93,73 @@ fun SaveSlotsScreen(
                     }
                 ) {
                     Text(locale.getString("legacy_save_decline", "Decline & Close App"))
+                }
+            }
+        )
+    }
+
+    if (showDuplicateDialog != null) {
+        val sourceSlot = showDuplicateDialog!!
+        val emptyTargets = (1..MAX_SAVE_SLOTS).filter { slotMetadata[it - 1]?.isEmpty != false && it != sourceSlot }
+        val target = if (duplicateTarget in emptyTargets) duplicateTarget else emptyTargets.firstOrNull() ?: 0
+        AlertDialog(
+            onDismissRequest = { showDuplicateDialog = null },
+            title = { Text(locale.getString("save_slot_duplicate_title", "Duplicate Slot %d", sourceSlot)) },
+            text = {
+                if (emptyTargets.isEmpty()) {
+                    Text(locale.getString("save_slot_duplicate_no_targets", "No empty slots are available."))
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text(locale.getString("save_slot_duplicate_description", "Choose an empty slot to copy this save into."))
+                        var expanded by remember { mutableStateOf(false) }
+                        Box {
+                            OutlinedButton(onClick = { expanded = true }) {
+                                Text(locale.getString("save_slot_title", "Slot %d", target))
+                            }
+                            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                                emptyTargets.forEach { slot ->
+                                    DropdownMenuItem(
+                                        text = { Text(locale.getString("save_slot_title", "Slot %d", slot)) },
+                                        onClick = { duplicateTarget = slot; expanded = false }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = emptyTargets.isNotEmpty() && target in emptyTargets,
+                    onClick = {
+                        viewModel.duplicateSlot(sourceSlot, target) { refreshMetadata() }
+                        showDuplicateDialog = null
+                    }
+                ) { Text(locale.getString("save_slot_duplicate_confirm", "Duplicate")) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDuplicateDialog = null }) {
+                    Text(locale.getString("cancel", "Cancel"))
+                }
+            }
+        )
+    }
+
+    if (showRestoreDialog != null) {
+        val slotNum = showRestoreDialog!!
+        AlertDialog(
+            onDismissRequest = { showRestoreDialog = null },
+            title = { Text(locale.getString("save_slot_restore_title", "Restore Slot %d Backup?", slotNum)) },
+            text = { Text(locale.getString("save_slot_restore_description", "Restore the previous backup for Slot %d? Your current save will become the backup.", slotNum)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.restoreBackup(slotNum) { refreshMetadata() }
+                    showRestoreDialog = null
+                }) { Text(locale.getString("save_slot_restore_confirm", "Restore")) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRestoreDialog = null }) {
+                    Text(locale.getString("cancel", "Cancel"))
                 }
             }
         )
@@ -212,6 +284,8 @@ fun SaveSlotsScreen(
                                 showProfileDialog = slot
                             }
                         },
+                        onDuplicate = { duplicateTarget = 0; showDuplicateDialog = slot },
+                        onRestoreBackup = { showRestoreDialog = slot },
                         locale = locale
                     )
                 }
@@ -256,6 +330,8 @@ fun SlotCard(
     onSelect: () -> Unit,
     onReset: () -> Unit,
     onEditProfile: () -> Unit,
+    onDuplicate: () -> Unit,
+    onRestoreBackup: () -> Unit,
     locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 ) {
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
@@ -287,8 +363,16 @@ fun SlotCard(
                         IconButton(onClick = onEditProfile) {
                             Icon(Icons.Default.Edit, contentDescription = locale.getString("save_profile_edit", "Edit Profile"))
                         }
+                        IconButton(onClick = onDuplicate) {
+                            Icon(Icons.Default.ContentCopy, contentDescription = locale.getString("save_slot_duplicate", "Duplicate Slot"))
+                        }
+                        if (metadata.hasBackup) {
+                            IconButton(onClick = onRestoreBackup) {
+                                Icon(Icons.Default.Restore, contentDescription = locale.getString("save_slot_restore", "Restore Backup"))
+                            }
+                        }
                         IconButton(onClick = onReset) {
-                        Icon(Icons.Default.Delete, contentDescription = locale.getString("save_slot_reset", "Reset Slot"), tint = MaterialTheme.colorScheme.error)
+                            Icon(Icons.Default.Delete, contentDescription = locale.getString("save_slot_reset", "Reset Slot"), tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
