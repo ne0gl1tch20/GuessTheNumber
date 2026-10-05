@@ -21,6 +21,22 @@ data class GuessResult(
 
 class GameEngine(private val rng: Random = Random.Default) {
 
+    companion object {
+        const val FRENZY_THRESHOLD = 5
+        const val FRENZY_BONUS_PER_TIER = 0.25
+        const val FRENZY_MAX_MULTIPLIER = 5.0
+    }
+
+    fun frenzyMultiplier(streak: Int): BigNumber {
+        if (streak < FRENZY_THRESHOLD) return BigNumber.ONE
+        val tiers = streak / FRENZY_THRESHOLD
+        val multiplier = minOf(
+            FRENZY_MAX_MULTIPLIER,
+            1.0 + (tiers * FRENZY_BONUS_PER_TIER)
+        )
+        return BigNumber(multiplier)
+    }
+
     fun getInitialRangeMax(difficultyId: String): Long =
         Difficulty.baseRangeMax(difficultyId)
 
@@ -38,6 +54,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             val isCrit = rng.nextDouble() < critChance
             val baseReward = BigNumber(100) * BigNumber(state.currentRangeMax)
             val streakMultiplier = BigNumber(1.0 + (state.streak * 0.1))
+            val frenzyMult = frenzyMultiplier(state.streak)
             val critMultiplier = if (isCrit) BigNumber(5) else BigNumber.ONE
 
             // Multipliers from upgrades
@@ -49,7 +66,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             val mutatorMult = if (state.shopPurchases.contains("mut_hardcore")) BigNumber(2.0) else BigNumber.ONE
 
             val difficultyMultiplier = BigNumber(Difficulty.rewardMultiplier(state.difficultyId))
-            val calculatedReward = baseReward * streakMultiplier * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier
+            val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier
             val totalReward = maxOf(BigNumber(10), calculatedReward)
             val newMoney = state.money + totalReward
             val newStreak = state.streak + 1
