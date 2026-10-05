@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
@@ -274,7 +275,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            val success = saveManager.duplicateSlot(sourceSlot, targetSlot)
+            val success = slotOperationMutex.withLock {
+                saveManager.duplicateSlot(sourceSlot, targetSlot)
+            }
             withContext(Dispatchers.Main) { onResult(success) }
         }
     }
@@ -600,29 +603,39 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun importSave(json: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val success = saveManager.importSave(json, _activeSlot.value)
+            val success = slotOperationMutex.withLock {
+                saveManager.importSave(json, _activeSlot.value)
+            }
             if (success) {
                 val loaded = saveManager.loadGame(_activeSlot.value)
                 val sanitized = AntiCheatService.sanitizeCurrency(loaded)
                 withContext(Dispatchers.Main) {
                     _gameState.value = sanitized
+                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                    lastIncomeMeasurement = sanitized.money
+                    _incomePerSecond.value = BigNumber.ZERO
                     onResult(true)
                 }
             } else {
-                withContext(Dispatchers.Main) {
-                    onResult(false)
-                }
+                withContext(Dispatchers.Main) { onResult(false) }
             }
         }
     }
 
     fun resetData() {
         viewModelScope.launch(Dispatchers.IO) {
-            saveManager.resetData()
-            loadGame(1)
-            withContext(Dispatchers.Main) {
-                backgroundMusicManager.stop()
+            slotOperationMutex.withLock {
+                saveManager.resetData()
+                val fresh = GameState()
+                saveManager.setActiveSlot(1)
+                saveManager.saveGame(fresh, 1)
+                _activeSlot.value = 1
+                _gameState.value = fresh
+                guessingBot.reset(fresh.currentRangeMin, fresh.currentRangeMax)
+                lastIncomeMeasurement = fresh.money
+                _incomePerSecond.value = BigNumber.ZERO
             }
+            withContext(Dispatchers.Main) { backgroundMusicManager.stop() }
         }
     }
 
@@ -776,11 +789,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         randomEventJob = viewModelScope.launch(Dispatchers.Default) {
             while (true) {
                 delay(60_000L)
-                val currentState = _gameState.value
-                val event = randomEventEngine.roll(currentState) ?: continue
-                withContext(Dispatchers.Main) {
-                    _gameState.value = event.state
-                }
+                val event = withContext(Dispatchers.Main) {
+                    val currentState = _gameState.value
+                    randomEventEngine.roll(currentState)?.also { _gameState.value = it.state }
+                } ?: continue
                 saveGameAsync()
                 GameLogger.log(
                     LogLevel.INFO,
@@ -807,19 +819,20 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     1000L
                 }
                 delay(delayMillis)
-                val currentState = _gameState.value
-                if (currentState.autoClickerActive) {
-                    val guess = guessingBot.nextGuess(
-                        currentState.currentRangeMin,
-                        currentState.currentRangeMax
-                    )
-                    val result = gameEngine.processGuess(currentState, guess)
-                    guessingBot.observeGuess(guess, result.feedback)
-                    if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
-                        guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
-                    }
-                    withContext(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
+                    val currentState = _gameState.value
+                    if (currentState.autoClickerActive) {
+                        val guess = guessingBot.nextGuess(
+                            currentState.currentRangeMin,
+                            currentState.currentRangeMax
+                        )
+                        val result = gameEngine.processGuess(currentState, guess)
+                        guessingBot.observeGuess(guess, result.feedback)
+                        if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
+                            guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
+                        }
                         _gameState.value = result.newState
+                        saveGameAsync()
                     }
                 }
             }
@@ -833,8 +846,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         timerJob?.cancel()
         randomEventJob?.cancel()
         backgroundMusicManager.release()
-        viewModelScope.launch(Dispatchers.IO) {
-            saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
+        runBlocking(Dispatchers.IO) {
+            saveManager.saveGame(
+                _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()),
+                _activeSlot.value
+            )
         }
     }
 }
