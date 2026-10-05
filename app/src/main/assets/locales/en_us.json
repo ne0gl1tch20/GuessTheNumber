@@ -518,5 +518,20 @@
   "achievement_tier_bronze": "Bronze",
   "achievement_tier_silver": "Silver",
   "achievement_tier_gold": "Gold",
-  "achievement_tier_diamond": "Diamond"
+  "achievement_tier_diamond": "Diamond",
+  "random_event_active": "⚡ Random Event: %s",
+  "random_event_cash_burst_name": "Cash Burst",
+  "random_event_cash_burst_desc": "A sudden cash surge! You gain a bonus based on your current money.",
+  "random_event_nebula_rain_name": "Nebula Rain",
+  "random_event_nebula_rain_desc": "Nebula crystals are falling from the sky! Grab the bonus before they vanish.",
+  "random_event_jackpot_name": "Jackpot",
+  "random_event_jackpot_desc": "🎰 JACKPOT! A huge payout based on your current range lands in your wallet.",
+  "random_event_streak_surge_name": "Streak Surge",
+  "random_event_streak_surge_desc": "Your combo gets a sudden boost. Your streak jumps by 2!",
+  "random_event_range_shuffle_name": "Range Shuffle",
+  "random_event_range_shuffle_desc": "The target moved! The hidden number has been shuffled inside the current range.",
+  "random_event_tax_refund_name": "Tax Refund",
+  "random_event_tax_refund_desc": "The game owes you one. You receive a refund based on your spending.",
+  "random_event_cosmic_gift_name": "Cosmic Gift",
+  "random_event_cosmic_gift_desc": "🌌 A rare cosmic gift grants you 100 Nebula."
 }
