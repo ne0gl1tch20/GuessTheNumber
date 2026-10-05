@@ -18,13 +18,11 @@
   "mutators": "Mga Mutator",
   "prestige": "Prestige",
   "save_slots": "Mga Slot ng Save",
-
   "guess_prompt": "Ilagay ang iyong hula:",
   "submit_guess": "Isumite",
   "correct_guess": "✨ Tama! Nahulaan mo ang sekretong numero!",
   "too_low": "Masyadong mababa! Subukan ang mas mataas na numero.",
   "too_high": "Masyadong mataas! Subukan ang mas mababang numero.",
-
   "settings_title": "Mga Setting ng Laro",
   "sound_effects": "Tunog",
   "background_music": "Musika sa Background",
@@ -40,7 +38,6 @@
   "game_preferences": "Mga Kagustuhan sa Laro",
   "notifications": "Mga Notipikasyon",
   "cloud_backup_title": "Cloud Backup at Sync",
-
   "shop_title": "Tindahan ng Nebula",
   "buy": "Bumili",
   "purchased": "Binili",
@@ -49,7 +46,6 @@
   "cost": "Halaga: %s Nebula",
   "owned": "Pag-aari",
   "acquire": "Kunin",
-
   "achievements_title": "Mga Nakamit at Perks",
   "locked": "Naka-lock",
   "unlocked": "Naka-unlock",
@@ -58,14 +54,12 @@
   "achievement_unlocked_format": "Naka-unlock: %d / %d",
   "achievement_progress_desc": "Ang pag-unlock ng mga achievements ay nagbibigay ng permanenteng Nebula rewards at passive perks!",
   "reward_format": "Gantimpala: +%s Nebula",
-
   "achievement_correct_10_name": "Baguhang Manghuhula",
   "achievement_correct_10_desc": "Matagumpay na hulaan ang numero nang 10 beses.",
   "achievement_streak_5_name": "Master ng Sunud-sunod",
   "achievement_streak_5_desc": "Magkamit ng 5 sunud-sunod na tamang hula.",
   "achievement_millionaire_name": "Milyonaryo sa Numero",
   "achievement_millionaire_desc": "Mag-ipon ng 1,000,000 na pera.",
-
   "upgrade_reward_multiplier_name": "Multiplier ng Gantimpala",
   "upgrade_reward_multiplier_desc": "Pinapataas ang perang kinikita bawat tamang hula.",
   "upgrade_better_range_name": "Mas Magandang Saklaw",
@@ -88,40 +82,34 @@
   "upgrade_ultra_efficiency_desc": "Pinapalakas ang gantimpala ng Ultra reset currency.",
   "upgrade_discount_bargain_name": "Diskwento sa Upgrade",
   "upgrade_discount_bargain_desc": "Binabawasan ang pagtaas ng presyo sa lahat ng upgrade.",
-
   "prestige_money_boost_name": "Kayamanan ng Prestige",
   "prestige_money_boost_desc": "Permanenteng pinapataas ang kita batay sa antas ng Prestige.",
   "prestige_gain_boost_name": "Prestige Catalyst",
   "prestige_gain_boost_desc": "Pinapataas ang nakukuhang Prestige currency mula sa mga reset.",
   "prestige_starting_capital_name": "Prestige Endowment",
   "prestige_starting_capital_desc": "Binibigyan ka ng karagdagang pera pagkatapos mag-reset.",
-
   "ultra_money_boost_name": "Cosmic Wealth",
   "ultra_money_boost_desc": "Malaking pinararami ang kita batay sa antas ng Ultra.",
   "ultra_gain_boost_name": "Walang Hanggang Pagpapalawak",
   "ultra_gain_boost_desc": "Pinapataas ang Ultra currency mula sa mga reset (hanggang 2,000 limit).",
   "ultra_nebula_boost_name": "Nebula Resonance",
   "ultra_nebula_boost_desc": "Pinapalakas ang mga gantimpala ng Nebula mula sa Arcade at achievements.",
-
   "shop_item_auto_clicker_basic_name": "Auto Clicker",
   "shop_item_auto_clicker_basic_desc": "Awtomatikong hinuhulaan ang target na numero bawat segundo.",
   "shop_item_nebula_boost_name": "Kristal ng Nebula",
   "shop_item_nebula_boost_desc": "Permanenteng pinapataas ang kita ng Nebula nang 2x.",
   "shop_item_golden_guess_name": "Golden Guess Pass",
   "shop_item_golden_guess_desc": "Ginagarantiyahan ang kritikal na gantimpala sa bawat ika-10 hula.",
-
   "prestige_shop_prestige_auto_speed_name": "Quantum Auto-Guess",
   "prestige_shop_prestige_auto_speed_desc": "Pinapabilis ang awtomatikong paghula nang 50%.",
   "prestige_shop_prestige_luck_charm_name": "Prestige Luck Charm",
   "prestige_shop_prestige_luck_charm_desc": "Pinapataas ang tyansa ng kritikal na hula nang 5%.",
-
   "ultra_shop_ultra_universal_harmony_name": "Unibersal na Pagkakaisa",
   "ultra_shop_ultra_universal_harmony_desc": "Ginagarantiyahan ang kritikal na gantimpala sa bawat tamang hula.",
   "ultra_shop_ultra_infinite_multiplier_name": "Walang Hanggang Singularity",
   "ultra_shop_ultra_infinite_multiplier_desc": "Permanenteng dinodoble ang lahat ng kita ng pera.",
   "ultra_shop_ultra_flex_badge_name": "ANG FLEX BADGE",
   "ultra_shop_ultra_flex_badge_desc": "Ang pinakadakilang simbolo ng karangalan at kayamanan sa uniberso.",
-
   "minigame_quick_guess_name": "Mabilisang Hula",
   "minigame_quick_guess_desc": "Hulaan ang mga numero sa loob ng 10 segundo upang maka-score at kumita ng Nebula!",
   "minigame_reaction_test_name": "Subok sa Reaksyon",
@@ -132,7 +120,6 @@
   "minigame_memory_match_desc": "Tandaan ang pagkakasunod-sunod ng mga kumikinang na numero at ulitin ito nang tama.",
   "minigame_number_rush_name": "Ratsada sa Numero",
   "minigame_number_rush_desc": "I-tap ang mga numero mula 1 hanggang 5 nang pataas sa pinakamabilis na paraan.",
-
   "mutator_mut_hardcore_name": "Hardcore Range",
   "mutator_mut_hardcore_desc": "Dobleng saklaw ng paghula. Gantimpala ×2.",
   "mutator_mut_speed_name": "Hyper Speed",
@@ -141,10 +128,8 @@
   "mutator_mut_blind_desc": "Walang gabay kung mas mababa o mataas. Gantimpala ×5.",
   "mutator_mut_tax_name": "Mabigat na Buwis",
   "mutator_mut_tax_desc": "Bawat maling hula ay nagbabawas ng 5% ng pera. Gantimpala ×10.",
-
   "challenge_daily_guess_50_name": "Pang-araw-araw na Hamon",
   "challenge_daily_guess_50_desc": "Gumawa ng 50 tamang hula ngayong araw.",
-
   "talent_talent_speed_1_name": "Bilis ng Buga I",
   "talent_talent_speed_1_desc": "Pinapabilis ang Auto-Clicker nang +25%",
   "talent_talent_speed_2_name": "Bilis ng Buga II",
@@ -157,13 +142,11 @@
   "talent_talent_reward_1_desc": "Pinapalakas ang lahat ng kita ng pera nang +50%",
   "talent_talent_master_1_name": "Omniscient Oracle",
   "talent_talent_master_1_desc": "Ginagarantiyahan ang mga pahiwatig at dinodoble ang prestige gains",
-
   "more_title": "Iba Pang Mga Tampok",
   "stats": "Estatistika",
   "talents": "Mga Talento",
   "staking": "Staking",
   "changelog": "Kasaysayan ng Pagbabago",
-
   "about_title": "Tungkol at Mga Lisensya",
   "about_header": "Gamified Guess the Number Simulator",
   "about_version_format": "Bersyon: %s (%d)",
@@ -172,7 +155,6 @@
   "about_library_author_format": "May-akda: %s",
   "about_library_license_format": "Lisensya: %s",
   "back": "Bumalik",
-
   "feedback_toolow_0": "Masyadong mababa ang iyong hula! Umabot sa mga bituin.",
   "feedback_toolow_1": "Masyadong mababa! Subukan ang mas mataas na numero.",
   "feedback_toolow_2": "Mas mataas! Ang numerong iyon ay nasa kailaliman.",
@@ -203,7 +185,6 @@
   "feedback_toolow_27": "Masyadong mababa! Sukatin ang mga taluktok.",
   "feedback_toolow_28": "Mababa sa par! Pumunta nang mas mataas.",
   "feedback_toolow_29": "Masyadong mababa! Targetin ang mga tuktok.",
-
   "feedback_toohigh_0": "Masyadong mataas! Ibaba ang iyong pagtataya.",
   "feedback_toohigh_1": "Masyadong mataas! Subukan ang mas mababang numero.",
   "feedback_toohigh_2": "Mas mababa! Ang numerong iyon ay lumipad na sa kalawakan.",
@@ -234,7 +215,6 @@
   "feedback_toohigh_27": "Masyadong mataas! Bumaba sa mga taluktok.",
   "feedback_toohigh_28": "Mataas sa par! Pumunta nang mas mababa.",
   "feedback_toohigh_29": "Masyadong mataas! Targetin ang mga lambak.",
-
   "feedback_tip_0": "💡 Istratehiya sa Binary Search: Subukang hulaan ang %d (ang eksaktong gitna ng %d at %d) upang agad maalis ang kalahati ng natitirang espasyo.",
   "feedback_tip_1": "💡 Pagsusuri sa Saklaw: Ang target na numero ay mas malaki kaysa sa aritmetikong mean (%d) ng iyong kasalukuyang bracket.",
   "feedback_tip_2": "💡 Pagsusuri sa Saklaw: Ang target na numero ay mas maliit kaysa sa aritmetikong mean (%d) ng iyong kasalukuyang bracket.",
@@ -290,7 +270,6 @@
   "feedback_tip_52": "💡 Combinatorial Clue: Index offset mula sa lower bound ay %d.",
   "feedback_tip_53": "💡 Binary Search Strategy: Pivot test sa %d.",
   "feedback_tip_54": "💡 Target Locked: Final convergence coordinate ay kinompute sa %d.",
-
   "play_title": "Hulaan Mo Ang Numero",
   "play_range_format": "Saklaw: %d - %d",
   "play_streak_format": "Sunud-sunod: %d (Pinakamahusay: %d)",
@@ -298,7 +277,6 @@
   "play_guess_button": "HULAAN ANG NUMERO",
   "play_correct_guess": "✨ Tama! Nahulaan mo ang sekretong numero!",
   "play_debug_warning": "Gumagamit ka ng debug build. Hindi ito para sa normal na paggamit.",
-
   "prestige_hub_title": "Prestige Hub at Mga Upgrade",
   "prestige_balance_format": "Prestige Balance: %s",
   "prestige_requirement_format": "Kailangan: %s Pera (Reset #%d)",
@@ -310,9 +288,6 @@
   "prestige_upgrade_tree_title": "Puno ng Prestige Upgrade (JSON Driven)",
   "prestige_shop_title": "Tindahan ng Prestige (JSON Driven)",
   "level_format": "Antas: %d / %d",
-  "buy": "Bumili",
-  "owned": "Pag-aari",
-
   "mutators_title": "Mga Mutator at Seeded Challenges",
   "gameplay_mutators_title": "Gameplay Mutators",
   "reward_multiplier_format": "Multiplier ng Gantimpala: %.1fx",
@@ -321,24 +296,19 @@
   "daily_seeded_challenges_title": "Pang-araw-araw na Hamon",
   "completed": "Tapos Na",
   "claim": "Kunin",
-
   "more_title_hub": "Iba Pang Hub",
   "reset_tiers_title": "I-reset ang Mga Tier at Hub",
   "ultra_hub_title": "Ultra Hub at Mga Upgrade",
   "prestige_hub_button": "Prestige Hub at Mga Upgrade",
   "audio_save_management_title": "Pamamahala ng Audio at Save",
-  "save_slots": "Mga Slot ng Save",
   "background_music_player": "Manlalaro ng Musika sa Background",
   "general_navigation_title": "Pangkalahatang Nabigasyon",
   "seasonal_events": "Mga Kaganapan sa Panahon",
   "prestige_talent_web": "Prestige Talent Web",
   "mutators_seeded_challenges": "Mga Mutator at Seeded Challenges",
-  "changelog": "Kasaysayan ng Pagbabago",
   "arcade_minigames": "Mga Minigame sa Arkade",
   "statistics": "Estatistika",
-  "settings": "Mga Setting",
   "about_licenses": "Tungkol at Mga Lisensya",
-  "dev_settings": "Mga Setting ng Dev",
   "background_music_dialog_title": "🎵 Manlalaro ng Musika sa Background",
   "background_music_dialog_desc": "Pumili ng audio file (MP3/WAV) upang i-save at patugtugin sa lahat ng screen.",
   "no_music_selected": "Walang napiling musika.",
@@ -353,7 +323,6 @@
   "playing_music_toast": "Nagpapatugtog ng musika...",
   "select_audio_first_toast": "Mangyaring pumili muna ng audio file!",
   "stopped_music_toast": "Itinigil ang musika",
-
   "arcade_title": "Mga Minigame sa Arkade • Expressive",
   "play_minigame_format": "Laruin ang %s",
   "quick_guess_title": "Mabilisang Hula Minigame",
@@ -382,7 +351,6 @@
   "number_rush_title": "Ratsada sa Numero",
   "tap_numbers_order_format": "I-tap ang mga numero ayon sa pagkakasunod: %d hanggang 5",
   "rush_completed": "Matagumpay na natapos ang ratsada! Nanalo ng 1 Nebula!",
-
   "crash_recovery_title": "⚠️ Nakitang Biglang Pag-crash",
   "crash_recovery_desc": "Nagkaroon ng hindi inaasahang error ang laro at ligtas na naibalik ang iyong huling wastong progreso.",
   "crash_diagnostic_logs": "Mga Log ng Diagnostic",
@@ -391,7 +359,6 @@
   "continue_playing": "Ipagpatuloy ang Paglalaro",
   "logs_copied_toast": "Kopya na ang mga log sa clipboard!",
   "share_crash_logs_chooser": "I-share ang mga Log ng Pag-crash",
-
   "cloud_backup_hub_title": "I-export/I-import ang Save at Cloud Backup",
   "cloud_backup_transfer_title": "Cloud Backup at Paglilipat",
   "cloud_backup_transfer_desc": "I-export ang iyong naka-encrypt na save string para i-backup ang iyong progreso sa iba't ibang device.",
@@ -401,7 +368,6 @@
   "backup_copied_toast": "Kopya na ang save string sa clipboard!",
   "backup_restored_toast": "Matagumpay na naibalik ang cloud backup!",
   "invalid_backup_toast": "Hindi wastong backup string!",
-
   "dev_settings_title": "Mga Setting ng Dev at Console",
   "open_process_inspector": "Buksan ang Variable at Process Inspector",
   "save_non_crash_logs": "I-save ang mga non-crash log sa storage",
@@ -427,7 +393,6 @@
   "switched_locale_us_toast": "Inilipat ang wika sa Ingles (US)",
   "switched_locale_fil_toast": "Inilipat ang wika sa Filipino",
   "reset_locale_default_toast": "Na-reset ang wika sa Default ng Device",
-
   "live_ops_screen_title": "Mga Kaganapan sa Panahon",
   "event_perks_title": "Mga Event Perk at Permanenteng Bonus",
   "permanent_bonus_level_format": "Antas ng Permanenteng Bonus: +%d (Nagbibigay ng permanenteng pera at multiplier sa buong save!)",
@@ -436,15 +401,12 @@
   "claims_label": "Mga Claim: %d / %d",
   "max_claimed": "Na-claim na ang Lahat",
   "claim_reward_nebula": "Kunin ang Gantimpala (+10 Nebula)",
-
   "talent_screen_title": "Prestige Talent Web",
   "prestige_balance_talent_format": "Prestige Balance: %s",
   "talent_screen_desc": "I-unlock ang mga magkakaugnay na talent node gamit ang Prestige upang makakuha ng mga permanenteng buff sa laro.",
   "locked_requires_parent": "Naka-lock: Nangangailangan ng magulang na talento",
   "unlock": "I-unlock",
-
   "loading_save_data": "Nag-a-load ng data ng save...",
-
   "time_travel_title": "⏳ Natuklasan ang Paglalakbay sa Oras!",
   "time_travel_text": "Mukhang nagbago ang oras mula noong huli kang naglaro (ang orasan ng device ay %d segundo ang huli sa huling save). Dahil dito, pansamantalang naka-pause ang auto-clicker at passive generation sa loob ng 24 oras.",
   "understood": "Naintindihan",
@@ -458,8 +420,7 @@
   "nav_play": "Laro",
   "nav_upgrade": "Mga Pagpapabuti",
   "nav_shop": "Tindahan",
-  "nav_more": "Higit Pa"
-,
+  "nav_more": "Higit Pa",
   "save_slot_title": "Slot %d",
   "save_slot_active": "(Aktibo)",
   "save_slot_empty": "Walang laman na slot",
@@ -467,5 +428,10 @@
   "save_slot_difficulty": "Hirap",
   "difficulty_classic": "Classic",
   "difficulty_hard": "Mahirap",
-  "difficulty_extreme": "Extreme"
+  "difficulty_extreme": "Extreme",
+  "submit": "Isumite",
+  "run": "Patakbuhin",
+  "achievement_unlocked_count_format": "Naka-unlock: %d / %d",
+  "achievement_unlocked_desc": "Ang pag-unlock ng mga achievement ay nagbibigay ng permanenteng Nebula rewards at passive perks!",
+  "reward_nebula_format": "Gantimpala: +%d Nebula"
 }
