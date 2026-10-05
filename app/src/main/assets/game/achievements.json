@@ -141,48 +141,6 @@
       "tier": "diamond"
     },
     {
-      "id": "arcade_1",
-      "name": "Arcade Rookie",
-      "description": "Play an arcade minigame once.",
-      "rewardNebula": 10,
-      "tier": "bronze"
-    },
-    {
-      "id": "arcade_25",
-      "name": "Arcade Regular",
-      "description": "Play 25 arcade minigames.",
-      "rewardNebula": 50,
-      "tier": "silver"
-    },
-    {
-      "id": "arcade_100",
-      "name": "Arcade Champion",
-      "description": "Play 100 arcade minigames.",
-      "rewardNebula": 150,
-      "tier": "gold"
-    },
-    {
-      "id": "nebula_100",
-      "name": "Nebula Collector",
-      "description": "Earn 100 Nebula.",
-      "rewardNebula": 25,
-      "tier": "bronze"
-    },
-    {
-      "id": "nebula_1000",
-      "name": "Nebula Hoarder",
-      "description": "Earn 1,000 Nebula.",
-      "rewardNebula": 100,
-      "tier": "silver"
-    },
-    {
-      "id": "nebula_10000",
-      "name": "Nebula Tycoon",
-      "description": "Earn 10,000 Nebula.",
-      "rewardNebula": 250,
-      "tier": "gold"
-    },
-    {
       "id": "playtime_1h",
       "name": "One Hour In",
       "description": "Play for 1 hour.",
