@@ -153,7 +153,7 @@ fun SaveSlotsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showResetDialog = null }) {
-                    Text("Cancel")
+                    Text(locale.getString("cancel", "Cancel"))
                 }
             }
         )
