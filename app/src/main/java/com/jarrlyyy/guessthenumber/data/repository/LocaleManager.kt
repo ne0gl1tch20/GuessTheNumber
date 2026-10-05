@@ -27,7 +27,11 @@ class LocaleManager(private val context: Context) {
                 val jsonString = reader.readText()
                 reader.close()
                 translations = JSONObject(jsonString)
-                currentLocale = localeFromFileName(localeFileName)
+                currentLocale = when {
+                    localeFileName.contains("fil_ph", ignoreCase = true) -> Locale("fil", "PH")
+                    localeFileName.contains("en_us", ignoreCase = true) -> Locale.US
+                    else -> Locale.US
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 translations = JSONObject()
@@ -79,8 +83,7 @@ class LocaleManager(private val context: Context) {
         DateFormat.getTimeInstance(DateFormat.SHORT, currentLocale).format(timestampMillis)
 
     fun formatDateTime(timestampMillis: Long): String =
-        DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, currentLocale)
-            .format(timestampMillis)
+        DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, currentLocale).format(timestampMillis)
 
     fun formatIsoDateTime(timestampMillis: Long): String =
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", currentLocale)
@@ -93,11 +96,11 @@ class LocaleManager(private val context: Context) {
         val minutes = duration.toMinutesPart()
         val seconds = duration.toSecondsPart()
         return if (hours > 0) {
-            "\${formatNumber(hours)}h \${formatNumber(minutes)}m \${formatNumber(seconds)}s"
+            "${formatNumber(hours)}h ${formatNumber(minutes)}m ${formatNumber(seconds)}s"
         } else if (minutes > 0) {
-            "\${formatNumber(minutes)}m \${formatNumber(seconds)}s"
+            "${formatNumber(minutes)}m ${formatNumber(seconds)}s"
         } else {
-            "\${formatNumber(seconds)}s"
+            "${formatNumber(seconds)}s"
         }
     }
 
@@ -111,12 +114,5 @@ class LocaleManager(private val context: Context) {
             String.format(currentLocale, raw, *args)
         } catch (_: Exception) {
             raw
-        }
-
-    private fun localeFromFileName(fileName: String): Locale =
-        when {
-            fileName.contains("fil_ph", ignoreCase = true) -> Locale("fil", "PH")
-            fileName.contains("en_us", ignoreCase = true) -> Locale.US
-            else -> Locale.US
         }
 }
