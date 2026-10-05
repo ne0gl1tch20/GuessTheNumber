@@ -20,7 +20,7 @@ BASELINE = "en_us.json"
 
 # Covers the formats used by LocaleManager/String.format:
 # %s, %d, %f, %.2f, %1$s, %02d, etc.
-PLACEHOLDER_RE = re.compile(r"%(?:(?:\d+)\$)?[-+#0 (]*\d*(?:\.\d+)?[a-zA-Z]")
+PLACEHOLDER_RE = re.compile(r"%(?!%)(?:(?:\d+)\$)?[-+#0 (]*\d*(?:\.\d+)?[a-zA-Z]")
 
 
 def load_locale(path: Path) -> dict[str, object]:
