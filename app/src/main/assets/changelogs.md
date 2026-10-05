@@ -1,5 +1,12 @@
 # 🚀 Guess The Number Simulator - Changelog
 
+## v1.11 (Combo / Frenzy)
+- 🔥 **Combo Frenzy**: Consecutive correct guesses now unlock Frenzy tiers every 5-streak steps.
+- 📈 **Frenzy Rewards**: Each Frenzy tier adds a 25% reward multiplier, capped at 5x, on top of the existing streak multiplier.
+- ✨ **Live Frenzy Indicator**: The Play screen shows the active Frenzy multiplier once the streak reaches 5.
+- 🌐 **Localized Frenzy UI**: Added English and Filipino Frenzy text.
+- 🧪 **Frenzy Tests**: Added engine coverage for tier scaling and reward increases.
+
 ## v1.10 (Save Slot Expansion, Profiles, Difficulty & Backup Improvements)
 - 💾 **10 Save Slots**: Expanded save management from 3 slots to 10 with dynamic slot handling and metadata support.
 - 🎚️ **Per-Slot Difficulty**: Added Classic, Hard, and Extreme difficulty profiles at the save-slot level.
