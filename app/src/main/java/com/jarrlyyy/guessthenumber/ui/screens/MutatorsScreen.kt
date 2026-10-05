@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 import java.time.temporal.WeekFields
+import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
 
@@ -160,8 +161,8 @@ fun MutatorsScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(locale.getString("weekly_" + challenge.kind + "_name", name), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
                         Text(
-                            if (challenge.kind == "money") description.format(BigNumber(challenge.target).format())
-                            else description.format(challenge.target),
+                            if (challenge.kind == "money") locale.getString("weekly_money_desc", "").format(BigNumber(challenge.target).format())
+                            else locale.getString("weekly_" + challenge.kind + "_desc", "").format(challenge.target),
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
