@@ -191,6 +191,39 @@ fun PlayScreen(
                 }
             }
 
+            state.lastRandomEventId?.let { eventId ->
+                item {
+                    val eventName = locale.getString(
+                        "random_event_" + eventId + "_name",
+                        eventId
+                    )
+                    val eventDescription = locale.getString(
+                        "random_event_" + eventId + "_desc",
+                        ""
+                    )
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.large,
+                        color = MaterialTheme.colorScheme.tertiaryContainer,
+                        tonalElevation = 5.dp
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = locale.getString("random_event_active", "⚡ Random Event: %s", eventName),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = eventDescription,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        }
+                    }
+                }
+            }
+
             item {
                 // Google-style M3 Expressive Action Card Container
                 Surface(
