@@ -53,7 +53,8 @@ data class GameStatistics(
     val nebulaEarned: Long = 0,
     val playtimeSeconds: Long = 0,
     val arcadePlayed: Long = 0,
-    val arcadeBestScores: Map<String, Int> = emptyMap()
+    val arcadeBestScores: Map<String, Int> = emptyMap(),
+    val randomEventsTriggered: Long = 0
 )
 
 @Serializable
