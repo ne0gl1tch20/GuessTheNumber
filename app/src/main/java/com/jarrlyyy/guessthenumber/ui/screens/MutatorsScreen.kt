@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.time.LocalDate
+import java.time.temporal.WeekFields
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
 
@@ -22,12 +24,22 @@ data class MutatorDef(
     val rewardMultiplier: Double
 )
 
-data class SeededChallengeDef(
-    val seed: Long,
-    val name: String,
-    val description: String,
-    val rewardNebula: Long
-)
+data class WeeklyChallengeDef(val id: String, val kind: String, val target: Long, val rewardNebula: Long)
+
+private fun weeklyChallenges(week: Int): List<WeeklyChallengeDef> {
+    val pool = listOf(
+        WeeklyChallengeDef("correct", "correct", 75, 75),
+        WeeklyChallengeDef("streak", "streak", 15, 90),
+        WeeklyChallengeDef("money", "money", 10_000_000, 100),
+        WeeklyChallengeDef("guesses", "guesses", 250, 80),
+        WeeklyChallengeDef("prestige", "prestige", 2, 125),
+        WeeklyChallengeDef("ultra", "ultra", 1, 175),
+        WeeklyChallengeDef("frenzy", "frenzy", 25, 110),
+        WeeklyChallengeDef("playtime", "playtime", 3_600, 95)
+    )
+    val offset = (week - 1) % pool.size
+    return List(3) { pool[(offset + it * 2) % pool.size] }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,10 +55,13 @@ fun MutatorsScreen(
         MutatorDef("mut_blind", "Blindfolded Oracle", "No lower/higher feedback indicators. Rewards ×5.", 5.0)
     )
 
-    val challenges = listOf(
-        SeededChallengeDef(20251001L, "Daily Seed #1", "Guess 25 numbers correctly under Hardcore Mutator.", 50),
-        SeededChallengeDef(20251002L, "Daily Seed #2", "Achieve a 10-guess streak on Seed 20251002.", 75)
-    )
+    val today = LocalDate.now()
+    val week = today.get(WeekFields.ISO.weekOfWeekBasedYear())
+    val weekYear = today.get(WeekFields.ISO.weekBasedYear())
+    val challenges = weeklyChallenges(week).map {
+        it.copy(id = "weekly_" + weekYear + "_" + week + "_" + it.kind)
+    }
+
 
     Scaffold(
         topBar = {
@@ -99,34 +114,62 @@ fun MutatorsScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Daily Seeded Challenges", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text("Weekly Challenges", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
 
             items(challenges) { challenge ->
-                val completed = state.completedChallenges.contains(challenge.seed.toString())
+                val completed = state.completedChallenges.contains(challenge.id)
+                val progress = when (challenge.kind) {
+                    "correct" -> state.correctGuesses.toLong()
+                    "streak", "frenzy" -> state.bestStreak.toLong()
+                    "money" -> state.money.value.toLong()
+                    "guesses" -> state.statistics.totalGuesses
+                    "prestige" -> state.prestigeCount
+                    "ultra" -> state.ultraCount
+                    "playtime" -> state.statistics.playtimeSeconds
+                    else -> 0L
+                }
+                val eligible = progress >= challenge.target
+                val name = when (challenge.kind) {
+                    "correct" -> "Weekly Accuracy"
+                    "streak" -> "Streak Climber"
+                    "money" -> "Millionaire Sprint"
+                    "guesses" -> "Guess Marathon"
+                    "prestige" -> "Prestige Push"
+                    "ultra" -> "Ultra Expedition"
+                    "frenzy" -> "Frenzy Hunt"
+                    else -> "Playtime Grinder"
+                }
+                val description = when (challenge.kind) {
+                    "correct" -> "Make %d correct guesses this week."
+                    "streak" -> "Reach a best streak of %d this week."
+                    "money" -> "Reach %s money."
+                    "guesses" -> "Make %d total guesses this week."
+                    "prestige" -> "Perform %d Prestige resets."
+                    "ultra" -> "Perform %d Ultra reset."
+                    "frenzy" -> "Reach a best streak of %d for Frenzy."
+                    else -> "Play for %d seconds."
+                }
                 Card(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(challenge.name, fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
-                            Text(challenge.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text("Reward: +${challenge.rewardNebula} Nebula", color = MoneyGold, fontSize = 14.sp)
-                        }
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(name, fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            if (challenge.kind == "money") description.format(BigNumber(challenge.target).format())
+                            else description.format(challenge.target),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("Progress: " + progress + " / " + challenge.target, fontSize = 13.sp)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("Reward: +" + challenge.rewardNebula + " Nebula", color = MoneyGold, fontSize = 14.sp)
+                        Spacer(modifier = Modifier.height(8.dp))
                         Button(
-                            onClick = { onCompleteChallenge(challenge.seed.toString(), challenge.rewardNebula) },
-                            enabled = !completed
+                            onClick = { onCompleteChallenge(challenge.id, challenge.rewardNebula) },
+                            enabled = eligible && !completed
                         ) {
-                            Text(if (completed) "Completed" else "Claim")
+                            Text(if (completed) "Completed" else if (eligible) "Claim" else "In Progress")
                         }
                     }
                 }
             }
-        }
-    }
-}
