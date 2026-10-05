@@ -455,5 +455,14 @@
   "legacy_save_decline": "Tanggihan at Isara ang App",
   "save_slot_reset_title": "I-reset ang Slot %d?",
   "save_slot_reset_description": "Sigurado ka bang gusto mong i-reset ang Slot %d? Permanenteng mawawala ang lahat ng progreso sa slot na ito.",
-  "save_slot_reset_confirm": "I-reset"
+  "save_slot_reset_confirm": "I-reset",
+  "save_slot_duplicate": "I-duplicate ang Slot",
+  "save_slot_duplicate_title": "I-duplicate ang Slot %d",
+  "save_slot_duplicate_description": "Pumili ng bakanteng slot na paglalagyan ng kopya ng save na ito.",
+  "save_slot_duplicate_no_targets": "Walang bakanteng slot.",
+  "save_slot_duplicate_confirm": "I-duplicate",
+  "save_slot_restore": "Ibalik ang Backup",
+  "save_slot_restore_title": "Ibalik ang Backup ng Slot %d?",
+  "save_slot_restore_description": "Ibalik ang dating backup para sa Slot %d? Ang kasalukuyang save ay magiging backup.",
+  "save_slot_restore_confirm": "Ibalik"
 }
