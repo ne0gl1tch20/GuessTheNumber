@@ -95,7 +95,7 @@
   "ultra_nebula_boost_name": "Nebula Resonance",
   "ultra_nebula_boost_desc": "Boosts Nebula rewards from Arcade and achievements.",
   "shop_item_auto_clicker_basic_name": "Auto Clicker",
-  "shop_item_auto_clicker_basic_desc": "Automatically guesses target number every second.",
+  "shop_item_auto_clicker_basic_desc": "Uses feedback to intelligently narrow down the target number.",
   "shop_item_nebula_boost_name": "Nebula Crystal",
   "shop_item_nebula_boost_desc": "Permanently increases Nebula gains by 2x.",
   "shop_item_golden_guess_name": "Golden Guess Pass",
