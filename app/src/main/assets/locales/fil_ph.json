@@ -459,4 +459,13 @@
   "nav_upgrade": "Mga Pagpapabuti",
   "nav_shop": "Tindahan",
   "nav_more": "Higit Pa"
+,
+  "save_slot_title": "Slot %d",
+  "save_slot_active": "(Aktibo)",
+  "save_slot_empty": "Walang laman na slot",
+  "save_slot_start_new": "Magsimula ng Bagong Laro",
+  "save_slot_difficulty": "Hirap",
+  "difficulty_classic": "Classic",
+  "difficulty_hard": "Mahirap",
+  "difficulty_extreme": "Extreme"
 }
