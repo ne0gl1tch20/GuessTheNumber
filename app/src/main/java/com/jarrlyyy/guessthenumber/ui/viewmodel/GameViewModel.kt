@@ -39,10 +39,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
 
 class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val saveManager = SaveManager(application)
+    private val slotOperationMutex = Mutex()
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
@@ -189,13 +192,32 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun createSlot(slot: Int, difficultyId: String) {
-        if (slot !in 1..MAX_SAVE_SLOTS || !Difficulty.isValid(difficultyId)) return
+    fun createSlot(slot: Int, difficultyId: String, onResult: (Boolean) -> Unit = {}) {
+        if (slot !in 1..MAX_SAVE_SLOTS || !Difficulty.isValid(difficultyId)) {
+            onResult(false)
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
-            val metadata = saveManager.getSlotMetadata(slot)
-            if (!metadata.isEmpty) return@launch
-            saveManager.saveGame(GameState(difficultyId = difficultyId), slot)
-            loadGame(slot)
+            val success = slotOperationMutex.withLock {
+                val created = saveManager.createFreshSlot(slot, difficultyId)
+                if (!created) {
+                    false
+                } else {
+                    val freshState = GameState(
+                        difficultyId = difficultyId,
+                        lastSaveTimestamp = System.currentTimeMillis()
+                    )
+                    _activeSlot.value = slot
+                    _gameState.value = freshState
+                    guessingBot.reset(freshState.currentRangeMin, freshState.currentRangeMax)
+                    lastIncomeMeasurement = freshState.money
+                    _incomePerSecond.value = BigNumber.ZERO
+                    true
+                }
+            }
+            withContext(Dispatchers.Main) {
+                onResult(success)
+            }
         }
     }
 
@@ -684,7 +706,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun saveGameAsync() {
         viewModelScope.launch(Dispatchers.IO) {
-            saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
+            slotOperationMutex.withLock {
+                val slot = _activeSlot.value
+                val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
+                saveManager.saveGame(state, slot)
+            }
         }
     }
 
@@ -692,7 +718,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         saveJob = viewModelScope.launch(Dispatchers.IO) {
             while (true) {
                 delay(30000)
-                saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
+                slotOperationMutex.withLock {
+                    val slot = _activeSlot.value
+                    val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
+                    saveManager.saveGame(state, slot)
+                }
             }
         }
     }
