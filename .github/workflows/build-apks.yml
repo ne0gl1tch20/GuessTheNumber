@@ -2,7 +2,7 @@ name: Build Android APKs (Debug & Release)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   workflow_dispatch:
 
 jobs:
