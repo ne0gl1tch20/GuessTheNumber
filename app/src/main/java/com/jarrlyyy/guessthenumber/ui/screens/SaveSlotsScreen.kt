@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
+import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -33,17 +34,19 @@ fun SaveSlotsScreen(
     val activeSlot by viewModel.activeSlot.collectAsState()
     val hasLegacySave by viewModel.hasLegacySave.collectAsState()
 
-    var slot1Meta by remember { mutableStateOf<SaveSlotMetadata?>(null) }
-    var slot2Meta by remember { mutableStateOf<SaveSlotMetadata?>(null) }
-    var slot3Meta by remember { mutableStateOf<SaveSlotMetadata?>(null) }
+    val slotMetadata = remember {
+        mutableStateListOf<SaveSlotMetadata?>().apply {
+            repeat(MAX_SAVE_SLOTS) { add(null) }
+        }
+    }
 
     var showResetDialog by remember { mutableStateOf<Int?>(null) }
 
     val refreshMetadata = {
         scope.launch {
-            slot1Meta = viewModel.getSlotMetadata(1)
-            slot2Meta = viewModel.getSlotMetadata(2)
-            slot3Meta = viewModel.getSlotMetadata(3)
+            for (slot in 1..MAX_SAVE_SLOTS) {
+                slotMetadata[slot - 1] = viewModel.getSlotMetadata(slot)
+            }
         }
     }
 
@@ -134,43 +137,19 @@ fun SaveSlotsScreen(
                 )
             }
 
-            item {
-                SlotCard(
-                    slotIndex = 1,
-                    isActive = activeSlot == 1,
-                    metadata = slot1Meta,
-                    onSelect = {
-                        viewModel.switchSlot(1)
-                        onNavigateBack()
-                    },
-                    onReset = { showResetDialog = 1 }
-                )
-            }
-
-            item {
-                SlotCard(
-                    slotIndex = 2,
-                    isActive = activeSlot == 2,
-                    metadata = slot2Meta,
-                    onSelect = {
-                        viewModel.switchSlot(2)
-                        onNavigateBack()
-                    },
-                    onReset = { showResetDialog = 2 }
-                )
-            }
-
-            item {
-                SlotCard(
-                    slotIndex = 3,
-                    isActive = activeSlot == 3,
-                    metadata = slot3Meta,
-                    onSelect = {
-                        viewModel.switchSlot(3)
-                        onNavigateBack()
-                    },
-                    onReset = { showResetDialog = 3 }
-                )
+            for (slot in 1..MAX_SAVE_SLOTS) {
+                item {
+                    SlotCard(
+                        slotIndex = slot,
+                        isActive = activeSlot == slot,
+                        metadata = slotMetadata[slot - 1],
+                        onSelect = {
+                            viewModel.switchSlot(slot)
+                            onNavigateBack()
+                        },
+                        onReset = { showResetDialog = slot }
+                    )
+                }
             }
         }
     }
