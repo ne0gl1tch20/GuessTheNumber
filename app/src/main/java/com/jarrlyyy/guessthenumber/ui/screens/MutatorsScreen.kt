@@ -8,6 +8,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -49,6 +51,10 @@ fun MutatorsScreen(
     onCompleteChallenge: (String, Long) -> Unit,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
+    val configRepository = remember(state.settings.locale) { JsonConfigRepository(context, state.settings.locale) }
+    val locale = configRepository.localeManager
+
     val mutators = listOf(
         MutatorDef("mut_hardcore", "Hardcore Range", "Guessing range is doubled. Rewards ×2.", 2.0),
         MutatorDef("mut_speed", "Hyper Speed", "Auto-clicker speed ×3, but earnings halved.", 1.5),
@@ -66,10 +72,10 @@ fun MutatorsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mutators & Seeded Challenges") },
+                title = { Text(locale.getString("mutators_title", "Mutators & Weekly Challenges")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 }
             )
@@ -83,7 +89,7 @@ fun MutatorsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text("Gameplay Mutators", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(locale.getString("mutators_gameplay", "Gameplay Mutators"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
 
             items(mutators) { mutator ->
@@ -100,12 +106,12 @@ fun MutatorsScreen(
                             Text(mutator.name, fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
                             Text(mutator.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Reward Multiplier: ${mutator.rewardMultiplier}x", color = MoneyGold, fontSize = 14.sp)
+                            Text(locale.getString("mutator_reward_format", "Reward Multiplier: %sx", mutator.rewardMultiplier), color = MoneyGold, fontSize = 14.sp)
                         }
                         Button(
                             onClick = { onSelectMutator(mutator.id) }
                         ) {
-                            Text(if (active) "Disable" else "Activate")
+                            Text(if (active) locale.getString("disable", "Disable") else locale.getString("activate", "Activate"))
                         }
                     }
                 }
@@ -114,7 +120,7 @@ fun MutatorsScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Weekly Challenges", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(locale.getString("weekly_challenges_title", "Weekly Challenges"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
 
             items(challenges) { challenge ->
@@ -152,7 +158,7 @@ fun MutatorsScreen(
                 }
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(name, fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                        Text(locale.getString("weekly_" + challenge.kind + "_name", name), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
                         Text(
                             if (challenge.kind == "money") description.format(BigNumber(challenge.target).format())
                             else description.format(challenge.target),
@@ -160,15 +166,15 @@ fun MutatorsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text("Progress: " + progress + " / " + challenge.target, fontSize = 13.sp)
+                        Text(locale.getString("weekly_progress_format", "Progress: %s / %s", progress, challenge.target), fontSize = 13.sp)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("Reward: +" + challenge.rewardNebula + " Nebula", color = MoneyGold, fontSize = 14.sp)
+                        Text(locale.getString("weekly_reward_format", "Reward: +%s Nebula", challenge.rewardNebula), color = MoneyGold, fontSize = 14.sp)
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
                             onClick = { onCompleteChallenge(challenge.id, challenge.rewardNebula) },
                             enabled = eligible && !completed
                         ) {
-                            Text(if (completed) "Completed" else if (eligible) "Claim" else "In Progress")
+                            Text(if (completed) locale.getString("completed", "Completed") else if (eligible) locale.getString("claim", "Claim") else locale.getString("in_progress", "In Progress"))
                         }
                     }
                 }
