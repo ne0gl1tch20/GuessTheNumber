@@ -1,6 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,31 +21,27 @@ import com.jarrlyyy.guessthenumber.ui.theme.NebulaPink
 @Composable
 fun ShopScreen(
     state: GameState,
-    onBuyShopItem: (String, Long) -> Unit
+    onBuyShopItem: (String, Long) -> Unit,
+    onEquipCosmetic: (String) -> Unit
 ) {
     val context = LocalContext.current
     val configRepo = remember(state.settings.locale) { JsonConfigRepository(context, state.settings.locale) }
     val locale = configRepo.localeManager
-    val shopItems = remember {
-        configRepo.loadShopItems()
-    }
+    val shopItems = remember(state.settings.locale) { configRepo.loadShopItems() }
+    var selectedCategory by remember { mutableStateOf("all") }
+
+    val categories = listOf("all", "automation", "boosts", "cosmetics")
+    val filteredItems = if (selectedCategory == "all") shopItems else shopItems.filter { it.category == selectedCategory }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(locale.getString("shop_title", "Nebula Shop"), style = MaterialTheme.typography.titleMedium) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
-            )
+            TopAppBar(title = { Text(locale.getString("shop_title", "Nebula Shop"), style = MaterialTheme.typography.titleMedium) })
         }
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Material 3 Expressive Balance Header Card (Matching UpgradeScreen style)
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -54,67 +50,87 @@ fun ShopScreen(
                     tonalElevation = 6.dp
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
+                        modifier = Modifier.fillMaxWidth().padding(20.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            Text("Available Nebula", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(locale.getString("available_nebula", "Available Nebula"), style = MaterialTheme.typography.bodyMedium)
                             AnimatedContent(targetState = state.nebula.format(), label = "ShopNebulaAnimation") { nebulaStr ->
                                 Text("$nebulaStr Nebula", color = NebulaPink, style = MaterialTheme.typography.titleLarge)
                             }
+                            state.equippedCosmeticId?.let { equipped ->
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    locale.getString("equipped_cosmetic_format", "Equipped: %s", equipped.removePrefix("cosmetic_").replace('_', ' ')),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
                         }
-                        Icon(imageVector = Icons.Default.Star, contentDescription = null, tint = NebulaPink, modifier = Modifier.size(32.dp))
+                        Icon(Icons.Default.Star, contentDescription = null, tint = NebulaPink, modifier = Modifier.size(32.dp))
                     }
                 }
             }
 
-            items(shopItems, key = { it.id }) { item ->
-                val purchased = state.shopPurchases.contains(item.id)
+            item {
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    categories.forEachIndexed { index, category ->
+                        SegmentedButton(
+                            selected = selectedCategory == category,
+                            onClick = { selectedCategory = category },
+                            shape = SegmentedButtonDefaults.itemShape(index = index, count = categories.size)
+                        ) {
+                            Text(
+                                locale.getString(
+                                    "shop_category_$category",
+                                    when (category) {
+                                        "automation" -> "Automation"
+                                        "boosts" -> "Boosts"
+                                        "cosmetics" -> "Cosmetics"
+                                        else -> "All"
+                                    }
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+            items(filteredItems, key = { it.id }) { item ->
+                val purchased = item.id in state.shopPurchases
+                val equipped = state.equippedCosmeticId == item.id
                 val canAfford = state.nebula >= BigNumber(item.nebulaCost)
 
-                // Material 3 Expressive Shop Item Card (Matching UpgradeScreen style)
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.large,
-                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    color = if (equipped) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
                     tonalElevation = 2.dp
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(item.name, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                            Text(item.name, style = MaterialTheme.typography.titleMedium)
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(item.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(modifier = Modifier.height(8.dp))
-                            Surface(
-                                shape = MaterialTheme.shapes.extraSmall,
-                                color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
-                            ) {
-                                Text(
-                                    text = "Cost: ${item.nebulaCost} Nebula",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = NebulaPink,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                                )
-                            }
+                            Text(locale.getString("cost", "Cost: %s Nebula", item.nebulaCost), style = MaterialTheme.typography.labelMedium, color = NebulaPink)
                         }
                         Spacer(modifier = Modifier.width(12.dp))
-                        Button(
-                            onClick = { onBuyShopItem(item.id, item.nebulaCost) },
-                            enabled = canAfford && !purchased,
-                            shape = MaterialTheme.shapes.medium,
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                        ) {
-                            Text(if (purchased) "Owned" else "Acquire", style = MaterialTheme.typography.labelLarge)
+                        if (item.isCosmetic && purchased) {
+                            OutlinedButton(onClick = { onEquipCosmetic(item.id) }, enabled = !equipped) {
+                                Text(if (equipped) locale.getString("equipped", "Equipped") else locale.getString("equip", "Equip"))
+                            }
+                        } else {
+                            Button(
+                                onClick = { onBuyShopItem(item.id, item.nebulaCost) },
+                                enabled = canAfford && !purchased
+                            ) {
+                                Text(if (purchased) locale.getString("owned", "Owned") else locale.getString("acquire", "Acquire"))
+                            }
                         }
                     }
                 }
