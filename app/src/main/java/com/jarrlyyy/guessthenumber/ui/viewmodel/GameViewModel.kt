@@ -70,6 +70,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     val hasPreviousCrash: StateFlow<Boolean> = _hasPreviousCrash.asStateFlow()
 
     private val _offlineGains = MutableStateFlow<BigNumber?>(null)
+    private val _incomePerSecond = MutableStateFlow(BigNumber.ZERO)
+    val incomePerSecond: StateFlow<BigNumber> = _incomePerSecond.asStateFlow()
+    private var lastIncomeMeasurement = BigNumber.ZERO
     val offlineGains: StateFlow<BigNumber?> = _offlineGains.asStateFlow()
 
     private val _showChangelogPopup = MutableStateFlow(false)
@@ -159,6 +162,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             guessingBot.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+            lastIncomeMeasurement = finalState.money
+            _incomePerSecond.value = BigNumber.ZERO
 
             withContext(Dispatchers.Main) {
                 _gameState.value = finalState
@@ -606,6 +611,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         timerJob = viewModelScope.launch(Dispatchers.Default) {
             while (true) {
                 delay(1000)
+                val currentMoney = _gameState.value.money
+                _incomePerSecond.value = if (_gameState.value.autoClickerActive) {
+                    currentMoney - lastIncomeMeasurement
+                } else {
+                    BigNumber.ZERO
+                }
+                lastIncomeMeasurement = currentMoney
                 _gameState.update {
                     it.copy(statistics = it.statistics.copy(playtimeSeconds = it.statistics.playtimeSeconds + 1))
                 }
