@@ -26,6 +26,7 @@ import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.RandomEventEngine
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import java.util.concurrent.TimeUnit
@@ -55,6 +56,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private val gameEngine = GameEngine()
     private val guessingBot = GuessingBot()
+    private val randomEventEngine = RandomEventEngine()
     private val commandExecutor = CommandExecutor()
     private val backgroundMusicManager = BackgroundMusicManager(application)
 
@@ -92,6 +94,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private var autoClickerJob: Job? = null
     private var saveJob: Job? = null
     private var timerJob: Job? = null
+    private var randomEventJob: Job? = null
 
     init {
         AppErrorHandler.init(application.filesDir)
@@ -100,6 +103,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         loadGame()
         startAutoSave()
         startPlaytimeTimer()
+        startRandomEvents()
         startAutoClicker()
     }
 
@@ -658,6 +662,30 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun startRandomEvents() {
+        randomEventJob = viewModelScope.launch(Dispatchers.Default) {
+            while (true) {
+                delay(60_000L)
+                val currentState = _gameState.value
+                val event = randomEventEngine.roll(currentState) ?: continue
+                withContext(Dispatchers.Main) {
+                    _gameState.value = event.state
+                }
+                saveGameAsync()
+                GameLogger.log(
+                    LogLevel.INFO,
+                    LoggerCategory.GAMEPLAY,
+                    "RANDOM_EVENT",
+                    "Random event triggered: " + event.type.name
+                )
+                delay(8_000L)
+                if (_gameState.value.lastRandomEventId == event.type.name.lowercase()) {
+                    _gameState.update { it.copy(lastRandomEventId = null) }
+                }
+            }
+        }
+    }
+
     private fun startAutoClicker() {
         autoClickerJob = viewModelScope.launch(Dispatchers.Default) {
             while (true) {
@@ -692,6 +720,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         autoClickerJob?.cancel()
         saveJob?.cancel()
         timerJob?.cancel()
+        randomEventJob?.cancel()
         backgroundMusicManager.release()
         viewModelScope.launch(Dispatchers.IO) {
             saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
