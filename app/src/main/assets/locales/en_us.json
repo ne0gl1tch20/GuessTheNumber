@@ -514,5 +514,9 @@
   "achievement_frenzy_25_name": "Frenzy Master",
   "achievement_frenzy_25_desc": "Reach a 25 streak.",
   "achievement_frenzy_50_name": "Frenzy Eternal",
-  "achievement_frenzy_50_desc": "Reach a 50 streak."
+  "achievement_frenzy_50_desc": "Reach a 50 streak.",
+  "achievement_tier_bronze": "Bronze",
+  "achievement_tier_silver": "Silver",
+  "achievement_tier_gold": "Gold",
+  "achievement_tier_diamond": "Diamond"
 }
