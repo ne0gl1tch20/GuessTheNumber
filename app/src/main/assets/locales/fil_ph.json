@@ -464,5 +464,6 @@
   "save_slot_restore": "Ibalik ang Backup",
   "save_slot_restore_title": "Ibalik ang Backup ng Slot %d?",
   "save_slot_restore_description": "Ibalik ang dating backup para sa Slot %d? Ang kasalukuyang save ay magiging backup.",
-  "save_slot_restore_confirm": "Ibalik"
+  "save_slot_restore_confirm": "Ibalik",
+  "frenzy_format": "🔥 Frenzy x%s"
 }
