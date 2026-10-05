@@ -1,10 +1,16 @@
 # 🚀 Guess The Number Simulator - Changelog
-## v1.10 (Difficulty Gameplay Mechanics)
-- 🎚️ **Difficulty Mechanics**: Classic, Hard, and Extreme now have distinct range sizes, reward multipliers, and incorrect-guess money penalties.
+
+## v1.10 (Save Slot Expansion, Profiles, Difficulty & Backup Improvements)
+- 💾 **10 Save Slots**: Expanded save management from 3 slots to 10 with dynamic slot handling and metadata support.
+- 🎚️ **Per-Slot Difficulty**: Added Classic, Hard, and Extreme difficulty profiles at the save-slot level.
+- 👤 **Save Profiles**: Added customizable profile names and icons with sanitized save metadata.
+- 📋 **Slot Duplication & Backup Restore**: Added duplication into empty slots and backup restoration with protection against overwriting occupied slots.
+- 🛠️ **About Screen License Fix**: Fixed open-source license author and license fields displaying `%s` instead of their actual values.
+- 🧪 **Localization Validation**: Improved placeholder validation so literal percent signs in localized text are handled correctly.
+- 🎮 **Difficulty Mechanics**: Classic, Hard, and Extreme now have distinct range sizes, reward multipliers, and incorrect-guess money penalties.
 - 📈 **Difficulty-Aware Ranges**: Better Range upgrades now scale from each difficulty's own base range.
 - 🔄 **Reset Consistency**: Prestige resets preserve the selected difficulty's range.
 - 🧪 **Engine Tests**: Added coverage for difficulty penalties, rewards, and range behavior.
-
 
 ## v1.9 (Comprehensive Internationalization & Localization Overhaul)
 - 🌐 **Full Locale & Internationalization Support**: Localized 100% of user-visible strings across all screens (Play, Prestige, Ultra, Upgrades, Shop, Arcade, More, Mutators, Achievements, Cloud Backup, Crash Recovery, Settings, Dev Settings) into `locales/en_us.json`.
