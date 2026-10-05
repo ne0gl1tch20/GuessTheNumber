@@ -455,5 +455,14 @@
   "legacy_save_decline": "Decline & Close App",
   "save_slot_reset_title": "Reset Slot %d?",
   "save_slot_reset_description": "Are you sure you want to reset Slot %d? All progress in this slot will be permanently lost.",
-  "save_slot_reset_confirm": "Reset"
+  "save_slot_reset_confirm": "Reset",
+  "save_slot_duplicate": "Duplicate Slot",
+  "save_slot_duplicate_title": "Duplicate Slot %d",
+  "save_slot_duplicate_description": "Choose an empty slot to copy this save into.",
+  "save_slot_duplicate_no_targets": "No empty slots are available.",
+  "save_slot_duplicate_confirm": "Duplicate",
+  "save_slot_restore": "Restore Backup",
+  "save_slot_restore_title": "Restore Slot %d Backup?",
+  "save_slot_restore_description": "Restore the previous backup for Slot %d? Your current save will become the backup.",
+  "save_slot_restore_confirm": "Restore"
 }
