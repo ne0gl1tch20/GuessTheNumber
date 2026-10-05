@@ -22,7 +22,8 @@ import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
 @Composable
 fun PlayScreen(
     state: GameState,
-    onMakeGuess: (Long) -> Unit
+    onMakeGuess: (Long) -> Unit,
+    incomePerSecond: com.jarrlyyy.guessthenumber.domain.model.BigNumber = com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     var guessInput by remember { mutableStateOf("") }
@@ -91,12 +92,9 @@ fun PlayScreen(
                                     )
                                 }
                             }
-                            val autoClickerRate = if (state.autoClickerActive) state.autoClickerSpeed * 500.0 else 0.0
-                            val upgradeMult = 1.0 + ((state.upgradeLevels["reward_multiplier"] ?: 0) * 0.25)
-                            val prestigeMult = 1.0 + (state.prestige.value.toDouble() * 0.5)
-                            val ultraMult = 1.0 + (state.ultra.value.toDouble() * 2.0)
-                            val totalIncomePerSecBig = com.jarrlyyy.guessthenumber.domain.model.BigNumber(autoClickerRate * upgradeMult * prestigeMult * ultraMult)
-                            val formattedIncome = totalIncomePerSecBig.format()
+                            // This is the actual money gained during the last one-second measurement window.
+                            // It intentionally uses GameViewModel's observed state delta instead of a theoretical formula.
+                            val formattedIncome = incomePerSecond.format()
 
                             Surface(
                                 shape = MaterialTheme.shapes.small,
