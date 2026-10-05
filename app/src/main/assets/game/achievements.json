@@ -4,19 +4,232 @@
       "id": "correct_10",
       "name": "Novice Guesser",
       "description": "Successfully guess the number 10 times.",
-      "rewardNebula": 10
+      "rewardNebula": 10,
+      "tier": "bronze"
+    },
+    {
+      "id": "correct_50",
+      "name": "Skilled Guesser",
+      "description": "Successfully guess the number 50 times.",
+      "rewardNebula": 20,
+      "tier": "silver"
+    },
+    {
+      "id": "correct_100",
+      "name": "Expert Guesser",
+      "description": "Successfully guess the number 100 times.",
+      "rewardNebula": 40,
+      "tier": "gold"
+    },
+    {
+      "id": "correct_500",
+      "name": "Master Guesser",
+      "description": "Successfully guess the number 500 times.",
+      "rewardNebula": 100,
+      "tier": "diamond"
     },
     {
       "id": "streak_5",
       "name": "Streak Master",
       "description": "Achieve a winning guess streak of 5.",
-      "rewardNebula": 25
+      "rewardNebula": 25,
+      "tier": "bronze"
+    },
+    {
+      "id": "streak_10",
+      "name": "Streak Champion",
+      "description": "Achieve a winning guess streak of 10.",
+      "rewardNebula": 50,
+      "tier": "silver"
+    },
+    {
+      "id": "streak_25",
+      "name": "Streak Legend",
+      "description": "Achieve a winning guess streak of 25.",
+      "rewardNebula": 100,
+      "tier": "gold"
+    },
+    {
+      "id": "streak_50",
+      "name": "Unbreakable",
+      "description": "Achieve a winning guess streak of 50.",
+      "rewardNebula": 250,
+      "tier": "diamond"
     },
     {
       "id": "millionaire",
       "name": "Number Millionaire",
       "description": "Accumulate 1,000,000 money.",
-      "rewardNebula": 50
+      "rewardNebula": 50,
+      "tier": "bronze"
+    },
+    {
+      "id": "ten_millionaire",
+      "name": "Ten Million Club",
+      "description": "Accumulate 10,000,000 money.",
+      "rewardNebula": 100,
+      "tier": "silver"
+    },
+    {
+      "id": "hundred_millionaire",
+      "name": "Hundred Million Club",
+      "description": "Accumulate 100,000,000 money.",
+      "rewardNebula": 200,
+      "tier": "gold"
+    },
+    {
+      "id": "billionaire",
+      "name": "Number Billionaire",
+      "description": "Accumulate 1,000,000,000 money.",
+      "rewardNebula": 500,
+      "tier": "diamond"
+    },
+    {
+      "id": "prestige_1",
+      "name": "First Prestige",
+      "description": "Perform your first Prestige reset.",
+      "rewardNebula": 25,
+      "tier": "bronze"
+    },
+    {
+      "id": "prestige_5",
+      "name": "Prestige Veteran",
+      "description": "Perform 5 Prestige resets.",
+      "rewardNebula": 75,
+      "tier": "silver"
+    },
+    {
+      "id": "prestige_10",
+      "name": "Prestige Master",
+      "description": "Perform 10 Prestige resets.",
+      "rewardNebula": 150,
+      "tier": "gold"
+    },
+    {
+      "id": "prestige_25",
+      "name": "Prestige Eternal",
+      "description": "Perform 25 Prestige resets.",
+      "rewardNebula": 300,
+      "tier": "diamond"
+    },
+    {
+      "id": "ultra_1",
+      "name": "First Ultra",
+      "description": "Perform your first Ultra reset.",
+      "rewardNebula": 100,
+      "tier": "bronze"
+    },
+    {
+      "id": "ultra_3",
+      "name": "Ultra Voyager",
+      "description": "Perform 3 Ultra resets.",
+      "rewardNebula": 250,
+      "tier": "silver"
+    },
+    {
+      "id": "ultra_10",
+      "name": "Ultra Master",
+      "description": "Perform 10 Ultra resets.",
+      "rewardNebula": 500,
+      "tier": "gold"
+    },
+    {
+      "id": "ultra_25",
+      "name": "Ultra Eternal",
+      "description": "Perform 25 Ultra resets.",
+      "rewardNebula": 1000,
+      "tier": "diamond"
+    },
+    {
+      "id": "arcade_1",
+      "name": "Arcade Rookie",
+      "description": "Play an arcade minigame once.",
+      "rewardNebula": 10,
+      "tier": "bronze"
+    },
+    {
+      "id": "arcade_25",
+      "name": "Arcade Regular",
+      "description": "Play 25 arcade minigames.",
+      "rewardNebula": 50,
+      "tier": "silver"
+    },
+    {
+      "id": "arcade_100",
+      "name": "Arcade Champion",
+      "description": "Play 100 arcade minigames.",
+      "rewardNebula": 150,
+      "tier": "gold"
+    },
+    {
+      "id": "nebula_100",
+      "name": "Nebula Collector",
+      "description": "Earn 100 Nebula.",
+      "rewardNebula": 25,
+      "tier": "bronze"
+    },
+    {
+      "id": "nebula_1000",
+      "name": "Nebula Hoarder",
+      "description": "Earn 1,000 Nebula.",
+      "rewardNebula": 100,
+      "tier": "silver"
+    },
+    {
+      "id": "nebula_10000",
+      "name": "Nebula Tycoon",
+      "description": "Earn 10,000 Nebula.",
+      "rewardNebula": 250,
+      "tier": "gold"
+    },
+    {
+      "id": "playtime_1h",
+      "name": "One Hour In",
+      "description": "Play for 1 hour.",
+      "rewardNebula": 25,
+      "tier": "bronze"
+    },
+    {
+      "id": "playtime_10h",
+      "name": "Dedicated Player",
+      "description": "Play for 10 hours.",
+      "rewardNebula": 100,
+      "tier": "silver"
+    },
+    {
+      "id": "playtime_50h",
+      "name": "No Sleep Guesser",
+      "description": "Play for 50 hours.",
+      "rewardNebula": 300,
+      "tier": "gold"
+    },
+    {
+      "id": "frenzy_5",
+      "name": "Frenzy Ignition",
+      "description": "Reach Frenzy tier 1.",
+      "rewardNebula": 30,
+      "tier": "bronze"
+    },
+    {
+      "id": "frenzy_10",
+      "name": "Frenzy Runner",
+      "description": "Reach a 10 streak.",
+      "rewardNebula": 75,
+      "tier": "silver"
+    },
+    {
+      "id": "frenzy_25",
+      "name": "Frenzy Master",
+      "description": "Reach a 25 streak.",
+      "rewardNebula": 150,
+      "tier": "gold"
+    },
+    {
+      "id": "frenzy_50",
+      "name": "Frenzy Eternal",
+      "description": "Reach a 50 streak.",
+      "rewardNebula": 350,
+      "tier": "diamond"
     }
   ]
 }
