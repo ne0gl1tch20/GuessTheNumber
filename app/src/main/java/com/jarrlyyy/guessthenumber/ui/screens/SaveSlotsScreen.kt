@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
+import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -41,6 +42,8 @@ fun SaveSlotsScreen(
     }
 
     var showResetDialog by remember { mutableStateOf<Int?>(null) }
+    val difficultySelections = remember { mutableStateMapOf<Int, String>() }
+    val locale = viewModel.localeManager
 
     val refreshMetadata = {
         scope.launch {
@@ -143,11 +146,19 @@ fun SaveSlotsScreen(
                         slotIndex = slot,
                         isActive = activeSlot == slot,
                         metadata = slotMetadata[slot - 1],
+                        selectedDifficultyId = difficultySelections[slot] ?: Difficulty.CLASSIC,
+                        onDifficultyChange = { difficultySelections[slot] = it },
                         onSelect = {
-                            viewModel.switchSlot(slot)
+                            val metadata = slotMetadata[slot - 1]
+                            if (metadata?.isEmpty != false) {
+                                viewModel.createSlot(slot, difficultySelections[slot] ?: Difficulty.CLASSIC)
+                            } else {
+                                viewModel.switchSlot(slot)
+                            }
                             onNavigateBack()
                         },
-                        onReset = { showResetDialog = slot }
+                        onReset = { showResetDialog = slot },
+                        locale = locale
                     )
                 }
             }
@@ -156,12 +167,41 @@ fun SaveSlotsScreen(
 }
 
 @Composable
+private fun DifficultySelector(
+    selectedDifficultyId: String,
+    onDifficultyChange: (String) -> Unit,
+    locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val selectedName = locale.getString(Difficulty.nameKey(selectedDifficultyId), "Classic")
+
+    Box {
+        OutlinedButton(onClick = { expanded = true }) {
+            Text("${locale.getString("save_slot_difficulty", "Difficulty")}: $selectedName")
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            Difficulty.ids.forEach { difficultyId ->
+                DropdownMenuItem(
+                    text = { Text(locale.getString(Difficulty.nameKey(difficultyId), difficultyId)) },
+                    onClick = {
+                        onDifficultyChange(difficultyId)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+@Composable
 fun SlotCard(
     slotIndex: Int,
     isActive: Boolean,
     metadata: SaveSlotMetadata?,
+    selectedDifficultyId: String,
+    onDifficultyChange: (String) -> Unit,
     onSelect: () -> Unit,
-    onReset: () -> Unit
+    onReset: () -> Unit,
+    locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 ) {
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
 
@@ -196,7 +236,7 @@ fun SlotCard(
 
             if (metadata == null || metadata.isEmpty) {
                 Text(
-                    text = "Empty Slot",
+                    text = locale.getString("save_slot_empty", "Empty Slot"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -206,9 +246,10 @@ fun SlotCard(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Start New Game")
+                    Text(locale.getString("save_slot_start_new", "Start New Game"))
                 }
             } else {
+                Text(text = "${locale.getString("save_slot_difficulty", "Difficulty")}: ${locale.getString(Difficulty.nameKey(metadata.difficultyId), "Classic")}", style = MaterialTheme.typography.bodyMedium)
                 Text(text = "Money: ${metadata.money}", style = MaterialTheme.typography.bodyMedium)
                 Text(text = "Prestige: ${metadata.prestige} | Ultra: ${metadata.ultra}", style = MaterialTheme.typography.bodySmall)
                 Text(text = "Attempts: ${metadata.attempts} | Correct: ${metadata.correctGuesses}", style = MaterialTheme.typography.bodySmall)
