@@ -1,7 +1,7 @@
 # 🚀 Guess The Number Simulator - Changelog
 
-## v1.11 (Combo / Frenzy)
-- 🔥 **Combo Frenzy**: Consecutive correct guesses now unlock Frenzy tiers every 5-streak steps.
+## v1.11 (Achievement Tiers & Combo / Frenzy)
+- 🏆 **Achievement Tiers**: Expanded the system to 27 achievements across Bronze, Silver, Gold, and Diamond tiers, with escalating Nebula rewards.\n- 🌐 **Achievement Localization**: Added localized names and descriptions for the expanded catalog in English and Filipino.\n- 🔥 **Combo Frenzy**: Consecutive correct guesses now unlock Frenzy tiers every 5-streak steps.
 - 📈 **Frenzy Rewards**: Each Frenzy tier adds a 25% reward multiplier, capped at 5x, on top of the existing streak multiplier.
 - ✨ **Live Frenzy Indicator**: The Play screen shows the active Frenzy multiplier once the streak reaches 5.
 - 🌐 **Localized Frenzy UI**: Added English and Filipino Frenzy text.
