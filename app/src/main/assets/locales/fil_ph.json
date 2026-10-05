@@ -448,5 +448,12 @@
   "save_profile_name": "Pangalan ng Profile",
   "save_profile_name_limit": "Hanggang 24 na character",
   "save_profile_icon": "Icon ng Profile",
-  "save_profile_save": "I-save"
+  "save_profile_save": "I-save",
+  "legacy_save_title": "May Nakita na Legacy Save",
+  "legacy_save_description": "May nakita kaming dating single-save mula sa nakaraang bersyon ng Guess The Number. Gusto mo bang ilipat ang save mo sa Slot 1?\n\nKung tatanggi ka, magsasara ang app.",
+  "legacy_save_transfer": "Ilipat sa Slot 1",
+  "legacy_save_decline": "Tanggihan at Isara ang App",
+  "save_slot_reset_title": "I-reset ang Slot %d?",
+  "save_slot_reset_description": "Sigurado ka bang gusto mong i-reset ang Slot %d? Permanenteng mawawala ang lahat ng progreso sa slot na ito.",
+  "save_slot_reset_confirm": "I-reset"
 }
