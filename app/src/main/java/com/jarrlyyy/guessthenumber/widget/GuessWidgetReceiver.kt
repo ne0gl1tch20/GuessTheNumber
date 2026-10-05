@@ -93,16 +93,15 @@ class GuessWidget : GlanceAppWidget() {
 class QuickGuessActionCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val saveManager = SaveManager(context)
-        val state = saveManager.loadGame()
         val engine = GameEngine()
-        val guess = state.targetNumber // Guaranteed correct guess for instant widget gratification
-        val result = engine.processGuess(state, guess)
-        saveManager.saveGame(result.newState)
+        val updated = saveManager.updateGameAtomically { state ->
+            engine.processGuess(state, state.targetNumber).newState
+        } ?: return
 
         updateAppWidgetState(context, glanceId) { prefs ->
-            prefs[stringPreferencesKey("widget_money")] = result.newState.money.format()
-            prefs[stringPreferencesKey("widget_range")] = "${result.newState.currentRangeMin} - ${result.newState.currentRangeMax}"
-            prefs[stringPreferencesKey("widget_streak")] = result.newState.streak.toString()
+            prefs[stringPreferencesKey("widget_money")] = updated.money.format()
+            prefs[stringPreferencesKey("widget_range")] = "${updated.currentRangeMin} - ${updated.currentRangeMax}"
+            prefs[stringPreferencesKey("widget_streak")] = updated.streak.toString()
         }
         GuessWidget().update(context, glanceId)
     }
