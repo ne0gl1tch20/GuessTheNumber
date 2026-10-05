@@ -433,5 +433,20 @@
   "difficulty_hard": "Hard",
   "difficulty_extreme": "Extreme",
   "filipino": "Filipino",
-  "switched_locale_fil_toast": "Switched language to Filipino"
+  "switched_locale_fil_toast": "Switched language to Filipino",
+  "save_slots_description": "Select a save slot to play or manage your games.",
+  "save_slot_reset": "Reset Slot",
+  "save_slot_money": "Money: %s",
+  "save_slot_prestige_ultra": "Prestige: %s | Ultra: %s",
+  "save_slot_attempts_correct": "Attempts: %d | Correct: %d",
+  "save_slot_last_saved": "Last Saved: %s",
+  "save_slot_resume": "Resume Game",
+  "save_slot_switch": "Switch to Slot",
+  "save_slot_add": "Add",
+  "save_profile_edit_title": "Edit Save Profile",
+  "save_profile_edit": "Edit Profile",
+  "save_profile_name": "Profile Name",
+  "save_profile_name_limit": "Up to 24 characters",
+  "save_profile_icon": "Profile Icon",
+  "save_profile_save": "Save"
 }
