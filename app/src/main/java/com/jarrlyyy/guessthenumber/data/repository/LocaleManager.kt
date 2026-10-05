@@ -92,9 +92,10 @@ class LocaleManager(private val context: Context) {
 
     fun formatDuration(totalSeconds: Long): String {
         val duration = Duration.ofSeconds(totalSeconds.coerceAtLeast(0))
-        val hours = duration.toHours()
-        val minutes = duration.toMinutesPart()
-        val seconds = duration.toSecondsPart()
+        val total = duration.seconds
+        val hours = total / 3600
+        val minutes = (total % 3600) / 60
+        val seconds = total % 60
         return if (hours > 0) {
             "${formatNumber(hours)}h ${formatNumber(minutes)}m ${formatNumber(seconds)}s"
         } else if (minutes > 0) {
