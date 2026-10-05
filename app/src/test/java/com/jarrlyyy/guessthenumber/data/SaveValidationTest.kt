@@ -48,6 +48,18 @@ class SaveValidationTest {
     }
 
     @Test
+    fun atomicGameUpdateUsesLatestSavedState() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = SaveManager(context)
+        manager.saveGame(GameState(money = BigNumber(100)), 1)
+
+        val updated = manager.updateGameAtomically(1) { it.copy(money = it.money + BigNumber(50)) }
+
+        assertEquals(BigNumber(150), updated?.money)
+        assertEquals(BigNumber(150), manager.loadGame(1).money)
+    }
+
+    @Test
     fun testCurrencySanitization() {
         val corrupted = GameState(money = BigNumber(-5000), prestige = BigNumber(-10))
         val sanitized = AntiCheatService.sanitizeCurrency(corrupted)
