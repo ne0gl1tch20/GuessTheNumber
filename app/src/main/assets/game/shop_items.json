@@ -4,19 +4,49 @@
       "id": "auto_clicker_basic",
       "name": "Auto Clicker",
       "description": "Automatically guesses target number every second.",
-      "nebulaCost": 25
+      "nebulaCost": 25,
+      "category": "automation",
+      "isCosmetic": false
     },
     {
       "id": "nebula_boost",
       "name": "Nebula Crystal",
       "description": "Permanently increases Nebula gains by 2x.",
-      "nebulaCost": 50
+      "nebulaCost": 50,
+      "category": "boosts",
+      "isCosmetic": false
     },
     {
       "id": "golden_guess",
       "name": "Golden Guess Pass",
       "description": "Guarantees critical rewards on every 10th guess.",
-      "nebulaCost": 100
+      "nebulaCost": 100,
+      "category": "boosts",
+      "isCosmetic": false
+    },
+    {
+      "id": "cosmetic_nebula_ring",
+      "name": "Nebula Ring",
+      "description": "A glowing ring cosmetic for your player profile.",
+      "nebulaCost": 75,
+      "category": "cosmetics",
+      "isCosmetic": true
+    },
+    {
+      "id": "cosmetic_starfield",
+      "name": "Starfield Badge",
+      "description": "A cosmic starfield badge for your player profile.",
+      "nebulaCost": 100,
+      "category": "cosmetics",
+      "isCosmetic": true
+    },
+    {
+      "id": "cosmetic_pixel_glow",
+      "name": "Pixel Glow",
+      "description": "A retro pixel-glow cosmetic for your player profile.",
+      "nebulaCost": 150,
+      "category": "cosmetics",
+      "isCosmetic": true
     }
   ]
 }
