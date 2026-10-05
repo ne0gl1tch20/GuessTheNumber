@@ -144,4 +144,24 @@ class GameEngineTest {
         val (_, claimed2) = engine.claimChallenge(state1, "daily_1", 50)
         assertFalse(claimed2)
     }
+    @Test
+    fun combinedMutatorsStackTheirRewardMultipliers() {
+        val state = GameState(
+            currentRangeMax = 100,
+            targetNumber = 50,
+            activeMutators = setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")
+        )
+        val multiplier = engine.mutatorRewardMultiplier(state)
+        assertEquals(BigNumber(150.0), multiplier)
+    }
+
+    @Test
+    fun hardcoreMutatorDoublesTheConfiguredRange() {
+        val state = GameState(
+            difficultyId = Difficulty.CLASSIC,
+            activeMutators = setOf("mut_hardcore")
+        )
+        assertEquals(200L, engine.getRangeMax(state))
+    }
+
 }
