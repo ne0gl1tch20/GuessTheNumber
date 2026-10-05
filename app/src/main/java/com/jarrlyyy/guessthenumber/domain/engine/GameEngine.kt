@@ -47,6 +47,7 @@ class GameEngine(private val rng: Random = Random.Default) {
     fun getRangeMax(state: GameState): Long {
         val betterRangeLevel = state.upgradeLevels["better_range"] ?: 0
         val base = Difficulty.rangeMax(state.difficultyId, betterRangeLevel)
+        val active = validateMutators(state.activeMutators)
         return if ("mut_hardcore" in active) base * 2L else base
     }
 
