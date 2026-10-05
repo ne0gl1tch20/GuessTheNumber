@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -215,6 +216,15 @@ fun PlayScreen(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        if (state.streak >= GameEngine.FRENZY_THRESHOLD) {
+                            val frenzyMultiplier = GameEngine().frenzyMultiplier(state.streak).format()
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = locale.getString("frenzy_format", "🔥 Frenzy x%s", frenzyMultiplier),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
 
                         AnimatedContent(targetState = lastFeedback, label = "FeedbackAnimation") { feedback ->
