@@ -1,7 +1,7 @@
-# Project Memory: Gamified Guess the Number Simulator (v1.9 Update)
+# Project Memory: Gamified Guess the Number Simulator (v1.10 Update)
 
 ## Project Overview
-A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 3 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.9`.
+A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.10`.
 
 ## Strict Project Rules: Localization & Open-Source Licenses
 - **EVERYTHING USER-VISIBLE MUST BE LOCALIZED**: Zero hardcoded user-visible strings (screen titles, buttons, dialogs, toasts, accessibility descriptions, achievements, upgrades, shop items, settings, dynamic text formatting with `%s`/`%d`) in Kotlin/Compose UI. All strings must reside in `assets/locales/en_us.json` and be fetched via `LocaleManager`.
@@ -22,7 +22,7 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - **`ui.screens`**: `PlayScreen`, `UpgradeScreen`, `ShopScreen`, `MoreScreen`, `PrestigeScreen`, `UltraScreen`, `ArcadeScreen`, `StatsScreen`, `SettingsScreen`, `AboutScreen`, `DevSettingsScreen`, `TutorialScreen`, `CrashRecoveryScreen`, `TalentScreen`, `MutatorsScreen`, `StakingScreen`, `CloudBackupScreen`, `SaveSlotsScreen`.
 - **`ui.viewmodel`**: `GameViewModel`.
 
-## Advanced Features Implemented in v1.9
+## Advanced Features Implemented in v1.10
 1. **Comprehensive Internationalization & Localization (`v1.9`)**: 100% of user-visible UI text, screen titles, dialogs, buttons, toasts, and data-driven config definitions (`upgrades.json`, `shop_items.json`, `achievements.json`, `prestige_shop.json`, `ultra_shop.json`, `minigames.json`, `mutators.json`, `challenges.json`, `talents.json`) are fully localized and managed via `LocaleManager` and `en_us.json`.
 2. **Dynamic Math & Clue Analysis (`v1.9`)**: Guess feedback tips and math clues dynamically inject real-time game state variables (midpoints, parities, deltas, interval bounds, moduli).
 3. **3 Distinct Save Slots System (`SaveSlotsScreen`, `SaveManager`)**: Manages Slot 1, Slot 2, and Slot 3 independently with separate preferences keys, metadata summaries, switching, and reset actions.
@@ -34,3 +34,9 @@ A fully polished, feature-complete Android incremental game combining classic gu
 9. **Combo Streaks & High-Stakes "Lucky Guess" Staking**: High-stakes 50/50 staking mode (`StakingScreen`) with streak multiplier bonuses.
 10. **Save Export/Import & Cloud Backup UI**: Dedicated Cloud Backup and encrypted save transfer UI (`CloudBackupScreen`).
 11. **GitHub Actions APK Build Pipeline (`.github/workflows/build-apks.yml`)**: Automated CI/CD workflow running on `ubuntu-latest` (supporting `push` to `main` and `workflow_dispatch`) that sets up JDK 17, sets up Gradle with caching, executes `./gradlew assembleDebug` and `./gradlew assembleRelease` (producing unsigned release APK), and uploads both APK variants (`GuessTheNumber-debug` and `GuessTheNumber-release`) as GitHub Actions artifacts.
+
+## v1.10 Maintenance Notes
+- Fixed `AboutScreen` open-source license attribution formatting so author and license placeholders render their actual values.
+- Added Phase 5 slot duplication and backup restoration workflow.
+- Updated app version metadata to `versionCode 9` / `versionName 1.10`.
+- Changelog entries continue using the existing Markdown heading and emoji-bullet format.
