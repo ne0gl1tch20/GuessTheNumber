@@ -271,7 +271,7 @@ fun NavGraph(
                 MutatorsScreen(
                     state = state,
                     onSelectMutator = { id -> onBuyShopItem(id, 0L) },
-                    onCompleteChallenge = { id, reward -> onEarnMinigameReward(reward, BigNumber.ZERO) },
+                    onCompleteChallenge = { id, reward -> viewModel.claimChallenge(id, reward) },
                     onBack = { navController.popBackStack() }
                 )
             }
