@@ -66,6 +66,7 @@ class MainActivity : ComponentActivity() {
                     NavGraph(
                         state = state,
                         onMakeGuess = { viewModel.makeGuess(it) },
+                        incomePerSecond = incomePerSecond,
                         onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
                         onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
                         onBuyPrestigeUpgrade = { id, cost -> viewModel.buyPrestigeUpgrade(id, cost) },
