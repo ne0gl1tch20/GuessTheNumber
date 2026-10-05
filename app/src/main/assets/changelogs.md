@@ -11,6 +11,8 @@
 - 📈 **Difficulty-Aware Ranges**: Better Range upgrades now scale from each difficulty's own base range.
 - 🔄 **Reset Consistency**: Prestige resets preserve the selected difficulty's range.
 - 🧪 **Engine Tests**: Added coverage for difficulty penalties, rewards, and range behavior.
+- 🤖 **Smarter Guessing Bot**: Reworked the auto-clicker to use feedback-driven binary search instead of reading the hidden target directly.
+- 🧪 **Bot Tests**: Added coverage for feedback-based target finding and difficulty-sized ranges.
 
 ## v1.9 (Comprehensive Internationalization & Localization Overhaul)
 - 🌐 **Full Locale & Internationalization Support**: Localized 100% of user-visible strings across all screens (Play, Prestige, Ultra, Upgrades, Shop, Arcade, More, Mutators, Achievements, Cloud Backup, Crash Recovery, Settings, Dev Settings) into `locales/en_us.json`.
