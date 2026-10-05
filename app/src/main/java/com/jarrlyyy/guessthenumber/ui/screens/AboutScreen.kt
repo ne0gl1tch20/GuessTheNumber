@@ -59,7 +59,7 @@ fun AboutScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(locale.getString("about_header", "Gamified Guess the Number Simulator"), fontSize = 20.sp, style = MaterialTheme.typography.titleLarge)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(String.format(locale.getString("about_version_format"), versionName, versionCode), fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+                        Text(locale.getString("about_version_format", versionName, versionCode), fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(locale.getString("about_description", "A polished Android incremental game combining classic guessing mechanics with deep prestige/ultra progression, anti-cheat protection, offline progression! Made with love by @jarrlyyy!"))
                     }
@@ -74,8 +74,8 @@ fun AboutScreen(
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(lib.name, fontSize = 16.sp, style = MaterialTheme.typography.titleSmall)
-                        Text(String.format(locale.getString("about_library_author_format"), lib.author), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(String.format(locale.getString("about_library_license_format"), lib.license), fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
+                        Text(locale.getString("about_library_author_format", lib.author), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(locale.getString("about_library_license_format", lib.license), fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
