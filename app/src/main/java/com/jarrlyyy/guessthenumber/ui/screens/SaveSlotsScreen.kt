@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
+import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -42,6 +44,9 @@ fun SaveSlotsScreen(
     }
 
     var showResetDialog by remember { mutableStateOf<Int?>(null) }
+    var showProfileDialog by remember { mutableStateOf<Int?>(null) }
+    var profileNameDraft by remember { mutableStateOf("") }
+    var profileIconDraft by remember { mutableStateOf(SaveProfile.DEFAULT_ICON) }
     val difficultySelections = remember { mutableStateMapOf<Int, String>() }
     val locale = viewModel.localeManager
 
@@ -88,6 +93,47 @@ fun SaveSlotsScreen(
         )
     }
 
+    if (showProfileDialog != null) {
+        val slotNum = showProfileDialog!!
+        AlertDialog(
+            onDismissRequest = { showProfileDialog = null },
+            title = { Text(locale.getString("save_profile_edit_title", "Edit Save Profile")) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedTextField(
+                        value = profileNameDraft,
+                        onValueChange = { profileNameDraft = it.take(24) },
+                        label = { Text(locale.getString("save_profile_name", "Profile Name")) },
+                        singleLine = true,
+                        supportingText = { Text(locale.getString("save_profile_name_limit", "Up to 24 characters")) }
+                    )
+                    Text(locale.getString("save_profile_icon", "Profile Icon"), style = MaterialTheme.typography.labelLarge)
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        SaveProfile.iconIds.forEach { iconId ->
+                            FilterChip(
+                                selected = profileIconDraft == iconId,
+                                onClick = { profileIconDraft = iconId },
+                                label = { Text(SaveProfile.iconSymbol(iconId)) }
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.updateSlotProfile(slotNum, profileNameDraft, profileIconDraft)
+                    showProfileDialog = null
+                    refreshMetadata()
+                }) { Text(locale.getString("save_profile_save", "Save")) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showProfileDialog = null }) {
+                    Text(locale.getString("cancel", "Cancel"))
+                }
+            }
+        )
+    }
+
     if (showResetDialog != null) {
         val slotNum = showResetDialog!!
         AlertDialog(
@@ -116,10 +162,10 @@ fun SaveSlotsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Save Slots", fontWeight = FontWeight.Bold) },
+                title = { Text(locale.getString("save_slots", "Save Slots"), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 }
             )
@@ -134,7 +180,7 @@ fun SaveSlotsScreen(
         ) {
             item {
                 Text(
-                    "Select a save slot to play or manage your games.",
+                    locale.getString("save_slots_description", "Select a save slot to play or manage your games."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -158,6 +204,14 @@ fun SaveSlotsScreen(
                             onNavigateBack()
                         },
                         onReset = { showResetDialog = slot },
+                        onEditProfile = {
+                            val metadata = slotMetadata[slot - 1]
+                            if (metadata != null && !metadata.isEmpty) {
+                                profileNameDraft = metadata.profileName
+                                profileIconDraft = metadata.profileIconId
+                                showProfileDialog = slot
+                            }
+                        },
                         locale = locale
                     )
                 }
@@ -201,6 +255,7 @@ fun SlotCard(
     onDifficultyChange: (String) -> Unit,
     onSelect: () -> Unit,
     onReset: () -> Unit,
+    onEditProfile: () -> Unit,
     locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 ) {
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
@@ -223,13 +278,18 @@ fun SlotCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Slot $slotIndex${if (isActive) " (Active)" else ""}",
+                    text = locale.getString("save_slot_title", "Slot %d", slotIndex) + if (isActive) " ${locale.getString("save_slot_active", "(Active)")}" else "",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 if (metadata != null && !metadata.isEmpty) {
-                    IconButton(onClick = onReset) {
-                        Icon(Icons.Default.Delete, contentDescription = "Reset Slot", tint = MaterialTheme.colorScheme.error)
+                    Row {
+                        IconButton(onClick = onEditProfile) {
+                            Icon(Icons.Default.Edit, contentDescription = locale.getString("save_profile_edit", "Edit Profile"))
+                        }
+                        IconButton(onClick = onReset) {
+                        Icon(Icons.Default.Delete, contentDescription = locale.getString("save_slot_reset", "Reset Slot", tint = MaterialTheme.colorScheme.error)
+                        }
                     }
                 }
             }
@@ -249,13 +309,21 @@ fun SlotCard(
                     Text(locale.getString("save_slot_start_new", "Start New Game"))
                 }
             } else {
+                val profileDisplayName = metadata.profileName.ifBlank {
+                    locale.getString("save_slot_title", "Slot %d", slotIndex)
+                }
+                Text(
+                    text = "${SaveProfile.iconSymbol(metadata.profileIconId)}  $profileDisplayName",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold
+                )
                 Text(text = "${locale.getString("save_slot_difficulty", "Difficulty")}: ${locale.getString(Difficulty.nameKey(metadata.difficultyId), "Classic")}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Money: ${metadata.money}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Prestige: ${metadata.prestige} | Ultra: ${metadata.ultra}", style = MaterialTheme.typography.bodySmall)
-                Text(text = "Attempts: ${metadata.attempts} | Correct: ${metadata.correctGuesses}", style = MaterialTheme.typography.bodySmall)
+                Text(text = locale.getString("save_slot_money", "Money: %s", metadata.money), style = MaterialTheme.typography.bodyMedium)
+                Text(text = locale.getString("save_slot_prestige_ultra", "Prestige: %s | Ultra: %s", metadata.prestige, metadata.ultra), style = MaterialTheme.typography.bodySmall)
+                Text(text = locale.getString("save_slot_attempts_correct", "Attempts: %d | Correct: %d", metadata.attempts, metadata.correctGuesses), style = MaterialTheme.typography.bodySmall)
                 if (metadata.lastSaveTimestamp > 0) {
                     Text(
-                        text = "Last Saved: ${dateFormat.format(Date(metadata.lastSaveTimestamp))}",
+                        text = locale.getString("save_slot_last_saved", "Last Saved: %s", dateFormat.format(Date(metadata.lastSaveTimestamp))),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -270,7 +338,7 @@ fun SlotCard(
                 ) {
                     Icon(Icons.Default.PlayArrow, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(if (isActive) "Resume Game" else "Switch to Slot")
+                    Text(if (isActive) locale.getString("save_slot_resume", "Resume Game") else locale.getString("save_slot_switch", "Switch to Slot"))
                 }
             }
         }
