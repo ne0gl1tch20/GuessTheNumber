@@ -269,11 +269,17 @@ fun SaveSlotsScreen(
                         onSelect = {
                             val metadata = slotMetadata[slot - 1]
                             if (metadata?.isEmpty != false) {
-                                viewModel.createSlot(slot, difficultySelections[slot] ?: Difficulty.CLASSIC)
+                                viewModel.createSlot(
+                                    slot,
+                                    difficultySelections[slot] ?: Difficulty.CLASSIC
+                                ) { success ->
+                                    if (success) onNavigateBack()
+                                    refreshMetadata()
+                                }
                             } else {
                                 viewModel.switchSlot(slot)
+                                onNavigateBack()
                             }
-                            onNavigateBack()
                         },
                         onReset = { showResetDialog = slot },
                         onEditProfile = {
