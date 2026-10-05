@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.domain.engine
 
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import kotlin.math.log10
 import kotlin.math.sqrt
@@ -19,6 +20,9 @@ data class GuessResult(
 )
 
 class GameEngine(private val rng: Random = Random.Default) {
+
+    fun getInitialRangeMax(difficultyId: String): Long =
+        Difficulty.baseRangeMax(difficultyId)
 
     fun processGuess(state: GameState, guess: Long): GuessResult {
         // Validate target range bounds
@@ -44,7 +48,8 @@ class GameEngine(private val rng: Random = Random.Default) {
             val talentMult = if (state.shopPurchases.contains("talent_reward_1") || state.upgradeLevels.containsKey("talent_reward_1")) BigNumber(1.5) else BigNumber.ONE
             val mutatorMult = if (state.shopPurchases.contains("mut_hardcore")) BigNumber(2.0) else BigNumber.ONE
 
-            val calculatedReward = baseReward * streakMultiplier * critMultiplier * upgradeMult * talentMult * mutatorMult
+            val difficultyMultiplier = BigNumber(Difficulty.rewardMultiplier(state.difficultyId))
+            val calculatedReward = baseReward * streakMultiplier * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier
             val totalReward = maxOf(BigNumber(10), calculatedReward)
             val newMoney = state.money + totalReward
             val newStreak = state.streak + 1
@@ -53,7 +58,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             // Generate new target number
             val newMin = 1L
             val betterRangeLevel = state.upgradeLevels["better_range"] ?: 0
-            val newMax = maxOf(50L, 100L - (betterRangeLevel * 5L))
+            val newMax = Difficulty.rangeMax(state.difficultyId, betterRangeLevel)
             val newTarget = rng.nextLong(newMin, newMax + 1)
 
             val newStats = state.statistics.copy(
@@ -77,8 +82,9 @@ class GameEngine(private val rng: Random = Random.Default) {
             return GuessResult(feedback, totalReward, isCrit, newStreak, updatedState)
         } else {
             val newAttempts = state.attempts + 1
+            val difficultyPenalty = state.money * BigNumber(Difficulty.wrongGuessPenalty(state.difficultyId))
             val taxPenalty = if (state.shopPurchases.contains("mut_tax")) state.money * BigNumber(0.05) else BigNumber.ZERO
-            val newMoney = maxOf(BigNumber.ZERO, state.money - taxPenalty)
+            val newMoney = maxOf(BigNumber.ZERO, state.money - difficultyPenalty - taxPenalty)
 
             val newStats = state.statistics.copy(
                 totalGuesses = state.statistics.totalGuesses + 1,
