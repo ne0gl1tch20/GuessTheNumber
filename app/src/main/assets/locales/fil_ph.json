@@ -514,5 +514,9 @@
   "achievement_frenzy_25_name": "Master ng Frenzy",
   "achievement_frenzy_25_desc": "Maabot ang 25-streak.",
   "achievement_frenzy_50_name": "Walang Hanggang Frenzy",
-  "achievement_frenzy_50_desc": "Maabot ang 50-streak."
+  "achievement_frenzy_50_desc": "Maabot ang 50-streak.",
+  "achievement_tier_bronze": "Bronze",
+  "achievement_tier_silver": "Silver",
+  "achievement_tier_gold": "Gold",
+  "achievement_tier_diamond": "Diamond"
 }
