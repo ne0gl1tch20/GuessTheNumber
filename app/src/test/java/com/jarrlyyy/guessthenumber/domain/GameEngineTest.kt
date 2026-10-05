@@ -10,6 +10,8 @@ import org.junit.Test
 import kotlin.random.Random
 
 class GameEngineTest {
+    private val engine = GameEngine()
+
 
     @Test
     fun testCorrectGuessRewardAndStreak() {
