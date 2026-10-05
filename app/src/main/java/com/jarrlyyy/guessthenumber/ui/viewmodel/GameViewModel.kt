@@ -14,6 +14,7 @@ import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.data.notification.GameReminderWorker
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
+import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
 import com.jarrlyyy.guessthenumber.domain.engine.AntiCheatService
@@ -97,7 +98,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadGame(slot: Int = -1) {
         viewModelScope.launch(Dispatchers.IO) {
-            val targetSlot = if (slot in 1..3) slot else saveManager.getActiveSlot()
+            val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else saveManager.getActiveSlot()
             saveManager.setActiveSlot(targetSlot)
             _activeSlot.value = targetSlot
 
@@ -174,7 +175,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun switchSlot(slot: Int) {
-        if (slot in 1..3 && slot != _activeSlot.value) {
+        if (slot in 1..MAX_SAVE_SLOTS && slot != _activeSlot.value) {
             viewModelScope.launch(Dispatchers.IO) {
                 saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
                 loadGame(slot)
