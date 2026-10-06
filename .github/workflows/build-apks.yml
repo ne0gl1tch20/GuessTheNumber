@@ -31,6 +31,12 @@ jobs:
       - name: Validate Version Metadata
         run: python3 tools/validate_versions.py
 
+      - name: Validate All JSON Assets
+        run: python3 tools/validate_json_assets.py
+
+      - name: Audit Repository Localization Surface
+        run: python3 tools/audit_localization_surface.py
+
       - name: Audit Hardcoded UI Strings
         run: python3 tools/validate_hardcoded_strings.py
 
@@ -43,11 +49,28 @@ jobs:
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest
 
+      - name: Run Lint
+        run: ./gradlew lintDebug
+
+      - name: Run Full Gradle Check
+        run: ./gradlew check
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
       - name: Build Release APK (Unsigned)
         run: ./gradlew assembleRelease
+
+      - name: Upload Test and Lint Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GuessTheNumber-test-reports
+          path: |
+            app/build/reports/tests/**
+            app/build/test-results/**
+            app/build/reports/lint-results-*.html
+          if-no-files-found: warn
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
