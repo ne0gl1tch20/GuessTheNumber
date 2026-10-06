@@ -154,15 +154,44 @@ fun SettingsScreen(
                     "Ocean" to listOf("#2196F3", "#00BCD4", "#3F51B5"),
                     "Forest" to listOf("#4CAF50", "#009688", "#8BC34A")
                 )
+                var presetExpanded by remember { mutableStateOf(false) }
+                val selectedPreset = presets.firstOrNull { it.first == settings.themePreset }?.first ?: "Custom"
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                        presets.forEach { (name, colors) ->
-                            OutlinedButton(
+                    ExposedDropdownMenuBox(
+                        expanded = presetExpanded,
+                        onExpandedChange = { presetExpanded = it },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        OutlinedTextField(
+                            value = selectedPreset,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Theme Preset") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = presetExpanded) },
+                            modifier = Modifier.menuAnchor().fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = presetExpanded,
+                            onDismissRequest = { presetExpanded = false }
+                        ) {
+                            presets.forEach { (name, colors) ->
+                                DropdownMenuItem(
+                                    text = { Text(name) },
+                                    trailingIcon = { if (name == selectedPreset) Icon(Icons.Default.Check, contentDescription = null) },
+                                    onClick = {
+                                        onUpdateSettings(settings.copy(themePreset = name, customPrimaryColor = colors[0], customSecondaryColor = colors[1], customTertiaryColor = colors[2]))
+                                        presetExpanded = false
+                                    }
+                                )
+                            }
+                            DropdownMenuItem(
+                                text = { Text("Custom") },
+                                trailingIcon = { if (selectedPreset == "Custom") Icon(Icons.Default.Check, contentDescription = null) },
                                 onClick = {
-                                    onUpdateSettings(settings.copy(themePreset = name, customPrimaryColor = colors[0], customSecondaryColor = colors[1], customTertiaryColor = colors[2]))
-                                },
-                                modifier = Modifier.weight(1f)
-                            ) { Text(name) }
+                                    onUpdateSettings(settings.copy(themePreset = "Custom"))
+                                    presetExpanded = false
+                                }
+                            )
                         }
                     }
                     listOf(
