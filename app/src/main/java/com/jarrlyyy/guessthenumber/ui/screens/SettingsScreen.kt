@@ -104,7 +104,10 @@ fun SettingsScreen(
                                     text = { Text(name) },
                                     onClick = {
                                         onUpdateSettings(settings.copy(locale = code))
-                                        Toast.makeText(context, locale.getString("language_changed_restart", "Language changed. Restart app to take effect."), Toast.LENGTH_SHORT).show()
+                                        androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                                            androidx.core.os.LocaleListCompat.forLanguageTags(code)
+                                        )
+                                        Toast.makeText(context, locale.getString("language_changed_restart", "Language changed."), Toast.LENGTH_SHORT).show()
                                         expanded = false
                                     }
                                 )
