@@ -220,13 +220,16 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 if (!created) {
                     false
                 } else {
+                    val globalSettings = saveManager.loadGame(slot).settings
                     val freshState = GameState(
                         difficultyId = difficultyId,
                         profileName = profileName.trim().take(24),
                         profileIconId = if (SaveProfile.isValidIcon(profileIconId)) profileIconId else SaveProfile.DEFAULT_ICON,
                         currentRangeMax = Difficulty.rangeMax(difficultyId, 0),
                         targetNumber = (Difficulty.rangeMax(difficultyId, 0) / 2L).coerceAtLeast(1L),
-                        lastSaveTimestamp = System.currentTimeMillis()
+                        lastSaveTimestamp = System.currentTimeMillis(),
+                        settings = globalSettings,
+                        tutorialCompleted = globalSettings.tutorialCompleted
                     )
                     _activeSlot.value = slot
                     _hasAnySave.value = true
@@ -363,7 +366,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 saveManager.resetSlot(slot)
                 if (_activeSlot.value == slot) {
                     saveManager.setActiveSlot(slot)
-                    val fresh = GameState(lastSaveTimestamp = System.currentTimeMillis())
+                    val globalSettings = saveManager.loadGame(slot).settings
+                    val fresh = GameState(settings = globalSettings, tutorialCompleted = globalSettings.tutorialCompleted, lastSaveTimestamp = System.currentTimeMillis())
                     saveManager.saveGame(fresh, slot)
                     _gameState.value = fresh
                     guessingBot.reset(fresh.currentRangeMin, fresh.currentRangeMax)
