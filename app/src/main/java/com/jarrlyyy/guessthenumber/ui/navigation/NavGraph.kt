@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -73,16 +74,22 @@ fun NavGraph(
         SaveSlotsScreen(viewModel = viewModel, onNavigateBack = {})
         return
     }
-    if (!state.tutorialCompleted) {
-        TutorialScreen(onComplete = onCompleteTutorial)
-        return
-    }
-
     val locale = viewModel.localeManager
     val items = listOf(Screen.Play, Screen.Upgrade, Screen.Shop, Screen.More)
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    var tutorialStep by rememberSaveable { mutableIntStateOf(0) }
+    val tutorialActive = !state.tutorialCompleted
+    LaunchedEffect(currentRoute, tutorialActive, tutorialStep) {
+        if (tutorialActive) {
+            when {
+                tutorialStep == 1 && currentRoute == Screen.Upgrade.route -> tutorialStep = 2
+                tutorialStep == 2 && currentRoute == Screen.More.route -> tutorialStep = 3
+                tutorialStep == 3 && currentRoute == Screen.Settings.route -> onCompleteTutorial()
+            }
+        }
+    }
 
     if (needsSettingsMigration) {
         AlertDialog(
@@ -203,7 +210,10 @@ fun NavGraph(
             popExitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { 100 }) }
         ) {
             composable(Screen.Play.route) {
-                PlayScreen(state = state, onMakeGuess = onMakeGuess, incomePerSecond = incomePerSecond)
+                PlayScreen(state = state, onMakeGuess = { guess ->
+                    onMakeGuess(guess)
+                    if (tutorialActive && tutorialStep == 0) tutorialStep = 1
+                }, incomePerSecond = incomePerSecond)
             }
             composable(Screen.Upgrade.route) {
                 UpgradeScreen(
@@ -326,5 +336,8 @@ fun NavGraph(
                 )
             }
         }
+    }
+    if (tutorialActive) {
+        GuidedTutorialOverlay(step = tutorialStep)
     }
 }
