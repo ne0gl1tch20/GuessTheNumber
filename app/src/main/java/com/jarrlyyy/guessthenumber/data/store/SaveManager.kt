@@ -398,6 +398,7 @@ class SaveManager(private val context: Context) {
     suspend fun applyAppPreferencesJson(raw: String): Boolean {
         val settings = globalPreferences.decode(raw) ?: return false
         globalPreferences.saveSettings(settings)
+        globalPreferences.markMigrationCompleted()
         return true
     }
 
