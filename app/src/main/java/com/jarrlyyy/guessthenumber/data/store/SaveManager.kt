@@ -426,6 +426,8 @@ class SaveManager(private val context: Context) {
                 difficultyId = difficultyId,
                 profileName = profileName.trim().take(24),
                 profileIconId = if (SaveProfile.isValidIcon(profileIconId)) profileIconId else SaveProfile.DEFAULT_ICON,
+                currentRangeMax = Difficulty.rangeMax(difficultyId, 0),
+                targetNumber = (Difficulty.rangeMax(difficultyId, 0) / 2L).coerceAtLeast(1L),
                 lastSaveTimestamp = System.currentTimeMillis()
             )
             val freshJson = json.encodeToString(freshState)
