@@ -59,14 +59,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     init {
         kotlinx.coroutines.runBlocking {
-            val systemLocale = java.util.Locale.getDefault().toLanguageTag()
-            val effectiveTag = if (localeTag == "en-US" && systemLocale.startsWith("fil", ignoreCase = true)) {
-                "fil-PH"
+            val effectiveTag = if (localeTag == "en-US") {
+                java.util.Locale.getDefault().toLanguageTag()
             } else {
                 localeTag
             }
-            val fileName = if (effectiveTag.startsWith("fil", ignoreCase = true)) "locales/fil_ph.json" else "locales/en_us.json"
-            localeManager.loadLocale(fileName)
+            localeManager.loadLocaleForTag(effectiveTag)
         }
     }
 
