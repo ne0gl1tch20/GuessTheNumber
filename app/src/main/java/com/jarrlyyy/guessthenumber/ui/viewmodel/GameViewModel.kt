@@ -95,6 +95,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val _hasLegacySave = MutableStateFlow(false)
     val hasLegacySave: StateFlow<Boolean> = _hasLegacySave.asStateFlow()
 
+    private val _needsSettingsMigration = MutableStateFlow(false)
+    val needsSettingsMigration: StateFlow<Boolean> = _needsSettingsMigration.asStateFlow()
+    private val _isMigratingSettings = MutableStateFlow(false)
+    val isMigratingSettings: StateFlow<Boolean> = _isMigratingSettings.asStateFlow()
+
     private var autoClickerJob: Job? = null
     private var saveJob: Job? = null
     private var timerJob: Job? = null
@@ -116,6 +121,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else saveManager.getActiveSlot()
             saveManager.setActiveSlot(targetSlot)
             _activeSlot.value = targetSlot
+
+            val settingsMigrationCheck = saveManager.needsSettingsMigration()
+            withContext(Dispatchers.Main) { _needsSettingsMigration.value = settingsMigrationCheck }
 
             val legacyCheck = saveManager.hasLegacySave()
             if (legacyCheck) {
@@ -256,6 +264,31 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
                     lastIncomeMeasurement = sanitized.money
                     _incomePerSecond.value = BigNumber.ZERO
+                }
+            }
+        }
+    }
+
+    fun migrateSettingsToGlobal(onResult: (Boolean) -> Unit = {}) {
+        if (_isMigratingSettings.value) return
+        _isMigratingSettings.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = slotOperationMutex.withLock { saveManager.migrateSettingsToGlobal() }
+            if (success) {
+                val active = saveManager.getActiveSlot()
+                val loaded = saveManager.loadGame(active)
+                val sanitized = AntiCheatService.sanitizeCurrency(loaded)
+                withContext(Dispatchers.Main) {
+                    _gameState.value = sanitized
+                    updateLocaleRepo(sanitized.settings.locale)
+                    _needsSettingsMigration.value = false
+                    _isMigratingSettings.value = false
+                    onResult(true)
+                }
+            } else {
+                withContext(Dispatchers.Main) {
+                    _isMigratingSettings.value = false
+                    onResult(false)
                 }
             }
         }
@@ -681,6 +714,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             updateLocaleRepo(newSettings.locale)
         }
         _gameState.update { it.copy(settings = newSettings) }
+        viewModelScope.launch(Dispatchers.IO) { saveManager.saveAppPreferences(newSettings) }
         GameLogger.configureStorage(File(getApplication<Application>().filesDir, "game_logs.txt"), newSettings.saveLogsToStorage)
         saveGameAsync()
 
@@ -699,6 +733,41 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "UPDATE_SETTINGS", "Updated game settings.")
+    }
+
+    fun getAppPreferencesJson(onResult: (String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val raw = saveManager.getAppPreferencesJson()
+            withContext(Dispatchers.Main) { onResult(raw) }
+        }
+    }
+
+    fun applyAppPreferencesJson(raw: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = slotOperationMutex.withLock { saveManager.applyAppPreferencesJson(raw) }
+            if (success) {
+                val loaded = saveManager.loadGame(_activeSlot.value)
+                withContext(Dispatchers.Main) {
+                    _gameState.value = AntiCheatService.sanitizeCurrency(loaded)
+                    updateLocaleRepo(_gameState.value.settings.locale)
+                    onResult(true)
+                }
+            } else withContext(Dispatchers.Main) { onResult(false) }
+        }
+    }
+
+    fun getSaveJson(slot: Int, onResult: (String?) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val raw = saveManager.getSaveJson(slot)
+            withContext(Dispatchers.Main) { onResult(raw) }
+        }
+    }
+
+    fun applySaveJson(slot: Int, raw: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = slotOperationMutex.withLock { saveManager.applySaveJson(slot, raw) }
+            withContext(Dispatchers.Main) { onResult(success) }
+        }
     }
 
     fun updateBackgroundMusicPath(path: String?) {
