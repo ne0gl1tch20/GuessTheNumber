@@ -28,7 +28,11 @@ object ExpressiveMotion {
 }
 
 @Composable
-fun ExpressiveScreen(content: @Composable () -> Unit) {
+fun ExpressiveScreen(enabled: Boolean = true, content: @Composable () -> Unit) {
+    if (!enabled) {
+        content()
+        return
+    }
     AnimatedVisibility(
         visible = true,
         enter = fadeIn(ExpressiveMotion.standardSpring) +
