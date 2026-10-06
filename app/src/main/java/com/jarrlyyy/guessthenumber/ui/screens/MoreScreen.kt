@@ -4,6 +4,9 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.lazy.LazyColumn
@@ -80,25 +83,6 @@ fun MoreScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text("Theme Presets", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    listOf(
-                        "Neon" to listOf("#7C4DFF", "#00BCD4", "#00C853"),
-                        "Sunset" to listOf("#FF4081", "#FF9800", "#FFC107"),
-                        "Ocean" to listOf("#2196F3", "#00BCD4", "#3F51B5"),
-                        "Forest" to listOf("#4CAF50", "#009688", "#8BC34A")
-                    ).forEach { (name, colors) ->
-                        OutlinedButton(
-                            onClick = {
-                                onUpdateSettings(state.settings.copy(themePreset = name, customPrimaryColor = colors[0], customSecondaryColor = colors[1], customTertiaryColor = colors[2]))
-                            },
-                            modifier = Modifier.weight(1f)
-                        ) { Text(name) }
-                    }
-                }
-            }
-
-            item {
                 val defaultOrder = listOf("achievements", "live_ops", "mutators", "talent", "arcade", "stats", "changelog", "settings", "about", "dev_settings")
                 var order by remember(state.settings.moreScreenOrder) {
                     mutableStateOf((state.settings.moreScreenOrder + defaultOrder).distinct().take(defaultOrder.size))
@@ -145,6 +129,8 @@ fun MoreScreen(
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .animateContentSize()
+                                .graphicsLayer { scaleX = if (dragging == index) 1.03f else 1f; scaleY = if (dragging == index) 1.03f else 1f; shadowElevation = if (dragging == index) 12f else 0f }
                                 .pointerInput(isReordering) {
                                     if (isReordering) detectDragGesturesAfterLongPress(
                                         onDragStart = { dragging = index; dragDistance = 0f },
