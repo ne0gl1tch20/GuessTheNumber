@@ -360,6 +360,23 @@ fun SettingsScreen(
             }
 
             item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                        Text("Reduced Motion", style = MaterialTheme.typography.bodyLarge)
+                        Text("Soften or disable expressive screen transitions", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Switch(
+                        checked = settings.reducedMotion,
+                        onCheckedChange = { onUpdateSettings(settings.copy(reducedMotion = it)) }
+                    )
+                }
+            }
+
+            item {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Master Volume: ${(settings.volume * 100).toInt()}%", style = MaterialTheme.typography.bodyLarge)
                     Slider(
