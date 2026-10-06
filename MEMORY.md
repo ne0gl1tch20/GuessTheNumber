@@ -1,4 +1,4 @@
-# Project Memory: Gamified Guess the Number Simulator (v1.13.0 Update)
+# Project Memory: Gamified Guess the Number Simulator (v1.14.0 Update)
 
 ## Project Overview
 
@@ -55,6 +55,17 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - More screen shortcut order is globally persisted and can be changed with long-press drag-and-drop.
 - Developer JSON editing is split into global App Preferences and Save Slots with a Save 1–10 selector.
 - CI remains manual-only; no automatic build was started as part of this implementation.
+
+## v1.14.0 Global Localization & Internationalization
+- App version is now `versionCode 14` / `versionName 1.14.0`.
+- Added 23 supported locale overlays with English fallback.
+- LocaleManager now resolves BCP-47 tags, merges locale overlays over English, detects RTL languages, and performs locale-aware number/date/currency/percent formatting.
+- Settings exposes the complete supported locale registry.
+- Android per-app language configuration is declared for Android 13+.
+- Added JSON asset validation, localization surface auditing, locale contract validation, and LocaleManager unit tests.
+- Manual CI now runs localization validation, JSON validation, unit tests, lint, full Gradle check, and report uploads.
+- Full repository scanning remains an acceptance criterion: Kotlin, XML, JSON, Markdown/text assets, locale assets, game data, tests, and workflow/configuration files must be inspected during the de-hardcoding pass.
+- CI remains manual-only.
 
 ## v1.13.0 Material 3 Expressive UI Overhaul
 - App version is now `versionCode 13` / `versionName 1.13.0`.
