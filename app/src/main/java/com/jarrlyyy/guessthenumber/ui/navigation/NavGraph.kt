@@ -263,6 +263,10 @@ fun NavGraph(
                     onExecuteCommand = onExecuteDevCommand,
                     onImportSave = onImportSave,
                     onUpdateSettings = onUpdateSettings,
+                    onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
+                    onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
+                    onGetSaveJson = viewModel::getSaveJson,
+                    onApplySaveJson = viewModel::applySaveJson,
                     onNavigate = { route -> navController.navigate(route) },
                     onBack = { navController.popBackStack() }
                 )
