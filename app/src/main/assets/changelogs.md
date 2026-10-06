@@ -8,8 +8,9 @@
 - 🔄 **Settings Migration**: Existing per-save settings receive a one-time OK confirmation, followed by an in-dialog migration/loading state before global migration completes.
 - 🎮 **New Save Setup**: New saves can choose a name, icon, and permanent per-save difficulty during creation.
 - 🧭 **Interactive Tutorial**: New saves now enter an action-driven tutorial requiring highlighted controls to be pressed before advancing.
-- 🎨 **Theme Customization**: Added theme presets plus custom RGB color picking for primary, secondary, and tertiary colors.
-- ↕️ **More Reordering**: Added long-press drag-and-drop ordering for More screen shortcuts, persisted globally.
+- 🎨 **Theme Customization**: Theme presets now live in Settings as a polished dropdown, with Custom HSV/brightness controls, live preview, and hex entry for primary, secondary, and tertiary colors.
+- ↕️ **Animated More Reordering**: More shortcut reordering stays locked until Reorder is pressed and now gives the dragged item lift, scale, elevation, and smoother motion.
+- 🧭 **Guided In-App Tutorial**: Replaced the generic tutorial screen with an action-required coachmark flow that uses the real Play, Upgrades, More, and Settings screens. Tutorial completion remains global across save slots.
 - 🛠️ **Developer JSON Editors**: Split raw preference editing into global App Preferences and Save Slots, with a Save 1–10 selector.
 - 📱 **Version**: Bumped to versionCode 12 / versionName 1.12.1.
 
