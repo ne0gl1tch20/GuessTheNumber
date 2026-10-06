@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.input.pointer.consume
+import androidx.compose.ui.input.pointer.consumePositionChange
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.navigation.Screen
 import java.io.File
@@ -155,7 +155,7 @@ fun MoreScreen(
                                             onUpdateSettings(state.settings.copy(moreScreenOrder = order))
                                         },
                                         onDrag = { change, amount ->
-                                            change.consume()
+                                            change.consumePositionChange()
                                             if (dragging == index) {
                                                 dragDistance += amount.y
                                                 if (dragDistance > 48f && index < order.lastIndex) {
