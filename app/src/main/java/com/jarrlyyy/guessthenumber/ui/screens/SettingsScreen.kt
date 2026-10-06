@@ -463,26 +463,30 @@ private fun ColorPickerDialog(
     onApply: (String) -> Unit
 ) {
     val initial = runCatching { android.graphics.Color.parseColor(initialHex) }.getOrDefault(android.graphics.Color.MAGENTA)
-    var red by remember { mutableFloatStateOf(android.graphics.Color.red(initial).toFloat()) }
-    var green by remember { mutableFloatStateOf(android.graphics.Color.green(initial).toFloat()) }
-    var blue by remember { mutableFloatStateOf(android.graphics.Color.blue(initial).toFloat()) }
-    val color = Color(red / 255f, green / 255f, blue / 255f)
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Theme Color Picker") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Surface(Modifier.fillMaxWidth().height(64.dp), color = color, shape = MaterialTheme.shapes.medium) {}
-                Text("Red: ${red.toInt()}")
-                Slider(value = red, onValueChange = { red = it }, valueRange = 0f..255f)
-                Text("Green: ${green.toInt()}")
-                Slider(value = green, onValueChange = { green = it }, valueRange = 0f..255f)
-                Text("Blue: ${blue.toInt()}")
-                Slider(value = blue, onValueChange = { blue = it }, valueRange = 0f..255f)
-                Text("#%02X%02X%02X".format(red.toInt(), green.toInt(), blue.toInt()))
-            }
-        },
-        confirmButton = { Button(onClick = { onApply("#%02X%02X%02X".format(red.toInt(), green.toInt(), blue.toInt())) }) { Text("Apply") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
-    )
+    val hsv = FloatArray(3).also { android.graphics.Color.colorToHSV(initial, it) }
+    var hue by remember { mutableFloatStateOf(hsv[0]) }
+    var saturation by remember { mutableFloatStateOf(hsv[1]) }
+    var value by remember { mutableFloatStateOf(hsv[2]) }
+    var hexInput by remember { mutableStateOf(initialHex.uppercase()) }
+
+    val colorInt = android.graphics.Color.HSVToColor(floatArrayOf(hue, saturation, value))
+    val color = Color(colorInt)
+    val hex = "#%02X%02X%02X".format(android.graphics.Color.red(colorInt), android.graphics.Color.green(colorInt), android.graphics.Color.blue(colorInt))
+
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("🎨 Custom Theme Color") }, text = {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Surface(Modifier.fillMaxWidth().height(72.dp), color = color, shape = MaterialTheme.shapes.medium) {}
+            Text("Hue: " + hue.toInt() + "°")
+            Slider(value = hue, onValueChange = { hue = it }, valueRange = 0f..360f)
+            Text("Saturation: " + (saturation * 100).toInt() + "%")
+            Slider(value = saturation, onValueChange = { saturation = it }, valueRange = 0f..1f)
+            Text("Brightness: " + (value * 100).toInt() + "%")
+            Slider(value = value, onValueChange = { value = it }, valueRange = 0f..1f)
+            OutlinedTextField(value = hexInput, onValueChange = {
+                hexInput = it.uppercase()
+                runCatching { val parsed = android.graphics.Color.parseColor(hexInput); val next = FloatArray(3); android.graphics.Color.colorToHSV(parsed, next); hue = next[0]; saturation = next[1]; value = next[2] }
+            }, label = { Text("Hex") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            Text("Live preview: " + hex, style = MaterialTheme.typography.labelLarge)
+        }
+    }, confirmButton = { Button(onClick = { onApply(hex) }) { Text("Apply") } }, dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
 }
