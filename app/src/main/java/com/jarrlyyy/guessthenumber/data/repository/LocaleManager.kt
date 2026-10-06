@@ -57,7 +57,7 @@ class LocaleManager(private val context: Context) {
 
     fun getCurrentLocaleTag(): String = currentLocale.toLanguageTag()
 
-    fun isRtl(): Boolean = currentLocale.layoutDirection == Locale.SA ? false : currentLocale.language == "ar" || currentLocale.language == "fa" || currentLocale.language == "he"
+    fun isRtl(): Boolean = currentLocale.language in setOf("ar", "fa", "he", "ur")
 
     fun getString(key: String, default: String = key): String =
         translations.optString(key, default)
