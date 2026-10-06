@@ -208,7 +208,7 @@ fun NavGraph(
             NavHost(
                 navController = navController,
             startDestination = Screen.Play.route,
-            modifier = Modifier.padding(padding),
+            modifier = Modifier.fillMaxSize(),
             enterTransition = { if (state.settings.reducedMotion) EnterTransition.None else fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { 100 }) },
             exitTransition = { if (state.settings.reducedMotion) ExitTransition.None else fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { -100 }) },
             popEnterTransition = { if (state.settings.reducedMotion) EnterTransition.None else fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { -100 }) },
