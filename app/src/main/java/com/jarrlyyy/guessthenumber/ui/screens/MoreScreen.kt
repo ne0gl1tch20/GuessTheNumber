@@ -105,10 +105,31 @@ fun MoreScreen(
                 }
                 var dragging by remember { mutableStateOf<Int?>(null) }
                 var dragDistance by remember { mutableFloatStateOf(0f) }
+                var isReordering by remember { mutableStateOf(false) }
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("Reorder More", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                    Text("Long-press and drag items to change their order.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    order.forEachIndexed { index, route ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("More Menu Order", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                        OutlinedButton(onClick = {
+                            if (isReordering) {
+                                dragging = null
+                                dragDistance = 0f
+                                onUpdateSettings(state.settings.copy(moreScreenOrder = order))
+                            }
+                            isReordering = !isReordering
+                        }) {
+                            Icon(Icons.Default.DragHandle, contentDescription = null)
+                            Spacer(Modifier.width(6.dp))
+                            Text(if (isReordering) "Done" else "Reorder")
+                        }
+                    }
+                    if (isReordering) {
+                        Text("Long-press and drag items to change their order.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    if (isReordering) order.forEachIndexed { index, route ->
                         val labels = mapOf(
                             "achievements" to "Achievements & Tiers",
                             "live_ops" to "Random & Seasonal Events",
@@ -124,8 +145,8 @@ fun MoreScreen(
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .pointerInput(order) {
-                                    detectDragGesturesAfterLongPress(
+                                .pointerInput(isReordering) {
+                                    if (isReordering) detectDragGesturesAfterLongPress(
                                         onDragStart = { dragging = index; dragDistance = 0f },
                                         onDragCancel = { dragging = null; dragDistance = 0f },
                                         onDragEnd = {
