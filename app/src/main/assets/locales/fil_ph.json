@@ -593,4 +593,14 @@
   "save_export_success": "Nakopya ang buong encrypted backup!",
   "save_import_success": "Na-restore ang buong backup!",
   "save_import_invalid": "Invalid na encrypted backup!"
+,
+  "guided_tutorial_step": "Hakbang %d ng 4 • Kailangan ng aksyon",
+  "guided_tutorial_title_0": "🎮 Subukan ang unang hula",
+  "guided_tutorial_title_1": "📈 Buksan ang Upgrades",
+  "guided_tutorial_title_2": "🧭 Buksan ang More",
+  "guided_tutorial_title_3": "⚙️ Buksan ang Settings",
+  "guided_tutorial_instruction_0": "Ito ang totoong Play screen. Maglagay ng numero at pindutin ang GUESS NUMBER para magpatuloy.",
+  "guided_tutorial_instruction_1": "Pindutin ang Upgrades tab sa ibabang navigation.",
+  "guided_tutorial_instruction_2": "Pindutin ang More tab para makita ang iba pang bahagi ng laro.",
+  "guided_tutorial_instruction_3": "Sa More, buksan ang Settings. Dito matatapos ang guided tour."
 }
