@@ -222,6 +222,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                         difficultyId = difficultyId,
                         profileName = profileName.trim().take(24),
                         profileIconId = if (SaveProfile.isValidIcon(profileIconId)) profileIconId else SaveProfile.DEFAULT_ICON,
+                        currentRangeMax = Difficulty.rangeMax(difficultyId, 0),
+                        targetNumber = (Difficulty.rangeMax(difficultyId, 0) / 2L).coerceAtLeast(1L),
                         lastSaveTimestamp = System.currentTimeMillis()
                     )
                     _activeSlot.value = slot
