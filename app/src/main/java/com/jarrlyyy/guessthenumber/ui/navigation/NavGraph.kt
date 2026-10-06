@@ -57,6 +57,9 @@ fun NavGraph(
     showTimeTravelPopup: Boolean,
     timeTravelSeconds: Long,
     onDismissTimeTravel: () -> Unit,
+    needsSettingsMigration: Boolean,
+    isMigratingSettings: Boolean,
+    onMigrateSettings: (Boolean) -> Unit,
     onEarnMinigameReward: (Long, BigNumber) -> Unit,
     onUpdateMultiplier: (String) -> Unit,
     onClaimLiveOpsEventReward: (String) -> Unit,
@@ -74,6 +77,30 @@ fun NavGraph(
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    if (needsSettingsMigration) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text(locale.getString("settings_migration_title", "Settings Update")) },
+            text = {
+                if (isMigratingSettings) {
+                    Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                        Text(locale.getString("settings_migration_loading", "Migrating your app settings..."))
+                        androidx.compose.material3.CircularProgressIndicator()
+                    }
+                } else {
+                    Text(locale.getString("settings_migration_text", "Your existing app settings will be moved from the save data into global App Preferences. Your game progress will stay unchanged."))
+                }
+            },
+            confirmButton = {
+                if (!isMigratingSettings) {
+                    Button(onClick = { onMigrateSettings(true) }) {
+                        Text(locale.getString("ok", "OK"))
+                    }
+                }
+            }
+        )
+    }
 
     if (hasPreviousCrash) {
         CrashRecoveryScreen(onDismiss = onDismissCrash)
