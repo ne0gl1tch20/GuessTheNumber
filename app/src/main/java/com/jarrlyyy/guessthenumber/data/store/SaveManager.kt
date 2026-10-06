@@ -406,7 +406,7 @@ class SaveManager(private val context: Context) {
         return context.saveDataStore.edit { it[getSaveKey(slot)] = raw }.let { true }
     }
 
-    suspend fun createFreshSlot(slot: Int, difficultyId: String): Boolean {
+    suspend fun createFreshSlot(slot: Int, difficultyId: String, profileName: String = "", profileIconId: String = SaveProfile.DEFAULT_ICON): Boolean {
         if (slot !in 1..MAX_SAVE_SLOTS || !Difficulty.isValid(difficultyId)) return false
 
         val targetSlot = slot
@@ -419,6 +419,8 @@ class SaveManager(private val context: Context) {
 
             val freshState = GameState(
                 difficultyId = difficultyId,
+                profileName = profileName.trim().take(24),
+                profileIconId = if (SaveProfile.isValidIcon(profileIconId)) profileIconId else SaveProfile.DEFAULT_ICON,
                 lastSaveTimestamp = System.currentTimeMillis()
             )
             val freshJson = json.encodeToString(freshState)
