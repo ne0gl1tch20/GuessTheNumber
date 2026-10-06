@@ -12,6 +12,7 @@ import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.encodeToString
@@ -162,8 +163,9 @@ class SaveManager(private val context: Context) {
                 if (currentJson.isNullOrEmpty() || !validateSave(currentJson)) return@edit
                 val current = sanitizeLoadedState(json.decodeFromString<GameState>(currentJson))
                 val updated = transform(current).copy(lastSaveTimestamp = System.currentTimeMillis())
+                val storedUpdated = if (globalPreferences.isMigrationCompleted()) updated.copy(settings = GameSettings()) else updated
                 prefs[bKey] = currentJson
-                prefs[sKey] = json.encodeToString(updated)
+                prefs[sKey] = json.encodeToString(storedUpdated)
                 updatedState = updated
             }
             updatedState
