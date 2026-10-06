@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -200,8 +202,9 @@ fun NavGraph(
             }
         }
     ) { padding ->
-        NavHost(
-            navController = navController,
+        Box(Modifier.fillMaxSize().padding(padding)) {
+            NavHost(
+                navController = navController,
             startDestination = Screen.Play.route,
             modifier = Modifier.padding(padding),
             enterTransition = { fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { 100 }) },
@@ -335,14 +338,17 @@ fun NavGraph(
                     onBack = { navController.popBackStack() }
                 )
             }
+            }
+            if (tutorialActive) {
+                Box(Modifier.fillMaxSize(), contentAlignment = if (tutorialStep == 0 || tutorialStep == 3) androidx.compose.ui.Alignment.TopCenter else androidx.compose.ui.Alignment.BottomCenter) {
+                    GuidedTutorialOverlay(
+                        step = tutorialStep,
+                        title = locale.getString("guided_tutorial_title_" + tutorialStep, "Guided Tutorial"),
+                        instruction = locale.getString("guided_tutorial_instruction_" + tutorialStep, "Follow the highlighted action to continue."),
+                        stepLabel = locale.getString("guided_tutorial_step", "Step %d of 4 • Action required", tutorialStep + 1)
+                    )
+                }
+            }
         }
-    }
-    if (tutorialActive) {
-        GuidedTutorialOverlay(
-            step = tutorialStep,
-            title = locale.getString("guided_tutorial_title_" + tutorialStep, "Guided Tutorial"),
-            instruction = locale.getString("guided_tutorial_instruction_" + tutorialStep, "Follow the highlighted action to continue."),
-            stepLabel = locale.getString("guided_tutorial_step", "Step %d of 4 • Action required", tutorialStep + 1)
-        )
     }
 }
