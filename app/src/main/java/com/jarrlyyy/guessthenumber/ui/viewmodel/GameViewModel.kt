@@ -781,7 +781,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateBackgroundMusicPath(path: String?) {
-        _gameState.update { it.copy(settings = it.settings.copy(backgroundMusicPath = path)) }
+        val updatedSettings = _gameState.value.settings.copy(backgroundMusicPath = path)
+        _gameState.update { it.copy(settings = updatedSettings) }
+        viewModelScope.launch(Dispatchers.IO) { saveManager.saveAppPreferences(updatedSettings) }
         saveGameAsync()
         backgroundMusicManager.setSourceAndPlay(path)
         GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "BG_MUSIC", "Updated background music path: $path")
