@@ -8,7 +8,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.BuildConfig
@@ -21,7 +20,6 @@ fun AboutScreen(
     viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel,
     onBack: () -> Unit
 ) {
-    val context = LocalContext.current
     val versionName = BuildConfig.VERSION_NAME
     val versionCode = BuildConfig.VERSION_CODE
     val locale = viewModel.localeManager
@@ -41,7 +39,10 @@ fun AboutScreen(
                 title = { Text(locale.getString("about_title", "About & Open Source Licenses")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = locale.getString("back", "Back")
+                        )
                     }
                 }
             )
@@ -57,25 +58,73 @@ fun AboutScreen(
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(locale.getString("about_header", "Gamified Guess the Number Simulator"), fontSize = 20.sp, style = MaterialTheme.typography.titleLarge)
+                        Text(
+                            locale.getString(
+                                "about_header",
+                                "Gamified Guess the Number Simulator"
+                            ),
+                            fontSize = 20.sp,
+                            style = MaterialTheme.typography.titleLarge
+                        )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(locale.getString("about_version_format", versionName, versionCode), fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            locale.getString(
+                                "about_version_format",
+                                "Version: %s (%d)",
+                                versionName,
+                                versionCode
+                            ),
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(locale.getString("about_description", "A polished Android incremental game combining classic guessing mechanics with deep prestige/ultra progression, anti-cheat protection, offline progression! Made with love by @jarrlyyy!"))
+                        Text(
+                            locale.getString(
+                                "about_description",
+                                "A polished Android incremental game combining classic guessing mechanics with deep prestige/ultra progression, anti-cheat protection, offline progression! Made with love by @jarrlyyy!"
+                            )
+                        )
                     }
                 }
             }
 
             item {
-                Text(locale.getString("about_licenses_title", "Open Source Licenses (Android Standards)"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    locale.getString(
+                        "about_licenses_title",
+                        "Open Source Licenses (Android Standards)"
+                    ),
+                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
             items(libraries) { lib ->
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text(lib.name, fontSize = 16.sp, style = MaterialTheme.typography.titleSmall)
-                        Text(locale.getString("about_library_author_format", lib.author), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(locale.getString("about_library_license_format", lib.license), fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            lib.name,
+                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Text(
+                            locale.getString(
+                                "about_library_author_format",
+                                "Author: %s",
+                                lib.author
+                            ),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            locale.getString(
+                                "about_library_license_format",
+                                "License: %s",
+                                lib.license
+                            ),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
