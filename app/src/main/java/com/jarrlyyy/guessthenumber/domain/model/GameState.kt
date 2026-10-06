@@ -76,7 +76,12 @@ data class GameSettings(
     val volume: Float = 1.0f,
     val reduceFlashes: Boolean = false,
     val saveLogsToStorage: Boolean = false,
-    val backgroundMusicPath: String? = null
+    val backgroundMusicPath: String? = null,
+    val themePreset: String = "Neon",
+    val customPrimaryColor: String = "#7C4DFF",
+    val customSecondaryColor: String = "#00BCD4",
+    val customTertiaryColor: String = "#00C853",
+    val moreScreenOrder: List<String> = emptyList()
 )
 
 @Serializable
