@@ -239,7 +239,7 @@ fun MoreScreen(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("Latest Systems", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                 Text(
-                    "v1.10–v1.12.1 features",
+                    "v1.10–v1.13.0 features",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
