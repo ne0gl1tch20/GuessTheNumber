@@ -32,6 +32,11 @@ class GlobalPreferencesManager(private val context: Context) {
         context.appPreferencesDataStore.edit { it[migrationKey] = "true" }
     }
 
+    suspend fun markTutorialCompleted() {
+        val settings = getSettings()
+        saveSettings(settings.copy(tutorialCompleted = true))
+    }
+
     suspend fun clear() {
         context.appPreferencesDataStore.edit { it.clear() }
     }
