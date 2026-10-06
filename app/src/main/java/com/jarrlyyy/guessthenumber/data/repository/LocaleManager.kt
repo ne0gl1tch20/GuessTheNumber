@@ -23,15 +23,27 @@ class LocaleManager(private val context: Context) {
         withContext(Dispatchers.IO) {
             val requestedTag = supportedLocales.firstOrNull { it.fileName == localeFileName }?.tag ?: "en-US"
             val locale = Locale.forLanguageTag(requestedTag)
+
             try {
+                // Always establish the requested locale first. Formatting and RTL detection
+                // must not depend on whether an optional overlay asset can be read.
                 val fallback = readJson(ENGLISH_FILE)
-                val overlay = if (localeFileName == ENGLISH_FILE) JSONObject() else readJson(localeFileName)
                 val merged = JSONObject(fallback.toString())
-                val keys = overlay.keys()
-                while (keys.hasNext()) {
-                    val key = keys.next()
-                    merged.put(key, overlay.get(key))
+
+                if (localeFileName != ENGLISH_FILE) {
+                    try {
+                        val overlay = readJson(localeFileName)
+                        val keys = overlay.keys()
+                        while (keys.hasNext()) {
+                            val key = keys.next()
+                            merged.put(key, overlay.get(key))
+                        }
+                    } catch (overlayError: Exception) {
+                        // Keep the complete English fallback while retaining the requested locale.
+                        overlayError.printStackTrace()
+                    }
                 }
+
                 translations = merged
                 currentLocale = locale
             } catch (e: Exception) {
