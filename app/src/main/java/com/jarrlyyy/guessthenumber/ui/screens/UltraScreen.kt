@@ -30,6 +30,7 @@ fun UltraScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val locale = remember(state.settings.locale) { JsonConfigRepository(context, state.settings.locale).localeManager }
     val gameEngine = GameEngine()
     val requiredMoney = gameEngine.calculateUltraRequirement(state.ultraCount)
     val ultraReward = gameEngine.calculateUltraReward(state.money, state.ultraCount)
