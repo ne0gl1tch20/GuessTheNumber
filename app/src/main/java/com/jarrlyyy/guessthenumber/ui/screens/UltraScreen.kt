@@ -41,10 +41,10 @@ fun UltraScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ultra Hub & Upgrades") },
+                title = { Text(locale.getString("ultra_hub_title", "Ultra Hub & Upgrades")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 }
             )
@@ -97,7 +97,7 @@ fun UltraScreen(
                         OutlinedButton(onClick = { expanded = true }, shape = MaterialTheme.shapes.medium, contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
                             Text("${state.buyMultiplier}x", style = MaterialTheme.typography.labelLarge)
                             Spacer(Modifier.width(8.dp))
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = locale.getString("dropdown", "Dropdown"))
                         }
                         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                             multipliers.forEach { mult ->
