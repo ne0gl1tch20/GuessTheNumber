@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Repository-wide localization surface audit.
+"""Deep repository-wide localization surface audit.
 
-This intentionally reports candidates rather than blindly failing on every string:
-machine-readable IDs, schema keys, logs, tests, and developer internals are valid
-hardcoded values. User-facing Compose literals are the high-confidence targets.
+Reports user-facing literals that can remain hidden in older Compose/XML screens.
+It is intentionally informational until the de-hardcoding pass is complete.
 """
 from __future__ import annotations
 import re
@@ -12,30 +11,61 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 KOTLIN_ROOT = ROOT / "app" / "src" / "main" / "java"
-PATTERNS = [
-    re.compile(r'\bText\s*\(\s*"([^"\\]{2,})"'),
-    re.compile(r'\bcontentDescription\s*=\s*"([^"\\]{2,})"'),
-    re.compile(r'\bToast\.makeText\s*\([^,]+,\s*"([^"\\]{2,})"'),
-    re.compile(r'\bSnackbarHostState.*?showSnackbar\s*\(\s*"([^"\\]{2,})"'),
-]
-IGNORE = ("http://", "https://", "file://", "TAG", "UTF-8")
+XML_ROOT = ROOT / "app" / "src" / "main" / "res"
 
-def main() -> int:
+PATTERNS = [
+    ("Compose Text", re.compile(r'\bText\s*\(\s*(?:text\s*=\s*)?"([^"\\]{2,})"')),
+    ("Compose Text template", re.compile(r'\bText\s*\(\s*(?:text\s*=\s*)?"([^"]*\$\{[^}]+\}[^"]*)"')),
+    ("Icon/content description", re.compile(r'\bcontentDescription\s*=\s*"([^"\\]{2,})"')),
+    ("Toast", re.compile(r'\b(?:android\.widget\.)?Toast\.makeText\s*\([^,]+,\s*"([^"\\]{2,})"')),
+    ("Snackbar", re.compile(r'\bshowSnackbar\s*\(\s*"([^"\\]{2,})"')),
+    ("Dialog title", re.compile(r'\btitle\s*=\s*"([^"\\]{2,})"')),
+    ("Label", re.compile(r'\blabel\s*=\s*"([^"\\]{2,})"')),
+]
+
+IGNORE_PREFIXES = ("http://", "https://", "file://", "TAG", "UTF-8", "/help", "/reset", "BUY_")
+SKIP_PATH_PARTS = ("/data/", "/domain/", "/test/", "/androidTest/")
+
+def probable_user_text(value: str) -> bool:
+    value = value.strip()
+    if len(value) < 2 or value.startswith(IGNORE_PREFIXES):
+        return False
+    if re.fullmatch(r"[A-Za-z0-9_./:-]+", value) and (
+        "_" in value or "/" in value or value.startswith(("http", "file"))
+    ):
+        return False
+    return any(ch.isalpha() for ch in value)
+
+def scan_kotlin():
     findings = []
     for path in KOTLIN_ROOT.rglob("*.kt"):
         rel = str(path.relative_to(ROOT)).replace("\\", "/")
+        if any(part in rel for part in SKIP_PATH_PARTS):
+            continue
         for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            for pattern in PATTERNS:
+            for kind, pattern in PATTERNS:
                 for match in pattern.finditer(line):
                     value = match.group(1).strip()
-                    if value and not value.startswith(IGNORE):
-                        findings.append(f"{rel}:{line_no}: {value}")
-    print(f"Localization surface audit: {len(findings)} high-confidence candidate(s).")
-    for finding in findings:
-        print(f"  - {finding}")
-    # This audit is informational while the repository-wide de-hardcoding pass is
-    # still being completed. The dedicated hardcoded-string validator remains the
-    # enforcement gate once all candidates have been migrated.
+                    if probable_user_text(value):
+                        findings.append((rel, line_no, kind, value))
+    return findings
+
+def scan_xml():
+    findings = []
+    for path in XML_ROOT.rglob("*.xml"):
+        rel = str(path.relative_to(ROOT)).replace("\\", "/")
+        for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            for attr in ("text", "contentDescription", "hint", "label"):
+                match = re.search(rf'\b{attr}\s*=\s*"([^"]+)"', line)
+                if match and probable_user_text(match.group(1)):
+                    findings.append((rel, line_no, f"XML {attr}", match.group(1).strip()))
+    return findings
+
+def main() -> int:
+    findings = scan_kotlin() + scan_xml()
+    print(f"Localization surface audit: {len(findings)} candidate(s).")
+    for rel, line_no, kind, value in findings:
+        print(f"  - {rel}:{line_no}: [{kind}] {value}")
     return 0
 
 if __name__ == "__main__":
