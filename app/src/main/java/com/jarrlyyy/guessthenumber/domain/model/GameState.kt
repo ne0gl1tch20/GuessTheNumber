@@ -81,7 +81,8 @@ data class GameSettings(
     val customPrimaryColor: String = "#7C4DFF",
     val customSecondaryColor: String = "#00BCD4",
     val customTertiaryColor: String = "#00C853",
-    val moreScreenOrder: List<String> = emptyList()
+    val moreScreenOrder: List<String> = emptyList(),
+    val tutorialCompleted: Boolean = false
 )
 
 @Serializable
