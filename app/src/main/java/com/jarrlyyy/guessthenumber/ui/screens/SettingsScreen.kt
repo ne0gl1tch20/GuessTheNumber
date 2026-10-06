@@ -1,9 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import android.Manifest
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,7 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
@@ -26,15 +22,11 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 @Composable
 fun SettingsScreen(
     state: GameState,
-    onExportSave: ((String) -> Unit) -> Unit,
-    onImportSave: (String, (Boolean) -> Unit) -> Unit,
     onResetData: () -> Unit,
     onUpdateSettings: (GameSettings) -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    var importString by remember { mutableStateOf("") }
-    var showImportDialog by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
     var confirmResetCheck by remember { mutableStateOf(false) }
 
@@ -323,31 +315,6 @@ fun SettingsScreen(
             item {
                 Button(
                     onClick = {
-                        onExportSave { json ->
-                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText("GuessTheNumberSave", json)
-                            clipboard.setPrimaryClip(clip)
-                            Toast.makeText(context, "Encrypted save copied to clipboard!", Toast.LENGTH_SHORT).show()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Export Encrypted Save to Clipboard")
-                }
-            }
-
-            item {
-                Button(
-                    onClick = { showImportDialog = true },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Import Encrypted Save from String")
-                }
-            }
-
-            item {
-                Button(
-                    onClick = {
                         confirmResetCheck = false
                         showResetDialog = true
                     },
@@ -358,40 +325,6 @@ fun SettingsScreen(
                 }
             }
         }
-    }
-
-    if (showImportDialog) {
-        AlertDialog(
-            onDismissRequest = { showImportDialog = false },
-            title = { Text("Import Save Data") },
-            text = {
-                OutlinedTextField(
-                    value = importString,
-                    onValueChange = { importString = it },
-                    label = { Text("Paste encrypted save string here") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    onImportSave(importString) { success ->
-                        if (success) {
-                            Toast.makeText(context, "Save imported successfully!", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, "Invalid save string!", Toast.LENGTH_SHORT).show()
-                        }
-                        showImportDialog = false
-                    }
-                }) {
-                    Text("Import")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showImportDialog = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
     }
 
     if (showResetDialog) {
