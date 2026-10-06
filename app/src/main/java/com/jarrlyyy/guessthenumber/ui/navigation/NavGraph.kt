@@ -224,7 +224,7 @@ fun NavGraph(
                 StatsScreen(state = state, onBack = { navController.popBackStack() })
             }
             composable(Screen.Settings.route) {
-                SettingsScreen(state = state, onExportSave = onExportSave, onImportSave = onImportSave, onResetData = onResetData, onUpdateSettings = onUpdateSettings, onBack = { navController.popBackStack() })
+                SettingsScreen(state = state, onResetData = onResetData, onUpdateSettings = onUpdateSettings, onBack = { navController.popBackStack() })
             }
             composable(Screen.About.route) {
                 AboutScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
