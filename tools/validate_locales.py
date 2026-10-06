@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
-"""Validate Guess The Number locale JSON files.
-
-The English (US) locale is the canonical key set. Every other locale must:
-- contain every canonical key
-- avoid keys that do not exist in the canonical locale
-- use the same printf-style placeholder signature for shared keys
-"""
-
+"""Validate the repository's JSON locale overlays and formatting contracts."""
 from __future__ import annotations
-
 import json
 import re
 import sys
@@ -17,82 +9,69 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LOCALES_DIR = ROOT / "app" / "src" / "main" / "assets" / "locales"
 BASELINE = "en_us.json"
-
-# Covers the formats used by LocaleManager/String.format:
-# %s, %d, %f, %.2f, %1$s, %02d, etc.
+EXPECTED = {
+    "en_us.json": "en-US", "en_gb.json": "en-GB", "fil_ph.json": "fil-PH",
+    "zh_cn.json": "zh-CN", "zh_tw.json": "zh-TW", "ja.json": "ja-JP",
+    "ko.json": "ko-KR", "es.json": "es-ES", "fr.json": "fr-FR",
+    "de.json": "de-DE", "it.json": "it-IT", "pt_pt.json": "pt-PT",
+    "pt_br.json": "pt-BR", "ru.json": "ru-RU", "hi_in.json": "hi-IN",
+    "id.json": "id-ID", "th.json": "th-TH", "vi.json": "vi-VN",
+    "tr.json": "tr-TR", "pl.json": "pl-PL", "uk.json": "uk-UA",
+    "nl.json": "nl-NL", "ar.json": "ar-SA",
+}
 PLACEHOLDER_RE = re.compile(r"%(?!%)(?:(?:\d+)\$)?[-+#0(]*\d*(?:\.\d+)?[a-zA-Z]")
 
-
-def load_locale(path: Path) -> dict[str, object]:
-    try:
-        with path.open("r", encoding="utf-8") as handle:
-            value = json.load(handle)
-    except json.JSONDecodeError as exc:
-        raise ValueError(f"{path.name}: invalid JSON at line {exc.lineno}, column {exc.colno}: {exc.msg}") from exc
-
+def load(path: Path) -> dict:
+    with path.open("r", encoding="utf-8") as handle:
+        value = json.load(handle)
     if not isinstance(value, dict):
-        raise ValueError(f"{path.name}: locale root must be a JSON object")
-
+        raise ValueError(f"{path.name}: locale root must be an object")
     return value
 
-
 def placeholders(value: object) -> list[str]:
-    if not isinstance(value, str):
-        return []
-    return PLACEHOLDER_RE.findall(value)
-
+    return PLACEHOLDER_RE.findall(value) if isinstance(value, str) else []
 
 def main() -> int:
-    if not LOCALES_DIR.is_dir():
-        print(f"ERROR: Locale directory not found: {LOCALES_DIR}")
-        return 1
-
-    files = sorted(LOCALES_DIR.glob("*.json"))
-    if not files:
-        print(f"ERROR: No locale JSON files found in {LOCALES_DIR}")
-        return 1
-
+    errors: list[str] = []
     baseline_path = LOCALES_DIR / BASELINE
     if not baseline_path.exists():
-        print(f"ERROR: Baseline locale not found: {baseline_path}")
+        print("ERROR: missing en_us.json")
         return 1
-
-    errors: list[str] = []
-
-    locales: dict[str, dict[str, object]] = {}
-    for path in files:
-        try:
-            locales[path.name] = load_locale(path)
-        except ValueError as exc:
-            errors.append(str(exc))
-
-    if BASELINE not in locales:
+    try:
+        baseline = load(baseline_path)
+    except Exception as exc:
+        print(f"ERROR: invalid baseline: {exc}")
         return 1
-
-    baseline = locales[BASELINE]
     baseline_keys = set(baseline)
 
-    for filename, locale in locales.items():
-        if filename == BASELINE:
+    for filename, tag in EXPECTED.items():
+        path = LOCALES_DIR / filename
+        if not path.exists():
+            errors.append(f"missing locale file: {filename}")
+            continue
+        try:
+            data = load(path)
+        except Exception as exc:
+            errors.append(f"{filename}: invalid JSON: {exc}")
             continue
 
-        keys = set(locale)
-        missing = sorted(baseline_keys - keys)
-        extra = sorted(keys - baseline_keys)
+        if data.get("locale_tag") != tag:
+            errors.append(f"{filename}: locale_tag must be {tag!r}")
+        if not data.get("locale_language"):
+            errors.append(f"{filename}: missing locale_language")
+        if not data.get("locale_code"):
+            errors.append(f"{filename}: missing locale_code")
 
-        if missing:
-            errors.append(f"{filename}: missing {len(missing)} key(s): {', '.join(missing)}")
-        if extra:
-            errors.append(f"{filename}: extra {len(extra)} key(s): {', '.join(extra)}")
-
-        for key in sorted(baseline_keys & keys):
+        for key in data:
+            if key not in baseline_keys:
+                # Metadata is allowed to differ from the canonical translation set.
+                if key not in {"locale_language", "locale_code", "locale_tag", "rtl"}:
+                    errors.append(f"{filename}: unknown translation key {key!r}")
+        for key in set(data) & baseline_keys:
             expected = placeholders(baseline[key])
-            actual = placeholders(locale[key])
+            actual = placeholders(data[key])
             if expected != actual:
-                errors.append(
-                    f"{filename}: placeholder mismatch for '{key}': "
-                    f"expected {expected or 'none'}, got {actual or 'none'}"
-                )
+                errors.append(f"{filename}: placeholder mismatch for {key!r}: expected {expected}, got {actual}")
 
     if errors:
         print("Localization validation FAILED:")
@@ -100,9 +79,9 @@ def main() -> int:
             print(f"  - {error}")
         return 1
 
-    print(f"Localization validation PASSED: {len(files)} locale(s), {len(baseline_keys)} key(s).")
+    print(f"Localization validation PASSED: {len(EXPECTED)} locale overlays + canonical locale.")
+    print(f"Canonical translation keys: {len(baseline_keys)}")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())
