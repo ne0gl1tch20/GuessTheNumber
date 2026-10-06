@@ -1,10 +1,10 @@
-# Project Memory: Gamified Guess the Number Simulator (v1.12 Update)
+# Project Memory: Gamified Guess the Number Simulator (v1.12.1 Update)
 
 ## Project Overview
 
 **Current player-facing pitch:** Start with a simple number guess, then build a run around upgrades, Frenzy streaks, random events, achievement tiers, cosmetics, stackable mutators, and custom challenges. v1.12 is intended to feel like a game you can keep poking at because every run can be pushed, optimized, or made weird in a different way. 🎮✨
 
-A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.12`.
+A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.12.1`.
 
 ## Strict Project Rules: Localization & Open-Source Licenses
 - **EVERYTHING USER-VISIBLE MUST BE LOCALIZED**: Zero hardcoded user-visible strings (screen titles, buttons, dialogs, toasts, accessibility descriptions, achievements, upgrades, shop items, settings, dynamic text formatting with `%s`/`%d`) in Kotlin/Compose UI. All strings must reside in `assets/locales/en_us.json` and be fetched via `LocaleManager`.
@@ -41,6 +41,20 @@ A fully polished, feature-complete Android incremental game combining classic gu
 13. **High-Stakes "Lucky Guess" Staking**: High-stakes 50/50 staking mode (`StakingScreen`) with streak multiplier bonuses.
 10. **Save Export/Import & Cloud Backup UI**: Dedicated Cloud Backup and encrypted save transfer UI (`CloudBackupScreen`).
 11. **GitHub Actions APK Build Pipeline (`.github/workflows/build-apks.yml`)**: Manual APK build workflow running on `ubuntu-latest` through `workflow_dispatch` only that sets up JDK 17, sets up Gradle with caching, executes `./gradlew assembleDebug` and `./gradlew assembleRelease` (producing unsigned release APK), and uploads both APK variants (`GuessTheNumber-debug` and `GuessTheNumber-release`) as GitHub Actions artifacts.
+
+## v1.12.1 Combined Implementation
+
+- App version is now `versionCode 12` / `versionName 1.12.1`.
+- Save Slots is the first-launch destination when no valid save exists; encrypted Import/Export is placed directly on the Save Slots screen.
+- Encrypted export now creates one backup bundle containing global App Preferences, all 10 save slots, and slot backups. Import restores the complete bundle.
+- App settings are stored in a dedicated global App Preferences DataStore rather than individual save slots.
+- Existing per-save settings are detected for migration and shown in a one-time confirmation/loading popup before being moved to global preferences.
+- New save creation supports name, icon, and persistent per-save difficulty.
+- New saves use an interactive action-driven tutorial.
+- Theme settings now include presets, custom RGB color picking, and global custom primary/secondary/tertiary colors.
+- More screen shortcut order is globally persisted and can be changed with long-press drag-and-drop.
+- Developer JSON editing is split into global App Preferences and Save Slots with a Save 1–10 selector.
+- CI remains manual-only; no automatic build was started as part of this implementation.
 
 ## v1.12 Phase 13–14
 - **Phase 13 — Shop Categories & Cosmetics**: Added category and cosmetic metadata to ShopItemDef, categorized the Nebula Shop into All / Automation / Boosts / Cosmetics, and added three localized cosmetics (cosmetic_nebula_ring, cosmetic_starfield, cosmetic_pixel_glow).
