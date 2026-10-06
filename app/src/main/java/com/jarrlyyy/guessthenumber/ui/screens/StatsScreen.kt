@@ -40,7 +40,7 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                 title = { Text("Advanced Statistics", style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -190,7 +190,7 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
             item {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Session & Arcade",
+                    text = locale.getString("stats_session_arcade", "Session & Arcade"),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
