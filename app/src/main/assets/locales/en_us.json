@@ -413,8 +413,8 @@
   "time_travel_title": "⏳ Time Travel Detected!",
   "time_travel_text": "It seems like the time has changed since the last time you played (device clock is %d seconds behind last save). As a consequence, auto-clicker and passive generation have been temporarily paused for 24 hours.",
   "understood": "Understood",
-  "changelog_popup_title": "🚀 What's New in v1.10!",
-  "changelog_popup_text": "A new version of Guess The Number is installed! Check out the changelog for details on Internationalization, Localization, and updates.",
+  "changelog_popup_title": "🚀 What's New in v1.12.1!",
+  "changelog_popup_text": "Guess The Number v1.12.1 is installed! Check out the changelog for the latest features, polish, and fixes.",
   "view_changelog": "View Changelog",
   "dismiss": "Dismiss",
   "welcome_back_title": "🌙 Welcome Back!",
@@ -581,5 +581,16 @@
   "builder_kind_streak": "Streak",
   "builder_kind_guesses": "Guesses",
   "builder_kind_money": "Money",
-  "blind_feedback": "Feedback hidden by Blindfolded Oracle."
+  "blind_feedback": "Feedback hidden by Blindfolded Oracle.",
+  "settings_migration_title": "Settings Update",
+  "settings_migration_text": "Your existing app settings will be moved from the save data into global App Preferences. Your game progress will stay unchanged.",
+  "settings_migration_loading": "Migrating your app settings...",
+  "ok": "OK",
+  "save_export_button": "Export Encrypted Backup",
+  "save_import_button": "Import Encrypted Backup",
+  "save_import_title": "Import Complete Backup",
+  "save_import_hint": "Paste encrypted backup string here",
+  "save_export_success": "Complete encrypted backup copied to clipboard!",
+  "save_import_success": "Complete backup restored!",
+  "save_import_invalid": "Invalid encrypted backup!"
 }
