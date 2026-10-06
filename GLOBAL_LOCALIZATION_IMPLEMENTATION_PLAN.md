@@ -86,6 +86,103 @@ Declare the supported locales for Android per-app language settings and keep the
 
 Verify Arabic RTL behavior and test Chinese, Japanese, and Korean for text expansion, wrapping, navigation, dialogs, cards, accessibility, and adaptive layouts.
 
+## Notifications + widget engagement upgrade
+
+Upgrade notifications and the Glance/widget system so they surface meaningful game state and give the player a natural reason to return, without relying on notification spam or fake urgency.
+
+### Notification system
+
+- Add a context-aware notification engine driven by the active save and real game state.
+- Support daily guess challenges, meaningful progress reminders, upgrade proximity, Prestige/Ultra/Nebula milestones, Arcade score/streak events, achievements, and seasonal/live-ops events where applicable.
+- Prefer event-driven notifications over generic "come back" messages.
+- Add notification deduplication, cooldowns, per-category limits, and stale-event prevention.
+- Respect notification permission state, Android notification-channel behavior, quiet hours, and user-configured preferences.
+- Deep-link every actionable notification to the correct screen/save slot.
+- Keep notification content fully localized and use locale-aware numbers, dates, times, durations, and game-number formatting.
+- Ensure switching save slots, importing/exporting saves, migrating saves, deleting saves, and resetting progress cannot leave stale notification jobs behind.
+
+### Widget system
+
+- Upgrade the widget into a live mini game dashboard rather than a static shortcut.
+- Small widget: current Money/progression plus a primary Play action.
+- Medium widget: next-upgrade progress, current streak/best, progression state, and quick actions.
+- Large widget: progression dashboard with upgrade progress, Arcade best, milestone state, and useful quick actions.
+- Make widget content adapt to the player's current progression and recent events.
+- Provide meaningful empty/no-save/import states.
+- Refresh widgets after gameplay, upgrades, Prestige/Ultra/Nebula changes, save import/export, migration, save switching, settings changes, and relevant live-ops updates.
+- Keep widget actions resilient when the referenced save slot no longer exists.
+- Support localization, RTL, CJK text, accessibility labels, responsive sizing, and stale-data recovery.
+
+### Notification + widget integration
+
+- Use the same source-of-truth game state so notifications and widgets never disagree about progression.
+- Example loop: widget shows upgrade progress → meaningful progress notification → notification opens the relevant screen → game action updates the widget.
+- Do not manufacture progress, rewards, urgency, or activity solely to drive re-engagement.
+- Keep a user-controllable notification settings surface with categories such as progress, milestones, Arcade, streaks, challenges, and live ops.
+
+### Notification/widget automated test matrix
+
+Add extensive automated coverage for:
+
+- notification scheduling and cancellation
+- duplicate notification prevention
+- notification cooldowns
+- per-category notification limits
+- stale notification prevention
+- notification permission denied/granted states
+- Android notification channels and channel settings
+- notification deep links
+- deep links to the correct save slot
+- save-slot switching while notifications are scheduled
+- deleted save slots with pending notifications
+- save migration with pending notifications
+- save import replacing existing state
+- save export/import round trips with notification state
+- corrupted or missing save data
+- app reinstall/first-launch notification state
+- Android reboot/reschedule behavior
+- timezone changes
+- locale changes
+- 12/24-hour formatting
+- date/time formatting
+- locale-aware large-number formatting
+- notification placeholder integrity
+- every notification category's localized title/body
+- notification rate-limit behavior
+- quiet-hours behavior
+- user-disabled notification categories
+- widget rendering with no save
+- widget rendering with an active save
+- widget rendering after save switching
+- widget rendering after save deletion
+- widget rendering after migration
+- widget rendering after import/export
+- widget rendering after gameplay changes
+- widget rendering after upgrades
+- widget rendering after Prestige/Ultra/Nebula changes
+- widget rendering after Arcade score/streak changes
+- widget rendering after settings changes
+- widget refresh/recomposition behavior
+- stale widget data detection and recovery
+- widget action routing
+- widget action routing when the target save is missing
+- widget action routing from each supported size
+- small/medium/large widget content contracts
+- widget accessibility content descriptions
+- RTL widget layouts
+- Chinese/Japanese/Korean text wrapping
+- long translated strings and text expansion
+- Arabic RTL notification/widget content
+- missing locale fallback to English
+- notification/widget consistency against the canonical game state
+- notification/widget behavior after app process death
+- worker retry/idempotency behavior
+- WorkManager constraint handling
+- duplicate worker prevention
+- widget update failure recovery
+- notification failure recovery
+- regression tests for every discovered notification/widget bug
+
 ## Automated tests
 
 CI must remain manual-only through `workflow_dispatch`.
