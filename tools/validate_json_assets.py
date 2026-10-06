@@ -32,6 +32,13 @@ def items(root):
                     if isinstance(item, dict):
                         yield item
 
+def localization_key(prefix: str, item_id: str, suffix: str) -> str:
+    """Build the canonical key without duplicating a prefix already in the asset ID."""
+    normalized_id = str(item_id)
+    if normalized_id.startswith(prefix + "_"):
+        return f"{normalized_id}_{suffix}"
+    return f"{prefix}_{normalized_id}_{suffix}"
+
 def main() -> int:
     errors = []
     json_files = []
@@ -64,7 +71,7 @@ def main() -> int:
                 if not item_id:
                     continue
                 for suffix in ("name", "desc"):
-                    key = f"{prefix}_{item_id}_{suffix}"
+                    key = localization_key(prefix, item_id, suffix)
                     if key not in locale:
                         errors.append(f"{path.relative_to(ROOT)}: missing localization key {key!r}")
         except Exception:
