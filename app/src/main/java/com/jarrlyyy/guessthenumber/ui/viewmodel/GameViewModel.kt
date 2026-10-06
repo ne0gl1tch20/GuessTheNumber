@@ -207,19 +207,21 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun createSlot(slot: Int, difficultyId: String, onResult: (Boolean) -> Unit = {}) {
+    fun createSlot(slot: Int, difficultyId: String, profileName: String = "", profileIconId: String = SaveProfile.DEFAULT_ICON, onResult: (Boolean) -> Unit = {}) {
         if (slot !in 1..MAX_SAVE_SLOTS || !Difficulty.isValid(difficultyId)) {
             onResult(false)
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
             val success = slotOperationMutex.withLock {
-                val created = saveManager.createFreshSlot(slot, difficultyId)
+                val created = saveManager.createFreshSlot(slot, difficultyId, profileName, profileIconId)
                 if (!created) {
                     false
                 } else {
                     val freshState = GameState(
                         difficultyId = difficultyId,
+                        profileName = profileName.trim().take(24),
+                        profileIconId = if (SaveProfile.isValidIcon(profileIconId)) profileIconId else SaveProfile.DEFAULT_ICON,
                         lastSaveTimestamp = System.currentTimeMillis()
                     )
                     _activeSlot.value = slot
