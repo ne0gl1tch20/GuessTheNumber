@@ -101,6 +101,11 @@ class SaveManager(private val context: Context) {
         }
     }
 
+    suspend fun hasAnyValidSave(): Boolean {
+        val prefs = context.saveDataStore.data.first()
+        return (1..MAX_SAVE_SLOTS).any { index -> prefs[getSaveKey(index)]?.let { validateSave(it) } == true }
+    }
+
     suspend fun getSlotMetadata(slot: Int): SaveSlotMetadata {
         val s = slot.coerceIn(1, MAX_SAVE_SLOTS)
         return try {
