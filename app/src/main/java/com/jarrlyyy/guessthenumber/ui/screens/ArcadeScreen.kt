@@ -25,6 +25,7 @@ fun ArcadeScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val locale = remember { JsonConfigRepository(context).localeManager }
     val minigames = remember {
         JsonConfigRepository(context).loadMinigames()
     }
