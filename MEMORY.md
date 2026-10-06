@@ -1,4 +1,4 @@
-# Project Memory: Gamified Guess the Number Simulator (v1.12.1 Update)
+# Project Memory: Gamified Guess the Number Simulator (v1.13.0 Update)
 
 ## Project Overview
 
