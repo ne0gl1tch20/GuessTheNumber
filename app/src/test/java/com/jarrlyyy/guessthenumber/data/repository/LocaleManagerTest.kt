@@ -1,7 +1,7 @@
 package com.jarrlyyy.guessthenumber.data.repository
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
+import org.robolectric.RuntimeEnvironment
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -9,7 +9,7 @@ import org.junit.Test
 import java.math.BigDecimal
 
 class LocaleManagerTest {
-    private val context: Context = ApplicationProvider.getApplicationContext()
+    private val context: Context = RuntimeEnvironment.getApplication()
 
     @Test
     fun supportedLocalesHaveAssetsAndFallbackKeys() = runBlocking {
