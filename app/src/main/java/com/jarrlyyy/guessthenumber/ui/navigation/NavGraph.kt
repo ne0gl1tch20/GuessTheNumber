@@ -64,15 +64,20 @@ fun NavGraph(
     onUpdateMultiplier: (String) -> Unit,
     onClaimLiveOpsEventReward: (String) -> Unit,
     onActivateChallengeBuilder: (Set<String>) -> Unit,
-    viewModel: GameViewModel
+    viewModel: GameViewModel,
+    hasAnySave: Boolean
 ) {
+    val navController = rememberNavController()
+    if (!hasAnySave) {
+        SaveSlotsScreen(viewModel = viewModel, onNavigateBack = {})
+        return
+    }
     if (!state.tutorialCompleted) {
         TutorialScreen(onComplete = onCompleteTutorial)
         return
     }
 
     val locale = viewModel.localeManager
-    val navController = rememberNavController()
     val items = listOf(Screen.Play, Screen.Upgrade, Screen.Shop, Screen.More)
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
