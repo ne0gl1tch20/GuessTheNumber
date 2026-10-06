@@ -1,5 +1,17 @@
 # 🚀 Guess The Number Simulator - Changelog
 
+## v1.13.0 (Material 3 Expressive UI Overhaul)
+
+- 🎨 **Unified Material 3 Expressive Design System**: Centralized expressive shapes, typography, theme roles, and reusable motion primitives across the app.
+- 🌀 **App-Wide Expressive Motion**: Added spring-based screen entrance/exit motion and animated navigation selection states for a consistent Android interaction language.
+- 🧭 **Expressive Navigation**: Bottom navigation icons now animate their selected state while preserving navigation and state restoration.
+- 🎮 **Primary Screen Polish**: Play, Upgrades, Shop, and More now use the shared expressive screen-motion foundation without changing game logic.
+- ♿ **Reduced Motion Support**: The existing reduced-motion setting now disables the new screen and navigation transitions instead of leaving the preference disconnected.
+- 📐 **Adaptive UI Foundation**: Shared Material 3 shapes, typography, and motion primitives provide a consistent base for phone, foldable, tablet, and split-screen layouts.
+- ⚡ **Performance-Oriented Motion**: Animation specs are centralized and reused rather than recreated independently across screens.
+- 🔍 **Guideline Alignment Pass**: Preserved Material components, semantic color roles, custom theme picker, localization, save system, tutorial, and offline architecture.
+- 📱 **Version**: Bumped to versionCode 13 / versionName 1.13.0.
+
 ## v1.12.1 (Global Preferences, Complete Encrypted Backups, Save Creation & Theme Customization)
 
 - 💾 **Save Slots First Launch**: Devices with no valid saves now open the Save Slots screen first, with encrypted Import/Export available above the slot list.
