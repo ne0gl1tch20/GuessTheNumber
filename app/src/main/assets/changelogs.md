@@ -1,5 +1,19 @@
 # 🚀 Guess The Number Simulator - Changelog
 
+## v1.12.1 (Global Preferences, Complete Encrypted Backups, Save Creation & Theme Customization)
+
+- 💾 **Save Slots First Launch**: Devices with no valid saves now open the Save Slots screen first, with encrypted Import/Export available above the slot list.
+- 🔐 **Complete Encrypted Backup**: Export now packages global App Preferences plus all 10 save slots and slot backups into one encrypted string; importing restores the complete package.
+- 🌐 **Global App Preferences**: App settings are stored globally instead of inside individual game saves.
+- 🔄 **Settings Migration**: Existing per-save settings receive a one-time OK confirmation, followed by an in-dialog migration/loading state before global migration completes.
+- 🎮 **New Save Setup**: New saves can choose a name, icon, and permanent per-save difficulty during creation.
+- 🧭 **Interactive Tutorial**: New saves now enter an action-driven tutorial requiring highlighted controls to be pressed before advancing.
+- 🎨 **Theme Customization**: Added theme presets plus custom RGB color picking for primary, secondary, and tertiary colors.
+- ↕️ **More Reordering**: Added long-press drag-and-drop ordering for More screen shortcuts, persisted globally.
+- 🛠️ **Developer JSON Editors**: Split raw preference editing into global App Preferences and Save Slots, with a Save 1–10 selector.
+- 📱 **Version**: Bumped to versionCode 12 / versionName 1.12.1.
+
+
 ## v1.12 (Shop Categories, Cosmetics, Mutator Combinations & Challenge Builder)
 
 **Ready to play? v1.12 gives you more ways to build your run your way.** Customize your shop, unlock cosmetics, stack mutators, and create your own challenges. Then head back to Play and see how far your build can go. 🎮✨
