@@ -186,9 +186,14 @@ def check_ci_contract(errors: list[str]) -> None:
         )
         return
 
-    between = workflow[preflight:setup]
-    step_headers = re.findall(r"^      - name:", between, re.MULTILINE)
-    if len(step_headers) != 1:
+    step_names = re.findall(r"^      - name: (.+)$", workflow, re.MULTILINE)
+    try:
+        preflight_index = step_names.index("Build Preflight")
+        setup_index = step_names.index("Setup Gradle")
+    except ValueError:
+        errors.append("CI workflow is missing a required named step")
+        return
+    if setup_index != preflight_index + 1:
         errors.append(
             "'Build Preflight' is not immediately before 'Setup Gradle' "
             "(another CI step exists between them)"
