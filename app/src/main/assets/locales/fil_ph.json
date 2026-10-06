@@ -410,8 +410,8 @@
   "time_travel_title": "⏳ Natuklasan ang Paglalakbay sa Oras!",
   "time_travel_text": "Mukhang nagbago ang oras mula noong huli kang naglaro (ang orasan ng device ay %d segundo ang huli sa huling save). Dahil dito, pansamantalang naka-pause ang auto-clicker at passive generation sa loob ng 24 oras.",
   "understood": "Naintindihan",
-  "changelog_popup_title": "🚀 Ano ang Bago sa v1.10!",
-  "changelog_popup_text": "Naka-install ang bagong bersyon ng Guess The Number! Tingnan ang changelog para sa mga detalye sa Internationalization, Localization, at mga pagbabago.",
+  "changelog_popup_title": "🚀 Ano ang Bago sa v1.12.1!",
+  "changelog_popup_text": "Naka-install na ang Guess The Number v1.12.1! Tingnan ang changelog para sa mga bagong feature, polish, at fixes.",
   "view_changelog": "Tingnan ang Changelog",
   "dismiss": "I-dismiss",
   "welcome_back_title": "🌙 Maligayang Pagbabalik!",
@@ -581,5 +581,16 @@
   "builder_kind_streak": "Sunud-sunod",
   "builder_kind_guesses": "Mga Hula",
   "builder_kind_money": "Pera",
-  "blind_feedback": "Nakatago ang feedback dahil sa Blindfolded Oracle."
+  "blind_feedback": "Nakatago ang feedback dahil sa Blindfolded Oracle.",
+  "settings_migration_title": "Update ng Settings",
+  "settings_migration_text": "Ililipat ang kasalukuyang app settings mula sa save data papunta sa global App Preferences. Hindi magbabago ang game progress mo.",
+  "settings_migration_loading": "Inililipat ang app settings...",
+  "ok": "OK",
+  "save_export_button": "I-export ang Encrypted Backup",
+  "save_import_button": "I-import ang Encrypted Backup",
+  "save_import_title": "I-import ang Buong Backup",
+  "save_import_hint": "I-paste ang encrypted backup string dito",
+  "save_export_success": "Nakopya ang buong encrypted backup!",
+  "save_import_success": "Na-restore ang buong backup!",
+  "save_import_invalid": "Invalid na encrypted backup!"
 }
