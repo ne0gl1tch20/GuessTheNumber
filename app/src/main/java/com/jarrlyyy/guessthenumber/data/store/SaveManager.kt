@@ -101,6 +101,24 @@ class SaveManager(private val context: Context) {
         }
     }
 
+    suspend fun hasGlobalTutorialCompleted(): Boolean = globalPreferences.getSettings().tutorialCompleted
+
+    suspend fun migrateTutorialCompletionToGlobal(): Boolean {
+        if (globalPreferences.getSettings().tutorialCompleted) return true
+        return try {
+            val prefs = context.saveDataStore.data.first()
+            val completed = (1..MAX_SAVE_SLOTS).any { slot ->
+                prefs[getSaveKey(slot)]?.let { raw ->
+                    runCatching { json.decodeFromString<GameState>(raw).tutorialCompleted }.getOrDefault(false)
+                } == true
+            }
+            if (completed) globalPreferences.markTutorialCompleted()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     suspend fun hasAnyValidSave(): Boolean {
         val prefs = context.saveDataStore.data.first()
         return (1..MAX_SAVE_SLOTS).any { index -> prefs[getSaveKey(index)]?.let { validateSave(it) } == true }
@@ -187,15 +205,15 @@ class SaveManager(private val context: Context) {
             val prefs = context.saveDataStore.data.first()
             val jsonString = prefs[sKey]
             if (jsonString != null && validateSave(jsonString)) {
-                sanitizeLoadedState(json.decodeFromString<GameState>(jsonString)).let { state -> if (globalPreferences.isMigrationCompleted()) state.copy(settings = globalPreferences.getSettings()) else state }
+                sanitizeLoadedState(json.decodeFromString<GameState>(jsonString)).let { state -> state.copy(settings = globalPreferences.getSettings(), tutorialCompleted = globalPreferences.getSettings().tutorialCompleted) }
             } else {
                 val backupString = prefs[bKey]
                 if (backupString != null && validateSave(backupString)) {
                     GameLogger.log(LogLevel.WARN, LoggerCategory.SAVE, "RESTORE_BACKUP", "Restored slot $targetSlot from backup save.")
-                    sanitizeLoadedState(json.decodeFromString<GameState>(backupString)).let { state -> if (globalPreferences.isMigrationCompleted()) state.copy(settings = globalPreferences.getSettings()) else state }
+                    sanitizeLoadedState(json.decodeFromString<GameState>(backupString)).let { state -> state.copy(settings = globalPreferences.getSettings(), tutorialCompleted = globalPreferences.getSettings().tutorialCompleted) }
                 } else {
                     GameLogger.log(LogLevel.INFO, LoggerCategory.SAVE, "NEW_GAME", "Initializing fresh game state for slot $targetSlot.")
-                    GameState(settings = globalPreferences.getSettings())
+                    GameState(settings = globalPreferences.getSettings(), tutorialCompleted = globalPreferences.getSettings().tutorialCompleted)
                 }
             }
         } catch (e: Exception) {
