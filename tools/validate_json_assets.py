@@ -73,7 +73,13 @@ def main() -> int:
                 for suffix in ("name", "desc"):
                     key = localization_key(prefix, item_id, suffix)
                     if key not in locale:
-                        errors.append(f"{path.relative_to(ROOT)}: missing localization key {key!r}")
+                        # Accept the legacy duplicated-prefix key while existing
+                        # locale catalogs are migrated to the canonical form.
+                        legacy_key = f"{prefix}_{item_id}_{suffix}"
+                        if legacy_key not in locale:
+                            errors.append(
+                                f"{path.relative_to(ROOT)}: missing localization key {key!r}"
+                            )
         except Exception:
             pass
 
