@@ -356,13 +356,18 @@ class SaveManager(private val context: Context) {
     suspend fun needsSettingsMigration(): Boolean {
         if (globalPreferences.isMigrationCompleted()) return false
         val prefs = context.saveDataStore.data.first()
-        return (1..MAX_SAVE_SLOTS).any { index ->
+        val needsMigration = (1..MAX_SAVE_SLOTS).any { index ->
             val raw = prefs[getSaveKey(index)]
             !raw.isNullOrEmpty() && runCatching {
                 val state = json.decodeFromString<GameState>(raw)
                 state.settings != GameSettings()
             }.getOrDefault(false)
         }
+        if (!needsMigration) {
+            globalPreferences.saveSettings(globalPreferences.getSettings())
+            globalPreferences.markMigrationCompleted()
+        }
+        return needsMigration
     }
 
     suspend fun migrateSettingsToGlobal(): Boolean {
