@@ -39,6 +39,8 @@ class MainActivity : ComponentActivity() {
             val musicCurrentPosition by viewModel.musicCurrentPosition.collectAsState()
             val musicDuration by viewModel.musicDuration.collectAsState()
             val musicAlbumArt by viewModel.musicAlbumArt.collectAsState()
+            val needsSettingsMigration by viewModel.needsSettingsMigration.collectAsState()
+            val isMigratingSettings by viewModel.isMigratingSettings.collectAsState()
 
             GuessTheNumberTheme(
                 themeMode = state.settings.themeMode,
@@ -106,6 +108,9 @@ class MainActivity : ComponentActivity() {
                         showTimeTravelPopup = showTimeTravelPopup,
                         timeTravelSeconds = timeTravelSeconds,
                         onDismissTimeTravel = { viewModel.dismissTimeTravelPopup() },
+                        needsSettingsMigration = needsSettingsMigration,
+                        isMigratingSettings = isMigratingSettings,
+                        onMigrateSettings = { viewModel.migrateSettingsToGlobal() },
                         onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) },
                         onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) },
                         onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
