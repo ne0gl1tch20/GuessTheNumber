@@ -40,6 +40,9 @@ jobs:
       - name: Audit Hardcoded UI Strings
         run: python3 tools/validate_hardcoded_strings.py
 
+      - name: Fast Kotlin Preflight Check
+        run: python3 tools/preflight_compile_check.py
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
