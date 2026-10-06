@@ -1,13 +1,16 @@
 package com.jarrlyyy.guessthenumber.data.repository
 
 import android.content.Context
-import org.robolectric.RuntimeEnvironment
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import java.math.BigDecimal
 
+@RunWith(RobolectricTestRunner::class)
 class LocaleManagerTest {
     private val context: Context = RuntimeEnvironment.getApplication()
 
