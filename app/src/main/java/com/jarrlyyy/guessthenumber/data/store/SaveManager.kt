@@ -335,8 +335,8 @@ class SaveManager(private val context: Context) {
                         prefs.remove(getSaveKey(index))
                         prefs.remove(getBackupKey(index))
                     }
-                    bundle.slots.forEach { (index, raw) -> if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) prefs[getSaveKey(index)] = raw }
-                    bundle.backups.forEach { (index, raw) -> if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) prefs[getBackupKey(index)] = raw }
+                    bundle.slots.forEach { (index, raw) -> if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) prefs[getSaveKey(index)] = json.encodeToString(json.decodeFromString<GameState>(raw).copy(settings = GameSettings())) }
+                    bundle.backups.forEach { (index, raw) -> if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) prefs[getBackupKey(index)] = json.encodeToString(json.decodeFromString<GameState>(raw).copy(settings = GameSettings())) }
                     prefs[activeSlotKey] = bundle.activeSlot.coerceIn(1, MAX_SAVE_SLOTS)
                 }
                 globalPreferences.saveSettings(importedSettings)
