@@ -70,7 +70,7 @@ fun ReusableColorPickerDialog(
                                         updateFromPosition(it, size.width.toFloat(), size.height.toFloat())
                                     },
                                     onDrag = { change, _ ->
-                                        change.consume()
+                                        change.consumePositionChange()
                                         updateFromPosition(
                                             change.position,
                                             size.width.toFloat(),
