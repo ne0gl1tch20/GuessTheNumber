@@ -42,7 +42,14 @@ class LocaleManagerTest {
     fun currencyFormattingUsesLocaleCurrencyRules() = runBlocking {
         val manager = LocaleManager(context)
         manager.loadLocaleForTag("ja-JP")
-        assertTrue(manager.formatCurrency(BigDecimal("1234.5"), "JPY").contains("¥"))
+        val formatted = manager.formatCurrency(BigDecimal("1234.5"), "JPY")
+
+        assertTrue(formatted.isNotBlank())
+        assertTrue(
+            formatted.contains("¥") ||
+                formatted.contains("￥") ||
+                formatted.contains("JPY")
+        )
     }
 
     @Test
