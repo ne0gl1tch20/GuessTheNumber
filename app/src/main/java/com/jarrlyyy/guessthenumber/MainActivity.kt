@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
             val musicCurrentPosition by viewModel.musicCurrentPosition.collectAsState()
             val musicDuration by viewModel.musicDuration.collectAsState()
             val musicAlbumArt by viewModel.musicAlbumArt.collectAsState()
+            val hasAnySave by viewModel.hasAnySave.collectAsState()
             val needsSettingsMigration by viewModel.needsSettingsMigration.collectAsState()
             val isMigratingSettings by viewModel.isMigratingSettings.collectAsState()
 
@@ -111,6 +112,7 @@ class MainActivity : ComponentActivity() {
                         needsSettingsMigration = needsSettingsMigration,
                         isMigratingSettings = isMigratingSettings,
                         onMigrateSettings = { viewModel.migrateSettingsToGlobal() },
+                        hasAnySave = hasAnySave,
                         onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) },
                         onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) },
                         onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
