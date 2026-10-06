@@ -56,6 +56,14 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - Developer JSON editing is split into global App Preferences and Save Slots with a Save 1–10 selector.
 - CI remains manual-only; no automatic build was started as part of this implementation.
 
+## v1.13.0 Material 3 Expressive UI Overhaul
+- App version is now `versionCode 13` / `versionName 1.13.0`.
+- The approved 15-part Material 3 Expressive UI plan was combined into one implementation pass.
+- Added centralized expressive typography, shapes, spring motion primitives, screen entrance/exit transitions, and animated bottom-navigation selection.
+- Applied shared expressive screen motion to Play, Upgrades, Shop, and More without changing game logic, save behavior, localization, tutorial state, or offline architecture.
+- Connected the existing global Reduced Motion setting to the new screen/navigation animations.
+- CI remains manual-only.
+
 ## v1.12.1 UI/UX Polish Pass
 - Theme Presets were removed from More and consolidated into Settings as a polished dropdown with a Custom option.
 - Custom theme colors now use an HSV-style hue/saturation/brightness workflow plus live preview and hex entry for Primary, Secondary, and Tertiary colors.
