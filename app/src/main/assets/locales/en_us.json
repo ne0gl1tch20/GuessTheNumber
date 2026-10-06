@@ -593,4 +593,14 @@
   "save_export_success": "Complete encrypted backup copied to clipboard!",
   "save_import_success": "Complete backup restored!",
   "save_import_invalid": "Invalid encrypted backup!"
+,
+  "guided_tutorial_step": "Step %d of 4 • Action required",
+  "guided_tutorial_title_0": "🎮 Try your first guess",
+  "guided_tutorial_title_1": "📈 Open Upgrades",
+  "guided_tutorial_title_2": "🧭 Open More",
+  "guided_tutorial_title_3": "⚙️ Open Settings",
+  "guided_tutorial_instruction_0": "This is the real Play screen. Enter a number and press GUESS NUMBER to continue.",
+  "guided_tutorial_instruction_1": "Tap the Upgrades tab in the bottom navigation.",
+  "guided_tutorial_instruction_2": "Tap the More tab to explore the rest of the game.",
+  "guided_tutorial_instruction_3": "Inside More, open Settings. This finishes your guided tour."
 }
