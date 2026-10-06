@@ -40,7 +40,12 @@ class MainActivity : ComponentActivity() {
             val musicDuration by viewModel.musicDuration.collectAsState()
             val musicAlbumArt by viewModel.musicAlbumArt.collectAsState()
 
-            GuessTheNumberTheme(themeMode = state.settings.themeMode) {
+            GuessTheNumberTheme(
+                themeMode = state.settings.themeMode,
+                primaryHex = state.settings.customPrimaryColor,
+                secondaryHex = state.settings.customSecondaryColor,
+                tertiaryHex = state.settings.customTertiaryColor
+            ) {
                 val locale = viewModel.localeManager
                 if (isLoadingSave) {
                     Surface(
