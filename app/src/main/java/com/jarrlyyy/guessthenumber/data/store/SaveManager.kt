@@ -182,12 +182,12 @@ class SaveManager(private val context: Context) {
             val prefs = context.saveDataStore.data.first()
             val jsonString = prefs[sKey]
             if (jsonString != null && validateSave(jsonString)) {
-                sanitizeLoadedState(json.decodeFromString<GameState>(jsonString)).copy(settings = globalPreferences.getSettings())
+                sanitizeLoadedState(json.decodeFromString<GameState>(jsonString)).let { state -> if (globalPreferences.isMigrationCompleted()) state.copy(settings = globalPreferences.getSettings()) else state }
             } else {
                 val backupString = prefs[bKey]
                 if (backupString != null && validateSave(backupString)) {
                     GameLogger.log(LogLevel.WARN, LoggerCategory.SAVE, "RESTORE_BACKUP", "Restored slot $targetSlot from backup save.")
-                    sanitizeLoadedState(json.decodeFromString<GameState>(backupString)).copy(settings = globalPreferences.getSettings())
+                    sanitizeLoadedState(json.decodeFromString<GameState>(backupString)).let { state -> if (globalPreferences.isMigrationCompleted()) state.copy(settings = globalPreferences.getSettings()) else state }
                 } else {
                     GameLogger.log(LogLevel.INFO, LoggerCategory.SAVE, "NEW_GAME", "Initializing fresh game state for slot $targetSlot.")
                     GameState(settings = globalPreferences.getSettings())
@@ -383,6 +383,7 @@ class SaveManager(private val context: Context) {
         } catch (_: Exception) { false }
     }
 
+    suspend fun saveAppPreferences(settings: GameSettings) = globalPreferences.saveSettings(settings)
     suspend fun getAppPreferencesJson(): String = globalPreferences.encode(globalPreferences.getSettings())
     suspend fun applyAppPreferencesJson(raw: String): Boolean {
         val settings = globalPreferences.decode(raw) ?: return false
