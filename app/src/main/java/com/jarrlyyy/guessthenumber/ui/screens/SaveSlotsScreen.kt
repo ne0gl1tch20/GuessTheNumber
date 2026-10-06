@@ -1,6 +1,9 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -49,6 +52,8 @@ fun SaveSlotsScreen(
     var showProfileDialog by remember { mutableStateOf<Int?>(null) }
     var showDuplicateDialog by remember { mutableStateOf<Int?>(null) }
     var showRestoreDialog by remember { mutableStateOf<Int?>(null) }
+    var showImportDialog by remember { mutableStateOf(false) }
+    var importString by remember { mutableStateOf("") }
     var duplicateTarget by remember { mutableStateOf(0) }
     var profileNameDraft by remember { mutableStateOf("") }
     var profileIconDraft by remember { mutableStateOf(SaveProfile.DEFAULT_ICON) }
@@ -57,6 +62,36 @@ fun SaveSlotsScreen(
 
     val refreshMetadata = {
         scope.launch {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            viewModel.exportSave { json ->
+                                val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+                                clipboard?.setPrimaryClip(ClipData.newPlainText("GuessTheNumberSave", json))
+                                android.widget.Toast.makeText(
+                                    context,
+                                    locale.getString("save_export_success", "Encrypted save copied to clipboard!"),
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(locale.getString("save_export_button", "Export Encrypted Save"))
+                    }
+                    OutlinedButton(
+                        onClick = { showImportDialog = true },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(locale.getString("save_import_button", "Import Encrypted Save"))
+                    }
+                }
+            }
+
             for (slot in 1..MAX_SAVE_SLOTS) {
                 slotMetadata[slot - 1] = viewModel.getSlotMetadata(slot)
             }
@@ -225,6 +260,47 @@ fun SaveSlotsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showResetDialog = null }) {
+                    Text(locale.getString("cancel", "Cancel"))
+                }
+            }
+        )
+    }
+
+    if (showImportDialog) {
+        AlertDialog(
+            onDismissRequest = { showImportDialog = false },
+            title = { Text(locale.getString("save_import_title", "Import Save Data")) },
+            text = {
+                OutlinedTextField(
+                    value = importString,
+                    onValueChange = { importString = it },
+                    label = { Text(locale.getString("save_import_hint", "Paste encrypted save string here")) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.importSave(importString) { success ->
+                        android.widget.Toast.makeText(
+                            context,
+                            locale.getString(
+                                if (success) "save_import_success" else "save_import_invalid",
+                                if (success) "Save imported successfully!" else "Invalid save string!"
+                            ),
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                        if (success) {
+                            importString = ""
+                            refreshMetadata()
+                        }
+                        showImportDialog = false
+                    }
+                }) {
+                    Text(locale.getString("import", "Import"))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showImportDialog = false }) {
                     Text(locale.getString("cancel", "Cancel"))
                 }
             }
