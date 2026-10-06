@@ -95,6 +95,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val _hasLegacySave = MutableStateFlow(false)
     val hasLegacySave: StateFlow<Boolean> = _hasLegacySave.asStateFlow()
 
+    private val _hasAnySave = MutableStateFlow(false)
+    val hasAnySave: StateFlow<Boolean> = _hasAnySave.asStateFlow()
+
     private val _needsSettingsMigration = MutableStateFlow(false)
     val needsSettingsMigration: StateFlow<Boolean> = _needsSettingsMigration.asStateFlow()
     private val _isMigratingSettings = MutableStateFlow(false)
@@ -121,6 +124,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else saveManager.getActiveSlot()
             saveManager.setActiveSlot(targetSlot)
             _activeSlot.value = targetSlot
+
+            val anySaveCheck = saveManager.hasAnyValidSave()
+            withContext(Dispatchers.Main) { _hasAnySave.value = anySaveCheck }
 
             val settingsMigrationCheck = saveManager.needsSettingsMigration()
             withContext(Dispatchers.Main) { _needsSettingsMigration.value = settingsMigrationCheck }
@@ -217,6 +223,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                         lastSaveTimestamp = System.currentTimeMillis()
                     )
                     _activeSlot.value = slot
+                    _hasAnySave.value = true
                     _gameState.value = freshState
                     guessingBot.reset(freshState.currentRangeMin, freshState.currentRangeMax)
                     lastIncomeMeasurement = freshState.money
@@ -680,6 +687,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val sanitized = AntiCheatService.sanitizeCurrency(loaded)
                 withContext(Dispatchers.Main) {
                     _gameState.value = sanitized
+                    _hasAnySave.value = true
                     guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
                     lastIncomeMeasurement = sanitized.money
                     _incomePerSecond.value = BigNumber.ZERO
