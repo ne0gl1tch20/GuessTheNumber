@@ -21,6 +21,7 @@ import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.components.ReusableColorPickerDialog
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +37,7 @@ fun SettingsScreen(
     var colorTarget by remember { mutableStateOf<String?>(null) }
 
     val settings = state.settings
-    val locale = remember(settings.locale) { LocaleManager(context).also { manager -> kotlinx.coroutines.runBlocking { manager.loadLocaleForTag(settings.locale) } } }
+    val locale = remember(settings.locale) { JsonConfigRepository(context, settings.locale).localeManager }
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
