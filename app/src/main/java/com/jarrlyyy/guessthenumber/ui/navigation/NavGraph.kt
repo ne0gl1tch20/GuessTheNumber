@@ -338,6 +338,11 @@ fun NavGraph(
         }
     }
     if (tutorialActive) {
-        GuidedTutorialOverlay(step = tutorialStep)
+        GuidedTutorialOverlay(
+            step = tutorialStep,
+            title = locale.getString("guided_tutorial_title_" + tutorialStep, "Guided Tutorial"),
+            instruction = locale.getString("guided_tutorial_instruction_" + tutorialStep, "Follow the highlighted action to continue."),
+            stepLabel = locale.getString("guided_tutorial_step", "Step %d of 4 • Action required", tutorialStep + 1)
+        )
     }
 }
