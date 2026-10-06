@@ -209,29 +209,29 @@ fun NavGraph(
                 navController = navController,
             startDestination = Screen.Play.route,
             modifier = Modifier.padding(padding),
-            enterTransition = { fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { 100 }) },
-            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { -100 }) },
-            popEnterTransition = { fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { -100 }) },
-            popExitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { 100 }) }
+            enterTransition = { if (state.settings.reducedMotion) EnterTransition.None else fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { 100 }) },
+            exitTransition = { if (state.settings.reducedMotion) ExitTransition.None else fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { -100 }) },
+            popEnterTransition = { if (state.settings.reducedMotion) EnterTransition.None else fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { -100 }) },
+            popExitTransition = { if (state.settings.reducedMotion) ExitTransition.None else fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { 100 }) }
         ) {
             composable(Screen.Play.route) {
-                ExpressiveScreen { PlayScreen(state = state, onMakeGuess = { guess ->
+                ExpressiveScreen(enabled = !state.settings.reducedMotion) { PlayScreen(state = state, onMakeGuess = { guess ->
                     onMakeGuess(guess)
                     if (tutorialActive && tutorialStep == 0) tutorialStep = 1
                 }, incomePerSecond = incomePerSecond) }
             }
             composable(Screen.Upgrade.route) {
-                ExpressiveScreen { UpgradeScreen(
+                ExpressiveScreen(enabled = !state.settings.reducedMotion) { UpgradeScreen(
                     state = state,
                     onBuyUpgrade = onBuyUpgrade,
                     onUpdateMultiplier = onUpdateMultiplier
                 ) }
             }
             composable(Screen.Shop.route) {
-                ExpressiveScreen { ShopScreen(state = state, onBuyShopItem = onBuyShopItem, onEquipCosmetic = onEquipCosmetic) }
+                ExpressiveScreen(enabled = !state.settings.reducedMotion) { ShopScreen(state = state, onBuyShopItem = onBuyShopItem, onEquipCosmetic = onEquipCosmetic) }
             }
             composable(Screen.More.route) {
-                ExpressiveScreen { MoreScreen(
+                ExpressiveScreen(enabled = !state.settings.reducedMotion) { MoreScreen(
                     state = state,
                     onNavigate = { route -> navController.navigate(route) },
                     onUpdateBackgroundMusic = onUpdateBackgroundMusic,
