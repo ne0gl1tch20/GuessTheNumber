@@ -199,7 +199,7 @@ fun SaveSlotsScreen(
                     }
                     Text("Difficulty", style = MaterialTheme.typography.labelLarge)
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Difficulty.ALL.forEach { id ->
+                        Difficulty.ids.forEach { id ->
                             FilterChip(
                                 selected = difficultyDraft == id,
                                 onClick = { difficultyDraft = id },
