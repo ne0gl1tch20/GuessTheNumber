@@ -128,6 +128,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             val anySaveCheck = saveManager.hasAnyValidSave()
             withContext(Dispatchers.Main) { _hasAnySave.value = anySaveCheck }
 
+            saveManager.migrateTutorialCompletionToGlobal()
+
             val settingsMigrationCheck = saveManager.needsSettingsMigration()
             withContext(Dispatchers.Main) { _needsSettingsMigration.value = settingsMigrationCheck }
 
@@ -841,7 +843,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun completeTutorial() {
-        _gameState.update { it.copy(tutorialCompleted = true) }
+        _gameState.update { it.copy(tutorialCompleted = true, settings = it.settings.copy(tutorialCompleted = true)) }
+        viewModelScope.launch(Dispatchers.IO) { saveManager.saveAppPreferences(_gameState.value.settings) }
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "TUTORIAL_COMPLETE", "Tutorial completed by user.")
     }
