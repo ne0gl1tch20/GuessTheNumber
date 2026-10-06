@@ -20,6 +20,8 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.screens.*
+import com.jarrlyyy.guessthenumber.ui.components.ExpressiveScreen
+import com.jarrlyyy.guessthenumber.ui.components.expressiveSelection
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 
 
@@ -136,8 +138,8 @@ fun NavGraph(
     } else if (showChangelogPopup) {
         AlertDialog(
             onDismissRequest = onDismissChangelog,
-            title = { Text(locale.getString("changelog_popup_title", "🚀 What's New in v1.12.1!")) },
-            text = { Text(locale.getString("changelog_popup_text", "Guess The Number v1.12.1 is installed! Check out the changelog for the latest features, polish, and fixes.")) },
+            title = { Text(locale.getString("changelog_popup_title", "🚀 What's New in v1.13.0!")) },
+            text = { Text(locale.getString("changelog_popup_text", "Guess The Number v1.13.0 is installed! Check out the changelog for the latest Material 3 Expressive polish and fixes.")) },
             confirmButton = {
                 Button(onClick = {
                     onDismissChangelog()
@@ -181,7 +183,7 @@ fun NavGraph(
                             else -> screen.title
                         }
                         NavigationBarItem(
-                            icon = { Icon(imageVector = screen.icon, contentDescription = labelText) },
+                            icon = { Icon(modifier = Modifier.expressiveSelection(currentRoute == screen.route), imageVector = screen.icon, contentDescription = labelText) },
                             label = { Text(labelText) },
                             selected = currentRoute == screen.route,
                             onClick = {
@@ -213,23 +215,23 @@ fun NavGraph(
             popExitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { 100 }) }
         ) {
             composable(Screen.Play.route) {
-                PlayScreen(state = state, onMakeGuess = { guess ->
+                ExpressiveScreen { PlayScreen(state = state, onMakeGuess = { guess ->
                     onMakeGuess(guess)
                     if (tutorialActive && tutorialStep == 0) tutorialStep = 1
-                }, incomePerSecond = incomePerSecond)
+                }, incomePerSecond = incomePerSecond) }
             }
             composable(Screen.Upgrade.route) {
-                UpgradeScreen(
+                ExpressiveScreen { UpgradeScreen(
                     state = state,
                     onBuyUpgrade = onBuyUpgrade,
                     onUpdateMultiplier = onUpdateMultiplier
-                )
+                ) }
             }
             composable(Screen.Shop.route) {
-                ShopScreen(state = state, onBuyShopItem = onBuyShopItem, onEquipCosmetic = onEquipCosmetic)
+                ExpressiveScreen { ShopScreen(state = state, onBuyShopItem = onBuyShopItem, onEquipCosmetic = onEquipCosmetic) }
             }
             composable(Screen.More.route) {
-                MoreScreen(
+                ExpressiveScreen { MoreScreen(
                     state = state,
                     onNavigate = { route -> navController.navigate(route) },
                     onUpdateBackgroundMusic = onUpdateBackgroundMusic,
@@ -242,7 +244,7 @@ fun NavGraph(
                     onStopMusic = onStopMusic,
                     onSeekMusic = onSeekMusic,
                     onUpdateSettings = onUpdateSettings
-                )
+                ) }
             }
             composable(Screen.Prestige.route) {
                 PrestigeScreen(
