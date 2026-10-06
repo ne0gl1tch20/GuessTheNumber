@@ -18,6 +18,8 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(state: GameState, onBack: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val locale = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale).localeManager }
     val stats = state.statistics
     val totalGuesses = stats.totalGuesses
     val correctGuesses = stats.correctGuesses
