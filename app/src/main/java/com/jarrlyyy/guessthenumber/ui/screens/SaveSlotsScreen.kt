@@ -50,6 +50,7 @@ fun SaveSlotsScreen(
 
     var showResetDialog by remember { mutableStateOf<Int?>(null) }
     var showProfileDialog by remember { mutableStateOf<Int?>(null) }
+    var showCreateDialog by remember { mutableStateOf<Int?>(null) }
     var showDuplicateDialog by remember { mutableStateOf<Int?>(null) }
     var showRestoreDialog by remember { mutableStateOf<Int?>(null) }
     var showImportDialog by remember { mutableStateOf(false) }
@@ -57,6 +58,8 @@ fun SaveSlotsScreen(
     var duplicateTarget by remember { mutableStateOf(0) }
     var profileNameDraft by remember { mutableStateOf("") }
     var profileIconDraft by remember { mutableStateOf(SaveProfile.DEFAULT_ICON) }
+    var createNameDraft by remember { mutableStateOf("") }
+    var createIconDraft by remember { mutableStateOf(SaveProfile.DEFAULT_ICON) }
     val difficultySelections = remember { mutableStateMapOf<Int, String>() }
     val locale = viewModel.localeManager
 
@@ -167,6 +170,55 @@ fun SaveSlotsScreen(
                     Text(locale.getString("cancel", "Cancel"))
                 }
             }
+        )
+    }
+
+    if (showCreateDialog != null) {
+        val slotNum = showCreateDialog!!
+        var difficultyDraft by remember(slotNum) { mutableStateOf(difficultySelections[slotNum] ?: Difficulty.CLASSIC) }
+        AlertDialog(
+            onDismissRequest = { showCreateDialog = null },
+            title = { Text("Create Save Slot $slotNum") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedTextField(
+                        value = createNameDraft,
+                        onValueChange = { createNameDraft = it.take(24) },
+                        label = { Text("Save Name") },
+                        singleLine = true
+                    )
+                    Text("Icon", style = MaterialTheme.typography.labelLarge)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        SaveProfile.iconIds.forEach { iconId ->
+                            FilterChip(
+                                selected = createIconDraft == iconId,
+                                onClick = { createIconDraft = iconId },
+                                label = { Text(SaveProfile.iconSymbol(iconId)) }
+                            )
+                        }
+                    }
+                    Text("Difficulty", style = MaterialTheme.typography.labelLarge)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Difficulty.ALL.forEach { id ->
+                            FilterChip(
+                                selected = difficultyDraft == id,
+                                onClick = { difficultyDraft = id },
+                                label = { Text(locale.getString(Difficulty.nameKey(id), id)) }
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    difficultySelections[slotNum] = difficultyDraft
+                    viewModel.createSlot(slotNum, difficultyDraft, createNameDraft, createIconDraft) { success ->
+                        if (success) showCreateDialog = null
+                        refreshMetadata()
+                    }
+                }) { Text("Create") }
+            },
+            dismissButton = { TextButton(onClick = { showCreateDialog = null }) { Text(locale.getString("cancel", "Cancel")) } }
         )
     }
 
@@ -347,13 +399,10 @@ fun SaveSlotsScreen(
                         onSelect = {
                             val metadata = slotMetadata[slot - 1]
                             if (metadata?.isEmpty != false) {
-                                viewModel.createSlot(
-                                    slot,
-                                    difficultySelections[slot] ?: Difficulty.CLASSIC
-                                ) { success ->
-                                    if (success) onNavigateBack()
-                                    refreshMetadata()
-                                }
+                                createNameDraft = ""
+                                createIconDraft = SaveProfile.DEFAULT_ICON
+                                difficultySelections[slot] = Difficulty.CLASSIC
+                                showCreateDialog = slot
                             } else {
                                 viewModel.switchSlot(slot)
                                 onNavigateBack()
