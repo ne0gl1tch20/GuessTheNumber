@@ -39,6 +39,36 @@ class LocaleManagerTest {
     }
 
     @Test
+    fun formattedStringsReplaceAllPlaceholders() = runBlocking {
+        val manager = LocaleManager(context)
+        manager.loadLocaleForTag("en-US")
+
+        val version = manager.getString(
+            "about_version_format",
+            "Version: %s (%d)",
+            "1.14.0",
+            14
+        )
+        val author = manager.getString(
+            "about_library_author_format",
+            "Author: %s",
+            "Google"
+        )
+        val license = manager.getString(
+            "about_library_license_format",
+            "License: %s",
+            "Apache 2.0"
+        )
+
+        assertEquals("Version: 1.14.0 (14)", version)
+        assertEquals("Author: Google", author)
+        assertEquals("License: Apache 2.0", license)
+        assertTrue(!version.contains("%s") && !version.contains("%d"))
+        assertTrue(!author.contains("%s"))
+        assertTrue(!license.contains("%s"))
+    }
+
+    @Test
     fun currencyFormattingUsesLocaleCurrencyRules() = runBlocking {
         val manager = LocaleManager(context)
         manager.loadLocaleForTag("ja-JP")
