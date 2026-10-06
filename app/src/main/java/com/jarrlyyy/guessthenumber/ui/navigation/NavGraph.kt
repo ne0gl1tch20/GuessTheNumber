@@ -221,7 +221,8 @@ fun NavGraph(
                     onPlayMusic = onPlayMusic,
                     onPauseMusic = onPauseMusic,
                     onStopMusic = onStopMusic,
-                    onSeekMusic = onSeekMusic
+                    onSeekMusic = onSeekMusic,
+                    onUpdateSettings = onUpdateSettings
                 )
             }
             composable(Screen.Prestige.route) {
