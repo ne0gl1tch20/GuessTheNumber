@@ -4,6 +4,8 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.pointerinput.pointerInput
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -15,6 +17,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.input.pointer.consume
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.navigation.Screen
 import java.io.File
@@ -33,7 +36,8 @@ fun MoreScreen(
     onPlayMusic: () -> Unit,
     onPauseMusic: () -> Unit,
     onStopMusic: () -> Unit,
-    onSeekMusic: (Int) -> Unit
+    onSeekMusic: (Int) -> Unit,
+    onUpdateSettings: (com.jarrlyyy.guessthenumber.domain.model.GameSettings) -> Unit
 ) {
     val context = LocalContext.current
     var showMusicDialog by remember { mutableStateOf(false) }
@@ -75,6 +79,74 @@ fun MoreScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item {
+                val defaultOrder = listOf("achievements", "live_ops", "mutators", "talent", "arcade", "stats", "changelog", "settings", "about", "dev_settings")
+                var order by remember(state.settings.moreScreenOrder) {
+                    mutableStateOf((state.settings.moreScreenOrder + defaultOrder).distinct().take(defaultOrder.size))
+                }
+                var dragging by remember { mutableStateOf<Int?>(null) }
+                var dragDistance by remember { mutableFloatStateOf(0f) }
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("Reorder More", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                    Text("Long-press and drag items to change their order.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    order.forEachIndexed { index, route ->
+                        val labels = mapOf(
+                            "achievements" to "Achievements & Tiers",
+                            "live_ops" to "Random & Seasonal Events",
+                            "mutators" to "Mutators & Challenge Builder",
+                            "talent" to "Prestige Talent Web",
+                            "arcade" to "Arcade Minigames",
+                            "stats" to "Statistics",
+                            "changelog" to "Changelog",
+                            "settings" to "Settings",
+                            "about" to "About & Licenses",
+                            "dev_settings" to "Dev Settings"
+                        )
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .pointerInput(order) {
+                                    detectDragGesturesAfterLongPress(
+                                        onDragStart = { dragging = index; dragDistance = 0f },
+                                        onDragCancel = { dragging = null; dragDistance = 0f },
+                                        onDragEnd = {
+                                            dragging = null
+                                            dragDistance = 0f
+                                            onUpdateSettings(state.settings.copy(moreScreenOrder = order))
+                                        },
+                                        onDrag = { change, amount ->
+                                            change.consume()
+                                            if (dragging == index) {
+                                                dragDistance += amount.y
+                                                if (dragDistance > 48f && index < order.lastIndex) {
+                                                    val next = order.toMutableList()
+                                                    next[index] = next[index + 1].also { next[index + 1] = next[index] }
+                                                    order = next
+                                                    dragDistance = 0f
+                                                } else if (dragDistance < -48f && index > 0) {
+                                                    val next = order.toMutableList()
+                                                    next[index] = next[index - 1].also { next[index - 1] = next[index] }
+                                                    order = next
+                                                    dragDistance = 0f
+                                                }
+                                            }
+                                        }
+                                    )
+                                },
+                            shape = MaterialTheme.shapes.small,
+                            color = if (dragging == index) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                        ) {
+                            Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.DragHandle, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(labels[route] ?: route, modifier = Modifier.weight(1f))
+                                Text("↕", style = MaterialTheme.typography.titleMedium)
+                            }
+                        }
+                    }
+                }
+            }
+
             item {
                 Text("Reset Tiers & Hubs", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
