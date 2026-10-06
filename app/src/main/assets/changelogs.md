@@ -1,5 +1,19 @@
 # 🚀 Guess The Number Simulator - Changelog
 
+## v1.14.0 (Global Localization & Internationalization Expansion)
+
+- 🌍 **Global locale expansion**: Added 23 supported locale overlays covering English (US/UK), Filipino, Simplified/Traditional Chinese, Japanese, Korean, Spanish, French, German, Italian, Portuguese (Portugal/Brazil), Russian, Hindi, Indonesian, Thai, Vietnamese, Turkish, Polish, Ukrainian, Dutch, and Arabic.
+- 🧩 **Locale fallback architecture**: Locale JSON files can now provide translated overlays while safely falling back to the complete English catalog for keys that are not yet translated.
+- 🔢 **Locale-aware formatting**: Number, decimal, percent, currency, date, time, date-time, and duration formatting now follows the active locale.
+- ↔️ **RTL foundation**: Arabic is registered as an RTL locale and locale metadata is available to the UI for future layout-direction enforcement.
+- 📱 **Android per-app language support**: Declared the supported language configuration so Android 13+ can expose app-specific language preferences.
+- ⚙️ **Expanded language picker**: Settings now exposes the complete supported locale list instead of only English and Filipino.
+- 🔎 **Repository-wide JSON inspection**: Added automated validation for JSON assets and data-driven localization keys, including the game's JSON catalogs.
+- 🧪 **Localization tests**: Added locale loading, fallback, formatting, and RTL unit coverage.
+- 🛠️ **CI expansion**: Manual GitHub Actions now validates locale contracts, scans the localization surface, validates JSON assets, runs unit tests, runs lint, runs the full Gradle check, and uploads test/lint reports.
+- 🧹 **De-hardcoding foundation**: Added repository-wide high-confidence localization auditing so remaining user-facing literals can be migrated without touching machine-readable IDs or internal schema values.
+- 📱 **Version**: Bumped to versionCode 14 / versionName 1.14.0.
+
 ## v1.13.0 (Material 3 Expressive UI Overhaul)
 
 - 🎨 **Unified Material 3 Expressive Design System**: Centralized expressive shapes, typography, theme roles, and reusable motion primitives across the app.
