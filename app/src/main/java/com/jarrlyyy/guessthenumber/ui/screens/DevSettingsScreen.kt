@@ -41,12 +41,19 @@ fun DevSettingsScreen(
     onExecuteCommand: (String) -> String,
     onImportSave: (String, (Boolean) -> Unit) -> Unit,
     onUpdateSettings: (GameSettings) -> Unit,
+    onGetAppPreferencesJson: ((String) -> Unit) -> Unit,
+    onApplyAppPreferencesJson: (String, (Boolean) -> Unit) -> Unit,
+    onGetSaveJson: (Int, (String?) -> Unit) -> Unit,
+    onApplySaveJson: (Int, String, (Boolean) -> Unit) -> Unit,
     onNavigate: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
     var commandInput by remember { mutableStateOf("") }
     var saveJsonEditorInput by remember { mutableStateOf("") }
+    var appPreferencesJsonEditorInput by remember { mutableStateOf("") }
+    var selectedSaveSlot by remember { mutableIntStateOf(1) }
+    var saveSlotExpanded by remember { mutableStateOf(false) }
     var logSearchQuery by remember { mutableStateOf("") }
     var isPaused by remember { mutableStateOf(false) }
 
@@ -242,11 +249,65 @@ fun DevSettingsScreen(
                 }
             }
 
+            // Section 1.5: Global App Preferences JSON
+            item {
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("App Preferences (Global JSON)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+            }
+            item {
+                OutlinedTextField(
+                    value = appPreferencesJsonEditorInput,
+                    onValueChange = { appPreferencesJsonEditorInput = it },
+                    label = { Text("Raw App Preferences JSON") },
+                    modifier = Modifier.fillMaxWidth().height(150.dp)
+                )
+            }
+            item {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        onGetAppPreferencesJson {
+                            appPreferencesJsonEditorInput = it
+                            Toast.makeText(context, "Loaded global app preferences", Toast.LENGTH_SHORT).show()
+                        }
+                    }, modifier = Modifier.weight(1f)) { Text("Load App Preferences") }
+                    Button(onClick = {
+                        onApplyAppPreferencesJson(appPreferencesJsonEditorInput) { success ->
+                            Toast.makeText(context, if (success) "App preferences applied!" else "Invalid app preferences JSON!", Toast.LENGTH_SHORT).show()
+                        }
+                    }, modifier = Modifier.weight(1f)) { Text("Apply App Preferences") }
+                }
+            }
+
             // Section 2: Save Editor (JSON Text Editing)
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("Save Editor (JSON Editing)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+            }
+            item {
+                ExposedDropdownMenuBox(
+                    expanded = saveSlotExpanded,
+                    onExpandedChange = { saveSlotExpanded = it },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = "Save Slot $selectedSaveSlot",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Save Slots") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(saveSlotExpanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(expanded = saveSlotExpanded, onDismissRequest = { saveSlotExpanded = false }) {
+                        (1..10).forEach { slot ->
+                            DropdownMenuItem(
+                                text = { Text("Save Slot $slot") },
+                                onClick = { selectedSaveSlot = slot; saveSlotExpanded = false }
+                            )
+                        }
+                    }
+                }
             }
             item {
                 OutlinedTextField(
@@ -265,7 +326,7 @@ fun DevSettingsScreen(
                 ) {
                     Button(
                         onClick = {
-                            saveJsonEditorInput = jsonSerializer.encodeToString(state)
+                            onGetSaveJson(selectedSaveSlot) { raw -> saveJsonEditorInput = raw ?: ""; }
                             Toast.makeText(context, "Loaded current state into editor", Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.weight(1f)
@@ -277,7 +338,7 @@ fun DevSettingsScreen(
                     Button(
                         onClick = {
                             if (saveJsonEditorInput.isNotBlank()) {
-                                onImportSave(saveJsonEditorInput) { success ->
+                                onApplySaveJson(selectedSaveSlot, saveJsonEditorInput) { success ->
                                     if (success) {
                                         Toast.makeText(context, "Save applied successfully!", Toast.LENGTH_SHORT).show()
                                     } else {
