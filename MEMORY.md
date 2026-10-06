@@ -56,6 +56,14 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - Developer JSON editing is split into global App Preferences and Save Slots with a Save 1–10 selector.
 - CI remains manual-only; no automatic build was started as part of this implementation.
 
+## v1.12.1 UI/UX Polish Pass
+- Theme Presets were removed from More and consolidated into Settings as a polished dropdown with a Custom option.
+- Custom theme colors now use an HSV-style hue/saturation/brightness workflow plus live preview and hex entry for Primary, Secondary, and Tertiary colors.
+- More menu reordering remains gated behind Reorder/Done and now has lifted scale/elevation and content-size motion while dragging.
+- The old full-screen generic tutorial flow was replaced with an in-app guided tutorial overlay that requires real actions in Play, Upgrades, More, and Settings.
+- Guided tutorial copy is localized in English and Filipino and tutorial completion remains global so new save slots do not restart onboarding.
+- CI remains manual-only.
+
 ## v1.12 Phase 13–14
 - **Phase 13 — Shop Categories & Cosmetics**: Added category and cosmetic metadata to ShopItemDef, categorized the Nebula Shop into All / Automation / Boosts / Cosmetics, and added three localized cosmetics (cosmetic_nebula_ring, cosmetic_starfield, cosmetic_pixel_glow).
 - Cosmetic purchases persist in shopPurchases and the currently equipped cosmetic is stored in equippedCosmeticId.
