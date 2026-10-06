@@ -62,36 +62,6 @@ fun SaveSlotsScreen(
 
     val refreshMetadata = {
         scope.launch {
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            viewModel.exportSave { json ->
-                                val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
-                                clipboard?.setPrimaryClip(ClipData.newPlainText("GuessTheNumberSave", json))
-                                android.widget.Toast.makeText(
-                                    context,
-                                    locale.getString("save_export_success", "Encrypted save copied to clipboard!"),
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(locale.getString("save_export_button", "Export Encrypted Save"))
-                    }
-                    OutlinedButton(
-                        onClick = { showImportDialog = true },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(locale.getString("save_import_button", "Import Encrypted Save"))
-                    }
-                }
-            }
-
             for (slot in 1..MAX_SAVE_SLOTS) {
                 slotMetadata[slot - 1] = viewModel.getSlotMetadata(slot)
             }
