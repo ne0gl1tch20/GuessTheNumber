@@ -25,6 +25,8 @@ fun StakingScreen(
     onStakeResult: (BigNumber, Boolean) -> Unit,
     onBack: () -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val locale = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale).localeManager }
     var stakeInput by remember { mutableStateOf("") }
     var resultMessage by remember { mutableStateOf<String?>(null) }
 
