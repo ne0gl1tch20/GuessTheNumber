@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.components.ReusableColorPickerDialog
+import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,6 +36,7 @@ fun SettingsScreen(
     var colorTarget by remember { mutableStateOf<String?>(null) }
 
     val settings = state.settings
+    val locale = remember(settings.locale) { LocaleManager(context).also { manager -> kotlinx.coroutines.runBlocking { manager.loadLocaleForTag(settings.locale) } } }
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -74,10 +76,10 @@ fun SettingsScreen(
             // Language Selector Dropdown
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Language / Wika", style = MaterialTheme.typography.bodyLarge)
+                    Text(locale.getString("language", "Language"), style = MaterialTheme.typography.bodyLarge)
                     var expanded by remember { mutableStateOf(false) }
-                    val languageMap = mapOf("en-US" to "English (US)", "fil-PH" to "Filipino")
-                    val currentLangName = languageMap[settings.locale] ?: "English (US)"
+                    val languageMap = LocaleManager.supportedLocales.associate { it.tag to it.displayName }
+                    val currentLangName = languageMap[settings.locale] ?: LocaleManager.supportedLocales.first().displayName
                     ExposedDropdownMenuBox(
                         expanded = expanded,
                         onExpandedChange = { expanded = it },
@@ -101,7 +103,7 @@ fun SettingsScreen(
                                     text = { Text(name) },
                                     onClick = {
                                         onUpdateSettings(settings.copy(locale = code))
-                                        Toast.makeText(context, "Language changed. Restart app to take effect.", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, locale.getString("language_changed_restart", "Language changed. Restart app to take effect."), Toast.LENGTH_SHORT).show()
                                         expanded = false
                                     }
                                 )
