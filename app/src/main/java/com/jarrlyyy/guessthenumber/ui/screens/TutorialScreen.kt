@@ -12,58 +12,68 @@ import androidx.compose.ui.unit.sp
 fun TutorialScreen(
     onComplete: () -> Unit
 ) {
-    var step by remember { mutableStateOf(1) }
+    var step by remember { mutableIntStateOf(0) }
+    var pressed by remember { mutableStateOf(false) }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
+    val titles = listOf(
+        "🎮 Welcome! Try the button below",
+        "📈 Great! Now learn Upgrades",
+        "🧭 Nice! More has your systems",
+        "🚀 You're ready to play!"
+    )
+    val descriptions = listOf(
+        "This tutorial is interactive. You must press the highlighted control to continue.",
+        "Upgrades improve your guessing run. Press the highlighted Upgrades button.",
+        "The More screen contains Save Slots, settings, statistics, and advanced systems.",
+        "You completed the guided tour. Your new save is ready!"
+    )
+
+    fun advance() {
+        if (step < 3) {
+            step++
+            pressed = false
+        } else {
+            onComplete()
+        }
+    }
+
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
+            Modifier.fillMaxSize().padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(8.dp)
-            ) {
+            Card(Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(8.dp)) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(
-                        text = when (step) {
-                            1 -> "🎮 Welcome to Guess The Number!"
-                            2 -> "📈 Earn Money & Upgrades"
-                            else -> "🚀 Prestige & Beyond"
-                        },
-                        fontSize = 22.sp,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = when (step) {
-                            1 -> "Guess the secret target number correctly to earn Money. Every initial correct guess awards some money!"
-                            2 -> "Spend your hard-earned money on Upgrades in the Upgrades tab to multiply rewards and narrow down guessing ranges."
-                            else -> "Reach high milestones to perform Prestige and Ultra resets, unlocking Nebula currency and Arcade minigames!"
-                        },
-                        fontSize = 16.sp
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Button(
-                        onClick = {
-                            if (step < 3) {
-                                step++
-                            } else {
-                                onComplete()
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(if (step < 3) "Next" else "Start Playing!")
+                    Text("Step ${step + 1} of 4", style = MaterialTheme.typography.labelLarge)
+                    Text(titles[step], fontSize = 22.sp, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+                    Text(descriptions[step], fontSize = 16.sp)
+
+                    if (step < 3) {
+                        Text("👇 Tap the highlighted button", color = MaterialTheme.colorScheme.primary)
+                        Button(
+                            onClick = { pressed = true; advance() },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                when (step) {
+                                    0 -> "GUESS NUMBER"
+                                    1 -> "UPGRADES"
+                                    else -> "MORE"
+                                }
+                            )
+                        }
+                        if (!pressed) {
+                            Text("You need to press it to continue.", style = MaterialTheme.typography.bodySmall)
+                        }
+                    } else {
+                        Button(onClick = { onComplete() }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Start Playing!")
+                        }
                     }
                 }
             }
