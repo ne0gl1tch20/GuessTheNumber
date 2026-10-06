@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.ui.components.ReusableColorPickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -399,8 +400,9 @@ fun SettingsScreen(
             "Secondary" -> settings.customSecondaryColor
             else -> settings.customTertiaryColor
         }
-        ColorPickerDialog(
+        ReusableColorPickerDialog(
             initialHex = current,
+            title = "🎨 Custom Theme Color",
             onDismiss = { colorTarget = null },
             onApply = { hex ->
                 val updated = when (target) {
@@ -455,38 +457,3 @@ fun SettingsScreen(
     }
 }
 
-
-@Composable
-private fun ColorPickerDialog(
-    initialHex: String,
-    onDismiss: () -> Unit,
-    onApply: (String) -> Unit
-) {
-    val initial = runCatching { android.graphics.Color.parseColor(initialHex) }.getOrDefault(android.graphics.Color.MAGENTA)
-    val hsv = FloatArray(3).also { android.graphics.Color.colorToHSV(initial, it) }
-    var hue by remember { mutableFloatStateOf(hsv[0]) }
-    var saturation by remember { mutableFloatStateOf(hsv[1]) }
-    var value by remember { mutableFloatStateOf(hsv[2]) }
-    var hexInput by remember { mutableStateOf(initialHex.uppercase()) }
-
-    val colorInt = android.graphics.Color.HSVToColor(floatArrayOf(hue, saturation, value))
-    val color = Color(colorInt)
-    val hex = "#%02X%02X%02X".format(android.graphics.Color.red(colorInt), android.graphics.Color.green(colorInt), android.graphics.Color.blue(colorInt))
-
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("🎨 Custom Theme Color") }, text = {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Surface(Modifier.fillMaxWidth().height(72.dp), color = color, shape = MaterialTheme.shapes.medium) {}
-            Text("Hue: " + hue.toInt() + "°")
-            Slider(value = hue, onValueChange = { hue = it }, valueRange = 0f..360f)
-            Text("Saturation: " + (saturation * 100).toInt() + "%")
-            Slider(value = saturation, onValueChange = { saturation = it }, valueRange = 0f..1f)
-            Text("Brightness: " + (value * 100).toInt() + "%")
-            Slider(value = value, onValueChange = { value = it }, valueRange = 0f..1f)
-            OutlinedTextField(value = hexInput, onValueChange = {
-                hexInput = it.uppercase()
-                runCatching { val parsed = android.graphics.Color.parseColor(hexInput); val next = FloatArray(3); android.graphics.Color.colorToHSV(parsed, next); hue = next[0]; saturation = next[1]; value = next[2] }
-            }, label = { Text("Hex") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-            Text("Live preview: " + hex, style = MaterialTheme.typography.labelLarge)
-        }
-    }, confirmButton = { Button(onClick = { onApply(hex) }) { Text("Apply") } }, dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
-}
