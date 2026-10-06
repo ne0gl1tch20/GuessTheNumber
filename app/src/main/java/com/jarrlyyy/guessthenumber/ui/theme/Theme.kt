@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 
 private val ExpressiveDarkColorScheme = darkColorScheme(
@@ -65,6 +66,14 @@ private val AmoledDarkColorScheme = darkColorScheme(
 )
 
 // Google Material 3 Expressive Shapes (Oversized rounded corners and pill shapes)
+val ExpressiveTypography = Typography().run {
+    copy(
+        displayLarge = displayLarge.copy(letterSpacing = (-0.5).sp),
+        headlineLarge = headlineLarge.copy(letterSpacing = (-0.25).sp),
+        titleLarge = titleLarge.copy(letterSpacing = 0.sp)
+    )
+}
+
 val ExpressiveShapes = Shapes(
     extraSmall = RoundedCornerShape(16.dp),
     small = RoundedCornerShape(24.dp),
@@ -131,6 +140,7 @@ fun GuessTheNumberTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         shapes = ExpressiveShapes,
+        typography = ExpressiveTypography,
         content = content
     )
 }
