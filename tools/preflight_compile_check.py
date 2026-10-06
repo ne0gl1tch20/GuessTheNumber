@@ -1,34 +1,26 @@
 #!/usr/bin/env python3
-"""Fast Kotlin preflight checks before Gradle compilation.
+"""Fast, conservative Kotlin source preflight before Gradle compilation.
 
-This is intentionally lightweight: it catches common source mistakes quickly
-without starting the Kotlin/Gradle compiler.
+This checker deliberately only reports syntax-like source problems that can be
+reliably detected without Kotlin's compiler/type resolver. It must not try to
+reimplement Kotlin import resolution.
 """
 from __future__ import annotations
 
-import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "app" / "src" / "main"
 
-# Common Compose symbols that frequently fail when their import is missing.
-SYMBOL_IMPORTS = {
-    "remember": "androidx.compose.runtime.remember",
-    "mutableStateOf": "androidx.compose.runtime.mutableStateOf",
-    "LaunchedEffect": "androidx.compose.runtime.LaunchedEffect",
-    "DisposableEffect": "androidx.compose.runtime.DisposableEffect",
-    "Check": "androidx.compose.material.icons.filled.Check",
-    "consumePositionChange": "androidx.compose.ui.input.pointer.consumePositionChange",
-    "LocalContext": "androidx.compose.ui.platform.LocalContext",
-}
 
-def check_balanced(path: Path, text: str, errors: list[str]) -> None:
+def check_structure(path: Path, text: str, errors: list[str]) -> None:
+    """Check delimiters, strings, and comments while ignoring comments/strings."""
     pairs = {"(": ")", "[": "]", "{": "}"}
     closing = set(pairs.values())
     stack: list[tuple[str, int]] = []
     in_string = False
+    in_char = False
     escaped = False
     in_line_comment = False
     in_block_comment = False
@@ -42,6 +34,7 @@ def check_balanced(path: Path, text: str, errors: list[str]) -> None:
         if ch == "\n":
             line += 1
             in_line_comment = False
+            escaped = False
             i += 1
             continue
 
@@ -57,72 +50,105 @@ def check_balanced(path: Path, text: str, errors: list[str]) -> None:
                 i += 1
             continue
 
-        if not in_string and ch == "/" and nxt == "/":
-            in_line_comment = True
-            i += 2
+        if not in_string and not in_char:
+            if ch == "/" and nxt == "/":
+                in_line_comment = True
+                i += 2
+                continue
+            if ch == "/" and nxt == "*":
+                in_block_comment = True
+                i += 2
+                continue
+
+        if in_string:
+            if ch == '"' and not escaped:
+                # Kotlin raw strings use triple quotes; handle their closing separately.
+                if text[i:i + 3] == '"""':
+                    in_string = False
+                    i += 3
+                    continue
+                in_string = False
+            escaped = ch == "\\" and not escaped
+            if ch != "\\":
+                escaped = False
+            i += 1
             continue
 
-        if not in_string and ch == "/" and nxt == "*":
-            in_block_comment = True
-            i += 2
+        if in_char:
+            if ch == "'" and not escaped:
+                in_char = False
+            escaped = ch == "\\" and not escaped
+            if ch != "\\":
+                escaped = False
+            i += 1
             continue
 
-        if ch == '"' and not escaped:
-            in_string = not in_string
-
-        if not in_string:
-            if ch in pairs:
-                stack.append((ch, line))
-            elif ch in closing:
-                if not stack or pairs[stack[-1][0]] != ch:
-                    errors.append(f"{path.relative_to(ROOT)}:{line}: unmatched '{ch}'")
-                else:
-                    stack.pop()
-
-        escaped = (ch == "\\") and not escaped
-        if ch != "\\":
+        if text[i:i + 3] == '"""':
+            in_string = True
+            i += 3
+            continue
+        if ch == '"':
+            in_string = True
             escaped = False
+            i += 1
+            continue
+        if ch == "'":
+            in_char = True
+            escaped = False
+            i += 1
+            continue
+
+        if ch in pairs:
+            stack.append((ch, line))
+        elif ch in closing:
+            if not stack or pairs[stack[-1][0]] != ch:
+                errors.append(f"{path.relative_to(ROOT)}:{line}: unmatched '{ch}'")
+            else:
+                stack.pop()
+
         i += 1
 
     if in_string:
         errors.append(f"{path.relative_to(ROOT)}:{line}: unterminated string literal")
+    if in_char:
+        errors.append(f"{path.relative_to(ROOT)}:{line}: unterminated character literal")
     if in_block_comment:
         errors.append(f"{path.relative_to(ROOT)}:{line}: unterminated block comment")
+
     for opening, opening_line in stack:
         errors.append(f"{path.relative_to(ROOT)}:{opening_line}: unclosed '{opening}'")
 
-def check_imports(path: Path, text: str, errors: list[str]) -> None:
-    imports = re.findall(r"^\s*import\s+([A-Za-z_][\w.]*)", text, re.MULTILINE)
-    if len(imports) != len(set(imports)):
-        seen: set[str] = set()
-        for item in imports:
-            if item in seen:
-                errors.append(f"{path.relative_to(ROOT)}: duplicate import '{item}'")
-            seen.add(item)
 
-    for symbol, fqcn in SYMBOL_IMPORTS.items():
-        if not re.search(rf"\b{re.escape(symbol)}\b", text):
+def check_duplicate_imports(path: Path, text: str, errors: list[str]) -> None:
+    """Catch exact duplicate imports without attempting semantic import checks."""
+    seen: set[str] = set()
+    for line_number, line in enumerate(text.splitlines(), 1):
+        stripped = line.strip()
+        if not stripped.startswith("import "):
             continue
-        if re.search(rf"\bimport\s+{re.escape(fqcn)}\s*$", text, re.MULTILINE):
-            continue
-        # Don't flag declarations/qualified calls where an import is unnecessary.
-        if re.search(rf"\b(?:fun|class|object|interface|typealias|val|var)\s+{re.escape(symbol)}\b", text):
-            continue
-        if f".{symbol}" in text and symbol not in {"remember", "Check"}:
-            continue
-        errors.append(
-            f"{path.relative_to(ROOT)}: possible missing import for '{symbol}' "
-            f"(expected {fqcn})"
-        )
+        imported = stripped[7:].strip()
+        if imported in seen:
+            errors.append(f"{path.relative_to(ROOT)}:{line_number}: duplicate import '{imported}'")
+        seen.add(imported)
+
 
 def main() -> int:
+    if not SRC.exists():
+        print(f"Kotlin preflight: source directory not found: {SRC}")
+        return 1
+
     kotlin_files = sorted(SRC.rglob("*.kt"))
     errors: list[str] = []
 
     for path in kotlin_files:
-        text = path.read_text(encoding="utf-8")
-        check_balanced(path, text, errors)
-        check_imports(path, text, errors)
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            errors.append(f"{path.relative_to(ROOT)}: invalid UTF-8: {exc}")
+            continue
+
+        check_structure(path, text, errors)
+        check_duplicate_imports(path, text, errors)
 
     print(f"Kotlin preflight: scanned {len(kotlin_files)} file(s).")
     if errors:
@@ -131,8 +157,9 @@ def main() -> int:
             print(f"  - {error}")
         return 1
 
-    print("Kotlin preflight: PASS — no quick-fail source issues found.")
+    print("Kotlin preflight: PASS — no conservative source-structure issues found.")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
