@@ -19,19 +19,21 @@ class LocaleManager(private val context: Context) {
     private var translations: JSONObject = JSONObject()
     private var currentLocale: Locale = Locale.US
 
-    suspend fun loadLocale(localeFileName: String = "locales/en_us.json") {
+    suspend fun loadLocale(localeFileName: String = ENGLISH_FILE) {
         withContext(Dispatchers.IO) {
+            val requestedTag = supportedLocales.firstOrNull { it.fileName == localeFileName }?.tag ?: "en-US"
+            val locale = Locale.forLanguageTag(requestedTag)
             try {
-                val inputStream = context.assets.open(localeFileName)
-                val reader = InputStreamReader(inputStream)
-                val jsonString = reader.readText()
-                reader.close()
-                translations = JSONObject(jsonString)
-                currentLocale = when {
-                    localeFileName.contains("fil_ph", ignoreCase = true) -> Locale("fil", "PH")
-                    localeFileName.contains("en_us", ignoreCase = true) -> Locale.US
-                    else -> Locale.US
+                val fallback = readJson(ENGLISH_FILE)
+                val overlay = if (localeFileName == ENGLISH_FILE) JSONObject() else readJson(localeFileName)
+                val merged = JSONObject(fallback.toString())
+                val keys = overlay.keys()
+                while (keys.hasNext()) {
+                    val key = keys.next()
+                    merged.put(key, overlay.get(key))
                 }
+                translations = merged
+                currentLocale = locale
             } catch (e: Exception) {
                 e.printStackTrace()
                 translations = JSONObject()
@@ -39,6 +41,23 @@ class LocaleManager(private val context: Context) {
             }
         }
     }
+
+    suspend fun loadLocaleForTag(localeTag: String?) {
+        loadLocale(resolveFileName(localeTag))
+    }
+
+    fun resolveFileName(localeTag: String?): String {
+        val normalized = localeTag?.trim()?.replace('_', '-')?.lowercase(Locale.ROOT)
+        return supportedLocales.firstOrNull { it.tag.lowercase(Locale.ROOT) == normalized }?.fileName
+            ?: supportedLocales.firstOrNull {
+                normalized != null && it.tag.substringBefore('-').lowercase(Locale.ROOT) == normalized.substringBefore('-')
+            }?.fileName
+            ?: ENGLISH_FILE
+    }
+
+    fun getCurrentLocaleTag(): String = currentLocale.toLanguageTag()
+
+    fun isRtl(): Boolean = currentLocale.layoutDirection == Locale.SA ? false : currentLocale.language == "ar" || currentLocale.language == "fa" || currentLocale.language == "he"
 
     fun getString(key: String, default: String = key): String =
         translations.optString(key, default)
@@ -97,17 +116,22 @@ class LocaleManager(private val context: Context) {
         val minutes = (total % 3600) / 60
         val seconds = total % 60
         return if (hours > 0) {
-            "${formatNumber(hours)}h ${formatNumber(minutes)}m ${formatNumber(seconds)}s"
+            getString("duration_hms_format", "%s:%s:%s", formatNumber(hours), formatNumber(minutes), formatNumber(seconds))
         } else if (minutes > 0) {
-            "${formatNumber(minutes)}m ${formatNumber(seconds)}s"
+            getString("duration_ms_format", "%s:%s", formatNumber(minutes), formatNumber(seconds))
         } else {
-            "${formatNumber(seconds)}s"
+            getString("duration_seconds_format", "%ss", formatNumber(seconds))
         }
     }
 
     fun formatClock(totalSeconds: Int): String {
         val safeSeconds = totalSeconds.coerceAtLeast(0)
-        return "%d:%02d".format(Locale.US, safeSeconds / 60, safeSeconds % 60)
+        return "%d:%02d".format(Locale.ROOT, safeSeconds / 60, safeSeconds % 60)
+    }
+
+    private fun readJson(fileName: String): JSONObject {
+        val inputStream = context.assets.open("locales/$fileName")
+        return InputStreamReader(inputStream).use { JSONObject(it.readText()) }
     }
 
     private fun formatString(raw: String, vararg args: Any): String =
@@ -116,4 +140,41 @@ class LocaleManager(private val context: Context) {
         } catch (_: Exception) {
             raw
         }
+
+    data class SupportedLocale(
+        val tag: String,
+        val fileName: String,
+        val displayName: String,
+        val rtl: Boolean = false
+    )
+
+    companion object {
+        const val ENGLISH_FILE = "en_us.json"
+
+        val supportedLocales = listOf(
+            SupportedLocale("en-US", "en_us.json", "English (US)"),
+            SupportedLocale("en-GB", "en_gb.json", "English (UK)"),
+            SupportedLocale("fil-PH", "fil_ph.json", "Filipino"),
+            SupportedLocale("zh-CN", "zh_cn.json", "简体中文"),
+            SupportedLocale("zh-TW", "zh_tw.json", "繁體中文"),
+            SupportedLocale("ja-JP", "ja.json", "日本語"),
+            SupportedLocale("ko-KR", "ko.json", "한국어"),
+            SupportedLocale("es-ES", "es.json", "Español"),
+            SupportedLocale("fr-FR", "fr.json", "Français"),
+            SupportedLocale("de-DE", "de.json", "Deutsch"),
+            SupportedLocale("it-IT", "it.json", "Italiano"),
+            SupportedLocale("pt-PT", "pt_pt.json", "Português (Portugal)"),
+            SupportedLocale("pt-BR", "pt_br.json", "Português (Brasil)"),
+            SupportedLocale("ru-RU", "ru.json", "Русский"),
+            SupportedLocale("hi-IN", "hi_in.json", "हिन्दी"),
+            SupportedLocale("id-ID", "id.json", "Bahasa Indonesia"),
+            SupportedLocale("th-TH", "th.json", "ไทย"),
+            SupportedLocale("vi-VN", "vi.json", "Tiếng Việt"),
+            SupportedLocale("tr-TR", "tr.json", "Türkçe"),
+            SupportedLocale("pl-PL", "pl.json", "Polski"),
+            SupportedLocale("uk-UA", "uk.json", "Українська"),
+            SupportedLocale("nl-NL", "nl.json", "Nederlands"),
+            SupportedLocale("ar-SA", "ar.json", "العربية", rtl = true)
+        )
+    }
 }
