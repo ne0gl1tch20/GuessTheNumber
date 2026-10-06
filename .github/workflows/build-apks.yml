@@ -43,6 +43,9 @@ jobs:
       - name: Fast Kotlin Preflight Check
         run: python3 tools/preflight_compile_check.py
 
+      - name: Build Preflight
+        run: python3 tools/build_preflight.py
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
