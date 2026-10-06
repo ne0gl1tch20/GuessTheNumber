@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 
@@ -30,6 +31,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     var showResetDialog by remember { mutableStateOf(false) }
     var confirmResetCheck by remember { mutableStateOf(false) }
+    var colorTarget by remember { mutableStateOf<String?>(null) }
 
     val settings = state.settings
 
@@ -139,6 +141,39 @@ fun SettingsScreen(
                                     }
                                 )
                             }
+                        }
+                    }
+                }
+            }
+
+            item {
+                Text("Theme Colors", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                val presets = listOf(
+                    "Neon" to listOf("#7C4DFF", "#00BCD4", "#00C853"),
+                    "Sunset" to listOf("#FF4081", "#FF9800", "#FFC107"),
+                    "Ocean" to listOf("#2196F3", "#00BCD4", "#3F51B5"),
+                    "Forest" to listOf("#4CAF50", "#009688", "#8BC34A")
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        presets.forEach { (name, colors) ->
+                            OutlinedButton(
+                                onClick = {
+                                    onUpdateSettings(settings.copy(themePreset = name, customPrimaryColor = colors[0], customSecondaryColor = colors[1], customTertiaryColor = colors[2]))
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) { Text(name) }
+                        }
+                    }
+                    listOf(
+                        "Primary" to settings.customPrimaryColor,
+                        "Secondary" to settings.customSecondaryColor,
+                        "Tertiary" to settings.customTertiaryColor
+                    ).forEach { (label, value) ->
+                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Surface(modifier = Modifier.size(36.dp), shape = MaterialTheme.shapes.small, color = runCatching { Color(android.graphics.Color.parseColor(value)) }.getOrDefault(MaterialTheme.colorScheme.primary)) {}
+                            Text(label, modifier = Modifier.weight(1f))
+                            OutlinedButton(onClick = { colorTarget = label }) { Text(value) }
                         }
                     }
                 }
@@ -328,6 +363,28 @@ fun SettingsScreen(
         }
     }
 
+    if (colorTarget != null) {
+        val target = colorTarget!!
+        val current = when (target) {
+            "Primary" -> settings.customPrimaryColor
+            "Secondary" -> settings.customSecondaryColor
+            else -> settings.customTertiaryColor
+        }
+        ColorPickerDialog(
+            initialHex = current,
+            onDismiss = { colorTarget = null },
+            onApply = { hex ->
+                val updated = when (target) {
+                    "Primary" -> settings.copy(themePreset = "Custom", customPrimaryColor = hex)
+                    "Secondary" -> settings.copy(themePreset = "Custom", customSecondaryColor = hex)
+                    else -> settings.copy(themePreset = "Custom", customTertiaryColor = hex)
+                }
+                onUpdateSettings(updated)
+                colorTarget = null
+            }
+        )
+    }
+
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
@@ -367,4 +424,36 @@ fun SettingsScreen(
             }
         )
     }
+}
+
+
+@Composable
+private fun ColorPickerDialog(
+    initialHex: String,
+    onDismiss: () -> Unit,
+    onApply: (String) -> Unit
+) {
+    val initial = runCatching { android.graphics.Color.parseColor(initialHex) }.getOrDefault(android.graphics.Color.MAGENTA)
+    var red by remember { mutableFloatStateOf(android.graphics.Color.red(initial).toFloat()) }
+    var green by remember { mutableFloatStateOf(android.graphics.Color.green(initial).toFloat()) }
+    var blue by remember { mutableFloatStateOf(android.graphics.Color.blue(initial).toFloat()) }
+    val color = Color(red / 255f, green / 255f, blue / 255f)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Theme Color Picker") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Surface(Modifier.fillMaxWidth().height(64.dp), color = color, shape = MaterialTheme.shapes.medium) {}
+                Text("Red: ${red.toInt()}")
+                Slider(value = red, onValueChange = { red = it }, valueRange = 0f..255f)
+                Text("Green: ${green.toInt()}")
+                Slider(value = green, onValueChange = { green = it }, valueRange = 0f..255f)
+                Text("Blue: ${blue.toInt()}")
+                Slider(value = blue, onValueChange = { blue = it }, valueRange = 0f..255f)
+                Text("#%02X%02X%02X".format(red.toInt(), green.toInt(), blue.toInt()))
+            }
+        },
+        confirmButton = { Button(onClick = { onApply("#%02X%02X%02X".format(red.toInt(), green.toInt(), blue.toInt())) }) { Text("Apply") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+    )
 }
