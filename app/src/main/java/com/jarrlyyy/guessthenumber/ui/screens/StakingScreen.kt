@@ -31,10 +31,10 @@ fun StakingScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Combo Streaks & Lucky Stake") },
+                title = { Text(locale.getString("staking_title", "Combo Streaks & Lucky Stake")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 }
             )
