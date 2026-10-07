@@ -22,6 +22,8 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.screens.*
 import com.jarrlyyy.guessthenumber.ui.components.ExpressiveScreen
 import com.jarrlyyy.guessthenumber.ui.components.expressiveSelection
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
+import androidx.compose.runtime.CompositionLocalProvider
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 
 
@@ -167,7 +169,8 @@ fun NavGraph(
         )
     }
 
-    Scaffold(
+    CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+        Scaffold(
         bottomBar = {
             if (items.any { it.route == currentRoute }) {
                 NavigationBar(
@@ -351,6 +354,7 @@ fun NavGraph(
                     )
                 }
             }
+        }
         }
     }
 }
