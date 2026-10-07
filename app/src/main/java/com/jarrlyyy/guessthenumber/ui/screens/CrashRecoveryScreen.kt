@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -38,16 +40,16 @@ fun CrashRecoveryScreen(onDismiss: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("⚠️ Unexpected Crash Detected", fontSize = 24.sp, color = MaterialTheme.colorScheme.onErrorContainer)
+            Text(localizedText("⚠️ Unexpected Crash Detected"), fontSize = 24.sp, color = MaterialTheme.colorScheme.onErrorContainer)
             Spacer(modifier = Modifier.height(16.dp))
-            Text("The game encountered an unexpected error during the previous session and has safely recovered your last valid progress.", fontSize = 16.sp)
+            Text(localizedText("The game encountered an unexpected error during the previous session and has safely recovered your last valid progress."), fontSize = 16.sp)
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = crashLog,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Crash Diagnostic Logs") },
+                label = { Text(localizedText("Crash Diagnostic Logs")) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -62,7 +64,7 @@ fun CrashRecoveryScreen(onDismiss: () -> Unit) {
                 Button(
                     onClick = {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText("Crash Log", crashLog)
+                        val clip = ClipData.newPlainText(localizedText("Crash Log"), crashLog)
                         clipboard.setPrimaryClip(clip)
                         Toast.makeText(context, "Crash logs copied to clipboard!", Toast.LENGTH_SHORT).show()
                     },
@@ -70,7 +72,7 @@ fun CrashRecoveryScreen(onDismiss: () -> Unit) {
                 ) {
                     Icon(imageVector = Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Copy Logs", fontSize = 12.sp)
+                    Text(localizedText("Copy Logs"), fontSize = 12.sp)
                 }
                 Button(
                     onClick = {
@@ -86,7 +88,7 @@ fun CrashRecoveryScreen(onDismiss: () -> Unit) {
                 ) {
                     Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Share Logs", fontSize = 12.sp)
+                    Text(localizedText("Share Logs"), fontSize = 12.sp)
                 }
             }
 
@@ -96,7 +98,7 @@ fun CrashRecoveryScreen(onDismiss: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Continue Playing")
+                Text(localizedText("Continue Playing"))
             }
         }
     }
