@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import android.content.ClipData
@@ -25,6 +26,7 @@ import com.jarrlyyy.guessthenumber.data.crash.AppErrorHandler
 @Composable
 fun CrashRecoveryScreen(onDismiss: () -> Unit) {
     val context = LocalContext.current
+    val locale = LocalAppLocaleManager.current
     val crashLog = remember { AppErrorHandler.getCrashLog() }
     val scrollState = rememberScrollState()
 
@@ -64,9 +66,9 @@ fun CrashRecoveryScreen(onDismiss: () -> Unit) {
                 Button(
                     onClick = {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText(localizedText("Crash Log"), crashLog)
+                        val clip = ClipData.newPlainText(locale.getString("Crash Log", "Crash Log"), crashLog)
                         clipboard.setPrimaryClip(clip)
-                        Toast.makeText(context, "Crash logs copied to clipboard!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, locale.getString("Crash logs copied to clipboard!", "Crash logs copied to clipboard!"), Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.weight(1f)
                 ) {
