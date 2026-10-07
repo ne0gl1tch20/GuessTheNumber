@@ -77,13 +77,13 @@ fun NavGraph(
     hasAnySave: Boolean
 ) {
     val navController = rememberNavController()
+    val locale = viewModel.localeManager
     if (!hasAnySave) {
         CompositionLocalProvider(LocalAppLocaleManager provides locale) {
             SaveSlotsScreen(viewModel = viewModel, onNavigateBack = {})
         }
         return
     }
-    val locale = viewModel.localeManager
     val items = listOf(Screen.Play, Screen.Upgrade, Screen.Shop, Screen.More)
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
