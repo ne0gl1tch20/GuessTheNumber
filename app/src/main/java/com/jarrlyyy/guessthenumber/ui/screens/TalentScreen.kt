@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -43,7 +45,7 @@ fun TalentScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Prestige Talent Web") },
+                title = { Text(localizedText("Prestige Talent Web")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -65,9 +67,9 @@ fun TalentScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Prestige Balance: ${state.prestige.format()}", color = PrestigeBlue, fontSize = 20.sp)
+                        Text(localizedText("Prestige Balance: ${state.prestige.format()}"), color = PrestigeBlue, fontSize = 20.sp)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("Unlock interconnected talent nodes using Prestige to acquire permanent gameplay buffs.", fontSize = 13.sp)
+                        Text(localizedText("Unlock interconnected talent nodes using Prestige to acquire permanent gameplay buffs."), fontSize = 13.sp)
                     }
                 }
             }
@@ -94,9 +96,9 @@ fun TalentScreen(
                             Text(talent.name, fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
                             Text(talent.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Cost: ${talent.cost} Prestige", color = PrestigeBlue, fontSize = 14.sp)
+                            Text(localizedText("Cost: ${talent.cost} Prestige"), color = PrestigeBlue, fontSize = 14.sp)
                             if (talent.requiredParentId != null && !parentUnlocked) {
-                                Text("Locked: Requires parent talent", fontSize = 12.sp, color = MaterialTheme.colorScheme.error)
+                                Text(localizedText("Locked: Requires parent talent"), fontSize = 12.sp, color = MaterialTheme.colorScheme.error)
                             }
                         }
                         Button(
