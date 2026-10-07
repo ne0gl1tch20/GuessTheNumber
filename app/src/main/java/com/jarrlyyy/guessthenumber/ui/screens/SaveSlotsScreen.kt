@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -178,16 +180,16 @@ fun SaveSlotsScreen(
         var difficultyDraft by remember(slotNum) { mutableStateOf(difficultySelections[slotNum] ?: Difficulty.CLASSIC) }
         AlertDialog(
             onDismissRequest = { showCreateDialog = null },
-            title = { Text("Create Save Slot $slotNum") },
+            title = { Text(localizedText("Create Save Slot $slotNum")) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
                         value = createNameDraft,
                         onValueChange = { createNameDraft = it.take(24) },
-                        label = { Text("Save Name") },
+                        label = { Text(localizedText("Save Name")) },
                         singleLine = true
                     )
-                    Text("Icon", style = MaterialTheme.typography.labelLarge)
+                    Text(localizedText("Icon"), style = MaterialTheme.typography.labelLarge)
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         SaveProfile.iconIds.forEach { iconId ->
                             FilterChip(
@@ -197,7 +199,7 @@ fun SaveSlotsScreen(
                             )
                         }
                     }
-                    Text("Difficulty", style = MaterialTheme.typography.labelLarge)
+                    Text(localizedText("Difficulty"), style = MaterialTheme.typography.labelLarge)
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         Difficulty.ids.forEach { id ->
                             FilterChip(
@@ -216,7 +218,7 @@ fun SaveSlotsScreen(
                         if (success) showCreateDialog = null
                         refreshMetadata()
                     }
-                }) { Text("Create") }
+                }) { Text(localizedText("Create")) }
             },
             dismissButton = { TextButton(onClick = { showCreateDialog = null }) { Text(locale.getString("cancel", "Cancel")) } }
         )
@@ -366,7 +368,7 @@ fun SaveSlotsScreen(
                             viewModel.exportSave { json ->
                                 val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
                                 clipboard?.setPrimaryClip(
-                                    ClipData.newPlainText("GuessTheNumberSave", json)
+                                    ClipData.newPlainText(localizedText("GuessTheNumberSave"), json)
                                 )
                                 android.widget.Toast.makeText(
                                     context,
@@ -438,7 +440,7 @@ private fun DifficultySelector(
 
     Box {
         OutlinedButton(onClick = { expanded = true }) {
-            Text("${locale.getString("save_slot_difficulty", "Difficulty")}: $selectedName")
+            Text(localizedText("${locale.getString(")save_slot_difficulty", "Difficulty")}: $selectedName")
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             Difficulty.ids.forEach { difficultyId ->
@@ -529,12 +531,11 @@ fun SlotCard(
                 val profileDisplayName = metadata.profileName.ifBlank {
                     locale.getString("save_slot_title", "Slot %d", slotIndex)
                 }
-                Text(
-                    text = "${SaveProfile.iconSymbol(metadata.profileIconId)}  $profileDisplayName",
+                Text(text = localizedText("${SaveProfile.iconSymbol(metadata.profileIconId)}  $profileDisplayName"),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = "${locale.getString("save_slot_difficulty", "Difficulty")}: ${locale.getString(Difficulty.nameKey(metadata.difficultyId), "Classic")}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = localizedText("${locale.getString(")save_slot_difficulty", "Difficulty")}: ${locale.getString(Difficulty.nameKey(metadata.difficultyId), "Classic")}", style = MaterialTheme.typography.bodyMedium)
                 Text(text = locale.getString("save_slot_money", "Money: %s", metadata.money), style = MaterialTheme.typography.bodyMedium)
                 Text(text = locale.getString("save_slot_prestige_ultra", "Prestige: %s | Ultra: %s", metadata.prestige, metadata.ultra), style = MaterialTheme.typography.bodySmall)
                 Text(text = locale.getString("save_slot_attempts_correct", "Attempts: %d | Correct: %d", metadata.attempts, metadata.correctGuesses), style = MaterialTheme.typography.bodySmall)
