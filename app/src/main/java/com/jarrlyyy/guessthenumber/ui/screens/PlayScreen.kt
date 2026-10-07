@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
@@ -86,8 +88,7 @@ fun PlayScreen(
                                 Icon(imageVector = Icons.Default.Star, contentDescription = "Money", tint = MoneyGold, modifier = Modifier.size(28.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
                                 AnimatedContent(targetState = state.money.format(), label = "MoneyAnimation") { moneyStr ->
-                                    Text(
-                                        text = "Money: $moneyStr",
+                                    Text(text = localizedText("Money: $moneyStr"),
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         style = MaterialTheme.typography.titleLarge
                                     )
@@ -102,8 +103,7 @@ fun PlayScreen(
                                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.25f),
                                 tonalElevation = 2.dp
                             ) {
-                                Text(
-                                    text = "+$formattedIncome/s",
+                                Text(text = localizedText("+$formattedIncome/s"),
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     style = MaterialTheme.typography.labelMedium,
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
@@ -126,8 +126,7 @@ fun PlayScreen(
                                     modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text(
-                                        text = "Prestige",
+                                    Text(text = localizedText("Prestige"),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                                     )
@@ -149,8 +148,7 @@ fun PlayScreen(
                                     modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text(
-                                        text = "Ultra",
+                                    Text(text = localizedText("Ultra"),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                                     )
@@ -172,8 +170,7 @@ fun PlayScreen(
                                     modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text(
-                                        text = "Nebula",
+                                    Text(text = localizedText("Nebula"),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                                     )
