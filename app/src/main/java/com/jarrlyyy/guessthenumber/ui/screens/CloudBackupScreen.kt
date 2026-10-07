@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -30,7 +32,7 @@ fun CloudBackupScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Save Export / Import & Cloud Backup") },
+                title = { Text(localizedText("Save Export / Import & Cloud Backup")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -52,8 +54,8 @@ fun CloudBackupScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Cloud Backup & Transfer", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
-                        Text("Export your encrypted save string to back up your progress across devices or securely restore from a backup string.", fontSize = 14.sp)
+                        Text(localizedText("Cloud Backup & Transfer"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                        Text(localizedText("Export your encrypted save string to back up your progress across devices or securely restore from a backup string."), fontSize = 14.sp)
                     }
                 }
             }
@@ -63,14 +65,14 @@ fun CloudBackupScreen(
                     onClick = {
                         onExportSave { json ->
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText("GuessTheNumberBackup", json)
+                            val clip = ClipData.newPlainText(localizedText("GuessTheNumberBackup"), json)
                             clipboard.setPrimaryClip(clip)
                             Toast.makeText(context, "Encrypted save string copied to clipboard!", Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Export & Copy Backup String")
+                    Text(localizedText("Export & Copy Backup String"))
                 }
             }
 
@@ -78,7 +80,7 @@ fun CloudBackupScreen(
                 OutlinedTextField(
                     value = importJson,
                     onValueChange = { importJson = it },
-                    label = { Text("Paste Backup String") },
+                    label = { Text(localizedText("Paste Backup String")) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -97,7 +99,7 @@ fun CloudBackupScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Restore Backup String")
+                    Text(localizedText("Restore Backup String"))
                 }
             }
         }
