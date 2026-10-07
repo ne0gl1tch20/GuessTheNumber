@@ -216,4 +216,4 @@ Add more tests as new localization or UI systems are discovered. New functionali
 
 ## Current release
 
-v1.14.0 / versionCode 14.
+v1.15.0 / versionCode 15.
