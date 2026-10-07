@@ -83,6 +83,18 @@ class LocaleManagerTest {
     }
 
     @Test
+    fun englishUiLiteralsResolveThroughActiveLocale() = runBlocking {
+        val manager = LocaleManager(context)
+
+        manager.loadLocaleForTag("fil-PH")
+        assertEquals("Mga Setting", manager.getStringByEnglish("Settings"))
+        assertEquals("Iba Pa", manager.getStringByEnglish("More"))
+
+        manager.loadLocaleForTag("en-US")
+        assertEquals("Settings", manager.getStringByEnglish("Settings"))
+    }
+
+    @Test
     fun unknownLocaleFallsBackToEnglish() = runBlocking {
         val manager = LocaleManager(context)
         manager.loadLocaleForTag("xx-XX")
