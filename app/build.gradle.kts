@@ -7,9 +7,14 @@ plugins {
 }
 
 android {
-    // Stable project-local debug signing. Generate once with scripts/generate_debug_keystore.sh.
+    // Stable project debug signing. CI supplies the keystore through environment variables; local builds can use debug-signing/debug.keystore.
+    val ciDebugKeystore = System.getenv("GTN_DEBUG_KEYSTORE_PATH")?.let(::file)
     val projectDebugKeystore = rootProject.file("debug-signing/debug.keystore")
-    val hasProjectDebugKeystore = projectDebugKeystore.isFile
+    val selectedDebugKeystore = ciDebugKeystore?.takeIf { it.isFile } ?: projectDebugKeystore
+    val hasProjectDebugKeystore = selectedDebugKeystore.isFile
+    val debugStorePassword = System.getenv("GTN_DEBUG_KEYSTORE_PASSWORD") ?: "android"
+    val debugKeyAlias = System.getenv("GTN_DEBUG_KEY_ALIAS") ?: "guessthenumber-debug"
+    val debugKeyPassword = System.getenv("GTN_DEBUG_KEY_PASSWORD") ?: "android"
 
     namespace = "com.jarrlyyy.guessthenumber"
     compileSdk = 37
@@ -30,10 +35,10 @@ android {
     signingConfigs {
         if (hasProjectDebugKeystore) {
             create("projectDebug") {
-                storeFile = projectDebugKeystore
-                storePassword = "android"
-                keyAlias = "guessthenumber-debug"
-                keyPassword = "android"
+                storeFile = selectedDebugKeystore
+                storePassword = debugStorePassword
+                keyAlias = debugKeyAlias
+                keyPassword = debugKeyPassword
             }
         }
     }
