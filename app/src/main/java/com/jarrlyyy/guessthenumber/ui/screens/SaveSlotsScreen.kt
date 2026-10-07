@@ -368,7 +368,7 @@ fun SaveSlotsScreen(
                             viewModel.exportSave { json ->
                                 val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
                                 clipboard?.setPrimaryClip(
-                                    ClipData.newPlainText(localizedText("GuessTheNumberSave"), json)
+                                    ClipData.newPlainText(locale.getString("GuessTheNumberSave", "GuessTheNumberSave"), json)
                                 )
                                 android.widget.Toast.makeText(
                                     context,
@@ -440,7 +440,7 @@ private fun DifficultySelector(
 
     Box {
         OutlinedButton(onClick = { expanded = true }) {
-            Text(localizedText("${locale.getString(")save_slot_difficulty", "Difficulty")}: $selectedName")
+            Text(locale.getString("save_slot_difficulty", "Difficulty") + ": " + selectedName)
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             Difficulty.ids.forEach { difficultyId ->
@@ -531,11 +531,11 @@ fun SlotCard(
                 val profileDisplayName = metadata.profileName.ifBlank {
                     locale.getString("save_slot_title", "Slot %d", slotIndex)
                 }
-                Text(text = localizedText("${SaveProfile.iconSymbol(metadata.profileIconId)}  $profileDisplayName"),
+                Text(text = "${SaveProfile.iconSymbol(metadata.profileIconId)}  $profileDisplayName",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = localizedText("${locale.getString(")save_slot_difficulty", "Difficulty")}: ${locale.getString(Difficulty.nameKey(metadata.difficultyId), "Classic")}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = locale.getString("save_slot_difficulty", "Difficulty") + ": " + locale.getString(Difficulty.nameKey(metadata.difficultyId), "Classic"), style = MaterialTheme.typography.bodyMedium)
                 Text(text = locale.getString("save_slot_money", "Money: %s", metadata.money), style = MaterialTheme.typography.bodyMedium)
                 Text(text = locale.getString("save_slot_prestige_ultra", "Prestige: %s | Ultra: %s", metadata.prestige, metadata.ultra), style = MaterialTheme.typography.bodySmall)
                 Text(text = locale.getString("save_slot_attempts_correct", "Attempts: %d | Correct: %d", metadata.attempts, metadata.correctGuesses), style = MaterialTheme.typography.bodySmall)
