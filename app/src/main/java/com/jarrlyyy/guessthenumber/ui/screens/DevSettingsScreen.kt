@@ -61,9 +61,6 @@ fun DevSettingsScreen(
     var logSearchQuery by remember { mutableStateOf("") }
     var isPaused by remember { mutableStateOf(false) }
 
-    val configRepo = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale) }
-    val locale = configRepo.localeManager
-    
     val logs by GameLogger.logFlow.collectAsState(initial = emptyList())
     val jsonSerializer = remember { Json { ignoreUnknownKeys = true; prettyPrint = true } }
 
