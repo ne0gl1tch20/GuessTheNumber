@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -61,11 +63,11 @@ fun StakingScreen(
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Current Streak: ${state.streak} (Best: ${state.bestStreak})", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                        Text(localizedText("Current Streak: ${state.streak} (Best: ${state.bestStreak})"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("Money: ${state.money.format()}", color = MoneyGold, fontSize = 16.sp)
+                        Text(localizedText("Money: ${state.money.format()}"), color = MoneyGold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Stake a portion of your money on a 50/50 'Lucky Guess' coin flip. Win to double your stake (+streak multiplier bonus), lose to forfeit it!", fontSize = 13.sp)
+                        Text(localizedText("Stake a portion of your money on a 50/50 'Lucky Guess' coin flip. Win to double your stake (+streak multiplier bonus), lose to forfeit it!"), fontSize = 13.sp)
                     }
                 }
             }
@@ -74,7 +76,7 @@ fun StakingScreen(
                 OutlinedTextField(
                     value = stakeInput,
                     onValueChange = { stakeInput = it },
-                    label = { Text("Stake Amount") },
+                    label = { Text(localizedText("Stake Amount")) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -109,7 +111,7 @@ fun StakingScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = MoneyGold)
                 ) {
-                    Text("Stake & Flip (50/50)", color = MaterialTheme.colorScheme.onBackground)
+                    Text(localizedText("Stake & Flip (50/50)"), color = MaterialTheme.colorScheme.onBackground)
                 }
             }
 
