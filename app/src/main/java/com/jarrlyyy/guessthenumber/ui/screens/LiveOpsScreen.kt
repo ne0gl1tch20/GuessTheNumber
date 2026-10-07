@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -44,7 +46,7 @@ fun LiveOpsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Seasonal Events") },
+                title = { Text(localizedText("Seasonal Events")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -80,14 +82,12 @@ fun LiveOpsScreen(
                                 .padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text("Event Perks & Permanent Bonuses", style = MaterialTheme.typography.titleMedium)
-                            Text(
-                                text = "Permanent Bonus Level: +${state.permanentEventBoosts} (Grants permanent money & currency multipliers across saves!)",
+                            Text(localizedText("Event Perks & Permanent Bonuses"), style = MaterialTheme.typography.titleMedium)
+                            Text(text = localizedText("Permanent Bonus Level: +${state.permanentEventBoosts} (Grants permanent money & currency multipliers across saves!)"),
                                 fontSize = 16.sp,
                                 color = MoneyGold
                             )
-                            Text(
-                                text = "Participate in limited-time live ops events to claim rewards and permanently enhance your progression.",
+                            Text(text = localizedText("Participate in limited-time live ops events to claim rewards and permanently enhance your progression."),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -142,8 +142,8 @@ fun LiveOpsScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
-                                    Text("Currency: ${event.currencyName}", fontSize = 12.sp, style = MaterialTheme.typography.labelMedium)
-                                    Text("Claims: $claims / ${event.maxClaims}", fontSize = 12.sp, color = MoneyGold)
+                                    Text(localizedText("Currency: ${event.currencyName}"), fontSize = 12.sp, style = MaterialTheme.typography.labelMedium)
+                                    Text(localizedText("Claims: $claims / ${event.maxClaims}"), fontSize = 12.sp, color = MoneyGold)
                                 }
                                 Button(
                                     onClick = { onClaimReward(event.id) },
