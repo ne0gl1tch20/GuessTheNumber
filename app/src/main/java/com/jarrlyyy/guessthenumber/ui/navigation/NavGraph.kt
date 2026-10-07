@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -142,19 +143,19 @@ fun NavGraph(
     } else if (showChangelogPopup) {
         AlertDialog(
             onDismissRequest = onDismissChangelog,
-            title = { Text(locale.getString("changelog_popup_title", "🚀 What's New in v1.13.0!")) },
-            text = { Text(locale.getString("changelog_popup_text", "Guess The Number v1.13.0 is installed! Check out the changelog for the latest Material 3 Expressive polish and fixes.")) },
+            title = { Text(locale.getString("changelog_popup_title", BuildConfig.VERSION_NAME)) },
+            text = { Text(locale.getString("changelog_popup_text", BuildConfig.VERSION_NAME)) },
             confirmButton = {
                 Button(onClick = {
                     onDismissChangelog()
                     navController.navigate(Screen.ChangelogViewer.route)
                 }) {
-                    Text(locale.getString("view_changelog", "View Changelog"))
+                    Text(locale.getString("view_changelog"))
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismissChangelog) {
-                    Text(locale.getString("dismiss", "Dismiss"))
+                    Text(locale.getString("dismiss"))
                 }
             }
         )
