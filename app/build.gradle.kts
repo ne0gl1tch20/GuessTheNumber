@@ -7,6 +7,10 @@ plugins {
 }
 
 android {
+    // Stable project-local debug signing. Generate once with scripts/generate_debug_keystore.sh.
+    val projectDebugKeystore = rootProject.file("debug-signing/debug.keystore")
+    val hasProjectDebugKeystore = projectDebugKeystore.isFile
+
     namespace = "com.jarrlyyy.guessthenumber"
     compileSdk = 37
 
@@ -23,6 +27,17 @@ android {
         }
     }
 
+    signingConfigs {
+        if (hasProjectDebugKeystore) {
+            create("projectDebug") {
+                storeFile = projectDebugKeystore
+                storePassword = "android"
+                keyAlias = "guessthenumber-debug"
+                keyPassword = "android"
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -34,6 +49,9 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             isDebuggable = true
+            if (hasProjectDebugKeystore) {
+                signingConfig = signingConfigs.getByName("projectDebug")
+            }
         }
     }
     compileOptions {
