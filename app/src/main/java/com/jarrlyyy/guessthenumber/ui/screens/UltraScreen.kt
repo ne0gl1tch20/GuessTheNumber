@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -65,13 +67,13 @@ fun UltraScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Ultra Balance: ${state.ultra.format()}", color = UltraPurple, fontSize = 20.sp)
+                        Text(localizedText("Ultra Balance: ${state.ultra.format()}"), color = UltraPurple, fontSize = 20.sp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Requirements: ${requiredMoney.format()} Money AND 1,000 Prestige (Reset #${state.ultraCount + 1})")
-                        Text("Current Money: ${state.money.format()} | Current Prestige: ${state.prestige.format()}")
-                        Text("Preview Reward: +${ultraReward.format()} Ultra (Max 2,000)")
+                        Text(localizedText("Requirements: ${requiredMoney.format()} Money AND 1,000 Prestige (Reset #${state.ultraCount + 1})"))
+                        Text(localizedText("Current Money: ${state.money.format()} | Current Prestige: ${state.prestige.format()}"))
+                        Text(localizedText("Preview Reward: +${ultraReward.format()} Ultra (Max 2,000)"))
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("🔄 Reset Info: Resets all regular Money, Prestige balance, Upgrade Levels, and Prestige Upgrade Levels. Each ultra increases the money requirement for the next ultra.", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(localizedText("🔄 Reset Info: Resets all regular Money, Prestige balance, Upgrade Levels, and Prestige Upgrade Levels. Each ultra increases the money requirement for the next ultra."), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.height(12.dp))
                         Button(
                             onClick = onUltra,
@@ -87,22 +89,22 @@ fun UltraScreen(
 
             // Ultra Upgrades Header
             item {
-                Text("Ultra Upgrade Tree (JSON Driven)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(localizedText("Ultra Upgrade Tree (JSON Driven)"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
             item {
                 var expanded by remember { mutableStateOf(false) }
                 val multipliers = listOf("1", "10", "100", "MAX")
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text("Buy Multiplier:", style = MaterialTheme.typography.titleMedium)
+                    Text(localizedText("Buy Multiplier:"), style = MaterialTheme.typography.titleMedium)
                     Box(Modifier.wrapContentSize(Alignment.TopEnd)) {
                         OutlinedButton(onClick = { expanded = true }, shape = MaterialTheme.shapes.medium, contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
-                            Text("${state.buyMultiplier}x", style = MaterialTheme.typography.labelLarge)
+                            Text(localizedText("${state.buyMultiplier}x"), style = MaterialTheme.typography.labelLarge)
                             Spacer(Modifier.width(8.dp))
                             Icon(Icons.Default.ArrowDropDown, contentDescription = locale.getString("dropdown", "Dropdown"))
                         }
                         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                             multipliers.forEach { mult ->
-                                DropdownMenuItem(text = { Text("$mult x", style = MaterialTheme.typography.bodyMedium) }, onClick = { onUpdateMultiplier(mult); expanded = false })
+                                DropdownMenuItem(text = { Text(localizedText("$mult x"), style = MaterialTheme.typography.bodyMedium) }, onClick = { onUpdateMultiplier(mult); expanded = false })
                             }
                         }
                     }
@@ -151,14 +153,14 @@ fun UltraScreen(
                             Text(upgrade.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(Modifier.height(6.dp))
                             Surface(shape = MaterialTheme.shapes.extraSmall, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)) {
-                                Text("Level: " + level + " / " + if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+                                Text(localizedText("Level: ") + level + " / " + if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
                             }
                             if (!isMaxed) {
                                 Spacer(Modifier.height(4.dp))
-                                Text("Cost (${state.buyMultiplier}x): ${totalCost.format()} Ultra", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(localizedText("Cost (${state.buyMultiplier}x): ${totalCost.format()} Ultra"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             } else {
                                 Spacer(Modifier.height(4.dp))
-                                Text("MAXED", style = MaterialTheme.typography.bodySmall, color = UltraPurple)
+                                Text(localizedText("MAXED"), style = MaterialTheme.typography.bodySmall, color = UltraPurple)
                             }
                         }
                         Spacer(Modifier.width(12.dp))
@@ -172,7 +174,7 @@ fun UltraScreen(
             // Ultra Shop Header
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("Ultra Shop (JSON Driven)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(localizedText("Ultra Shop (JSON Driven)"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
 
             items(shopItems, key = { it.id }) { item ->
@@ -191,7 +193,7 @@ fun UltraScreen(
                             Text(item.name, fontSize = 18.sp)
                             Text(item.description, fontSize = 14.sp)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Cost: ${item.cost} Ultra", color = UltraPurple)
+                            Text(localizedText("Cost: ${item.cost} Ultra"), color = UltraPurple)
                         }
                         Button(
                             onClick = { onBuyUltraShopItem(item.id, item.cost) },
