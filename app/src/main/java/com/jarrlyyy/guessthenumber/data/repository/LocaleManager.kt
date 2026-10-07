@@ -17,6 +17,7 @@ import java.util.Locale
 
 class LocaleManager(private val context: Context) {
     private var translations: JSONObject = JSONObject()
+    private var englishCatalog: JSONObject = JSONObject()
     private var currentLocale: Locale = Locale.US
 
     suspend fun loadLocale(localeFileName: String = ENGLISH_FILE) {
@@ -28,6 +29,7 @@ class LocaleManager(private val context: Context) {
                 // Always establish the requested locale first. Formatting and RTL detection
                 // must not depend on whether an optional overlay asset can be read.
                 val fallback = readJson(ENGLISH_FILE)
+                englishCatalog = fallback
                 val merged = JSONObject(fallback.toString())
 
                 if (localeFileName != ENGLISH_FILE) {
@@ -78,12 +80,11 @@ class LocaleManager(private val context: Context) {
         formatString(translations.optString(key, key), *formatArgs)
 
     fun getStringByEnglish(english: String): String {
-        val catalog = try { readJson(ENGLISH_FILE) } catch (_: Exception) { null }
-        if (catalog != null) {
-            val keys = catalog.keys()
-            while (keys.hasNext()) {
-                val key = keys.next()
-                if (catalog.optString(key, "") == english) return translations.optString(key, english)
+        val keys = englishCatalog.keys()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            if (englishCatalog.optString(key, "") == english) {
+                return translations.optString(key, english)
             }
         }
         return english
