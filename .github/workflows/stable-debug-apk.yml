@@ -22,6 +22,42 @@ jobs:
           java-version: '17'
           cache: gradle
 
+      - name: Validate Localizations
+        run: python3 tools/validate_locales.py
+
+      - name: Validate Version Metadata
+        run: python3 tools/validate_versions.py
+
+      - name: Validate All JSON Assets
+        run: python3 tools/validate_json_assets.py
+
+      - name: Audit Repository Localization Surface
+        run: python3 tools/audit_localization_surface.py
+
+      - name: Audit Hardcoded UI Strings
+        run: python3 tools/validate_hardcoded_strings.py
+
+      - name: Fast Kotlin Preflight Check
+        run: python3 tools/preflight_compile_check.py
+
+      - name: Build Preflight
+        run: python3 tools/build_preflight.py
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest --no-daemon
+
+      - name: Run Lint
+        run: ./gradlew lintDebug --no-daemon
+
+      - name: Run Full Gradle Check
+        run: ./gradlew check --no-daemon
+
       - name: Restore stable debug keystore
         env:
           KEYSTORE_B64: ${{ secrets.GTN_DEBUG_KEYSTORE_BASE64 }}
