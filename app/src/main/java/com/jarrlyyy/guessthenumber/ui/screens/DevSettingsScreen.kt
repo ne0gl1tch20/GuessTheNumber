@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -107,7 +109,7 @@ fun DevSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Developer Settings & Console") },
+                title = { Text(localizedText("Developer Settings & Console")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -132,7 +134,7 @@ fun DevSettingsScreen(
                 ) {
                     Icon(imageVector = Icons.Default.Info, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Open Variable & Process Inspector", fontSize = 16.sp)
+                    Text(localizedText("Open Variable & Process Inspector"), fontSize = 16.sp)
                 }
             }
 
@@ -145,8 +147,8 @@ fun DevSettingsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Save non-crash logs to storage", style = MaterialTheme.typography.titleMedium, fontSize = 16.sp)
-                            Text("Saves game logs to Android/data files directory", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(localizedText("Save non-crash logs to storage"), style = MaterialTheme.typography.titleMedium, fontSize = 16.sp)
+                            Text(localizedText("Saves game logs to Android/data files directory"), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Switch(
                             checked = state.settings.saveLogsToStorage,
@@ -195,7 +197,7 @@ fun DevSettingsScreen(
                     ) {
                         Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Zip & Share Logs from Storage", fontSize = 14.sp)
+                        Text(localizedText("Zip & Share Logs from Storage"), fontSize = 14.sp)
                     }
                 }
             }
@@ -204,7 +206,7 @@ fun DevSettingsScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Developer Commands", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(localizedText("Developer Commands"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -215,7 +217,7 @@ fun DevSettingsScreen(
                         OutlinedTextField(
                             value = commandInput,
                             onValueChange = { commandInput = it },
-                            label = { Text("Command (e.g. /help)") },
+                            label = { Text(localizedText("Command (e.g. /help)")) },
                             modifier = Modifier.weight(1f),
                             singleLine = true
                         )
@@ -226,7 +228,7 @@ fun DevSettingsScreen(
                                 commandInput = ""
                             }
                         }) {
-                            Text("Run")
+                            Text(localizedText("Run"))
                         }
                     }
 
@@ -253,13 +255,13 @@ fun DevSettingsScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("App Preferences (Global JSON)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(localizedText("App Preferences (Global JSON)"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
             item {
                 OutlinedTextField(
                     value = appPreferencesJsonEditorInput,
                     onValueChange = { appPreferencesJsonEditorInput = it },
-                    label = { Text("Raw App Preferences JSON") },
+                    label = { Text(localizedText("Raw App Preferences JSON")) },
                     modifier = Modifier.fillMaxWidth().height(150.dp)
                 )
             }
@@ -270,12 +272,12 @@ fun DevSettingsScreen(
                             appPreferencesJsonEditorInput = it
                             Toast.makeText(context, "Loaded global app preferences", Toast.LENGTH_SHORT).show()
                         }
-                    }, modifier = Modifier.weight(1f)) { Text("Load App Preferences") }
+                    }, modifier = Modifier.weight(1f)) { Text(localizedText("Load App Preferences")) }
                     Button(onClick = {
                         onApplyAppPreferencesJson(appPreferencesJsonEditorInput) { success ->
                             Toast.makeText(context, if (success) "App preferences applied!" else "Invalid app preferences JSON!", Toast.LENGTH_SHORT).show()
                         }
-                    }, modifier = Modifier.weight(1f)) { Text("Apply App Preferences") }
+                    }, modifier = Modifier.weight(1f)) { Text(localizedText("Apply App Preferences")) }
                 }
             }
 
@@ -283,7 +285,7 @@ fun DevSettingsScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Save Editor (JSON Editing)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(localizedText("Save Editor (JSON Editing)"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
             item {
                 ExposedDropdownMenuBox(
@@ -295,14 +297,14 @@ fun DevSettingsScreen(
                         value = "Save Slot $selectedSaveSlot",
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Save Slots") },
+                        label = { Text(localizedText("Save Slots")) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(saveSlotExpanded) },
                         modifier = Modifier.menuAnchor().fillMaxWidth()
                     )
                     ExposedDropdownMenu(expanded = saveSlotExpanded, onDismissRequest = { saveSlotExpanded = false }) {
                         (1..10).forEach { slot ->
                             DropdownMenuItem(
-                                text = { Text("Save Slot $slot") },
+                                text = { Text(localizedText("Save Slot $slot")) },
                                 onClick = { selectedSaveSlot = slot; saveSlotExpanded = false }
                             )
                         }
@@ -313,7 +315,7 @@ fun DevSettingsScreen(
                 OutlinedTextField(
                     value = saveJsonEditorInput,
                     onValueChange = { saveJsonEditorInput = it },
-                    label = { Text("Raw GameState JSON") },
+                    label = { Text(localizedText("Raw GameState JSON")) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
@@ -333,7 +335,7 @@ fun DevSettingsScreen(
                     ) {
                         Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Load Current Save", fontSize = 12.sp)
+                        Text(localizedText("Load Current Save"), fontSize = 12.sp)
                     }
                     Button(
                         onClick = {
@@ -354,7 +356,7 @@ fun DevSettingsScreen(
                     ) {
                         Icon(imageVector = Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Apply Save JSON", fontSize = 12.sp)
+                        Text(localizedText("Apply Save JSON"), fontSize = 12.sp)
                     }
                 }
             }
@@ -369,7 +371,7 @@ fun DevSettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Live Console Logs", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                        Text(localizedText("Live Console Logs"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
                             IconButton(
                                 onClick = {
@@ -403,7 +405,7 @@ fun DevSettingsScreen(
                                 onClick = {
                                     val exported = GameLogger.exportLogs()
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    clipboard.setPrimaryClip(ClipData.newPlainText("Game Logs", exported))
+                                    clipboard.setPrimaryClip(ClipData.newPlainText(localizedText("Game Logs"), exported))
                                     Toast.makeText(context, "Logs copied to clipboard", Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.size(36.dp)
@@ -420,7 +422,7 @@ fun DevSettingsScreen(
                     OutlinedTextField(
                         value = logSearchQuery,
                         onValueChange = { logSearchQuery = it },
-                        label = { Text("Filter logs (category, level, message)...") },
+                        label = { Text(localizedText("Filter logs (category, level, message)...")) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
@@ -472,8 +474,7 @@ fun DevSettingsScreen(
                                 .padding(12.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = "No logs recorded yet...",
+                            Text(text = localizedText("No logs recorded yet..."),
                                 color = Color(0xFF888888),
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 12.sp
@@ -494,8 +495,7 @@ fun DevSettingsScreen(
                                     LogLevel.INFO -> Color(0xFF50FA7B)
                                     else -> Color(0xFF8BE9FD)
                                 }
-                                Text(
-                                    text = "[$timeStr][${log.category}][${log.level}] ${log.message}",
+                                Text(text = localizedText("[$timeStr][${log.category}][${log.level}] ${log.message}"),
                                     color = color,
                                     fontFamily = FontFamily.Monospace,
                                     fontSize = 11.sp,
