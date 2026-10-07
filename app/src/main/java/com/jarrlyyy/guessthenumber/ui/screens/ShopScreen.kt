@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -58,7 +60,7 @@ fun ShopScreen(
                         Column {
                             Text(locale.getString("available_nebula", "Available Nebula"), style = MaterialTheme.typography.bodyMedium)
                             AnimatedContent(targetState = state.nebula.format(), label = "ShopNebulaAnimation") { nebulaStr ->
-                                Text("$nebulaStr Nebula", color = NebulaPink, style = MaterialTheme.typography.titleLarge)
+                                Text(localizedText("$nebulaStr Nebula"), color = NebulaPink, style = MaterialTheme.typography.titleLarge)
                             }
                             state.equippedCosmeticId?.let { equipped ->
                                 Spacer(modifier = Modifier.height(6.dp))
