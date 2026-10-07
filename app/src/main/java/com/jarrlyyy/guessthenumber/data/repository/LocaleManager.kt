@@ -77,6 +77,18 @@ class LocaleManager(private val context: Context) {
     fun getString(key: String, vararg formatArgs: Any): String =
         formatString(translations.optString(key, key), *formatArgs)
 
+    fun getStringByEnglish(english: String): String {
+        val catalog = try { readJson(ENGLISH_FILE) } catch (_: Exception) { null }
+        if (catalog != null) {
+            val keys = catalog.keys()
+            while (keys.hasNext()) {
+                val key = keys.next()
+                if (catalog.optString(key, "") == english) return translations.optString(key, english)
+            }
+        }
+        return english
+    }
+
     fun getString(key: String, default: String, vararg formatArgs: Any): String =
         formatString(translations.optString(key, default), *formatArgs)
 
