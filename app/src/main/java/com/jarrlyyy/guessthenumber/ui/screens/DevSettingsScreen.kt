@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import android.content.ClipData
@@ -51,6 +52,7 @@ fun DevSettingsScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val locale = LocalAppLocaleManager.current
     var commandInput by remember { mutableStateOf("") }
     var saveJsonEditorInput by remember { mutableStateOf("") }
     var appPreferencesJsonEditorInput by remember { mutableStateOf("") }
@@ -405,8 +407,8 @@ fun DevSettingsScreen(
                                 onClick = {
                                     val exported = GameLogger.exportLogs()
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    clipboard.setPrimaryClip(ClipData.newPlainText(localizedText("Game Logs"), exported))
-                                    Toast.makeText(context, "Logs copied to clipboard", Toast.LENGTH_SHORT).show()
+                                    clipboard.setPrimaryClip(ClipData.newPlainText(locale.getString("Game Logs", "Game Logs"), exported))
+                                    Toast.makeText(context, locale.getString("Logs copied to clipboard", "Logs copied to clipboard"), Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.size(36.dp)
                             ) {
