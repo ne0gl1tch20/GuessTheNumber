@@ -194,7 +194,7 @@ fun UpgradeScreen(
                                 shape = MaterialTheme.shapes.extraSmall,
                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                             ) {
-                                Text(text = localizedText("Level: $level / ${if (upgrade.maxLevel >= 999999) ")MAX" else upgrade.maxLevel}",
+                                Text(text = "Level: $level / ${if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel}",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
