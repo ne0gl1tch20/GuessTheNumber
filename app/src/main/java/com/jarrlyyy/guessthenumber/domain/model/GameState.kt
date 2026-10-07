@@ -62,6 +62,8 @@ data class GameStatistics(
     val randomEventsTriggered: Long = 0
 )
 
+val DEFAULT_MORE_SCREEN_ORDER = listOf("achievements", "live_ops", "mutators", "talent", "arcade", "stats", "changelog", "settings", "about", "dev_settings")
+
 @Serializable
 data class GameSettings(
     val musicEnabled: Boolean = true,
@@ -81,7 +83,7 @@ data class GameSettings(
     val customPrimaryColor: String = "#7C4DFF",
     val customSecondaryColor: String = "#00BCD4",
     val customTertiaryColor: String = "#00C853",
-    val moreScreenOrder: List<String> = emptyList(),
+    val moreScreenOrder: List<String> = DEFAULT_MORE_SCREEN_ORDER,
     val tutorialCompleted: Boolean = false
 )
 
