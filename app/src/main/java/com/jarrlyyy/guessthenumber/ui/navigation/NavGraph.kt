@@ -143,8 +143,8 @@ fun NavGraph(
     } else if (showChangelogPopup) {
         AlertDialog(
             onDismissRequest = onDismissChangelog,
-            title = { Text(locale.getString("changelog_popup_title", BuildConfig.VERSION_NAME)) },
-            text = { Text(locale.getString("changelog_popup_text", BuildConfig.VERSION_NAME)) },
+            title = { Text(locale.getString("changelog_popup_title", "🚀 What's New in v%s!", BuildConfig.VERSION_NAME)) },
+            text = { Text(locale.getString("changelog_popup_text", "Guess The Number v%s is installed! Check out the changelog for the latest features, polish, and fixes.", BuildConfig.VERSION_NAME)) },
             confirmButton = {
                 Button(onClick = {
                     onDismissChangelog()
