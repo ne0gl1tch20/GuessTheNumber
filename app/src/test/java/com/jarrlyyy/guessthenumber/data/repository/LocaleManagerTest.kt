@@ -46,8 +46,8 @@ class LocaleManagerTest {
         val version = manager.getString(
             "about_version_format",
             "Version: %s (%d)",
-            "1.14.0",
-            14
+            "1.15.0",
+            15
         )
         val author = manager.getString(
             "about_library_author_format",
@@ -60,12 +60,33 @@ class LocaleManagerTest {
             "Apache 2.0"
         )
 
-        assertEquals("Version: 1.14.0 (14)", version)
+        assertEquals("Version: 1.15.0 (15)", version)
         assertEquals("Author: Google", author)
         assertEquals("License: Apache 2.0", license)
         assertTrue(!version.contains("%s") && !version.contains("%d"))
         assertTrue(!author.contains("%s"))
         assertTrue(!license.contains("%s"))
+    }
+
+    @Test
+    fun whatsNewPopupStringsAreLocalizedAndVersionFormatted() = runBlocking {
+        val manager = LocaleManager(context)
+
+        manager.loadLocaleForTag("en-US")
+        val englishTitle = manager.getString("changelog_popup_title", "1.15.0")
+        val englishText = manager.getString("changelog_popup_text", "1.15.0")
+        assertEquals("🚀 What's New in v1.15.0!", englishTitle)
+        assertEquals("Guess The Number v1.15.0 is installed! Check out the changelog for the latest features, polish, and fixes.", englishText)
+        assertTrue(!englishTitle.contains("%s"))
+        assertTrue(!englishText.contains("%s"))
+
+        manager.loadLocaleForTag("fil-PH")
+        val filipinoTitle = manager.getString("changelog_popup_title", "1.15.0")
+        val filipinoText = manager.getString("changelog_popup_text", "1.15.0")
+        assertEquals("🚀 Ano ang Bago sa v1.15.0!", filipinoTitle)
+        assertEquals("Naka-install na ang Guess The Number v1.15.0! Tingnan ang changelog para sa mga bagong feature, polish, at fixes.", filipinoText)
+        assertTrue(!filipinoTitle.contains("%s"))
+        assertTrue(!filipinoText.contains("%s"))
     }
 
     @Test
