@@ -73,8 +73,8 @@ class LocaleManagerTest {
         val manager = LocaleManager(context)
 
         manager.loadLocaleForTag("en-US")
-        val englishTitle = manager.getString("changelog_popup_title", "1.15.0")
-        val englishText = manager.getString("changelog_popup_text", "1.15.0")
+        val englishTitle = manager.getString("changelog_popup_title", "🚀 What's New in v%s!", "1.15.0")
+        val englishText = manager.getString("changelog_popup_text", "Guess The Number v%s is installed! Check out the changelog for the latest features, polish, and fixes.", "1.15.0")
         assertEquals("🚀 What's New in v1.15.0!", englishTitle)
         assertEquals("Guess The Number v1.15.0 is installed! Check out the changelog for the latest features, polish, and fixes.", englishText)
         assertTrue(!englishTitle.contains("%s"))
