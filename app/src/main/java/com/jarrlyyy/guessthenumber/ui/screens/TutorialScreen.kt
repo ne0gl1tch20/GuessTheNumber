@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -49,12 +51,12 @@ fun TutorialScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text("Step ${step + 1} of 4", style = MaterialTheme.typography.labelLarge)
+                    Text(localizedText("Step ${step + 1} of 4"), style = MaterialTheme.typography.labelLarge)
                     Text(titles[step], fontSize = 22.sp, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
                     Text(descriptions[step], fontSize = 16.sp)
 
                     if (step < 3) {
-                        Text("👇 Tap the highlighted button", color = MaterialTheme.colorScheme.primary)
+                        Text(localizedText("👇 Tap the highlighted button"), color = MaterialTheme.colorScheme.primary)
                         Button(
                             onClick = { pressed = true; advance() },
                             modifier = Modifier.fillMaxWidth()
@@ -68,11 +70,11 @@ fun TutorialScreen(
                             )
                         }
                         if (!pressed) {
-                            Text("You need to press it to continue.", style = MaterialTheme.typography.bodySmall)
+                            Text(localizedText("You need to press it to continue."), style = MaterialTheme.typography.bodySmall)
                         }
                     } else {
                         Button(onClick = { onComplete() }, modifier = Modifier.fillMaxWidth()) {
-                            Text("Start Playing!")
+                            Text(localizedText("Start Playing!"))
                         }
                     }
                 }
