@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -40,7 +42,7 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Advanced Statistics", style = MaterialTheme.typography.titleMedium) },
+                title = { Text(localizedText("Advanced Statistics"), style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
@@ -74,7 +76,7 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Guessing Precision", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(localizedText("Guessing Precision"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                             Icon(imageVector = Icons.Default.Analytics, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         }
                         Text(
@@ -95,9 +97,9 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Correct: $correctGuesses", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                            Text("Failed: $failedGuesses", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                            Text("Total: $totalGuesses", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(localizedText("Correct: $correctGuesses"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(localizedText("Failed: $failedGuesses"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(localizedText("Total: $totalGuesses"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
                         }
                     }
                 }
@@ -105,8 +107,7 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
 
             // Core Metrics Section Header
             item {
-                Text(
-                    text = "Performance & Economy",
+                Text(text = localizedText("Performance & Economy"),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -159,8 +160,7 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
             // Resets & Progression Header
             item {
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Resets & Meta Progression",
+                Text(text = localizedText("Resets & Meta Progression"),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
