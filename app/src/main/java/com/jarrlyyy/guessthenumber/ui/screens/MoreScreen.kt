@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -70,7 +72,7 @@ fun MoreScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("More Hub", style = MaterialTheme.typography.titleMedium) },
+                title = { Text(localizedText("More Hub"), style = MaterialTheme.typography.titleMedium) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
@@ -96,7 +98,7 @@ fun MoreScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("More Menu Order", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                        Text(localizedText("More Menu Order"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                         OutlinedButton(onClick = {
                             if (isReordering) {
                                 dragging = null
@@ -111,7 +113,7 @@ fun MoreScreen(
                         }
                     }
                     if (isReordering) {
-                        Text("Long-press and drag items to change their order.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(localizedText("Long-press and drag items to change their order."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if (isReordering) order.forEachIndexed { index, route ->
                         val labels = mapOf(
@@ -174,7 +176,7 @@ fun MoreScreen(
             }
 
             item {
-                Text("Reset Tiers & Hubs", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(localizedText("Reset Tiers & Hubs"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
 
             item {
@@ -186,7 +188,7 @@ fun MoreScreen(
                 ) {
                     Icon(imageVector = Icons.Default.Star, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Ultra Hub & Upgrades", style = MaterialTheme.typography.titleMedium)
+                    Text(localizedText("Ultra Hub & Upgrades"), style = MaterialTheme.typography.titleMedium)
                 }
             }
 
@@ -199,14 +201,14 @@ fun MoreScreen(
                 ) {
                     Icon(imageVector = Icons.Default.Star, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Prestige Hub & Upgrades", style = MaterialTheme.typography.titleMedium)
+                    Text(localizedText("Prestige Hub & Upgrades"), style = MaterialTheme.typography.titleMedium)
                 }
             }
 
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Audio & Save Management", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(localizedText("Audio & Save Management"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
 
             item {
@@ -218,7 +220,7 @@ fun MoreScreen(
                 ) {
                     Icon(imageVector = Icons.Default.Save, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Save Slots", style = MaterialTheme.typography.titleMedium)
+                    Text(localizedText("Save Slots"), style = MaterialTheme.typography.titleMedium)
                 }
             }
 
@@ -230,16 +232,15 @@ fun MoreScreen(
                 ) {
                     Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Background Music Player", style = MaterialTheme.typography.titleMedium)
+                    Text(localizedText("Background Music Player"), style = MaterialTheme.typography.titleMedium)
                 }
             }
 
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Latest Systems", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                Text(
-                    "v1.10–v1.13.0 features",
+                Text(localizedText("Latest Systems"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(localizedText("v1.10–v1.13.0 features"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -248,82 +249,82 @@ fun MoreScreen(
                 Button(onClick = { onNavigate("achievements") }, modifier = Modifier.fillMaxWidth()) {
                     Icon(imageVector = Icons.Default.EmojiEvents, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Achievements & Tiers", fontSize = 16.sp)
+                    Text(localizedText("Achievements & Tiers"), fontSize = 16.sp)
                 }
             }
             item {
                 Button(onClick = { onNavigate("live_ops") }, modifier = Modifier.fillMaxWidth()) {
                     Icon(imageVector = Icons.Default.Event, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Random & Seasonal Events", fontSize = 16.sp)
+                    Text(localizedText("Random & Seasonal Events"), fontSize = 16.sp)
                 }
             }
             item {
                 Button(onClick = { onNavigate("mutators") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer)) {
                     Icon(imageVector = Icons.Default.Tune, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Mutators & Challenge Builder", fontSize = 16.sp)
+                    Text(localizedText("Mutators & Challenge Builder"), fontSize = 16.sp)
                 }
             }
             item {
                 Button(onClick = { onNavigate("talent") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer)) {
                     Icon(imageVector = Icons.Default.AccountTree, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Prestige Talent Web", fontSize = 16.sp)
+                    Text(localizedText("Prestige Talent Web"), fontSize = 16.sp)
                 }
             }
 
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Explore & Progress", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(localizedText("Explore & Progress"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
             item {
                 Button(onClick = { onNavigate("arcade") }, modifier = Modifier.fillMaxWidth()) {
                     Icon(imageVector = Icons.Default.Favorite, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Arcade Minigames", fontSize = 16.sp)
+                    Text(localizedText("Arcade Minigames"), fontSize = 16.sp)
                 }
             }
             item {
                 Button(onClick = { onNavigate("stats") }, modifier = Modifier.fillMaxWidth()) {
                     Icon(imageVector = Icons.Default.Face, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Statistics", fontSize = 16.sp)
+                    Text(localizedText("Statistics"), fontSize = 16.sp)
                 }
             }
             item {
                 Button(onClick = { onNavigate(Screen.ChangelogViewer.route) }, modifier = Modifier.fillMaxWidth()) {
                     Icon(imageVector = Icons.Default.Info, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Changelog", fontSize = 16.sp)
+                    Text(localizedText("Changelog"), fontSize = 16.sp)
                 }
             }
 
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("App & Developer", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(localizedText("App & Developer"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
             item {
                 Button(onClick = { onNavigate("settings") }, modifier = Modifier.fillMaxWidth()) {
                     Icon(imageVector = Icons.Default.Settings, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Settings", fontSize = 16.sp)
+                    Text(localizedText("Settings"), fontSize = 16.sp)
                 }
             }
             item {
                 Button(onClick = { onNavigate("about") }, modifier = Modifier.fillMaxWidth()) {
                     Icon(imageVector = Icons.Default.Info, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("About & Licenses", fontSize = 16.sp)
+                    Text(localizedText("About & Licenses"), fontSize = 16.sp)
                 }
             }
             item {
                 Button(onClick = { onNavigate("dev_settings") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)) {
                     Icon(imageVector = Icons.Default.Build, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Dev Settings", fontSize = 16.sp)
+                    Text(localizedText("Dev Settings"), fontSize = 16.sp)
                 }
             }
         }
@@ -332,13 +333,13 @@ fun MoreScreen(
     if (showMusicDialog) {
         AlertDialog(
             onDismissRequest = { showMusicDialog = false },
-            title = { Text("🎵 Background Music Player") },
+            title = { Text(localizedText("🎵 Background Music Player")) },
             text = {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Select an audio file (MP3/WAV) to save and play across all screens.")
+                    Text(localizedText("Select an audio file (MP3/WAV) to save and play across all screens."))
                     Text(
                         text = if (currentMusicPath != null) "File: ${File(currentMusicPath).name}" else "No music file selected.",
                         fontSize = 12.sp,
@@ -363,7 +364,7 @@ fun MoreScreen(
                     ) {
                         Icon(imageVector = Icons.Default.FolderOpen, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Select Audio File")
+                        Text(localizedText("Select Audio File"))
                     }
 
                     // Sliding Progress Bar
@@ -458,7 +459,7 @@ fun MoreScreen(
             },
             confirmButton = {
                 Button(onClick = { showMusicDialog = false }) {
-                    Text("Close")
+                    Text(localizedText("Close"))
                 }
             }
         )
