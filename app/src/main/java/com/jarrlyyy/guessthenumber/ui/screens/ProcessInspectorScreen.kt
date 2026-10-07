@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -25,7 +27,7 @@ fun ProcessInspectorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Variable & Process Inspector", style = MaterialTheme.typography.titleMedium) },
+                title = { Text(localizedText("Variable & Process Inspector"), style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -43,7 +45,7 @@ fun ProcessInspectorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text("Active Background Processes & Loops", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(localizedText("Active Background Processes & Loops"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
 
             item {
@@ -69,7 +71,7 @@ fun ProcessInspectorScreen(
 
             item {
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Complete Runtime Game State Variables", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(localizedText("Complete Runtime Game State Variables"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }
 
             // Grouped Material 3 Variable Cards
