@@ -85,54 +85,107 @@ fun MoreScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                val defaultOrder = listOf("achievements", "live_ops", "mutators", "talent", "arcade", "stats", "changelog", "settings", "about", "dev_settings")
-                var order by remember(state.settings.moreScreenOrder) {
-                    mutableStateOf((state.settings.moreScreenOrder + defaultOrder).distinct().take(defaultOrder.size))
+                val defaultOrder = com.jarrlyyy.guessthenumber.domain.model.DEFAULT_MORE_SCREEN_ORDER
+                val normalizedOrder = remember(state.settings.moreScreenOrder) {
+                    (state.settings.moreScreenOrder + defaultOrder).distinct()
+                        .filter { it in defaultOrder }
+                        .let { it + defaultOrder.filterNot(it::contains) }
                 }
+                var order by remember(normalizedOrder) { mutableStateOf(normalizedOrder) }
                 var dragging by remember { mutableStateOf<Int?>(null) }
                 var dragDistance by remember { mutableFloatStateOf(0f) }
                 var isReordering by remember { mutableStateOf(false) }
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+
+                LaunchedEffect(state.settings.moreScreenOrder) {
+                    if (state.settings.moreScreenOrder != normalizedOrder) {
+                        onUpdateSettings(state.settings.copy(moreScreenOrder = normalizedOrder))
+                    }
+                }
+
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(localizedText("More Menu Order"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                        OutlinedButton(onClick = {
-                            if (isReordering) {
-                                dragging = null
-                                dragDistance = 0f
-                                onUpdateSettings(state.settings.copy(moreScreenOrder = order))
-                            }
-                            isReordering = !isReordering
-                        }) {
+                        Column(Modifier.weight(1f)) {
+                            Text(localizedText("More Menu"), style = MaterialTheme.typography.headlineSmall)
+                            Text(
+                                localizedText("Your shortcuts, your order."),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        FilledTonalButton(
+                            onClick = {
+                                if (isReordering) {
+                                    dragging = null
+                                    dragDistance = 0f
+                                    onUpdateSettings(state.settings.copy(moreScreenOrder = order))
+                                }
+                                isReordering = !isReordering
+                            },
+                            shape = MaterialTheme.shapes.extraLarge
+                        ) {
                             Icon(Icons.Default.DragHandle, contentDescription = null)
                             Spacer(Modifier.width(6.dp))
-                            Text(if (isReordering) "Done" else "Reorder")
+                            Text(if (isReordering) localizedText("Done") else localizedText("Reorder"))
                         }
                     }
+
                     if (isReordering) {
-                        Text(localizedText("Long-press and drag items to change their order."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.large,
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            tonalElevation = 2.dp
+                        ) {
+                            Text(
+                                localizedText("Long-press and drag. The new order is saved and used by this menu."),
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
                     }
-                    if (isReordering) order.forEachIndexed { index, route ->
-                        val labels = mapOf(
-                            "achievements" to "Achievements & Tiers",
-                            "live_ops" to "Random & Seasonal Events",
-                            "mutators" to "Mutators & Challenge Builder",
-                            "talent" to "Prestige Talent Web",
-                            "arcade" to "Arcade Minigames",
-                            "stats" to "Statistics",
-                            "changelog" to "Changelog",
-                            "settings" to "Settings",
-                            "about" to "About & Licenses",
-                            "dev_settings" to "Dev Settings"
-                        )
+
+                    val labels = mapOf(
+                        "achievements" to "Achievements & Tiers",
+                        "live_ops" to "Random & Seasonal Events",
+                        "mutators" to "Mutators & Challenge Builder",
+                        "talent" to "Prestige Talent Web",
+                        "arcade" to "Arcade Minigames",
+                        "stats" to "Statistics",
+                        "changelog" to "Changelog",
+                        "settings" to "Settings",
+                        "about" to "About & Licenses",
+                        "dev_settings" to "Dev Settings"
+                    )
+                    val icons = mapOf(
+                        "achievements" to Icons.Default.EmojiEvents,
+                        "live_ops" to Icons.Default.Event,
+                        "mutators" to Icons.Default.Tune,
+                        "talent" to Icons.Default.AccountTree,
+                        "arcade" to Icons.Default.Favorite,
+                        "stats" to Icons.Default.Face,
+                        "changelog" to Icons.Default.Info,
+                        "settings" to Icons.Default.Settings,
+                        "about" to Icons.Default.Info,
+                        "dev_settings" to Icons.Default.Build
+                    )
+
+                    order.forEachIndexed { index, route ->
+                        val selected = dragging == index
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .animateContentSize()
-                                .graphicsLayer { scaleX = if (dragging == index) 1.03f else 1f; scaleY = if (dragging == index) 1.03f else 1f; shadowElevation = if (dragging == index) 12f else 0f }
+                                .graphicsLayer {
+                                    val scale = if (selected) 1.025f else 1f
+                                    scaleX = scale
+                                    scaleY = scale
+                                    shadowElevation = if (selected) 16f else 0f
+                                }
                                 .pointerInput(isReordering) {
                                     if (isReordering) detectDragGesturesAfterLongPress(
                                         onDragStart = { dragging = index; dragDistance = 0f },
@@ -147,28 +200,51 @@ fun MoreScreen(
                                             if (dragging == index) {
                                                 dragDistance += amount.y
                                                 if (dragDistance > 48f && index < order.lastIndex) {
-                                                    val next = order.toMutableList()
-                                                    next[index] = next[index + 1].also { next[index + 1] = next[index] }
-                                                    order = next
+                                                    order = order.toMutableList().also {
+                                                        val tmp = it[index]
+                                                        it[index] = it[index + 1]
+                                                        it[index + 1] = tmp
+                                                    }
                                                     dragDistance = 0f
                                                 } else if (dragDistance < -48f && index > 0) {
-                                                    val next = order.toMutableList()
-                                                    next[index] = next[index - 1].also { next[index - 1] = next[index] }
-                                                    order = next
+                                                    order = order.toMutableList().also {
+                                                        val tmp = it[index]
+                                                        it[index] = it[index - 1]
+                                                        it[index - 1] = tmp
+                                                    }
                                                     dragDistance = 0f
                                                 }
                                             }
                                         }
                                     )
                                 },
-                            shape = MaterialTheme.shapes.small,
-                            color = if (dragging == index) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                            shape = MaterialTheme.shapes.large,
+                            color = if (selected) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceContainerHigh
                         ) {
-                            Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.DragHandle, contentDescription = null)
-                                Spacer(Modifier.width(8.dp))
-                                Text(labels[route] ?: route, modifier = Modifier.weight(1f))
-                                Text("↕", style = MaterialTheme.typography.titleMedium)
+                            Row(
+                                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = icons[route] ?: Icons.Default.Circle,
+                                    contentDescription = null,
+                                    tint = if (selected) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(Modifier.width(14.dp))
+                                Text(
+                                    labels[route] ?: route,
+                                    modifier = Modifier.weight(1f),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                if (isReordering) {
+                                    Icon(Icons.Default.DragHandle, contentDescription = localizedText("Reorder"))
+                                } else {
+                                    IconButton(onClick = { onNavigate(route) }) {
+                                        Icon(Icons.Default.ChevronRight, contentDescription = localizedText("Open"))
+                                    }
+                                }
                             }
                         }
                     }
@@ -208,30 +284,33 @@ fun MoreScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(localizedText("Audio & Save Management"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    localizedText("Audio & Save Management"),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
 
             item {
-                Button(
+                FilledTonalButton(
                     onClick = { onNavigate(Screen.SaveSlots.route) },
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer),
-                    modifier = Modifier.fillMaxWidth().height(52.dp)
+                    shape = MaterialTheme.shapes.extraLarge,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(imageVector = Icons.Default.Save, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(Icons.Default.Save, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
                     Text(localizedText("Save Slots"), style = MaterialTheme.typography.titleMedium)
                 }
             }
 
             item {
-                Button(
+                FilledTonalButton(
                     onClick = { showMusicDialog = true },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier.fillMaxWidth().height(52.dp)
+                    shape = MaterialTheme.shapes.extraLarge,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(Icons.Default.PlayArrow, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
                     Text(localizedText("Background Music Player"), style = MaterialTheme.typography.titleMedium)
                 }
             }
@@ -239,93 +318,16 @@ fun MoreScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(localizedText("Latest Systems"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                Text(localizedText("v1.10–v1.13.0 features"),
+                Text(
+                    localizedText("Latest Systems"),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    localizedText("v1.10–v1.13.0 features"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-            item {
-                Button(onClick = { onNavigate("achievements") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(imageVector = Icons.Default.EmojiEvents, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Achievements & Tiers"), fontSize = 16.sp)
-                }
-            }
-            item {
-                Button(onClick = { onNavigate("live_ops") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(imageVector = Icons.Default.Event, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Random & Seasonal Events"), fontSize = 16.sp)
-                }
-            }
-            item {
-                Button(onClick = { onNavigate("mutators") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer)) {
-                    Icon(imageVector = Icons.Default.Tune, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Mutators & Challenge Builder"), fontSize = 16.sp)
-                }
-            }
-            item {
-                Button(onClick = { onNavigate("talent") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer)) {
-                    Icon(imageVector = Icons.Default.AccountTree, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Prestige Talent Web"), fontSize = 16.sp)
-                }
-            }
-
-            item {
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(localizedText("Explore & Progress"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-            }
-            item {
-                Button(onClick = { onNavigate("arcade") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(imageVector = Icons.Default.Favorite, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Arcade Minigames"), fontSize = 16.sp)
-                }
-            }
-            item {
-                Button(onClick = { onNavigate("stats") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(imageVector = Icons.Default.Face, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Statistics"), fontSize = 16.sp)
-                }
-            }
-            item {
-                Button(onClick = { onNavigate(Screen.ChangelogViewer.route) }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(imageVector = Icons.Default.Info, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Changelog"), fontSize = 16.sp)
-                }
-            }
-
-            item {
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(localizedText("App & Developer"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-            }
-            item {
-                Button(onClick = { onNavigate("settings") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(imageVector = Icons.Default.Settings, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Settings"), fontSize = 16.sp)
-                }
-            }
-            item {
-                Button(onClick = { onNavigate("about") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(imageVector = Icons.Default.Info, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("About & Licenses"), fontSize = 16.sp)
-                }
-            }
-            item {
-                Button(onClick = { onNavigate("dev_settings") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)) {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Dev Settings"), fontSize = 16.sp)
-                }
             }
         }
     }
