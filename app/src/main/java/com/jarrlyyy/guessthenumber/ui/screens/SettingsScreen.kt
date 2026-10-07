@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import android.Manifest
 import android.os.Build
 import android.widget.Toast
@@ -55,7 +57,7 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings & Save Management") },
+                title = { Text(localizedText("Settings & Save Management")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -72,7 +74,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text("Game Preferences", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                Text(localizedText("Game Preferences"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
             }
 
             // Language Selector Dropdown
@@ -119,7 +121,7 @@ fun SettingsScreen(
             }
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Theme Appearance", style = MaterialTheme.typography.bodyLarge)
+                    Text(localizedText("Theme Appearance"), style = MaterialTheme.typography.bodyLarge)
                     var expanded by remember { mutableStateOf(false) }
                     val themeOptions = listOf("System", "Dark", "Light", "AMOLED")
                     ExposedDropdownMenuBox(
@@ -155,7 +157,7 @@ fun SettingsScreen(
             }
 
             item {
-                Text("Theme Colors", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                Text(localizedText("Theme Colors"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
                 val presets = listOf(
                     "Neon" to listOf("#7C4DFF", "#00BCD4", "#00C853"),
                     "Sunset" to listOf("#FF4081", "#FF9800", "#FFC107"),
@@ -174,7 +176,7 @@ fun SettingsScreen(
                             value = selectedPreset,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Theme Preset") },
+                            label = { Text(localizedText("Theme Preset")) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = presetExpanded) },
                             modifier = Modifier.menuAnchor().fillMaxWidth()
                         )
@@ -193,7 +195,7 @@ fun SettingsScreen(
                                 )
                             }
                             DropdownMenuItem(
-                                text = { Text("Custom") },
+                                text = { Text(localizedText("Custom")) },
                                 trailingIcon = { if (selectedPreset == "Custom") Icon(Icons.Default.Check, contentDescription = null) },
                                 onClick = {
                                     onUpdateSettings(settings.copy(themePreset = "Custom"))
@@ -219,7 +221,7 @@ fun SettingsScreen(
             // Number Notation Selector
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Number Notation", style = MaterialTheme.typography.bodyLarge)
+                    Text(localizedText("Number Notation"), style = MaterialTheme.typography.bodyLarge)
                     var expanded by remember { mutableStateOf(false) }
                     val notationOptions = listOf("Standard", "Scientific", "Engineering")
                     ExposedDropdownMenuBox(
@@ -261,8 +263,8 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                        Text("Push Notifications & Reminders", style = MaterialTheme.typography.bodyLarge)
-                        Text("Get periodic reminder notifications", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(localizedText("Push Notifications & Reminders"), style = MaterialTheme.typography.bodyLarge)
+                        Text(localizedText("Get periodic reminder notifications"), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(
                         checked = settings.notificationsEnabled,
@@ -285,7 +287,7 @@ fun SettingsScreen(
             if (settings.notificationsEnabled) {
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Reminder Frequency", style = MaterialTheme.typography.bodyMedium)
+                        Text(localizedText("Reminder Frequency"), style = MaterialTheme.typography.bodyMedium)
                         var expanded by remember { mutableStateOf(false) }
                         val intervalOptions = listOf(12L, 24L, 48L)
                         ExposedDropdownMenuBox(
@@ -308,7 +310,7 @@ fun SettingsScreen(
                             ) {
                                 intervalOptions.forEach { hours ->
                                     DropdownMenuItem(
-                                        text = { Text("$hours Hours") },
+                                        text = { Text(localizedText("$hours Hours")) },
                                         onClick = {
                                             onUpdateSettings(settings.copy(notificationIntervalHours = hours))
                                             expanded = false
@@ -327,7 +329,7 @@ fun SettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Sound FX", style = MaterialTheme.typography.bodyLarge)
+                    Text(localizedText("Sound FX"), style = MaterialTheme.typography.bodyLarge)
                     Switch(
                         checked = settings.soundEnabled,
                         onCheckedChange = { onUpdateSettings(settings.copy(soundEnabled = it)) }
@@ -341,7 +343,7 @@ fun SettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Vibration", style = MaterialTheme.typography.bodyLarge)
+                    Text(localizedText("Vibration"), style = MaterialTheme.typography.bodyLarge)
                     Switch(
                         checked = settings.vibrationEnabled,
                         onCheckedChange = { onUpdateSettings(settings.copy(vibrationEnabled = it)) }
@@ -356,8 +358,8 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                        Text("Reduce Flashes", style = MaterialTheme.typography.bodyLarge)
-                        Text("Visual comfort & accessibility", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(localizedText("Reduce Flashes"), style = MaterialTheme.typography.bodyLarge)
+                        Text(localizedText("Visual comfort & accessibility"), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(
                         checked = settings.reduceFlashes,
@@ -373,8 +375,8 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                        Text("Reduced Motion", style = MaterialTheme.typography.bodyLarge)
-                        Text("Soften or disable expressive screen transitions", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(localizedText("Reduced Motion"), style = MaterialTheme.typography.bodyLarge)
+                        Text(localizedText("Soften or disable expressive screen transitions"), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(
                         checked = settings.reducedMotion,
@@ -385,7 +387,7 @@ fun SettingsScreen(
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Master Volume: ${(settings.volume * 100).toInt()}%", style = MaterialTheme.typography.bodyLarge)
+                    Text(localizedText("Master Volume: ${(settings.volume * 100).toInt()}%"), style = MaterialTheme.typography.bodyLarge)
                     Slider(
                         value = settings.volume,
                         onValueChange = { onUpdateSettings(settings.copy(volume = it)) },
@@ -399,7 +401,7 @@ fun SettingsScreen(
             }
 
             item {
-                Text("Save Data Management", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                Text(localizedText("Save Data Management"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
             }
 
             item {
@@ -411,7 +413,7 @@ fun SettingsScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Reset All Game Data")
+                    Text(localizedText("Reset All Game Data"))
                 }
             }
         }
@@ -443,10 +445,10 @@ fun SettingsScreen(
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
-            title = { Text("Confirm Data Reset") },
+            title = { Text(localizedText("Confirm Data Reset")) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Are you sure you want to reset all progress? This action is irreversible.")
+                    Text(localizedText("Are you sure you want to reset all progress? This action is irreversible."))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -455,7 +457,7 @@ fun SettingsScreen(
                             checked = confirmResetCheck,
                             onCheckedChange = { confirmResetCheck = it }
                         )
-                        Text("I understand this will erase all my progress", fontSize = 14.sp)
+                        Text(localizedText("I understand this will erase all my progress"), fontSize = 14.sp)
                     }
                 }
             },
@@ -469,12 +471,12 @@ fun SettingsScreen(
                     enabled = confirmResetCheck,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Reset Everything")
+                    Text(localizedText("Reset Everything"))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showResetDialog = false }) {
-                    Text("Cancel")
+                    Text(localizedText("Cancel"))
                 }
             }
         )
