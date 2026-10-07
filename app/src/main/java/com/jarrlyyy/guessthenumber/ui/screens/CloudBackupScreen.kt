@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import android.content.ClipData
@@ -27,6 +28,7 @@ fun CloudBackupScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val locale = LocalAppLocaleManager.current
     var importJson by remember { mutableStateOf("") }
 
     Scaffold(
@@ -65,9 +67,9 @@ fun CloudBackupScreen(
                     onClick = {
                         onExportSave { json ->
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText(localizedText("GuessTheNumberBackup"), json)
+                            val clip = ClipData.newPlainText(locale.getString("GuessTheNumberBackup", "GuessTheNumberBackup"), json)
                             clipboard.setPrimaryClip(clip)
-                            Toast.makeText(context, "Encrypted save string copied to clipboard!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, locale.getString("save_export_success", "Encrypted save string copied to clipboard!"), Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
