@@ -1,5 +1,15 @@
 # 🚀 Guess The Number Simulator - Changelog
 
+## v1.15.0 (Expressive More Menu & Persistent Reordering)
+
+- 🎨 **More Expressive Material 3 UI**: Expanded the More Hub's Material 3 Expressive treatment with richer surfaces, rounded shapes, drag elevation, animated selection feedback, and clearer visual hierarchy.
+- ↕️ **Real More Menu Reordering**: Reordered shortcuts now control the actual More menu instead of only changing the preview list.
+- 💾 **Persistent Default Order**: Added a stable default More shortcut order that is saved with game settings and automatically repairs missing or legacy entries.
+- 🧭 **Reorder UX Polish**: Long-press drag-and-drop now clearly communicates that the new order is saved and reused by the menu.
+- 🌐 **What's New Localization**: Moved the release popup copy fully into the locale catalog and changed its version text to a localized %s placeholder, so the popup no longer contains hardcoded release text in Kotlin.
+- 🧪 **Localization Regression Coverage**: Added coverage for localized What's New formatting and updated release-version assertions.
+- 📱 **Version**: Bumped to versionCode 15 / versionName 1.15.0.
+
 ## v1.14.0 (Global Localization & Internationalization Expansion)
 
 - 🌍 **Global locale expansion**: Added 23 supported locale overlays covering English (US/UK), Filipino, Simplified/Traditional Chinese, Japanese, Korean, Spanish, French, German, Italian, Portuguese (Portugal/Brazil), Russian, Hindi, Indonesian, Thai, Vietnamese, Turkish, Polish, Ukrainian, Dutch, and Arabic.
