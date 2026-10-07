@@ -81,8 +81,8 @@ class LocaleManagerTest {
         assertTrue(!englishText.contains("%s"))
 
         manager.loadLocaleForTag("fil-PH")
-        val filipinoTitle = manager.getString("changelog_popup_title", "1.15.0")
-        val filipinoText = manager.getString("changelog_popup_text", "1.15.0")
+        val filipinoTitle = manager.getString("changelog_popup_title", "🚀 What's New in v%s!", "1.15.0")
+        val filipinoText = manager.getString("changelog_popup_text", "Guess The Number v%s is installed! Check out the changelog for the latest features, polish, and fixes.", "1.15.0")
         assertEquals("🚀 Ano ang Bago sa v1.15.0!", filipinoTitle)
         assertEquals("Naka-install na ang Guess The Number v1.15.0! Tingnan ang changelog para sa mga bagong feature, polish, at fixes.", filipinoText)
         assertTrue(!filipinoTitle.contains("%s"))
