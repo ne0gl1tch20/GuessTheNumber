@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -77,7 +79,7 @@ fun UpgradeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Upgrades", style = MaterialTheme.typography.titleMedium) },
+                title = { Text(localizedText("Upgrades"), style = MaterialTheme.typography.titleMedium) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
@@ -105,9 +107,9 @@ fun UpgradeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            Text("Available Money", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(localizedText("Available Money"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                             AnimatedContent(targetState = state.money.format(), label = "UpgradeMoneyAnimation") { moneyStr ->
-                                Text("$moneyStr Money", color = MoneyGold, style = MaterialTheme.typography.titleLarge)
+                                Text(localizedText("$moneyStr Money"), color = MoneyGold, style = MaterialTheme.typography.titleLarge)
                             }
                         }
                         Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null, tint = MoneyGold, modifier = Modifier.size(32.dp))
@@ -125,7 +127,7 @@ fun UpgradeScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Buy Multiplier:", style = MaterialTheme.typography.titleMedium)
+                    Text(localizedText("Buy Multiplier:"), style = MaterialTheme.typography.titleMedium)
                     
                     Box(
                         modifier = Modifier.wrapContentSize(Alignment.TopEnd)
@@ -135,7 +137,7 @@ fun UpgradeScreen(
                             shape = MaterialTheme.shapes.medium,
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                         ) {
-                            Text("${state.buyMultiplier}x", style = MaterialTheme.typography.labelLarge)
+                            Text(localizedText("${state.buyMultiplier}x"), style = MaterialTheme.typography.labelLarge)
                             Spacer(modifier = Modifier.width(8.dp))
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
@@ -149,7 +151,7 @@ fun UpgradeScreen(
                         ) {
                             multipliers.forEach { mult ->
                                 DropdownMenuItem(
-                                    text = { Text("$mult x", style = MaterialTheme.typography.bodyMedium) },
+                                    text = { Text(localizedText("$mult x"), style = MaterialTheme.typography.bodyMedium) },
                                     onClick = {
                                         onUpdateMultiplier(mult)
                                         expanded = false
@@ -192,8 +194,7 @@ fun UpgradeScreen(
                                 shape = MaterialTheme.shapes.extraSmall,
                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                             ) {
-                                Text(
-                                    text = "Level: $level / ${if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel}",
+                                Text(text = localizedText("Level: $level / ${if (upgrade.maxLevel >= 999999) ")MAX" else upgrade.maxLevel}",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
@@ -201,7 +202,7 @@ fun UpgradeScreen(
                             }
                             if (!isMaxed) {
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text("Cost (${state.buyMultiplier}x): ${totalCost.format()}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(localizedText("Cost (${state.buyMultiplier}x): ${totalCost.format()}"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                         Spacer(modifier = Modifier.width(12.dp))
