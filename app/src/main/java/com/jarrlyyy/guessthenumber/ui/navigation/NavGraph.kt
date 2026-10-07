@@ -77,7 +77,9 @@ fun NavGraph(
 ) {
     val navController = rememberNavController()
     if (!hasAnySave) {
-        SaveSlotsScreen(viewModel = viewModel, onNavigateBack = {})
+        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+            SaveSlotsScreen(viewModel = viewModel, onNavigateBack = {})
+        }
         return
     }
     val locale = viewModel.localeManager
