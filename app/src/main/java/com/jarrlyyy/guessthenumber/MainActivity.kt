@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    isLoadingSave -> {
+                    isLoadingSave && !(hasAnySave && state.lastSaveTimestamp > 0L) -> {
                         Surface(
                             modifier = Modifier.fillMaxSize(),
                             color = MaterialTheme.colorScheme.background
