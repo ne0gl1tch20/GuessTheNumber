@@ -56,7 +56,7 @@ fun ReusableColorPickerDialog(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text("Color", style = MaterialTheme.typography.labelLarge)
 
-                BoxWithConstraints(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1.45f)
