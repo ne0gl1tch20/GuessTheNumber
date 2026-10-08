@@ -605,5 +605,8 @@
   "guided_tutorial_instruction_1": "Pindutin ang Upgrades tab sa ibabang navigation.",
   "guided_tutorial_instruction_2": "Pindutin ang More tab para makita ang iba pang bahagi ng laro.",
   "guided_tutorial_instruction_3": "Sa More, buksan ang Settings. Dito matatapos ang guided tour.",
-  "language_changed_restart": "Nagbago ang wika. I-restart ang app para magkabisa."
+  "language_changed_restart": "Nagbago ang wika. I-restart ang app para magkabisa.",
+  "dropdown": "Dropdown",
+  "staking_title": "Combo Streaks at Lucky Stake",
+  "stats_session_arcade": "Session at Arkade"
 }
