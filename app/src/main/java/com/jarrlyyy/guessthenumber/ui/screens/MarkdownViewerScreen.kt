@@ -68,7 +68,7 @@ fun parseMarkdownInline(text: String): AnnotatedString {
                         SpanStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp, color = primaryColor)
                     ) -> true
 
-                    appendStyled(
+                    (appendStyled(
                         "$",
                         SpanStyle(fontStyle = FontStyle.Italic, fontWeight = FontWeight.Medium, color = secondaryColor)
                     ) { math ->
@@ -80,7 +80,7 @@ fun parseMarkdownInline(text: String): AnnotatedString {
                             .replace("\\pm", "±")
                             .replace("\\leq", "≤")
                             .replace("\\geq", "≥")
-                    }
+                    }) -> true
 
                     else -> {
                         append(text[index])
