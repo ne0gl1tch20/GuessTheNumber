@@ -239,7 +239,12 @@ fun NavGraph(
             composable(Screen.More.route) {
                 ExpressiveScreen(enabled = !state.settings.reducedMotion) { MoreScreen(
                     state = state,
-                    onNavigate = { route -> navController.navigate(route) },
+                    onNavigate = { route ->
+                        // Keep the legacy More-menu route working for existing saves.
+                        navController.navigate(
+                            if (route == "changelog") Screen.ChangelogViewer.route else route
+                        )
+                    },
                     onUpdateBackgroundMusic = onUpdateBackgroundMusic,
                     isPlayingMusic = isPlayingMusic,
                     musicCurrentPosition = musicCurrentPosition,
