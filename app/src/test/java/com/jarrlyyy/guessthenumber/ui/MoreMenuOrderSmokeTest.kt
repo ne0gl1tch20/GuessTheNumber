@@ -13,12 +13,12 @@ class MoreMenuOrderSmokeTest {
 
     @Test
     fun defaultMoreMenuOrderContainsChangelog() {
-        assertTrue(DEFAULT_MORE_SCREEN_ORDER.contains("changelog_viewer"))
+        assertTrue(DEFAULT_MORE_SCREEN_ORDER.contains("changelog"))
     }
 
     @Test
     fun persistedOrderNormalizationRestoresMissingAndRejectsUnknownRoutes() {
-        val saved = listOf("changelog_viewer", "not_a_real_route", "settings", "settings")
+        val saved = listOf("changelog", "not_a_real_route", "settings", "settings")
         val normalized = (saved + DEFAULT_MORE_SCREEN_ORDER)
             .distinct()
             .filter { it in DEFAULT_MORE_SCREEN_ORDER }
@@ -26,7 +26,7 @@ class MoreMenuOrderSmokeTest {
 
         assertEquals(DEFAULT_MORE_SCREEN_ORDER.toSet(), normalized.toSet())
         assertEquals(normalized.size, normalized.distinct().size)
-        assertTrue(normalized.first() == "changelog_viewer")
+        assertTrue(normalized.first() == "changelog")
         assertTrue(normalized[1] == "settings")
     }
 }
