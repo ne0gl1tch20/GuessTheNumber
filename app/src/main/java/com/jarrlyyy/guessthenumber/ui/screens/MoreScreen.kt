@@ -186,44 +186,52 @@ fun MoreScreen(
                                     scaleY = scale
                                     shadowElevation = if (selected) 16f else 0f
                                 }
-                                .pointerInput(isReordering) {
-                                    if (isReordering) detectDragGesturesAfterLongPress(
-                                        onDragStart = { dragging = index; dragDistance = 0f },
-                                        onDragCancel = { dragging = null; dragDistance = 0f },
-                                        onDragEnd = {
-                                            dragging = null
-                                            dragDistance = 0f
-                                            onUpdateSettings(state.settings.copy(moreScreenOrder = order))
-                                        },
-                                        onDrag = { change, amount ->
-                                            change.consumePositionChange()
-                                            if (dragging == index) {
-                                                dragDistance += amount.y
-                                                if (dragDistance > 48f && index < order.lastIndex) {
-                                                    order = order.toMutableList().also {
-                                                        val tmp = it[index]
-                                                        it[index] = it[index + 1]
-                                                        it[index + 1] = tmp
-                                                    }
+                                .then(
+                                    if (isReordering) {
+                                        Modifier.pointerInput(isReordering) {
+                                            detectDragGesturesAfterLongPress(
+                                                onDragStart = { dragging = index; dragDistance = 0f },
+                                                onDragCancel = { dragging = null; dragDistance = 0f },
+                                                onDragEnd = {
+                                                    dragging = null
                                                     dragDistance = 0f
-                                                } else if (dragDistance < -48f && index > 0) {
-                                                    order = order.toMutableList().also {
-                                                        val tmp = it[index]
-                                                        it[index] = it[index - 1]
-                                                        it[index - 1] = tmp
+                                                    onUpdateSettings(state.settings.copy(moreScreenOrder = order))
+                                                },
+                                                onDrag = { change, amount ->
+                                                    change.consumePositionChange()
+                                                    if (dragging == index) {
+                                                        dragDistance += amount.y
+                                                        if (dragDistance > 48f && index < order.lastIndex) {
+                                                            order = order.toMutableList().also {
+                                                                val tmp = it[index]
+                                                                it[index] = it[index + 1]
+                                                                it[index + 1] = tmp
+                                                            }
+                                                            dragDistance = 0f
+                                                        } else if (dragDistance < -48f && index > 0) {
+                                                            order = order.toMutableList().also {
+                                                                val tmp = it[index]
+                                                                it[index] = it[index - 1]
+                                                                it[index - 1] = tmp
+                                                            }
+                                                            dragDistance = 0f
+                                                        }
                                                     }
-                                                    dragDistance = 0f
                                                 }
-                                            }
+                                            )
                                         }
-                                    )
-                                },
+                                    } else {
+                                        Modifier.clickable { onNavigate(route) }
+                                    }
+                                ),
                             shape = MaterialTheme.shapes.large,
                             color = if (selected) MaterialTheme.colorScheme.primaryContainer
                             else MaterialTheme.colorScheme.surfaceContainerHigh
                         ) {
                             Row(
-                                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
@@ -241,9 +249,7 @@ fun MoreScreen(
                                 if (isReordering) {
                                     Icon(Icons.Default.DragHandle, contentDescription = localizedText("Reorder"))
                                 } else {
-                                    IconButton(onClick = { onNavigate(route) }) {
-                                        Icon(Icons.Default.ChevronRight, contentDescription = localizedText("Open"))
-                                    }
+                                    Icon(Icons.Default.ChevronRight, contentDescription = localizedText("Open"))
                                 }
                             }
                         }
@@ -348,7 +354,6 @@ fun MoreScreen(
                         color = MaterialTheme.colorScheme.primary
                     )
 
-                    // Album Art Display if available
                     if (musicAlbumArt != null) {
                         androidx.compose.foundation.Image(
                             bitmap = musicAlbumArt.asImageBitmap(),
@@ -369,7 +374,6 @@ fun MoreScreen(
                         Text(localizedText("Select Audio File"))
                     }
 
-                    // Sliding Progress Bar
                     val maxDur = if (musicDuration > 0) musicDuration.toFloat() else 1f
                     var sliderPos by remember(musicCurrentPosition) { mutableStateOf(musicCurrentPosition.toFloat()) }
                     var isSeeking by remember { mutableStateOf(false) }
@@ -406,13 +410,11 @@ fun MoreScreen(
                         }
                     }
 
-                    // Play/Pause and Stop Controls
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Play/Toggle Button
                         FilledIconButton(
                             onClick = {
                                 if (currentMusicPath != null && File(currentMusicPath).exists()) {
@@ -437,7 +439,6 @@ fun MoreScreen(
                             )
                         }
 
-                        // Stop Button
                         FilledIconButton(
                             onClick = {
                                 onStopMusic()
@@ -466,6 +467,4 @@ fun MoreScreen(
             }
         )
     }
-
-
 }
