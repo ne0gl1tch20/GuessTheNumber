@@ -175,23 +175,36 @@ fun MoreScreen(
                         "dev_settings" to Icons.Default.Build
                     )
 
-                    order.forEachIndexed { index, route ->
-                        val selected = dragging == index
+                    items(order, key = { it }) { route ->
+                        val selected = dragging == route
+                        val animatedScale by animateFloatAsState(
+                            targetValue = if (selected) 1.025f else 1f,
+                            animationSpec = androidx.compose.animation.core.spring(
+                                stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow,
+                                dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
+                            ),
+                            label = "moreMenuItemScale"
+                        )
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .animateContentSize()
+                                .animateItem(
+                                    placementSpec = androidx.compose.animation.core.spring(
+                                        stiffness = androidx.compose.animation.core.Spring.StiffnessLow,
+                                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
+                                    )
+                                )
                                 .graphicsLayer {
-                                    val scale = if (selected) 1.025f else 1f
-                                    scaleX = scale
-                                    scaleY = scale
+                                    scaleX = animatedScale
+                                    scaleY = animatedScale
                                     shadowElevation = if (selected) 16f else 0f
                                 }
                                 .then(
                                     if (isReordering) {
-                                        Modifier.pointerInput(isReordering) {
+                                        Modifier.pointerInput(isReordering, route) {
                                             detectDragGesturesAfterLongPress(
-                                                onDragStart = { dragging = index; dragDistance = 0f },
+                                                onDragStart = { dragging = route; dragDistance = 0f },
                                                 onDragCancel = { dragging = null; dragDistance = 0f },
                                                 onDragEnd = {
                                                     dragging = null
@@ -200,8 +213,9 @@ fun MoreScreen(
                                                 },
                                                 onDrag = { change, amount ->
                                                     change.consumePositionChange()
-                                                    if (dragging == index) {
+                                                    if (dragging == route) {
                                                         dragDistance += amount.y
+                                                        val index = order.indexOf(route)
                                                         if (dragDistance > 48f && index < order.lastIndex) {
                                                             order = order.toMutableList().also {
                                                                 val tmp = it[index]
