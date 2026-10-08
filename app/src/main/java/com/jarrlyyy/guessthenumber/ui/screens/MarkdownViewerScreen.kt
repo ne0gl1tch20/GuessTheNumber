@@ -25,7 +25,8 @@ fun parseMarkdownInline(text: String): AnnotatedString {
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
 
     return remember(text, primaryColor, secondaryColor, onSurfaceColor) {
-        buildAnnotatedString {
+        try {
+            buildAnnotatedString {
             var index = 0
 
             fun appendStyled(delimiter: String, style: SpanStyle, transform: (String) -> String = { it }): Boolean {
@@ -90,6 +91,9 @@ fun parseMarkdownInline(text: String): AnnotatedString {
                 }
                 if (!parsed) index++
             }
+            }
+        } catch (_: RuntimeException) {
+            buildAnnotatedString { append(text) }
         }
     }
 }
@@ -115,7 +119,7 @@ fun MarkdownViewerScreen(
         }
     }
 
-    val lines = remember(markdownText) { markdownText.split("\\n") }
+    val lines = remember(markdownText) { markdownText.lines() }
 
     Scaffold(
         topBar = {
@@ -194,6 +198,7 @@ fun MarkdownViewerScreen(
                         }
                         
                     }
+                }
                 }
             }
         }
