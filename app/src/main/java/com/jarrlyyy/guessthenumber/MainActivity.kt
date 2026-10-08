@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.ui.navigation.NavGraph
+import com.jarrlyyy.guessthenumber.ui.screens.CrashRecoveryScreen
 import com.jarrlyyy.guessthenumber.ui.theme.GuessTheNumberTheme
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 
@@ -50,75 +51,87 @@ class MainActivity : ComponentActivity() {
                 tertiaryHex = state.settings.customTertiaryColor
             ) {
                 val locale = viewModel.localeManager
-                if (isLoadingSave) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        Box(
+                when {
+                    hasPreviousCrash -> {
+                        // Crash recovery must be the first visible boot layer.
+                        // Save loading is intentionally blocked until Continue Playing.
+                        CrashRecoveryScreen(
+                            onDismiss = { viewModel.dismissCrash() }
+                        )
+                    }
+
+                    isLoadingSave -> {
+                        Surface(
                             modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
+                            color = MaterialTheme.colorScheme.background
                         ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator()
-                                Text(
-                                    text = locale.getString("loading_save_data", "Loading save data..."),
-                                    style = MaterialTheme.typography.titleMedium
-                                )
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    CircularProgressIndicator()
+                                    Text(
+                                        text = locale.getString("loading_save_data", "Loading save data..."),
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                }
                             }
                         }
                     }
-                } else {
-                    NavGraph(
-                        state = state,
-                        onMakeGuess = { viewModel.makeGuess(it) },
-                        incomePerSecond = incomePerSecond,
-                        onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
-                        onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
-                        onEquipCosmetic = { id -> viewModel.equipCosmetic(id) },
-                        onBuyPrestigeUpgrade = { id, cost -> viewModel.buyPrestigeUpgrade(id, cost) },
-                        onBuyPrestigeShopItem = { id, cost -> viewModel.buyPrestigeShopItem(id, cost) },
-                        onBuyUltraUpgrade = { id, cost -> viewModel.buyUltraUpgrade(id, cost) },
-                        onBuyUltraShopItem = { id, cost -> viewModel.buyUltraShopItem(id, cost) },
-                        onPrestige = { viewModel.prestigeReset() },
-                        onUltra = { viewModel.ultraReset() },
-                        onExecuteDevCommand = { viewModel.executeDevCommand(it) },
-                        onExportSave = { viewModel.exportSave(it) },
-                        onImportSave = { json, cb -> viewModel.importSave(json, cb) },
-                        onResetData = { viewModel.resetData() },
-                        onUpdateSettings = { viewModel.updateSettings(it) },
-                        onUpdateBackgroundMusic = { viewModel.updateBackgroundMusicPath(it) },
-                        isPlayingMusic = isPlayingMusic,
-                        musicCurrentPosition = musicCurrentPosition,
-                        musicDuration = musicDuration,
-                        musicAlbumArt = musicAlbumArt,
-                        onPlayMusic = { viewModel.playBackgroundMusic() },
-                        onPauseMusic = { viewModel.pauseBackgroundMusic() },
-                        onStopMusic = { viewModel.stopBackgroundMusic() },
-                        onSeekMusic = { viewModel.seekBackgroundMusic(it) },
-                        onCompleteTutorial = { viewModel.completeTutorial() },
-                        hasPreviousCrash = hasPreviousCrash,
-                        onDismissCrash = { viewModel.dismissCrash() },
-                        offlineGains = offlineGains,
-                        onDismissOfflineGains = { viewModel.dismissOfflineGains() },
-                        showChangelogPopup = showChangelogPopup,
-                        onDismissChangelog = { viewModel.dismissChangelogPopup() },
-                        showTimeTravelPopup = showTimeTravelPopup,
-                        timeTravelSeconds = timeTravelSeconds,
-                        onDismissTimeTravel = { viewModel.dismissTimeTravelPopup() },
-                        needsSettingsMigration = needsSettingsMigration,
-                        isMigratingSettings = isMigratingSettings,
-                        onMigrateSettings = { viewModel.migrateSettingsToGlobal() },
-                        hasAnySave = hasAnySave,
-                        onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) },
-                        onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) },
-                        onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
-                        onActivateChallengeBuilder = { ids -> viewModel.activateChallengeBuilder(ids) },
-                        viewModel = viewModel
-                    )
+
+                    else -> {
+                        NavGraph(
+                            state = state,
+                            onMakeGuess = { viewModel.makeGuess(it) },
+                            incomePerSecond = incomePerSecond,
+                            onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
+                            onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
+                            onEquipCosmetic = { id -> viewModel.equipCosmetic(id) },
+                            onBuyPrestigeUpgrade = { id, cost -> viewModel.buyPrestigeUpgrade(id, cost) },
+                            onBuyPrestigeShopItem = { id, cost -> viewModel.buyPrestigeShopItem(id, cost) },
+                            onBuyUltraUpgrade = { id, cost -> viewModel.buyUltraUpgrade(id, cost) },
+                            onBuyUltraShopItem = { id, cost -> viewModel.buyUltraShopItem(id, cost) },
+                            onPrestige = { viewModel.prestigeReset() },
+                            onUltra = { viewModel.ultraReset() },
+                            onExecuteDevCommand = { viewModel.executeDevCommand(it) },
+                            onExportSave = { viewModel.exportSave(it) },
+                            onImportSave = { json, cb -> viewModel.importSave(json, cb) },
+                            onResetData = { viewModel.resetData() },
+                            onUpdateSettings = { viewModel.updateSettings(it) },
+                            onUpdateBackgroundMusic = { viewModel.updateBackgroundMusicPath(it) },
+                            isPlayingMusic = isPlayingMusic,
+                            musicCurrentPosition = musicCurrentPosition,
+                            musicDuration = musicDuration,
+                            musicAlbumArt = musicAlbumArt,
+                            onPlayMusic = { viewModel.playBackgroundMusic() },
+                            onPauseMusic = { viewModel.pauseBackgroundMusic() },
+                            onStopMusic = { viewModel.stopBackgroundMusic() },
+                            onSeekMusic = { viewModel.seekBackgroundMusic(it) },
+                            onCompleteTutorial = { viewModel.completeTutorial() },
+                            hasPreviousCrash = hasPreviousCrash,
+                            onDismissCrash = { viewModel.dismissCrash() },
+                            offlineGains = offlineGains,
+                            onDismissOfflineGains = { viewModel.dismissOfflineGains() },
+                            showChangelogPopup = showChangelogPopup,
+                            onDismissChangelog = { viewModel.dismissChangelogPopup() },
+                            showTimeTravelPopup = showTimeTravelPopup,
+                            timeTravelSeconds = timeTravelSeconds,
+                            onDismissTimeTravel = { viewModel.dismissTimeTravelPopup() },
+                            needsSettingsMigration = needsSettingsMigration,
+                            isMigratingSettings = isMigratingSettings,
+                            onMigrateSettings = { viewModel.migrateSettingsToGlobal() },
+                            hasAnySave = hasAnySave,
+                            onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) },
+                            onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) },
+                            onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
+                            onActivateChallengeBuilder = { ids -> viewModel.activateChallengeBuilder(ids) },
+                            viewModel = viewModel
+                        )
+                    }
                 }
             }
         }
