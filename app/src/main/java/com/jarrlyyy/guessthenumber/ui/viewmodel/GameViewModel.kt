@@ -831,6 +831,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun dismissCrash() {
         AppErrorHandler.clearCrashMarker()
         _hasPreviousCrash.value = false
+
+        // Only begin save loading and background game work after crash recovery is dismissed.
+        loadGame()
+        startAutoSave()
+        startPlaytimeTimer()
+        startRandomEvents()
+        startAutoClicker()
     }
 
     fun claimChallenge(challengeId: String, rewardNebula: Long) {
