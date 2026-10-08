@@ -272,7 +272,6 @@ fun MoreScreen(
                             }
                         }
                     }
-                }
 
             item {
                 Text(localizedText("Reset Tiers & Hubs"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
