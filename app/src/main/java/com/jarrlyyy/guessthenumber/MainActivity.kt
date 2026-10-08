@@ -14,8 +14,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.CompositionLocalProvider
-import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -56,12 +54,11 @@ class MainActivity : ComponentActivity() {
                 when {
                     hasPreviousCrash -> {
                         // Crash recovery must be the first visible boot layer.
-                        // Provide the locale directly because NavGraph is intentionally bypassed.
-                        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-                            CrashRecoveryScreen(
-                                onDismiss = { viewModel.dismissCrash() }
-                            )
-                        }
+                        // Keep it independent from NavGraph and CompositionLocals.
+                        CrashRecoveryScreen(
+                            locale = locale,
+                            onDismiss = { viewModel.dismissCrash() }
+                        )
                     }
 
                     isLoadingSave -> {
