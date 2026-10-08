@@ -102,15 +102,20 @@ fun MarkdownViewerScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    var markdownText by remember { mutableStateOf("") }
+    var markdownText by remember(assetFileName) { mutableStateOf("") }
+    var loadError by remember(assetFileName) { mutableStateOf(false) }
 
     LaunchedEffect(assetFileName) {
+        loadError = false
         markdownText = try {
             context.assets.open(assetFileName).bufferedReader().use { it.readText() }
         } catch (_: Exception) {
-            "Failed to load $assetFileName"
+            loadError = true
+            ""
         }
     }
+
+    val lines = remember(markdownText) { markdownText.split("\\n") }
 
     Scaffold(
         topBar = {
@@ -130,7 +135,6 @@ fun MarkdownViewerScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            val lines = markdownText.lines()
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
