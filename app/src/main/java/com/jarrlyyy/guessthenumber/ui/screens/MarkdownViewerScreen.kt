@@ -201,6 +201,5 @@ fun MarkdownViewerScreen(
                 }
                 }
             }
-        }
     }
 }
