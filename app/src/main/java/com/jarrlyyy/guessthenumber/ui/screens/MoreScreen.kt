@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.graphics.graphicsLayer
@@ -50,6 +51,48 @@ fun MoreScreen(
 
     val currentMusicPath = state.settings.backgroundMusicPath
 
+    val defaultOrder = com.jarrlyyy.guessthenumber.domain.model.DEFAULT_MORE_SCREEN_ORDER
+    val normalizedOrder = remember(state.settings.moreScreenOrder) {
+        (state.settings.moreScreenOrder + defaultOrder).distinct()
+            .filter { it in defaultOrder }
+            .let { it + defaultOrder.filterNot(it::contains) }
+    }
+    var order by remember(normalizedOrder) { mutableStateOf(normalizedOrder) }
+    var dragging by remember { mutableStateOf<String?>(null) }
+    var dragDistance by remember { mutableFloatStateOf(0f) }
+    var isReordering by remember { mutableStateOf(false) }
+
+    LaunchedEffect(state.settings.moreScreenOrder) {
+        if (state.settings.moreScreenOrder != normalizedOrder) {
+            onUpdateSettings(state.settings.copy(moreScreenOrder = normalizedOrder))
+        }
+    }
+
+    val labels = mapOf(
+        "achievements" to "Achievements & Tiers",
+        "live_ops" to "Random & Seasonal Events",
+        "mutators" to "Mutators & Challenge Builder",
+        "talent" to "Prestige Talent Web",
+        "arcade" to "Arcade Minigames",
+        "stats" to "Statistics",
+        "changelog" to "Changelog",
+        "settings" to "Settings",
+        "about" to "About & Licenses",
+        "dev_settings" to "Dev Settings"
+    )
+    val icons = mapOf(
+        "achievements" to Icons.Default.EmojiEvents,
+        "live_ops" to Icons.Default.Event,
+        "mutators" to Icons.Default.Tune,
+        "talent" to Icons.Default.AccountTree,
+        "arcade" to Icons.Default.Favorite,
+        "stats" to Icons.Default.Face,
+        "changelog" to Icons.Default.Info,
+        "settings" to Icons.Default.Settings,
+        "about" to Icons.Default.Info,
+        "dev_settings" to Icons.Default.Build
+    )
+
     val audioPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -86,23 +129,6 @@ fun MoreScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                val defaultOrder = com.jarrlyyy.guessthenumber.domain.model.DEFAULT_MORE_SCREEN_ORDER
-                val normalizedOrder = remember(state.settings.moreScreenOrder) {
-                    (state.settings.moreScreenOrder + defaultOrder).distinct()
-                        .filter { it in defaultOrder }
-                        .let { it + defaultOrder.filterNot(it::contains) }
-                }
-                var order by remember(normalizedOrder) { mutableStateOf(normalizedOrder) }
-                var dragging by remember { mutableStateOf<Int?>(null) }
-                var dragDistance by remember { mutableFloatStateOf(0f) }
-                var isReordering by remember { mutableStateOf(false) }
-
-                LaunchedEffect(state.settings.moreScreenOrder) {
-                    if (state.settings.moreScreenOrder != normalizedOrder) {
-                        onUpdateSettings(state.settings.copy(moreScreenOrder = normalizedOrder))
-                    }
-                }
-
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -149,33 +175,10 @@ fun MoreScreen(
                             )
                         }
                     }
+                }
+            }
 
-                    val labels = mapOf(
-                        "achievements" to "Achievements & Tiers",
-                        "live_ops" to "Random & Seasonal Events",
-                        "mutators" to "Mutators & Challenge Builder",
-                        "talent" to "Prestige Talent Web",
-                        "arcade" to "Arcade Minigames",
-                        "stats" to "Statistics",
-                        "changelog" to "Changelog",
-                        "settings" to "Settings",
-                        "about" to "About & Licenses",
-                        "dev_settings" to "Dev Settings"
-                    )
-                    val icons = mapOf(
-                        "achievements" to Icons.Default.EmojiEvents,
-                        "live_ops" to Icons.Default.Event,
-                        "mutators" to Icons.Default.Tune,
-                        "talent" to Icons.Default.AccountTree,
-                        "arcade" to Icons.Default.Favorite,
-                        "stats" to Icons.Default.Face,
-                        "changelog" to Icons.Default.Info,
-                        "settings" to Icons.Default.Settings,
-                        "about" to Icons.Default.Info,
-                        "dev_settings" to Icons.Default.Build
-                    )
-
-                    items(order, key = { it }) { route ->
+                                items(order, key = { it }) { route ->
                         val selected = dragging == route
                         val animatedScale by animateFloatAsState(
                             targetValue = if (selected) 1.025f else 1f,
@@ -270,7 +273,6 @@ fun MoreScreen(
                         }
                     }
                 }
-            }
 
             item {
                 Text(localizedText("Reset Tiers & Hubs"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
