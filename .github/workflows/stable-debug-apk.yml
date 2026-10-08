@@ -70,9 +70,6 @@ jobs:
       - name: Build signed debug APK
         env:
           GTN_DEBUG_KEYSTORE_PATH: ${{ runner.temp }}/gtn-signing/debug.keystore
-          GTN_DEBUG_KEYSTORE_PASSWORD: ${{ secrets.GTN_DEBUG_KEYSTORE_PASSWORD }}
-          GTN_DEBUG_KEY_ALIAS: ${{ secrets.GTN_DEBUG_KEY_ALIAS }}
-          GTN_DEBUG_KEY_PASSWORD: ${{ secrets.GTN_DEBUG_KEY_PASSWORD }}
         run: ./gradlew assembleDebug --no-daemon
 
       - name: Upload debug APK
