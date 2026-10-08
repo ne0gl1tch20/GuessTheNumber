@@ -112,11 +112,16 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         AppErrorHandler.init(application.filesDir)
         _hasPreviousCrash.value = AppErrorHandler.hasPreviousCrash()
         GameLogger.configureStorage(File(application.filesDir, "game_logs.txt"), _gameState.value.settings.saveLogsToStorage)
-        loadGame()
-        startAutoSave()
-        startPlaytimeTimer()
-        startRandomEvents()
-        startAutoClicker()
+
+        // Crash recovery is the first boot layer. Do not touch save data or start game
+        // background jobs until the user has acknowledged the previous crash.
+        if (!_hasPreviousCrash.value) {
+            loadGame()
+            startAutoSave()
+            startPlaytimeTimer()
+            startRandomEvents()
+            startAutoClicker()
+        }
     }
 
     fun loadGame(slot: Int = -1) {
