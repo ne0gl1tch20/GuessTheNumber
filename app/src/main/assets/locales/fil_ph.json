@@ -627,5 +627,19 @@
   "daily_quest_claim": "Kunin",
   "daily_quest_claimed": "Nakuha na",
   "daily_quest_in_progress": "Kasalukuyang ginagawa",
-  "stats_session_arcade": "Session at Arkade"
+  "stats_session_arcade": "Session at Arkade",
+  "loot_title": "Mga Kayamanan",
+  "loot_subtitle": "Makakuha ng tamang hula para makahanap ng mga kaban.",
+  "loot_found": "Nahanap",
+  "loot_opened_count": "Nabuksan: %d",
+  "loot_drop_message": "May nahulog na %s na kaban!",
+  "loot_drop_rates": "Tsansa sa bawat tamang hula: Common 18%, Rare 5%, Epic 1%.",
+  "loot_tier_common": "Karaniwang Kaban",
+  "loot_tier_rare": "Bihirang Kaban",
+  "loot_tier_epic": "Epikong Kaban",
+  "loot_chest_count": "%d sa imbentaryo",
+  "loot_rewards_common": "5,000 Money o 5 Nebula",
+  "loot_rewards_rare": "25,000 Money o 25 Nebula",
+  "loot_rewards_epic": "100,000 Money o 100 Nebula",
+  "loot_open": "Buksan"
 }
