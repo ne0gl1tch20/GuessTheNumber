@@ -999,6 +999,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun settleStake(stakeAmount: BigNumber, payout: BigNumber, won: Boolean) {
+        val state = _gameState.value
+        if (stakeAmount <= BigNumber.ZERO || state.money < stakeAmount) return
+        val updatedMoney = if (won) state.money - stakeAmount + payout else state.money - stakeAmount
+        _gameState.value = state.copy(money = updatedMoney, statistics = state.statistics.copy(moneyEarned = if (won) state.statistics.moneyEarned + payout else state.statistics.moneyEarned, moneySpent = state.statistics.moneySpent + stakeAmount))
+        saveGameAsync()
+    }
+
     fun openLootChest(tier: String) {
         val state = _gameState.value
         val available = when (tier) {
