@@ -68,6 +68,9 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - CI remains manual-only.
 
 ## v1.16.0 Expressive Motion & Gameplay Feedback
+- Added a persistent Daily Bounty Board to the Play screen with four goals: make 10 guesses, get 5 correct guesses, reach a 5-correct streak, and buy upgrades 3 times.
+- Bounties grant claimable Money or Nebula rewards; progress and claims are saved per game slot and reset when the local calendar day changes.
+- Added English and Filipino localization for all bounty-board strings. Other locale overlays use the existing English fallback until translated.
 - App version is now `versionCode 16` / `versionName 1.16.0`.
 - Added an expressive save-loading screen connected to the actual save-switch loading state.
 - Expanded spring-based transitions, animated card/content changes, tactile press feedback, and gameplay result animations across Play, Upgrades, Shop, Prestige, Ultra, Achievements, Arcade, Save Slots, guided tutorial, crash recovery, and navigation.
