@@ -99,7 +99,7 @@ val DEFAULT_MORE_SCREEN_ORDER = buildList {
         "world_map", "achievements", "live_ops", "mutators", "talent", "relics",
         "home_base", "codex", "endgame", "arcade", "stats", "changelog", "settings", "about"
     ))
-    if (BuildConfig.DEBUG) addAll(listOf("dev_settings", "process_inspector"))
+    if (BuildConfig.DEBUG) add("dev_settings")
     addAll(listOf("staking", "ultra", "prestige", "save_slots", "music"))
 }
 
