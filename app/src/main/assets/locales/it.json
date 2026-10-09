@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Riscuoti",
   "daily_quest_claimed": "Riscosso",
-  "daily_quest_in_progress": "In corso"
+  "daily_quest_in_progress": "In corso",
+  "liveops_bonus_level_label": "Livello bonus permanente",
+  "liveops_bonus_effect": "+2% denaro per livello e +1 Nebula per risposta corretta ogni 5 livelli, fino al livello 25. Si applica a questo slot di salvataggio."
 }
