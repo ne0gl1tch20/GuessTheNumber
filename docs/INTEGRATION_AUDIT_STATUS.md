@@ -13,19 +13,28 @@
 
 ## Completed in the latest notification/widget pass
 
-- Added localized reminder/progression/event notification titles and bodies to all 23 supported locale catalogs; notifications load the saved global app language.
-- Restored reminder scheduling after device reboot from saved notification preferences, including the selected 12/24/48-hour interval and disabled state.
-- Kept reminder, progression and event notifications on separate channels with destination extras for navigation.
-- Routed supported notification destinations directly from MainActivity into the matching NavGraph start destination.
-- Changed the home-screen widget to render metrics from the latest saved game state instead of stale Glance preference snapshots.
-- Added a throttled widget refresh after game saves to avoid hammering widget updates during rapid gameplay.
-- Updated reminder scheduling to honor the selected 12/24/48-hour interval and reschedule when the interval changes.
+- Added independent reminder, progression-milestone and game-event switches in Settings. Notification dispatch checks both the global switch and the matching category switch.
+- Connected progression notifications to new achievements, world unlocks, boss victories, secret discoveries, Codex claims, Home Base milestones and Endless Rift milestones.
+- Connected event notifications to actual random-event engine rolls, rather than state comparisons that can miss event timing.
+- Kept reminder, progression and event notifications on separate channels and preserved destination extras for navigation.
+- Reminder scheduling and reboot restoration honor the reminder category switch and the selected 12/24/48-hour interval.
+- Expanded the home-screen widget with money, range, streak, mastery, world and boss metrics; added per-widget save-slot cycling and an Open Game action.
+- Added a compact widget layout alongside the expanded layout. Both widget layouts refresh after persisted gameplay saves through a throttled refresh coordinator.
+- Removed the widget's duplicated gameplay engine/reward implementation. Widget actions no longer grant a free correct guess or duplicate boss/relic reward logic.
+
+## Completed in the latest RPG integration pass
+
+- Expanded relic equipment capacity to four boss relics and added explicit two-, three- and four-relic set bonuses.
+- Full four-relic set adds a stronger currency bonus and extra Nebula generation; discovering all four secret areas adds another Nebula bonus on correct guesses.
+- Secret discoveries now grant one-time money/Nebula rewards, Codex entries, a world-specific mastery discount and an ongoing reward bonus in that world.
+- Mastery level 5 and 10 milestones grant Nebula and Codex entries; the secret-area discount reduces mastery upgrade costs.
+- Home Base upgrades now account for money spent, grant milestone Nebula at levels 5/10/15/20 and add Sanctuary Codex entries.
+- Added a claimable endgame goal for reaching mastery level 5 in every world. Existing endgame goals now expose claim buttons when their requirements are met.
 
 ## Still requires the remaining integration pass
 
-- Add explicit per-category notification switches and wire real progression/event triggers to the corresponding channels.
-- Expand widget layouts with more selectable metrics, quick actions and selected-save-slot support.
-- Finish secret-area unique reward/action chains and deeper mastery/relic/Home Base/endgame cross-system effects.
-- Run the manual GitHub Actions validation/build and resolve compiler/lint/localization failures before calling the pass build-verified.
+- Verify all locale catalogs contain every new notification, widget and endgame key, then run the localization audit.
+- Review RPG reward balance, set-specific effects, boss/Rift reward consistency and whether Codex completion thresholds should include the new mastery/Sanctuary entries.
+- Run the manual GitHub Actions validation/build and resolve compiler/lint/runtime issues before calling the pass build-verified.
 
 Current app version: 3.0.1 (versionCode 19).
