@@ -382,7 +382,7 @@ fun NavGraph(
             composable("talent") {
                 TalentScreen(
                     state = state,
-                    onBuyTalent = onBuyPrestigeShopItem,
+                    onBuyTalent = viewModel::buyTalent,
                     onBack = { navController.popBackStack() }
                 )
             }
