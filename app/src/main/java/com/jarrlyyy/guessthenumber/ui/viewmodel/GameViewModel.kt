@@ -700,6 +700,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (earned <= BigNumber.ZERO) return after
         var bonusMoney = BigNumber.ZERO
         if ("talent_reward_1" in before.prestigeShopPurchases) bonusMoney += earned * BigNumber(0.5)
+        val masteryLevel = (before.worldMasteryLevels[before.activeWorldId] ?: 0).coerceIn(0, 10)
+        if (masteryLevel > 0) bonusMoney += earned * BigNumber(masteryLevel * 0.02)
         val criticalChance = when { "talent_crit_2" in before.prestigeShopPurchases -> 0.15; "talent_crit_1" in before.prestigeShopPurchases -> 0.05; else -> 0.0 }
         if (criticalChance > 0.0 && Random.nextDouble() < criticalChance) bonusMoney += earned
         if ("verdant_guardian" in before.equippedRelicIds) bonusMoney += earned * BigNumber(0.10)
@@ -959,7 +961,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (action != "boss_hit") return
         val nextDamage = (state.bossBattleProgress[bossId] ?: 0) + 1
         if (nextDamage < bossHp) {
-            _gameState.value = state.copy(bossBattleProgress = state.bossBattleProgress + (bossId to nextDamage))
+            val oldPhase = ((damage * 3) / bossHp + 1).coerceIn(1, 3)
+            val newPhase = ((nextDamage * 3) / bossHp + 1).coerceIn(1, 3)
+            val mistakes = if (newPhase != oldPhase) 0 else (state.bossBattleMistakes[bossId] ?: 0)
+            _gameState.value = state.copy(bossBattleProgress = state.bossBattleProgress + (bossId to nextDamage), bossBattleMistakes = state.bossBattleMistakes + (bossId to mistakes))
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_HIT", "Hit boss $bossId: $nextDamage/$bossHp")
             return
@@ -977,7 +982,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val updated = when (action) {
             "select_world" -> {
                 if (id !in state.unlockedWorldIds) return
-                state.copy(activeWorldId = id)
+                state.copy(activeWorldId = id, activeBossBattleWorldId = if (state.activeBossBattleWorldId == id) id else null)
             }
             "secret" -> {
                 val secretWorld = mapOf("whispering_hollow" to "verdant_grove", "shard_archive" to "crystal_caverns", "ashen_vault" to "ember_summit", "lost_observatory" to "nebula_rift")[id] ?: return
