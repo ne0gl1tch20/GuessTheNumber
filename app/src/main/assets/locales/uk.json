@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Забрати",
   "daily_quest_claimed": "Отримано",
-  "daily_quest_in_progress": "У процесі"
+  "daily_quest_in_progress": "У процесі",
+  "liveops_bonus_level_label": "Рівень постійного бонусу",
+  "liveops_bonus_effect": "+2% грошей за рівень і +1 Небула за кожну правильну відповідь кожні 5 рівнів, максимум до 25 рівня. Діє для цього слота збереження."
 }
