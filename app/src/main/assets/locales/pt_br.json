@@ -783,5 +783,14 @@
   "notification_category_progression": "Marcos de progresso",
   "notification_category_progression_desc": "Desbloqueios de mundos e vitórias contra chefes",
   "notification_category_events": "Eventos do jogo",
-  "notification_category_events_desc": "Novos eventos aleatórios e recompensas por tempo limitado"
+  "notification_category_events_desc": "Novos eventos aleatórios e recompensas por tempo limitado",
+  "widget_title": "🎯 Adivinhe o Número",
+  "widget_slot": "Slot de salvamento %d • %s",
+  "widget_money": "Dinheiro",
+  "widget_range": "Intervalo",
+  "widget_streak": "Sequência %d",
+  "widget_mastery": "Maestria %d",
+  "widget_worlds_bosses": "Mundos %d • Chefes %d",
+  "widget_quick_guess": "Palpite rápido",
+  "widget_next_slot": "Próximo slot"
 }
