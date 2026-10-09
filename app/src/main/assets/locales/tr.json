@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Al",
   "daily_quest_claimed": "Alındı",
-  "daily_quest_in_progress": "Devam ediyor"
+  "daily_quest_in_progress": "Devam ediyor",
+  "liveops_bonus_level_label": "Kalıcı Bonus Seviyesi",
+  "liveops_bonus_effect": "Her seviyede +%2 para ve her 5 seviyede doğru tahmin başına +1 Nebula, en fazla 25 seviye. Bu kayıt yuvası için geçerlidir."
 }
