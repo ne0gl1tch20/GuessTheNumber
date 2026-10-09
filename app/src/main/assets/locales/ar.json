@@ -757,5 +757,7 @@
   "boss_guess_rule": "Correct guesses deal damage. Every third wrong guess restores one HP.",
   "codex_claim_reward": "Claim 100 Nebula completion reward",
   "codex_reward_claimed": "Completion reward claimed",
-  "world_mastery_upgrade": "Increase mastery • %s Nebula"
+  "world_mastery_upgrade": "Increase mastery • %s Nebula",
+  "relic_set_bonus": "Set bonus: equipping two relics adds another 10% Money to correct-guess rewards.",
+  "home_base_bonus": "Each sanctuary level adds 2% Money to correct-guess rewards, up to 40%."
 }
