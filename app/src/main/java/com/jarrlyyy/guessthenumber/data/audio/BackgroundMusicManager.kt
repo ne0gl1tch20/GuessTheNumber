@@ -1,11 +1,13 @@
 package com.jarrlyyy.guessthenumber.data.audio
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -81,6 +83,19 @@ class BackgroundMusicManager private constructor(context: Context) {
                 }
             }
         }
+    }
+
+    private fun ensurePlaybackService() {
+        runCatching {
+            ContextCompat.startForegroundService(
+                appContext,
+                Intent(appContext, MusicPlaybackService::class.java)
+            )
+        }
+    }
+
+    private fun stopPlaybackService() {
+        runCatching { appContext.stopService(Intent(appContext, MusicPlaybackService::class.java)) }
     }
 
     fun importTrack(uri: Uri, displayName: String? = null): Track? = try {
@@ -188,27 +203,24 @@ class BackgroundMusicManager private constructor(context: Context) {
             _currentPosition.value = 0
             extractAlbumArt(path)
             _isPlaying.value = true
+            ensurePlaybackService()
         } catch (_: Exception) { _isPlaying.value = false }
     }
 
     fun play() {
         try {
             if (mediaPlayer == null) _currentTrackId.value?.let(::playTrack) ?: _currentPath.value?.let { startPath(it, null) }
-            else if (mediaPlayer?.isPlaying == false) { mediaPlayer?.start(); _isPlaying.value = true }
+            else if (mediaPlayer?.isPlaying == false) { mediaPlayer?.start(); _isPlaying.value = true; ensurePlaybackService() }
         } catch (_: Exception) {}
     }
 
     fun pause() { runCatching { mediaPlayer?.pause(); _isPlaying.value = false } }
-    fun stop() { runCatching { mediaPlayer?.stop(); mediaPlayer?.release() }; mediaPlayer = null; _isPlaying.value = false; _currentPosition.value = 0 }
+    fun stop() { runCatching { mediaPlayer?.stop(); mediaPlayer?.release() }; mediaPlayer = null; _isPlaying.value = false; _currentPosition.value = 0; stopPlaybackService() }
     fun seekTo(position: Int) { runCatching { mediaPlayer?.seekTo(position.coerceAtLeast(0)); _currentPosition.value = position.coerceAtLeast(0) } }
 
     fun release() {
-        progressJob?.cancel()
-        scope.cancel()
-        runCatching { mediaPlayer?.release() }
-        mediaPlayer = null
-        _isPlaying.value = false
-        removeInstance(this)
+        // Playback is app-scoped. Screens must not release the shared owner during navigation.
+        // The service lifecycle and explicit stop() control the actual player lifecycle.
     }
 
     private fun extractAlbumArt(path: String) {
