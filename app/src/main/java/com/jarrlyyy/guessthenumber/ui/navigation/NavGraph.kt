@@ -75,7 +75,8 @@ fun NavGraph(
     onClaimLiveOpsEventReward: (String) -> Unit,
     onActivateChallengeBuilder: (Set<String>) -> Unit,
     viewModel: GameViewModel,
-    hasAnySave: Boolean
+    hasAnySave: Boolean,
+    initialDestination: String? = null
 ) {
     val navController = rememberNavController()
     val locale = viewModel.localeManager
@@ -86,6 +87,19 @@ fun NavGraph(
         return
     }
     val items = listOf(Screen.Play, Screen.Upgrade, Screen.Shop, Screen.More)
+    val startRoute = initialDestination?.takeIf {
+        it in setOf(
+            Screen.Play.route,
+            Screen.WorldMap.route,
+            Screen.Relics.route,
+            Screen.HomeBase.route,
+            Screen.Codex.route,
+            Screen.Endgame.route,
+            Screen.MusicPlayer.route,
+            "live_ops",
+            "achievements"
+        )
+    } ?: Screen.Play.route
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -214,7 +228,7 @@ fun NavGraph(
             Box(Modifier.fillMaxSize().padding(padding)) {
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.Play.route,
+                    startDestination = startRoute,
                     modifier = Modifier.fillMaxSize(),
                     enterTransition = {
                         if (state.settings.reducedMotion) EnterTransition.None
