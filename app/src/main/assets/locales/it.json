@@ -783,5 +783,14 @@
   "notification_category_progression": "Traguardi di progressione",
   "notification_category_progression_desc": "Sblocco dei mondi e vittorie sui boss",
   "notification_category_events": "Eventi di gioco",
-  "notification_category_events_desc": "Nuovi eventi casuali e ricompense a tempo limitato"
+  "notification_category_events_desc": "Nuovi eventi casuali e ricompense a tempo limitato",
+  "widget_title": "🎯 Indovina il numero",
+  "widget_slot": "Slot salvataggio %d • %s",
+  "widget_money": "Denaro",
+  "widget_range": "Intervallo",
+  "widget_streak": "Serie %d",
+  "widget_mastery": "Maestria %d",
+  "widget_worlds_bosses": "Mondi %d • Boss %d",
+  "widget_quick_guess": "Tentativo rapido",
+  "widget_next_slot": "Slot successivo"
 }
