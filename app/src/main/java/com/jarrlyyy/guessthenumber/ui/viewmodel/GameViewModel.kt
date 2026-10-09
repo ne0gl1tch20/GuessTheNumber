@@ -1126,6 +1126,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     "all_relics" -> if (state.relicInventory.containsAll(allBosses)) 300L to BigNumber(1_000_000) else return
                     "sanctuary_10" -> if (state.homeBaseLevel >= 10) 500L to BigNumber(5_000_000) else return
                     "rift_tier_10" -> if (state.endlessRiftBestTier >= 10) 1_000L to BigNumber(10_000_000) else return
+                    "mastery_all_5" -> if (listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift").all { (state.worldMasteryLevels[it] ?: 0) >= 5 }) 400L to BigNumber(5_000_000) else return
                     else -> return
                 }
                 if (id in state.endgameRewardsClaimed) return
@@ -1154,7 +1155,21 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val baseCost = BigNumber(10L * (current + 1L))
                 val cost = if (secretForWorld != null && secretForWorld in state.discoveredSecretIds) baseCost * BigNumber(0.8) else baseCost
                 if (current >= 10 || state.nebula < cost) return
-                state.copy(nebula = state.nebula - cost, worldMasteryLevels = state.worldMasteryLevels + (id to (current + 1)))
+                val nextLevel = current + 1
+                val milestoneNebula = when (nextLevel) {
+                    5 -> 25L
+                    10 -> 100L
+                    else -> 0L
+                }
+                val milestoneEntries = if (nextLevel == 5 || nextLevel == 10) {
+                    state.codexEntries + "mastery:$id:$nextLevel"
+                } else state.codexEntries
+                state.copy(
+                    nebula = state.nebula - cost + BigNumber(milestoneNebula),
+                    worldMasteryLevels = state.worldMasteryLevels + (id to nextLevel),
+                    codexEntries = milestoneEntries,
+                    statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + milestoneNebula)
+                )
             }
             else -> return
         }
