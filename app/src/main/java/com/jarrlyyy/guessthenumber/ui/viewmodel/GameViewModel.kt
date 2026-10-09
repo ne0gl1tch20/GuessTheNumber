@@ -737,7 +737,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val bonusNebula = (if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L) +
             (if ("ember_dragon" in before.equippedRelicIds) 1L else 0L) +
             (if (equippedBossRelics.size == 4) 1L else 0L) +
-            (if (before.discoveredSecretIds.size >= 4) 1L else 0L)
+            (if (before.discoveredSecretIds.size >= 4) 1L else 0L) +
+            (if (before.activeWorldId == "ember_summit" && "ashen_vault" in before.discoveredSecretIds) 1L else 0L)
         return after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(bonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + bonusNebula))
     }
 
@@ -1201,7 +1202,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     "nebula_rift" to "lost_observatory"
                 )[id]
                 val baseCost = BigNumber(10L * (current + 1L))
-                val cost = if (secretForWorld != null && secretForWorld in state.discoveredSecretIds) baseCost * BigNumber(0.8) else baseCost
+                val secretDiscount = if (secretForWorld != null && secretForWorld in state.discoveredSecretIds) 0.20 else 0.0
+                val sanctuaryDiscount = (state.homeBaseLevel * 0.01).coerceAtMost(0.20)
+                val fullRelicSetDiscount = if (
+                    state.equippedRelicIds.containsAll(setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan"))
+                ) 0.10 else 0.0
+                val totalDiscount = (secretDiscount + sanctuaryDiscount + fullRelicSetDiscount).coerceAtMost(0.40)
+                val cost = baseCost * BigNumber(1.0 - totalDiscount)
                 if (current >= 10 || state.nebula < cost) return
                 val nextLevel = current + 1
                 val milestoneNebula = when (nextLevel) {
