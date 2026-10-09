@@ -78,7 +78,11 @@ fun MoreScreen(
         "changelog" to "Changelog",
         "settings" to "Settings",
         "about" to "About & Licenses",
-        "dev_settings" to "Dev Settings"
+        "dev_settings" to "Dev Settings",
+        "ultra" to "Ultra Hub & Upgrades",
+        "prestige" to "Prestige Hub & Upgrades",
+        "save_slots" to "Save Slots",
+        "music" to "Background Music Player"
     )
     val icons = mapOf(
         "achievements" to Icons.Default.EmojiEvents,
@@ -90,7 +94,11 @@ fun MoreScreen(
         "changelog" to Icons.Default.Info,
         "settings" to Icons.Default.Settings,
         "about" to Icons.Default.Info,
-        "dev_settings" to Icons.Default.Build
+        "dev_settings" to Icons.Default.Build,
+        "ultra" to Icons.Default.Star,
+        "prestige" to Icons.Default.Star,
+        "save_slots" to Icons.Default.Save,
+        "music" to Icons.Default.MusicNote
     )
 
     val audioPickerLauncher = rememberLauncherForActivityResult(
@@ -143,7 +151,7 @@ fun MoreScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        FilledTonalButton(
+                        TextButton(
                             onClick = {
                                 if (isReordering) {
                                     dragging = null
@@ -151,8 +159,7 @@ fun MoreScreen(
                                     onUpdateSettings(state.settings.copy(moreScreenOrder = order))
                                 }
                                 isReordering = !isReordering
-                            },
-                            shape = MaterialTheme.shapes.extraLarge
+                            }
                         ) {
                             Icon(Icons.Default.DragHandle, contentDescription = null)
                             Spacer(Modifier.width(6.dp))
@@ -161,19 +168,11 @@ fun MoreScreen(
                     }
 
                     if (isReordering) {
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = MaterialTheme.shapes.large,
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            tonalElevation = 2.dp
-                        ) {
-                            Text(
-                                localizedText("Long-press and drag. The new order is saved and used by this menu."),
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
+                        Text(
+                            localizedText("Hold and drag to rearrange"),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
@@ -239,7 +238,14 @@ fun MoreScreen(
                                             )
                                         }
                                     } else {
-                                        Modifier.clickable { onNavigate(route) }
+                                        Modifier.clickable {
+                                            when (route) {
+                                                "ultra", "prestige" -> onNavigate(route)
+                                                "save_slots" -> onNavigate(Screen.SaveSlots.route)
+                                                "music" -> showMusicDialog = true
+                                                else -> onNavigate(route)
+                                            }
+                                        }
                                     }
                                 ),
                             shape = MaterialTheme.shapes.large,
@@ -272,70 +278,6 @@ fun MoreScreen(
                             }
                         }
                     }
-
-            item {
-                Text(localizedText("Reset Tiers & Hubs"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-            }
-
-            item {
-                Button(
-                    onClick = { onNavigate("ultra") },
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer, contentColor = MaterialTheme.colorScheme.onTertiaryContainer),
-                    modifier = Modifier.fillMaxWidth().height(52.dp)
-                ) {
-                    Icon(imageVector = Icons.Default.Star, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Ultra Hub & Upgrades"), style = MaterialTheme.typography.titleMedium)
-                }
-            }
-
-            item {
-                Button(
-                    onClick = { onNavigate("prestige") },
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer),
-                    modifier = Modifier.fillMaxWidth().height(52.dp)
-                ) {
-                    Icon(imageVector = Icons.Default.Star, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Prestige Hub & Upgrades"), style = MaterialTheme.typography.titleMedium)
-                }
-            }
-
-            item {
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    localizedText("Audio & Save Management"),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            item {
-                FilledTonalButton(
-                    onClick = { onNavigate(Screen.SaveSlots.route) },
-                    shape = MaterialTheme.shapes.extraLarge,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.Save, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(localizedText("Save Slots"), style = MaterialTheme.typography.titleMedium)
-                }
-            }
-
-            item {
-                FilledTonalButton(
-                    onClick = { showMusicDialog = true },
-                    shape = MaterialTheme.shapes.extraLarge,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(localizedText("Background Music Player"), style = MaterialTheme.typography.titleMedium)
-                }
-            }
 
             item {
                 HorizontalDivider()

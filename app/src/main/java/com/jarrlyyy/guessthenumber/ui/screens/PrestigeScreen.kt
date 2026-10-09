@@ -2,7 +2,13 @@ package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
+import kotlinx.coroutines.delay
+import com.jarrlyyy.guessthenumber.ui.components.ExpressiveMilestoneBanner
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -37,6 +43,19 @@ fun PrestigeScreen(
     val requiredMoney = gameEngine.calculatePrestigeRequirement(state.prestigeCount)
     val prestigeReward = gameEngine.calculatePrestigeReward(state.money, state.prestigeCount)
     val canPrestige = state.money >= requiredMoney
+    val prestigeInteractionSource = remember { MutableInteractionSource() }
+    var showPrestigeCelebration by remember { mutableStateOf(false) }
+    var observedPrestigeCount by remember { mutableStateOf(state.prestigeCount) }
+
+    LaunchedEffect(state.prestigeCount) {
+        val reachedNewPrestige = state.prestigeCount > observedPrestigeCount
+        observedPrestigeCount = state.prestigeCount
+        if (reachedNewPrestige) {
+            showPrestigeCelebration = true
+            delay(if (state.settings.reducedMotion) 700L else 2200L)
+            showPrestigeCelebration = false
+        }
+    }
 
     val upgrades = remember { JsonConfigRepository(context).loadPrestigeUpgrades() }
     val shopItems = remember { JsonConfigRepository(context).loadPrestigeShopItems() }
@@ -63,11 +82,13 @@ fun PrestigeScreen(
             // Currency Display
             item {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().animateContentSize(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(localizedText("Prestige Balance: ${state.prestige.format()}"), color = PrestigeBlue, fontSize = 20.sp)
+                        AnimatedContent(targetState = state.prestige.format(), label = "prestigeBalance") { balance ->
+                            Text(localizedText("Prestige Balance: $balance"), color = PrestigeBlue, fontSize = 20.sp)
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(localizedText("Requirement: ${requiredMoney.format()} Money (Reset #${state.prestigeCount + 1})"))
                         Text(localizedText("Current Money: ${state.money.format()}"))
@@ -78,13 +99,30 @@ fun PrestigeScreen(
                         Button(
                             onClick = onPrestige,
                             enabled = canPrestige,
+                            interactionSource = prestigeInteractionSource,
                             colors = ButtonDefaults.buttonColors(containerColor = PrestigeBlue),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .expressivePressScale(
+                                    interactionSource = prestigeInteractionSource,
+                                    enabled = canPrestige,
+                                    reducedMotion = state.settings.reducedMotion,
+                                    scaleDownFactor = 0.97f
+                                )
+                                .fillMaxWidth()
                         ) {
                             Text(if (canPrestige) "Perform Prestige Reset" else "Need ${requiredMoney.format()} Money to Prestige")
                         }
                     }
                 }
+            }
+
+            item {
+                ExpressiveMilestoneBanner(
+                    visible = showPrestigeCelebration,
+                    title = "Prestige achieved!",
+                    description = "A new reset is complete. Your next run starts now.",
+                    reducedMotion = state.settings.reducedMotion
+                )
             }
 
             // Prestige Upgrades Header
@@ -145,7 +183,7 @@ fun PrestigeScreen(
                 }
                 val canAfford = !isMaxed && state.prestige >= totalCost
 
-                Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceVariant, tonalElevation = 2.dp) {
+                Surface(Modifier.fillMaxWidth().then(if (state.settings.reducedMotion) Modifier else Modifier.animateItem(placementSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow, dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy))).animateContentSize(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceVariant, tonalElevation = 2.dp) {
                     Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(upgrade.name, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
@@ -181,7 +219,7 @@ fun PrestigeScreen(
                 val purchased = state.prestigeShopPurchases.contains(item.id)
                 val canAfford = state.prestige >= BigNumber(item.cost)
 
-                Card(modifier = Modifier.fillMaxWidth()) {
+                Card(modifier = Modifier.fillMaxWidth().then(if (state.settings.reducedMotion) Modifier else Modifier.animateItem(placementSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow, dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy))).animateContentSize()) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -200,7 +238,7 @@ fun PrestigeScreen(
                             enabled = canAfford && !purchased,
                             colors = ButtonDefaults.buttonColors(containerColor = PrestigeBlue)
                         ) {
-                            Text(if (purchased) "Owned" else "Buy")
+                            AnimatedContent(targetState = purchased, label = "prestigeShopPurchase_${item.id}") { isPurchased -> Text(if (isPurchased) "Owned" else "Buy") }
                         }
                     }
                 }

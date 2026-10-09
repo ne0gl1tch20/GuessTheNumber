@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.ui.screens
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import androidx.compose.animation.*
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -16,6 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import kotlinx.coroutines.delay
+import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
@@ -33,13 +39,35 @@ fun PlayScreen(
     val configRepository = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale) }
     val locale = configRepository.localeManager
     var lastFeedback by remember { mutableStateOf(locale.getString("guess_prompt", "Guess a number between ${state.currentRangeMin} and ${state.currentRangeMax}")) }
+    var showCorrectCelebration by remember { mutableStateOf(false) }
+    var observedCorrectGuesses by remember { mutableStateOf(state.correctGuesses) }
+    val guessInteractionSource = remember { MutableInteractionSource() }
+    val isGuessPressed by guessInteractionSource.collectIsPressedAsState()
+    val guessCornerRadius by animateDpAsState(
+        targetValue = if (isGuessPressed && !state.settings.reducedMotion) 20.dp else 28.dp,
+        animationSpec = if (state.settings.reducedMotion) snap() else spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "guessButtonShape"
+    )
+
+    LaunchedEffect(state.correctGuesses, state.settings.reducedMotion) {
+        val foundNewNumber = state.correctGuesses > observedCorrectGuesses
+        observedCorrectGuesses = state.correctGuesses
+        if (foundNewNumber) {
+            showCorrectCelebration = true
+            delay(if (state.settings.reducedMotion) 700L else 1800L)
+            showCorrectCelebration = false
+        }
+    }
 
     val feedbackRoot = remember {
         configRepository.loadFeedbackMessages()
     }
 
     val infiniteTransition = rememberInfiniteTransition(label = "moe_pulse")
-    val scalePulse by infiniteTransition.animateFloat(
+    val animatedScalePulse by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = 1.02f,
         animationSpec = infiniteRepeatable(
@@ -48,6 +76,7 @@ fun PlayScreen(
         ),
         label = "pulse"
     )
+    val scalePulse = if (state.settings.reducedMotion) 1f else animatedScalePulse
 
     Scaffold(
         topBar = {
@@ -70,6 +99,7 @@ fun PlayScreen(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .animateContentSize()
                         .scale(scalePulse),
                     shape = MaterialTheme.shapes.extraLarge,
                     color = MaterialTheme.colorScheme.primaryContainer,
@@ -87,7 +117,14 @@ fun PlayScreen(
                             ) {
                                 Icon(imageVector = Icons.Default.Star, contentDescription = "Money", tint = MoneyGold, modifier = Modifier.size(28.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
-                                AnimatedContent(targetState = state.money.format(), label = "MoneyAnimation") { moneyStr ->
+                                AnimatedContent(
+                                    targetState = state.money.format(),
+                                    transitionSpec = {
+                                        (slideInVertically { it / 3 } + fadeIn()) togetherWith
+                                            (slideOutVertically { -it / 3 } + fadeOut())
+                                    },
+                                    label = "MoneyAnimation"
+                                ) { moneyStr ->
                                     Text(text = localizedText("Money: $moneyStr"),
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         style = MaterialTheme.typography.titleLarge
@@ -188,6 +225,46 @@ fun PlayScreen(
                 }
             }
 
+            item {
+                AnimatedVisibility(
+                    visible = showCorrectCelebration,
+                    enter = if (state.settings.reducedMotion) fadeIn() else scaleIn() + fadeIn(),
+                    exit = if (state.settings.reducedMotion) fadeOut() else scaleOut() + fadeOut()
+                ) {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth().animateContentSize(),
+                        shape = MaterialTheme.shapes.extraLarge,
+                        color = MaterialTheme.colorScheme.tertiaryContainer,
+                        tonalElevation = if (state.settings.reducedMotion) 0.dp else 6.dp
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.EmojiEvents,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                                modifier = Modifier.size(30.dp)
+                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = locale.getString("play_correct_celebration_title", "Nice guess!"),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                                )
+                                Text(
+                                    text = locale.getString("play_correct_celebration_desc", "Secret number found. Your streak keeps growing."),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             state.lastRandomEventId?.let { eventId ->
                 item {
                     val eventName = locale.getString(
@@ -257,7 +334,14 @@ fun PlayScreen(
                         }
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        AnimatedContent(targetState = lastFeedback, label = "FeedbackAnimation") { feedback ->
+                        AnimatedContent(
+                            targetState = lastFeedback,
+                            transitionSpec = {
+                                (fadeIn(animationSpec = tween(180)) + slideInVertically { it / 5 }) togetherWith
+                                    (fadeOut(animationSpec = tween(120)) + slideOutVertically { -it / 5 })
+                            },
+                            label = "FeedbackAnimation"
+                        ) { feedback ->
                             Text(
                                 text = feedback,
                                 style = MaterialTheme.typography.titleMedium,
@@ -348,6 +432,7 @@ fun PlayScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Button(
+                            interactionSource = guessInteractionSource,
                             onClick = {
                                 val g = guessInput.toLongOrNull()
                                 if (g != null) {
@@ -415,9 +500,13 @@ fun PlayScreen(
                                 }
                             },
                             modifier = Modifier
+                                .expressivePressScale(
+                                    interactionSource = guessInteractionSource,
+                                    reducedMotion = state.settings.reducedMotion
+                                )
                                 .fillMaxWidth()
                                 .height(56.dp),
-                            shape = MaterialTheme.shapes.extraLarge,
+                            shape = RoundedCornerShape(guessCornerRadius),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
                             Icon(imageVector = Icons.Default.Check, contentDescription = null, modifier = Modifier.size(20.dp))

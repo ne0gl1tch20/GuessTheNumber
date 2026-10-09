@@ -1,6 +1,10 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.animateContentSize
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -23,15 +27,22 @@ import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.data.crash.AppErrorHandler
 
 @Composable
-fun CrashRecoveryScreen(locale: LocaleManager, onDismiss: () -> Unit) {
+fun CrashRecoveryScreen(locale: LocaleManager, onDismiss: () -> Unit, reducedMotion: Boolean = false) {
     val context = LocalContext.current
     val crashLog = remember { AppErrorHandler.getCrashLog() }
     val scrollState = rememberScrollState()
 
+    var showRecoveryContent by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { showRecoveryContent = true }
+
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().animateContentSize(),
         color = MaterialTheme.colorScheme.errorContainer
     ) {
+        AnimatedVisibility(
+            visible = showRecoveryContent,
+            enter = if (reducedMotion) fadeIn() else scaleIn(initialScale = 0.97f) + fadeIn()
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -100,6 +111,7 @@ fun CrashRecoveryScreen(locale: LocaleManager, onDismiss: () -> Unit) {
             ) {
                 Text(locale.getString("continue_playing", "Continue Playing"))
             }
+        }
         }
     }
 }

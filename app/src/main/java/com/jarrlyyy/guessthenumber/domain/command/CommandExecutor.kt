@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.domain.command
 
+import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
@@ -7,7 +8,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 
 object DeveloperConfig {
-    const val ENABLED = true
+    const val ENABLED = BuildConfig.DEBUG
 }
 
 class CommandExecutor {

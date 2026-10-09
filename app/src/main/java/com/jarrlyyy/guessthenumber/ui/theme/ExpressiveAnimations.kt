@@ -26,6 +26,28 @@ object ExpressiveSprings {
 /**
  * Adds an expressive scale-down press effect with bouncy spring physics.
  */
+/**
+ * Adds springy press feedback to a Material component without replacing its click handler.
+ */
+fun Modifier.expressivePressScale(
+    interactionSource: MutableInteractionSource,
+    enabled: Boolean = true,
+    reducedMotion: Boolean = false,
+    scaleDownFactor: Float = 0.96f
+): Modifier = composed {
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (enabled && isPressed && !reducedMotion) scaleDownFactor else 1f,
+        animationSpec = if (reducedMotion) {
+            spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessHigh)
+        } else {
+            ExpressiveSprings.Bouncy
+        },
+        label = "ExpressivePressScale"
+    )
+    this.scale(scale)
+}
+
 fun Modifier.expressiveClickable(
     interactionSource: MutableInteractionSource? = null,
     enabled: Boolean = true,

@@ -2,7 +2,13 @@ package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
+import kotlinx.coroutines.delay
+import com.jarrlyyy.guessthenumber.ui.components.ExpressiveMilestoneBanner
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -37,6 +43,19 @@ fun UltraScreen(
     val requiredMoney = gameEngine.calculateUltraRequirement(state.ultraCount)
     val ultraReward = gameEngine.calculateUltraReward(state.money, state.ultraCount)
     val canUltra = state.money >= requiredMoney && state.prestige >= BigNumber(1_000)
+    val ultraInteractionSource = remember { MutableInteractionSource() }
+    var showUltraCelebration by remember { mutableStateOf(false) }
+    var observedUltraCount by remember { mutableStateOf(state.ultraCount) }
+
+    LaunchedEffect(state.ultraCount) {
+        val reachedNewUltra = state.ultraCount > observedUltraCount
+        observedUltraCount = state.ultraCount
+        if (reachedNewUltra) {
+            showUltraCelebration = true
+            delay(if (state.settings.reducedMotion) 700L else 2400L)
+            showUltraCelebration = false
+        }
+    }
 
     val upgrades = remember { JsonConfigRepository(context).loadUltraUpgrades() }
     val shopItems = remember { JsonConfigRepository(context).loadUltraShopItems() }
@@ -63,11 +82,13 @@ fun UltraScreen(
             // Currency Display
             item {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().animateContentSize(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(localizedText("Ultra Balance: ${state.ultra.format()}"), color = UltraPurple, fontSize = 20.sp)
+                        AnimatedContent(targetState = state.ultra.format(), label = "ultraBalance") { balance ->
+                            Text(localizedText("Ultra Balance: $balance"), color = UltraPurple, fontSize = 20.sp)
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(localizedText("Requirements: ${requiredMoney.format()} Money AND 1,000 Prestige (Reset #${state.ultraCount + 1})"))
                         Text(localizedText("Current Money: ${state.money.format()} | Current Prestige: ${state.prestige.format()}"))
@@ -78,13 +99,30 @@ fun UltraScreen(
                         Button(
                             onClick = onUltra,
                             enabled = canUltra,
+                            interactionSource = ultraInteractionSource,
                             colors = ButtonDefaults.buttonColors(containerColor = UltraPurple),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .expressivePressScale(
+                                    interactionSource = ultraInteractionSource,
+                                    enabled = canUltra,
+                                    reducedMotion = state.settings.reducedMotion,
+                                    scaleDownFactor = 0.97f
+                                )
+                                .fillMaxWidth()
                         ) {
                             Text(if (canUltra) "Perform Ultra Reset" else "Need ${requiredMoney.format()} Money & 1K Prestige to Ultra")
                         }
                     }
                 }
+            }
+
+            item {
+                ExpressiveMilestoneBanner(
+                    visible = showUltraCelebration,
+                    title = "Ultra achieved!",
+                    description = "Your cosmic reset is complete. Time to build bigger.",
+                    reducedMotion = state.settings.reducedMotion
+                )
             }
 
             // Ultra Upgrades Header
@@ -145,7 +183,7 @@ fun UltraScreen(
                 }
                 val canAfford = !isMaxed && state.ultra >= totalCost
 
-                Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceVariant, tonalElevation = 2.dp) {
+                Surface(Modifier.fillMaxWidth().then(if (state.settings.reducedMotion) Modifier else Modifier.animateItem(placementSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow, dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy))).animateContentSize(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceVariant, tonalElevation = 2.dp) {
                     Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(upgrade.name, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
@@ -181,7 +219,7 @@ fun UltraScreen(
                 val purchased = state.ultraShopPurchases.contains(item.id)
                 val canAfford = state.ultra >= BigNumber(item.cost)
 
-                Card(modifier = Modifier.fillMaxWidth()) {
+                Card(modifier = Modifier.fillMaxWidth().then(if (state.settings.reducedMotion) Modifier else Modifier.animateItem(placementSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow, dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy))).animateContentSize()) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -200,7 +238,7 @@ fun UltraScreen(
                             enabled = canAfford && !purchased,
                             colors = ButtonDefaults.buttonColors(containerColor = UltraPurple)
                         ) {
-                            Text(if (purchased) "Owned" else "Buy")
+                            AnimatedContent(targetState = purchased, label = "ultraShopPurchase_${item.id}") { isPurchased -> Text(if (isPurchased) "Owned" else "Buy") }
                         }
                     }
                 }
