@@ -1,5 +1,19 @@
 # 🚀 Guess The Number Simulator - Changelog
 
+## v2.0.0 (Beyond the Numbers Major Expansion)
+- 🗺️ **Interactive World Map**: Added four selectable worlds, zoom and pan controls, connected routes, secret-area markers, unlock requirements, boss progress and world mastery upgrades.
+- ⚔️ **Guessing-Based Boss Combat**: Boss battles now start from the map; correct guesses deal damage, every third miss restores one boss HP, and victory grants one-time Money, Nebula, relic and Codex rewards.
+- 🌳 **Zoomable Skill Tree**: Rebuilt the Prestige Talent Web as a connected, clickable tree with pinch-to-zoom, drag-to-pan, zoom controls, node selection and parent requirements.
+- 💠 **Real Talent Effects**: Automation talents increase auto-clicker speed; precision talents add critical reward chances; Nebula Resonance boosts correct-guess earnings; Cosmic Oracle grants Nebula on correct guesses.
+- 💎 **Relic Collection and Bonuses**: Bosses award persistent relics; equip up to two to gain Money bonuses, critical rewards and extra Nebula.
+- 🏡 **Evolving Home Base**: Added persistent sanctuary levels, building milestones and a Money bonus that scales with restoration progress.
+- 📖 **Explorer's Codex**: Added collectible world, boss and secret-area entries plus a one-time 100 Nebula completion reward.
+- 🏆 **Endgame Goals**: Added long-term goals for boss victories, secret areas, relic collection and sanctuary restoration.
+- 🧭 **Navigation Integration**: Added direct More-menu entry points for World Map, Relics, Home Base, Codex, Endgame, Cloud Backup, Lucky Stake and Tutorial; registered their navigation destinations.
+- 💾 **Save Compatibility**: Added new progression fields with defaults so older save data can load without a reset.
+- 🌐 **Locale Coverage**: Added all new progression keys to the 23 locale JSON files. Filipino strings are translated; several newly added strings in other locales currently retain English values and need native-language review.
+- 🚀 **Major Version**: Bumped versionName to 2.0.0 and versionCode to 17.
+
 ## v1.16.0 (Expressive Motion & Gameplay Feedback)
 - 🌍 **World Progression**: Added four unlockable realms, each with explicit requirements based on correct guesses, upgrade levels, Prestige, Ultra, and previous boss victories.
 - ⚔️ **Multi-Hit Boss Battles**: Added four bosses with persistent HP progress, increasing hit counts, one-time victories, and escalating Money + Nebula rewards.
