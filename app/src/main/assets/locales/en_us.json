@@ -802,5 +802,14 @@
   "notification_category_progression": "Progression milestones",
   "notification_category_progression_desc": "World unlocks and boss victories",
   "notification_category_events": "Game events",
-  "notification_category_events_desc": "New random events and limited-time event rewards"
+  "notification_category_events_desc": "New random events and limited-time event rewards",
+  "widget_title": "🎯 Guess The Number",
+  "widget_slot": "Save slot %d • %s",
+  "widget_money": "Money",
+  "widget_range": "Range",
+  "widget_streak": "Streak %d",
+  "widget_mastery": "Mastery %d",
+  "widget_worlds_bosses": "Worlds %d • Bosses %d",
+  "widget_quick_guess": "Quick Guess",
+  "widget_next_slot": "Next Slot"
 }
