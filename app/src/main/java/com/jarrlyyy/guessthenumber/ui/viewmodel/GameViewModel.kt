@@ -952,6 +952,32 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun progressionRewardBonus(state: GameState, baseMoney: BigNumber): Pair<BigNumber, Long> {
+        val relicCount = state.equippedRelicIds.intersect(
+            setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        ).size
+        val setRate = when (relicCount) {
+            2 -> 0.10
+            3 -> 0.20
+            4 -> 0.35
+            else -> 0.0
+        }
+        val masteryRate = ((state.worldMasteryLevels[state.activeWorldId] ?: 0).coerceIn(0, 10) * 0.02)
+        val sanctuaryRate = (state.homeBaseLevel * 0.01).coerceAtMost(0.20)
+        val secretId = mapOf(
+            "verdant_grove" to "whispering_hollow",
+            "crystal_caverns" to "shard_archive",
+            "ember_summit" to "ashen_vault",
+            "nebula_rift" to "lost_observatory"
+        )[state.activeWorldId]
+        val secretRate = if (secretId != null && secretId in state.discoveredSecretIds) 0.05 else 0.0
+        val bonusMoney = baseMoney * BigNumber(setRate + masteryRate + sanctuaryRate + secretRate)
+        val bonusNebula = (if (relicCount == 4) 10L else 0L) +
+            (if ((state.worldMasteryLevels[state.activeWorldId] ?: 0) >= 5) 5L else 0L) +
+            (if (secretId != null && secretId in state.discoveredSecretIds) 5L else 0L)
+        return bonusMoney to bonusNebula
+    }
+
     fun worldProgressAction(worldId: String, action: String) {
         val state = _gameState.value
         val totalUpgradeLevels = state.upgradeLevels.values.sum()
@@ -1012,8 +1038,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val baseNebulaReward = when (worldId) { "verdant_grove" -> 10L; "crystal_caverns" -> 25L; "ember_summit" -> 75L; else -> 250L }
         if (state.endlessRiftActive) {
             val tierMultiplier = state.endlessRiftTier.coerceAtLeast(1)
-            val moneyReward = baseMoneyReward * BigNumber(tierMultiplier)
-            val nebulaReward = baseNebulaReward * tierMultiplier.toLong()
+            val (baseBonusMoney, baseBonusNebula) = progressionRewardBonus(state, baseMoneyReward)
+            val moneyReward = (baseMoneyReward + baseBonusMoney) * BigNumber(tierMultiplier)
+            val nebulaReward = (baseNebulaReward + baseBonusNebula) * tierMultiplier.toLong()
             val order = listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift")
             val nextWorld = order[(order.indexOf(worldId).coerceAtLeast(0) + 1) % order.size]
             val nextBoss = when (nextWorld) { "verdant_grove" -> "verdant_guardian"; "crystal_caverns" -> "crystal_golem"; "ember_summit" -> "ember_dragon"; else -> "nebula_titan" }
@@ -1037,7 +1064,24 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "ENDLESS_RIFT_CLEARED", "Cleared Rift tier ${state.endlessRiftTier}")
             return
         }
-        _gameState.value = state.copy(money = state.money + baseMoneyReward, nebula = state.nebula + BigNumber(baseNebulaReward), defeatedBossIds = state.defeatedBossIds + bossId, worldBossVictories = state.worldBossVictories + 1, bossBattleProgress = state.bossBattleProgress + (bossId to bossHp), activeBossBattleWorldId = null, relicInventory = state.relicInventory + bossId, codexEntries = state.codexEntries + setOf("world:$worldId", "boss:$bossId"), worldMasteryLevels = state.worldMasteryLevels + (worldId to ((state.worldMasteryLevels[worldId] ?: 0) + 1)), statistics = state.statistics.copy(moneyEarned = state.statistics.moneyEarned + baseMoneyReward, nebulaEarned = state.statistics.nebulaEarned + baseNebulaReward))
+        val (bonusMoney, bonusNebula) = progressionRewardBonus(state, baseMoneyReward)
+        val finalMoneyReward = baseMoneyReward + bonusMoney
+        val finalNebulaReward = baseNebulaReward + bonusNebula
+        _gameState.value = state.copy(
+            money = state.money + finalMoneyReward,
+            nebula = state.nebula + BigNumber(finalNebulaReward),
+            defeatedBossIds = state.defeatedBossIds + bossId,
+            worldBossVictories = state.worldBossVictories + 1,
+            bossBattleProgress = state.bossBattleProgress + (bossId to bossHp),
+            activeBossBattleWorldId = null,
+            relicInventory = state.relicInventory + bossId,
+            codexEntries = state.codexEntries + setOf("world:$worldId", "boss:$bossId"),
+            worldMasteryLevels = state.worldMasteryLevels + (worldId to ((state.worldMasteryLevels[worldId] ?: 0) + 1)),
+            statistics = state.statistics.copy(
+                moneyEarned = state.statistics.moneyEarned + finalMoneyReward,
+                nebulaEarned = state.statistics.nebulaEarned + finalNebulaReward
+            )
+        )
         saveGameAsync()
         NotificationHelper.showProgressionNotification(getApplication<Application>())
         GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_DEFEATED", "Defeated boss $bossId")
