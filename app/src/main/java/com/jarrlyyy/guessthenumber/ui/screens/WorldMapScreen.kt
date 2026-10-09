@@ -71,7 +71,8 @@ fun WorldMapScreen(
         else -> state.correctGuesses >= 500 && totalUpgrades >= 75 && state.prestigeCount >= 5 && state.ultraCount >= 1
     }
     val damage = state.bossBattleProgress[world.bossId] ?: 0
-    val defeated = world.bossId in state.defeatedBossIds
+    val bossHp = world.hp + if (state.endlessRiftActive) ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
+    val defeated = world.bossId in state.defeatedBossIds && !state.endlessRiftActive
     val secretFound = world.secretId in state.discoveredSecretIds
     val worldRequirementKey = when (world.id) { "crystal_caverns" -> "world_crystal_requirement"; "ember_summit" -> "world_ember_requirement"; "nebula_rift" -> "world_nebula_requirement"; else -> "world_verdant_requirement" }
     val bossRequirementKey = when (world.id) { "crystal_caverns" -> "boss_crystal_requirement"; "ember_summit" -> "boss_ember_requirement"; "nebula_rift" -> "boss_nebula_requirement"; else -> "boss_verdant_requirement" }
@@ -200,9 +201,12 @@ fun WorldMapScreen(
                     } else if (!defeated) {
                         Text(locale.getString(bossRequirementKey, "Battle requirements"), style = MaterialTheme.typography.bodySmall)
                         Text(locale.getString(bossRewardKey, "Victory reward"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
-                        Text(locale.getString("boss_hp_progress", "%d / %d HP", (world.hp - damage).coerceAtLeast(0), world.hp))
-                        LinearProgressIndicator(progress = { damage.toFloat() / world.hp.toFloat() }, modifier = Modifier.fillMaxWidth())
-                        val phase = ((damage * 3) / world.hp + 1).coerceIn(1, 3)
+                        if (state.endlessRiftActive) {
+                            Text(locale.getString("rift_tier_label", "Endless Rift • Tier %d", state.endlessRiftTier), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.tertiary)
+                        }
+                        Text(locale.getString("boss_hp_progress", "%d / %d HP", (bossHp - damage).coerceAtLeast(0), bossHp))
+                        LinearProgressIndicator(progress = { (damage.toFloat() / bossHp.toFloat()).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth())
+                        val phase = ((damage * 3) / bossHp + 1).coerceIn(1, 3)
                         Text(locale.getString("boss_phase_label", "Phase %d / 3 • Correct guesses damage the boss.", phase))
                         Text(locale.getString("boss_battle_tip", "Phase 1: every 4 misses pushes back your progress. Phase 2: every 3 misses. Phase 3: every 2 misses."))
                         if (state.activeBossBattleWorldId == world.id) {
