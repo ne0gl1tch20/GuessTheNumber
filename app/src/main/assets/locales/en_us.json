@@ -820,5 +820,7 @@
   "music_control_pause": "Pause",
   "music_control_play": "Play",
   "music_control_next": "Next",
-  "music_control_stop": "Stop"
+  "music_control_stop": "Stop",
+  "liveops_bonus_level_label": "Permanent Bonus Level",
+  "liveops_bonus_effect": "+2% money per level and +1 Nebula per correct guess every 5 levels, up to level 25. Applies to this save slot."
 }
