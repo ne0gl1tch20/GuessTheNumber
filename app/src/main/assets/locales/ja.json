@@ -762,5 +762,13 @@
   "map_fit_screen": "画面に合わせる",
   "world_mastery_bonus": "このワールドで正解するたびに所持金が+%d%%。",
   "beyond_numbers_title": "数字のその先へ",
-  "world_progress_summary": "解放した世界: %d / 4 • 倒したボス: %d / 4"
+  "world_progress_summary": "解放した世界: %d / 4 • 倒したボス: %d / 4",
+  "rift_title": "エンドレスリフト",
+  "rift_description": "4体のボスに連続で再挑戦。勝利するたびにティア、ボスのHP、報酬が増加します。",
+  "rift_best_tier": "最高クリアティア：%d",
+  "rift_active_tier": "現在のティア：%d。次のボスがワールドマップで待っています。",
+  "rift_requirement": "4体すべてのワールドボスを倒すとリフトが解放されます。",
+  "rift_stop": "エンドレスリフトを終了",
+  "rift_start": "エンドレスリフトを開始",
+  "rift_tier_label": "エンドレスリフト • ティア%d"
 }
