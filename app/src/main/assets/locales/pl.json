@@ -770,5 +770,11 @@
   "rift_requirement": "Odblokuj Szczelinę po pokonaniu wszystkich czterech bossów świata.",
   "rift_stop": "Opuść Niekończącą się Szczelinę",
   "rift_start": "Rozpocznij Niekończącą się Szczelinę",
-  "rift_tier_label": "Niekończąca się Szczelina • Poziom %d"
+  "rift_tier_label": "Niekończąca się Szczelina • Poziom %d",
+  "notification_reminder_title": "Zgadnij liczbę",
+  "notification_reminder_body": "Twoje liczby tęsknią! Wróć i zgadnij liczbę!",
+  "notification_progression_title": "Kamień milowy postępu",
+  "notification_progression_body": "Dostępny jest nowy kamień milowy postępu.",
+  "notification_event_title": "Czeka na Ciebie wydarzenie",
+  "notification_event_body": "Dostępne jest wydarzenie ograniczone czasowo."
 }
