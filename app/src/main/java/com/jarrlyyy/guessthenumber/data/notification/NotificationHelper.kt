@@ -12,8 +12,13 @@ import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import org.json.JSONObject
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 object NotificationHelper {
+    private val notificationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     const val CHANNEL_ID = "game_reminder_channel"
     const val PROGRESSION_CHANNEL_ID = "progression_channel"
     const val EVENT_CHANNEL_ID = "event_channel"
@@ -46,27 +51,30 @@ object NotificationHelper {
     fun createNotificationChannel(context: Context) = createNotificationChannels(context)
 
     fun show(context: Context, type: Type) {
-        if (!isCategoryEnabled(context, type)) return
-        createNotificationChannels(context)
-        val locale = createLocaleManager(context)
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("notification_destination", type.destination)
-        }
-        val pendingIntent = PendingIntent.getActivity(context, type.id, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        val notification = NotificationCompat.Builder(context, type.channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(locale.getString(type.titleKey, type.fallbackTitle))
-            .setContentText(locale.getString(type.bodyKey, type.fallbackBody))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-        try {
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(type.id, notification)
-        } catch (_: SecurityException) {
-            // Permission can be denied on Android 13+.
+        val appContext = context.applicationContext
+        notificationScope.launch {
+            if (!isCategoryEnabled(appContext, type)) return@launch
+            createNotificationChannels(appContext)
+            val locale = createLocaleManager(appContext)
+            val intent = Intent(appContext, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra("notification_destination", type.destination)
+            }
+            val pendingIntent = PendingIntent.getActivity(appContext, type.id, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            val notification = NotificationCompat.Builder(appContext, type.channelId)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(locale.getString(type.titleKey, type.fallbackTitle))
+                .setContentText(locale.getString(type.bodyKey, type.fallbackBody))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .build()
+            try {
+                val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.notify(type.id, notification)
+            } catch (_: SecurityException) {
+                // Android 13+ notification permission may be denied.
+            }
         }
     }
 
