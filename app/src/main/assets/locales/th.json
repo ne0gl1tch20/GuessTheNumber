@@ -792,5 +792,9 @@
   "widget_mastery": "ความชำนาญ %d",
   "widget_worlds_bosses": "โลก %d • บอส %d",
   "widget_quick_guess": "ทายด่วน",
-  "widget_next_slot": "ช่องถัดไป"
+  "widget_next_slot": "ช่องถัดไป",
+  "endgame_goal_rift": "ผ่านรอยแยกไร้สิ้นสุดระดับ 10",
+  "endgame_goal_mastery": "เพิ่มความชำนาญเป็นระดับ 5 ในทุกโลก",
+  "endgame_claimed": "รับรางวัลแล้ว",
+  "endgame_claim_reward": "รับรางวัล"
 }
