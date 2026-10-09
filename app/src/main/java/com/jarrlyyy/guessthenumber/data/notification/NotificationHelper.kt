@@ -21,10 +21,10 @@ object NotificationHelper {
     const val PROGRESSION_NOTIFICATION_ID = 1002
     const val EVENT_NOTIFICATION_ID = 1003
 
-    enum class Type(val channelId: String, val id: Int, val titleKey: String, val bodyKey: String, val fallbackTitle: String, val fallbackBody: String, val destination: String) {
-        REMINDER(CHANNEL_ID, NOTIFICATION_ID, "notification_reminder_title", "notification_reminder_body", "Guess The Number", "Your numbers miss you! Come back and guess the number!", "play"),
-        PROGRESSION(PROGRESSION_CHANNEL_ID, PROGRESSION_NOTIFICATION_ID, "notification_progression_title", "notification_progression_body", "Progression milestone", "A new progression milestone is ready.", "world_map"),
-        EVENT(EVENT_CHANNEL_ID, EVENT_NOTIFICATION_ID, "notification_event_title", "notification_event_body", "A game event is waiting", "A limited game event is ready.", "live_ops")
+    enum class Type(val channelId: String, val id: Int, val titleKey: String, val bodyKey: String, val fallbackTitle: String, val fallbackBody: String, val destination: String, val preferenceKey: String) {
+        REMINDER(CHANNEL_ID, NOTIFICATION_ID, "notification_reminder_title", "notification_reminder_body", "Guess The Number", "Your numbers miss you! Come back and guess the number!", "play", "notificationRemindersEnabled"),
+        PROGRESSION(PROGRESSION_CHANNEL_ID, PROGRESSION_NOTIFICATION_ID, "notification_progression_title", "notification_progression_body", "Progression milestone", "A new progression milestone is ready.", "world_map", "notificationProgressionEnabled"),
+        EVENT(EVENT_CHANNEL_ID, EVENT_NOTIFICATION_ID, "notification_event_title", "notification_event_body", "A game event is waiting", "A limited game event is ready.", "live_ops", "notificationEventsEnabled")
     }
 
     fun createNotificationChannels(context: Context) {
@@ -46,6 +46,7 @@ object NotificationHelper {
     fun createNotificationChannel(context: Context) = createNotificationChannels(context)
 
     fun show(context: Context, type: Type) {
+        if (!isCategoryEnabled(context, type)) return
         createNotificationChannels(context)
         val locale = createLocaleManager(context)
         val intent = Intent(context, MainActivity::class.java).apply {
@@ -68,6 +69,11 @@ object NotificationHelper {
             // Permission can be denied on Android 13+.
         }
     }
+
+    private fun isCategoryEnabled(context: Context, type: Type): Boolean = runCatching {
+        val settings = JSONObject(runBlocking { SaveManager(context).getAppPreferencesJson() })
+        settings.optBoolean("notificationsEnabled", true) && settings.optBoolean(type.preferenceKey, true)
+    }.getOrDefault(false)
 
     private fun createLocaleManager(context: Context): LocaleManager {
         val locale = LocaleManager(context)
