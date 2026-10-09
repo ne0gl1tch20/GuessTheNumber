@@ -783,5 +783,14 @@
   "notification_category_progression": "진행 단계",
   "notification_category_progression_desc": "월드 해금 및 보스 처치",
   "notification_category_events": "게임 이벤트",
-  "notification_category_events_desc": "새로운 무작위 이벤트 및 기간 한정 보상"
+  "notification_category_events_desc": "새로운 무작위 이벤트 및 기간 한정 보상",
+  "widget_title": "🎯 숫자 맞히기",
+  "widget_slot": "저장 슬롯 %d • %s",
+  "widget_money": "머니",
+  "widget_range": "범위",
+  "widget_streak": "연속 기록 %d",
+  "widget_mastery": "숙련도 %d",
+  "widget_worlds_bosses": "월드 %d • 보스 %d",
+  "widget_quick_guess": "빠른 추측",
+  "widget_next_slot": "다음 슬롯"
 }
