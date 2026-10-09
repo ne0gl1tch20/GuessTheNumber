@@ -762,5 +762,13 @@
   "map_fit_screen": "Adatta allo schermo",
   "world_mastery_bonus": "+%d%% di denaro per ogni risposta corretta in questo mondo.",
   "beyond_numbers_title": "Oltre i numeri",
-  "world_progress_summary": "Mondi sbloccati: %d / 4 • Boss sconfitti: %d / 4"
+  "world_progress_summary": "Mondi sbloccati: %d / 4 • Boss sconfitti: %d / 4",
+  "rift_title": "Rift infinito",
+  "rift_description": "Affronta di nuovo i quattro boss in una sfida continua. Ogni vittoria aumenta il livello, i PS dei boss e le ricompense.",
+  "rift_best_tier": "Miglior livello completato: %d",
+  "rift_active_tier": "Livello attuale: %d. Il prossimo boss ti aspetta sulla mappa del mondo.",
+  "rift_requirement": "Sblocca il Rift dopo aver sconfitto tutti e quattro i boss del mondo.",
+  "rift_stop": "Esci dal Rift infinito",
+  "rift_start": "Avvia il Rift infinito",
+  "rift_tier_label": "Rift infinito • Livello %d"
 }
