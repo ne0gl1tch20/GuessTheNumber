@@ -772,5 +772,8 @@
   "boss_battle_start": "Simulan ang laban sa boss",
   "boss_battle_stop": "Umalis sa laban",
   "boss_battle_active_title": "Aktibong Laban sa Boss",
-  "boss_guess_rule": "Nakababawas ng buhay ng boss ang tamang hula. Bawat ikatlong maling hula ay nagbabalik ng isang HP."
+  "boss_guess_rule": "Nakababawas ng buhay ng boss ang tamang hula. Bawat ikatlong maling hula ay nagbabalik ng isang HP.",
+  "codex_claim_reward": "Kunin ang 100 Nebula na gantimpala sa pagkumpleto",
+  "codex_reward_claimed": "Nakuha na ang gantimpala sa pagkumpleto",
+  "world_mastery_upgrade": "Itaas ang mastery • %s Nebula"
 }
