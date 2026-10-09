@@ -653,5 +653,8 @@
   "boss_defeated": "已擊敗首領",
   "world_locked_boss": "請先解鎖此世界",
   "boss_fight": "挑戰首領",
-  "boss_requirements_pending": "繼續成長後再挑戰"
+  "boss_requirements_pending": "繼續成長後再挑戰",
+  "boss_hp_label": "首領生命值",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "攻擊首領"
 }
