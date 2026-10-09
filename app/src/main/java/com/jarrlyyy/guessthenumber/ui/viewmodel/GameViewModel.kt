@@ -13,6 +13,7 @@ import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.data.notification.GameReminderWorker
+import com.jarrlyyy.guessthenumber.widget.WidgetRefresh
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
@@ -787,8 +788,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateSettings(newSettings: GameSettings) {
-        val oldEnabled = _gameState.value.settings.notificationsEnabled
-        if (newSettings.locale != _gameState.value.settings.locale) {
+        val oldSettings = _gameState.value.settings
+        if (newSettings.locale != oldSettings.locale) {
             updateLocaleRepo(newSettings.locale)
         }
         _gameState.update { it.copy(settings = newSettings) }
@@ -797,17 +798,22 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         saveGameAsync()
 
         val context = getApplication<Application>()
-        if (newSettings.notificationsEnabled && !oldEnabled) {
+        val workManager = WorkManager.getInstance(context)
+        if (!newSettings.notificationsEnabled) {
+            workManager.cancelUniqueWork(GameReminderWorker.WORK_NAME)
+        } else if (
+            !oldSettings.notificationsEnabled ||
+            newSettings.notificationIntervalHours != oldSettings.notificationIntervalHours
+        ) {
+            val intervalHours = newSettings.notificationIntervalHours.coerceIn(12L, 48L)
             val workRequest = PeriodicWorkRequestBuilder<GameReminderWorker>(
-                24, TimeUnit.HOURS
+                intervalHours, TimeUnit.HOURS
             ).build()
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            workManager.enqueueUniquePeriodicWork(
                 GameReminderWorker.WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 workRequest
             )
-        } else if (!newSettings.notificationsEnabled && oldEnabled) {
-            WorkManager.getInstance(context).cancelUniqueWork(GameReminderWorker.WORK_NAME)
         }
 
         GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "UPDATE_SETTINGS", "Updated game settings.")
@@ -1199,6 +1205,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val slot = _activeSlot.value
                 val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
                 saveManager.saveGame(state, slot)
+                WidgetRefresh.request(getApplication<Application>())
             }
         }
     }
