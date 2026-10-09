@@ -153,10 +153,12 @@ fun EndgameScreen(state: GameState, onNavigate: (String) -> Unit, onAction: (Str
     val locale = LocalAppLocaleManager.current
     val bossesDefeated = state.defeatedBossIds.size.coerceAtMost(4)
     val goals = listOf(
-        locale.getString("endgame_goal_bosses", "Defeat all four world bosses") to (bossesDefeated == 4),
-        locale.getString("endgame_goal_secrets", "Discover all four secret areas") to (state.discoveredSecretIds.size >= 4),
-        locale.getString("endgame_goal_relics", "Collect all four boss relics") to (state.relicInventory.size >= 4),
-        locale.getString("endgame_goal_base", "Restore the sanctuary to level 10") to (state.homeBaseLevel >= 10)
+        Triple("all_bosses", locale.getString("endgame_goal_bosses", "Defeat all four world bosses"), bossesDefeated == 4),
+        Triple("all_secrets", locale.getString("endgame_goal_secrets", "Discover all four secret areas"), state.discoveredSecretIds.size >= 4),
+        Triple("all_relics", locale.getString("endgame_goal_relics", "Collect all four boss relics"), state.relicInventory.size >= 4),
+        Triple("sanctuary_10", locale.getString("endgame_goal_base", "Restore the sanctuary to level 10"), state.homeBaseLevel >= 10),
+        Triple("rift_tier_10", locale.getString("endgame_goal_rift", "Clear Endless Rift tier 10"), state.endlessRiftBestTier >= 10),
+        Triple("mastery_all_5", locale.getString("endgame_goal_mastery", "Reach mastery level 5 in every world"), listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift").all { (state.worldMasteryLevels[it] ?: 0) >= 5 })
     )
     Scaffold(topBar = { TopAppBar(title = { Text(locale.getString("endgame_title", "Endgame Challenges")) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = locale.getString("back", "Back")) } }) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -193,12 +195,22 @@ fun EndgameScreen(state: GameState, onNavigate: (String) -> Unit, onAction: (Str
                 }
             }
             Text(locale.getString("endgame_goals", "Legacy goals"), style = MaterialTheme.typography.titleLarge)
-            goals.forEach { (title, done) ->
-                ListItem(
-                    leadingContent = { Icon(if (done) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked, contentDescription = null, tint = if (done) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline) },
-                    headlineContent = { Text(title) },
-                    supportingContent = { Text(if (done) locale.getString("endgame_complete", "Complete") else locale.getString("endgame_incomplete", "In progress")) }
-                )
+            goals.forEach { (rewardId, title, done) ->
+                val claimed = rewardId in state.endgameRewardsClaimed
+                Card {
+                    Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        ListItem(
+                            leadingContent = { Icon(if (done) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked, contentDescription = null, tint = if (done) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline) },
+                            headlineContent = { Text(title) },
+                            supportingContent = { Text(when { claimed -> locale.getString("endgame_claimed", "Reward claimed"); done -> locale.getString("endgame_complete", "Complete"); else -> locale.getString("endgame_incomplete", "In progress") }) }
+                        )
+                        if (done && !claimed) {
+                            Button(onClick = { onAction("claim_endgame_reward", rewardId) }, modifier = Modifier.fillMaxWidth()) {
+                                Text(locale.getString("endgame_claim_reward", "Claim reward"))
+                            }
+                        }
+                    }
+                }
             }
             Button(onClick = { onNavigate("world_map") }, modifier = Modifier.fillMaxWidth()) { Text(locale.getString("world_map_open", "Explore World Map")) }
             OutlinedButton(onClick = { onNavigate("relics") }, modifier = Modifier.fillMaxWidth()) { Text(locale.getString("relics_open", "Open Relic Collection")) }
