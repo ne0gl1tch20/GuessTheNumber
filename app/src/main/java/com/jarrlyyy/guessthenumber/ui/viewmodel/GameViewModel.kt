@@ -1095,11 +1095,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             "claim_endgame_reward" -> {
                 val allBosses = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
                 val reward = when (id) {
-                    "all_bosses" -> if (state.defeatedBossIds.containsAll(allBosses)) BigNumber(250) to BigNumber(2_000_000) else return
-                    "all_secrets" -> if (state.discoveredSecretIds.containsAll(setOf("whispering_hollow", "shard_archive", "ashen_vault", "lost_observatory"))) BigNumber(200) to BigNumber(1_000_000) else return
-                    "all_relics" -> if (state.relicInventory.containsAll(allBosses)) BigNumber(300) to BigNumber(1_000_000) else return
-                    "sanctuary_10" -> if (state.homeBaseLevel >= 10) BigNumber(500) to BigNumber(5_000_000) else return
-                    "rift_tier_10" -> if (state.endlessRiftBestTier >= 10) BigNumber(1_000) to BigNumber(10_000_000) else return
+                    "all_bosses" -> if (state.defeatedBossIds.containsAll(allBosses)) 250L to BigNumber(2_000_000) else return
+                    "all_secrets" -> if (state.discoveredSecretIds.containsAll(setOf("whispering_hollow", "shard_archive", "ashen_vault", "lost_observatory"))) 200L to BigNumber(1_000_000) else return
+                    "all_relics" -> if (state.relicInventory.containsAll(allBosses)) 300L to BigNumber(1_000_000) else return
+                    "sanctuary_10" -> if (state.homeBaseLevel >= 10) 500L to BigNumber(5_000_000) else return
+                    "rift_tier_10" -> if (state.endlessRiftBestTier >= 10) 1_000L to BigNumber(10_000_000) else return
                     else -> return
                 }
                 if (id in state.endgameRewardsClaimed) return
@@ -1107,11 +1107,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val moneyReward = reward.second
                 state.copy(
                     money = state.money + moneyReward,
-                    nebula = state.nebula + nebulaReward,
+                    nebula = state.nebula + BigNumber(nebulaReward),
                     endgameRewardsClaimed = state.endgameRewardsClaimed + id,
                     statistics = state.statistics.copy(
                         moneyEarned = state.statistics.moneyEarned + moneyReward,
-                        nebulaEarned = state.statistics.nebulaEarned + nebulaReward.toLong()
+                        nebulaEarned = state.statistics.nebulaEarned + nebulaReward
                     )
                 )
             }
