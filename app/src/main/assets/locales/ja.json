@@ -783,5 +783,14 @@
   "notification_category_progression": "進行マイルストーン",
   "notification_category_progression_desc": "ワールド解放とボス撃破",
   "notification_category_events": "ゲームイベント",
-  "notification_category_events_desc": "新しいランダムイベントと期間限定報酬"
+  "notification_category_events_desc": "新しいランダムイベントと期間限定報酬",
+  "widget_title": "🎯 数字当てゲーム",
+  "widget_slot": "セーブスロット %d • %s",
+  "widget_money": "所持金",
+  "widget_range": "範囲",
+  "widget_streak": "連勝 %d",
+  "widget_mastery": "マスタリー %d",
+  "widget_worlds_bosses": "ワールド %d • ボス %d",
+  "widget_quick_guess": "クイック予想",
+  "widget_next_slot": "次のスロット"
 }
