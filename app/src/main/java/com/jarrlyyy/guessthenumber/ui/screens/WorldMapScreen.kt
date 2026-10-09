@@ -123,7 +123,7 @@ fun WorldMapScreen(
                         val isUnlocked = node.id in state.unlockedWorldIds
                         val isSelected = node.id == selectedWorld
                         Surface(
-                            onClick = { selectedWorld = node.id },
+                            onClick = { selectedWorld = node.id; if (isUnlocked) onProgressionAction("select_world", node.id) },
                             modifier = Modifier.offset(x = mapWidth * node.x - 54.dp, y = mapHeight * node.y - 35.dp).width(108.dp),
                             shape = RoundedCornerShape(22.dp),
                             color = when {
@@ -173,11 +173,16 @@ fun WorldMapScreen(
                     } else if (!defeated) {
                         Text(locale.getString("boss_hp_progress", "%d / %d HP", (world.hp - damage).coerceAtLeast(0), world.hp))
                         LinearProgressIndicator(progress = { damage.toFloat() / world.hp.toFloat() }, modifier = Modifier.fillMaxWidth())
+                        val phase = ((damage * 3) / world.hp + 1).coerceIn(1, 3)
+                        Text(locale.getString("boss_phase_label", "Phase %d / 3 • Correct guesses damage the boss.", phase))
                         Text(locale.getString("boss_battle_tip", "Bosses become more dangerous as their health drops. Build your upgrades before attacking."))
-                        Button(onClick = { onWorldAction(world.id, "boss") }, enabled = canFight, modifier = Modifier.fillMaxWidth()) {
+                        if (state.activeBossBattleWorldId == world.id) {
+                            Text(locale.getString("boss_battle_active", "Battle active! Return to Play and guess the number. Every three misses restores 1 HP."), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodySmall)
+                        }
+                        Button(onClick = { onWorldAction(world.id, "boss") }, enabled = canFight || state.activeBossBattleWorldId == world.id, modifier = Modifier.fillMaxWidth()) {
                             Icon(Icons.Default.SportsMma, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
-                            Text(locale.getString("boss_attack", "Attack boss"))
+                            Text(locale.getString(if (state.activeBossBattleWorldId == world.id) "boss_battle_stop" else "boss_battle_start", if (state.activeBossBattleWorldId == world.id) "Leave battle" else "Start boss battle"))
                         }
                     } else {
                         Text(locale.getString("boss_defeated", "Boss defeated"))
