@@ -762,5 +762,13 @@
   "map_fit_screen": "符合螢幕",
   "world_mastery_bonus": "在此世界每次猜對可獲得 +%d%% 金錢。",
   "beyond_numbers_title": "超越數字",
-  "world_progress_summary": "已解鎖世界：%d / 4 • 已擊敗首領：%d / 4"
+  "world_progress_summary": "已解鎖世界：%d / 4 • 已擊敗首領：%d / 4",
+  "rift_title": "無盡裂隙",
+  "rift_description": "在連續挑戰中再次挑戰四位首領。每次勝利都會提高階層、首領生命值與獎勵。",
+  "rift_best_tier": "最高通關階層：%d",
+  "rift_active_tier": "目前階層：%d。下一位首領正在世界地圖等候。",
+  "rift_requirement": "擊敗全部四位世界首領後即可解鎖裂隙。",
+  "rift_stop": "離開無盡裂隙",
+  "rift_start": "開始無盡裂隙",
+  "rift_tier_label": "無盡裂隙 • 第 %d 層"
 }
