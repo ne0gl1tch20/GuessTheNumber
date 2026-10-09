@@ -771,5 +771,11 @@
   "rift_requirement": "افتح الشق بعد هزيمة زعماء العوالم الأربعة.",
   "rift_stop": "مغادرة الشق اللانهائي",
   "rift_start": "بدء الشق اللانهائي",
-  "rift_tier_label": "الشق اللانهائي • المستوى %d"
+  "rift_tier_label": "الشق اللانهائي • المستوى %d",
+  "notification_reminder_title": "خمن الرقم",
+  "notification_reminder_body": "أرقامك تشتاق إليك! عُد وخمّن الرقم!",
+  "notification_progression_title": "إنجاز التقدم",
+  "notification_progression_body": "إنجاز جديد في التقدم جاهز.",
+  "notification_event_title": "هناك فعالية بانتظارك",
+  "notification_event_body": "فعالية محدودة الوقت في اللعبة جاهزة."
 }
