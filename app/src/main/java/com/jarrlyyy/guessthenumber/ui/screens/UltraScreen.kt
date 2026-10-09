@@ -4,6 +4,8 @@ import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
+import kotlinx.coroutines.delay
+import com.jarrlyyy.guessthenumber.ui.components.ExpressiveMilestoneBanner
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,6 +41,18 @@ fun UltraScreen(
     val requiredMoney = gameEngine.calculateUltraRequirement(state.ultraCount)
     val ultraReward = gameEngine.calculateUltraReward(state.money, state.ultraCount)
     val canUltra = state.money >= requiredMoney && state.prestige >= BigNumber(1_000)
+    var showUltraCelebration by remember { mutableStateOf(false) }
+    var observedUltraCount by remember { mutableStateOf(state.ultraCount) }
+
+    LaunchedEffect(state.ultraCount) {
+        val reachedNewUltra = state.ultraCount > observedUltraCount
+        observedUltraCount = state.ultraCount
+        if (reachedNewUltra) {
+            showUltraCelebration = true
+            delay(if (state.settings.reducedMotion) 700L else 2400L)
+            showUltraCelebration = false
+        }
+    }
 
     val upgrades = remember { JsonConfigRepository(context).loadUltraUpgrades() }
     val shopItems = remember { JsonConfigRepository(context).loadUltraShopItems() }
@@ -89,6 +103,15 @@ fun UltraScreen(
                         }
                     }
                 }
+            }
+
+            item {
+                ExpressiveMilestoneBanner(
+                    visible = showUltraCelebration,
+                    title = "Ultra achieved!",
+                    description = "Your cosmic reset is complete. Time to build bigger.",
+                    reducedMotion = state.settings.reducedMotion
+                )
             }
 
             // Ultra Upgrades Header
