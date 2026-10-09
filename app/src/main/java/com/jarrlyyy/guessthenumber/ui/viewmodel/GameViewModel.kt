@@ -719,6 +719,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if ("nebula_titan" in before.equippedRelicIds) bonusMoney += earned * BigNumber(0.25)
         if (before.equippedRelicIds.size >= 2) bonusMoney += earned * BigNumber(0.10)
         if (before.homeBaseLevel > 0) bonusMoney += earned * BigNumber((before.homeBaseLevel * 0.02).coerceAtMost(0.40))
+        val secretForActiveWorld = mapOf(
+            "verdant_grove" to "whispering_hollow",
+            "crystal_caverns" to "shard_archive",
+            "ember_summit" to "ashen_vault",
+            "nebula_rift" to "lost_observatory"
+        )[before.activeWorldId]
+        if (secretForActiveWorld in before.discoveredSecretIds) bonusMoney += earned * BigNumber(0.05)
         val bonusNebula = (if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L) + (if ("ember_dragon" in before.equippedRelicIds) 1L else 0L)
         return after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(bonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + bonusNebula))
     }
@@ -1051,8 +1058,24 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             "secret" -> {
                 val secretWorld = mapOf("whispering_hollow" to "verdant_grove", "shard_archive" to "crystal_caverns", "ashen_vault" to "ember_summit", "lost_observatory" to "nebula_rift")[id] ?: return
                 val threshold = mapOf("whispering_hollow" to 50L, "shard_archive" to 150L, "ashen_vault" to 300L, "lost_observatory" to 600L)[id] ?: return
-                if (secretWorld !in state.unlockedWorldIds || state.correctGuesses < threshold) return
-                state.copy(discoveredSecretIds = state.discoveredSecretIds + id, codexEntries = state.codexEntries + "secret:$id")
+                if (id in state.discoveredSecretIds || secretWorld !in state.unlockedWorldIds || state.correctGuesses < threshold) return
+                val moneyReward = mapOf(
+                    "whispering_hollow" to BigNumber(10_000),
+                    "shard_archive" to BigNumber(50_000),
+                    "ashen_vault" to BigNumber(250_000),
+                    "lost_observatory" to BigNumber(1_000_000)
+                )[id] ?: BigNumber.ZERO
+                val nebulaReward = mapOf("whispering_hollow" to 5L, "shard_archive" to 15L, "ashen_vault" to 50L, "lost_observatory" to 150L)[id] ?: 0L
+                state.copy(
+                    money = state.money + moneyReward,
+                    nebula = state.nebula + BigNumber(nebulaReward),
+                    discoveredSecretIds = state.discoveredSecretIds + id,
+                    codexEntries = state.codexEntries + "secret:$id",
+                    statistics = state.statistics.copy(
+                        moneyEarned = state.statistics.moneyEarned + moneyReward,
+                        nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+                    )
+                )
             }
             "equip_relic" -> {
                 if (id !in state.relicInventory) return
@@ -1073,7 +1096,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val bossForMastery = mapOf("verdant_grove" to "verdant_guardian", "crystal_caverns" to "crystal_golem", "ember_summit" to "ember_dragon", "nebula_rift" to "nebula_titan")[id] ?: return
                 if (id !in state.unlockedWorldIds || bossForMastery !in state.defeatedBossIds) return
                 val current = state.worldMasteryLevels[id] ?: 1
-                val cost = BigNumber(10L * (current + 1L))
+                val secretForWorld = mapOf(
+                    "verdant_grove" to "whispering_hollow",
+                    "crystal_caverns" to "shard_archive",
+                    "ember_summit" to "ashen_vault",
+                    "nebula_rift" to "lost_observatory"
+                )[id]
+                val baseCost = BigNumber(10L * (current + 1L))
+                val cost = if (secretForWorld in state.discoveredSecretIds) baseCost * BigNumber(0.8) else baseCost
                 if (current >= 10 || state.nebula < cost) return
                 state.copy(nebula = state.nebula - cost, worldMasteryLevels = state.worldMasteryLevels + (id to (current + 1)))
             }
