@@ -783,5 +783,14 @@
   "notification_category_progression": "進度里程碑",
   "notification_category_progression_desc": "解鎖世界和擊敗首領",
   "notification_category_events": "遊戲活動",
-  "notification_category_events_desc": "新的隨機事件和限時活動獎勵"
+  "notification_category_events_desc": "新的隨機事件和限時活動獎勵",
+  "widget_title": "🎯 猜數字",
+  "widget_slot": "存檔槽 %d • %s",
+  "widget_money": "金錢",
+  "widget_range": "範圍",
+  "widget_streak": "連勝 %d",
+  "widget_mastery": "精通 %d",
+  "widget_worlds_bosses": "世界 %d • 首領 %d",
+  "widget_quick_guess": "快速猜測",
+  "widget_next_slot": "下一個存檔"
 }
