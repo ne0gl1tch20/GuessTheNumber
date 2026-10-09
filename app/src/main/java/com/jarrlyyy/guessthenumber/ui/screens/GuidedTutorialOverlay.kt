@@ -34,7 +34,7 @@ fun GuidedTutorialOverlay(
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
     ) {
         AnimatedContent(
-            targetState = step,
+            targetState = TutorialStepContent(step, title, instruction, stepLabel),
             transitionSpec = {
                 if (reducedMotion) {
                     fadeIn() togetherWith fadeOut()
@@ -44,16 +44,19 @@ fun GuidedTutorialOverlay(
                 }
             },
             label = "tutorialStepTransition"
-        ) { animatedStep ->
+        ) { content ->
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    if (animatedStep == step) stepLabel else stepLabel,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(title, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                Text(instruction, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                Text(content.stepLabel, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Text(content.title, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                Text(content.instruction, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
             }
         }
     }
 }
+
+private data class TutorialStepContent(
+    val step: Int,
+    val title: String,
+    val instruction: String,
+    val stepLabel: String
+)
