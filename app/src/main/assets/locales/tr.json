@@ -762,5 +762,13 @@
   "map_fit_screen": "Ekrana sığdır",
   "world_mastery_bonus": "Bu dünyada her doğru tahminde +%d%% para.",
   "beyond_numbers_title": "Sayıların Ötesinde",
-  "world_progress_summary": "Açılan dünyalar: %d / 4 • Yenilen bosslar: %d / 4"
+  "world_progress_summary": "Açılan dünyalar: %d / 4 • Yenilen bosslar: %d / 4",
+  "rift_title": "Sonsuz Yarık",
+  "rift_description": "Dört bossla aralıksız bir mücadelede yeniden savaş. Her zafer aşamayı, boss HP'sini ve ödülleri artırır.",
+  "rift_best_tier": "En iyi tamamlanan aşama: %d",
+  "rift_active_tier": "Mevcut aşama: %d. Sıradaki boss Dünya Haritası'nda bekliyor.",
+  "rift_requirement": "Dört dünya boss'unu da yenerek Yarık'ın kilidini aç.",
+  "rift_stop": "Sonsuz Yarık'tan çık",
+  "rift_start": "Sonsuz Yarık'ı başlat",
+  "rift_tier_label": "Sonsuz Yarık • Aşama %d"
 }
