@@ -770,5 +770,11 @@
   "rift_requirement": "Ontgrendel de Rift door alle vier de wereldbazen te verslaan.",
   "rift_stop": "Eindeloze Rift verlaten",
   "rift_start": "Eindeloze Rift starten",
-  "rift_tier_label": "Eindeloze Rift • Niveau %d"
+  "rift_tier_label": "Eindeloze Rift • Niveau %d",
+  "notification_reminder_title": "Raad het getal",
+  "notification_reminder_body": "Je getallen missen je! Kom terug en raad het getal!",
+  "notification_progression_title": "Voortgangsmijlpaal",
+  "notification_progression_body": "Er is een nieuwe voortgangsmijlpaal beschikbaar.",
+  "notification_event_title": "Er wacht een game-evenement",
+  "notification_event_body": "Er is een tijdelijk game-evenement beschikbaar."
 }
