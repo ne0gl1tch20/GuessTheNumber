@@ -1,6 +1,9 @@
 # 🚀 Guess The Number Simulator - Changelog
 
 ## v1.16.0 (Expressive Motion & Gameplay Feedback)
+- 🎁 **Treasure Drops**: Correct guesses can drop collectible Common, Rare, and Epic chests. Open stored chests for random Money or Nebula rewards, with rarer tiers offering bigger prizes.
+- 📦 **Loot Inventory**: Added persistent per-save chest counts, total drops found, opened-chest stats, and a latest-drop banner on the Play screen.
+- 🌐 **Full Locale Coverage**: Added all treasure-drop strings to all 23 locale JSON files.
 
 - 🎯 **Daily Bounty Board**: Added four rotating-by-day contracts for guesses, correct answers, streaks, and upgrade purchases, each with claimable rewards.
 - 💎 **Reward Loop**: Daily contracts award Money or Nebula, track progress inside each save slot, and reset their progress and claims when the local calendar day changes.
