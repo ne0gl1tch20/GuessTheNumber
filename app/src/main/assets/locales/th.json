@@ -783,5 +783,14 @@
   "notification_category_progression": "ความคืบหน้าสำคัญ",
   "notification_category_progression_desc": "ปลดล็อกโลกและเอาชนะบอส",
   "notification_category_events": "อีเวนต์เกม",
-  "notification_category_events_desc": "อีเวนต์สุ่มใหม่และรางวัลจำกัดเวลา"
+  "notification_category_events_desc": "อีเวนต์สุ่มใหม่และรางวัลจำกัดเวลา",
+  "widget_title": "🎯 ทายตัวเลข",
+  "widget_slot": "ช่องบันทึก %d • %s",
+  "widget_money": "เงิน",
+  "widget_range": "ช่วงตัวเลข",
+  "widget_streak": "สตรีค %d",
+  "widget_mastery": "ความชำนาญ %d",
+  "widget_worlds_bosses": "โลก %d • บอส %d",
+  "widget_quick_guess": "ทายด่วน",
+  "widget_next_slot": "ช่องถัดไป"
 }
