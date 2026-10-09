@@ -269,7 +269,7 @@ fun NavGraph(
                 ExpressiveScreen(enabled = !state.settings.reducedMotion) { PlayScreen(state = state, onMakeGuess = { guess ->
                     onMakeGuess(guess)
                     if (tutorialActive && tutorialStep == 0) tutorialStep = 1
-                }, incomePerSecond = incomePerSecond) }
+                }, onClaimDailyQuest = viewModel::claimDailyQuest, incomePerSecond = incomePerSecond) }
             }
             composable(Screen.Upgrade.route) {
                 ExpressiveScreen(enabled = !state.settings.reducedMotion) { UpgradeScreen(
