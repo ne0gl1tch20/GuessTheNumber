@@ -709,7 +709,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val masteryLevel = (before.worldMasteryLevels[before.activeWorldId] ?: 0).coerceIn(0, 10)
         if (masteryLevel > 0) bonusMoney += eligibleEarnings * BigNumber(masteryLevel * 0.02)
         val criticalChance = when { "talent_crit_2" in before.prestigeShopPurchases -> 0.15; "talent_crit_1" in before.prestigeShopPurchases -> 0.05; else -> 0.0 }
-        if (criticalChance > 0.0 && Random.nextDouble() < criticalChance) bonusMoney += earned
+        if (criticalChance > 0.0 && Random.nextDouble() < criticalChance) bonusMoney += eligibleEarnings
         if ("verdant_guardian" in before.equippedRelicIds) bonusMoney += eligibleEarnings * BigNumber(0.10)
         if ("crystal_golem" in before.equippedRelicIds && Random.nextDouble() < 0.10) bonusMoney += eligibleEarnings * BigNumber(0.5)
         if ("ember_dragon" in before.equippedRelicIds) bonusMoney += eligibleEarnings * BigNumber(0.25)
