@@ -89,6 +89,9 @@ fun WorldMapScreen(
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(locale.getString("world_map_hint", "Pinch to zoom, drag to explore, and tap a world to inspect it."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            val worldPathColor = MaterialTheme.colorScheme.outlineVariant
+            val unlockedWorldGlow = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+            val lockedWorldGlow = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
             BoxWithConstraints(
                 Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(28.dp)).background(MaterialTheme.colorScheme.surfaceContainerLow)
             ) {
@@ -109,12 +112,12 @@ fun WorldMapScreen(
                     Canvas(Modifier.fillMaxSize()) {
                         val pts = worlds.map { Offset(size.width * it.x, size.height * it.y) }
                         for (i in 0 until pts.lastIndex) {
-                            drawLine(MaterialTheme.colorScheme.outlineVariant, pts[i], pts[i + 1], strokeWidth = 7f, cap = StrokeCap.Round)
+                            drawLine(worldPathColor, pts[i], pts[i + 1], strokeWidth = 7f, cap = StrokeCap.Round)
                         }
                         worlds.forEachIndexed { i, node ->
                             val p = pts[i]
                             drawCircle(
-                                color = if (node.id in state.unlockedWorldIds) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
+                                color = if (node.id in state.unlockedWorldIds) unlockedWorldGlow else lockedWorldGlow,
                                 radius = 35f, center = p
                             )
                         }
