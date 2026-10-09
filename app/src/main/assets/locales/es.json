@@ -608,5 +608,19 @@
   "language_changed_restart": "Language changed. Restart app to take effect.",
   "dropdown": "Dropdown",
   "staking_title": "Combo Streaks & Lucky Stake",
-  "stats_session_arcade": "Session & Arcade"
+  "stats_session_arcade": "Session & Arcade",
+  "loot_title": "Tesoros",
+  "loot_subtitle": "Acierta números para encontrar cofres coleccionables.",
+  "loot_found": "Encontrados",
+  "loot_opened_count": "Abiertos: %d",
+  "loot_drop_message": "¡Ha aparecido un cofre %s!",
+  "loot_drop_rates": "Probabilidad por acierto: Común 18 %, Raro 5 %, Épico 1 %.",
+  "loot_tier_common": "Cofre común",
+  "loot_tier_rare": "Cofre raro",
+  "loot_tier_epic": "Cofre épico",
+  "loot_chest_count": "%d en el inventario",
+  "loot_rewards_common": "5.000 Money o 5 Nebula",
+  "loot_rewards_rare": "25.000 Money o 25 Nebula",
+  "loot_rewards_epic": "100.000 Money o 100 Nebula",
+  "loot_open": "Abrir"
 }
