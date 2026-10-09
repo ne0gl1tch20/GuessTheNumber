@@ -29,11 +29,13 @@
 - Secret discoveries now grant one-time money/Nebula rewards, Codex entries, a world-specific mastery discount and an ongoing reward bonus in that world.
 - Mastery level 5 and 10 milestones grant Nebula and Codex entries; the secret-area discount reduces mastery upgrade costs.
 - Home Base upgrades now account for money spent, grant milestone Nebula at levels 5/10/15/20 and add Sanctuary Codex entries.
-- Added a claimable endgame goal for reaching mastery level 5 in every world. Existing endgame goals now expose claim buttons when their requirements are met.
+- Boss and Endless Rift rewards now receive connected bonuses from relic set size, world mastery, Home Base and discovered secret areas.
+- Mastery level 5 and 10 milestones add Codex entries and Nebula rewards. The endgame now includes a claimable goal for reaching mastery level 5 in every world.
+- Endgame goals expose reward-claim buttons when their requirements are met, and the Codex completion reward requires all 12 core world/boss/secret entries instead of being affected by bonus Codex entries.
 
 ## Still requires the remaining integration pass
 
-- Verify all locale catalogs contain every new notification, widget and endgame key, then run the localization audit.
+- Run a localization audit to catch missing keys, placeholder mismatches and untranslated legacy UI strings.
 - Review RPG reward balance, set-specific effects, boss/Rift reward consistency and whether Codex completion thresholds should include the new mastery/Sanctuary entries.
 - Run the manual GitHub Actions validation/build and resolve compiler/lint/runtime issues before calling the pass build-verified.
 
