@@ -815,5 +815,10 @@
   "endgame_goal_rift": "Clear Endless Rift tier 10",
   "endgame_goal_mastery": "Reach mastery level 5 in every world",
   "endgame_claimed": "Reward claimed",
-  "endgame_claim_reward": "Claim reward"
+  "endgame_claim_reward": "Claim reward",
+  "music_control_previous": "Previous",
+  "music_control_pause": "Pause",
+  "music_control_play": "Play",
+  "music_control_next": "Next",
+  "music_control_stop": "Stop"
 }
