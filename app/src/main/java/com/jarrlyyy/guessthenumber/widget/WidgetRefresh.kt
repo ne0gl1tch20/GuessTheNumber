@@ -24,7 +24,10 @@ object WidgetRefresh {
         val appContext = context.applicationContext
         scope.launch {
             delay(350L)
-            runCatching { GuessWidget().updateAll(appContext) }
+            runCatching {
+                GuessWidget().updateAll(appContext)
+                CompactGuessWidget().updateAll(appContext)
+            }
         }
     }
 }
