@@ -7,6 +7,8 @@ import androidx.compose.animation.animateContentSize
 import kotlinx.coroutines.delay
 import com.jarrlyyy.guessthenumber.ui.components.ExpressiveMilestoneBanner
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -41,6 +43,7 @@ fun PrestigeScreen(
     val requiredMoney = gameEngine.calculatePrestigeRequirement(state.prestigeCount)
     val prestigeReward = gameEngine.calculatePrestigeReward(state.money, state.prestigeCount)
     val canPrestige = state.money >= requiredMoney
+    val prestigeInteractionSource = remember { MutableInteractionSource() }
     var showPrestigeCelebration by remember { mutableStateOf(false) }
     var observedPrestigeCount by remember { mutableStateOf(state.prestigeCount) }
 
@@ -96,8 +99,16 @@ fun PrestigeScreen(
                         Button(
                             onClick = onPrestige,
                             enabled = canPrestige,
+                            interactionSource = prestigeInteractionSource,
                             colors = ButtonDefaults.buttonColors(containerColor = PrestigeBlue),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .expressivePressScale(
+                                    interactionSource = prestigeInteractionSource,
+                                    enabled = canPrestige,
+                                    reducedMotion = state.settings.reducedMotion,
+                                    scaleDownFactor = 0.97f
+                                )
+                                .fillMaxWidth()
                         ) {
                             Text(if (canPrestige) "Perform Prestige Reset" else "Need ${requiredMoney.format()} Money to Prestige")
                         }
