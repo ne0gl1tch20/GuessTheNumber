@@ -19,7 +19,8 @@ fun ReusableColorPickerDialog(
     initialHex: String,
     title: String = "🎨 Pick a color",
     onDismiss: () -> Unit,
-    onApply: (String) -> Unit
+    onApply: (String) -> Unit,
+    onReset: (() -> Unit)? = null
 ) {
     val initial = remember(initialHex) {
         runCatching { android.graphics.Color.parseColor(initialHex) }
@@ -145,6 +146,11 @@ fun ReusableColorPickerDialog(
             }
         },
         confirmButton = { Button(onClick = { onApply(hex) }) { Text("Apply") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (onReset != null) TextButton(onClick = onReset) { Text("Use theme") }
+                TextButton(onClick = onDismiss) { Text("Cancel") }
+            }
+        }
     )
 }
