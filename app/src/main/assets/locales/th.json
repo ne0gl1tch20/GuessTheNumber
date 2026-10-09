@@ -796,5 +796,10 @@
   "endgame_goal_rift": "ผ่านรอยแยกไร้สิ้นสุดระดับ 10",
   "endgame_goal_mastery": "เพิ่มความชำนาญเป็นระดับ 5 ในทุกโลก",
   "endgame_claimed": "รับรางวัลแล้ว",
-  "endgame_claim_reward": "รับรางวัล"
+  "endgame_claim_reward": "รับรางวัล",
+  "music_control_previous": "ก่อนหน้า",
+  "music_control_pause": "หยุดชั่วคราว",
+  "music_control_play": "เล่น",
+  "music_control_next": "ถัดไป",
+  "music_control_stop": "หยุด"
 }
