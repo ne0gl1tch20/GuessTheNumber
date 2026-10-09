@@ -70,7 +70,8 @@ data class GameState(
     val codexEntries: Set<String> = emptySet(),
     val homeBaseLevel: Int = 0,
     val activeBossBattleWorldId: String? = null,
-    val bossBattleMistakes: Map<String, Int> = emptyMap()
+    val bossBattleMistakes: Map<String, Int> = emptyMap(),
+    val codexRewardClaimed: Boolean = false
 )
 
 @Serializable
