@@ -770,5 +770,11 @@
   "rift_requirement": "Desbloquea la Grieta tras derrotar a los cuatro jefes del mundo.",
   "rift_stop": "Salir de la Grieta infinita",
   "rift_start": "Iniciar la Grieta infinita",
-  "rift_tier_label": "Grieta infinita • Nivel %d"
+  "rift_tier_label": "Grieta infinita • Nivel %d",
+  "notification_reminder_title": "Adivina el número",
+  "notification_reminder_body": "¡Tus números te echan de menos! Vuelve y adivina.",
+  "notification_progression_title": "Hito de progreso",
+  "notification_progression_body": "Hay un nuevo hito de progreso disponible.",
+  "notification_event_title": "Hay un evento esperándote",
+  "notification_event_body": "Hay un evento de tiempo limitado disponible."
 }
