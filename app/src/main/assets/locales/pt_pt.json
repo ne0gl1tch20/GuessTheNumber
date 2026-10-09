@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Reclamar",
   "daily_quest_claimed": "Reclamado",
-  "daily_quest_in_progress": "Em curso"
+  "daily_quest_in_progress": "Em curso",
+  "liveops_bonus_level_label": "Nível de bónus permanente",
+  "liveops_bonus_effect": "+2% de dinheiro por nível e +1 Nebula por resposta certa a cada 5 níveis, até ao nível 25. Aplica-se a esta ranhura de gravação."
 }
