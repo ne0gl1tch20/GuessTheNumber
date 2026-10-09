@@ -423,9 +423,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (finalState.achievements.size > currentState.achievements.size) {
             NotificationHelper.showProgressionNotification(getApplication<Application>())
         }
-        if (finalState.lastRandomEventId != currentState.lastRandomEventId && finalState.lastRandomEventId != null) {
-            NotificationHelper.showEventNotification(getApplication<Application>())
-        }
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.GUESS, "MAKE_GUESS", "Guess $guess resulted in ${result.feedback}, reward: ${result.reward}")
     }
@@ -1302,6 +1299,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     "RANDOM_EVENT",
                     "Random event triggered: " + event.type.name
                 )
+                NotificationHelper.showEventNotification(getApplication<Application>())
                 delay(8_000L)
                 if (_gameState.value.lastRandomEventId == event.type.name.lowercase()) {
                     _gameState.update { it.copy(lastRandomEventId = null) }
