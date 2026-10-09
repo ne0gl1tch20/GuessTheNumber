@@ -334,19 +334,27 @@ fun NavGraph(
             composable(Screen.About.route) {
                 AboutScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
             }
-            composable(Screen.DevSettings.route) {
-                DevSettingsScreen(
-                    state = state,
-                    onExecuteCommand = onExecuteDevCommand,
-                    onImportSave = onImportSave,
-                    onUpdateSettings = onUpdateSettings,
-                    onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
-                    onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
-                    onGetSaveJson = viewModel::getSaveJson,
-                    onApplySaveJson = viewModel::applySaveJson,
-                    onNavigate = { route -> navController.navigate(route) },
-                    onBack = { navController.popBackStack() }
-                )
+            if (BuildConfig.DEBUG) {
+                composable(Screen.DevSettings.route) {
+                    DevSettingsScreen(
+                        state = state,
+                        onExecuteCommand = onExecuteDevCommand,
+                        onImportSave = onImportSave,
+                        onUpdateSettings = onUpdateSettings,
+                        onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
+                        onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
+                        onGetSaveJson = viewModel::getSaveJson,
+                        onApplySaveJson = viewModel::applySaveJson,
+                        onNavigate = { route -> navController.navigate(route) },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+                composable("process_inspector") {
+                    ProcessInspectorScreen(
+                        state = state,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
             composable(Screen.SaveSlots.route) {
                 SaveSlotsScreen(
