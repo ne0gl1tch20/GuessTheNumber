@@ -43,6 +43,7 @@ fun RelicsScreen(state: GameState, onAction: (String, String) -> Unit, onBack: (
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(locale.getString("relics_hint", "Defeat world bosses to discover relics. Equip up to two to customize your collection."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(locale.getString("relic_set_bonus", "Set bonus: equipping two relics adds another 10% Money to correct-guess rewards."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
             }
             items(relics, key = { it.id }) { relic ->
                 val owned = relic.id in state.relicInventory
@@ -97,6 +98,7 @@ fun HomeBaseScreen(state: GameState, onAction: (String, String) -> Unit, onBack:
             Button(onClick = { onAction("home_upgrade", "sanctuary") }, enabled = state.money >= cost && state.homeBaseLevel < 20, modifier = Modifier.fillMaxWidth()) {
                 Text(locale.getString("home_base_upgrade", "Restore next level • %s Money", cost.format()))
             }
+            Text(locale.getString("home_base_bonus", "Each sanctuary level adds 2% Money to correct-guess rewards, up to 40%."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
             Text(locale.getString("home_base_cost_hint", "Each restoration costs more than the previous one. Your level and building milestones are saved with this slot."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
