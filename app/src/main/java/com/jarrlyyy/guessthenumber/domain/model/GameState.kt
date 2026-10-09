@@ -1,7 +1,6 @@
 package com.jarrlyyy.guessthenumber.domain.model
 
 import com.jarrlyyy.guessthenumber.BuildConfig
-
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -36,9 +35,9 @@ data class GameState(
     val lastSavedVersion: String = BuildConfig.VERSION_NAME,
     val timeTravelPenaltyUntil: Long = 0L,
     val autoClickerActive: Boolean = false,
-    val autoClickerSpeed: Double = 1.0, // clicks per second
+    val autoClickerSpeed: Double = 1.0,
     val tutorialCompleted: Boolean = false,
-    val buyMultiplier: String = "1", // "1", "10", "100", "MAX"
+    val buyMultiplier: String = "1",
     val prestigeCount: Long = 0,
     val ultraCount: Long = 0,
     val liveOpsClaims: Map<String, Int> = emptyMap(),
@@ -62,7 +61,6 @@ data class GameState(
     val activeWorldId: String = "verdant_grove",
     val worldBossVictories: Int = 0,
     val bossBattleProgress: Map<String, Int> = emptyMap(),
-    // v2.0 progression data. Defaults keep existing save files backward compatible.
     val relicInventory: Set<String> = emptySet(),
     val equippedRelicIds: Set<String> = emptySet(),
     val worldMasteryLevels: Map<String, Int> = emptyMap(),
@@ -72,7 +70,6 @@ data class GameState(
     val activeBossBattleWorldId: String? = null,
     val bossBattleMistakes: Map<String, Int> = emptyMap(),
     val codexRewardClaimed: Boolean = false,
-    // Endless Rift is opt-in endgame progress; defaults preserve existing saves.
     val endlessRiftTier: Int = 0,
     val endlessRiftBestTier: Int = 0,
     val endlessRiftActive: Boolean = false
@@ -110,20 +107,24 @@ data class GameSettings(
     val vibrationEnabled: Boolean = true,
     val notificationsEnabled: Boolean = true,
     val notificationIntervalHours: Long = 24L,
-    val themeMode: String = "System", // Light, Dark, System
-    val numberNotation: String = "Standard", // Standard, Scientific, Engineering
-    val locale: String = "en-US", // en-US, fil-PH
+    val themeMode: String = "System",
+    val numberNotation: String = "Standard",
+    val locale: String = "en-US",
     val reducedMotion: Boolean = false,
     val volume: Float = 1.0f,
     val reduceFlashes: Boolean = false,
     val saveLogsToStorage: Boolean = false,
     val backgroundMusicPath: String? = null,
+    val musicLibraryPaths: List<String> = emptyList(),
+    val musicQueuePaths: List<String> = emptyList(),
+    val musicPlaylistPaths: Map<String, List<String>> = emptyMap(),
+    val musicRepeatMode: String = "off",
+    val musicShuffle: Boolean = false,
     val themePreset: String = "Neon",
     val customPrimaryColor: String = "#7C4DFF",
     val customSecondaryColor: String = "#00BCD4",
     val customTertiaryColor: String = "#00C853",
     val moreScreenOrder: List<String> = DEFAULT_MORE_SCREEN_ORDER,
-    // Empty by default so shortcuts inherit the active Material theme.
     val moreScreenButtonColors: Map<String, String> = emptyMap(),
     val tutorialCompleted: Boolean = false
 )
