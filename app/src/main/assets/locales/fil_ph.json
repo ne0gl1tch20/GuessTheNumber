@@ -775,5 +775,7 @@
   "boss_guess_rule": "Nakababawas ng buhay ng boss ang tamang hula. Bawat ikatlong maling hula ay nagbabalik ng isang HP.",
   "codex_claim_reward": "Kunin ang 100 Nebula na gantimpala sa pagkumpleto",
   "codex_reward_claimed": "Nakuha na ang gantimpala sa pagkumpleto",
-  "world_mastery_upgrade": "Itaas ang mastery • %s Nebula"
+  "world_mastery_upgrade": "Itaas ang mastery • %s Nebula",
+  "relic_set_bonus": "Bonus ng set: ang pagsusuot ng dalawang relikya ay nagdaragdag ng 10% Pera sa gantimpala ng tamang hula.",
+  "home_base_bonus": "Bawat antas ng santuwaryo ay nagdaragdag ng 2% Pera sa gantimpala ng tamang hula, hanggang 40%."
 }
