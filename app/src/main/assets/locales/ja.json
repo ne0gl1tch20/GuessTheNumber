@@ -770,5 +770,11 @@
   "rift_requirement": "4体すべてのワールドボスを倒すとリフトが解放されます。",
   "rift_stop": "エンドレスリフトを終了",
   "rift_start": "エンドレスリフトを開始",
-  "rift_tier_label": "エンドレスリフト • ティア%d"
+  "rift_tier_label": "エンドレスリフト • ティア%d",
+  "notification_reminder_title": "数字当てゲーム",
+  "notification_reminder_body": "数字たちが待っています！戻って数字を当てましょう！",
+  "notification_progression_title": "進行マイルストーン",
+  "notification_progression_body": "新しい進行マイルストーンが利用できます。",
+  "notification_event_title": "ゲームイベントのお知らせ",
+  "notification_event_body": "期間限定イベントが利用できます。"
 }
