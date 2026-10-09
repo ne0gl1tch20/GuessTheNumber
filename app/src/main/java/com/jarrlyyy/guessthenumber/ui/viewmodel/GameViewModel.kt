@@ -31,6 +31,7 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.RandomEventEngine
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+import com.jarrlyyy.guessthenumber.data.repository.LiveOpsRepository
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -46,11 +47,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.time.LocalDate
+import java.time.Instant
 import kotlin.random.Random
 
 class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val saveManager = SaveManager(application)
     private val slotOperationMutex = Mutex()
+    private val liveOpsClaimMutex = Mutex()
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
@@ -706,6 +709,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val eligibleEarnings = if (earned > BigNumber.ZERO) earned else BigNumber.ZERO
         var bonusMoney = BigNumber.ZERO
         if ("talent_reward_1" in before.prestigeShopPurchases) bonusMoney += eligibleEarnings * BigNumber(0.5)
+        val eventBoostLevel = before.permanentEventBoosts.coerceIn(0, 25)
+        if (eventBoostLevel > 0) bonusMoney += eligibleEarnings * BigNumber(eventBoostLevel * 0.02)
         val masteryLevel = (before.worldMasteryLevels[before.activeWorldId] ?: 0).coerceIn(0, 10)
         if (masteryLevel > 0) bonusMoney += eligibleEarnings * BigNumber(masteryLevel * 0.02)
         val criticalChance = when { "talent_crit_2" in before.prestigeShopPurchases -> 0.15; "talent_crit_1" in before.prestigeShopPurchases -> 0.05; else -> 0.0 }
@@ -735,6 +740,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         )[before.activeWorldId]
         if (secretForActiveWorld != null && secretForActiveWorld in before.discoveredSecretIds) bonusMoney += eligibleEarnings * BigNumber(0.05)
         val bonusNebula = (if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L) +
+            (eventBoostLevel / 5).toLong() +
             (if ("ember_dragon" in before.equippedRelicIds) 1L else 0L) +
             (if (equippedBossRelics.size == 4) 1L else 0L) +
             (if (before.discoveredSecretIds.size >= 4) 1L else 0L) +
@@ -1351,7 +1357,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val state = _gameState.value
         _gameState.value = state.copy(
             nebula = state.nebula + BigNumber(nebulaReward),
-            money = state.money + moneyReward
+            money = state.money + moneyReward,
+            statistics = state.statistics.copy(
+                moneyEarned = state.statistics.moneyEarned + moneyReward,
+                nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+            )
         )
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.ARCADE, "MINIGAME_REWARD", "Earned $nebulaReward Nebula and $moneyReward Money from minigame.")
@@ -1377,8 +1387,35 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun claimLiveOpsEventReward(eventId: String) {
-        // Handled or logged
-        GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "LIVEOPS_CLAIM", "Claimed event reward: $eventId")
+        viewModelScope.launch {
+            liveOpsClaimMutex.withLock {
+                val manifest = withContext(Dispatchers.IO) {
+                    LiveOpsRepository(getApplication<Application>()).loadLiveOpsEvents()
+                }
+                val event = manifest.events.firstOrNull { it.id == eventId } ?: return@withLock
+                val now = Instant.now()
+                val withinDates = runCatching {
+                    !now.isBefore(Instant.parse(event.startDate)) && now.isBefore(Instant.parse(event.endDate))
+                }.getOrDefault(false)
+                if (event.status != "ACTIVE" || !withinDates) return@withLock
+
+                val state = _gameState.value
+                val claims = state.liveOpsClaims[eventId] ?: 0
+                if (claims >= event.maxClaims) return@withLock
+
+                val rewardNebula = 10L
+                _gameState.value = state.copy(
+                    nebula = state.nebula + BigNumber(rewardNebula),
+                    liveOpsClaims = state.liveOpsClaims + (eventId to (claims + 1)),
+                    permanentEventBoosts = state.permanentEventBoosts + 1,
+                    statistics = state.statistics.copy(
+                        nebulaEarned = state.statistics.nebulaEarned + rewardNebula
+                    )
+                )
+                saveGameAsync()
+                GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "LIVEOPS_CLAIM", "Claimed Live Ops reward: $eventId")
+            }
+        }
     }
 
     private fun saveGameAsync() {
