@@ -104,7 +104,8 @@ class MainActivity : ComponentActivity() {
                             onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) },
                             onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
                             onActivateChallengeBuilder = { ids -> viewModel.activateChallengeBuilder(ids) },
-                            viewModel = viewModel
+                            viewModel = viewModel,
+                            initialDestination = intent.getStringExtra("notification_destination")
                         )
                     }
                 }
