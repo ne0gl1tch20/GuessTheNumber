@@ -770,5 +770,11 @@
   "rift_requirement": "ปลดล็อกรอยแยกหลังเอาชนะบอสโลกทั้งสี่ตัว",
   "rift_stop": "ออกจากรอยแยกไร้สิ้นสุด",
   "rift_start": "เริ่มรอยแยกไร้สิ้นสุด",
-  "rift_tier_label": "รอยแยกไร้สิ้นสุด • ระดับ %d"
+  "rift_tier_label": "รอยแยกไร้สิ้นสุด • ระดับ %d",
+  "notification_reminder_title": "ทายตัวเลข",
+  "notification_reminder_body": "ตัวเลขของคุณกำลังรออยู่! กลับมาทายตัวเลขกันเถอะ!",
+  "notification_progression_title": "ความสำเร็จความคืบหน้า",
+  "notification_progression_body": "มีความคืบหน้าขั้นใหม่พร้อมแล้ว",
+  "notification_event_title": "มีอีเวนต์รออยู่",
+  "notification_event_body": "อีเวนต์เกมแบบจำกัดเวลาพร้อมแล้ว"
 }
