@@ -796,5 +796,10 @@
   "endgame_goal_rift": "एंडलेस रिफ्ट टियर 10 पूरा करें",
   "endgame_goal_mastery": "हर दुनिया में महारत स्तर 5 तक पहुँचें",
   "endgame_claimed": "इनाम प्राप्त किया गया",
-  "endgame_claim_reward": "इनाम प्राप्त करें"
+  "endgame_claim_reward": "इनाम प्राप्त करें",
+  "music_control_previous": "पिछला",
+  "music_control_pause": "रोकें",
+  "music_control_play": "चलाएँ",
+  "music_control_next": "अगला",
+  "music_control_stop": "बंद करें"
 }
