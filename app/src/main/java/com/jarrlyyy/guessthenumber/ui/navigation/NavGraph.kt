@@ -408,7 +408,7 @@ fun NavGraph(
                 CodexScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
             }
             composable(Screen.Endgame.route) {
-                EndgameScreen(state = state, onNavigate = { navController.navigate(it) }, onBack = { navController.popBackStack() })
+                EndgameScreen(state = state, onNavigate = { navController.navigate(it) }, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
             }
             composable(Screen.CloudBackup.route) {
                 CloudBackupScreen(state = state, onExportSave = onExportSave, onImportSave = onImportSave, onBack = { navController.popBackStack() })
