@@ -783,5 +783,14 @@
   "notification_category_progression": "Voortgangsmijlpalen",
   "notification_category_progression_desc": "Werelden ontgrendelen en bazen verslaan",
   "notification_category_events": "Game-evenementen",
-  "notification_category_events_desc": "Nieuwe willekeurige evenementen en tijdelijke beloningen"
+  "notification_category_events_desc": "Nieuwe willekeurige evenementen en tijdelijke beloningen",
+  "widget_title": "🎯 Raad het getal",
+  "widget_slot": "Opslagslot %d • %s",
+  "widget_money": "Geld",
+  "widget_range": "Bereik",
+  "widget_streak": "Reeks %d",
+  "widget_mastery": "Meesterschap %d",
+  "widget_worlds_bosses": "Werelden %d • Bazen %d",
+  "widget_quick_guess": "Snel raden",
+  "widget_next_slot": "Volgend slot"
 }
