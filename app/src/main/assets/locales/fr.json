@@ -762,5 +762,13 @@
   "map_fit_screen": "Ajuster à l’écran",
   "world_mastery_bonus": "+%d%% d’argent par bonne réponse dans ce monde.",
   "beyond_numbers_title": "Au-delà des nombres",
-  "world_progress_summary": "Mondes débloqués : %d / 4 • Boss vaincus : %d / 4"
+  "world_progress_summary": "Mondes débloqués : %d / 4 • Boss vaincus : %d / 4",
+  "rift_title": "Faille infinie",
+  "rift_description": "Affrontez à nouveau les quatre boss dans un défi sans fin. Chaque victoire augmente le niveau, les PV des boss et les récompenses.",
+  "rift_best_tier": "Meilleur niveau terminé : %d",
+  "rift_active_tier": "Niveau actuel : %d. Le prochain boss vous attend sur la carte du monde.",
+  "rift_requirement": "Débloquez la Faille après avoir vaincu les quatre boss du monde.",
+  "rift_stop": "Quitter la Faille infinie",
+  "rift_start": "Lancer la Faille infinie",
+  "rift_tier_label": "Faille infinie • Niveau %d"
 }
