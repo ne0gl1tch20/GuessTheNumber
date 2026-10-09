@@ -789,5 +789,11 @@
   "rift_requirement": "Unlock the Rift after defeating all four world bosses.",
   "rift_stop": "Leave Endless Rift",
   "rift_start": "Start Endless Rift",
-  "rift_tier_label": "Endless Rift • Tier %d"
+  "rift_tier_label": "Endless Rift • Tier %d",
+  "notification_reminder_title": "Guess The Number",
+  "notification_reminder_body": "Your numbers miss you! Come back and guess the number!",
+  "notification_progression_title": "Progression milestone",
+  "notification_progression_body": "A new progression milestone is ready.",
+  "notification_event_title": "A game event is waiting",
+  "notification_event_body": "A limited game event is ready."
 }
