@@ -410,14 +410,8 @@ fun NavGraph(
             composable(Screen.Endgame.route) {
                 EndgameScreen(state = state, onNavigate = { navController.navigate(it) }, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
             }
-            composable(Screen.CloudBackup.route) {
-                CloudBackupScreen(state = state, onExportSave = onExportSave, onImportSave = onImportSave, onBack = { navController.popBackStack() })
-            }
             composable(Screen.Staking.route) {
                 StakingScreen(state = state, onStakeResult = viewModel::settleStake, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.Tutorial.route) {
-                TutorialScreen(onComplete = { viewModel.completeTutorial(); navController.popBackStack() })
             }
             composable(Screen.ChangelogViewer.route) {
                 MarkdownViewerScreen(

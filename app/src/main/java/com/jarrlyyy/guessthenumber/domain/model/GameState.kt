@@ -100,7 +100,7 @@ val DEFAULT_MORE_SCREEN_ORDER = buildList {
         "home_base", "codex", "endgame", "arcade", "stats", "changelog", "settings", "about"
     ))
     if (BuildConfig.DEBUG) addAll(listOf("dev_settings", "process_inspector"))
-    addAll(listOf("cloud_backup", "staking", "tutorial", "ultra", "prestige", "save_slots", "music"))
+    addAll(listOf("staking", "ultra", "prestige", "save_slots", "music"))
 }
 
 @Serializable

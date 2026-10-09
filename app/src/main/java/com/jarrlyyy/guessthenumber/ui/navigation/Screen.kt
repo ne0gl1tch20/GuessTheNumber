@@ -27,7 +27,5 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object HomeBase : Screen("home_base", "Home Base", Icons.Default.Castle)
     object Codex : Screen("codex", "Codex", Icons.Default.MenuBook)
     object Endgame : Screen("endgame", "Endgame", Icons.Default.AutoAwesome)
-    object CloudBackup : Screen("cloud_backup", "Save Export / Import", Icons.Default.CloudSync)
     object Staking : Screen("staking", "Lucky Stake", Icons.Default.Casino)
-    object Tutorial : Screen("tutorial", "Tutorial", Icons.Default.School)
 }

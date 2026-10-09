@@ -1,3 +1,10 @@
+## v3.0.1 (Streamlined More Hub)
+
+- Removed the redundant Interactive Tutorial and Save Export / Import shortcuts from More. The action-driven tutorial remains available through its existing button action, and encrypted backup/restore remains on Save Slots.
+- Removed the standalone tutorial and cloud-backup navigation destinations and their unused screen implementations.
+- Existing saved More-menu orders automatically discard the retired shortcuts while preserving the user's remaining order.
+- Version: versionCode 19 / versionName 3.0.1.
+
 # Changelog
 
 ## v3.0.0 (Beyond the Numbers: Ultimate Expansion)

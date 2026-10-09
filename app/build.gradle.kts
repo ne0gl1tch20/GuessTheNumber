@@ -23,8 +23,8 @@ android {
         applicationId = "com.jarrlyyy.guessthenumber"
         minSdk = 26
         targetSdk = 35
-        versionCode = 18
-        versionName = "3.0.0"
+        versionCode = 19
+        versionName = "3.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

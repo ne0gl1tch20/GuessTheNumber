@@ -88,9 +88,7 @@ fun MoreScreen(
         "home_base" to localizedText("Home Base"),
         "codex" to localizedText("Explorer's Codex"),
         "endgame" to localizedText("Endgame Challenges"),
-        "cloud_backup" to localizedText("Save Export / Import"),
         "staking" to localizedText("Lucky Stake"),
-        "tutorial" to localizedText("Interactive Tutorial"),
         "process_inspector" to localizedText("Process Inspector")
     )
     val icons = mapOf(
@@ -113,9 +111,7 @@ fun MoreScreen(
         "home_base" to Icons.Default.Home,
         "codex" to Icons.Default.MenuBook,
         "endgame" to Icons.Default.AutoAwesome,
-        "cloud_backup" to Icons.Default.Cloud,
         "staking" to Icons.Default.Casino,
-        "tutorial" to Icons.Default.School,
         "process_inspector" to Icons.Default.Memory
     )
 
