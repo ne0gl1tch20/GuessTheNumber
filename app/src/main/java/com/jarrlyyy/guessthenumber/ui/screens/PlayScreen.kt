@@ -98,66 +98,6 @@ fun PlayScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    Column(
-                        Modifier.fillMaxWidth().padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Explore, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                            Spacer(Modifier.width(8.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(locale.getString("beyond_numbers_title", "Beyond the Numbers"), style = MaterialTheme.typography.titleMedium)
-                                Text(
-                                    locale.getString(
-                                        "world_progress_summary",
-                                        "Worlds unlocked: %d / 4 • Bosses defeated: %d / 4",
-                                        state.unlockedWorldIds.size.coerceAtMost(4),
-                                        state.defeatedBossIds.size.coerceAtMost(4)
-                                    ),
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-                        }
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            FilledTonalButton(
-                                onClick = { onNavigateProgression("world_map") },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
-                                Spacer(Modifier.width(6.dp))
-                                Text(locale.getString("world_map_title", "World Map"), maxLines = 1)
-                            }
-                            FilledTonalButton(
-                                onClick = { onNavigateProgression("relics") },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(Icons.Default.Diamond, contentDescription = null, modifier = Modifier.size(18.dp))
-                                Spacer(Modifier.width(6.dp))
-                                Text(locale.getString("relics_title", "Relics"), maxLines = 1)
-                            }
-                        }
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(
-                                onClick = { onNavigateProgression("home_base") },
-                                modifier = Modifier.weight(1f)
-                            ) { Text(locale.getString("home_base_title", "Home Base"), maxLines = 1) }
-                            OutlinedButton(
-                                onClick = { onNavigateProgression("codex") },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.size(18.dp))
-                                Spacer(Modifier.width(6.dp))
-                                Text(locale.getString("codex_title", "Codex"), maxLines = 1)
-                            }
-                        }
-                    }
-                }
-            }
             if (state.activeBossBattleWorldId != null) {
                 item {
                     val bossNameKey = when (state.activeBossBattleWorldId) {
@@ -651,6 +591,66 @@ fun PlayScreen(
                                         color = MaterialTheme.colorScheme.onErrorContainer
                                     )
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(
+                        Modifier.fillMaxWidth().padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Explore, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            Spacer(Modifier.width(8.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(locale.getString("beyond_numbers_title", "Beyond the Numbers"), style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    locale.getString(
+                                        "world_progress_summary",
+                                        "Worlds unlocked: %d / 4 • Bosses defeated: %d / 4",
+                                        state.unlockedWorldIds.size.coerceAtMost(4),
+                                        state.defeatedBossIds.size.coerceAtMost(4)
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            FilledTonalButton(
+                                onClick = { onNavigateProgression("world_map") },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(locale.getString("world_map_title", "World Map"), maxLines = 1)
+                            }
+                            FilledTonalButton(
+                                onClick = { onNavigateProgression("relics") },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.Diamond, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(locale.getString("relics_title", "Relics"), maxLines = 1)
+                            }
+                        }
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = { onNavigateProgression("home_base") },
+                                modifier = Modifier.weight(1f)
+                            ) { Text(locale.getString("home_base_title", "Home Base"), maxLines = 1) }
+                            OutlinedButton(
+                                onClick = { onNavigateProgression("codex") },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(locale.getString("codex_title", "Codex"), maxLines = 1)
                             }
                         }
                     }
