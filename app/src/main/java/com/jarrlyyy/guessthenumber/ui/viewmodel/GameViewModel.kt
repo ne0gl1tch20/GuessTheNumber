@@ -714,7 +714,18 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if ("crystal_golem" in before.equippedRelicIds && Random.nextDouble() < 0.10) bonusMoney += earned * BigNumber(0.5)
         if ("ember_dragon" in before.equippedRelicIds) bonusMoney += earned * BigNumber(0.25)
         if ("nebula_titan" in before.equippedRelicIds) bonusMoney += earned * BigNumber(0.25)
-        if (before.equippedRelicIds.size >= 2) bonusMoney += earned * BigNumber(0.10)
+
+        // Relic set bonuses now scale across the full four-world relic collection.
+        val equippedBossRelics = before.equippedRelicIds.intersect(
+            setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        )
+        val relicSetBonus = when (equippedBossRelics.size) {
+            2 -> 0.10
+            3 -> 0.20
+            4 -> 0.35
+            else -> 0.0
+        }
+        if (relicSetBonus > 0.0) bonusMoney += earned * BigNumber(relicSetBonus)
         if (before.homeBaseLevel > 0) bonusMoney += earned * BigNumber((before.homeBaseLevel * 0.02).coerceAtMost(0.40))
         val secretForActiveWorld = mapOf(
             "verdant_grove" to "whispering_hollow",
@@ -723,7 +734,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             "nebula_rift" to "lost_observatory"
         )[before.activeWorldId]
         if (secretForActiveWorld != null && secretForActiveWorld in before.discoveredSecretIds) bonusMoney += earned * BigNumber(0.05)
-        val bonusNebula = (if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L) + (if ("ember_dragon" in before.equippedRelicIds) 1L else 0L)
+        val bonusNebula = (if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L) +
+            (if ("ember_dragon" in before.equippedRelicIds) 1L else 0L) +
+            (if (equippedBossRelics.size == 4) 1L else 0L) +
+            (if (before.discoveredSecretIds.size >= 4) 1L else 0L)
         return after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(bonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + bonusNebula))
     }
 
@@ -1079,13 +1093,25 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             }
             "equip_relic" -> {
                 if (id !in state.relicInventory) return
-                val equipped = if (id in state.equippedRelicIds) state.equippedRelicIds - id else (state.equippedRelicIds + id).toList().takeLast(2).toSet()
+                val equipped = if (id in state.equippedRelicIds) state.equippedRelicIds - id else (state.equippedRelicIds + id).toList().takeLast(4).toSet()
                 state.copy(equippedRelicIds = equipped)
             }
             "home_upgrade" -> {
                 val cost = BigNumber(50_000L * (state.homeBaseLevel + 1L))
                 if (state.money < cost || state.homeBaseLevel >= 20) return
-                state.copy(money = state.money - cost, homeBaseLevel = state.homeBaseLevel + 1)
+                val nextLevel = state.homeBaseLevel + 1
+                val milestoneNebula = if (nextLevel % 5 == 0) (nextLevel / 5L) * 25L else 0L
+                val milestoneEntries = if (nextLevel in setOf(5, 10, 15, 20)) state.codexEntries + "sanctuary:$nextLevel" else state.codexEntries
+                state.copy(
+                    money = state.money - cost,
+                    nebula = state.nebula + BigNumber(milestoneNebula),
+                    homeBaseLevel = nextLevel,
+                    codexEntries = milestoneEntries,
+                    statistics = state.statistics.copy(
+                        moneySpent = state.statistics.moneySpent + cost,
+                        nebulaEarned = state.statistics.nebulaEarned + milestoneNebula
+                    )
+                )
             }
             "claim_codex" -> {
                 val totalEntries = 12
