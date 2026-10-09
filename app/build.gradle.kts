@@ -105,6 +105,7 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation(libs.androidx.glance)
     implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.media)
 
     testImplementation(libs.junit)
     testImplementation("org.robolectric:robolectric:4.15")
