@@ -653,5 +653,8 @@
   "boss_defeated": "เอาชนะบอสแล้ว",
   "world_locked_boss": "ปลดล็อกโลกนี้ก่อน",
   "boss_fight": "ท้าสู้กับบอส",
-  "boss_requirements_pending": "พัฒนาตัวละครก่อนต่อสู้"
+  "boss_requirements_pending": "พัฒนาตัวละครก่อนต่อสู้",
+  "boss_hp_label": "พลังชีวิตบอส",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "โจมตีบอส"
 }
