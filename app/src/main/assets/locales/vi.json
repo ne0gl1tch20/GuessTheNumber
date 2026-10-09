@@ -770,5 +770,11 @@
   "rift_requirement": "Mở khóa Khe Nứt sau khi đánh bại cả bốn trùm thế giới.",
   "rift_stop": "Rời Khe Nứt Vô Tận",
   "rift_start": "Bắt đầu Khe Nứt Vô Tận",
-  "rift_tier_label": "Khe Nứt Vô Tận • Cấp %d"
+  "rift_tier_label": "Khe Nứt Vô Tận • Cấp %d",
+  "notification_reminder_title": "Đoán Số",
+  "notification_reminder_body": "Các con số đang nhớ bạn! Quay lại và đoán số nhé!",
+  "notification_progression_title": "Cột mốc tiến trình",
+  "notification_progression_body": "Một cột mốc tiến trình mới đã sẵn sàng.",
+  "notification_event_title": "Có sự kiện đang chờ",
+  "notification_event_body": "Sự kiện trò chơi có thời hạn đã sẵn sàng."
 }
