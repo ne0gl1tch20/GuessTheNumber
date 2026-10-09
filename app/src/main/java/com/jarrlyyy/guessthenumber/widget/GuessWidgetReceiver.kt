@@ -49,7 +49,7 @@ class GuessWidget : GlanceAppWidget() {
                     horizontalAlignment = Alignment.Horizontal.Start
                 ) {
                     Text("🎯 Guess The Number", style = TextStyle(fontWeight = FontWeight.Bold, color = GlanceTheme.colors.onBackground))
-                    Text("Save slot \$slot • ${state.profileName.ifBlank { state.difficultyId }}", style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
+                    Text("Save slot $slot • ${state.profileName.ifBlank { state.difficultyId }}", style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                     Spacer(GlanceModifier.height(6.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), horizontalAlignment = Alignment.Horizontal.Start) {
                         Column(modifier = GlanceModifier.defaultWeight()) {
