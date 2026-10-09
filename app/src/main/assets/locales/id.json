@@ -762,5 +762,13 @@
   "map_fit_screen": "Sesuaikan ke layar",
   "world_mastery_bonus": "+%d%% Uang untuk setiap tebakan benar di dunia ini.",
   "beyond_numbers_title": "Melampaui Angka",
-  "world_progress_summary": "Dunia terbuka: %d / 4 • Bos dikalahkan: %d / 4"
+  "world_progress_summary": "Dunia terbuka: %d / 4 • Bos dikalahkan: %d / 4",
+  "rift_title": "Rift Tanpa Akhir",
+  "rift_description": "Lawan kembali keempat bos dalam tantangan beruntun. Setiap kemenangan menaikkan tingkat, HP bos, dan hadiah.",
+  "rift_best_tier": "Tingkat terbaik yang diselesaikan: %d",
+  "rift_active_tier": "Tingkat saat ini: %d. Bos berikutnya menunggu di Peta Dunia.",
+  "rift_requirement": "Buka Rift setelah mengalahkan keempat bos dunia.",
+  "rift_stop": "Keluar dari Rift Tanpa Akhir",
+  "rift_start": "Mulai Rift Tanpa Akhir",
+  "rift_tier_label": "Rift Tanpa Akhir • Tingkat %d"
 }
