@@ -82,7 +82,15 @@ fun MoreScreen(
         "ultra" to "Ultra Hub & Upgrades",
         "prestige" to "Prestige Hub & Upgrades",
         "save_slots" to "Save Slots",
-        "music" to "Background Music Player"
+        "music" to localizedText("Background Music Player"),
+        "world_map" to localizedText("World Map"),
+        "relics" to localizedText("Relic Collection"),
+        "home_base" to localizedText("Home Base"),
+        "codex" to localizedText("Explorer's Codex"),
+        "endgame" to localizedText("Endgame Challenges"),
+        "cloud_backup" to localizedText("Save Export / Import"),
+        "staking" to localizedText("Lucky Stake"),
+        "tutorial" to localizedText("Interactive Tutorial")
     )
     val icons = mapOf(
         "achievements" to Icons.Default.EmojiEvents,
@@ -98,7 +106,15 @@ fun MoreScreen(
         "ultra" to Icons.Default.Star,
         "prestige" to Icons.Default.Star,
         "save_slots" to Icons.Default.Save,
-        "music" to Icons.Default.MusicNote
+        "music" to Icons.Default.MusicNote,
+        "world_map" to Icons.Default.Map,
+        "relics" to Icons.Default.Diamond,
+        "home_base" to Icons.Default.Home,
+        "codex" to Icons.Default.MenuBook,
+        "endgame" to Icons.Default.AutoAwesome,
+        "cloud_backup" to Icons.Default.Cloud,
+        "staking" to Icons.Default.Casino,
+        "tutorial" to Icons.Default.School
     )
 
     val audioPickerLauncher = rememberLauncherForActivityResult(
