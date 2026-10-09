@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import com.jarrlyyy.guessthenumber.ui.components.ExpressiveMilestoneBanner
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
@@ -34,6 +36,25 @@ fun AchievementsScreen(
     val locale = configRepo.localeManager
     val achievements = remember(state.settings.locale) {
         configRepo.loadAchievements()
+    }
+    var observedAchievements by remember { mutableStateOf(state.achievements) }
+    var showUnlockCelebration by remember { mutableStateOf(false) }
+    var unlockCelebrationText by remember { mutableStateOf("") }
+
+    LaunchedEffect(state.achievements) {
+        val newlyUnlocked = state.achievements - observedAchievements
+        observedAchievements = state.achievements
+        if (newlyUnlocked.isNotEmpty()) {
+            val achievementName = achievements.firstOrNull { it.id in newlyUnlocked }?.name
+            unlockCelebrationText = if (achievementName != null) {
+                locale.getString("achievement_unlocked_banner", "Unlocked: %s", achievementName)
+            } else {
+                locale.getString("achievement_unlocked_fallback", "A new achievement is unlocked!")
+            }
+            showUnlockCelebration = true
+            delay(if (state.settings.reducedMotion) 700L else 2200L)
+            showUnlockCelebration = false
+        }
     }
 
     Scaffold(
@@ -55,6 +76,15 @@ fun AchievementsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item {
+                ExpressiveMilestoneBanner(
+                    visible = showUnlockCelebration,
+                    title = locale.getString("achievement_unlocked_title", "Achievement unlocked!"),
+                    description = unlockCelebrationText,
+                    reducedMotion = state.settings.reducedMotion
+                )
+            }
+
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
