@@ -23,7 +23,6 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
     val locale = LocalAppLocaleManager.current
     val manager = remember { BackgroundMusicManager(context.applicationContext) }
     DisposableEffect(Unit) { onDispose { manager.release() } }
-
     val library by manager.library.collectAsState()
     val queue by manager.queue.collectAsState()
     val playlists by manager.playlists.collectAsState()
@@ -34,19 +33,14 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
     val shuffle by manager.shuffle.collectAsState()
     val repeat by manager.repeatMode.collectAsState()
     var playlistName by remember { mutableStateOf("") }
+    var expandedPlaylist by remember { mutableStateOf<String?>(null) }
     val current = library.firstOrNull { it.id == currentTrackId }
-
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) manager.importTrack(uri)?.let { manager.playTrack(it.id) }
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(locale.getString("music_player_title", "Offline Music Player")) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = locale.getString("back", "Back")) } }
-            )
-        }
+        topBar = { TopAppBar(title = { Text(locale.getString("music_player_title", "Offline Music Player")) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = locale.getString("back", "Back")) } }) }
     ) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
@@ -66,30 +60,37 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
                     }
                 }
             }
-            item {
-                Button(onClick = { picker.launch(arrayOf("audio/*")) }, Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(locale.getString("music_import", "Add local audio"))
-                }
-            }
+            item { Button(onClick = { picker.launch(arrayOf("audio/*")) }, Modifier.fillMaxWidth()) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(locale.getString("music_import", "Add local audio")) } }
             item { Text(locale.getString("music_library", "Library"), style = MaterialTheme.typography.titleLarge) }
             items(library, key = { it.id }) { track ->
                 ListItem(
                     headlineContent = { Text(track.title) },
                     supportingContent = { Text(track.artist.ifBlank { track.album }) },
                     leadingContent = { Icon(Icons.Default.MusicNote, null) },
-                    trailingContent = {
-                        Row {
-                            IconButton(onClick = { manager.playTrack(track.id) }) { Icon(Icons.Default.PlayArrow, null) }
-                            IconButton(onClick = { manager.enqueue(track.id) }) { Icon(Icons.Default.QueueMusic, null) }
-                            IconButton(onClick = { manager.removeTrack(track.id) }) { Icon(Icons.Default.Delete, null) }
-                        }
-                    }
+                    trailingContent = { Row {
+                        IconButton(onClick = { manager.playTrack(track.id) }) { Icon(Icons.Default.PlayArrow, null) }
+                        IconButton(onClick = { manager.enqueue(track.id) }) { Icon(Icons.Default.QueueMusic, null) }
+                        IconButton(onClick = { manager.removeTrack(track.id) }) { Icon(Icons.Default.Delete, null) }
+                    } }
                 )
             }
-            item { Text(locale.getString("music_queue", "Queue (${queue.size})"), style = MaterialTheme.typography.titleLarge) }
+            item {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text(locale.getString("music_queue", "Queue (${queue.size})"), style = MaterialTheme.typography.titleLarge)
+                    TextButton(onClick = manager::clearQueue) { Text(locale.getString("clear", "Clear")) }
+                }
+            }
             items(queue.indices.toList()) { index ->
                 val track = library.firstOrNull { it.id == queue[index] } ?: return@items
-                ListItem(headlineContent = { Text(track.title) }, supportingContent = { Text(locale.getString("music_queue_position", "Position %d", index + 1)) }, trailingContent = { IconButton(onClick = { manager.removeFromQueue(index) }) { Icon(Icons.Default.Close, null) } })
+                ListItem(
+                    headlineContent = { Text(track.title) },
+                    supportingContent = { Text(locale.getString("music_queue_position", "Position %d", index + 1)) },
+                    trailingContent = { Row {
+                        IconButton(onClick = { if (index > 0) manager.moveQueue(index, index - 1) }) { Icon(Icons.Default.KeyboardArrowUp, null) }
+                        IconButton(onClick = { if (index < queue.lastIndex) manager.moveQueue(index, index + 1) }) { Icon(Icons.Default.KeyboardArrowDown, null) }
+                        IconButton(onClick = { manager.removeFromQueue(index) }) { Icon(Icons.Default.Close, null) }
+                    } }
+                )
             }
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -100,16 +101,26 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
             }
             item { Text(locale.getString("music_playlists", "Playlists"), style = MaterialTheme.typography.titleLarge) }
             items(playlists.keys.toList()) { name ->
+                val ids = playlists[name].orEmpty()
                 ListItem(
                     headlineContent = { Text(name) },
-                    supportingContent = { Text(locale.getString("music_playlist_tracks", "%d tracks", playlists[name]?.size ?: 0)) },
-                    trailingContent = {
-                        Row {
-                            IconButton(onClick = { manager.playQueue(playlists[name].orEmpty()) }) { Icon(Icons.Default.PlayArrow, null) }
-                            IconButton(onClick = { manager.deletePlaylist(name) }) { Icon(Icons.Default.Delete, null) }
-                        }
-                    }
+                    supportingContent = { Text(locale.getString("music_playlist_tracks", "%d tracks", ids.size)) },
+                    trailingContent = { Row {
+                        IconButton(onClick = { manager.playQueue(ids) }) { Icon(Icons.Default.PlayArrow, null) }
+                        IconButton(onClick = { expandedPlaylist = if (expandedPlaylist == name) null else name }) { Icon(if (expandedPlaylist == name) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null) }
+                        IconButton(onClick = { manager.deletePlaylist(name); if (expandedPlaylist == name) expandedPlaylist = null }) { Icon(Icons.Default.Delete, null) }
+                    } }
                 )
+                if (expandedPlaylist == name) {
+                    library.forEach { track ->
+                        val included = track.id in ids
+                        ListItem(
+                            modifier = Modifier.padding(start = 20.dp),
+                            headlineContent = { Text(track.title) },
+                            trailingContent = { IconButton(onClick = { if (included) manager.removeFromPlaylist(name, track.id) else manager.addToPlaylist(name, track.id) }) { Icon(if (included) Icons.Default.CheckCircle else Icons.Default.AddCircleOutline, null) } }
+                        )
+                    }
+                }
             }
         }
     }
