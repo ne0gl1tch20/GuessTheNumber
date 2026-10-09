@@ -762,5 +762,13 @@
   "map_fit_screen": "An Bildschirm anpassen",
   "world_mastery_bonus": "+%d%% Geld pro richtigem Tipp in dieser Welt.",
   "beyond_numbers_title": "Jenseits der Zahlen",
-  "world_progress_summary": "Freigeschaltete Welten: %d / 4 • Besiegte Bosse: %d / 4"
+  "world_progress_summary": "Freigeschaltete Welten: %d / 4 • Besiegte Bosse: %d / 4",
+  "rift_title": "Endloser Riss",
+  "rift_description": "Kämpfe erneut gegen alle vier Bosse. Jeder Sieg erhöht die Stufe, die Boss-TP und die Belohnungen.",
+  "rift_best_tier": "Beste abgeschlossene Stufe: %d",
+  "rift_active_tier": "Aktuelle Stufe: %d. Der nächste Boss wartet auf der Weltkarte.",
+  "rift_requirement": "Schalte den Riss frei, indem du alle vier Weltbosse besiegst.",
+  "rift_stop": "Endlosen Riss verlassen",
+  "rift_start": "Endlosen Riss starten",
+  "rift_tier_label": "Endloser Riss • Stufe %d"
 }
