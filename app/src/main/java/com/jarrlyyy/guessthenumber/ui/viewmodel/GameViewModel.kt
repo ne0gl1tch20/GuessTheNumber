@@ -695,7 +695,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun applyTalentBonuses(before: GameState, after: GameState, correct: Boolean): GameState {
-        if (!correct || before.prestigeShopPurchases.isEmpty()) return after
+        if (!correct) return after
         val earned = after.money - before.money
         if (earned <= BigNumber.ZERO) return after
         var bonusMoney = BigNumber.ZERO
