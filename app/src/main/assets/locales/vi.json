@@ -783,5 +783,14 @@
   "notification_category_progression": "Cột mốc tiến trình",
   "notification_category_progression_desc": "Mở khóa thế giới và đánh bại trùm",
   "notification_category_events": "Sự kiện trò chơi",
-  "notification_category_events_desc": "Sự kiện ngẫu nhiên mới và phần thưởng có thời hạn"
+  "notification_category_events_desc": "Sự kiện ngẫu nhiên mới và phần thưởng có thời hạn",
+  "widget_title": "🎯 Đoán Số",
+  "widget_slot": "Ô lưu %d • %s",
+  "widget_money": "Tiền",
+  "widget_range": "Phạm vi",
+  "widget_streak": "Chuỗi %d",
+  "widget_mastery": "Tinh thông %d",
+  "widget_worlds_bosses": "Thế giới %d • Trùm %d",
+  "widget_quick_guess": "Đoán nhanh",
+  "widget_next_slot": "Ô lưu tiếp theo"
 }
