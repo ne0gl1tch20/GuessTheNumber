@@ -792,5 +792,9 @@
   "widget_mastery": "Penguasaan %d",
   "widget_worlds_bosses": "Dunia %d • Bos %d",
   "widget_quick_guess": "Tebak Cepat",
-  "widget_next_slot": "Slot Berikutnya"
+  "widget_next_slot": "Slot Berikutnya",
+  "endgame_goal_rift": "Selesaikan Rift Tanpa Akhir tingkat 10",
+  "endgame_goal_mastery": "Capai penguasaan level 5 di setiap dunia",
+  "endgame_claimed": "Hadiah sudah diklaim",
+  "endgame_claim_reward": "Klaim hadiah"
 }
