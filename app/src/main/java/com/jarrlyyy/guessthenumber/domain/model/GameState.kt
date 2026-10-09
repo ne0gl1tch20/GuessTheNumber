@@ -56,7 +56,11 @@ data class GameState(
     val lootDropsFound: Long = 0,
     val lootChestsOpened: Long = 0,
     val lastLootDropTier: String? = null,
-    val lootEventId: Long = 0
+    val lootEventId: Long = 0,
+    val unlockedWorldIds: Set<String> = setOf("verdant_grove"),
+    val defeatedBossIds: Set<String> = emptySet(),
+    val activeWorldId: String = "verdant_grove",
+    val worldBossVictories: Int = 0
 )
 
 @Serializable
