@@ -76,7 +76,8 @@ fun NavGraph(
     onActivateChallengeBuilder: (Set<String>) -> Unit,
     viewModel: GameViewModel,
     hasAnySave: Boolean,
-    initialDestination: String? = null
+    initialDestination: String? = null,
+    onNotificationDestinationHandled: () -> Unit = {}
 ) {
     val navController = rememberNavController()
     val locale = viewModel.localeManager
@@ -117,8 +118,11 @@ fun NavGraph(
                 "achievements"
             )
         }
-        if (destination != null && navController.currentDestination?.route != destination) {
-            navController.navigate(destination) { launchSingleTop = true }
+        if (destination != null) {
+            if (navController.currentDestination?.route != destination) {
+                navController.navigate(destination) { launchSingleTop = true }
+            }
+            onNotificationDestinationHandled()
         }
     }
 
