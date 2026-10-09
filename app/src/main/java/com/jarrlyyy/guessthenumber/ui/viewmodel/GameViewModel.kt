@@ -948,9 +948,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
         if (state.activeBossBattleWorldId != worldId || worldId !in state.unlockedWorldIds || bossId in state.defeatedBossIds) return
         val bossHp = when (worldId) { "verdant_grove" -> 3; "crystal_caverns" -> 5; "ember_summit" -> 7; else -> 10 }
+        val damage = state.bossBattleProgress[bossId] ?: 0
         if (action == "boss_miss") {
             val misses = (state.bossBattleMistakes[bossId] ?: 0) + 1
-            val damage = state.bossBattleProgress[bossId] ?: 0
             val phase = ((damage * 3) / bossHp + 1).coerceIn(1, 3)
             val missInterval = when (phase) { 1 -> 4; 2 -> 3; else -> 2 }
             val regressedDamage = if (misses % missInterval == 0) (damage - 1).coerceAtLeast(0) else damage
