@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Resgatar",
   "daily_quest_claimed": "Resgatado",
-  "daily_quest_in_progress": "Em andamento"
+  "daily_quest_in_progress": "Em andamento",
+  "liveops_bonus_level_label": "Nível de bônus permanente",
+  "liveops_bonus_effect": "+2% de dinheiro por nível e +1 Nebula por resposta certa a cada 5 níveis, até o nível 25. Aplica-se a este espaço de salvamento."
 }
