@@ -770,5 +770,11 @@
   "rift_requirement": "Desbloqueia a Fenda após derrotar os quatro bosses do mundo.",
   "rift_stop": "Sair da Fenda Infinita",
   "rift_start": "Iniciar Fenda Infinita",
-  "rift_tier_label": "Fenda Infinita • Nível %d"
+  "rift_tier_label": "Fenda Infinita • Nível %d",
+  "notification_reminder_title": "Adivinha o Número",
+  "notification_reminder_body": "Os teus números têm saudades tuas! Volta e adivinha!",
+  "notification_progression_title": "Marco de progresso",
+  "notification_progression_body": "Está disponível um novo marco de progresso.",
+  "notification_event_title": "Há um evento à tua espera",
+  "notification_event_body": "Está disponível um evento por tempo limitado."
 }
