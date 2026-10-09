@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import com.jarrlyyy.guessthenumber.ui.components.ExpressiveSaveLoadingScreen
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,9 +17,12 @@ import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 
 class MainActivity : ComponentActivity() {
     private val viewModel: GameViewModel by viewModels()
+    private var notificationDestination by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        notificationDestination = savedInstanceState?.getString(STATE_NOTIFICATION_DESTINATION)
+            ?: intent.getStringExtra(EXTRA_NOTIFICATION_DESTINATION)
         setContent {
             val state by viewModel.gameState.collectAsState()
             val isLoadingSave by viewModel.isLoadingSave.collectAsState()
@@ -105,7 +111,7 @@ class MainActivity : ComponentActivity() {
                             onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
                             onActivateChallengeBuilder = { ids -> viewModel.activateChallengeBuilder(ids) },
                             viewModel = viewModel,
-                            initialDestination = intent.getStringExtra("notification_destination")
+                            initialDestination = notificationDestination
                         )
                     }
                 }
