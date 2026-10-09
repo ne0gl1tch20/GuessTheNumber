@@ -24,7 +24,7 @@ import kotlin.random.Random
 @Composable
 fun StakingScreen(
     state: GameState,
-    onStakeResult: (BigNumber, Boolean) -> Unit,
+    onStakeResult: (BigNumber, BigNumber, Boolean) -> Unit,
     onBack: () -> Unit
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -94,10 +94,10 @@ fun StakingScreen(
                                 val multiplier = 2.0 + (state.streak * 0.1)
                                 if (won) {
                                     val payout = stakeAmount * BigNumber(multiplier)
-                                    onStakeResult(payout, true)
+                                    onStakeResult(stakeAmount, payout, true)
                                     resultMessage = "🎉 Lucky Guess Won! Earned ${payout.format()}!"
                                 } else {
-                                    onStakeResult(stakeAmount, false)
+                                    onStakeResult(stakeAmount, BigNumber.ZERO, false)
                                     resultMessage = "💥 Lucky Guess Lost! Forfeited ${stakeAmount.format()}."
                                 }
                                 stakeInput = ""
