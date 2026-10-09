@@ -811,5 +811,9 @@
   "widget_mastery": "Mastery %d",
   "widget_worlds_bosses": "Worlds %d • Bosses %d",
   "widget_quick_guess": "Quick Guess",
-  "widget_next_slot": "Next Slot"
+  "widget_next_slot": "Next Slot",
+  "endgame_goal_rift": "Clear Endless Rift tier 10",
+  "endgame_goal_mastery": "Reach mastery level 5 in every world",
+  "endgame_claimed": "Reward claimed",
+  "endgame_claim_reward": "Claim reward"
 }
