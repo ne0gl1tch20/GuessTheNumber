@@ -608,5 +608,19 @@
   "language_changed_restart": "Language changed. Restart app to take effect.",
   "dropdown": "Dropdown",
   "staking_title": "Combo Streaks & Lucky Stake",
-  "stats_session_arcade": "Session & Arcade"
+  "stats_session_arcade": "Session & Arcade",
+  "loot_title": "Treasure Drops",
+  "loot_subtitle": "Get guesses right to discover collectible chests.",
+  "loot_found": "Found",
+  "loot_opened_count": "Opened: %d",
+  "loot_drop_message": "A %s chest dropped!",
+  "loot_drop_rates": "Chance per correct guess: Common 18%, Rare 5%, Epic 1%.",
+  "loot_tier_common": "Common Chest",
+  "loot_tier_rare": "Rare Chest",
+  "loot_tier_epic": "Epic Chest",
+  "loot_chest_count": "%d in inventory",
+  "loot_rewards_common": "5,000 Money or 5 Nebula",
+  "loot_rewards_rare": "25,000 Money or 25 Nebula",
+  "loot_rewards_epic": "100,000 Money or 100 Nebula",
+  "loot_open": "Open"
 }
