@@ -50,12 +50,12 @@ fun WorldMapScreen(
     var zoom by remember { mutableFloatStateOf(1f) }
     var pan by remember { mutableStateOf(Offset.Zero) }
     val worlds = listOf(
-        WorldMapNode("verdant_grove", "world_verdant_name", "Verdant Grove", "0.16".toFloat(), 0.24f, "verdant_guardian", "boss_verdant_name", "Verdant Guardian", 3, "whispering_hollow", 50),
+        WorldMapNode("verdant_grove", "world_verdant_name", "Verdant Grove", 0.16f, 0.24f, "verdant_guardian", "boss_verdant_name", "Verdant Guardian", 3, "whispering_hollow", 50),
         WorldMapNode("crystal_caverns", "world_crystal_name", "Crystal Caverns", 0.43f, 0.43f, "crystal_golem", "boss_crystal_name", "Crystal Golem", 5, "shard_archive", 150),
         WorldMapNode("ember_summit", "world_ember_name", "Ember Summit", 0.67f, 0.24f, "ember_dragon", "boss_ember_name", "Ember Dragon", 7, "ashen_vault", 300),
         WorldMapNode("nebula_rift", "world_nebula_name", "Nebula Rift", 0.82f, 0.59f, "nebula_titan", "boss_nebula_name", "Nebula Titan", 10, "lost_observatory", 600)
     )
-    val world = worlds.first { it.id == selectedWorld }
+    val world = worlds.firstOrNull { it.id == selectedWorld } ?: worlds.first()
     val unlocked = world.id in state.unlockedWorldIds
     val totalUpgrades = state.upgradeLevels.values.sum()
     val canUnlock = when (world.id) {
