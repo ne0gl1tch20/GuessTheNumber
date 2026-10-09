@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Odbierz",
   "daily_quest_claimed": "Odebrano",
-  "daily_quest_in_progress": "W toku"
+  "daily_quest_in_progress": "W toku",
+  "liveops_bonus_level_label": "Poziom stałego bonusu",
+  "liveops_bonus_effect": "+2% pieniędzy na poziom i +1 Nebula za każdą poprawną odpowiedź co 5 poziomów, maksymalnie do poziomu 25. Dotyczy tego slotu zapisu."
 }
