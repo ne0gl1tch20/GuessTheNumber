@@ -770,5 +770,11 @@
   "rift_requirement": "Відкрийте розлом після перемоги над усіма чотирма світовими босами.",
   "rift_stop": "Вийти з нескінченного розлому",
   "rift_start": "Почати нескінченний розлом",
-  "rift_tier_label": "Нескінченний розлом • Рівень %d"
+  "rift_tier_label": "Нескінченний розлом • Рівень %d",
+  "notification_reminder_title": "Вгадай число",
+  "notification_reminder_body": "Твої числа сумують! Повертайся та вгадай число!",
+  "notification_progression_title": "Етап прогресу",
+  "notification_progression_body": "Доступний новий етап прогресу.",
+  "notification_event_title": "На тебе чекає подія",
+  "notification_event_body": "Доступна обмежена в часі ігрова подія."
 }
