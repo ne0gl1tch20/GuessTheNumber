@@ -152,11 +152,13 @@ fun CodexScreen(state: GameState, onAction: (String, String) -> Unit, onBack: ()
 @Composable
 fun EndgameScreen(state: GameState, onNavigate: (String) -> Unit, onAction: (String, String) -> Unit, onBack: () -> Unit) {
     val locale = LocalAppLocaleManager.current
-    val bossesDefeated = state.defeatedBossIds.size.coerceAtMost(4)
+    val allBossIds = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+    val allSecretIds = setOf("whispering_hollow", "shard_archive", "ashen_vault", "lost_observatory")
+    val bossesDefeated = state.defeatedBossIds.containsAll(allBossIds)
     val goals = listOf(
-        Triple("all_bosses", locale.getString("endgame_goal_bosses", "Defeat all four world bosses"), bossesDefeated == 4),
-        Triple("all_secrets", locale.getString("endgame_goal_secrets", "Discover all four secret areas"), state.discoveredSecretIds.size >= 4),
-        Triple("all_relics", locale.getString("endgame_goal_relics", "Collect all four boss relics"), state.relicInventory.size >= 4),
+        Triple("all_bosses", locale.getString("endgame_goal_bosses", "Defeat all four world bosses"), bossesDefeated),
+        Triple("all_secrets", locale.getString("endgame_goal_secrets", "Discover all four secret areas"), state.discoveredSecretIds.containsAll(allSecretIds)),
+        Triple("all_relics", locale.getString("endgame_goal_relics", "Collect all four boss relics"), state.relicInventory.containsAll(allBossIds)),
         Triple("sanctuary_10", locale.getString("endgame_goal_base", "Restore the sanctuary to level 10"), state.homeBaseLevel >= 10),
         Triple("rift_tier_10", locale.getString("endgame_goal_rift", "Clear Endless Rift tier 10"), state.endlessRiftBestTier >= 10),
         Triple("mastery_all_5", locale.getString("endgame_goal_mastery", "Reach mastery level 5 in every world"), listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift").all { (state.worldMasteryLevels[it] ?: 0) >= 5 })
