@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Claimen",
   "daily_quest_claimed": "Geclaimd",
-  "daily_quest_in_progress": "Bezig"
+  "daily_quest_in_progress": "Bezig",
+  "liveops_bonus_level_label": "Permanent bonusniveau",
+  "liveops_bonus_effect": "+2% geld per niveau en +1 Nebula per goed antwoord elke 5 niveaus, tot niveau 25. Geldt voor deze opslagplek."
 }
