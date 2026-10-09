@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "รับรางวัล",
   "daily_quest_claimed": "รับแล้ว",
-  "daily_quest_in_progress": "กำลังดำเนินการ"
+  "daily_quest_in_progress": "กำลังดำเนินการ",
+  "liveops_bonus_level_label": "ระดับโบนัสถาวร",
+  "liveops_bonus_effect": "+2% เงินต่อระดับ และ +1 เนบิวลาต่อการทายถูกทุก ๆ 5 ระดับ สูงสุดระดับ 25 ใช้กับช่องบันทึกนี้เท่านั้น"
 }
