@@ -672,5 +672,8 @@
   "boss_defeated": "Natalo na ang boss",
   "world_locked_boss": "Buksan muna ang mundong ito",
   "boss_fight": "Hamunin ang boss",
-  "boss_requirements_pending": "Magpalakas pa bago lumaban"
+  "boss_requirements_pending": "Magpalakas pa bago lumaban",
+  "boss_hp_label": "Buhay ng boss",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "Atakihin ang boss"
 }
