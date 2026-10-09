@@ -792,5 +792,9 @@
   "widget_mastery": "精通 %d",
   "widget_worlds_bosses": "世界 %d • 首領 %d",
   "widget_quick_guess": "快速猜測",
-  "widget_next_slot": "下一個存檔"
+  "widget_next_slot": "下一個存檔",
+  "endgame_goal_rift": "通關無盡裂隙第10階",
+  "endgame_goal_mastery": "每個世界的精通等級達到5",
+  "endgame_claimed": "獎勵已領取",
+  "endgame_claim_reward": "領取獎勵"
 }
