@@ -653,5 +653,8 @@
   "boss_defeated": "Босс побеждён",
   "world_locked_boss": "Сначала откройте этот мир",
   "boss_fight": "Вызвать босса",
-  "boss_requirements_pending": "Усильтесь перед битвой"
+  "boss_requirements_pending": "Усильтесь перед битвой",
+  "boss_hp_label": "Здоровье босса",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "Атаковать босса"
 }
