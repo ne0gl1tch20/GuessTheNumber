@@ -762,5 +762,13 @@
   "map_fit_screen": "Ajustar a la pantalla",
   "world_mastery_bonus": "+%d%% de dinero por cada acierto en este mundo.",
   "beyond_numbers_title": "Más allá de los números",
-  "world_progress_summary": "Mundos desbloqueados: %d / 4 • Jefes derrotados: %d / 4"
+  "world_progress_summary": "Mundos desbloqueados: %d / 4 • Jefes derrotados: %d / 4",
+  "rift_title": "Grieta infinita",
+  "rift_description": "Vuelve a luchar contra los cuatro jefes en un desafío continuo. Cada victoria aumenta el nivel, la vida del jefe y las recompensas.",
+  "rift_best_tier": "Mejor nivel completado: %d",
+  "rift_active_tier": "Nivel actual: %d. El siguiente jefe te espera en el mapa del mundo.",
+  "rift_requirement": "Desbloquea la Grieta tras derrotar a los cuatro jefes del mundo.",
+  "rift_stop": "Salir de la Grieta infinita",
+  "rift_start": "Iniciar la Grieta infinita",
+  "rift_tier_label": "Grieta infinita • Nivel %d"
 }
