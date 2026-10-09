@@ -11,9 +11,19 @@
 - Kept the shared music manager alive across screen navigation; explicit stop controls the playback/service lifecycle.
 - Extended save-compatible `GameSettings` with music library/queue/playlist preference fields for future migration into the main save/preferences layer.
 
+## Completed in the latest notification/widget pass
+
+- Localized notification titles and bodies using the saved global app language instead of forcing English.
+- Kept reminder, progression and event notifications on separate channels with destination extras for navigation.
+- Routed supported notification destinations directly from MainActivity into the matching NavGraph start destination.
+- Changed the home-screen widget to render metrics from the latest saved game state instead of stale Glance preference snapshots.
+- Added a throttled widget refresh after game saves to avoid hammering widget updates during rapid gameplay.
+- Updated reminder scheduling to honor the selected 12/24/48-hour interval and reschedule when the interval changes.
+
 ## Still requires the remaining integration pass
 
-- Finish notification category settings/schedules and widget live-refresh wiring.
+- Add explicit per-category notification switches and wire real progression/event triggers to the corresponding channels.
+- Expand widget layouts with more selectable metrics, quick actions and selected-save-slot support.
 - Finish secret-area unique reward/action chains and deeper mastery/relic/Home Base/endgame cross-system effects.
 - Run the manual GitHub Actions validation/build and resolve compiler/lint/localization failures before calling the pass build-verified.
 
