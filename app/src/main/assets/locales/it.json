@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Completa il livello 10 della Fenditura infinita",
   "endgame_goal_mastery": "Raggiungi maestria 5 in ogni mondo",
   "endgame_claimed": "Ricompensa riscattata",
-  "endgame_claim_reward": "Riscatta ricompensa"
+  "endgame_claim_reward": "Riscatta ricompensa",
+  "music_control_previous": "Precedente",
+  "music_control_pause": "Pausa",
+  "music_control_play": "Riproduci",
+  "music_control_next": "Successivo",
+  "music_control_stop": "Ferma"
 }
