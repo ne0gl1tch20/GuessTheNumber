@@ -10,6 +10,7 @@
 - 📖 **Explorer's Codex**: Added collectible world, boss and secret-area entries plus a one-time 100 Nebula completion reward.
 - 🏆 **Endgame Goals**: Added long-term goals for boss victories, secret areas, relic collection and sanctuary restoration.
 - 🧭 **Navigation Integration**: Added direct More-menu entry points for World Map, Relics, Home Base, Codex, Endgame, Cloud Backup, Lucky Stake and Tutorial; registered their navigation destinations.
+- 🎮 **Play Hub Integration**: Added a live Beyond the Numbers card to Play with unlocked-world and defeated-boss counts plus direct World Map, Relics, Home Base and Codex shortcuts. The new hub labels and progress summary are present in all 23 locale files.
 - 💾 **Save Compatibility**: Added new progression fields with defaults so older save data can load without a reset.
 - 🌐 **Locale Coverage**: Added all new progression keys to the 23 locale JSON files. Filipino strings are translated; several newly added strings in other locales currently retain English values and need native-language review.
 - 🚀 **Major Version**: Bumped versionName to 2.0.0 and versionCode to 17.
