@@ -792,5 +792,9 @@
   "widget_mastery": "Maîtrise %d",
   "widget_worlds_bosses": "Mondes %d • Boss %d",
   "widget_quick_guess": "Deviner vite",
-  "widget_next_slot": "Emplacement suivant"
+  "widget_next_slot": "Emplacement suivant",
+  "endgame_goal_rift": "Terminer le niveau 10 de la Faille infinie",
+  "endgame_goal_mastery": "Atteindre la maîtrise 5 dans chaque monde",
+  "endgame_claimed": "Récompense récupérée",
+  "endgame_claim_reward": "Récupérer la récompense"
 }
