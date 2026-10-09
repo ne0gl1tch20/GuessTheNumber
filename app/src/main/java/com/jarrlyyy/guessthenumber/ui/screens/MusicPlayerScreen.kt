@@ -21,8 +21,9 @@ import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 fun MusicPlayerScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val locale = LocalAppLocaleManager.current
+    // BackgroundMusicManager is application-scoped and shared with GameViewModel.
+    // Do not release it from this screen: navigation must not stop app-wide playback.
     val manager = remember { BackgroundMusicManager(context.applicationContext) }
-    DisposableEffect(Unit) { onDispose { manager.release() } }
     val library by manager.library.collectAsState()
     val queue by manager.queue.collectAsState()
     val playlists by manager.playlists.collectAsState()
