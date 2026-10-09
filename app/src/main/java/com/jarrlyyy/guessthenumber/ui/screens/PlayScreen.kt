@@ -40,7 +40,7 @@ fun PlayScreen(
     }
 
     val infiniteTransition = rememberInfiniteTransition(label = "moe_pulse")
-    val scalePulse by infiniteTransition.animateFloat(
+    val animatedScalePulse by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = 1.02f,
         animationSpec = infiniteRepeatable(
@@ -49,6 +49,7 @@ fun PlayScreen(
         ),
         label = "pulse"
     )
+    val scalePulse = if (state.settings.reducedMotion) 1f else animatedScalePulse
 
     Scaffold(
         topBar = {
