@@ -783,5 +783,14 @@
   "notification_category_progression": "Fortschrittsmeilensteine",
   "notification_category_progression_desc": "Welten freischalten und Bosse besiegen",
   "notification_category_events": "Spielereignisse",
-  "notification_category_events_desc": "Neue Zufallsereignisse und zeitlich begrenzte Belohnungen"
+  "notification_category_events_desc": "Neue Zufallsereignisse und zeitlich begrenzte Belohnungen",
+  "widget_title": "🎯 Zahlenraten",
+  "widget_slot": "Speicherplatz %d • %s",
+  "widget_money": "Geld",
+  "widget_range": "Bereich",
+  "widget_streak": "Serie %d",
+  "widget_mastery": "Meisterschaft %d",
+  "widget_worlds_bosses": "Welten %d • Bosse %d",
+  "widget_quick_guess": "Schnell raten",
+  "widget_next_slot": "Nächster Speicherplatz"
 }
