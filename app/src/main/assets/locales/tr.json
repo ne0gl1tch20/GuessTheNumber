@@ -770,5 +770,11 @@
   "rift_requirement": "Dört dünya boss'unu da yenerek Yarık'ın kilidini aç.",
   "rift_stop": "Sonsuz Yarık'tan çık",
   "rift_start": "Sonsuz Yarık'ı başlat",
-  "rift_tier_label": "Sonsuz Yarık • Aşama %d"
+  "rift_tier_label": "Sonsuz Yarık • Aşama %d",
+  "notification_reminder_title": "Sayıyı Tahmin Et",
+  "notification_reminder_body": "Sayıların seni özledi! Geri dön ve sayıyı tahmin et!",
+  "notification_progression_title": "İlerleme dönüm noktası",
+  "notification_progression_body": "Yeni bir ilerleme dönüm noktası hazır.",
+  "notification_event_title": "Seni bir etkinlik bekliyor",
+  "notification_event_body": "Sınırlı süreli bir oyun etkinliği hazır."
 }
