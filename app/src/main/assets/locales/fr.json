@@ -770,5 +770,11 @@
   "rift_requirement": "Débloquez la Faille après avoir vaincu les quatre boss du monde.",
   "rift_stop": "Quitter la Faille infinie",
   "rift_start": "Lancer la Faille infinie",
-  "rift_tier_label": "Faille infinie • Niveau %d"
+  "rift_tier_label": "Faille infinie • Niveau %d",
+  "notification_reminder_title": "Devine le nombre",
+  "notification_reminder_body": "Tes nombres t’attendent ! Reviens jouer et devine le nombre !",
+  "notification_progression_title": "Étape de progression",
+  "notification_progression_body": "Une nouvelle étape de progression est disponible.",
+  "notification_event_title": "Un événement t’attend",
+  "notification_event_body": "Un événement à durée limitée est disponible."
 }
