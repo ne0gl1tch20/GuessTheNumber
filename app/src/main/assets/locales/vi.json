@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Vượt Ảnh Giới Vô Tận bậc 10",
   "endgame_goal_mastery": "Đạt tinh thông cấp 5 ở mọi thế giới",
   "endgame_claimed": "Đã nhận thưởng",
-  "endgame_claim_reward": "Nhận thưởng"
+  "endgame_claim_reward": "Nhận thưởng",
+  "music_control_previous": "Trước",
+  "music_control_pause": "Tạm dừng",
+  "music_control_play": "Phát",
+  "music_control_next": "Tiếp theo",
+  "music_control_stop": "Dừng"
 }
