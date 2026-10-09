@@ -3,6 +3,8 @@ package com.jarrlyyy.guessthenumber.ui.screens
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -24,6 +26,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -425,7 +430,8 @@ fun SaveSlotsScreen(
                         },
                         onDuplicate = { duplicateTarget = 0; showDuplicateDialog = slot },
                         onRestoreBackup = { showRestoreDialog = slot },
-                        locale = locale
+                        locale = locale,
+                        reducedMotion = viewModel.gameState.value.settings.reducedMotion
                     )
                 }
             }
@@ -471,21 +477,32 @@ fun SlotCard(
     onEditProfile: () -> Unit,
     onDuplicate: () -> Unit,
     onRestoreBackup: () -> Unit,
-    locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+    locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager,
+    reducedMotion: Boolean = false
 ) {
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
     val slotContainerColor by animateColorAsState(
         targetValue = if (isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-        animationSpec = spring(
+        animationSpec = if (reducedMotion) snap() else spring(
             dampingRatio = Spring.DampingRatioNoBouncy,
             stiffness = Spring.StiffnessMedium
         ),
         label = "save-slot-container"
     )
+    val slotScale by animateFloatAsState(
+        targetValue = if (isActive && !reducedMotion) 1.015f else 1f,
+        animationSpec = if (reducedMotion) snap() else spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "save-slot-scale"
+    )
+    val slotActionInteractionSource = remember { MutableInteractionSource() }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .scale(slotScale)
             .animateContentSize(),
         colors = CardDefaults.cardColors(containerColor = slotContainerColor)
     ) {
@@ -533,7 +550,13 @@ fun SlotCard(
                 )
                 Button(
                     onClick = onSelect,
-                    modifier = Modifier.align(Alignment.End)
+                    interactionSource = slotActionInteractionSource,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .expressivePressScale(
+                            interactionSource = slotActionInteractionSource,
+                            reducedMotion = reducedMotion
+                        )
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
@@ -561,7 +584,13 @@ fun SlotCard(
 
                 Button(
                     onClick = onSelect,
-                    modifier = Modifier.align(Alignment.End),
+                    interactionSource = slotActionInteractionSource,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .expressivePressScale(
+                            interactionSource = slotActionInteractionSource,
+                            reducedMotion = reducedMotion
+                        ),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                     )
