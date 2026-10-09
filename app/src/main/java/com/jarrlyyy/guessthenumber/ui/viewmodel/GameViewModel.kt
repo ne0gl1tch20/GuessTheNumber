@@ -1024,6 +1024,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             }
             "select_world" -> {
                 if (id !in state.unlockedWorldIds) return
+                if (state.endlessRiftActive && id != state.activeWorldId) return
                 state.copy(activeWorldId = id, activeBossBattleWorldId = if (state.activeBossBattleWorldId == id) id else null)
             }
             "secret" -> {
