@@ -32,6 +32,7 @@ import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
 fun PlayScreen(
     state: GameState,
     onMakeGuess: (Long) -> Unit,
+    onClaimDailyQuest: (String) -> Unit = {},
     incomePerSecond: com.jarrlyyy.guessthenumber.domain.model.BigNumber = com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -541,6 +542,83 @@ fun PlayScreen(
                                     )
                                 }
                             }
+                        }
+                    }
+                }
+            }
+            item {
+                DailyQuestBoard(
+                    state = state,
+                    locale = locale,
+                    onClaim = onClaimDailyQuest
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun DailyQuestBoard(
+    state: GameState,
+    locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager,
+    onClaim: (String) -> Unit
+) {
+    data class Quest(
+        val id: String,
+        val titleKey: String,
+        val descriptionKey: String,
+        val progress: Int,
+        val target: Int,
+        val rewardKey: String
+    )
+    val quests = listOf(
+        Quest("daily_guesses_10", "daily_quest_guesses_name", "daily_quest_guesses_desc", state.dailyQuestGuesses, 10, "daily_quest_reward_money"),
+        Quest("daily_correct_5", "daily_quest_correct_name", "daily_quest_correct_desc", state.dailyQuestCorrectGuesses, 5, "daily_quest_reward_nebula_25"),
+        Quest("daily_streak_5", "daily_quest_streak_name", "daily_quest_streak_desc", state.dailyQuestBestStreak, 5, "daily_quest_reward_nebula_50"),
+        Quest("daily_upgrades_3", "daily_quest_upgrades_name", "daily_quest_upgrades_desc", state.dailyQuestUpgradePurchases, 3, "daily_quest_reward_nebula_35")
+    )
+    Card(
+        modifier = Modifier.fillMaxWidth().animateContentSize(),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.tertiaryContainer) {
+                    Icon(Icons.Default.EmojiEvents, contentDescription = null, modifier = Modifier.padding(10.dp), tint = MaterialTheme.colorScheme.onTertiaryContainer)
+                }
+                Column(Modifier.weight(1f)) {
+                    Text(locale.getString("daily_quests_title"), style = MaterialTheme.typography.titleLarge)
+                    Text(locale.getString("daily_quests_subtitle"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text(locale.getString("daily_quests_reset"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
+            }
+            quests.forEach { quest ->
+                val claimed = quest.id in state.claimedDailyQuests
+                val progress = quest.progress.coerceIn(0, quest.target)
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(locale.getString(quest.titleKey), style = MaterialTheme.typography.titleSmall)
+                            Text(locale.getString(quest.descriptionKey), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Text(locale.getString("daily_quest_progress", progress, quest.target), style = MaterialTheme.typography.labelMedium)
+                    }
+                    LinearProgressIndicator(
+                        progress = { progress.toFloat() / quest.target.toFloat() },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = if (claimed) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(locale.getString(quest.rewardKey), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.tertiary, modifier = Modifier.weight(1f))
+                        Button(
+                            onClick = { onClaim(quest.id) },
+                            enabled = progress >= quest.target && !claimed,
+                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+                        ) {
+                            Text(locale.getString(if (claimed) "daily_quest_claimed" else if (progress >= quest.target) "daily_quest_claim" else "daily_quest_in_progress"))
                         }
                     }
                 }
