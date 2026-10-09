@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 
 private data class WorldMapNode(
@@ -189,7 +190,12 @@ fun WorldMapScreen(
                         }
                     } else {
                         Text(locale.getString("boss_defeated", "Boss defeated"))
-                        Text(locale.getString("world_mastery_label", "World mastery: %d", state.worldMasteryLevels[world.id] ?: 1))
+                        val mastery = state.worldMasteryLevels[world.id] ?: 1
+                        val masteryCost = BigNumber(10L * (mastery + 1L))
+                        Text(locale.getString("world_mastery_label", "World mastery: %d", mastery))
+                        Button(onClick = { onProgressionAction("mastery", world.id) }, enabled = mastery < 10 && state.nebula >= masteryCost, modifier = Modifier.fillMaxWidth()) {
+                            Text(locale.getString("world_mastery_upgrade", "Increase mastery • %s Nebula", masteryCost.format()))
+                        }
                     }
                     if (world.secretAt <= state.correctGuesses) {
                         Text(if (secretFound) locale.getString("secret_discovered", "Secret area discovered") else locale.getString("secret_available", "A hidden route has appeared! Tap its key on the map."), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodySmall)
