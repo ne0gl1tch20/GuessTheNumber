@@ -1,5 +1,14 @@
 # 🚀 Guess The Number Simulator - Changelog
 
+## v1.16.0 (Expressive Motion & Gameplay Feedback)
+
+- 🌀 **Expressive Save Loading**: Added a pulsing save icon, indeterminate progress ring, and animated loading dots tied to the real save-switch loading state.
+- 🎮 **Gameplay Feedback**: Added animated currency and guess feedback, a morphing guess button, tactile press responses, and a celebration banner for correct guesses.
+- ✨ **Progression Celebrations**: Added event-driven banners for achievement unlocks, Prestige resets, and Ultra resets.
+- 🧭 **Animated Screens & Navigation**: Expanded spring-based motion across save slots, upgrades, shop, achievements, arcade results, tutorial steps, crash recovery, and navigation transitions.
+- ♿ **Reduced Motion Support**: New motion effects respect the existing reduced-motion preference.
+- 📱 **Version**: Bumped to versionCode 16 / versionName 1.16.0.
+
 ## v1.15.0 (Expressive More Menu & Persistent Reordering)
 
 - 🎨 **More Expressive Material 3 UI**: Expanded the More Hub's Material 3 Expressive treatment with richer surfaces, rounded shapes, drag elevation, animated selection feedback, and clearer visual hierarchy.
