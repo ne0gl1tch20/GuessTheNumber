@@ -762,5 +762,13 @@
   "map_fit_screen": "Aan scherm aanpassen",
   "world_mastery_bonus": "+%d%% geld per goed antwoord in deze wereld.",
   "beyond_numbers_title": "Voorbij de getallen",
-  "world_progress_summary": "Vrijgespeelde werelden: %d / 4 • Verslagen bazen: %d / 4"
+  "world_progress_summary": "Vrijgespeelde werelden: %d / 4 • Verslagen bazen: %d / 4",
+  "rift_title": "Eindeloze Rift",
+  "rift_description": "Vecht opnieuw tegen alle vier de bazen in een doorlopende uitdaging. Elke overwinning verhoogt het niveau, de baas-HP en beloningen.",
+  "rift_best_tier": "Beste voltooide niveau: %d",
+  "rift_active_tier": "Huidig niveau: %d. De volgende baas wacht op de wereldkaart.",
+  "rift_requirement": "Ontgrendel de Rift door alle vier de wereldbazen te verslaan.",
+  "rift_stop": "Eindeloze Rift verlaten",
+  "rift_start": "Eindeloze Rift starten",
+  "rift_tier_label": "Eindeloze Rift • Niveau %d"
 }
