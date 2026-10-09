@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.data.crash.AppErrorHandler
 
 @Composable
-fun CrashRecoveryScreen(locale: LocaleManager, onDismiss: () -> Unit) {
+fun CrashRecoveryScreen(locale: LocaleManager, onDismiss: () -> Unit, reducedMotion: Boolean = false) {
     val context = LocalContext.current
     val crashLog = remember { AppErrorHandler.getCrashLog() }
     val scrollState = rememberScrollState()
@@ -41,7 +41,7 @@ fun CrashRecoveryScreen(locale: LocaleManager, onDismiss: () -> Unit) {
     ) {
         AnimatedVisibility(
             visible = showRecoveryContent,
-            enter = scaleIn(initialScale = 0.97f) + fadeIn()
+            enter = if (reducedMotion) fadeIn() else scaleIn(initialScale = 0.97f) + fadeIn()
         ) {
         Column(
             modifier = Modifier
