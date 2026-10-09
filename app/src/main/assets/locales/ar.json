@@ -793,5 +793,9 @@
   "widget_mastery": "الإتقان %d",
   "widget_worlds_bosses": "العوالم %d • الزعماء %d",
   "widget_quick_guess": "تخمين سريع",
-  "widget_next_slot": "الخانة التالية"
+  "widget_next_slot": "الخانة التالية",
+  "endgame_goal_rift": "أكمل المستوى 10 من الصدع اللانهائي",
+  "endgame_goal_mastery": "حقق مستوى إتقان 5 في كل عالم",
+  "endgame_claimed": "تم استلام المكافأة",
+  "endgame_claim_reward": "استلام المكافأة"
 }
