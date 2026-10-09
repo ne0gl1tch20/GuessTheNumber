@@ -1,10 +1,24 @@
-# Project Memory: Gamified Guess the Number Simulator (v1.16.0 Update)
+# Project Memory: Gamified Guess the Number Simulator (v2.0.0 Update)
 
 ## Project Overview
 
 **Current player-facing pitch:** Start with a simple number guess, then build a run around upgrades, Frenzy streaks, random events, achievement tiers, cosmetics, stackable mutators, and custom challenges. v1.12 is intended to feel like a game you can keep poking at because every run can be pushed, optimized, or made weird in a different way. 🎮✨
 
-A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.16.0`.
+A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v2.0.0` (versionCode 17).
+
+
+
+## v2.0.0 Beyond the Numbers Expansion
+- Current release metadata in `app/build.gradle.kts`: versionName `2.0.0`, versionCode `17`.
+- Added backward-compatible per-save fields: `relicInventory`, `equippedRelicIds`, `worldMasteryLevels`, `discoveredSecretIds`, `codexEntries`, `homeBaseLevel`, `activeBossBattleWorldId`, `bossBattleMistakes`, and `codexRewardClaimed`.
+- Added `WorldMapScreen.kt`: pinch/gesture zoom, drag panning, clickable world nodes, unlock requirements, secret-area markers, boss health, phase display and mastery upgrades.
+- Boss combat is guessing-driven: starting a battle makes correct manual or auto-clicker guesses damage the active boss. Every third incorrect guess restores one HP. Boss victories grant their one-time Money/Nebula reward, relic, Codex entries and initial world mastery.
+- Replaced the flat Talent screen with a zoomable connected skill tree. Talent purchases now check parent prerequisites and persist through the prestige currency. Speed talents boost auto-clicker speed; precision talents add critical reward chance; Nebula Resonance adds 50% correct-guess Money; Cosmic Oracle adds one Nebula per correct guess.
+- Added `ProgressionScreens.kt` with Relics, Home Base, Explorer's Codex and Endgame screens. Up to two relics can be equipped. Relics add correct-guess bonuses; each Home Base level adds 2% Money bonus up to 40%. Codex completion grants 100 Nebula once all 12 entries are discovered.
+- Added direct More-menu shortcuts and navigation destinations for World Map, Relics, Home Base, Codex, Endgame, Cloud Backup, Lucky Stake and Tutorial. Lucky Stake now settles currency changes through the ViewModel.
+- Locale keys for new progression UI have been added across all 23 locale JSON files. Filipino additions are translated; the newly added English fallback strings in other locales need native-language translation review before claiming complete localization quality.
+- Changelog v2.0.0 is recorded in `app/src/main/assets/changelogs.md`.
+- Validation status: GitHub source edits were committed directly to `master`. An Android build and emulator/runtime verification have not been run in this pass; verify compile and navigation before release.
 
 ## Strict Project Rules: Localization & Open-Source Licenses
 - **EVERYTHING USER-VISIBLE MUST BE LOCALIZED**: Zero hardcoded user-visible strings (screen titles, buttons, dialogs, toasts, accessibility descriptions, achievements, upgrades, shop items, settings, dynamic text formatting with `%s`/`%d`) in Kotlin/Compose UI. All strings must reside in `assets/locales/en_us.json` and be fetched via `LocaleManager`.
