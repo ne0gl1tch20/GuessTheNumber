@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Voltooi niveau 10 van de Eindeloze Spleet",
   "endgame_goal_mastery": "Bereik meesterschap 5 in elke wereld",
   "endgame_claimed": "Beloning opgehaald",
-  "endgame_claim_reward": "Beloning ophalen"
+  "endgame_claim_reward": "Beloning ophalen",
+  "music_control_previous": "Vorige",
+  "music_control_pause": "Pauze",
+  "music_control_play": "Afspelen",
+  "music_control_next": "Volgende",
+  "music_control_stop": "Stoppen"
 }
