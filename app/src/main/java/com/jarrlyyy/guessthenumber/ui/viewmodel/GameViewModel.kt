@@ -406,8 +406,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
         }
         val isCorrect = result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
+        val talentAdjustedState = applyTalentBonuses(currentState, result.newState, isCorrect)
         val progressedState = recordLootDrop(
-            recordDailyGuess(currentState, result.newState, isCorrect),
+            recordDailyGuess(currentState, talentAdjustedState, isCorrect),
             isCorrect
         )
         _gameState.value = progressedState
@@ -680,6 +681,29 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         _gameState.value = state.copy(ultra = newUltra, ultraUpgradeLevels = newLevels)
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_ULTRA_UPGRADE", "Bought ultra upgrade $upgradeId to level $newLevel")
+    }
+
+    fun buyTalent(talentId: String, cost: Long) {
+        val state = _gameState.value
+        val parents = mapOf("talent_speed_2" to "talent_speed_1", "talent_crit_2" to "talent_crit_1", "talent_reward_1" to "talent_crit_2", "talent_master_1" to "talent_reward_1")
+        if (talentId in state.prestigeShopPurchases || state.prestige < BigNumber(cost)) return
+        val parent = parents[talentId]
+        if (parent != null && parent !in state.prestigeShopPurchases) return
+        _gameState.value = state.copy(prestige = state.prestige - BigNumber(cost), prestigeShopPurchases = state.prestigeShopPurchases + talentId)
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_TALENT", "Unlocked talent $talentId")
+    }
+
+    private fun applyTalentBonuses(before: GameState, after: GameState, correct: Boolean): GameState {
+        if (!correct || before.prestigeShopPurchases.isEmpty()) return after
+        val earned = after.money - before.money
+        if (earned <= BigNumber.ZERO) return after
+        var bonusMoney = BigNumber.ZERO
+        if ("talent_reward_1" in before.prestigeShopPurchases) bonusMoney += earned * BigNumber(0.5)
+        val criticalChance = when { "talent_crit_2" in before.prestigeShopPurchases -> 0.15; "talent_crit_1" in before.prestigeShopPurchases -> 0.05; else -> 0.0 }
+        if (criticalChance > 0.0 && Random.nextDouble() < criticalChance) bonusMoney += earned
+        val bonusNebula = if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L
+        return after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(bonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + bonusNebula))
     }
 
     fun buyPrestigeShopItem(itemId: String, cost: Long) {
@@ -1175,7 +1199,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         autoClickerJob = viewModelScope.launch(Dispatchers.Default) {
             while (true) {
                 val state = _gameState.value
-                val effectiveSpeed = state.autoClickerSpeed * if ("mut_speed" in state.activeMutators) 3.0 else 1.0
+                val talentSpeed = (if ("talent_speed_1" in state.prestigeShopPurchases) 1.25 else 1.0) * (if ("talent_speed_2" in state.prestigeShopPurchases) 1.5 else 1.0)
+                val effectiveSpeed = state.autoClickerSpeed * talentSpeed * if ("mut_speed" in state.activeMutators) 3.0 else 1.0
                 val delayMillis = if (state.autoClickerActive && effectiveSpeed > 0.0) {
                     (1000.0 / effectiveSpeed).toLong()
                 } else {
@@ -1195,10 +1220,16 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                         if (isCorrect) {
                             guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
                         }
-                        _gameState.value = recordLootDrop(
-                            recordDailyGuess(currentState, result.newState, isCorrect),
+                        val talentAdjustedState = applyTalentBonuses(currentState, result.newState, isCorrect)
+                        val progressedState = recordLootDrop(
+                            recordDailyGuess(currentState, talentAdjustedState, isCorrect),
                             isCorrect
                         )
+                        _gameState.value = progressedState
+                        val activeBossWorld = progressedState.activeBossBattleWorldId
+                        if (activeBossWorld != null) {
+                            worldProgressAction(activeBossWorld, if (isCorrect) "boss_hit" else "boss_miss")
+                        }
                         saveGameAsync()
                     }
                 }
