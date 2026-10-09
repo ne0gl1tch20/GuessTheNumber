@@ -18,6 +18,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import kotlinx.coroutines.delay
 import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import com.jarrlyyy.guessthenumber.BuildConfig
@@ -40,6 +42,15 @@ fun PlayScreen(
     var showCorrectCelebration by remember { mutableStateOf(false) }
     var observedCorrectGuesses by remember { mutableStateOf(state.correctGuesses) }
     val guessInteractionSource = remember { MutableInteractionSource() }
+    val isGuessPressed by guessInteractionSource.collectIsPressedAsState()
+    val guessCornerRadius by animateDpAsState(
+        targetValue = if (isGuessPressed && !state.settings.reducedMotion) 20.dp else 28.dp,
+        animationSpec = if (state.settings.reducedMotion) snap() else spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "guessButtonShape"
+    )
 
     LaunchedEffect(state.correctGuesses, state.settings.reducedMotion) {
         val foundNewNumber = state.correctGuesses > observedCorrectGuesses
@@ -495,7 +506,7 @@ fun PlayScreen(
                                 )
                                 .fillMaxWidth()
                                 .height(56.dp),
-                            shape = MaterialTheme.shapes.extraLarge,
+                            shape = RoundedCornerShape(guessCornerRadius),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
                             Icon(imageVector = Icons.Default.Check, contentDescription = null, modifier = Modifier.size(20.dp))
