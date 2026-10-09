@@ -8,49 +8,68 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.jarrlyyy.guessthenumber.MainActivity
 import com.jarrlyyy.guessthenumber.R
+import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+import kotlinx.coroutines.runBlocking
 
 object NotificationHelper {
     const val CHANNEL_ID = "game_reminder_channel"
+    const val PROGRESSION_CHANNEL_ID = "progression_channel"
+    const val EVENT_CHANNEL_ID = "event_channel"
     const val NOTIFICATION_ID = 1001
+    const val PROGRESSION_NOTIFICATION_ID = 1002
+    const val EVENT_NOTIFICATION_ID = 1003
 
-    fun createNotificationChannel(context: Context) {
-        val name = "Game Reminders"
-        val descriptionText = "Reminders to come back and play Guess The Number"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-            description = descriptionText
-        }
-        val notificationManager: NotificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
+    enum class Type(val channelId: String, val id: Int, val titleKey: String, val bodyKey: String, val fallbackTitle: String, val fallbackBody: String, val destination: String) {
+        REMINDER(CHANNEL_ID, NOTIFICATION_ID, "notification_reminder_title", "notification_reminder_body", "Guess The Number", "Your numbers miss you! Come back and guess the number!", "play"),
+        PROGRESSION(PROGRESSION_CHANNEL_ID, PROGRESSION_NOTIFICATION_ID, "notification_progression_title", "notification_progression_body", "Progression milestone", "A new progression milestone is ready.", "world_map"),
+        EVENT(EVENT_CHANNEL_ID, EVENT_NOTIFICATION_ID, "notification_event_title", "notification_event_body", "A game event is waiting", "A limited game event is ready.", "live_ops")
     }
 
-    fun showReminderNotification(context: Context) {
-        createNotificationChannel(context)
+    fun createNotificationChannels(context: Context) {
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val locale = LocaleManager(context)
+        runBlocking { locale.loadLocale("en_us.json") }
+        listOf(
+            NotificationChannel(CHANNEL_ID, locale.getString("notification_channel_reminders", "Game Reminders"), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = locale.getString("notification_channel_reminders_desc", "Optional reminders to return to Guess The Number")
+            },
+            NotificationChannel(PROGRESSION_CHANNEL_ID, locale.getString("notification_channel_progression", "Progression"), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = locale.getString("notification_channel_progression_desc", "Optional progression milestone notifications")
+            },
+            NotificationChannel(EVENT_CHANNEL_ID, locale.getString("notification_channel_events", "Events"), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = locale.getString("notification_channel_events_desc", "Optional event notifications")
+            }
+        ).forEach(manager::createNotificationChannel)
+    }
 
+    fun createNotificationChannel(context: Context) = createNotificationChannels(context)
+
+    fun show(context: Context, type: Type) {
+        createNotificationChannels(context)
+        val locale = LocaleManager(context)
+        runBlocking { locale.loadLocale("en_us.json") }
         val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("notification_destination", type.destination)
         }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+        val pendingIntent = PendingIntent.getActivity(context, type.id, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        val notification = NotificationCompat.Builder(context, type.channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Guess The Number")
-            .setContentText("Your numbers miss you! Come back and guess the number!")
+            .setContentTitle(locale.getString(type.titleKey, type.fallbackTitle))
+            .setContentText(locale.getString(type.bodyKey, type.fallbackBody))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-
+            .build()
         try {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(NOTIFICATION_ID, builder.build())
+            notificationManager.notify(type.id, notification)
         } catch (_: SecurityException) {
-            // Permission might not be granted
+            // Permission can be denied on Android 13+.
         }
     }
+
+    fun showReminderNotification(context: Context) = show(context, Type.REMINDER)
+    fun showProgressionNotification(context: Context) = show(context, Type.PROGRESSION)
+    fun showEventNotification(context: Context) = show(context, Type.EVENT)
 }
