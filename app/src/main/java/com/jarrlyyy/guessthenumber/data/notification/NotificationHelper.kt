@@ -68,6 +68,9 @@ object NotificationHelper {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
+                // Progression can unlock several milestones in one action. Reuse the
+                // category notification without repeatedly sounding for the same ID.
+                .setOnlyAlertOnce(true)
                 .build()
             try {
                 val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
