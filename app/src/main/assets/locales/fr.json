@@ -653,5 +653,8 @@
   "boss_defeated": "Boss vaincu",
   "world_locked_boss": "Débloquez d’abord ce monde",
   "boss_fight": "Défier le boss",
-  "boss_requirements_pending": "Progressez encore avant le combat"
+  "boss_requirements_pending": "Progressez encore avant le combat",
+  "boss_hp_label": "Vie du boss",
+  "boss_hp_progress": "%d / %d PV",
+  "boss_attack": "Attaquer le boss"
 }
