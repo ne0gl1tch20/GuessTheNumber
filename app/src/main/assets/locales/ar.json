@@ -654,5 +654,8 @@
   "boss_defeated": "تم هزيمة الزعيم",
   "world_locked_boss": "افتح هذا العالم أولًا",
   "boss_fight": "تحدَّ الزعيم",
-  "boss_requirements_pending": "تدرّب أكثر قبل القتال"
+  "boss_requirements_pending": "تدرّب أكثر قبل القتال",
+  "boss_hp_label": "صحة الزعيم",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "هاجم الزعيم"
 }
