@@ -759,5 +759,6 @@
   "world_mastery_upgrade": "Increase mastery • %s Nebula",
   "relic_set_bonus": "Set bonus: equipping two relics adds another 10% Money to correct-guess rewards.",
   "home_base_bonus": "Each sanctuary level adds 2% Money to correct-guess rewards, up to 40%.",
-  "map_fit_screen": "Vừa màn hình"
+  "map_fit_screen": "Vừa màn hình",
+  "world_mastery_bonus": "+%d%% tiền cho mỗi lần đoán đúng trong thế giới này."
 }
