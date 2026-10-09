@@ -1407,7 +1407,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 _gameState.value = state.copy(
                     nebula = state.nebula + BigNumber(rewardNebula),
                     liveOpsClaims = state.liveOpsClaims + (eventId to (claims + 1)),
-                    permanentEventBoosts = state.permanentEventBoosts + 1,
+                    permanentEventBoosts = (state.permanentEventBoosts + 1).coerceAtMost(25),
                     statistics = state.statistics.copy(
                         nebulaEarned = state.statistics.nebulaEarned + rewardNebula
                     )
