@@ -29,7 +29,7 @@ object NotificationHelper {
     enum class Type(val channelId: String, val id: Int, val titleKey: String, val bodyKey: String, val fallbackTitle: String, val fallbackBody: String, val destination: String, val preferenceKey: String) {
         REMINDER(CHANNEL_ID, NOTIFICATION_ID, "notification_reminder_title", "notification_reminder_body", "Guess The Number", "Your numbers miss you! Come back and guess the number!", "play", "notificationRemindersEnabled"),
         PROGRESSION(PROGRESSION_CHANNEL_ID, PROGRESSION_NOTIFICATION_ID, "notification_progression_title", "notification_progression_body", "Progression milestone", "A new progression milestone is ready.", "world_map", "notificationProgressionEnabled"),
-        EVENT(EVENT_CHANNEL_ID, EVENT_NOTIFICATION_ID, "notification_event_title", "notification_event_body", "A game event is waiting", "A limited game event is ready.", "live_ops", "notificationEventsEnabled")
+        EVENT(EVENT_CHANNEL_ID, EVENT_NOTIFICATION_ID, "notification_event_title", "notification_event_body", "A game event is waiting", "A limited game event is ready.", "play", "notificationEventsEnabled")
     }
 
     fun createNotificationChannels(context: Context) {
