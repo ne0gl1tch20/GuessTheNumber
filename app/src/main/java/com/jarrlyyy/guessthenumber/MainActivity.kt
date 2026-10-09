@@ -110,7 +110,8 @@ class MainActivity : ComponentActivity() {
                             onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
                             onActivateChallengeBuilder = { ids -> viewModel.activateChallengeBuilder(ids) },
                             viewModel = viewModel,
-                            initialDestination = notificationDestination
+                            initialDestination = notificationDestination,
+                            onNotificationDestinationHandled = { notificationDestination = null }
                         )
                     }
                 }
