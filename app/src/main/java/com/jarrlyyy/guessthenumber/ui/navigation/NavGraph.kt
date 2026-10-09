@@ -126,7 +126,7 @@ fun NavGraph(
     }
 
     if (hasPreviousCrash) {
-        CrashRecoveryScreen(locale = locale, onDismiss = onDismissCrash)
+        CrashRecoveryScreen(locale = locale, onDismiss = onDismissCrash, reducedMotion = state.settings.reducedMotion)
         return
     }
 
