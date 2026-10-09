@@ -65,11 +65,13 @@ fun PrestigeScreen(
             // Currency Display
             item {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().animateContentSize(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(localizedText("Prestige Balance: ${state.prestige.format()}"), color = PrestigeBlue, fontSize = 20.sp)
+                        AnimatedContent(targetState = state.prestige.format(), label = "prestigeBalance") { balance ->
+                            Text(localizedText("Prestige Balance: $balance"), color = PrestigeBlue, fontSize = 20.sp)
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(localizedText("Requirement: ${requiredMoney.format()} Money (Reset #${state.prestigeCount + 1})"))
                         Text(localizedText("Current Money: ${state.money.format()}"))
