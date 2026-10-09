@@ -1158,8 +1158,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 )
             }
             "claim_codex" -> {
-                val totalEntries = 12
-                if (state.codexRewardClaimed || state.codexEntries.size < totalEntries) return
+                val requiredEntries = setOf(
+                    "world:verdant_grove", "world:crystal_caverns", "world:ember_summit", "world:nebula_rift",
+                    "boss:verdant_guardian", "boss:crystal_golem", "boss:ember_dragon", "boss:nebula_titan",
+                    "secret:whispering_hollow", "secret:shard_archive", "secret:ashen_vault", "secret:lost_observatory"
+                )
+                if (state.codexRewardClaimed || !state.codexEntries.containsAll(requiredEntries)) return
                 state.copy(nebula = state.nebula + BigNumber(100), codexRewardClaimed = true, statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 100))
             }
             "claim_endgame_reward" -> {
