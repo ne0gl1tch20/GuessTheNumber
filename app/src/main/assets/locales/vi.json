@@ -762,5 +762,13 @@
   "map_fit_screen": "Vừa màn hình",
   "world_mastery_bonus": "+%d%% tiền cho mỗi lần đoán đúng trong thế giới này.",
   "beyond_numbers_title": "Vượt Xa Những Con Số",
-  "world_progress_summary": "Thế giới đã mở khóa: %d / 4 • Trùm đã đánh bại: %d / 4"
+  "world_progress_summary": "Thế giới đã mở khóa: %d / 4 • Trùm đã đánh bại: %d / 4",
+  "rift_title": "Khe Nứt Vô Tận",
+  "rift_description": "Đấu lại cả bốn trùm trong thử thách liên tục. Mỗi chiến thắng tăng cấp, HP trùm và phần thưởng.",
+  "rift_best_tier": "Cấp cao nhất đã vượt qua: %d",
+  "rift_active_tier": "Cấp hiện tại: %d. Trùm tiếp theo đang chờ trên Bản đồ Thế giới.",
+  "rift_requirement": "Mở khóa Khe Nứt sau khi đánh bại cả bốn trùm thế giới.",
+  "rift_stop": "Rời Khe Nứt Vô Tận",
+  "rift_start": "Bắt đầu Khe Nứt Vô Tận",
+  "rift_tier_label": "Khe Nứt Vô Tận • Cấp %d"
 }
