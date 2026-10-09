@@ -35,11 +35,11 @@
 - Endgame goals expose reward-claim buttons when their requirements are met, and the Codex completion reward requires all 12 core world/boss/secret entries instead of being affected by bonus Codex entries.
 
 ## Completed in the follow-up audit pass
-- Live Ops is now offline-only: the event manifest is read from the bundled asset instead of attempting a remote GitHub fetch.
+- Live Ops is now offline-only: the event manifest is read from the bundled asset instead of attempting a remote GitHub fetch. Event availability automatically follows the bundled start/end dates, so scheduled events can activate and expire without a network refresh.
 - Live Ops claims now validate event status/date and per-event claim limits, grant the displayed 10 Nebula, increment the persisted claim count and permanent boost level, and update lifetime Nebula earnings. The boost level now contributes +2% correct-guess money per level (capped at 25 levels) and +1 Nebula per correct guess for every 5 levels.
 - Arcade reward payouts now update lifetime money/Nebula earned statistics too.
 
-- Completed the missing daily-bounty labels across the remaining locale catalogs. A key/placeholder audit now reports 822 matching English keys in every locale catalog; Arabic also retains its existing `rtl` metadata key. No missing keys or `%s/%d/%f/%i` placeholder mismatches were found in the audited catalogs.
+- Completed the missing daily-bounty labels across the remaining locale catalogs. A key/placeholder audit now reports 824 matching English keys in every locale catalog; Arabic also retains its existing `rtl` metadata key. No missing keys or `%s/%d/%f/%i` placeholder mismatches were found in the audited catalogs.
 - Daily bounty claims now update `statistics.moneyEarned` or `statistics.nebulaEarned` alongside the actual payout, keeping lifetime earned totals aligned with rewards.
 
 
