@@ -52,6 +52,7 @@ fun SaveSlotsScreen(
     val scope = rememberCoroutineScope()
     val activeSlot by viewModel.activeSlot.collectAsState()
     val hasLegacySave by viewModel.hasLegacySave.collectAsState()
+    val gameState by viewModel.gameState.collectAsState()
 
     val slotMetadata = remember {
         mutableStateListOf<SaveSlotMetadata?>().apply {
@@ -431,7 +432,7 @@ fun SaveSlotsScreen(
                         onDuplicate = { duplicateTarget = 0; showDuplicateDialog = slot },
                         onRestoreBackup = { showRestoreDialog = slot },
                         locale = locale,
-                        reducedMotion = viewModel.gameState.value.settings.reducedMotion
+                        reducedMotion = gameState.settings.reducedMotion
                     )
                 }
             }
