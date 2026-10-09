@@ -770,5 +770,11 @@
   "rift_requirement": "击败全部四位世界首领后解锁裂隙。",
   "rift_stop": "离开无尽裂隙",
   "rift_start": "开始无尽裂隙",
-  "rift_tier_label": "无尽裂隙 • 第 %d 层"
+  "rift_tier_label": "无尽裂隙 • 第 %d 层",
+  "notification_reminder_title": "猜数字",
+  "notification_reminder_body": "你的数字想你了！回来猜猜数字吧！",
+  "notification_progression_title": "进度里程碑",
+  "notification_progression_body": "新的进度里程碑已准备就绪。",
+  "notification_event_title": "游戏活动正在等待",
+  "notification_event_body": "限时游戏活动已准备就绪。"
 }
