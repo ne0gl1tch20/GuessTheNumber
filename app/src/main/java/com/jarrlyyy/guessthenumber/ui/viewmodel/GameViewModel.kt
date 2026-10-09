@@ -935,9 +935,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         if (action == "boss") {
-            if (worldId !in state.unlockedWorldIds || bossId in state.defeatedBossIds) return
+            if (worldId !in state.unlockedWorldIds || (bossId in state.defeatedBossIds && !state.endlessRiftActive)) return
             if (state.activeBossBattleWorldId == worldId) { _gameState.value = state.copy(activeBossBattleWorldId = null); saveGameAsync(); return }
-            val canFight = when (worldId) {
+            val canFight = state.endlessRiftActive || when (worldId) {
                 "verdant_grove" -> state.correctGuesses >= 10 && totalUpgradeLevels >= 3
                 "crystal_caverns" -> state.correctGuesses >= 50 && totalUpgradeLevels >= 10
                 "ember_summit" -> state.correctGuesses >= 150 && totalUpgradeLevels >= 25 && state.prestigeCount >= 1
@@ -946,8 +946,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             if (canFight) { _gameState.value = state.copy(activeWorldId = worldId, activeBossBattleWorldId = worldId); saveGameAsync(); GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "BOSS_BATTLE_STARTED", "Started boss battle $bossId") }
             return
         }
-        if (state.activeBossBattleWorldId != worldId || worldId !in state.unlockedWorldIds || bossId in state.defeatedBossIds) return
-        val bossHp = when (worldId) { "verdant_grove" -> 3; "crystal_caverns" -> 5; "ember_summit" -> 7; else -> 10 }
+        if (state.activeBossBattleWorldId != worldId || worldId !in state.unlockedWorldIds || (bossId in state.defeatedBossIds && !state.endlessRiftActive)) return
+        val baseBossHp = when (worldId) { "verdant_grove" -> 3; "crystal_caverns" -> 5; "ember_summit" -> 7; else -> 10 }
+        val bossHp = baseBossHp + if (state.endlessRiftActive) ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
         val damage = state.bossBattleProgress[bossId] ?: 0
         if (action == "boss_miss") {
             val misses = (state.bossBattleMistakes[bossId] ?: 0) + 1
@@ -969,9 +970,33 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_HIT", "Hit boss $bossId: $nextDamage/$bossHp")
             return
         }
-        val moneyReward = when (worldId) { "verdant_grove" -> BigNumber(25_000); "crystal_caverns" -> BigNumber(100_000); "ember_summit" -> BigNumber(500_000); else -> BigNumber(5_000_000) }
-        val nebulaReward = when (worldId) { "verdant_grove" -> 10L; "crystal_caverns" -> 25L; "ember_summit" -> 75L; else -> 250L }
-        _gameState.value = state.copy(money = state.money + moneyReward, nebula = state.nebula + BigNumber(nebulaReward), defeatedBossIds = state.defeatedBossIds + bossId, worldBossVictories = state.worldBossVictories + 1, bossBattleProgress = state.bossBattleProgress + (bossId to bossHp), activeBossBattleWorldId = null, relicInventory = state.relicInventory + bossId, codexEntries = state.codexEntries + setOf("world:$worldId", "boss:$bossId"), worldMasteryLevels = state.worldMasteryLevels + (worldId to ((state.worldMasteryLevels[worldId] ?: 0) + 1)), statistics = state.statistics.copy(moneyEarned = state.statistics.moneyEarned + moneyReward, nebulaEarned = state.statistics.nebulaEarned + nebulaReward))
+        val baseMoneyReward = when (worldId) { "verdant_grove" -> BigNumber(25_000); "crystal_caverns" -> BigNumber(100_000); "ember_summit" -> BigNumber(500_000); else -> BigNumber(5_000_000) }
+        val baseNebulaReward = when (worldId) { "verdant_grove" -> 10L; "crystal_caverns" -> 25L; "ember_summit" -> 75L; else -> 250L }
+        if (state.endlessRiftActive) {
+            val tierMultiplier = state.endlessRiftTier.coerceAtLeast(1)
+            val moneyReward = baseMoneyReward * BigNumber(tierMultiplier)
+            val nebulaReward = baseNebulaReward * tierMultiplier.toLong()
+            val order = listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift")
+            val nextWorld = order[(order.indexOf(worldId).coerceAtLeast(0) + 1) % order.size]
+            val nextBoss = when (nextWorld) { "verdant_grove" -> "verdant_guardian"; "crystal_caverns" -> "crystal_golem"; "ember_summit" -> "ember_dragon"; else -> "nebula_titan" }
+            val nextTier = state.endlessRiftTier + 1
+            _gameState.value = state.copy(
+                money = state.money + moneyReward,
+                nebula = state.nebula + BigNumber(nebulaReward),
+                worldBossVictories = state.worldBossVictories + 1,
+                bossBattleProgress = state.bossBattleProgress + (bossId to bossHp) + (nextBoss to 0),
+                bossBattleMistakes = state.bossBattleMistakes + (nextBoss to 0),
+                activeWorldId = nextWorld,
+                activeBossBattleWorldId = nextWorld,
+                endlessRiftTier = nextTier,
+                endlessRiftBestTier = maxOf(state.endlessRiftBestTier, state.endlessRiftTier),
+                statistics = state.statistics.copy(moneyEarned = state.statistics.moneyEarned + moneyReward, nebulaEarned = state.statistics.nebulaEarned + nebulaReward)
+            )
+            saveGameAsync()
+            GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "ENDLESS_RIFT_CLEARED", "Cleared Rift tier ${state.endlessRiftTier}")
+            return
+        }
+        _gameState.value = state.copy(money = state.money + baseMoneyReward, nebula = state.nebula + BigNumber(baseNebulaReward), defeatedBossIds = state.defeatedBossIds + bossId, worldBossVictories = state.worldBossVictories + 1, bossBattleProgress = state.bossBattleProgress + (bossId to bossHp), activeBossBattleWorldId = null, relicInventory = state.relicInventory + bossId, codexEntries = state.codexEntries + setOf("world:$worldId", "boss:$bossId"), worldMasteryLevels = state.worldMasteryLevels + (worldId to ((state.worldMasteryLevels[worldId] ?: 0) + 1)), statistics = state.statistics.copy(moneyEarned = state.statistics.moneyEarned + baseMoneyReward, nebulaEarned = state.statistics.nebulaEarned + baseNebulaReward))
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_DEFEATED", "Defeated boss $bossId")
     }
@@ -980,6 +1005,23 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun progressionAction(action: String, id: String) {
         val state = _gameState.value
         val updated = when (action) {
+            "rift_start" -> {
+                val requiredBosses = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+                if (state.endlessRiftActive || !state.defeatedBossIds.containsAll(requiredBosses)) return
+                val tier = maxOf(1, state.endlessRiftBestTier + 1)
+                state.copy(
+                    endlessRiftActive = true,
+                    endlessRiftTier = tier,
+                    activeWorldId = "verdant_grove",
+                    activeBossBattleWorldId = "verdant_grove",
+                    bossBattleProgress = state.bossBattleProgress + ("verdant_guardian" to 0),
+                    bossBattleMistakes = state.bossBattleMistakes + ("verdant_guardian" to 0)
+                )
+            }
+            "rift_stop" -> {
+                if (!state.endlessRiftActive) return
+                state.copy(endlessRiftActive = false, activeBossBattleWorldId = null)
+            }
             "select_world" -> {
                 if (id !in state.unlockedWorldIds) return
                 state.copy(activeWorldId = id, activeBossBattleWorldId = if (state.activeBossBattleWorldId == id) id else null)
