@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Пройдите 10-й уровень Бесконечного разлома",
   "endgame_goal_mastery": "Достигните мастерства 5 во всех мирах",
   "endgame_claimed": "Награда получена",
-  "endgame_claim_reward": "Получить награду"
+  "endgame_claim_reward": "Получить награду",
+  "music_control_previous": "Предыдущий",
+  "music_control_pause": "Пауза",
+  "music_control_play": "Воспроизвести",
+  "music_control_next": "Следующий",
+  "music_control_stop": "Стоп"
 }
