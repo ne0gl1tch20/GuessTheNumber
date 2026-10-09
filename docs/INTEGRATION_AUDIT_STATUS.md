@@ -24,7 +24,7 @@
 
 ## Completed in the latest RPG integration pass
 
-- Expanded relic equipment capacity to four boss relics and added explicit two-, three- and four-relic set bonuses.
+- Expanded relic equipment capacity to four boss relics and added explicit two-, three- and four-relic set bonuses. Updated the Relic Collection UI and all 23 locale catalogs to describe the new capacity and bonus tiers.
 - Full four-relic set adds a stronger currency bonus and extra Nebula generation; discovering all four secret areas adds another Nebula bonus on correct guesses.
 - Secret discoveries now grant one-time money/Nebula rewards, Codex entries, a world-specific mastery discount and an ongoing reward bonus in that world.
 - Mastery level 5 and 10 milestones grant Nebula and Codex entries; the secret-area discount reduces mastery upgrade costs.
@@ -36,7 +36,7 @@
 
 ## Still requires the remaining integration pass
 
-- Run a localization audit to catch missing keys, placeholder mismatches and untranslated legacy UI strings.
+- New notification-category, widget and endgame keys are present in all 23 locale catalogs. Run the broader localization audit to catch placeholder mismatches and untranslated legacy UI strings.
 - Review RPG reward balance, set-specific effects, boss/Rift reward consistency and whether Codex completion thresholds should include the new mastery/Sanctuary entries.
 - Run the manual GitHub Actions validation/build and resolve compiler/lint/runtime issues before calling the pass build-verified.
 
