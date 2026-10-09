@@ -792,5 +792,9 @@
   "widget_mastery": "Ustalık %d",
   "widget_worlds_bosses": "Dünya %d • Boss %d",
   "widget_quick_guess": "Hızlı tahmin",
-  "widget_next_slot": "Sonraki yuva"
+  "widget_next_slot": "Sonraki yuva",
+  "endgame_goal_rift": "Sonsuz Yarık 10. seviyeyi tamamla",
+  "endgame_goal_mastery": "Her dünyada ustalık seviyesini 5'e çıkar",
+  "endgame_claimed": "Ödül alındı",
+  "endgame_claim_reward": "Ödülü al"
 }
