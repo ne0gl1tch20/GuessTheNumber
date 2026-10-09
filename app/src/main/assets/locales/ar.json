@@ -797,5 +797,10 @@
   "endgame_goal_rift": "أكمل المستوى 10 من الصدع اللانهائي",
   "endgame_goal_mastery": "حقق مستوى إتقان 5 في كل عالم",
   "endgame_claimed": "تم استلام المكافأة",
-  "endgame_claim_reward": "استلام المكافأة"
+  "endgame_claim_reward": "استلام المكافأة",
+  "music_control_previous": "السابق",
+  "music_control_pause": "إيقاف مؤقت",
+  "music_control_play": "تشغيل",
+  "music_control_next": "التالي",
+  "music_control_stop": "إيقاف"
 }
