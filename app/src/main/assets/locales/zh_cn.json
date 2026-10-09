@@ -762,5 +762,13 @@
   "map_fit_screen": "适应屏幕",
   "world_mastery_bonus": "在此世界每次正确猜测可获得 +%d%% 金钱。",
   "beyond_numbers_title": "超越数字",
-  "world_progress_summary": "已解锁世界：%d / 4 • 已击败首领：%d / 4"
+  "world_progress_summary": "已解锁世界：%d / 4 • 已击败首领：%d / 4",
+  "rift_title": "无尽裂隙",
+  "rift_description": "在连续挑战中再次挑战四位首领。每次胜利都会提升层级、首领生命值和奖励。",
+  "rift_best_tier": "最高通关层级：%d",
+  "rift_active_tier": "当前层级：%d。下一位首领正在世界地图等待。",
+  "rift_requirement": "击败全部四位世界首领后解锁裂隙。",
+  "rift_stop": "离开无尽裂隙",
+  "rift_start": "开始无尽裂隙",
+  "rift_tier_label": "无尽裂隙 • 第 %d 层"
 }
