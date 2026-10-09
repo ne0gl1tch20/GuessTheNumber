@@ -1300,10 +1300,22 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         val rewardState = when (questId) {
-            "daily_guesses_10" -> state.copy(money = state.money + BigNumber(10_000))
-            "daily_correct_5" -> state.copy(nebula = state.nebula + BigNumber(25))
-            "daily_streak_5" -> state.copy(nebula = state.nebula + BigNumber(50))
-            "daily_upgrades_3" -> state.copy(nebula = state.nebula + BigNumber(35))
+            "daily_guesses_10" -> state.copy(
+                money = state.money + BigNumber(10_000),
+                statistics = state.statistics.copy(moneyEarned = state.statistics.moneyEarned + BigNumber(10_000))
+            )
+            "daily_correct_5" -> state.copy(
+                nebula = state.nebula + BigNumber(25),
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 25)
+            )
+            "daily_streak_5" -> state.copy(
+                nebula = state.nebula + BigNumber(50),
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 50)
+            )
+            "daily_upgrades_3" -> state.copy(
+                nebula = state.nebula + BigNumber(35),
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 35)
+            )
             else -> state
         }
         _gameState.value = rewardState.copy(claimedDailyQuests = rewardState.claimedDailyQuests + questId)
