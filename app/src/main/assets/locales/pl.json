@@ -762,5 +762,13 @@
   "map_fit_screen": "Dopasuj do ekranu",
   "world_mastery_bonus": "+%d%% pieniędzy za każde poprawne odgadnięcie w tym świecie.",
   "beyond_numbers_title": "Poza liczbami",
-  "world_progress_summary": "Odblokowane światy: %d / 4 • Pokonani bossowie: %d / 4"
+  "world_progress_summary": "Odblokowane światy: %d / 4 • Pokonani bossowie: %d / 4",
+  "rift_title": "Niekończąca się Szczelina",
+  "rift_description": "Ponownie zmierz się ze wszystkimi czterema bossami. Każde zwycięstwo zwiększa poziom, HP bossa i nagrody.",
+  "rift_best_tier": "Najlepszy ukończony poziom: %d",
+  "rift_active_tier": "Obecny poziom: %d. Następny boss czeka na mapie świata.",
+  "rift_requirement": "Odblokuj Szczelinę po pokonaniu wszystkich czterech bossów świata.",
+  "rift_stop": "Opuść Niekończącą się Szczelinę",
+  "rift_start": "Rozpocznij Niekończącą się Szczelinę",
+  "rift_tier_label": "Niekończąca się Szczelina • Poziom %d"
 }
