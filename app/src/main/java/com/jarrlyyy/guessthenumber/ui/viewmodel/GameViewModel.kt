@@ -725,7 +725,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             "ember_summit" to "ashen_vault",
             "nebula_rift" to "lost_observatory"
         )[before.activeWorldId]
-        if (secretForActiveWorld in before.discoveredSecretIds) bonusMoney += earned * BigNumber(0.05)
+        if (secretForActiveWorld != null && secretForActiveWorld in before.discoveredSecretIds) bonusMoney += earned * BigNumber(0.05)
         val bonusNebula = (if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L) + (if ("ember_dragon" in before.equippedRelicIds) 1L else 0L)
         return after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(bonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + bonusNebula))
     }
@@ -1103,7 +1103,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     "nebula_rift" to "lost_observatory"
                 )[id]
                 val baseCost = BigNumber(10L * (current + 1L))
-                val cost = if (secretForWorld in state.discoveredSecretIds) baseCost * BigNumber(0.8) else baseCost
+                val cost = if (secretForWorld != null && secretForWorld in state.discoveredSecretIds) baseCost * BigNumber(0.8) else baseCost
                 if (current >= 10 || state.nebula < cost) return
                 state.copy(nebula = state.nebula - cost, worldMasteryLevels = state.worldMasteryLevels + (id to (current + 1)))
             }
