@@ -1,10 +1,10 @@
-# Project Memory: Gamified Guess the Number Simulator (v1.15.0 Update)
+# Project Memory: Gamified Guess the Number Simulator (v1.16.0 Update)
 
 ## Project Overview
 
 **Current player-facing pitch:** Start with a simple number guess, then build a run around upgrades, Frenzy streaks, random events, achievement tiers, cosmetics, stackable mutators, and custom challenges. v1.12 is intended to feel like a game you can keep poking at because every run can be pushed, optimized, or made weird in a different way. 🎮✨
 
-A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.15.0`.
+A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v1.16.0`.
 
 ## Strict Project Rules: Localization & Open-Source Licenses
 - **EVERYTHING USER-VISIBLE MUST BE LOCALIZED**: Zero hardcoded user-visible strings (screen titles, buttons, dialogs, toasts, accessibility descriptions, achievements, upgrades, shop items, settings, dynamic text formatting with `%s`/`%d`) in Kotlin/Compose UI. All strings must reside in `assets/locales/en_us.json` and be fetched via `LocaleManager`.
@@ -66,6 +66,15 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - Manual CI now runs localization validation, JSON validation, unit tests, lint, full Gradle check, and report uploads.
 - Full repository scanning remains an acceptance criterion: Kotlin, XML, JSON, Markdown/text assets, locale assets, game data, tests, and workflow/configuration files must be inspected during the de-hardcoding pass.
 - CI remains manual-only.
+
+## v1.16.0 Expressive Motion & Gameplay Feedback
+- App version is now `versionCode 16` / `versionName 1.16.0`.
+- Added an expressive save-loading screen connected to the actual save-switch loading state.
+- Expanded spring-based transitions, animated card/content changes, tactile press feedback, and gameplay result animations across Play, Upgrades, Shop, Prestige, Ultra, Achievements, Arcade, Save Slots, guided tutorial, crash recovery, and navigation.
+- Added celebration banners for correct guesses, achievement unlocks, Prestige resets, and Ultra resets.
+- New motion effects respect the existing reduced-motion preference.
+- The changes were merged into `master` through PR #2.
+- CI workflows remain manual-only; no build was started as part of the version/changelog update.
 
 ## v1.15.0 Expressive More Menu & Persistent Reordering
 - App version is now `versionCode 15` / `versionName 1.15.0`.
