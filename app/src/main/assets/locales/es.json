@@ -783,5 +783,14 @@
   "notification_category_progression": "Hitos de progreso",
   "notification_category_progression_desc": "Desbloqueos de mundos y victorias contra jefes",
   "notification_category_events": "Eventos del juego",
-  "notification_category_events_desc": "Nuevos eventos aleatorios y recompensas por tiempo limitado"
+  "notification_category_events_desc": "Nuevos eventos aleatorios y recompensas por tiempo limitado",
+  "widget_title": "🎯 Adivina el número",
+  "widget_slot": "Ranura %d • %s",
+  "widget_money": "Dinero",
+  "widget_range": "Rango",
+  "widget_streak": "Racha %d",
+  "widget_mastery": "Maestría %d",
+  "widget_worlds_bosses": "Mundos %d • Jefes %d",
+  "widget_quick_guess": "Adivinación rápida",
+  "widget_next_slot": "Siguiente ranura"
 }
