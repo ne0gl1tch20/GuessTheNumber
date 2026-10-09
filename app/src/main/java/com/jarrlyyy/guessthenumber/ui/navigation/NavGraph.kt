@@ -175,264 +175,269 @@ fun NavGraph(
 
     CompositionLocalProvider(LocalAppLocaleManager provides locale) {
         Scaffold(
-        bottomBar = {
-            if (items.any { it.route == currentRoute }) {
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    tonalElevation = 8.dp
-                ) {
-                    items.forEach { screen ->
-                        val labelText = when (screen.route) {
-                            Screen.Play.route -> locale.getString("nav_play", "Play")
-                            Screen.Upgrade.route -> locale.getString("nav_upgrade", "Upgrades")
-                            Screen.Shop.route -> locale.getString("nav_shop", "Shop")
-                            Screen.More.route -> locale.getString("nav_more", "More")
-                            else -> screen.title
-                        }
-                        NavigationBarItem(
-                            icon = { Icon(modifier = Modifier.expressiveSelection(currentRoute == screen.route), imageVector = screen.icon, contentDescription = labelText) },
-                            label = { Text(labelText) },
-                            selected = currentRoute == screen.route,
-                            onClick = {
-                                if (currentRoute != screen.route) {
-                                    navController.navigate(screen.route) {
-                                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
+            bottomBar = {
+                if (items.any { it.route == currentRoute }) {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        tonalElevation = 8.dp
+                    ) {
+                        items.forEach { screen ->
+                            val labelText = when (screen.route) {
+                                Screen.Play.route -> locale.getString("nav_play", "Play")
+                                Screen.Upgrade.route -> locale.getString("nav_upgrade", "Upgrades")
+                                Screen.Shop.route -> locale.getString("nav_shop", "Shop")
+                                Screen.More.route -> locale.getString("nav_more", "More")
+                                else -> screen.title
+                            }
+                            NavigationBarItem(
+                                icon = { Icon(modifier = Modifier.expressiveSelection(currentRoute == screen.route), imageVector = screen.icon, contentDescription = labelText) },
+                                label = { Text(labelText) },
+                                selected = currentRoute == screen.route,
+                                onClick = {
+                                    if (currentRoute != screen.route) {
+                                        navController.navigate(screen.route) {
+                                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
                                     }
-                                }
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                                )
                             )
+                        }
+                    }
+                }
+            }
+        ) { padding ->
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.Play.route,
+                    modifier = Modifier.fillMaxSize(),
+                    enterTransition = {
+                        if (state.settings.reducedMotion) EnterTransition.None
+                        else fadeIn(animationSpec = tween(220)) +
+                            slideInHorizontally(
+                                initialOffsetX = { it / 12 },
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            ) +
+                            scaleIn(
+                                initialScale = 0.97f,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            )
+                    },
+                    exitTransition = {
+                        if (state.settings.reducedMotion) ExitTransition.None
+                        else fadeOut(animationSpec = tween(140)) +
+                            slideOutHorizontally(targetOffsetX = { -it / 16 }, animationSpec = tween(160)) +
+                            scaleOut(targetScale = 0.985f, animationSpec = tween(160))
+                    },
+                    popEnterTransition = {
+                        if (state.settings.reducedMotion) EnterTransition.None
+                        else fadeIn(animationSpec = tween(220)) +
+                            slideInHorizontally(
+                                initialOffsetX = { -it / 12 },
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            ) +
+                            scaleIn(
+                                initialScale = 0.97f,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            )
+                    },
+                    popExitTransition = {
+                        if (state.settings.reducedMotion) ExitTransition.None
+                        else fadeOut(animationSpec = tween(140)) +
+                            slideOutHorizontally(targetOffsetX = { it / 16 }, animationSpec = tween(160)) +
+                            scaleOut(targetScale = 0.985f, animationSpec = tween(160))
+                    }
+                ) {
+                    composable(Screen.Play.route) {
+                        ExpressiveScreen(enabled = !state.settings.reducedMotion) { PlayScreen(state = state, onMakeGuess = { guess ->
+                            onMakeGuess(guess)
+                            if (tutorialActive && tutorialStep == 0) tutorialStep = 1
+                        }, onClaimDailyQuest = viewModel::claimDailyQuest, onOpenLootChest = viewModel::openLootChest, onWorldAction = viewModel::worldProgressAction, onNavigateProgression = { route -> navController.navigate(route) }, incomePerSecond = incomePerSecond) }
+                    }
+                    composable(Screen.Upgrade.route) {
+                        ExpressiveScreen(enabled = !state.settings.reducedMotion) { UpgradeScreen(
+                            state = state,
+                            onBuyUpgrade = onBuyUpgrade,
+                            onUpdateMultiplier = onUpdateMultiplier
+                        ) }
+                    }
+                    composable(Screen.Shop.route) {
+                        ExpressiveScreen(enabled = !state.settings.reducedMotion) { ShopScreen(state = state, onBuyShopItem = onBuyShopItem, onEquipCosmetic = onEquipCosmetic) }
+                    }
+                    composable(Screen.More.route) {
+                        ExpressiveScreen(enabled = !state.settings.reducedMotion) { MoreScreen(
+                            state = state,
+                            onNavigate = { route ->
+                                // Keep the legacy More-menu route working for existing saves.
+                                navController.navigate(
+                                    if (route == "changelog") Screen.ChangelogViewer.route else route
+                                )
+                            },
+                            onUpdateBackgroundMusic = onUpdateBackgroundMusic,
+                            isPlayingMusic = isPlayingMusic,
+                            musicCurrentPosition = musicCurrentPosition,
+                            musicDuration = musicDuration,
+                            musicAlbumArt = musicAlbumArt,
+                            onPlayMusic = onPlayMusic,
+                            onPauseMusic = onPauseMusic,
+                            onStopMusic = onStopMusic,
+                            onSeekMusic = onSeekMusic,
+                            onUpdateSettings = onUpdateSettings
+                        ) }
+                    }
+                    composable(Screen.MusicPlayer.route) {
+                        MusicPlayerScreen(onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.Prestige.route) {
+                        PrestigeScreen(
+                            state = state,
+                            onPrestige = onPrestige,
+                            onBuyPrestigeUpgrade = onBuyPrestigeUpgrade,
+                            onUpdateMultiplier = onUpdateMultiplier,
+                            onBuyPrestigeShopItem = onBuyPrestigeShopItem,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable(Screen.Ultra.route) {
+                        UltraScreen(
+                            state = state,
+                            onUltra = onUltra,
+                            onBuyUltraUpgrade = onBuyUltraUpgrade,
+                            onUpdateMultiplier = onUpdateMultiplier,
+                            onBuyUltraUpgrade = onBuyUltraUpgrade,
+                            onUpdateMultiplier = onUpdateMultiplier,
+                            onBuyUltraShopItem = onBuyUltraShopItem,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable(Screen.Arcade.route) {
+                        ArcadeScreen(
+                            onEarnReward = onEarnMinigameReward,
+                            onBack = { navController.popBackStack() },
+                            reducedMotion = state.settings.reducedMotion
+                        )
+                    }
+                    composable(Screen.Stats.route) {
+                        StatsScreen(state = state, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.Settings.route) {
+                        SettingsScreen(state = state, onResetData = onResetData, onUpdateSettings = onUpdateSettings, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.About.route) {
+                        AboutScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
+                    }
+                    if (BuildConfig.DEBUG) {
+                        composable(Screen.DevSettings.route) {
+                            DevSettingsScreen(
+                                state = state,
+                                onExecuteCommand = onExecuteDevCommand,
+                                onImportSave = onImportSave,
+                                onUpdateSettings = onUpdateSettings,
+                                onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
+                                onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
+                                onGetSaveJson = viewModel::getSaveJson,
+                                onApplySaveJson = viewModel::applySaveJson,
+                                onNavigate = { route -> navController.navigate(route) },
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable("process_inspector") {
+                            ProcessInspectorScreen(
+                                state = state,
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                    }
+                    composable(Screen.SaveSlots.route) {
+                        SaveSlotsScreen(
+                            viewModel = viewModel,
+                            onNavigateBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("achievements") {
+                        AchievementsScreen(
+                            state = state,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("live_ops") {
+                        LiveOpsScreen(
+                            state = state,
+                            onClaimReward = onClaimLiveOpsEventReward,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("talent") {
+                        TalentScreen(
+                            state = state,
+                            onBuyTalent = viewModel::buyTalent,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("mutators") {
+                        MutatorsScreen(
+                            state = state,
+                            onSelectMutator = { id, active -> viewModel.setMutatorActive(id, active) },
+                            onActivateChallengeBuilder = onActivateChallengeBuilder,
+                            onCompleteChallenge = { id, reward -> viewModel.claimChallenge(id, reward) },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable(Screen.WorldMap.route) {
+                        WorldMapScreen(state = state, onWorldAction = viewModel::worldProgressAction, onProgressionAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.Relics.route) {
+                        RelicsScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.HomeBase.route) {
+                        HomeBaseScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.Codex.route) {
+                        CodexScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.Endgame.route) {
+                        EndgameScreen(state = state, onNavigate = { navController.navigate(it) }, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.Staking.route) {
+                        StakingScreen(state = state, onStakeResult = viewModel::settleStake, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.ChangelogViewer.route) {
+                        MarkdownViewerScreen(
+                            assetFileName = "changelogs.md",
+                            title = "Changelog",
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                }
+                if (tutorialActive) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = if (tutorialStep == 0 || tutorialStep == 3) androidx.compose.ui.Alignment.TopCenter else androidx.compose.ui.Alignment.BottomCenter) {
+                        GuidedTutorialOverlay(
+                            step = tutorialStep,
+                            title = locale.getString("guided_tutorial_title_" + tutorialStep, "Guided Tutorial"),
+                            instruction = locale.getString("guided_tutorial_instruction_" + tutorialStep, "Follow the highlighted action to continue."),
+                            stepLabel = locale.getString("guided_tutorial_step", "Step %d of 4 • Action required", tutorialStep + 1),
+                            reducedMotion = state.settings.reducedMotion
                         )
                     }
                 }
             }
-        }
-    ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
-            NavHost(
-                navController = navController,
-            startDestination = Screen.Play.route,
-            modifier = Modifier.fillMaxSize(),
-            enterTransition = {
-                if (state.settings.reducedMotion) EnterTransition.None
-                else fadeIn(animationSpec = tween(220)) +
-                    slideInHorizontally(
-                        initialOffsetX = { it / 12 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    ) +
-                    scaleIn(
-                        initialScale = 0.97f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    )
-            },
-            exitTransition = {
-                if (state.settings.reducedMotion) ExitTransition.None
-                else fadeOut(animationSpec = tween(140)) +
-                    slideOutHorizontally(targetOffsetX = { -it / 16 }, animationSpec = tween(160)) +
-                    scaleOut(targetScale = 0.985f, animationSpec = tween(160))
-            },
-            popEnterTransition = {
-                if (state.settings.reducedMotion) EnterTransition.None
-                else fadeIn(animationSpec = tween(220)) +
-                    slideInHorizontally(
-                        initialOffsetX = { -it / 12 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    ) +
-                    scaleIn(
-                        initialScale = 0.97f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    )
-            },
-            popExitTransition = {
-                if (state.settings.reducedMotion) ExitTransition.None
-                else fadeOut(animationSpec = tween(140)) +
-                    slideOutHorizontally(targetOffsetX = { it / 16 }, animationSpec = tween(160)) +
-                    scaleOut(targetScale = 0.985f, animationSpec = tween(160))
-            }
-        ) {
-            composable(Screen.Play.route) {
-                ExpressiveScreen(enabled = !state.settings.reducedMotion) { PlayScreen(state = state, onMakeGuess = { guess ->
-                    onMakeGuess(guess)
-                    if (tutorialActive && tutorialStep == 0) tutorialStep = 1
-                }, onClaimDailyQuest = viewModel::claimDailyQuest, onOpenLootChest = viewModel::openLootChest, onWorldAction = viewModel::worldProgressAction, onNavigateProgression = { route -> navController.navigate(route) }, incomePerSecond = incomePerSecond) }
-            }
-            composable(Screen.Upgrade.route) {
-                ExpressiveScreen(enabled = !state.settings.reducedMotion) { UpgradeScreen(
-                    state = state,
-                    onBuyUpgrade = onBuyUpgrade,
-                    onUpdateMultiplier = onUpdateMultiplier
-                ) }
-            }
-            composable(Screen.Shop.route) {
-                ExpressiveScreen(enabled = !state.settings.reducedMotion) { ShopScreen(state = state, onBuyShopItem = onBuyShopItem, onEquipCosmetic = onEquipCosmetic) }
-            }
-            composable(Screen.More.route) {
-                ExpressiveScreen(enabled = !state.settings.reducedMotion) { MoreScreen(
-                    state = state,
-                    onNavigate = { route ->
-                        // Keep the legacy More-menu route working for existing saves.
-                        navController.navigate(
-                            if (route == "changelog") Screen.ChangelogViewer.route else route
-                        )
-                    },
-                    onUpdateBackgroundMusic = onUpdateBackgroundMusic,
-                    isPlayingMusic = isPlayingMusic,
-                    musicCurrentPosition = musicCurrentPosition,
-                    musicDuration = musicDuration,
-                    musicAlbumArt = musicAlbumArt,
-                    onPlayMusic = onPlayMusic,
-                    onPauseMusic = onPauseMusic,
-                    onStopMusic = onStopMusic,
-                    onSeekMusic = onSeekMusic,
-                    onUpdateSettings = onUpdateSettings
-                ) }
-            }
-            composable(Screen.Prestige.route) {
-                PrestigeScreen(
-                    state = state,
-                    onPrestige = onPrestige,
-                    onBuyPrestigeUpgrade = onBuyPrestigeUpgrade,
-                    onUpdateMultiplier = onUpdateMultiplier,
-                    onBuyPrestigeShopItem = onBuyPrestigeShopItem,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(Screen.Ultra.route) {
-                UltraScreen(
-                    state = state,
-                    onUltra = onUltra,
-                    onBuyUltraUpgrade = onBuyUltraUpgrade,
-                    onUpdateMultiplier = onUpdateMultiplier,
-                    onBuyUltraShopItem = onBuyUltraShopItem,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(Screen.Arcade.route) {
-                ArcadeScreen(
-                    onEarnReward = onEarnMinigameReward,
-                    onBack = { navController.popBackStack() },
-                    reducedMotion = state.settings.reducedMotion
-                )
-            }
-            composable(Screen.Stats.route) {
-                StatsScreen(state = state, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.Settings.route) {
-                SettingsScreen(state = state, onResetData = onResetData, onUpdateSettings = onUpdateSettings, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.About.route) {
-                AboutScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
-            }
-            if (BuildConfig.DEBUG) {
-                composable(Screen.DevSettings.route) {
-                    DevSettingsScreen(
-                        state = state,
-                        onExecuteCommand = onExecuteDevCommand,
-                        onImportSave = onImportSave,
-                        onUpdateSettings = onUpdateSettings,
-                        onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
-                        onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
-                        onGetSaveJson = viewModel::getSaveJson,
-                        onApplySaveJson = viewModel::applySaveJson,
-                        onNavigate = { route -> navController.navigate(route) },
-                        onBack = { navController.popBackStack() }
-                    )
-                }
-                composable("process_inspector") {
-                    ProcessInspectorScreen(
-                        state = state,
-                        onBack = { navController.popBackStack() }
-                    )
-                }
-            }
-            composable(Screen.SaveSlots.route) {
-                SaveSlotsScreen(
-                    viewModel = viewModel,
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
-            composable("achievements") {
-                AchievementsScreen(
-                    state = state,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable("live_ops") {
-                LiveOpsScreen(
-                    state = state,
-                    onClaimReward = onClaimLiveOpsEventReward,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable("talent") {
-                TalentScreen(
-                    state = state,
-                    onBuyTalent = viewModel::buyTalent,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable("mutators") {
-                MutatorsScreen(
-                    state = state,
-                    onSelectMutator = { id, active -> viewModel.setMutatorActive(id, active) },
-                    onActivateChallengeBuilder = onActivateChallengeBuilder,
-                    onCompleteChallenge = { id, reward -> viewModel.claimChallenge(id, reward) },
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(Screen.WorldMap.route) {
-                WorldMapScreen(state = state, onWorldAction = viewModel::worldProgressAction, onProgressionAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.Relics.route) {
-                RelicsScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.HomeBase.route) {
-                HomeBaseScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.Codex.route) {
-                CodexScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.Endgame.route) {
-                EndgameScreen(state = state, onNavigate = { navController.navigate(it) }, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.Staking.route) {
-                StakingScreen(state = state, onStakeResult = viewModel::settleStake, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.ChangelogViewer.route) {
-                MarkdownViewerScreen(
-                    assetFileName = "changelogs.md",
-                    title = "Changelog",
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            }
-            if (tutorialActive) {
-                Box(Modifier.fillMaxSize(), contentAlignment = if (tutorialStep == 0 || tutorialStep == 3) androidx.compose.ui.Alignment.TopCenter else androidx.compose.ui.Alignment.BottomCenter) {
-                    GuidedTutorialOverlay(
-                        step = tutorialStep,
-                        title = locale.getString("guided_tutorial_title_" + tutorialStep, "Guided Tutorial"),
-                        instruction = locale.getString("guided_tutorial_instruction_" + tutorialStep, "Follow the highlighted action to continue."),
-                        stepLabel = locale.getString("guided_tutorial_step", "Step %d of 4 • Action required", tutorialStep + 1),
-                        reducedMotion = state.settings.reducedMotion
-                    )
-                }
-            }
-        }
         }
     }
 }
