@@ -792,5 +792,9 @@
   "widget_mastery": "महारत %d",
   "widget_worlds_bosses": "दुनिया %d • बॉस %d",
   "widget_quick_guess": "त्वरित अनुमान",
-  "widget_next_slot": "अगला स्लॉट"
+  "widget_next_slot": "अगला स्लॉट",
+  "endgame_goal_rift": "एंडलेस रिफ्ट टियर 10 पूरा करें",
+  "endgame_goal_mastery": "हर दुनिया में महारत स्तर 5 तक पहुँचें",
+  "endgame_claimed": "इनाम प्राप्त किया गया",
+  "endgame_claim_reward": "इनाम प्राप्त करें"
 }
