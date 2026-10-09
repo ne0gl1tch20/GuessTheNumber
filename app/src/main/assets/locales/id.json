@@ -770,5 +770,11 @@
   "rift_requirement": "Buka Rift setelah mengalahkan keempat bos dunia.",
   "rift_stop": "Keluar dari Rift Tanpa Akhir",
   "rift_start": "Mulai Rift Tanpa Akhir",
-  "rift_tier_label": "Rift Tanpa Akhir • Tingkat %d"
+  "rift_tier_label": "Rift Tanpa Akhir • Tingkat %d",
+  "notification_reminder_title": "Tebak Angka",
+  "notification_reminder_body": "Angka-angkamu merindukanmu! Kembali dan tebak angkanya!",
+  "notification_progression_title": "Tonggak progres",
+  "notification_progression_body": "Tonggak progres baru sudah tersedia.",
+  "notification_event_title": "Ada event yang menunggu",
+  "notification_event_body": "Event game terbatas sudah tersedia."
 }
