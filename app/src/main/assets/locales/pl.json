@@ -653,5 +653,8 @@
   "boss_defeated": "Boss pokonany",
   "world_locked_boss": "Najpierw odblokuj ten świat",
   "boss_fight": "Rzuć wyzwanie bossowi",
-  "boss_requirements_pending": "Rozwijaj się dalej przed walką"
+  "boss_requirements_pending": "Rozwijaj się dalej przed walką",
+  "boss_hp_label": "Zdrowie bossa",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "Atakuj bossa"
 }
