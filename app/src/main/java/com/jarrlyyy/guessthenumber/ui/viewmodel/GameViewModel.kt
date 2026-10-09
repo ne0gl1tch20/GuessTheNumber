@@ -1231,7 +1231,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (updated != state) {
             _gameState.value = updated
             saveGameAsync()
-            val isHomeBaseMilestone = action == "home_upgrade" && updated.homeBaseLevel in setOf(1, 3, 5, 10, 20)
+            val isHomeBaseMilestone = action == "home_upgrade" && updated.homeBaseLevel in setOf(1, 5, 10, 15, 20)
             if (action == "secret" || action == "claim_codex" || isHomeBaseMilestone ||
                 (action == "rift_start" && updated.endlessRiftTier > state.endlessRiftBestTier)
             ) {
