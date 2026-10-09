@@ -776,5 +776,12 @@
   "notification_progression_title": "Progression milestone",
   "notification_progression_body": "A new progression milestone is ready.",
   "notification_event_title": "A game event is waiting",
-  "notification_event_body": "A limited game event is ready."
+  "notification_event_body": "A limited game event is ready.",
+  "notification_category_title": "Notification Categories",
+  "notification_category_reminders": "Reminders",
+  "notification_category_reminders_desc": "Periodic reminders to return to the game",
+  "notification_category_progression": "Progression milestones",
+  "notification_category_progression_desc": "World unlocks and boss victories",
+  "notification_category_events": "Game events",
+  "notification_category_events_desc": "New random events and limited-time event rewards"
 }
