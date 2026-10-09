@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Reclamar",
   "daily_quest_claimed": "Reclamado",
-  "daily_quest_in_progress": "En curso"
+  "daily_quest_in_progress": "En curso",
+  "liveops_bonus_level_label": "Nivel de bonificación permanente",
+  "liveops_bonus_effect": "+2% de dinero por nivel y +1 Nebulosa por acierto cada 5 niveles, hasta el nivel 25. Se aplica a esta ranura de guardado."
 }
