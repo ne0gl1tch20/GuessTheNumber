@@ -792,5 +792,9 @@
   "widget_mastery": "Meesterschap %d",
   "widget_worlds_bosses": "Werelden %d • Bazen %d",
   "widget_quick_guess": "Snel raden",
-  "widget_next_slot": "Volgend slot"
+  "widget_next_slot": "Volgend slot",
+  "endgame_goal_rift": "Voltooi niveau 10 van de Eindeloze Spleet",
+  "endgame_goal_mastery": "Bereik meesterschap 5 in elke wereld",
+  "endgame_claimed": "Beloning opgehaald",
+  "endgame_claim_reward": "Beloning ophalen"
 }
