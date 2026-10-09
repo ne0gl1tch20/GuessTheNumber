@@ -949,7 +949,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (action == "boss_miss") {
             val misses = (state.bossBattleMistakes[bossId] ?: 0) + 1
             val damage = state.bossBattleProgress[bossId] ?: 0
-            val regressedDamage = if (misses % 3 == 0) (damage - 1).coerceAtLeast(0) else damage
+            val phase = ((damage * 3) / bossHp + 1).coerceIn(1, 3)
+            val missInterval = when (phase) { 1 -> 4; 2 -> 3; else -> 2 }
+            val regressedDamage = if (misses % missInterval == 0) (damage - 1).coerceAtLeast(0) else damage
             _gameState.value = state.copy(bossBattleMistakes = state.bossBattleMistakes + (bossId to misses), bossBattleProgress = state.bossBattleProgress + (bossId to regressedDamage))
             saveGameAsync()
             return
