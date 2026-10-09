@@ -192,124 +192,124 @@ fun MoreScreen(
                 }
             }
 
-                                items(order, key = { it }) { route ->
-                        val selected = dragging == route
-                        val animatedScale by animateFloatAsState(
-                            targetValue = if (selected) 1.025f else 1f,
-                            animationSpec = androidx.compose.animation.core.spring(
-                                stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow,
+            items(order, key = { it }) { route ->
+                val selected = dragging == route
+                val animatedScale by animateFloatAsState(
+                    targetValue = if (selected) 1.025f else 1f,
+                    animationSpec = androidx.compose.animation.core.spring(
+                        stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow,
+                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
+                    ),
+                    label = "moreMenuItemScale"
+                )
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateContentSize()
+                        .animateItem(
+                            placementSpec = androidx.compose.animation.core.spring(
+                                stiffness = androidx.compose.animation.core.Spring.StiffnessLow,
                                 dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
-                            ),
-                            label = "moreMenuItemScale"
+                            )
                         )
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .animateContentSize()
-                                .animateItem(
-                                    placementSpec = androidx.compose.animation.core.spring(
-                                        stiffness = androidx.compose.animation.core.Spring.StiffnessLow,
-                                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
-                                    )
-                                )
-                                .graphicsLayer {
-                                    scaleX = animatedScale
-                                    scaleY = animatedScale
-                                    shadowElevation = if (selected) 16f else 0f
-                                }
-                                .then(
-                                    if (isReordering) {
-                                        Modifier.pointerInput(isReordering, route) {
-                                            detectDragGesturesAfterLongPress(
-                                                onDragStart = { dragging = route; dragDistance = 0f },
-                                                onDragCancel = { dragging = null; dragDistance = 0f },
-                                                onDragEnd = {
-                                                    dragging = null
-                                                    dragDistance = 0f
-                                                    onUpdateSettings(state.settings.copy(moreScreenOrder = order))
-                                                },
-                                                onDrag = { change, amount ->
-                                                    change.consumePositionChange()
-                                                    if (dragging == route) {
-                                                        dragDistance += amount.y
-                                                        val index = order.indexOf(route)
-                                                        if (dragDistance > 48.dp.toPx() && index < order.lastIndex) {
-                                                            order = order.toMutableList().also {
-                                                                val tmp = it[index]
-                                                                it[index] = it[index + 1]
-                                                                it[index + 1] = tmp
-                                                            }
-                                                            dragDistance = 0f
-                                                        } else if (dragDistance < -48.dp.toPx() && index > 0) {
-                                                            order = order.toMutableList().also {
-                                                                val tmp = it[index]
-                                                                it[index] = it[index - 1]
-                                                                it[index - 1] = tmp
-                                                            }
-                                                            dragDistance = 0f
-                                                        }
+                        .graphicsLayer {
+                            scaleX = animatedScale
+                            scaleY = animatedScale
+                            shadowElevation = if (selected) 16f else 0f
+                        }
+                        .then(
+                            if (isReordering) {
+                                Modifier.pointerInput(isReordering, route) {
+                                    detectDragGesturesAfterLongPress(
+                                        onDragStart = { dragging = route; dragDistance = 0f },
+                                        onDragCancel = { dragging = null; dragDistance = 0f },
+                                        onDragEnd = {
+                                            dragging = null
+                                            dragDistance = 0f
+                                            onUpdateSettings(state.settings.copy(moreScreenOrder = order))
+                                        },
+                                        onDrag = { change, amount ->
+                                            change.consumePositionChange()
+                                            if (dragging == route) {
+                                                dragDistance += amount.y
+                                                val index = order.indexOf(route)
+                                                if (dragDistance > 48.dp.toPx() && index < order.lastIndex) {
+                                                    order = order.toMutableList().also {
+                                                        val tmp = it[index]
+                                                        it[index] = it[index + 1]
+                                                        it[index + 1] = tmp
                                                     }
+                                                    dragDistance = 0f
+                                                } else if (dragDistance < -48.dp.toPx() && index > 0) {
+                                                    order = order.toMutableList().also {
+                                                        val tmp = it[index]
+                                                        it[index] = it[index - 1]
+                                                        it[index - 1] = tmp
+                                                    }
+                                                    dragDistance = 0f
                                                 }
-                                            )
-                                        }
-                                    } else {
-                                        Modifier.clickable {
-                                            when (route) {
-                                                "ultra", "prestige" -> onNavigate(route)
-                                                "save_slots" -> onNavigate(Screen.SaveSlots.route)
-                                                "changelog" -> onNavigate(Screen.ChangelogViewer.route)
-                                                "music" -> showMusicDialog = true
-                                                else -> onNavigate(route)
                                             }
                                         }
-                                    }
-                                ),
-                            shape = MaterialTheme.shapes.large,
-                            color = if (selected) MaterialTheme.colorScheme.primaryContainer
-                            else state.settings.moreScreenButtonColors[route]?.let { hex ->
-                                runCatching { Color(android.graphics.Color.parseColor(hex)) }.getOrNull()
-                            } ?: MaterialTheme.colorScheme.surfaceContainerHigh
-                        ) {
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 14.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                val customColor = state.settings.moreScreenButtonColors[route]?.let { hex ->
-                                    runCatching { Color(android.graphics.Color.parseColor(hex)) }.getOrNull()
+                                    )
                                 }
-                                val contentTint = if (selected) MaterialTheme.colorScheme.primary
-                                else if (customColor != null) {
-                                    val luminance = 0.2126f * customColor.red + 0.7152f * customColor.green + 0.0722f * customColor.blue
-                                    if (luminance > 0.55f) Color.Black else Color.White
-                                } else MaterialTheme.colorScheme.onSurfaceVariant
-                                Icon(
-                                    imageVector = icons[route] ?: Icons.Default.Circle,
-                                    contentDescription = null,
-                                    tint = contentTint
-                                )
-                                Spacer(Modifier.width(14.dp))
-                                Text(
-                                    labels[route] ?: route,
-                                    modifier = Modifier.weight(1f),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = contentTint
-                                )
-                                if (isReordering) {
-                                    Icon(Icons.Default.DragHandle, contentDescription = localizedText("Reorder"), tint = contentTint)
-                                } else {
-                                    IconButton(
-                                        onClick = { colorTarget = route },
-                                        modifier = Modifier.size(40.dp)
-                                    ) {
-                                        Icon(Icons.Default.Palette, contentDescription = null, tint = contentTint)
+                            } else {
+                                Modifier.clickable {
+                                    when (route) {
+                                        "ultra", "prestige" -> onNavigate(route)
+                                        "save_slots" -> onNavigate(Screen.SaveSlots.route)
+                                        "changelog" -> onNavigate(Screen.ChangelogViewer.route)
+                                        "music" -> onNavigate(Screen.MusicPlayer.route)
+                                        else -> onNavigate(route)
                                     }
-                                    Icon(Icons.Default.ChevronRight, contentDescription = localizedText("Open"), tint = contentTint)
                                 }
                             }
+                        ),
+                    shape = MaterialTheme.shapes.large,
+                    color = if (selected) MaterialTheme.colorScheme.primaryContainer
+                    else state.settings.moreScreenButtonColors[route]?.let { hex ->
+                        runCatching { Color(android.graphics.Color.parseColor(hex)) }.getOrNull()
+                    } ?: MaterialTheme.colorScheme.surfaceContainerHigh
+                ) {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val customColor = state.settings.moreScreenButtonColors[route]?.let { hex ->
+                            runCatching { Color(android.graphics.Color.parseColor(hex)) }.getOrNull()
+                        }
+                        val contentTint = if (selected) MaterialTheme.colorScheme.primary
+                        else if (customColor != null) {
+                            val luminance = 0.2126f * customColor.red + 0.7152f * customColor.green + 0.0722f * customColor.blue
+                            if (luminance > 0.55f) Color.Black else Color.White
+                        } else MaterialTheme.colorScheme.onSurfaceVariant
+                        Icon(
+                            imageVector = icons[route] ?: Icons.Default.Circle,
+                            contentDescription = null,
+                            tint = contentTint
+                        )
+                        Spacer(Modifier.width(14.dp))
+                        Text(
+                            labels[route] ?: route,
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = contentTint
+                        )
+                        if (isReordering) {
+                            Icon(Icons.Default.DragHandle, contentDescription = localizedText("Reorder"), tint = contentTint)
+                        } else {
+                            IconButton(
+                                onClick = { colorTarget = route },
+                                modifier = Modifier.size(40.dp)
+                            ) {
+                                Icon(Icons.Default.Palette, contentDescription = null, tint = contentTint)
+                            }
+                            Icon(Icons.Default.ChevronRight, contentDescription = localizedText("Open"), tint = contentTint)
                         }
                     }
+                }
+            }
 
         }
     }
