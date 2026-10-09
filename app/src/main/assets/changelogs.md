@@ -2,7 +2,7 @@
 
 ## v2.0.0 (Beyond the Numbers Major Expansion)
 - 🗺️ **Interactive World Map**: Added four selectable worlds, zoom and pan controls, connected routes, secret-area markers, unlock requirements, boss progress and world mastery upgrades.
-- ⚔️ **Guessing-Based Boss Combat**: Boss battles now start from the map; correct guesses deal damage, every third miss restores one boss HP, and victory grants one-time Money, Nebula, relic and Codex rewards.
+- ⚔️ **Guessing-Based Boss Combat**: Boss battles now start from the map; correct guesses deal damage, and missed guesses push progress back every 4 misses in phase 1, every 3 in phase 2 and every 2 in phase 3, and victory grants one-time Money, Nebula, relic and Codex rewards.
 - 🌳 **Zoomable Skill Tree**: Rebuilt the Prestige Talent Web as a connected, clickable tree with pinch-to-zoom, drag-to-pan, zoom controls, node selection and parent requirements.
 - 💠 **Real Talent Effects**: Automation talents increase auto-clicker speed; precision talents add critical reward chances; Nebula Resonance boosts correct-guess earnings; Cosmic Oracle grants Nebula on correct guesses.
 - 💎 **Relic Collection and Bonuses**: Bosses award persistent relics; equip up to two to gain Money bonuses, critical rewards and extra Nebula.
