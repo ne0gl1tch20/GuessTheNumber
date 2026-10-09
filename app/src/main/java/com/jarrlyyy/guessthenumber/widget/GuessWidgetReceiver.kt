@@ -25,6 +25,7 @@ import androidx.glance.currentState
 import androidx.datastore.preferences.core.Preferences
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+import com.jarrlyyy.guessthenumber.data.notification.NotificationHelper
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
@@ -90,7 +91,8 @@ class QuickGuessActionCallback : ActionCallback {
         val preferences = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
         val slot = (preferences[widgetSaveSlotKey] ?: saveManager.getActiveSlot()).coerceIn(1, MAX_SAVE_SLOTS)
         val engine = GameEngine()
-        saveManager.updateGameAtomically(slot) { state ->
+        val before = saveManager.loadGame(slot)
+        val updated = saveManager.updateGameAtomically(slot) { state ->
             val after = engine.processGuess(state, state.targetNumber).newState
             val earned = after.money - state.money
             if (earned <= BigNumber.ZERO) return@updateGameAtomically after
@@ -119,7 +121,7 @@ class QuickGuessActionCallback : ActionCallback {
             if (secretForWorld != null && secretForWorld in state.discoveredSecretIds) bonusMoney += earned * BigNumber(0.05)
             val bonusNebula = (if ("talent_master_1" in state.prestigeShopPurchases) 1L else 0L) +
                 (if ("ember_dragon" in state.equippedRelicIds) 1L else 0L)
-            after.copy(
+            val rewarded = after.copy(
                 money = after.money + bonusMoney,
                 nebula = after.nebula + BigNumber(bonusNebula),
                 statistics = after.statistics.copy(
@@ -127,7 +129,91 @@ class QuickGuessActionCallback : ActionCallback {
                     nebulaEarned = after.statistics.nebulaEarned + bonusNebula
                 )
             )
+            val worldId = state.activeBossBattleWorldId ?: return@updateGameAtomically rewarded
+            val bossId = when (worldId) {
+                "verdant_grove" -> "verdant_guardian"
+                "crystal_caverns" -> "crystal_golem"
+                "ember_summit" -> "ember_dragon"
+                else -> "nebula_titan"
+            }
+            val baseHp = when (worldId) {
+                "verdant_grove" -> 3
+                "crystal_caverns" -> 5
+                "ember_summit" -> 7
+                else -> 10
+            }
+            val hp = baseHp + if (state.endlessRiftActive) ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
+            val nextDamage = (state.bossBattleProgress[bossId] ?: 0) + 1
+            if (nextDamage < hp) {
+                rewarded.copy(
+                    bossBattleProgress = state.bossBattleProgress + (bossId to nextDamage),
+                    bossBattleMistakes = state.bossBattleMistakes + (bossId to 0)
+                )
+            } else {
+                val baseMoney = when (worldId) {
+                    "verdant_grove" -> BigNumber(25_000)
+                    "crystal_caverns" -> BigNumber(100_000)
+                    "ember_summit" -> BigNumber(500_000)
+                    else -> BigNumber(5_000_000)
+                }
+                val baseNebula = when (worldId) {
+                    "verdant_grove" -> 10L
+                    "crystal_caverns" -> 25L
+                    "ember_summit" -> 75L
+                    else -> 250L
+                }
+                if (state.endlessRiftActive) {
+                    val multiplier = state.endlessRiftTier.coerceAtLeast(1)
+                    val rewardMoney = baseMoney * BigNumber(multiplier)
+                    val rewardNebula = baseNebula * multiplier.toLong()
+                    val order = listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift")
+                    val nextWorld = order[(order.indexOf(worldId).coerceAtLeast(0) + 1) % order.size]
+                    val nextBoss = when (nextWorld) {
+                        "verdant_grove" -> "verdant_guardian"
+                        "crystal_caverns" -> "crystal_golem"
+                        "ember_summit" -> "ember_dragon"
+                        else -> "nebula_titan"
+                    }
+                    val nextTier = state.endlessRiftTier + 1
+                    rewarded.copy(
+                        money = rewarded.money + rewardMoney,
+                        nebula = rewarded.nebula + BigNumber(rewardNebula),
+                        worldBossVictories = rewarded.worldBossVictories + 1,
+                        bossBattleProgress = rewarded.bossBattleProgress + (bossId to hp) + (nextBoss to 0),
+                        bossBattleMistakes = rewarded.bossBattleMistakes + (nextBoss to 0),
+                        activeWorldId = nextWorld,
+                        activeBossBattleWorldId = nextWorld,
+                        endlessRiftTier = nextTier,
+                        endlessRiftBestTier = maxOf(state.endlessRiftBestTier, state.endlessRiftTier),
+                        statistics = rewarded.statistics.copy(
+                            moneyEarned = rewarded.statistics.moneyEarned + rewardMoney,
+                            nebulaEarned = rewarded.statistics.nebulaEarned + rewardNebula
+                        )
+                    )
+                } else {
+                    rewarded.copy(
+                        money = rewarded.money + baseMoney,
+                        nebula = rewarded.nebula + BigNumber(baseNebula),
+                        defeatedBossIds = rewarded.defeatedBossIds + bossId,
+                        worldBossVictories = rewarded.worldBossVictories + 1,
+                        bossBattleProgress = rewarded.bossBattleProgress + (bossId to hp),
+                        activeBossBattleWorldId = null,
+                        relicInventory = rewarded.relicInventory + bossId,
+                        codexEntries = rewarded.codexEntries + setOf("world:$worldId", "boss:$bossId"),
+                        worldMasteryLevels = rewarded.worldMasteryLevels + (worldId to ((state.worldMasteryLevels[worldId] ?: 0) + 1)),
+                        statistics = rewarded.statistics.copy(
+                            moneyEarned = rewarded.statistics.moneyEarned + baseMoney,
+                            nebulaEarned = rewarded.statistics.nebulaEarned + baseNebula
+                        )
+                    )
+                }
+            }
         } ?: return
+        if (updated.defeatedBossIds.size > before.defeatedBossIds.size ||
+            updated.unlockedWorldIds.size > before.unlockedWorldIds.size
+        ) {
+            NotificationHelper.showProgressionNotification(context)
+        }
         GuessWidget().update(context, glanceId)
     }
 }
