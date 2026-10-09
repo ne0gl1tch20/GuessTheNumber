@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "領取",
   "daily_quest_claimed": "已領取",
-  "daily_quest_in_progress": "進行中"
+  "daily_quest_in_progress": "進行中",
+  "liveops_bonus_level_label": "永久加成等級",
+  "liveops_bonus_effect": "每級金錢獎勵 +2%，每 5 級每次猜對額外獲得 +1 星雲，最高 25 級。僅適用於目前存檔欄位。"
 }
