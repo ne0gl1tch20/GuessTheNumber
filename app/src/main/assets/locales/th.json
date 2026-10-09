@@ -760,5 +760,7 @@
   "relic_set_bonus": "Set bonus: equipping two relics adds another 10% Money to correct-guess rewards.",
   "home_base_bonus": "Each sanctuary level adds 2% Money to correct-guess rewards, up to 40%.",
   "map_fit_screen": "ปรับให้พอดีกับหน้าจอ",
-  "world_mastery_bonus": "+%d%% เงินสำหรับการทายถูกแต่ละครั้งในโลกนี้"
+  "world_mastery_bonus": "+%d%% เงินสำหรับการทายถูกแต่ละครั้งในโลกนี้",
+  "beyond_numbers_title": "เหนือกว่าตัวเลข",
+  "world_progress_summary": "โลกที่ปลดล็อก: %d / 4 • บอสที่ชนะ: %d / 4"
 }
