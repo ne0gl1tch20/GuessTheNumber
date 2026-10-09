@@ -888,7 +888,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
         _gameState.value = rewardState.copy(claimedDailyQuests = rewardState.claimedDailyQuests + questId)
         saveGameAsync()
-        GameLogger.log(LogLevel.INFO, LoggerCategory.GAMEPLAY, "DAILY_QUEST_CLAIM", "Claimed daily quest $questId")
+        GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "DAILY_QUEST_CLAIM", "Claimed daily quest $questId")
     }
 
     private fun refreshDailyQuestDay(state: GameState): GameState {
