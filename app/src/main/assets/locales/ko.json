@@ -776,5 +776,12 @@
   "notification_progression_title": "진행 단계 달성",
   "notification_progression_body": "새로운 진행 단계 보상이 준비됐어요.",
   "notification_event_title": "게임 이벤트 대기 중",
-  "notification_event_body": "기간 한정 게임 이벤트가 준비됐어요."
+  "notification_event_body": "기간 한정 게임 이벤트가 준비됐어요.",
+  "notification_category_title": "알림 카테고리",
+  "notification_category_reminders": "알림",
+  "notification_category_reminders_desc": "게임으로 돌아오도록 정기적으로 알립니다",
+  "notification_category_progression": "진행 단계",
+  "notification_category_progression_desc": "월드 해금 및 보스 처치",
+  "notification_category_events": "게임 이벤트",
+  "notification_category_events_desc": "새로운 무작위 이벤트 및 기간 한정 보상"
 }
