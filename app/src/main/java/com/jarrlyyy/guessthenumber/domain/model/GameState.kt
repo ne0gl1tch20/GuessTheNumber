@@ -61,7 +61,14 @@ data class GameState(
     val defeatedBossIds: Set<String> = emptySet(),
     val activeWorldId: String = "verdant_grove",
     val worldBossVictories: Int = 0,
-    val bossBattleProgress: Map<String, Int> = emptyMap()
+    val bossBattleProgress: Map<String, Int> = emptyMap(),
+    // v2.0 progression data. Defaults keep existing save files backward compatible.
+    val relicInventory: Set<String> = emptySet(),
+    val equippedRelicIds: Set<String> = emptySet(),
+    val worldMasteryLevels: Map<String, Int> = emptyMap(),
+    val discoveredSecretIds: Set<String> = emptySet(),
+    val codexEntries: Set<String> = emptySet(),
+    val homeBaseLevel: Int = 0
 )
 
 @Serializable
@@ -82,8 +89,8 @@ data class GameStatistics(
 
 val DEFAULT_MORE_SCREEN_ORDER = buildList {
     addAll(listOf(
-        "achievements", "live_ops", "mutators", "talent", "arcade",
-        "stats", "changelog", "settings", "about"
+        "world_map", "achievements", "live_ops", "mutators", "talent", "relics",
+        "home_base", "codex", "endgame", "arcade", "stats", "changelog", "settings", "about"
     ))
     if (BuildConfig.DEBUG) add("dev_settings")
     addAll(listOf("ultra", "prestige", "save_slots", "music"))
