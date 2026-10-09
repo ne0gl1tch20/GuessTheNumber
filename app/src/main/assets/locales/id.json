@@ -776,5 +776,12 @@
   "notification_progression_title": "Tonggak progres",
   "notification_progression_body": "Tonggak progres baru sudah tersedia.",
   "notification_event_title": "Ada event yang menunggu",
-  "notification_event_body": "Event game terbatas sudah tersedia."
+  "notification_event_body": "Event game terbatas sudah tersedia.",
+  "notification_category_title": "Kategori Notifikasi",
+  "notification_category_reminders": "Pengingat",
+  "notification_category_reminders_desc": "Pengingat berkala untuk kembali bermain",
+  "notification_category_progression": "Tonggak progres",
+  "notification_category_progression_desc": "Membuka dunia dan mengalahkan bos",
+  "notification_category_events": "Event game",
+  "notification_category_events_desc": "Event acak baru dan hadiah terbatas waktu"
 }
