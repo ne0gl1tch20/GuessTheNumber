@@ -49,7 +49,14 @@ data class GameState(
     val dailyQuestCorrectGuesses: Int = 0,
     val dailyQuestBestStreak: Int = 0,
     val dailyQuestUpgradePurchases: Int = 0,
-    val claimedDailyQuests: Set<String> = emptySet()
+    val claimedDailyQuests: Set<String> = emptySet(),
+    val lootCommonChests: Int = 0,
+    val lootRareChests: Int = 0,
+    val lootEpicChests: Int = 0,
+    val lootDropsFound: Long = 0,
+    val lootChestsOpened: Long = 0,
+    val lastLootDropTier: String? = null,
+    val lootEventId: Long = 0
 )
 
 @Serializable
