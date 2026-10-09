@@ -33,6 +33,7 @@ fun PlayScreen(
     state: GameState,
     onMakeGuess: (Long) -> Unit,
     onClaimDailyQuest: (String) -> Unit = {},
+    onOpenLootChest: (String) -> Unit = {},
     incomePerSecond: com.jarrlyyy.guessthenumber.domain.model.BigNumber = com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -553,6 +554,13 @@ fun PlayScreen(
                     onClaim = onClaimDailyQuest
                 )
             }
+            item {
+                LootChestBoard(
+                    state = state,
+                    locale = locale,
+                    onOpen = onOpenLootChest
+                )
+            }
         }
     }
 }
@@ -620,6 +628,83 @@ private fun DailyQuestBoard(
                         ) {
                             Text(locale.getString(if (claimed) "daily_quest_claimed" else if (progress >= quest.target) "daily_quest_claim" else "daily_quest_in_progress"))
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun LootChestBoard(
+    state: GameState,
+    locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager,
+    onOpen: (String) -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth().animateContentSize(),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.tertiaryContainer) {
+                    Icon(Icons.Default.CardGiftcard, contentDescription = null, modifier = Modifier.padding(12.dp).size(26.dp), tint = MaterialTheme.colorScheme.onTertiaryContainer)
+                }
+                Column(Modifier.weight(1f)) {
+                    Text(locale.getString("loot_title"), style = MaterialTheme.typography.titleLarge)
+                    Text(locale.getString("loot_subtitle"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(state.lootDropsFound.toString(), style = MaterialTheme.typography.titleMedium)
+                    Text(locale.getString("loot_found"), style = MaterialTheme.typography.labelSmall)
+                }
+            }
+            if (state.lastLootDropTier != null && state.lootEventId > 0) {
+                Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.14f)) {
+                    Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            locale.getString("loot_drop_message", locale.getString("loot_tier_" + state.lastLootDropTier)),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+            }
+            Text(locale.getString("loot_drop_rates"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            val tiers = listOf(
+                Triple("common", locale.getString("loot_tier_common"), state.lootCommonChests),
+                Triple("rare", locale.getString("loot_tier_rare"), state.lootRareChests),
+                Triple("epic", locale.getString("loot_tier_epic"), state.lootEpicChests)
+            )
+            tiers.forEach { (id, label, count) ->
+                val color = when (id) {
+                    "epic" -> MaterialTheme.colorScheme.tertiary
+                    "rare" -> MaterialTheme.colorScheme.primary
+                    else -> MaterialTheme.colorScheme.onSurfaceVariant
+                }
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Icon(
+                        imageVector = when (id) {
+                            "epic" -> Icons.Default.Diamond
+                            "rare" -> Icons.Default.Inventory2
+                            else -> Icons.Default.CardGiftcard
+                        },
+                        contentDescription = null,
+                        tint = color,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(Modifier.weight(1f)) {
+                        Text(label, style = MaterialTheme.typography.titleSmall)
+                        Text(locale.getString("loot_chest_count", count), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                    }
+                    Button(onClick = { onOpen(id) }, enabled = count > 0) {
+                        Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(locale.getString("loot_open"))
                     }
                 }
             }
