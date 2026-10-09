@@ -762,5 +762,13 @@
   "map_fit_screen": "Fit to screen",
   "world_mastery_bonus": "+%d%% Money per correct guess in this world.",
   "beyond_numbers_title": "Beyond the Numbers",
-  "world_progress_summary": "Worlds unlocked: %d / 4 • Bosses defeated: %d / 4"
+  "world_progress_summary": "Worlds unlocked: %d / 4 • Bosses defeated: %d / 4",
+  "rift_title": "Endless Rift",
+  "rift_description": "Rematch the four bosses in a looping gauntlet. Each victory raises the tier, increases boss HP and multiplies rewards.",
+  "rift_best_tier": "Best cleared tier: %d",
+  "rift_active_tier": "Current tier: %d. Your next boss is waiting on the World Map.",
+  "rift_requirement": "Unlock the Rift after defeating all four world bosses.",
+  "rift_stop": "Leave Endless Rift",
+  "rift_start": "Start Endless Rift",
+  "rift_tier_label": "Endless Rift • Tier %d"
 }
