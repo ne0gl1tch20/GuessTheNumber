@@ -405,7 +405,7 @@ fun NavGraph(
                 HomeBaseScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
             }
             composable(Screen.Codex.route) {
-                CodexScreen(state = state, onBack = { navController.popBackStack() })
+                CodexScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
             }
             composable(Screen.Endgame.route) {
                 EndgameScreen(state = state, onNavigate = { navController.navigate(it) }, onBack = { navController.popBackStack() })
