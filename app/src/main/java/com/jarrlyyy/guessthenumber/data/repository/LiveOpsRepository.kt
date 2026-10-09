@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import java.time.Instant
 
 @Serializable
 data class LiveOpsEvent(
@@ -35,7 +36,22 @@ class LiveOpsRepository(private val context: Context) {
         try {
             val inputStream = context.assets.open("game/liveops_manifest.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<LiveOpsManifest>(jsonString)
+            val manifest = json.decodeFromString<LiveOpsManifest>(jsonString)
+            val now = Instant.now()
+            manifest.copy(events = manifest.events.map { event ->
+                val dates = runCatching {
+                    Instant.parse(event.startDate) to Instant.parse(event.endDate)
+                }.getOrNull()
+                val status = when {
+                    event.status == "ARCHIVED" -> "ARCHIVED"
+                    dates == null -> event.status
+                    now.isBefore(dates.first) -> "UPCOMING"
+                    !now.isBefore(dates.second) -> "ARCHIVED"
+                    event.status == "ENDING" -> "ENDING"
+                    else -> "ACTIVE"
+                }
+                event.copy(status = status)
+            })
         } catch (e: Exception) {
             GameLogger.log(LogLevel.WARN, LoggerCategory.SAVE, "LIVEOPS_FALLBACK", "Failed to read bundled LiveOps manifest: ${e.message}")
             LiveOpsManifest(manifestVersion = 1, events = emptyList())
