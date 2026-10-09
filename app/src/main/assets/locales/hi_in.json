@@ -653,5 +653,8 @@
   "boss_defeated": "बॉस पराजित",
   "world_locked_boss": "पहले यह दुनिया खोलें",
   "boss_fight": "बॉस को चुनौती दें",
-  "boss_requirements_pending": "लड़ाई से पहले और मजबूत बनें"
+  "boss_requirements_pending": "लड़ाई से पहले और मजबूत बनें",
+  "boss_hp_label": "बॉस की सेहत",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "बॉस पर हमला करें"
 }
