@@ -947,6 +947,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             defeatedBossIds = state.defeatedBossIds + bossId,
             worldBossVictories = state.worldBossVictories + 1,
             bossBattleProgress = state.bossBattleProgress + (bossId to bossHp),
+            relicInventory = state.relicInventory + bossId,
+            codexEntries = state.codexEntries + setOf("world:$worldId", "boss:$bossId"),
+            worldMasteryLevels = state.worldMasteryLevels + (worldId to ((state.worldMasteryLevels[worldId] ?: 0) + 1)),
             statistics = state.statistics.copy(
                 moneyEarned = state.statistics.moneyEarned + moneyReward,
                 nebulaEarned = state.statistics.nebulaEarned + nebulaReward
@@ -954,6 +957,46 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         )
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_DEFEATED", "Defeated boss $bossId")
+    }
+
+    /** Handles persistent v2 progression actions. Defaults in GameState preserve older saves. */
+    fun progressionAction(action: String, id: String) {
+        val state = _gameState.value
+        val updated = when (action) {
+            "select_world" -> {
+                if (id !in state.unlockedWorldIds) return
+                state.copy(activeWorldId = id)
+            }
+            "secret" -> {
+                val secretWorld = mapOf("whispering_hollow" to "verdant_grove", "shard_archive" to "crystal_caverns", "ashen_vault" to "ember_summit", "lost_observatory" to "nebula_rift")[id] ?: return
+                val threshold = mapOf("whispering_hollow" to 50L, "shard_archive" to 150L, "ashen_vault" to 300L, "lost_observatory" to 600L)[id] ?: return
+                if (secretWorld !in state.unlockedWorldIds || state.correctGuesses < threshold) return
+                state.copy(discoveredSecretIds = state.discoveredSecretIds + id, codexEntries = state.codexEntries + "secret:$id")
+            }
+            "equip_relic" -> {
+                if (id !in state.relicInventory) return
+                val equipped = if (id in state.equippedRelicIds) state.equippedRelicIds - id else (state.equippedRelicIds + id).takeLast(2).toSet()
+                state.copy(equippedRelicIds = equipped)
+            }
+            "home_upgrade" -> {
+                val cost = BigNumber(50_000L * (state.homeBaseLevel + 1L))
+                if (state.money < cost || state.homeBaseLevel >= 20) return
+                state.copy(money = state.money - cost, homeBaseLevel = state.homeBaseLevel + 1)
+            }
+            "mastery" -> {
+                if (id !in state.unlockedWorldIds || id !in state.worldMasteryLevels.keys) return
+                val current = state.worldMasteryLevels[id] ?: 0
+                val cost = BigNumber(10L * (current + 1L))
+                if (current >= 10 || state.nebula < cost) return
+                state.copy(nebula = state.nebula - cost, worldMasteryLevels = state.worldMasteryLevels + (id to (current + 1)))
+            }
+            else -> return
+        }
+        if (updated != state) {
+            _gameState.value = updated
+            saveGameAsync()
+            GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "PROGRESSION_ACTION", "$action:$id")
+        }
     }
 
     fun openLootChest(tier: String) {
