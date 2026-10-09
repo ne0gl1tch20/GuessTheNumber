@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+import androidx.compose.animation.animateContentSize
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,7 +25,8 @@ import kotlin.random.Random
 @Composable
 fun ArcadeScreen(
     onEarnReward: (Long, BigNumber) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    reducedMotion: Boolean = false
 ) {
     val context = LocalContext.current
     val locale = remember { JsonConfigRepository(context).localeManager }
@@ -54,9 +56,20 @@ fun ArcadeScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(minigames) { minigame ->
+            items(minigames, key = { it.id }) { minigame ->
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(
+                            if (reducedMotion) Modifier
+                            else Modifier.animateItem(
+                                placementSpec = androidx.compose.animation.core.spring(
+                                    stiffness = androidx.compose.animation.core.Spring.StiffnessLow,
+                                    dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
+                                )
+                            )
+                        )
+                        .animateContentSize(),
                     shape = MaterialTheme.shapes.large,
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -286,7 +299,12 @@ fun MemoryMatchDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
                         singleLine = true
                     )
                 } else {
-                    Text(resultText, fontSize = 18.sp)
+                    androidx.compose.animation.AnimatedContent(
+                        targetState = resultText,
+                        label = "memoryMatchResult"
+                    ) { result ->
+                        Text(result, fontSize = 18.sp)
+                    }
                 }
             }
         },
