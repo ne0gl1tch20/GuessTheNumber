@@ -37,13 +37,13 @@ fun RelicsScreen(state: GameState, onAction: (String, String) -> Unit, onBack: (
                         Spacer(Modifier.width(12.dp))
                         Column {
                             Text(locale.getString("relics_title", "Relic Collection"), style = MaterialTheme.typography.titleLarge)
-                            Text(locale.getString("relic_equipped_count", "%d / 2 equipped", state.equippedRelicIds.size), style = MaterialTheme.typography.bodyMedium)
+                            Text(locale.getString("relic_equipped_count", "%d / 4 equipped", state.equippedRelicIds.size), style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(locale.getString("relics_hint", "Defeat world bosses to discover relics. Equip up to two to customize your collection."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(locale.getString("relic_set_bonus", "Set bonus: equipping two relics adds another 10% Money to correct-guess rewards."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
+                Text(locale.getString("relics_hint", "Defeat world bosses to discover relics. Equip up to four for stronger set bonuses."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(locale.getString("relic_set_bonus", "Set bonuses: 2 relics +10% Money, 3 relics +20%, 4 relics +35% and +1 Nebula per correct guess."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
             }
             items(relics, key = { it.id }) { relic ->
                 val owned = relic.id in state.relicInventory
