@@ -27,6 +27,8 @@ import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
+import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import kotlin.random.Random
 
 private val widgetSaveSlotKey = intPreferencesKey("widget_selected_save_slot")
 
@@ -89,7 +91,42 @@ class QuickGuessActionCallback : ActionCallback {
         val slot = (preferences[widgetSaveSlotKey] ?: saveManager.getActiveSlot()).coerceIn(1, MAX_SAVE_SLOTS)
         val engine = GameEngine()
         saveManager.updateGameAtomically(slot) { state ->
-            engine.processGuess(state, state.targetNumber).newState
+            val after = engine.processGuess(state, state.targetNumber).newState
+            val earned = after.money - state.money
+            if (earned <= BigNumber.ZERO) return@updateGameAtomically after
+            var bonusMoney = BigNumber.ZERO
+            if ("talent_reward_1" in state.prestigeShopPurchases) bonusMoney += earned * BigNumber(0.5)
+            val mastery = (state.worldMasteryLevels[state.activeWorldId] ?: 0).coerceIn(0, 10)
+            if (mastery > 0) bonusMoney += earned * BigNumber(mastery * 0.02)
+            val criticalChance = when {
+                "talent_crit_2" in state.prestigeShopPurchases -> 0.15
+                "talent_crit_1" in state.prestigeShopPurchases -> 0.05
+                else -> 0.0
+            }
+            if (criticalChance > 0.0 && Random.nextDouble() < criticalChance) bonusMoney += earned
+            if ("verdant_guardian" in state.equippedRelicIds) bonusMoney += earned * BigNumber(0.10)
+            if ("crystal_golem" in state.equippedRelicIds && Random.nextDouble() < 0.10) bonusMoney += earned * BigNumber(0.5)
+            if ("ember_dragon" in state.equippedRelicIds) bonusMoney += earned * BigNumber(0.25)
+            if ("nebula_titan" in state.equippedRelicIds) bonusMoney += earned * BigNumber(0.25)
+            if (state.equippedRelicIds.size >= 2) bonusMoney += earned * BigNumber(0.10)
+            if (state.homeBaseLevel > 0) bonusMoney += earned * BigNumber((state.homeBaseLevel * 0.02).coerceAtMost(0.40))
+            val secretForWorld = mapOf(
+                "verdant_grove" to "whispering_hollow",
+                "crystal_caverns" to "shard_archive",
+                "ember_summit" to "ashen_vault",
+                "nebula_rift" to "lost_observatory"
+            )[state.activeWorldId]
+            if (secretForWorld != null && secretForWorld in state.discoveredSecretIds) bonusMoney += earned * BigNumber(0.05)
+            val bonusNebula = (if ("talent_master_1" in state.prestigeShopPurchases) 1L else 0L) +
+                (if ("ember_dragon" in state.equippedRelicIds) 1L else 0L)
+            after.copy(
+                money = after.money + bonusMoney,
+                nebula = after.nebula + BigNumber(bonusNebula),
+                statistics = after.statistics.copy(
+                    moneyEarned = after.statistics.moneyEarned + bonusMoney,
+                    nebulaEarned = after.statistics.nebulaEarned + bonusNebula
+                )
+            )
         } ?: return
         GuessWidget().update(context, glanceId)
     }
