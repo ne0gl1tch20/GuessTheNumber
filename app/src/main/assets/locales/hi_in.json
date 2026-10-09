@@ -770,5 +770,11 @@
   "rift_requirement": "चारों विश्व बॉस को हराने के बाद रिफ्ट अनलॉक करें।",
   "rift_stop": "अनंत रिफ्ट छोड़ें",
   "rift_start": "अनंत रिफ्ट शुरू करें",
-  "rift_tier_label": "अनंत रिफ्ट • स्तर %d"
+  "rift_tier_label": "अनंत रिफ्ट • स्तर %d",
+  "notification_reminder_title": "संख्या का अनुमान लगाएँ",
+  "notification_reminder_body": "आपके नंबर आपको याद कर रहे हैं! वापस आएँ और संख्या का अनुमान लगाएँ!",
+  "notification_progression_title": "प्रगति उपलब्धि",
+  "notification_progression_body": "प्रगति का एक नया चरण उपलब्ध है।",
+  "notification_event_title": "गेम इवेंट आपका इंतज़ार कर रहा है",
+  "notification_event_body": "सीमित समय का गेम इवेंट उपलब्ध है।"
 }
