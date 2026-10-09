@@ -815,5 +815,10 @@
   "endgame_goal_rift": "Tapusin ang Endless Rift tier 10",
   "endgame_goal_mastery": "Abutin ang mastery level 5 sa bawat mundo",
   "endgame_claimed": "Na-claim na ang reward",
-  "endgame_claim_reward": "Kunin ang reward"
+  "endgame_claim_reward": "Kunin ang reward",
+  "music_control_previous": "Nakaraan",
+  "music_control_pause": "I-pause",
+  "music_control_play": "I-play",
+  "music_control_next": "Susunod",
+  "music_control_stop": "Ihinto"
 }
