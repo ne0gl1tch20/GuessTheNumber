@@ -70,7 +70,7 @@ class GuessWidget : GlanceAppWidget() {
                     Text(locale.getString("widget_worlds_bosses", "Worlds %d • Bosses %d", state.unlockedWorldIds.size, state.defeatedBossIds.size), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                     Spacer(GlanceModifier.height(8.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), horizontalAlignment = Alignment.Horizontal.CenterHorizontally) {
-                        Button(text = locale.getString("widget_quick_guess", "Open Game"), onClick = actionStartActivity<MainActivity>(), modifier = GlanceModifier.defaultWeight())
+                        Button(text = locale.getString("play", "Play"), onClick = actionStartActivity<MainActivity>(), modifier = GlanceModifier.defaultWeight())
                         Spacer(GlanceModifier.width(8.dp))
                         Button(text = locale.getString("widget_next_slot", "Next Slot"), onClick = actionRunCallback<CycleWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
                     }
