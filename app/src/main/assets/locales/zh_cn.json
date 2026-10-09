@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "领取",
   "daily_quest_claimed": "已领取",
-  "daily_quest_in_progress": "进行中"
+  "daily_quest_in_progress": "进行中",
+  "liveops_bonus_level_label": "永久加成等级",
+  "liveops_bonus_effect": "每级金钱奖励 +2%，每 5 级每次猜对额外获得 +1 星云，最高 25 级。仅适用于当前存档槽。"
 }
