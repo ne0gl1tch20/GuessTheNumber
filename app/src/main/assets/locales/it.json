@@ -792,5 +792,9 @@
   "widget_mastery": "Maestria %d",
   "widget_worlds_bosses": "Mondi %d • Boss %d",
   "widget_quick_guess": "Tentativo rapido",
-  "widget_next_slot": "Slot successivo"
+  "widget_next_slot": "Slot successivo",
+  "endgame_goal_rift": "Completa il livello 10 della Fenditura infinita",
+  "endgame_goal_mastery": "Raggiungi maestria 5 in ogni mondo",
+  "endgame_claimed": "Ricompensa riscattata",
+  "endgame_claim_reward": "Riscatta ricompensa"
 }
