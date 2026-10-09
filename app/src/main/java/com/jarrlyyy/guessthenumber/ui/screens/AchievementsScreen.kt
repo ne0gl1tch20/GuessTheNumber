@@ -1,5 +1,9 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.snap
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -69,6 +73,17 @@ fun AchievementsScreen(
                             fontSize = 16.sp,
                             color = MoneyGold
                         )
+                        val targetProgress = if (achievements.isEmpty()) 0f else unlockedCount.toFloat() / achievements.size
+                        val animatedProgress by animateFloatAsState(
+                            targetValue = targetProgress,
+                            animationSpec = if (state.settings.reducedMotion) snap() else tween(550),
+                            label = "achievementProgress"
+                        )
+                        LinearProgressIndicator(
+                            progress = { animatedProgress },
+                            modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+                            trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                        )
                         Text(
                             text = locale.getString("achievement_progress_desc", "Unlocking achievements grants permanent Nebula rewards and passive perks!"),
                             fontSize = 12.sp,
@@ -78,11 +93,22 @@ fun AchievementsScreen(
                 }
             }
 
-            items(achievements) { achievement ->
+            items(achievements, key = { it.id }) { achievement ->
                 val isUnlocked = state.achievements.contains(achievement.id)
 
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(
+                            if (state.settings.reducedMotion) Modifier
+                            else Modifier.animateItem(
+                                placementSpec = spring(
+                                    stiffness = androidx.compose.animation.core.Spring.StiffnessLow,
+                                    dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
+                                )
+                            )
+                        )
+                        .animateContentSize(),
                     elevation = CardDefaults.cardElevation(2.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = if (isUnlocked) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
