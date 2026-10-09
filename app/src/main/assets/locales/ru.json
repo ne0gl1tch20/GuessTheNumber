@@ -770,5 +770,11 @@
   "rift_requirement": "Разлом откроется после победы над всеми четырьмя мировыми боссами.",
   "rift_stop": "Покинуть Бесконечный разлом",
   "rift_start": "Начать Бесконечный разлом",
-  "rift_tier_label": "Бесконечный разлом • Уровень %d"
+  "rift_tier_label": "Бесконечный разлом • Уровень %d",
+  "notification_reminder_title": "Угадай число",
+  "notification_reminder_body": "Твои числа скучают! Возвращайся и угадай число!",
+  "notification_progression_title": "Этап прогресса",
+  "notification_progression_body": "Доступен новый этап прогресса.",
+  "notification_event_title": "Тебя ждёт событие",
+  "notification_event_body": "Доступно ограниченное по времени событие."
 }
