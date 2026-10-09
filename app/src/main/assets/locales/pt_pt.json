@@ -653,5 +653,8 @@
   "boss_defeated": "Chefe derrotado",
   "world_locked_boss": "Desbloqueie este mundo primeiro",
   "boss_fight": "Desafiar chefe",
-  "boss_requirements_pending": "Evolua mais antes da batalha"
+  "boss_requirements_pending": "Evolua mais antes da batalha",
+  "boss_hp_label": "Vida do chefe",
+  "boss_hp_progress": "%d / %d PV",
+  "boss_attack": "Atacar o chefe"
 }
