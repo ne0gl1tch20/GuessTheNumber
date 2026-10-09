@@ -1017,6 +1017,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 statistics = state.statistics.copy(moneyEarned = state.statistics.moneyEarned + moneyReward, nebulaEarned = state.statistics.nebulaEarned + nebulaReward)
             )
             saveGameAsync()
+            if (state.endlessRiftTier % 5 == 0) {
+                NotificationHelper.showProgressionNotification(getApplication<Application>())
+            }
             GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "ENDLESS_RIFT_CLEARED", "Cleared Rift tier ${state.endlessRiftTier}")
             return
         }
@@ -1109,6 +1112,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (updated != state) {
             _gameState.value = updated
             saveGameAsync()
+            val isHomeBaseMilestone = action == "home_upgrade" && updated.homeBaseLevel in setOf(1, 3, 5, 10, 20)
+            if (action == "secret" || action == "claim_codex" || isHomeBaseMilestone ||
+                (action == "rift_start" && updated.endlessRiftTier > state.endlessRiftBestTier)
+            ) {
+                NotificationHelper.showProgressionNotification(getApplication<Application>())
+            }
             GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "PROGRESSION_ACTION", "$action:$id")
         }
     }
