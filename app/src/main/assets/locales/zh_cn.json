@@ -792,5 +792,9 @@
   "widget_mastery": "精通 %d",
   "widget_worlds_bosses": "世界 %d • 首领 %d",
   "widget_quick_guess": "快速猜测",
-  "widget_next_slot": "下一个存档"
+  "widget_next_slot": "下一个存档",
+  "endgame_goal_rift": "通关无尽裂隙第10层",
+  "endgame_goal_mastery": "每个世界的精通等级达到5",
+  "endgame_claimed": "奖励已领取",
+  "endgame_claim_reward": "领取奖励"
 }
