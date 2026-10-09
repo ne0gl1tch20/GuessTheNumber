@@ -702,7 +702,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if ("talent_reward_1" in before.prestigeShopPurchases) bonusMoney += earned * BigNumber(0.5)
         val criticalChance = when { "talent_crit_2" in before.prestigeShopPurchases -> 0.15; "talent_crit_1" in before.prestigeShopPurchases -> 0.05; else -> 0.0 }
         if (criticalChance > 0.0 && Random.nextDouble() < criticalChance) bonusMoney += earned
-        val bonusNebula = if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L
+        if ("verdant_guardian" in before.equippedRelicIds) bonusMoney += earned * BigNumber(0.10)
+        if ("crystal_golem" in before.equippedRelicIds && Random.nextDouble() < 0.10) bonusMoney += earned * BigNumber(0.5)
+        if ("ember_dragon" in before.equippedRelicIds) bonusMoney += earned * BigNumber(0.25)
+        if ("nebula_titan" in before.equippedRelicIds) bonusMoney += earned * BigNumber(0.25)
+        if (before.equippedRelicIds.size >= 2) bonusMoney += earned * BigNumber(0.10)
+        if (before.homeBaseLevel > 0) bonusMoney += earned * BigNumber((before.homeBaseLevel * 0.02).coerceAtMost(0.40))
+        val bonusNebula = (if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L) + (if ("ember_dragon" in before.equippedRelicIds) 1L else 0L)
         return after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(bonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + bonusNebula))
     }
 
@@ -986,6 +992,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val cost = BigNumber(50_000L * (state.homeBaseLevel + 1L))
                 if (state.money < cost || state.homeBaseLevel >= 20) return
                 state.copy(money = state.money - cost, homeBaseLevel = state.homeBaseLevel + 1)
+            }
+            "claim_codex" -> {
+                val totalEntries = 12
+                if (state.codexRewardClaimed || state.codexEntries.size < totalEntries) return
+                state.copy(nebula = state.nebula + BigNumber(100), codexRewardClaimed = true, statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 100))
             }
             "mastery" -> {
                 if (id !in state.unlockedWorldIds || id !in state.worldMasteryLevels.keys) return
