@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Nhận",
   "daily_quest_claimed": "Đã nhận",
-  "daily_quest_in_progress": "Đang thực hiện"
+  "daily_quest_in_progress": "Đang thực hiện",
+  "liveops_bonus_level_label": "Cấp thưởng vĩnh viễn",
+  "liveops_bonus_effect": "+2% tiền mỗi cấp và +1 Tinh vân cho mỗi lần đoán đúng sau mỗi 5 cấp, tối đa cấp 25. Chỉ áp dụng cho ô lưu này."
 }
