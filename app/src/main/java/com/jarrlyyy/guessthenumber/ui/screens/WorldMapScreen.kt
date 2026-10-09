@@ -150,7 +150,7 @@ fun WorldMapScreen(
                         val isUnlocked = node.id in state.unlockedWorldIds
                         val isSelected = node.id == selectedWorld
                         Surface(
-                            onClick = { selectedWorld = node.id; if (isUnlocked) onProgressionAction("select_world", node.id) },
+                            onClick = { if (!state.endlessRiftActive || node.id == state.activeWorldId) { selectedWorld = node.id; if (isUnlocked) onProgressionAction("select_world", node.id) } },
                             modifier = Modifier.offset(x = mapWidth * node.x - 54.dp, y = mapHeight * node.y - 35.dp).width(108.dp),
                             shape = RoundedCornerShape(22.dp),
                             color = when {
