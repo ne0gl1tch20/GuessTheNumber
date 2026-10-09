@@ -762,5 +762,13 @@
   "map_fit_screen": "Ajustar ao ecrã",
   "world_mastery_bonus": "+%d%% de dinheiro por cada resposta certa neste mundo.",
   "beyond_numbers_title": "Além dos Números",
-  "world_progress_summary": "Mundos desbloqueados: %d / 4 • Chefes derrotados: %d / 4"
+  "world_progress_summary": "Mundos desbloqueados: %d / 4 • Chefes derrotados: %d / 4",
+  "rift_title": "Fenda Infinita",
+  "rift_description": "Enfrenta novamente os quatro bosses num desafio contínuo. Cada vitória aumenta o nível, os PV do boss e as recompensas.",
+  "rift_best_tier": "Melhor nível concluído: %d",
+  "rift_active_tier": "Nível atual: %d. O próximo boss espera no mapa-mundo.",
+  "rift_requirement": "Desbloqueia a Fenda após derrotar os quatro bosses do mundo.",
+  "rift_stop": "Sair da Fenda Infinita",
+  "rift_start": "Iniciar Fenda Infinita",
+  "rift_tier_label": "Fenda Infinita • Nível %d"
 }
