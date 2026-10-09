@@ -608,5 +608,19 @@
   "language_changed_restart": "Language changed. Restart app to take effect.",
   "dropdown": "Dropdown",
   "staking_title": "Combo Streaks & Lucky Stake",
-  "stats_session_arcade": "Session & Arcade"
+  "stats_session_arcade": "Session & Arcade",
+  "loot_title": "Tesouros encontrados",
+  "loot_subtitle": "Acerte os palpites para encontrar baús colecionáveis.",
+  "loot_found": "Encontrados",
+  "loot_opened_count": "Abertos: %d",
+  "loot_drop_message": "Apareceu um baú %s!",
+  "loot_drop_rates": "Probabilidade por resposta certa: Comum 18%, Raro 5%, Épico 1%.",
+  "loot_tier_common": "Baú comum",
+  "loot_tier_rare": "Baú raro",
+  "loot_tier_epic": "Baú épico",
+  "loot_chest_count": "%d no inventário",
+  "loot_rewards_common": "5 000 Money ou 5 Nebula",
+  "loot_rewards_rare": "25 000 Money ou 25 Nebula",
+  "loot_rewards_epic": "100 000 Money ou 100 Nebula",
+  "loot_open": "Abrir"
 }
