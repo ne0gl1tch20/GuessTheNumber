@@ -883,6 +883,65 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun worldProgressAction(worldId: String, action: String) {
+        val state = _gameState.value
+        val totalUpgradeLevels = state.upgradeLevels.values.sum()
+        val worldIndex = listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift").indexOf(worldId)
+        if (worldIndex < 0) return
+        val bossId = when (worldId) {
+            "verdant_grove" -> "verdant_guardian"
+            "crystal_caverns" -> "crystal_golem"
+            "ember_summit" -> "ember_dragon"
+            else -> "nebula_titan"
+        }
+        if (action == "unlock") {
+            val canUnlock = when (worldId) {
+                "crystal_caverns" -> "verdant_guardian" in state.defeatedBossIds && state.correctGuesses >= 25 && totalUpgradeLevels >= 5
+                "ember_summit" -> "crystal_golem" in state.defeatedBossIds && state.correctGuesses >= 100 && totalUpgradeLevels >= 15 && state.prestigeCount >= 1
+                "nebula_rift" -> "ember_dragon" in state.defeatedBossIds && state.correctGuesses >= 250 && totalUpgradeLevels >= 40 && state.prestigeCount >= 3 && state.ultraCount >= 1
+                else -> worldId == "verdant_grove"
+            }
+            if (canUnlock) {
+                _gameState.value = state.copy(unlockedWorldIds = state.unlockedWorldIds + worldId, activeWorldId = worldId)
+                saveGameAsync()
+                GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_UNLOCKED", "Unlocked world $worldId")
+            }
+            return
+        }
+        if (action != "boss" || worldId !in state.unlockedWorldIds || bossId in state.defeatedBossIds) return
+        val canFight = when (worldId) {
+            "verdant_grove" -> state.correctGuesses >= 10 && totalUpgradeLevels >= 3
+            "crystal_caverns" -> state.correctGuesses >= 50 && totalUpgradeLevels >= 10
+            "ember_summit" -> state.correctGuesses >= 150 && totalUpgradeLevels >= 25 && state.prestigeCount >= 1
+            else -> state.correctGuesses >= 500 && totalUpgradeLevels >= 75 && state.prestigeCount >= 5 && state.ultraCount >= 1
+        }
+        if (!canFight) return
+        val moneyReward = when (worldId) {
+            "verdant_grove" -> BigNumber(25_000)
+            "crystal_caverns" -> BigNumber(100_000)
+            "ember_summit" -> BigNumber(500_000)
+            else -> BigNumber(5_000_000)
+        }
+        val nebulaReward = when (worldId) {
+            "verdant_grove" -> 10L
+            "crystal_caverns" -> 25L
+            "ember_summit" -> 75L
+            else -> 250L
+        }
+        _gameState.value = state.copy(
+            money = state.money + moneyReward,
+            nebula = state.nebula + BigNumber(nebulaReward),
+            defeatedBossIds = state.defeatedBossIds + bossId,
+            worldBossVictories = state.worldBossVictories + 1,
+            statistics = state.statistics.copy(
+                moneyEarned = state.statistics.moneyEarned + moneyReward,
+                nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+            )
+        )
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_DEFEATED", "Defeated boss $bossId")
+    }
+
     fun openLootChest(tier: String) {
         val state = _gameState.value
         val available = when (tier) {
