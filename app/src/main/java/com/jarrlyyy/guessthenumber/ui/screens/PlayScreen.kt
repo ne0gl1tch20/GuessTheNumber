@@ -97,6 +97,53 @@ fun PlayScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            if (state.activeBossBattleWorldId != null) {
+                item {
+                    val bossNameKey = when (state.activeBossBattleWorldId) {
+                        "verdant_grove" -> "boss_verdant_name"
+                        "crystal_caverns" -> "boss_crystal_name"
+                        "ember_summit" -> "boss_ember_name"
+                        else -> "boss_nebula_name"
+                    }
+                    val bossFallback = when (state.activeBossBattleWorldId) {
+                        "verdant_grove" -> "Verdant Guardian"
+                        "crystal_caverns" -> "Crystal Golem"
+                        "ember_summit" -> "Ember Dragon"
+                        else -> "Nebula Titan"
+                    }
+                    val bossId = when (state.activeBossBattleWorldId) {
+                        "verdant_grove" -> "verdant_guardian"
+                        "crystal_caverns" -> "crystal_golem"
+                        "ember_summit" -> "ember_dragon"
+                        else -> "nebula_titan"
+                    }
+                    val bossHp = when (state.activeBossBattleWorldId) {
+                        "verdant_grove" -> 3
+                        "crystal_caverns" -> 5
+                        "ember_summit" -> 7
+                        else -> 10
+                    }
+                    val bossDamage = (state.bossBattleProgress[bossId] ?: 0).coerceAtMost(bossHp)
+                    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
+                        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.SportsMma, contentDescription = null, modifier = Modifier.size(28.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(locale.getString("boss_battle_active_title", "Boss Battle Active"), style = MaterialTheme.typography.titleMedium)
+                                    Text(locale.getString(bossNameKey, bossFallback), style = MaterialTheme.typography.bodyMedium)
+                                }
+                                Text(locale.getString("boss_hp_progress", "%d / %d HP", bossHp - bossDamage, bossHp), style = MaterialTheme.typography.labelMedium)
+                            }
+                            LinearProgressIndicator(progress = { bossDamage.toFloat() / bossHp.toFloat() }, modifier = Modifier.fillMaxWidth())
+                            Text(locale.getString("boss_guess_rule", "Correct guesses deal damage. Every third wrong guess restores one HP."), style = MaterialTheme.typography.bodySmall)
+                            OutlinedButton(onClick = { onWorldAction(state.activeBossBattleWorldId!!, "boss") }, modifier = Modifier.fillMaxWidth()) {
+                                Text(locale.getString("boss_battle_stop", "Leave battle"))
+                            }
+                        }
+                    }
+                }
+            }
             item {
                 // Material 3 Expressive Hero Card with Organic Pulsing
                 Surface(
