@@ -762,5 +762,13 @@
   "map_fit_screen": "화면에 맞추기",
   "world_mastery_bonus": "이 세계에서 정답을 맞힐 때마다 돈 +%d%%.",
   "beyond_numbers_title": "숫자를 넘어서",
-  "world_progress_summary": "해금한 세계: %d / 4 • 처치한 보스: %d / 4"
+  "world_progress_summary": "해금한 세계: %d / 4 • 처치한 보스: %d / 4",
+  "rift_title": "엔드리스 리프트",
+  "rift_description": "네 보스에게 연속으로 다시 도전하세요. 승리할 때마다 티어, 보스 HP, 보상이 증가합니다.",
+  "rift_best_tier": "최고 클리어 티어: %d",
+  "rift_active_tier": "현재 티어: %d. 다음 보스가 월드 맵에서 기다립니다.",
+  "rift_requirement": "월드 보스 네 명을 모두 처치하면 리프트가 열립니다.",
+  "rift_stop": "엔드리스 리프트 나가기",
+  "rift_start": "엔드리스 리프트 시작",
+  "rift_tier_label": "엔드리스 리프트 • 티어 %d"
 }
