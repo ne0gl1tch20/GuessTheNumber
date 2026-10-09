@@ -260,6 +260,7 @@ fun MoreScreen(
                                             when (route) {
                                                 "ultra", "prestige" -> onNavigate(route)
                                                 "save_slots" -> onNavigate(Screen.SaveSlots.route)
+                                                "changelog" -> onNavigate(Screen.ChangelogViewer.route)
                                                 "music" -> showMusicDialog = true
                                                 else -> onNavigate(route)
                                             }
