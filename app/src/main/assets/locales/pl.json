@@ -783,5 +783,14 @@
   "notification_category_progression": "Kamienie milowe postępów",
   "notification_category_progression_desc": "Odblokowywanie światów i pokonywanie bossów",
   "notification_category_events": "Wydarzenia w grze",
-  "notification_category_events_desc": "Nowe losowe wydarzenia i nagrody ograniczone czasowo"
+  "notification_category_events_desc": "Nowe losowe wydarzenia i nagrody ograniczone czasowo",
+  "widget_title": "🎯 Zgadnij liczbę",
+  "widget_slot": "Slot zapisu %d • %s",
+  "widget_money": "Pieniądze",
+  "widget_range": "Zakres",
+  "widget_streak": "Seria %d",
+  "widget_mastery": "Mistrzostwo %d",
+  "widget_worlds_bosses": "Światy %d • Bossowie %d",
+  "widget_quick_guess": "Szybki strzał",
+  "widget_next_slot": "Następny slot"
 }
