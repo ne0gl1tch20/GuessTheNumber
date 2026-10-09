@@ -8,7 +8,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 
 object DeveloperConfig {
-    const val ENABLED = BuildConfig.DEBUG
+    val ENABLED = BuildConfig.DEBUG
 }
 
 class CommandExecutor {

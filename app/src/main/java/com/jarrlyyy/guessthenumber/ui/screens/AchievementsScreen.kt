@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
