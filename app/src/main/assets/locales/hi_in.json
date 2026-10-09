@@ -776,5 +776,12 @@
   "notification_progression_title": "प्रगति उपलब्धि",
   "notification_progression_body": "प्रगति का एक नया चरण उपलब्ध है।",
   "notification_event_title": "गेम इवेंट आपका इंतज़ार कर रहा है",
-  "notification_event_body": "सीमित समय का गेम इवेंट उपलब्ध है।"
+  "notification_event_body": "सीमित समय का गेम इवेंट उपलब्ध है।",
+  "notification_category_title": "सूचना श्रेणियाँ",
+  "notification_category_reminders": "रिमाइंडर",
+  "notification_category_reminders_desc": "गेम में वापस आने के लिए नियमित रिमाइंडर",
+  "notification_category_progression": "प्रगति के पड़ाव",
+  "notification_category_progression_desc": "दुनिया अनलॉक करना और बॉस को हराना",
+  "notification_category_events": "गेम इवेंट",
+  "notification_category_events_desc": "नए रैंडम इवेंट और सीमित समय के पुरस्कार"
 }
