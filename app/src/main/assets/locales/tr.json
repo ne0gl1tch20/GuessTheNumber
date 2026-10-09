@@ -776,5 +776,12 @@
   "notification_progression_title": "İlerleme dönüm noktası",
   "notification_progression_body": "Yeni bir ilerleme dönüm noktası hazır.",
   "notification_event_title": "Seni bir etkinlik bekliyor",
-  "notification_event_body": "Sınırlı süreli bir oyun etkinliği hazır."
+  "notification_event_body": "Sınırlı süreli bir oyun etkinliği hazır.",
+  "notification_category_title": "Bildirim kategorileri",
+  "notification_category_reminders": "Hatırlatmalar",
+  "notification_category_reminders_desc": "Oyuna dönmen için düzenli hatırlatmalar",
+  "notification_category_progression": "İlerleme kilometre taşları",
+  "notification_category_progression_desc": "Dünyaların açılması ve boss zaferleri",
+  "notification_category_events": "Oyun etkinlikleri",
+  "notification_category_events_desc": "Yeni rastgele etkinlikler ve süreli ödüller"
 }
