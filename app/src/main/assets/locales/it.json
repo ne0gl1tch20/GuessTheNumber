@@ -608,5 +608,19 @@
   "language_changed_restart": "Language changed. Restart app to take effect.",
   "dropdown": "Dropdown",
   "staking_title": "Combo Streaks & Lucky Stake",
-  "stats_session_arcade": "Session & Arcade"
+  "stats_session_arcade": "Session & Arcade",
+  "loot_title": "Tesori trovati",
+  "loot_subtitle": "Indovina correttamente per trovare forzieri da collezionare.",
+  "loot_found": "Trovati",
+  "loot_opened_count": "Aperti: %d",
+  "loot_drop_message": "È apparso un forziere %s!",
+  "loot_drop_rates": "Probabilità per risposta corretta: Comune 18%, Raro 5%, Epico 1%.",
+  "loot_tier_common": "Forziere comune",
+  "loot_tier_rare": "Forziere raro",
+  "loot_tier_epic": "Forziere epico",
+  "loot_chest_count": "%d nell'inventario",
+  "loot_rewards_common": "5.000 Money o 5 Nebula",
+  "loot_rewards_rare": "25.000 Money o 25 Nebula",
+  "loot_rewards_epic": "100.000 Money o 100 Nebula",
+  "loot_open": "Apri"
 }
