@@ -1,12 +1,21 @@
-# Project Memory: Gamified Guess the Number Simulator (v2.0.0 Update)
+# Project Memory: Gamified Guess the Number Simulator (v3.0.0 Update)
 
 ## Project Overview
 
 **Current player-facing pitch:** Start with a simple number guess, then build a run around upgrades, Frenzy streaks, random events, achievement tiers, cosmetics, stackable mutators, and custom challenges. v1.12 is intended to feel like a game you can keep poking at because every run can be pushed, optimized, or made weird in a different way. 🎮✨
 
-A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v2.0.0` (versionCode 17).
+A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v3.0.0` (versionCode 18).
 
 
+
+## v3.0.0 Beyond the Numbers Ultimate Expansion
+- Current app metadata in `app/build.gradle.kts`: versionName `3.0.0`, versionCode `18`.
+- Added a save-compatible Endless Rift loop, unlocked only after all four world bosses are defeated. Rift tier, best cleared tier and active state are persisted in `GameState` with defaults for old saves.
+- Rift runs rematch bosses in a repeating four-world order. Each victory scales the next boss by +2 HP per tier, multiplies that victory's Money and Nebula rewards by the current tier, records the best cleared tier and automatically advances to the next world.
+- The World Map displays tier-scaled boss HP and the active Rift tier, and uses the existing guessing combat, phase rules and miss penalties for Rift rematches.
+- Endgame Challenges now starts or leaves the Rift and displays current/best tier. Navigation calls the same ViewModel progression action handler used by other progression screens.
+- Added the eight Rift UI strings to all 23 locale catalogs (Arabic, German, English UK/US, Spanish, Filipino, French, Hindi, Indonesian, Italian, Japanese, Korean, Dutch, Polish, Portuguese Brazil/Portugal, Russian, Thai, Turkish, Ukrainian, Vietnamese, Simplified Chinese and Traditional Chinese).
+- Changelog updated for v3.0.0. Build/runtime validation must be confirmed from GitHub Actions before describing the expansion as build-verified.
 
 ## v2.0.0 Beyond the Numbers Expansion
 - Current release metadata in `app/build.gradle.kts`: versionName `2.0.0`, versionCode `17`.
