@@ -68,7 +68,9 @@ data class GameState(
     val worldMasteryLevels: Map<String, Int> = emptyMap(),
     val discoveredSecretIds: Set<String> = emptySet(),
     val codexEntries: Set<String> = emptySet(),
-    val homeBaseLevel: Int = 0
+    val homeBaseLevel: Int = 0,
+    val activeBossBattleWorldId: String? = null,
+    val bossBattleMistakes: Map<String, Int> = emptyMap()
 )
 
 @Serializable
