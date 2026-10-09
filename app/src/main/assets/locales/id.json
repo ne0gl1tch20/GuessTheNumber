@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Selesaikan Rift Tanpa Akhir tingkat 10",
   "endgame_goal_mastery": "Capai penguasaan level 5 di setiap dunia",
   "endgame_claimed": "Hadiah sudah diklaim",
-  "endgame_claim_reward": "Klaim hadiah"
+  "endgame_claim_reward": "Klaim hadiah",
+  "music_control_previous": "Sebelumnya",
+  "music_control_pause": "Jeda",
+  "music_control_play": "Putar",
+  "music_control_next": "Berikutnya",
+  "music_control_stop": "Berhenti"
 }
