@@ -659,6 +659,7 @@ private fun LootChestBoard(
                 Column(horizontalAlignment = Alignment.End) {
                     Text(state.lootDropsFound.toString(), style = MaterialTheme.typography.titleMedium)
                     Text(locale.getString("loot_found"), style = MaterialTheme.typography.labelSmall)
+                    Text(locale.getString("loot_opened_count", state.lootChestsOpened), style = MaterialTheme.typography.labelSmall)
                 }
             }
             if (state.lastLootDropTier != null && state.lootEventId > 0) {
@@ -700,6 +701,7 @@ private fun LootChestBoard(
                     Column(Modifier.weight(1f)) {
                         Text(label, style = MaterialTheme.typography.titleSmall)
                         Text(locale.getString("loot_chest_count", count), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                        Text(locale.getString("loot_rewards_" + id), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
                     }
                     Button(onClick = { onOpen(id) }, enabled = count > 0) {
                         Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(16.dp))
