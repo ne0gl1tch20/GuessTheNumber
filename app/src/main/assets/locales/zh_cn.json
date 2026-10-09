@@ -796,5 +796,10 @@
   "endgame_goal_rift": "通关无尽裂隙第10层",
   "endgame_goal_mastery": "每个世界的精通等级达到5",
   "endgame_claimed": "奖励已领取",
-  "endgame_claim_reward": "领取奖励"
+  "endgame_claim_reward": "领取奖励",
+  "music_control_previous": "上一首",
+  "music_control_pause": "暂停",
+  "music_control_play": "播放",
+  "music_control_next": "下一首",
+  "music_control_stop": "停止"
 }
