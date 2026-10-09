@@ -34,6 +34,7 @@ fun PlayScreen(
     onMakeGuess: (Long) -> Unit,
     onClaimDailyQuest: (String) -> Unit = {},
     onOpenLootChest: (String) -> Unit = {},
+    onWorldAction: (String, String) -> Unit = { _, _ -> },
     incomePerSecond: com.jarrlyyy.guessthenumber.domain.model.BigNumber = com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -561,6 +562,13 @@ fun PlayScreen(
                     onOpen = onOpenLootChest
                 )
             }
+            item {
+                WorldProgressionBoard(
+                    state = state,
+                    locale = locale,
+                    onAction = onWorldAction
+                )
+            }
         }
     }
 }
@@ -715,6 +723,129 @@ private fun LootChestBoard(
                         Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(locale.getString("loot_open"))
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun WorldProgressionBoard(
+    state: GameState,
+    locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager,
+    onAction: (String, String) -> Unit
+) {
+    data class WorldDef(
+        val id: String,
+        val nameKey: String,
+        val bossId: String,
+        val bossNameKey: String,
+        val worldRequirementKey: String,
+        val bossRequirementKey: String,
+        val rewardKey: String
+    )
+    val worlds = listOf(
+        WorldDef("verdant_grove", "world_verdant_name", "verdant_guardian", "boss_verdant_name", "world_verdant_requirement", "boss_verdant_requirement", "boss_verdant_reward"),
+        WorldDef("crystal_caverns", "world_crystal_name", "crystal_golem", "boss_crystal_name", "world_crystal_requirement", "boss_crystal_requirement", "boss_crystal_reward"),
+        WorldDef("ember_summit", "world_ember_name", "ember_dragon", "boss_ember_name", "world_ember_requirement", "boss_ember_requirement", "boss_ember_reward"),
+        WorldDef("nebula_rift", "world_nebula_name", "nebula_titan", "boss_nebula_name", "world_nebula_requirement", "boss_nebula_requirement", "boss_nebula_reward")
+    )
+    val totalUpgradeLevels = state.upgradeLevels.values.sum()
+    Card(
+        modifier = Modifier.fillMaxWidth().animateContentSize(),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.primaryContainer) {
+                    Icon(Icons.Default.Explore, contentDescription = null, modifier = Modifier.padding(10.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                }
+                Column(Modifier.weight(1f)) {
+                    Text(locale.getString("worlds_title"), style = MaterialTheme.typography.titleLarge)
+                    Text(locale.getString("worlds_subtitle"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text(locale.getString("worlds_boss_count", state.worldBossVictories), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
+            }
+            worlds.forEachIndexed { index, world ->
+                val unlocked = world.id in state.unlockedWorldIds
+                val defeated = world.bossId in state.defeatedBossIds
+                val previousBossId = when (index) {
+                    1 -> "verdant_guardian"
+                    2 -> "crystal_golem"
+                    3 -> "ember_dragon"
+                    else -> ""
+                }
+                val canUnlock = when (world.id) {
+                    "crystal_caverns" -> previousBossId in state.defeatedBossIds && state.correctGuesses >= 25 && totalUpgradeLevels >= 5
+                    "ember_summit" -> previousBossId in state.defeatedBossIds && state.correctGuesses >= 100 && totalUpgradeLevels >= 15 && state.prestigeCount >= 1
+                    "nebula_rift" -> previousBossId in state.defeatedBossIds && state.correctGuesses >= 250 && totalUpgradeLevels >= 40 && state.prestigeCount >= 3 && state.ultraCount >= 1
+                    else -> false
+                }
+                val canFight = when (world.id) {
+                    "verdant_grove" -> state.correctGuesses >= 10 && totalUpgradeLevels >= 3
+                    "crystal_caverns" -> state.correctGuesses >= 50 && totalUpgradeLevels >= 10
+                    "ember_summit" -> state.correctGuesses >= 150 && totalUpgradeLevels >= 25 && state.prestigeCount >= 1
+                    else -> state.correctGuesses >= 500 && totalUpgradeLevels >= 75 && state.prestigeCount >= 5 && state.ultraCount >= 1
+                }
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = if (unlocked) MaterialTheme.colorScheme.surfaceContainerLow else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        if (world.id == state.activeWorldId) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+                    )
+                ) {
+                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Icon(
+                                imageVector = when (index) {
+                                    0 -> Icons.Default.Forest
+                                    1 -> Icons.Default.Diamond
+                                    2 -> Icons.Default.LocalFireDepartment
+                                    else -> Icons.Default.AutoAwesome
+                                },
+                                contentDescription = null,
+                                tint = if (unlocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(28.dp)
+                            )
+                            Column(Modifier.weight(1f)) {
+                                Text(locale.getString(world.nameKey), style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    locale.getString(if (unlocked) "world_status_unlocked" else "world_status_locked"),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (unlocked) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            if (defeated) Icon(Icons.Default.CheckCircle, contentDescription = locale.getString("boss_defeated"), tint = MaterialTheme.colorScheme.tertiary)
+                        }
+                        Text(locale.getString(world.worldRequirementKey), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        if (!unlocked && index > 0) {
+                            Button(onClick = { onAction(world.id, "unlock") }, enabled = canUnlock, modifier = Modifier.fillMaxWidth()) {
+                                Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text(locale.getString(if (canUnlock) "world_unlock" else "world_requirements_pending"))
+                            }
+                        }
+                        HorizontalDivider()
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Icon(Icons.Default.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
+                            Text(locale.getString(world.bossNameKey), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                        }
+                        Text(locale.getString(world.bossRequirementKey), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(locale.getString(world.rewardKey), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.tertiary)
+                        Button(
+                            onClick = { onAction(world.id, "boss") },
+                            enabled = unlocked && canFight && !defeated,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(if (defeated) Icons.Default.EmojiEvents else Icons.Default.SportsMma, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(locale.getString(if (defeated) "boss_defeated" else if (!unlocked) "world_locked_boss" else if (canFight) "boss_fight" else "boss_requirements_pending"))
+                        }
                     }
                 }
             }
