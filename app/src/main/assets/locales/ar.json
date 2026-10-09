@@ -609,5 +609,19 @@
   "dropdown": "Dropdown",
   "staking_title": "Combo Streaks & Lucky Stake",
   "stats_session_arcade": "Session & Arcade",
-  "rtl": true
+  "rtl": true,
+  "loot_title": "كنوز ومكافآت",
+  "loot_subtitle": "خمّن الأرقام بشكل صحيح لاكتشاف الصناديق القابلة للجمع.",
+  "loot_found": "تم العثور عليها",
+  "loot_opened_count": "تم فتحها: %d",
+  "loot_drop_message": "حصلت على صندوق %s!",
+  "loot_drop_rates": "فرصة السقوط لكل تخمين صحيح: عادي 18٪، نادر 5٪، ملحمي 1٪.",
+  "loot_tier_common": "صندوق عادي",
+  "loot_tier_rare": "صندوق نادر",
+  "loot_tier_epic": "صندوق ملحمي",
+  "loot_chest_count": "في المخزون: %d",
+  "loot_rewards_common": "5,000 Money أو 5 Nebula",
+  "loot_rewards_rare": "25,000 Money أو 25 Nebula",
+  "loot_rewards_epic": "100,000 Money أو 100 Nebula",
+  "loot_open": "افتح"
 }
