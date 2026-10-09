@@ -13,7 +13,8 @@
 
 ## Completed in the latest notification/widget pass
 
-- Localized notification titles and bodies using the saved global app language instead of forcing English.
+- Added localized reminder/progression/event notification titles and bodies to all 23 supported locale catalogs; notifications load the saved global app language.
+- Restored reminder scheduling after device reboot from saved notification preferences, including the selected 12/24/48-hour interval and disabled state.
 - Kept reminder, progression and event notifications on separate channels with destination extras for navigation.
 - Routed supported notification destinations directly from MainActivity into the matching NavGraph start destination.
 - Changed the home-screen widget to render metrics from the latest saved game state instead of stale Glance preference snapshots.
