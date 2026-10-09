@@ -62,6 +62,7 @@ fun TalentScreen(state: GameState, onBuyTalent: (String, Long) -> Unit, onBack: 
             title = { Text(locale.getString("talent_tree_title", "Prestige Skill Tree")) },
             navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = locale.getString("back", "Back")) } },
             actions = {
+                IconButton(onClick = { zoom = 0.82f; pan = Offset.Zero }) { Icon(Icons.Default.FitScreen, contentDescription = locale.getString("map_fit_screen", "Fit tree to screen")) }
                 IconButton(onClick = { zoom = (zoom / 1.25f).coerceAtLeast(.55f) }) { Icon(Icons.Default.ZoomOut, contentDescription = locale.getString("zoom_out", "Zoom out")) }
                 IconButton(onClick = { zoom = (zoom * 1.25f).coerceAtMost(2.8f) }) { Icon(Icons.Default.ZoomIn, contentDescription = locale.getString("zoom_in", "Zoom in")) }
                 IconButton(onClick = { zoom = 1f; pan = Offset.Zero }) { Icon(Icons.Default.CenterFocusStrong, contentDescription = locale.getString("map_reset_view", "Reset view")) }
