@@ -47,6 +47,11 @@ fun WorldMapScreen(
 ) {
     val locale = LocalAppLocaleManager.current
     var selectedWorld by remember { mutableStateOf(state.activeWorldId) }
+    // Keep the map selection aligned with persisted progression, especially when an Endless Rift
+    // victory advances to the next world or an active run is restored after process recreation.
+    LaunchedEffect(state.activeWorldId) {
+        selectedWorld = state.activeWorldId
+    }
     var zoom by remember { mutableFloatStateOf(1f) }
     var pan by remember { mutableStateOf(Offset.Zero) }
     val worlds = listOf(
