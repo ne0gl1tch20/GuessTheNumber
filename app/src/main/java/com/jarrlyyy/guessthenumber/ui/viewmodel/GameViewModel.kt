@@ -1092,6 +1092,29 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 if (state.codexRewardClaimed || state.codexEntries.size < totalEntries) return
                 state.copy(nebula = state.nebula + BigNumber(100), codexRewardClaimed = true, statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 100))
             }
+            "claim_endgame_reward" -> {
+                val allBosses = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+                val reward = when (id) {
+                    "all_bosses" -> if (state.defeatedBossIds.containsAll(allBosses)) BigNumber(250) to BigNumber(2_000_000) else return
+                    "all_secrets" -> if (state.discoveredSecretIds.containsAll(setOf("whispering_hollow", "shard_archive", "ashen_vault", "lost_observatory"))) BigNumber(200) to BigNumber(1_000_000) else return
+                    "all_relics" -> if (state.relicInventory.containsAll(allBosses)) BigNumber(300) to BigNumber(1_000_000) else return
+                    "sanctuary_10" -> if (state.homeBaseLevel >= 10) BigNumber(500) to BigNumber(5_000_000) else return
+                    "rift_tier_10" -> if (state.endlessRiftBestTier >= 10) BigNumber(1_000) to BigNumber(10_000_000) else return
+                    else -> return
+                }
+                if (id in state.endgameRewardsClaimed) return
+                val nebulaReward = reward.first
+                val moneyReward = reward.second
+                state.copy(
+                    money = state.money + moneyReward,
+                    nebula = state.nebula + nebulaReward,
+                    endgameRewardsClaimed = state.endgameRewardsClaimed + id,
+                    statistics = state.statistics.copy(
+                        moneyEarned = state.statistics.moneyEarned + moneyReward,
+                        nebulaEarned = state.statistics.nebulaEarned + nebulaReward.toLong()
+                    )
+                )
+            }
             "mastery" -> {
                 val bossForMastery = mapOf("verdant_grove" to "verdant_guardian", "crystal_caverns" to "crystal_golem", "ember_summit" to "ember_dragon", "nebula_rift" to "nebula_titan")[id] ?: return
                 if (id !in state.unlockedWorldIds || bossForMastery !in state.defeatedBossIds) return
