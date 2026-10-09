@@ -82,6 +82,9 @@ fun WorldMapScreen(
                 title = { Text(locale.getString("world_map_title", "World Map")) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = locale.getString("back", "Back")) } },
                 actions = {
+                    IconButton(onClick = { zoom = 0.82f; pan = Offset.Zero }) {
+                        Icon(Icons.Default.FitScreen, contentDescription = locale.getString("map_fit_screen", "Fit map to screen"))
+                    }
                     IconButton(onClick = { zoom = 1f; pan = Offset.Zero }) {
                         Icon(Icons.Default.CenterFocusStrong, contentDescription = locale.getString("map_reset_view", "Reset map view"))
                     }
@@ -191,7 +194,7 @@ fun WorldMapScreen(
                         LinearProgressIndicator(progress = { damage.toFloat() / world.hp.toFloat() }, modifier = Modifier.fillMaxWidth())
                         val phase = ((damage * 3) / world.hp + 1).coerceIn(1, 3)
                         Text(locale.getString("boss_phase_label", "Phase %d / 3 • Correct guesses damage the boss.", phase))
-                        Text(locale.getString("boss_battle_tip", "Bosses become more dangerous as their health drops. Build your upgrades before attacking."))
+                        Text(locale.getString("boss_battle_tip", "Phase 1: every 4 misses pushes back your progress. Phase 2: every 3 misses. Phase 3: every 2 misses."))
                         if (state.activeBossBattleWorldId == world.id) {
                             Text(locale.getString("boss_battle_active", "Battle active! Return to Play and guess the number. Every three misses restores 1 HP."), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodySmall)
                         }
