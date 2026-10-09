@@ -783,5 +783,14 @@
   "notification_category_progression": "Étapes de progression",
   "notification_category_progression_desc": "Déblocage de mondes et victoires contre les boss",
   "notification_category_events": "Événements du jeu",
-  "notification_category_events_desc": "Nouveaux événements aléatoires et récompenses limitées"
+  "notification_category_events_desc": "Nouveaux événements aléatoires et récompenses limitées",
+  "widget_title": "🎯 Devine le nombre",
+  "widget_slot": "Emplacement %d • %s",
+  "widget_money": "Argent",
+  "widget_range": "Plage",
+  "widget_streak": "Série %d",
+  "widget_mastery": "Maîtrise %d",
+  "widget_worlds_bosses": "Mondes %d • Boss %d",
+  "widget_quick_guess": "Deviner vite",
+  "widget_next_slot": "Emplacement suivant"
 }
