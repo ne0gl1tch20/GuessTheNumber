@@ -15,10 +15,21 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.jarrlyyy.guessthenumber.MainActivity
 import com.jarrlyyy.guessthenumber.R
+import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+import com.jarrlyyy.guessthenumber.data.store.SaveManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 class MusicPlaybackService : Service() {
     private lateinit var manager: BackgroundMusicManager
     private lateinit var mediaSession: MediaSessionCompat
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    @Volatile private var notificationLocale: LocaleManager? = null
     private val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private val stateUpdater = object : Runnable {
         override fun run() {
@@ -43,10 +54,22 @@ class MusicPlaybackService : Service() {
             isActive = true
         }
         startForeground(NOTIFICATION_ID, buildNotification())
+        serviceScope.launch {
+            val localeManager = LocaleManager(applicationContext)
+            val localeTag = runCatching {
+                JSONObject(SaveManager(applicationContext).getAppPreferencesJson()).optString("locale", "en-US")
+            }.getOrDefault("en-US")
+            localeManager.loadLocaleForTag(localeTag)
+            notificationLocale = localeManager
+            withContext(Dispatchers.Main) { updateSessionAndNotification() }
+        }
         mainHandler.post(stateUpdater)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent == null && !manager.isPlaying.value && manager.currentTrackId.value != null) {
+            manager.play()
+        }
         if (intent?.action == Intent.ACTION_MEDIA_BUTTON) {
             MediaButtonReceiver.handleIntent(mediaSession, intent)
         } else {
@@ -64,6 +87,7 @@ class MusicPlaybackService : Service() {
 
     override fun onDestroy() {
         mainHandler.removeCallbacks(stateUpdater)
+        serviceScope.cancel()
         mediaSession.isActive = false
         mediaSession.release()
         super.onDestroy()
@@ -126,13 +150,15 @@ class MusicPlaybackService : Service() {
             .setOngoing(manager.isPlaying.value)
             .setOnlyAlertOnce(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .addAction(NotificationCompat.Action(android.R.drawable.ic_media_previous, "Previous", previous))
-            .addAction(NotificationCompat.Action(if (manager.isPlaying.value) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play, if (manager.isPlaying.value) "Pause" else "Play", playPause))
-            .addAction(NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", next))
-            .addAction(NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, "Stop", stop))
+            .addAction(NotificationCompat.Action(android.R.drawable.ic_media_previous, label("music_control_previous", "Previous"), previous))
+            .addAction(NotificationCompat.Action(if (manager.isPlaying.value) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play, label(if (manager.isPlaying.value) "music_control_pause" else "music_control_play", if (manager.isPlaying.value) "Pause" else "Play"), playPause))
+            .addAction(NotificationCompat.Action(android.R.drawable.ic_media_next, label("music_control_next", "Next"), next))
+            .addAction(NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, label("music_control_stop", "Stop"), stop))
             .setStyle(NotificationCompat.MediaStyle().setMediaSession(mediaSession.sessionToken).setShowActionsInCompactView(0, 1, 2))
             .build()
     }
+
+    private fun label(key: String, fallback: String): String = notificationLocale?.getString(key, fallback) ?: fallback
 
     private fun commandIntent(action: String): Intent = Intent(this, MusicPlaybackService::class.java).setAction(action)
 
