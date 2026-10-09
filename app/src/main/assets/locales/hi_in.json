@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "ले लें",
   "daily_quest_claimed": "ले लिया गया",
-  "daily_quest_in_progress": "जारी है"
+  "daily_quest_in_progress": "जारी है",
+  "liveops_bonus_level_label": "स्थायी बोनस स्तर",
+  "liveops_bonus_effect": "हर स्तर पर +2% मनी और हर 5 स्तर पर प्रत्येक सही अनुमान के लिए +1 नेबुला, अधिकतम 25 स्तर तक। यह इसी सेव स्लॉट पर लागू है।"
 }
