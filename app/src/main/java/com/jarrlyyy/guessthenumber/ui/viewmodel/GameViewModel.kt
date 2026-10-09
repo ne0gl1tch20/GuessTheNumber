@@ -13,6 +13,7 @@ import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.data.notification.GameReminderWorker
+import com.jarrlyyy.guessthenumber.data.notification.NotificationHelper
 import com.jarrlyyy.guessthenumber.widget.WidgetRefresh
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
@@ -418,6 +419,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             worldProgressAction(activeBossWorld, if (isCorrect) "boss_hit" else "boss_miss")
         }
         checkAchievements(_gameState.value)
+        val finalState = _gameState.value
+        if (finalState.achievements.size > currentState.achievements.size) {
+            NotificationHelper.showProgressionNotification(getApplication<Application>())
+        }
+        if (finalState.lastRandomEventId != currentState.lastRandomEventId && finalState.lastRandomEventId != null) {
+            NotificationHelper.showEventNotification(getApplication<Application>())
+        }
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.GUESS, "MAKE_GUESS", "Guess $guess resulted in ${result.feedback}, reward: ${result.reward}")
     }
@@ -937,7 +945,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 "nebula_rift" -> "ember_dragon" in state.defeatedBossIds && state.correctGuesses >= 250 && totalUpgradeLevels >= 40 && state.prestigeCount >= 3 && state.ultraCount >= 1
                 else -> worldId == "verdant_grove"
             }
-            if (canUnlock) { _gameState.value = state.copy(unlockedWorldIds = state.unlockedWorldIds + worldId, activeWorldId = worldId); saveGameAsync(); GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_UNLOCKED", "Unlocked world $worldId") }
+            if (canUnlock) {
+                _gameState.value = state.copy(unlockedWorldIds = state.unlockedWorldIds + worldId, activeWorldId = worldId)
+                saveGameAsync()
+                NotificationHelper.showProgressionNotification(getApplication<Application>())
+                GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_UNLOCKED", "Unlocked world $worldId")
+            }
             return
         }
         if (action == "boss") {
@@ -1004,6 +1017,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
         _gameState.value = state.copy(money = state.money + baseMoneyReward, nebula = state.nebula + BigNumber(baseNebulaReward), defeatedBossIds = state.defeatedBossIds + bossId, worldBossVictories = state.worldBossVictories + 1, bossBattleProgress = state.bossBattleProgress + (bossId to bossHp), activeBossBattleWorldId = null, relicInventory = state.relicInventory + bossId, codexEntries = state.codexEntries + setOf("world:$worldId", "boss:$bossId"), worldMasteryLevels = state.worldMasteryLevels + (worldId to ((state.worldMasteryLevels[worldId] ?: 0) + 1)), statistics = state.statistics.copy(moneyEarned = state.statistics.moneyEarned + baseMoneyReward, nebulaEarned = state.statistics.nebulaEarned + baseNebulaReward))
         saveGameAsync()
+        NotificationHelper.showProgressionNotification(getApplication<Application>())
         GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_DEFEATED", "Defeated boss $bossId")
     }
 
