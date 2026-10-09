@@ -125,11 +125,12 @@ fun CodexScreen(state: GameState, onAction: (String, String) -> Unit, onBack: ()
     Scaffold(topBar = { TopAppBar(title = { Text(locale.getString("codex_title", "Explorer's Codex")) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = locale.getString("back", "Back")) } }) }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             item {
-                Text(locale.getString("codex_progress", "%d / %d entries discovered", state.codexEntries.size, entries.size), style = MaterialTheme.typography.titleMedium)
-                LinearProgressIndicator(progress = { (state.codexEntries.size.toFloat() / entries.size).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth())
+                val discoveredCount = entries.count { it.first in state.codexEntries }
+                Text(locale.getString("codex_progress", "%d / %d entries discovered", discoveredCount, entries.size), style = MaterialTheme.typography.titleMedium)
+                LinearProgressIndicator(progress = { (discoveredCount.toFloat() / entries.size).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth())
             }
             item {
-                Button(onClick = { onAction("claim_codex", "complete") }, enabled = state.codexEntries.size >= entries.size && !state.codexRewardClaimed, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = { onAction("claim_codex", "complete") }, enabled = entries.all { it.first in state.codexEntries } && !state.codexRewardClaimed, modifier = Modifier.fillMaxWidth()) {
                     Text(locale.getString(if (state.codexRewardClaimed) "codex_reward_claimed" else "codex_claim_reward", if (state.codexRewardClaimed) "Completion reward claimed" else "Claim 100 Nebula completion reward"))
                 }
             }
