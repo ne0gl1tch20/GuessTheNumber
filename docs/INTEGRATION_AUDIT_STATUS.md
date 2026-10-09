@@ -35,6 +35,9 @@
 - Endgame goals expose reward-claim buttons when their requirements are met, and the Codex completion reward requires all 12 core world/boss/secret entries instead of being affected by bonus Codex entries.
 
 ## Completed in the follow-up audit pass
+- Completed the missing daily-bounty labels across the remaining locale catalogs. A key/placeholder audit now reports 822 matching English keys in every locale catalog; Arabic also retains its existing `rtl` metadata key. No missing keys or `%s/%d/%f/%i` placeholder mismatches were found in the audited catalogs.
+- Daily bounty claims now update `statistics.moneyEarned` or `statistics.nebulaEarned` alongside the actual payout, keeping lifetime earned totals aligned with rewards.
+
 
 - Notification taps now reach the requested in-app destination on both cold launch and when the app is already running; the destination request is cleared after navigation so later taps are handled too.
 - Media playback notification controls now use the active locale catalog instead of hardcoded English labels. Added translated Previous/Pause/Play/Next/Stop labels to all 23 locale catalogs.
