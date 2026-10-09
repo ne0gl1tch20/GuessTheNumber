@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.ui.screens
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import androidx.compose.animation.*
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -70,6 +71,7 @@ fun PlayScreen(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .animateContentSize()
                         .scale(scalePulse),
                     shape = MaterialTheme.shapes.extraLarge,
                     color = MaterialTheme.colorScheme.primaryContainer,

@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.ui.navigation
 import androidx.compose.animation.*
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
@@ -215,10 +216,54 @@ fun NavGraph(
                 navController = navController,
             startDestination = Screen.Play.route,
             modifier = Modifier.fillMaxSize(),
-            enterTransition = { if (state.settings.reducedMotion) EnterTransition.None else fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { 100 }) },
-            exitTransition = { if (state.settings.reducedMotion) ExitTransition.None else fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { -100 }) },
-            popEnterTransition = { if (state.settings.reducedMotion) EnterTransition.None else fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { -100 }) },
-            popExitTransition = { if (state.settings.reducedMotion) ExitTransition.None else fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { 100 }) }
+            enterTransition = {
+                if (state.settings.reducedMotion) EnterTransition.None
+                else fadeIn(animationSpec = tween(220)) +
+                    slideInHorizontally(
+                        initialOffsetX = { it / 12 },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) +
+                    scaleIn(
+                        initialScale = 0.97f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    )
+            },
+            exitTransition = {
+                if (state.settings.reducedMotion) ExitTransition.None
+                else fadeOut(animationSpec = tween(140)) +
+                    slideOutHorizontally(targetOffsetX = { -it / 16 }, animationSpec = tween(160)) +
+                    scaleOut(targetScale = 0.985f, animationSpec = tween(160))
+            },
+            popEnterTransition = {
+                if (state.settings.reducedMotion) EnterTransition.None
+                else fadeIn(animationSpec = tween(220)) +
+                    slideInHorizontally(
+                        initialOffsetX = { -it / 12 },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) +
+                    scaleIn(
+                        initialScale = 0.97f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    )
+            },
+            popExitTransition = {
+                if (state.settings.reducedMotion) ExitTransition.None
+                else fadeOut(animationSpec = tween(140)) +
+                    slideOutHorizontally(targetOffsetX = { it / 16 }, animationSpec = tween(160)) +
+                    scaleOut(targetScale = 0.985f, animationSpec = tween(160))
+            }
         ) {
             composable(Screen.Play.route) {
                 ExpressiveScreen(enabled = !state.settings.reducedMotion) { PlayScreen(state = state, onMakeGuess = { guess ->

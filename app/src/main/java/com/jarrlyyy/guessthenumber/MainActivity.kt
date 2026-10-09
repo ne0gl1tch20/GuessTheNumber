@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import com.jarrlyyy.guessthenumber.ui.components.ExpressiveSaveLoadingScreen
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -61,27 +59,11 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    isLoadingSave && !(hasAnySave && state.lastSaveTimestamp > 0L) -> {
-                        Surface(
-                            modifier = Modifier.fillMaxSize(),
-                            color = MaterialTheme.colorScheme.background
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    CircularProgressIndicator()
-                                    Text(
-                                        text = locale.getString("loading_save_data", "Loading save data..."),
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                }
-                            }
-                        }
+                    isLoadingSave -> {
+                        ExpressiveSaveLoadingScreen(
+                            title = locale.getString("loading_save_data", "Loading save data..."),
+                            reducedMotion = state.settings.reducedMotion
+                        )
                     }
 
                     else -> {

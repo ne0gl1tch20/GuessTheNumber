@@ -274,17 +274,28 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (slot in 1..MAX_SAVE_SLOTS && slot != _activeSlot.value) {
             viewModelScope.launch(Dispatchers.IO) {
                 slotOperationMutex.withLock {
-                    val currentSlot = _activeSlot.value
-                    val currentState = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
-                    saveManager.saveGame(currentState, currentSlot)
-                    saveManager.setActiveSlot(slot)
-                    val loaded = saveManager.loadGame(slot)
-                    val sanitized = AntiCheatService.sanitizeCurrency(loaded)
-                    _activeSlot.value = slot
-                    _gameState.value = sanitized
-                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
-                    lastIncomeMeasurement = sanitized.money
-                    _incomePerSecond.value = BigNumber.ZERO
+                    withContext(Dispatchers.Main) {
+                        _isLoadingSave.value = true
+                    }
+                    try {
+                        val currentSlot = _activeSlot.value
+                        val currentState = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
+                        saveManager.saveGame(currentState, currentSlot)
+                        saveManager.setActiveSlot(slot)
+                        val loaded = saveManager.loadGame(slot)
+                        val sanitized = AntiCheatService.sanitizeCurrency(loaded)
+                        withContext(Dispatchers.Main) {
+                            _activeSlot.value = slot
+                            _gameState.value = sanitized
+                            guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                            lastIncomeMeasurement = sanitized.money
+                            _incomePerSecond.value = BigNumber.ZERO
+                        }
+                    } finally {
+                        withContext(Dispatchers.Main) {
+                            _isLoadingSave.value = false
+                        }
+                    }
                 }
             }
         }

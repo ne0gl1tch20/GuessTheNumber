@@ -2,6 +2,10 @@ package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -470,12 +474,20 @@ fun SlotCard(
     locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 ) {
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
+    val slotContainerColor by animateColorAsState(
+        targetValue = if (isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "save-slot-container"
+    )
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-        )
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize(),
+        colors = CardDefaults.cardColors(containerColor = slotContainerColor)
     ) {
         Column(
             modifier = Modifier
