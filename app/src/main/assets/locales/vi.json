@@ -792,5 +792,9 @@
   "widget_mastery": "Tinh thông %d",
   "widget_worlds_bosses": "Thế giới %d • Trùm %d",
   "widget_quick_guess": "Đoán nhanh",
-  "widget_next_slot": "Ô lưu tiếp theo"
+  "widget_next_slot": "Ô lưu tiếp theo",
+  "endgame_goal_rift": "Vượt Ảnh Giới Vô Tận bậc 10",
+  "endgame_goal_mastery": "Đạt tinh thông cấp 5 ở mọi thế giới",
+  "endgame_claimed": "Đã nhận thưởng",
+  "endgame_claim_reward": "Nhận thưởng"
 }
