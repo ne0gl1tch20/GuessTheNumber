@@ -795,5 +795,12 @@
   "notification_progression_title": "Yugto ng pag-unlad",
   "notification_progression_body": "May bagong milestone ng pag-unlad na handa na.",
   "notification_event_title": "May naghihintay na event",
-  "notification_event_body": "May limitadong event sa laro na handa na."
+  "notification_event_body": "May limitadong event sa laro na handa na.",
+  "notification_category_title": "Mga Kategorya ng Notification",
+  "notification_category_reminders": "Mga Paalala",
+  "notification_category_reminders_desc": "Mga pana-panahong paalala para bumalik sa laro",
+  "notification_category_progression": "Mga Yugto ng Progreso",
+  "notification_category_progression_desc": "Pagbubukas ng mundo at pagkapanalo sa boss",
+  "notification_category_events": "Mga Event sa Laro",
+  "notification_category_events_desc": "Mga bagong random event at limitadong reward"
 }
