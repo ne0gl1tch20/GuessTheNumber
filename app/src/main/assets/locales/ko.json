@@ -653,5 +653,8 @@
   "boss_defeated": "보스 처치 완료",
   "world_locked_boss": "먼저 이 월드를 잠금 해제하세요",
   "boss_fight": "보스에게 도전",
-  "boss_requirements_pending": "더 성장한 뒤 도전하세요"
+  "boss_requirements_pending": "더 성장한 뒤 도전하세요",
+  "boss_hp_label": "보스 체력",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "보스 공격"
 }
