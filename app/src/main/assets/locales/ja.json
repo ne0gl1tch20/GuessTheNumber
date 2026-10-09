@@ -776,5 +776,12 @@
   "notification_progression_title": "進行マイルストーン",
   "notification_progression_body": "新しい進行マイルストーンが利用できます。",
   "notification_event_title": "ゲームイベントのお知らせ",
-  "notification_event_body": "期間限定イベントが利用できます。"
+  "notification_event_body": "期間限定イベントが利用できます。",
+  "notification_category_title": "通知カテゴリ",
+  "notification_category_reminders": "リマインダー",
+  "notification_category_reminders_desc": "ゲームに戻るための定期通知",
+  "notification_category_progression": "進行マイルストーン",
+  "notification_category_progression_desc": "ワールド解放とボス撃破",
+  "notification_category_events": "ゲームイベント",
+  "notification_category_events_desc": "新しいランダムイベントと期間限定報酬"
 }
