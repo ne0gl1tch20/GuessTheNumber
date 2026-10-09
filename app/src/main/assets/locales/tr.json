@@ -653,5 +653,8 @@
   "boss_defeated": "Patron yenildi",
   "world_locked_boss": "Önce bu dünyanın kilidini aç",
   "boss_fight": "Patrona meydan oku",
-  "boss_requirements_pending": "Savaşmadan önce güçlen"
+  "boss_requirements_pending": "Savaşmadan önce güçlen",
+  "boss_hp_label": "Patron canı",
+  "boss_hp_progress": "%d / %d CP",
+  "boss_attack": "Patrona saldır"
 }
