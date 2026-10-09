@@ -653,5 +653,8 @@
   "boss_defeated": "Боса переможено",
   "world_locked_boss": "Спочатку відкрийте цей світ",
   "boss_fight": "Кинути виклик босу",
-  "boss_requirements_pending": "Підсильтеся перед боєм"
+  "boss_requirements_pending": "Підсильтеся перед боєм",
+  "boss_hp_label": "Здоров’я боса",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "Атакувати боса"
 }
