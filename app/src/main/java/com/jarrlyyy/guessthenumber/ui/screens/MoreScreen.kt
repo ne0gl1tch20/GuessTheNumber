@@ -21,6 +21,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.Color
+import com.jarrlyyy.guessthenumber.ui.components.ReusableColorPickerDialog
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,6 +50,7 @@ fun MoreScreen(
 ) {
     val context = LocalContext.current
     var showMusicDialog by remember { mutableStateOf(false) }
+    var colorTarget by remember { mutableStateOf<String?>(null) }
 
     val currentMusicPath = state.settings.backgroundMusicPath
 
@@ -230,14 +233,14 @@ fun MoreScreen(
                                                     if (dragging == route) {
                                                         dragDistance += amount.y
                                                         val index = order.indexOf(route)
-                                                        if (dragDistance > 48f && index < order.lastIndex) {
+                                                        if (dragDistance > 48.dp.toPx() && index < order.lastIndex) {
                                                             order = order.toMutableList().also {
                                                                 val tmp = it[index]
                                                                 it[index] = it[index + 1]
                                                                 it[index + 1] = tmp
                                                             }
                                                             dragDistance = 0f
-                                                        } else if (dragDistance < -48f && index > 0) {
+                                                        } else if (dragDistance < -48.dp.toPx() && index > 0) {
                                                             order = order.toMutableList().also {
                                                                 val tmp = it[index]
                                                                 it[index] = it[index - 1]
@@ -263,7 +266,9 @@ fun MoreScreen(
                                 ),
                             shape = MaterialTheme.shapes.large,
                             color = if (selected) MaterialTheme.colorScheme.primaryContainer
-                            else MaterialTheme.colorScheme.surfaceContainerHigh
+                            else state.settings.moreScreenButtonColors[route]?.let { hex ->
+                                runCatching { Color(android.graphics.Color.parseColor(hex)) }.getOrNull()
+                            } ?: MaterialTheme.colorScheme.surfaceContainerHigh
                         ) {
                             Row(
                                 Modifier
@@ -271,42 +276,73 @@ fun MoreScreen(
                                     .padding(horizontal = 16.dp, vertical = 14.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                val customColor = state.settings.moreScreenButtonColors[route]?.let { hex ->
+                                    runCatching { Color(android.graphics.Color.parseColor(hex)) }.getOrNull()
+                                }
+                                val contentTint = if (selected) MaterialTheme.colorScheme.primary
+                                else if (customColor != null) {
+                                    val luminance = 0.2126f * customColor.red + 0.7152f * customColor.green + 0.0722f * customColor.blue
+                                    if (luminance > 0.55f) Color.Black else Color.White
+                                } else MaterialTheme.colorScheme.onSurfaceVariant
                                 Icon(
                                     imageVector = icons[route] ?: Icons.Default.Circle,
                                     contentDescription = null,
-                                    tint = if (selected) MaterialTheme.colorScheme.primary
-                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = contentTint
                                 )
                                 Spacer(Modifier.width(14.dp))
                                 Text(
                                     labels[route] ?: route,
                                     modifier = Modifier.weight(1f),
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = contentTint
                                 )
                                 if (isReordering) {
-                                    Icon(Icons.Default.DragHandle, contentDescription = localizedText("Reorder"))
+                                    Icon(Icons.Default.DragHandle, contentDescription = localizedText("Reorder"), tint = contentTint)
                                 } else {
-                                    Icon(Icons.Default.ChevronRight, contentDescription = localizedText("Open"))
+                                    IconButton(
+                                        onClick = { colorTarget = route },
+                                        modifier = Modifier.size(40.dp)
+                                    ) {
+                                        Icon(Icons.Default.Palette, contentDescription = null, tint = contentTint)
+                                    }
+                                    Icon(Icons.Default.ChevronRight, contentDescription = localizedText("Open"), tint = contentTint)
                                 }
                             }
                         }
                     }
 
-            item {
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    localizedText("Latest Systems"),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    localizedText("v1.10–v1.13.0 features"),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
         }
+    }
+
+    if (colorTarget != null) {
+        val route = colorTarget!!
+        val themeDefault = MaterialTheme.colorScheme.surfaceContainerHigh
+        val defaultHex = "#%02X%02X%02X".format(
+            (themeDefault.red * 255).toInt(),
+            (themeDefault.green * 255).toInt(),
+            (themeDefault.blue * 255).toInt()
+        )
+        ReusableColorPickerDialog(
+            initialHex = state.settings.moreScreenButtonColors[route] ?: defaultHex,
+            title = "🎨 ${labels[route] ?: route}",
+            onDismiss = { colorTarget = null },
+            onApply = { hex ->
+                onUpdateSettings(
+                    state.settings.copy(
+                        moreScreenButtonColors = state.settings.moreScreenButtonColors + (route to hex)
+                    )
+                )
+                colorTarget = null
+            },
+            onReset = {
+                onUpdateSettings(
+                    state.settings.copy(
+                        moreScreenButtonColors = state.settings.moreScreenButtonColors - route
+                    )
+                )
+                colorTarget = null
+            }
+        )
     }
 
     if (showMusicDialog) {
