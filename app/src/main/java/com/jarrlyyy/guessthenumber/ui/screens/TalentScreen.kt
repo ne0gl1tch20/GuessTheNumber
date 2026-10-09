@@ -79,6 +79,8 @@ fun TalentScreen(state: GameState, onBuyTalent: (String, Long) -> Unit, onBack: 
                     }
                 }
             }
+            val unlockedBranchColor = MaterialTheme.colorScheme.primary
+            val lockedBranchColor = MaterialTheme.colorScheme.outlineVariant
             BoxWithConstraints(Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(24.dp)).background(MaterialTheme.colorScheme.surfaceContainerLow)) {
                 val w = maxWidth
                 val h = maxHeight
@@ -93,7 +95,7 @@ fun TalentScreen(state: GameState, onBuyTalent: (String, Long) -> Unit, onBack: 
                         talents.filter { it.parent != null }.forEach { node ->
                             val parent = byId[node.parent] ?: return@forEach
                             drawLine(
-                                color = if (node.id in state.prestigeShopPurchases && parent.id in state.prestigeShopPurchases) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                                color = if (node.id in state.prestigeShopPurchases && parent.id in state.prestigeShopPurchases) unlockedBranchColor else lockedBranchColor,
                                 start = Offset(size.width * parent.x, size.height * parent.y),
                                 end = Offset(size.width * node.x, size.height * node.y),
                                 strokeWidth = 7f,
