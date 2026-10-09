@@ -73,6 +73,9 @@ fun WorldMapScreen(
     val damage = state.bossBattleProgress[world.bossId] ?: 0
     val defeated = world.bossId in state.defeatedBossIds
     val secretFound = world.secretId in state.discoveredSecretIds
+    val worldRequirementKey = when (world.id) { "crystal_caverns" -> "world_crystal_requirement"; "ember_summit" -> "world_ember_requirement"; "nebula_rift" -> "world_nebula_requirement"; else -> "world_verdant_requirement" }
+    val bossRequirementKey = when (world.id) { "crystal_caverns" -> "boss_crystal_requirement"; "ember_summit" -> "boss_ember_requirement"; "nebula_rift" -> "boss_nebula_requirement"; else -> "boss_verdant_requirement" }
+    val bossRewardKey = when (world.id) { "crystal_caverns" -> "boss_crystal_reward"; "ember_summit" -> "boss_ember_reward"; "nebula_rift" -> "boss_nebula_reward"; else -> "boss_verdant_reward" }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -170,11 +173,14 @@ fun WorldMapScreen(
                     Text(locale.getString(world.bossKey, world.bossFallback), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                     Text(if (unlocked) locale.getString("world_status_unlocked", "Unlocked") else locale.getString("world_status_locked", "Locked"))
                     if (!unlocked) {
-                        Text(locale.getString("world_requirements_pending", "Requirements not met"), style = MaterialTheme.typography.bodySmall)
+                        Text(locale.getString(worldRequirementKey, "Requirements not met"), style = MaterialTheme.typography.bodySmall)
+                        Text(locale.getString("world_requirements_pending", "Requirements not met"), style = MaterialTheme.typography.labelSmall)
                         Button(onClick = { onWorldAction(world.id, "unlock") }, enabled = canUnlock, modifier = Modifier.fillMaxWidth()) {
                             Text(locale.getString("world_unlock", "Unlock world"))
                         }
                     } else if (!defeated) {
+                        Text(locale.getString(bossRequirementKey, "Battle requirements"), style = MaterialTheme.typography.bodySmall)
+                        Text(locale.getString(bossRewardKey, "Victory reward"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
                         Text(locale.getString("boss_hp_progress", "%d / %d HP", (world.hp - damage).coerceAtLeast(0), world.hp))
                         LinearProgressIndicator(progress = { damage.toFloat() / world.hp.toFloat() }, modifier = Modifier.fillMaxWidth())
                         val phase = ((damage * 3) / world.hp + 1).coerceIn(1, 3)
