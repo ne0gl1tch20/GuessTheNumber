@@ -362,12 +362,6 @@ fun NavGraph(
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
-            composable("process_inspector") {
-                ProcessInspectorScreen(
-                    state = state,
-                    onBack = { navController.popBackStack() }
-                )
-            }
             composable("achievements") {
                 AchievementsScreen(
                     state = state,
