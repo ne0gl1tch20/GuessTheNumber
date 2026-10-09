@@ -43,6 +43,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
+import java.time.LocalDate
 
 class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val saveManager = SaveManager(application)
@@ -173,7 +174,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             )
 
             val deltaSeconds = if (!timeTravelDetected) (System.currentTimeMillis() - effectiveSanitized.lastSaveTimestamp) / 1000L else 0L
-            var finalState = timeCheckedState
+            var finalState = refreshDailyQuestDay(timeCheckedState)
 
             if (!timeTravelDetected && deltaSeconds > 60 && timeCheckedState.autoClickerActive) {
                 val maxOfflineSeconds = 28800L
@@ -181,8 +182,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val earningsPerSec = BigNumber(500)
                 val totalOfflineEarnings = earningsPerSec * BigNumber(effectiveSeconds.toDouble())
                 
-                finalState = timeCheckedState.copy(
-                    money = timeCheckedState.money + totalOfflineEarnings
+                finalState = finalState.copy(
+                    money = finalState.money + totalOfflineEarnings
                 )
                 withContext(Dispatchers.Main) {
                     _offlineGains.value = totalOfflineEarnings
@@ -196,6 +197,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             withContext(Dispatchers.Main) {
                 _gameState.value = finalState
+                if (effectiveSanitized.dailyQuestDate != finalState.dailyQuestDate) saveGameAsync()
                 _isLoadingSave.value = false
                 if (timeTravelDetected) {
                     _showTimeTravelPopup.value = true
@@ -396,14 +398,19 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun makeGuess(guess: Long) {
         if (!AntiCheatService.validateGuessRate()) return
-        val currentState = _gameState.value
+        val currentState = refreshDailyQuestDay(_gameState.value)
         val result = gameEngine.processGuess(currentState, guess)
         guessingBot.observeGuess(guess.coerceIn(currentState.currentRangeMin, currentState.currentRangeMax), result.feedback)
         if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
             guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
         }
-        _gameState.value = result.newState
-        checkAchievements(result.newState)
+        val progressedState = recordDailyGuess(
+            currentState,
+            result.newState,
+            result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
+        )
+        _gameState.value = progressedState
+        checkAchievements(progressedState)
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.GUESS, "MAKE_GUESS", "Guess $guess resulted in ${result.feedback}, reward: ${result.reward}")
     }
@@ -472,7 +479,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun buyUpgrade(upgradeId: String, cost: BigNumber) {
-        val state = _gameState.value
+        val state = refreshDailyQuestDay(_gameState.value)
         if (state.money >= cost) {
             val currentLevel = state.upgradeLevels[upgradeId] ?: 0
             val upgradeDef = JsonConfigRepository(getApplication()).loadUpgrades().find { it.id == upgradeId }
@@ -505,7 +512,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             newLevels[upgradeId] = newLevel
             val newMoney = state.money - cost
             val newStats = state.statistics.copy(moneySpent = state.statistics.moneySpent + cost)
-            _gameState.value = state.copy(money = newMoney, upgradeLevels = newLevels, statistics = newStats)
+            _gameState.value = state.copy(money = newMoney, upgradeLevels = newLevels, statistics = newStats, dailyQuestUpgradePurchases = state.dailyQuestUpgradePurchases + 1)
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_UPGRADE", "Bought upgrade $upgradeId to level $newLevel")
         }
@@ -859,6 +866,55 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun claimDailyQuest(questId: String) {
+        val state = refreshDailyQuestDay(_gameState.value)
+        val requirement = when (questId) {
+            "daily_guesses_10" -> state.dailyQuestGuesses >= 10
+            "daily_correct_5" -> state.dailyQuestCorrectGuesses >= 5
+            "daily_streak_5" -> state.dailyQuestBestStreak >= 5
+            "daily_upgrades_3" -> state.dailyQuestUpgradePurchases >= 3
+            else -> false
+        }
+        if (!requirement || questId in state.claimedDailyQuests) {
+            _gameState.value = state
+            return
+        }
+        val rewardState = when (questId) {
+            "daily_guesses_10" -> state.copy(money = state.money + BigNumber(10_000))
+            "daily_correct_5" -> state.copy(nebula = state.nebula + BigNumber(25))
+            "daily_streak_5" -> state.copy(nebula = state.nebula + BigNumber(50))
+            "daily_upgrades_3" -> state.copy(nebula = state.nebula + BigNumber(35))
+            else -> state
+        }
+        _gameState.value = rewardState.copy(claimedDailyQuests = rewardState.claimedDailyQuests + questId)
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.GAMEPLAY, "DAILY_QUEST_CLAIM", "Claimed daily quest $questId")
+    }
+
+    private fun refreshDailyQuestDay(state: GameState): GameState {
+        val today = LocalDate.now().toString()
+        if (state.dailyQuestDate == today) return state
+        return state.copy(
+            dailyQuestDate = today,
+            dailyQuestGuesses = 0,
+            dailyQuestCorrectGuesses = 0,
+            dailyQuestBestStreak = 0,
+            dailyQuestUpgradePurchases = 0,
+            claimedDailyQuests = emptySet()
+        )
+    }
+
+    private fun recordDailyGuess(previous: GameState, next: GameState, correct: Boolean): GameState =
+        next.copy(
+            dailyQuestDate = previous.dailyQuestDate,
+            dailyQuestGuesses = previous.dailyQuestGuesses + 1,
+            dailyQuestCorrectGuesses = previous.dailyQuestCorrectGuesses + if (correct) 1 else 0,
+            dailyQuestBestStreak = maxOf(previous.dailyQuestBestStreak, next.streak),
+            dailyQuestUpgradePurchases = previous.dailyQuestUpgradePurchases,
+            claimedDailyQuests = previous.claimedDailyQuests
+        )
+
+
     fun earnMinigameReward(nebulaReward: Long, moneyReward: BigNumber) {
         val state = _gameState.value
         _gameState.value = state.copy(
@@ -969,7 +1025,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 delay(delayMillis)
                 withContext(Dispatchers.Main) {
-                    val currentState = _gameState.value
+                    val currentState = refreshDailyQuestDay(_gameState.value)
                     if (currentState.autoClickerActive) {
                         val guess = guessingBot.nextGuess(
                             currentState.currentRangeMin,
@@ -977,10 +1033,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                         )
                         val result = gameEngine.processGuess(currentState, guess)
                         guessingBot.observeGuess(guess, result.feedback)
-                        if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
+                        val isCorrect = result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
+                        if (isCorrect) {
                             guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
                         }
-                        _gameState.value = result.newState
+                        _gameState.value = recordDailyGuess(currentState, result.newState, isCorrect)
                         saveGameAsync()
                     }
                 }
