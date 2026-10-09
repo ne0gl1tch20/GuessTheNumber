@@ -776,5 +776,12 @@
   "notification_progression_title": "進度里程碑",
   "notification_progression_body": "新的進度里程碑已準備就緒。",
   "notification_event_title": "遊戲活動正在等候",
-  "notification_event_body": "限時遊戲活動已準備就緒。"
+  "notification_event_body": "限時遊戲活動已準備就緒。",
+  "notification_category_title": "通知類別",
+  "notification_category_reminders": "提醒",
+  "notification_category_reminders_desc": "提醒你回到遊戲的定期通知",
+  "notification_category_progression": "進度里程碑",
+  "notification_category_progression_desc": "解鎖世界和擊敗首領",
+  "notification_category_events": "遊戲活動",
+  "notification_category_events_desc": "新的隨機事件和限時活動獎勵"
 }
