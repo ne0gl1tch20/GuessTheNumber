@@ -72,7 +72,7 @@ class CompactGuessWidget : GlanceAppWidget() {
                         }
                     }
                     Row(modifier = GlanceModifier.fillMaxWidth()) {
-                        Button(text = locale.getString("widget_quick_guess", "Open Game"), onClick = actionStartActivity<MainActivity>(), modifier = GlanceModifier.defaultWeight())
+                        Button(text = locale.getString("play", "Play"), onClick = actionStartActivity<MainActivity>(), modifier = GlanceModifier.defaultWeight())
                         Spacer(GlanceModifier.width(8.dp))
                         Button(text = locale.getString("widget_next_slot", "Next Slot"), onClick = actionRunCallback<CycleCompactWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
                     }
