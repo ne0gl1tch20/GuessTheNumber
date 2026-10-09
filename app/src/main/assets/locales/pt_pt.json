@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Concluir o nível 10 da Fenda Infinita",
   "endgame_goal_mastery": "Atingir maestria 5 em todos os mundos",
   "endgame_claimed": "Recompensa reclamada",
-  "endgame_claim_reward": "Reclamar recompensa"
+  "endgame_claim_reward": "Reclamar recompensa",
+  "music_control_previous": "Anterior",
+  "music_control_pause": "Pausar",
+  "music_control_play": "Reproduzir",
+  "music_control_next": "Seguinte",
+  "music_control_stop": "Parar"
 }
