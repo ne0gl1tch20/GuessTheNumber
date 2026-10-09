@@ -760,5 +760,7 @@
   "relic_set_bonus": "Set bonus: equipping two relics adds another 10% Money to correct-guess rewards.",
   "home_base_bonus": "Each sanctuary level adds 2% Money to correct-guess rewards, up to 40%.",
   "map_fit_screen": "Ekrana sığdır",
-  "world_mastery_bonus": "Bu dünyada her doğru tahminde +%d%% para."
+  "world_mastery_bonus": "Bu dünyada her doğru tahminde +%d%% para.",
+  "beyond_numbers_title": "Sayıların Ötesinde",
+  "world_progress_summary": "Açılan dünyalar: %d / 4 • Yenilen bosslar: %d / 4"
 }
