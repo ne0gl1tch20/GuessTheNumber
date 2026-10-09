@@ -682,6 +682,7 @@ private fun LootChestBoard(
                 Triple("epic", locale.getString("loot_tier_epic"), state.lootEpicChests)
             )
             tiers.forEach { (id, label, count) ->
+                val chestInteraction = remember(id) { MutableInteractionSource() }
                 val color = when (id) {
                     "epic" -> MaterialTheme.colorScheme.tertiary
                     "rare" -> MaterialTheme.colorScheme.primary
@@ -700,10 +701,17 @@ private fun LootChestBoard(
                     )
                     Column(Modifier.weight(1f)) {
                         Text(label, style = MaterialTheme.typography.titleSmall)
-                        Text(locale.getString("loot_chest_count", count), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                        AnimatedContent(targetState = count, label = "lootChestCount") { animatedCount ->
+                            Text(locale.getString("loot_chest_count", animatedCount), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                        }
                         Text(locale.getString("loot_rewards_" + id), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
                     }
-                    Button(onClick = { onOpen(id) }, enabled = count > 0) {
+                    Button(
+                        onClick = { onOpen(id) },
+                        enabled = count > 0,
+                        interactionSource = chestInteraction,
+                        modifier = Modifier.expressivePressScale(interactionSource = chestInteraction, reducedMotion = state.settings.reducedMotion)
+                    ) {
                         Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(locale.getString("loot_open"))
