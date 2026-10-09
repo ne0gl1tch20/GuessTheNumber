@@ -792,5 +792,9 @@
   "widget_mastery": "Maestría %d",
   "widget_worlds_bosses": "Mundos %d • Jefes %d",
   "widget_quick_guess": "Adivinación rápida",
-  "widget_next_slot": "Siguiente ranura"
+  "widget_next_slot": "Siguiente ranura",
+  "endgame_goal_rift": "Completa el nivel 10 de la Grieta Infinita",
+  "endgame_goal_mastery": "Alcanza maestría 5 en todos los mundos",
+  "endgame_claimed": "Recompensa reclamada",
+  "endgame_claim_reward": "Reclamar recompensa"
 }
