@@ -31,35 +31,32 @@ class MusicPlaybackService : Service() {
         super.onCreate()
         manager = BackgroundMusicManager(applicationContext)
         createChannel()
-
         mediaSession = MediaSessionCompat(this, "GuessTheNumberMusic").apply {
             setCallback(object : MediaSessionCompat.Callback() {
-                override fun onPlay() = manager.play()
-                override fun onPause() = manager.pause()
-                override fun onStop() = stopPlayback()
-                override fun onSkipToNext() = manager.next()
-                override fun onSkipToPrevious() = manager.previous()
-                override fun onSeekTo(pos: Long) = manager.seekTo(pos.toInt())
-                override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
-                    MediaButtonReceiver.handleIntent(this@apply, mediaButtonEvent)
-                    return true
-                }
+                override fun onPlay() { manager.play() }
+                override fun onPause() { manager.pause() }
+                override fun onStop() { stopPlayback() }
+                override fun onSkipToNext() { manager.next() }
+                override fun onSkipToPrevious() { manager.previous() }
+                override fun onSeekTo(pos: Long) { manager.seekTo(pos.toInt()) }
             })
             isActive = true
         }
-
         startForeground(NOTIFICATION_ID, buildNotification())
         mainHandler.post(stateUpdater)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        MediaButtonReceiver.handleIntent(mediaSession, intent)
-        when (intent?.action) {
-            ACTION_PLAY -> manager.play()
-            ACTION_PAUSE -> manager.pause()
-            ACTION_NEXT -> manager.next()
-            ACTION_PREVIOUS -> manager.previous()
-            ACTION_STOP -> stopPlayback()
+        if (intent?.action == Intent.ACTION_MEDIA_BUTTON) {
+            MediaButtonReceiver.handleIntent(mediaSession, intent)
+        } else {
+            when (intent?.action) {
+                ACTION_PLAY -> manager.play()
+                ACTION_PAUSE -> manager.pause()
+                ACTION_NEXT -> manager.next()
+                ACTION_PREVIOUS -> manager.previous()
+                ACTION_STOP -> stopPlayback()
+            }
         }
         updateSessionAndNotification()
         return START_STICKY
@@ -105,8 +102,7 @@ class MusicPlaybackService : Service() {
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, manager.duration.value.toLong())
                 .build()
         )
-        val notification = buildNotification()
-        getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification)
+        getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, buildNotification())
     }
 
     private fun buildNotification(): Notification {
@@ -117,10 +113,10 @@ class MusicPlaybackService : Service() {
             Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val previous = PendingIntent.getService(this, 1, commandIntent(ACTION_PREVIOUS), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val playPause = PendingIntent.getService(this, 2, commandIntent(if (manager.isPlaying.value) ACTION_PAUSE else ACTION_PLAY), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val next = PendingIntent.getService(this, 3, commandIntent(ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val stop = PendingIntent.getService(this, 4, commandIntent(ACTION_STOP), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val previous = PendingIntent.getService(this, 1, commandIntent(ACTION_PREVIOUS), pendingFlags())
+        val playPause = PendingIntent.getService(this, 2, commandIntent(if (manager.isPlaying.value) ACTION_PAUSE else ACTION_PLAY), pendingFlags())
+        val next = PendingIntent.getService(this, 3, commandIntent(ACTION_NEXT), pendingFlags())
+        val stop = PendingIntent.getService(this, 4, commandIntent(ACTION_STOP), pendingFlags())
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -134,11 +130,13 @@ class MusicPlaybackService : Service() {
             .addAction(NotificationCompat.Action(if (manager.isPlaying.value) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play, if (manager.isPlaying.value) "Pause" else "Play", playPause))
             .addAction(NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", next))
             .addAction(NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, "Stop", stop))
-            .setStyle(MediaNotificationStyle(mediaSession.sessionToken))
+            .setStyle(NotificationCompat.MediaStyle().setMediaSession(mediaSession.sessionToken).setShowActionsInCompactView(0, 1, 2))
             .build()
     }
 
     private fun commandIntent(action: String): Intent = Intent(this, MusicPlaybackService::class.java).setAction(action)
+
+    private fun pendingFlags(): Int = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
     private fun createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -158,12 +156,5 @@ class MusicPlaybackService : Service() {
         const val ACTION_STOP = "com.jarrlyyy.guessthenumber.music.STOP"
         private const val CHANNEL_ID = "music_playback"
         private const val NOTIFICATION_ID = 4101
-    }
-}
-
-private class MediaNotificationStyle(token: android.support.v4.media.session.MediaSessionCompat.Token) : NotificationCompat.MediaStyle() {
-    init {
-        setMediaSession(token)
-        setShowActionsInCompactView(0, 1, 2)
     }
 }
