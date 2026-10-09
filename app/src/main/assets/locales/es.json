@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Completa el nivel 10 de la Grieta Infinita",
   "endgame_goal_mastery": "Alcanza maestría 5 en todos los mundos",
   "endgame_claimed": "Recompensa reclamada",
-  "endgame_claim_reward": "Reclamar recompensa"
+  "endgame_claim_reward": "Reclamar recompensa",
+  "music_control_previous": "Anterior",
+  "music_control_pause": "Pausar",
+  "music_control_play": "Reproducir",
+  "music_control_next": "Siguiente",
+  "music_control_stop": "Detener"
 }
