@@ -4,6 +4,8 @@ import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -169,6 +171,7 @@ fun UpgradeScreen(
                 val level = state.upgradeLevels[upgrade.id] ?: 0
                 val totalCost = computedUpgradeCosts[upgrade.id] ?: BigNumber.ZERO
                 val canAfford = state.money >= totalCost
+                val buyInteractionSource = remember(upgrade.id) { MutableInteractionSource() }
 
                 // Material 3 Expressive Upgrade Card
                 Surface(
@@ -211,9 +214,15 @@ fun UpgradeScreen(
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Button(
+                            interactionSource = buyInteractionSource,
                             onClick = { onBuyUpgrade(upgrade.id, totalCost) },
                             enabled = canAfford && !isMaxed,
                             shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier.expressivePressScale(
+                                interactionSource = buyInteractionSource,
+                                enabled = canAfford && !isMaxed,
+                                reducedMotion = state.settings.reducedMotion
+                            ),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
                             Text(if (isMaxed) "MAX" else "Buy", style = MaterialTheme.typography.labelLarge)
