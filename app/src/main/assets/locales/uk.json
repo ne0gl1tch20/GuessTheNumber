@@ -776,5 +776,12 @@
   "notification_progression_title": "Етап прогресу",
   "notification_progression_body": "Доступний новий етап прогресу.",
   "notification_event_title": "На тебе чекає подія",
-  "notification_event_body": "Доступна обмежена в часі ігрова подія."
+  "notification_event_body": "Доступна обмежена в часі ігрова подія.",
+  "notification_category_title": "Категорії сповіщень",
+  "notification_category_reminders": "Нагадування",
+  "notification_category_reminders_desc": "Періодичні нагадування повернутися до гри",
+  "notification_category_progression": "Етапи прогресу",
+  "notification_category_progression_desc": "Відкриття світів і перемоги над босами",
+  "notification_category_events": "Ігрові події",
+  "notification_category_events_desc": "Нові випадкові події та обмежені в часі нагороди"
 }
