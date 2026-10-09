@@ -90,7 +90,8 @@ fun MoreScreen(
         "endgame" to localizedText("Endgame Challenges"),
         "cloud_backup" to localizedText("Save Export / Import"),
         "staking" to localizedText("Lucky Stake"),
-        "tutorial" to localizedText("Interactive Tutorial")
+        "tutorial" to localizedText("Interactive Tutorial"),
+        "process_inspector" to localizedText("Process Inspector")
     )
     val icons = mapOf(
         "achievements" to Icons.Default.EmojiEvents,
@@ -114,7 +115,8 @@ fun MoreScreen(
         "endgame" to Icons.Default.AutoAwesome,
         "cloud_backup" to Icons.Default.Cloud,
         "staking" to Icons.Default.Casino,
-        "tutorial" to Icons.Default.School
+        "tutorial" to Icons.Default.School,
+        "process_inspector" to Icons.Default.Memory
     )
 
     val audioPickerLauncher = rememberLauncherForActivityResult(
