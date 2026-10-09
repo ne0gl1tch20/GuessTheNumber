@@ -783,5 +783,14 @@
   "notification_category_progression": "Етапи прогресу",
   "notification_category_progression_desc": "Відкриття світів і перемоги над босами",
   "notification_category_events": "Ігрові події",
-  "notification_category_events_desc": "Нові випадкові події та обмежені в часі нагороди"
+  "notification_category_events_desc": "Нові випадкові події та обмежені в часі нагороди",
+  "widget_title": "🎯 Вгадай число",
+  "widget_slot": "Комірка збереження %d • %s",
+  "widget_money": "Гроші",
+  "widget_range": "Діапазон",
+  "widget_streak": "Серія %d",
+  "widget_mastery": "Майстерність %d",
+  "widget_worlds_bosses": "Світи %d • Боси %d",
+  "widget_quick_guess": "Швидка спроба",
+  "widget_next_slot": "Наступна комірка"
 }
