@@ -123,6 +123,8 @@ data class GameSettings(
     val customSecondaryColor: String = "#00BCD4",
     val customTertiaryColor: String = "#00C853",
     val moreScreenOrder: List<String> = DEFAULT_MORE_SCREEN_ORDER,
+    // Empty by default so shortcuts inherit the active Material theme.
+    val moreScreenButtonColors: Map<String, String> = emptyMap(),
     val tutorialCompleted: Boolean = false
 )
 
