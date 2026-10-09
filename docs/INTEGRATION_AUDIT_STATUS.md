@@ -35,6 +35,10 @@
 - Endgame goals expose reward-claim buttons when their requirements are met, and the Codex completion reward requires all 12 core world/boss/secret entries instead of being affected by bonus Codex entries.
 
 ## Completed in the follow-up audit pass
+- Live Ops is now offline-only: the event manifest is read from the bundled asset instead of attempting a remote GitHub fetch.
+- Live Ops claims now validate event status/date and per-event claim limits, grant the displayed 10 Nebula, increment the persisted claim count and permanent boost level, and update lifetime Nebula earnings. The boost level now contributes +2% correct-guess money per level (capped at 25 levels) and +1 Nebula per correct guess for every 5 levels.
+- Arcade reward payouts now update lifetime money/Nebula earned statistics too.
+
 - Completed the missing daily-bounty labels across the remaining locale catalogs. A key/placeholder audit now reports 822 matching English keys in every locale catalog; Arabic also retains its existing `rtl` metadata key. No missing keys or `%s/%d/%f/%i` placeholder mismatches were found in the audited catalogs.
 - Daily bounty claims now update `statistics.moneyEarned` or `statistics.nebulaEarned` alongside the actual payout, keeping lifetime earned totals aligned with rewards.
 
@@ -48,8 +52,8 @@
 
 ## Still requires the remaining integration pass
 
-- New notification-category, widget and endgame keys are present in all 23 locale catalogs. Run the broader localization audit to catch placeholder mismatches and untranslated legacy UI strings.
-- Continue the RPG balance review across set-specific effects, boss/Rift reward scaling and whether Codex completion should include mastery/Sanctuary bonus entries.
+- All 23 locale catalogs now have matching key coverage and no audited string-format placeholder mismatches. A separate manual review of older hardcoded/dynamically assembled UI text is still needed.
+- Continue the numerical RPG balance review across stacked relic, mastery, Home Base, secret and permanent-event bonuses; current formulas are connected, but have not been play-tested for late-game pacing.
 - Run the manual GitHub Actions validation/build and resolve compiler/lint/runtime issues before calling the pass build-verified.
 
 Current app version: 3.0.1 (versionCode 19).
