@@ -653,5 +653,8 @@
   "boss_defeated": "Boss besiegt",
   "world_locked_boss": "Schalte zuerst diese Welt frei",
   "boss_fight": "Boss herausfordern",
-  "boss_requirements_pending": "Trainiere weiter, um zu kämpfen"
+  "boss_requirements_pending": "Trainiere weiter, um zu kämpfen",
+  "boss_hp_label": "Boss-Lebenspunkte",
+  "boss_hp_progress": "%d / %d LP",
+  "boss_attack": "Boss angreifen"
 }
