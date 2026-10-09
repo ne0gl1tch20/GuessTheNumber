@@ -2,6 +2,10 @@
 
 ## v1.16.0 (Expressive Motion & Gameplay Feedback)
 
+- 🎯 **Daily Bounty Board**: Added four rotating-by-day contracts for guesses, correct answers, streaks, and upgrade purchases, each with claimable rewards.
+- 💎 **Reward Loop**: Daily contracts award Money or Nebula, track progress inside each save slot, and reset their progress and claims when the local calendar day changes.
+- 🌐 **Bounty Localization**: Added English and Filipino text for the new board, quest progress, rewards, and claim states.
+
 - 🌀 **Expressive Save Loading**: Added a pulsing save icon, indeterminate progress ring, and animated loading dots tied to the real save-switch loading state.
 - 🎮 **Gameplay Feedback**: Added animated currency and guess feedback, a morphing guess button, tactile press responses, and a celebration banner for correct guesses.
 - ✨ **Progression Celebrations**: Added event-driven banners for achievement unlocks, Prestige resets, and Ultra resets.
