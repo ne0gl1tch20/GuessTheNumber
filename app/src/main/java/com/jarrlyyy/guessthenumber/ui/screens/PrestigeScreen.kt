@@ -2,6 +2,8 @@ package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -145,7 +147,7 @@ fun PrestigeScreen(
                 }
                 val canAfford = !isMaxed && state.prestige >= totalCost
 
-                Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceVariant, tonalElevation = 2.dp) {
+                Surface(Modifier.fillMaxWidth().then(if (state.settings.reducedMotion) Modifier else Modifier.animateItem(placementSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow, dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy))).animateContentSize(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceVariant, tonalElevation = 2.dp) {
                     Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(upgrade.name, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
@@ -181,7 +183,7 @@ fun PrestigeScreen(
                 val purchased = state.prestigeShopPurchases.contains(item.id)
                 val canAfford = state.prestige >= BigNumber(item.cost)
 
-                Card(modifier = Modifier.fillMaxWidth()) {
+                Card(modifier = Modifier.fillMaxWidth().then(if (state.settings.reducedMotion) Modifier else Modifier.animateItem(placementSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow, dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy))).animateContentSize()) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -200,7 +202,7 @@ fun PrestigeScreen(
                             enabled = canAfford && !purchased,
                             colors = ButtonDefaults.buttonColors(containerColor = PrestigeBlue)
                         ) {
-                            Text(if (purchased) "Owned" else "Buy")
+                            AnimatedContent(targetState = purchased, label = "prestigeShopPurchase_${item.id}") { isPurchased -> Text(if (isPurchased) "Owned" else "Buy") }
                         }
                     }
                 }
