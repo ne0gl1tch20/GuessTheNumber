@@ -776,5 +776,12 @@
   "notification_progression_title": "Marco de progresso",
   "notification_progression_body": "Um novo marco de progresso está disponível.",
   "notification_event_title": "Tem um evento esperando",
-  "notification_event_body": "Um evento por tempo limitado está disponível."
+  "notification_event_body": "Um evento por tempo limitado está disponível.",
+  "notification_category_title": "Categorias de notificações",
+  "notification_category_reminders": "Lembretes",
+  "notification_category_reminders_desc": "Lembretes periódicos para voltar ao jogo",
+  "notification_category_progression": "Marcos de progresso",
+  "notification_category_progression_desc": "Desbloqueios de mundos e vitórias contra chefes",
+  "notification_category_events": "Eventos do jogo",
+  "notification_category_events_desc": "Novos eventos aleatórios e recompensas por tempo limitado"
 }
