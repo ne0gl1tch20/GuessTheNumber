@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Пройдіть 10-й рівень Нескінченного розлому",
   "endgame_goal_mastery": "Досягніть майстерності 5 у кожному світі",
   "endgame_claimed": "Нагороду отримано",
-  "endgame_claim_reward": "Отримати нагороду"
+  "endgame_claim_reward": "Отримати нагороду",
+  "music_control_previous": "Попередній",
+  "music_control_pause": "Пауза",
+  "music_control_play": "Відтворити",
+  "music_control_next": "Наступний",
+  "music_control_stop": "Зупинити"
 }
