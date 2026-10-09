@@ -783,5 +783,14 @@
   "notification_category_progression": "Этапы прогресса",
   "notification_category_progression_desc": "Открытие миров и победы над боссами",
   "notification_category_events": "Игровые события",
-  "notification_category_events_desc": "Новые случайные события и ограниченные по времени награды"
+  "notification_category_events_desc": "Новые случайные события и ограниченные по времени награды",
+  "widget_title": "🎯 Угадай число",
+  "widget_slot": "Ячейка %d • %s",
+  "widget_money": "Деньги",
+  "widget_range": "Диапазон",
+  "widget_streak": "Серия %d",
+  "widget_mastery": "Мастерство %d",
+  "widget_worlds_bosses": "Миры %d • Боссы %d",
+  "widget_quick_guess": "Быстрая попытка",
+  "widget_next_slot": "Следующая ячейка"
 }
