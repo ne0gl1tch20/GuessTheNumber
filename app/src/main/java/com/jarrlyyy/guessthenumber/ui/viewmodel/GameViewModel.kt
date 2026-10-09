@@ -44,6 +44,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.time.LocalDate
+import kotlin.random.Random
 
 class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val saveManager = SaveManager(application)
@@ -404,10 +405,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
             guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
         }
-        val progressedState = recordDailyGuess(
-            currentState,
-            result.newState,
-            result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
+        val isCorrect = result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
+        val progressedState = recordLootDrop(
+            recordDailyGuess(currentState, result.newState, isCorrect),
+            isCorrect
         )
         _gameState.value = progressedState
         checkAchievements(progressedState)
@@ -866,6 +867,59 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun recordLootDrop(state: GameState, correct: Boolean): GameState {
+        if (!correct) return state
+        val roll = Random.nextInt(1000)
+        val tier = when {
+            roll < 10 -> "epic"
+            roll < 60 -> "rare"
+            roll < 240 -> "common"
+            else -> null
+        } ?: return state
+        return when (tier) {
+            "epic" -> state.copy(lootEpicChests = state.lootEpicChests + 1, lootDropsFound = state.lootDropsFound + 1, lastLootDropTier = tier, lootEventId = state.lootEventId + 1)
+            "rare" -> state.copy(lootRareChests = state.lootRareChests + 1, lootDropsFound = state.lootDropsFound + 1, lastLootDropTier = tier, lootEventId = state.lootEventId + 1)
+            else -> state.copy(lootCommonChests = state.lootCommonChests + 1, lootDropsFound = state.lootDropsFound + 1, lastLootDropTier = tier, lootEventId = state.lootEventId + 1)
+        }
+    }
+
+    fun openLootChest(tier: String) {
+        val state = _gameState.value
+        val available = when (tier) {
+            "common" -> state.lootCommonChests
+            "rare" -> state.lootRareChests
+            "epic" -> state.lootEpicChests
+            else -> 0
+        }
+        if (available <= 0) return
+        val moneyReward = when (tier) {
+            "common" -> BigNumber(5_000)
+            "rare" -> BigNumber(25_000)
+            "epic" -> BigNumber(100_000)
+            else -> BigNumber.ZERO
+        }
+        val nebulaReward = when (tier) {
+            "common" -> 5L
+            "rare" -> 25L
+            "epic" -> 100L
+            else -> 0L
+        }
+        val giveNebula = Random.nextBoolean()
+        val updated = when (tier) {
+            "common" -> state.copy(lootCommonChests = state.lootCommonChests - 1)
+            "rare" -> state.copy(lootRareChests = state.lootRareChests - 1)
+            "epic" -> state.copy(lootEpicChests = state.lootEpicChests - 1)
+            else -> state
+        }
+        _gameState.value = if (giveNebula) {
+            updated.copy(nebula = updated.nebula + BigNumber(nebulaReward), statistics = updated.statistics.copy(nebulaEarned = updated.statistics.nebulaEarned + nebulaReward), lootChestsOpened = updated.lootChestsOpened + 1)
+        } else {
+            updated.copy(money = updated.money + moneyReward, statistics = updated.statistics.copy(moneyEarned = updated.statistics.moneyEarned + moneyReward), lootChestsOpened = updated.lootChestsOpened + 1)
+        }
+        GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "LOOT_CHEST_OPENED", "Opened $tier loot chest.")
+        saveGameAsync()
+    }
+
     fun claimDailyQuest(questId: String) {
         val state = refreshDailyQuestDay(_gameState.value)
         val requirement = when (questId) {
@@ -1037,7 +1091,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                         if (isCorrect) {
                             guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
                         }
-                        _gameState.value = recordDailyGuess(currentState, result.newState, isCorrect)
+                        _gameState.value = recordLootDrop(
+                            recordDailyGuess(currentState, result.newState, isCorrect),
+                            isCorrect
+                        )
                         saveGameAsync()
                     }
                 }
