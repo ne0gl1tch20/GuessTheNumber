@@ -1218,6 +1218,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     val slot = _activeSlot.value
                     val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
                     saveManager.saveGame(state, slot)
+                    WidgetRefresh.request(getApplication<Application>())
                 }
             }
         }
