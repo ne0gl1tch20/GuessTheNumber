@@ -28,4 +28,5 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object Codex : Screen("codex", "Codex", Icons.Default.MenuBook)
     object Endgame : Screen("endgame", "Endgame", Icons.Default.AutoAwesome)
     object Staking : Screen("staking", "Lucky Stake", Icons.Default.Casino)
+    object MusicPlayer : Screen("music_player", "Music Player", Icons.Default.MusicNote)
 }
