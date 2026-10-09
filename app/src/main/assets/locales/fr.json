@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Terminer le niveau 10 de la Faille infinie",
   "endgame_goal_mastery": "Atteindre la maîtrise 5 dans chaque monde",
   "endgame_claimed": "Récompense récupérée",
-  "endgame_claim_reward": "Récupérer la récompense"
+  "endgame_claim_reward": "Récupérer la récompense",
+  "music_control_previous": "Précédent",
+  "music_control_pause": "Pause",
+  "music_control_play": "Lecture",
+  "music_control_next": "Suivant",
+  "music_control_stop": "Arrêter"
 }
