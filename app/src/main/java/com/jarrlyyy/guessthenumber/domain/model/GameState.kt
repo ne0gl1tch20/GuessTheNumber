@@ -62,7 +62,11 @@ data class GameStatistics(
     val randomEventsTriggered: Long = 0
 )
 
-val DEFAULT_MORE_SCREEN_ORDER = listOf("achievements", "live_ops", "mutators", "talent", "arcade", "stats", "changelog", "settings", "about", "dev_settings")
+val DEFAULT_MORE_SCREEN_ORDER = listOf(
+    "achievements", "live_ops", "mutators", "talent", "arcade",
+    "stats", "changelog", "settings", "about", "dev_settings",
+    "ultra", "prestige", "save_slots", "music"
+)
 
 @Serializable
 data class GameSettings(
