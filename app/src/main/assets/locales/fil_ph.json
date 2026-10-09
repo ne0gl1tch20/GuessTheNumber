@@ -766,5 +766,11 @@
   "endgame_menu_label": "Mga Hamon sa Endgame",
   "cloud_backup_menu_label": "I-export / I-import ang Save",
   "staking_menu_label": "Taya ng Swerte",
-  "tutorial_menu_label": "Interaktibong Tutorial"
+  "tutorial_menu_label": "Interaktibong Tutorial",
+  "boss_phase_label": "Yugto %d / 3 • Nakapipinsala sa boss ang tamang hula.",
+  "boss_battle_active": "Aktibo ang laban! Bumalik sa Laro at hulaan ang numero. Bawat tatlong maling hula ay nagpapabalik ng 1 HP.",
+  "boss_battle_start": "Simulan ang laban sa boss",
+  "boss_battle_stop": "Umalis sa laban",
+  "boss_battle_active_title": "Aktibong Laban sa Boss",
+  "boss_guess_rule": "Nakababawas ng buhay ng boss ang tamang hula. Bawat ikatlong maling hula ay nagbabalik ng isang HP."
 }
