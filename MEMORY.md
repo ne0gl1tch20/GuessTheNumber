@@ -68,6 +68,9 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - CI remains manual-only.
 
 ## v1.16.0 Expressive Motion & Gameplay Feedback
+- Added four persistent worlds: Verdant Grove, Crystal Caverns, Ember Summit, and Nebula Rift. Each has its own boss, requirement gate, and one-time victory reward.
+- Boss encounters are multi-hit: 3 hits, 5 hits, 7 hits, and 10 hits by tier. Boss damage persists per save slot; victories reward increasing Money and Nebula.
+- World unlock gates require the prior boss plus correct-guess milestones, upgrade levels, Prestige and Ultra milestones. All world/boss UI strings and boss HP labels were added across all 23 locale files.
 - Added collectible Treasure Drops: correct guesses have an 18% Common, 5% Rare, and 1% Epic chest drop chance. Chest counts are saved per slot; opening a chest awards either Money or Nebula based on tier.
 - Play screen now shows chest inventory, tier-specific reward values, total drops found, opened count, and latest drop tier.
 - Added 14 treasure-drop localization keys to all 23 locale JSON files: Arabic, German, English UK/US, Spanish, Filipino, French, Hindi, Indonesian, Italian, Japanese, Korean, Dutch, Polish, Portuguese Brazil/Portugal, Russian, Thai, Turkish, Ukrainian, Vietnamese, Simplified Chinese, and Traditional Chinese.
