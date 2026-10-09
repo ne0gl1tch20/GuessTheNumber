@@ -820,5 +820,7 @@
   "music_control_pause": "I-pause",
   "music_control_play": "I-play",
   "music_control_next": "Susunod",
-  "music_control_stop": "Ihinto"
+  "music_control_stop": "Ihinto",
+  "liveops_bonus_level_label": "Permanenteng Bonus Level",
+  "liveops_bonus_effect": "+2% pera bawat level at +1 Nebula sa bawat tamang hula kada 5 level, hanggang level 25. Para ito sa save slot na ito."
 }
