@@ -653,5 +653,8 @@
   "boss_defeated": "Baas verslagen",
   "world_locked_boss": "Ontgrendel eerst deze wereld",
   "boss_fight": "Daag de baas uit",
-  "boss_requirements_pending": "Train verder voordat je vecht"
+  "boss_requirements_pending": "Train verder voordat je vecht",
+  "boss_hp_label": "Boss-levenspunten",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "Val de baas aan"
 }
