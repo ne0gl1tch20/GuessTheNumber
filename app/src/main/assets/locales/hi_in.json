@@ -783,5 +783,14 @@
   "notification_category_progression": "प्रगति के पड़ाव",
   "notification_category_progression_desc": "दुनिया अनलॉक करना और बॉस को हराना",
   "notification_category_events": "गेम इवेंट",
-  "notification_category_events_desc": "नए रैंडम इवेंट और सीमित समय के पुरस्कार"
+  "notification_category_events_desc": "नए रैंडम इवेंट और सीमित समय के पुरस्कार",
+  "widget_title": "🎯 संख्या का अनुमान लगाएँ",
+  "widget_slot": "सेव स्लॉट %d • %s",
+  "widget_money": "पैसा",
+  "widget_range": "सीमा",
+  "widget_streak": "लगातार सही %d",
+  "widget_mastery": "महारत %d",
+  "widget_worlds_bosses": "दुनिया %d • बॉस %d",
+  "widget_quick_guess": "त्वरित अनुमान",
+  "widget_next_slot": "अगला स्लॉट"
 }
