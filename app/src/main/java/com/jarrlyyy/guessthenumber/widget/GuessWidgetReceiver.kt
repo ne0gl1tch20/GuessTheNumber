@@ -59,7 +59,7 @@ class QuickGuessActionCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val saveManager = SaveManager(context)
         val engine = GameEngine()
-        val updated = saveManager.updateGameAtomically { state -> engine.processGuess(state, state.targetNumber).newState } ?: return
+        saveManager.updateGameAtomically { state -> engine.processGuess(state, state.targetNumber).newState } ?: return
         GuessWidget().update(context, glanceId)
     }
 }
