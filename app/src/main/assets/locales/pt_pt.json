@@ -792,5 +792,9 @@
   "widget_mastery": "Maestria %d",
   "widget_worlds_bosses": "Mundos %d • Chefes %d",
   "widget_quick_guess": "Adivinhação rápida",
-  "widget_next_slot": "Slot seguinte"
+  "widget_next_slot": "Slot seguinte",
+  "endgame_goal_rift": "Concluir o nível 10 da Fenda Infinita",
+  "endgame_goal_mastery": "Atingir maestria 5 em todos os mundos",
+  "endgame_claimed": "Recompensa reclamada",
+  "endgame_claim_reward": "Reclamar recompensa"
 }
