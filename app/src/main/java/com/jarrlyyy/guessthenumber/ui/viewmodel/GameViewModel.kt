@@ -916,6 +916,19 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             else -> state.correctGuesses >= 500 && totalUpgradeLevels >= 75 && state.prestigeCount >= 5 && state.ultraCount >= 1
         }
         if (!canFight) return
+        val bossHp = when (worldId) {
+            "verdant_grove" -> 3
+            "crystal_caverns" -> 5
+            "ember_summit" -> 7
+            else -> 10
+        }
+        val nextDamage = (state.bossBattleProgress[bossId] ?: 0) + 1
+        if (nextDamage < bossHp) {
+            _gameState.value = state.copy(bossBattleProgress = state.bossBattleProgress + (bossId to nextDamage))
+            saveGameAsync()
+            GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_HIT", "Hit boss $bossId: $nextDamage/$bossHp")
+            return
+        }
         val moneyReward = when (worldId) {
             "verdant_grove" -> BigNumber(25_000)
             "crystal_caverns" -> BigNumber(100_000)
@@ -933,6 +946,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             nebula = state.nebula + BigNumber(nebulaReward),
             defeatedBossIds = state.defeatedBossIds + bossId,
             worldBossVictories = state.worldBossVictories + 1,
+            bossBattleProgress = state.bossBattleProgress + (bossId to bossHp),
             statistics = state.statistics.copy(
                 moneyEarned = state.statistics.moneyEarned + moneyReward,
                 nebulaEarned = state.statistics.nebulaEarned + nebulaReward
