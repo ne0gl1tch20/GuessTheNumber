@@ -760,5 +760,7 @@
   "relic_set_bonus": "Set bonus: equipping two relics adds another 10% Money to correct-guess rewards.",
   "home_base_bonus": "Each sanctuary level adds 2% Money to correct-guess rewards, up to 40%.",
   "map_fit_screen": "画面に合わせる",
-  "world_mastery_bonus": "このワールドで正解するたびに所持金が+%d%%。"
+  "world_mastery_bonus": "このワールドで正解するたびに所持金が+%d%%。",
+  "beyond_numbers_title": "数字のその先へ",
+  "world_progress_summary": "解放した世界: %d / 4 • 倒したボス: %d / 4"
 }
