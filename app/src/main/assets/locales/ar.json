@@ -821,5 +821,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "استلام",
   "daily_quest_claimed": "تم الاستلام",
-  "daily_quest_in_progress": "قيد التنفيذ"
+  "daily_quest_in_progress": "قيد التنفيذ",
+  "liveops_bonus_level_label": "مستوى المكافأة الدائمة",
+  "liveops_bonus_effect": "+2% مال لكل مستوى و+1 سديم لكل إجابة صحيحة كل 5 مستويات، حتى المستوى 25. ينطبق على خانة الحفظ هذه."
 }
