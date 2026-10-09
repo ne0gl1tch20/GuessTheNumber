@@ -34,10 +34,19 @@
 - Mastery level 5 and 10 milestones add Codex entries and Nebula rewards. The endgame now includes a claimable goal for reaching mastery level 5 in every world.
 - Endgame goals expose reward-claim buttons when their requirements are met, and the Codex completion reward requires all 12 core world/boss/secret entries instead of being affected by bonus Codex entries.
 
+## Completed in the follow-up audit pass
+
+- Notification taps now reach the requested in-app destination on both cold launch and when the app is already running; the destination request is cleared after navigation so later taps are handled too.
+- Media playback notification controls now use the active locale catalog instead of hardcoded English labels. Added translated Previous/Pause/Play/Next/Stop labels to all 23 locale catalogs.
+- Sticky media-service restarts attempt to resume the last saved local track when Android recreates the service after process death.
+- Repeated category notifications reuse their existing notification IDs without repeatedly alerting for the same visible notification.
+- Aligned endgame goal display checks for bosses, secrets and relics with the stricter reward-claim checks, avoiding goals that appear complete but cannot be claimed.
+- Correct-guess Nebula bonuses from relics, secret discoveries and talents are now evaluated even if that guess produced no positive money payout.
+
 ## Still requires the remaining integration pass
 
 - New notification-category, widget and endgame keys are present in all 23 locale catalogs. Run the broader localization audit to catch placeholder mismatches and untranslated legacy UI strings.
-- Review RPG reward balance, set-specific effects, boss/Rift reward consistency and whether Codex completion thresholds should include the new mastery/Sanctuary entries.
+- Continue the RPG balance review across set-specific effects, boss/Rift reward scaling and whether Codex completion should include mastery/Sanctuary bonus entries.
 - Run the manual GitHub Actions validation/build and resolve compiler/lint/runtime issues before calling the pass build-verified.
 
 Current app version: 3.0.1 (versionCode 19).
