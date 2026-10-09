@@ -772,5 +772,8 @@
   "boss_battle_start": "Start boss battle",
   "boss_battle_stop": "Leave battle",
   "boss_battle_active_title": "Boss Battle Active",
-  "boss_guess_rule": "Correct guesses deal damage. Every third wrong guess restores one HP."
+  "boss_guess_rule": "Correct guesses deal damage. Every third wrong guess restores one HP.",
+  "codex_claim_reward": "Claim 100 Nebula completion reward",
+  "codex_reward_claimed": "Completion reward claimed",
+  "world_mastery_upgrade": "Increase mastery • %s Nebula"
 }
