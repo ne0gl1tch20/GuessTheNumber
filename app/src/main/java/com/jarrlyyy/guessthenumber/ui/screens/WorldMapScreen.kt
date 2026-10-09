@@ -96,6 +96,7 @@ fun WorldMapScreen(
             val worldPathColor = MaterialTheme.colorScheme.outlineVariant
             val unlockedWorldGlow = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
             val lockedWorldGlow = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+            val secretPathColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.65f)
             BoxWithConstraints(
                 Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(28.dp)).background(MaterialTheme.colorScheme.surfaceContainerLow)
             ) {
@@ -117,6 +118,11 @@ fun WorldMapScreen(
                         val pts = worlds.map { Offset(size.width * it.x, size.height * it.y) }
                         for (i in 0 until pts.lastIndex) {
                             drawLine(worldPathColor, pts[i], pts[i + 1], strokeWidth = 7f, cap = StrokeCap.Round)
+                        }
+                        worlds.forEachIndexed { i, node ->
+                            if (state.correctGuesses >= node.secretAt) {
+                                drawLine(secretPathColor, pts[i], Offset(pts[i].x + 38f, pts[i].y + 52f), strokeWidth = 4f, cap = StrokeCap.Round)
+                            }
                         }
                         worlds.forEachIndexed { i, node ->
                             val p = pts[i]
