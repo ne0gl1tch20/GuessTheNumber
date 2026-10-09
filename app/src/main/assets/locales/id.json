@@ -653,5 +653,8 @@
   "boss_defeated": "Bos dikalahkan",
   "world_locked_boss": "Buka dunia ini terlebih dahulu",
   "boss_fight": "Tantang bos",
-  "boss_requirements_pending": "Kembangkan permainan sebelum bertarung"
+  "boss_requirements_pending": "Kembangkan permainan sebelum bertarung",
+  "boss_hp_label": "HP Bos",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "Serang bos"
 }
