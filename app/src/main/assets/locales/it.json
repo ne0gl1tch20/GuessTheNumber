@@ -776,5 +776,12 @@
   "notification_progression_title": "Traguardo di progressione",
   "notification_progression_body": "È disponibile un nuovo traguardo di progressione.",
   "notification_event_title": "Un evento ti aspetta",
-  "notification_event_body": "È disponibile un evento a tempo limitato."
+  "notification_event_body": "È disponibile un evento a tempo limitato.",
+  "notification_category_title": "Categorie notifiche",
+  "notification_category_reminders": "Promemoria",
+  "notification_category_reminders_desc": "Promemoria periodici per tornare al gioco",
+  "notification_category_progression": "Traguardi di progressione",
+  "notification_category_progression_desc": "Sblocco dei mondi e vittorie sui boss",
+  "notification_category_events": "Eventi di gioco",
+  "notification_category_events_desc": "Nuovi eventi casuali e ricompense a tempo limitato"
 }
