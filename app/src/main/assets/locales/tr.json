@@ -783,5 +783,14 @@
   "notification_category_progression": "İlerleme kilometre taşları",
   "notification_category_progression_desc": "Dünyaların açılması ve boss zaferleri",
   "notification_category_events": "Oyun etkinlikleri",
-  "notification_category_events_desc": "Yeni rastgele etkinlikler ve süreli ödüller"
+  "notification_category_events_desc": "Yeni rastgele etkinlikler ve süreli ödüller",
+  "widget_title": "🎯 Sayıyı Tahmin Et",
+  "widget_slot": "Kayıt yuvası %d • %s",
+  "widget_money": "Para",
+  "widget_range": "Aralık",
+  "widget_streak": "Seri %d",
+  "widget_mastery": "Ustalık %d",
+  "widget_worlds_bosses": "Dünya %d • Boss %d",
+  "widget_quick_guess": "Hızlı tahmin",
+  "widget_next_slot": "Sonraki yuva"
 }
