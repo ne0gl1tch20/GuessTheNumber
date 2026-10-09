@@ -985,7 +985,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             }
             "equip_relic" -> {
                 if (id !in state.relicInventory) return
-                val equipped = if (id in state.equippedRelicIds) state.equippedRelicIds - id else (state.equippedRelicIds + id).takeLast(2).toSet()
+                val equipped = if (id in state.equippedRelicIds) state.equippedRelicIds - id else (state.equippedRelicIds + id).toList().takeLast(2).toSet()
                 state.copy(equippedRelicIds = equipped)
             }
             "home_upgrade" -> {
@@ -999,8 +999,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 state.copy(nebula = state.nebula + BigNumber(100), codexRewardClaimed = true, statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 100))
             }
             "mastery" -> {
-                if (id !in state.unlockedWorldIds || id !in state.worldMasteryLevels.keys) return
-                val current = state.worldMasteryLevels[id] ?: 0
+                val bossForMastery = mapOf("verdant_grove" to "verdant_guardian", "crystal_caverns" to "crystal_golem", "ember_summit" to "ember_dragon", "nebula_rift" to "nebula_titan")[id] ?: return
+                if (id !in state.unlockedWorldIds || bossForMastery !in state.defeatedBossIds) return
+                val current = state.worldMasteryLevels[id] ?: 1
                 val cost = BigNumber(10L * (current + 1L))
                 if (current >= 10 || state.nebula < cost) return
                 state.copy(nebula = state.nebula - cost, worldMasteryLevels = state.worldMasteryLevels + (id to (current + 1)))
