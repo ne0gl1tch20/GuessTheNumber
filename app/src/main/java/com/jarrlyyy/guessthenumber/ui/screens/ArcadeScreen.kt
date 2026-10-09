@@ -4,6 +4,8 @@ import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 import androidx.compose.animation.animateContentSize
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -57,6 +59,7 @@ fun ArcadeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(minigames, key = { it.id }) { minigame ->
+                val launchInteractionSource = remember(minigame.id) { MutableInteractionSource() }
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -82,7 +85,13 @@ fun ArcadeScreen(
                         Button(
                             onClick = { activeMinigame = minigame },
                             shape = MaterialTheme.shapes.medium,
-                            modifier = Modifier.fillMaxWidth()
+                            interactionSource = launchInteractionSource,
+                            modifier = Modifier
+                                .expressivePressScale(
+                                    interactionSource = launchInteractionSource,
+                                    reducedMotion = reducedMotion
+                                )
+                                .fillMaxWidth()
                         ) {
                             Text("Play ${minigame.name}", style = MaterialTheme.typography.titleMedium)
                         }
