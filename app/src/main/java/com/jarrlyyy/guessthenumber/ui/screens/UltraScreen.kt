@@ -7,6 +7,8 @@ import androidx.compose.animation.animateContentSize
 import kotlinx.coroutines.delay
 import com.jarrlyyy.guessthenumber.ui.components.ExpressiveMilestoneBanner
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -41,6 +43,7 @@ fun UltraScreen(
     val requiredMoney = gameEngine.calculateUltraRequirement(state.ultraCount)
     val ultraReward = gameEngine.calculateUltraReward(state.money, state.ultraCount)
     val canUltra = state.money >= requiredMoney && state.prestige >= BigNumber(1_000)
+    val ultraInteractionSource = remember { MutableInteractionSource() }
     var showUltraCelebration by remember { mutableStateOf(false) }
     var observedUltraCount by remember { mutableStateOf(state.ultraCount) }
 
@@ -96,8 +99,16 @@ fun UltraScreen(
                         Button(
                             onClick = onUltra,
                             enabled = canUltra,
+                            interactionSource = ultraInteractionSource,
                             colors = ButtonDefaults.buttonColors(containerColor = UltraPurple),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .expressivePressScale(
+                                    interactionSource = ultraInteractionSource,
+                                    enabled = canUltra,
+                                    reducedMotion = state.settings.reducedMotion,
+                                    scaleDownFactor = 0.97f
+                                )
+                                .fillMaxWidth()
                         ) {
                             Text(if (canUltra) "Perform Ultra Reset" else "Need ${requiredMoney.format()} Money & 1K Prestige to Ultra")
                         }
