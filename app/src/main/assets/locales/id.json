@@ -783,5 +783,14 @@
   "notification_category_progression": "Tonggak progres",
   "notification_category_progression_desc": "Membuka dunia dan mengalahkan bos",
   "notification_category_events": "Event game",
-  "notification_category_events_desc": "Event acak baru dan hadiah terbatas waktu"
+  "notification_category_events_desc": "Event acak baru dan hadiah terbatas waktu",
+  "widget_title": "🎯 Tebak Angka",
+  "widget_slot": "Slot simpanan %d • %s",
+  "widget_money": "Uang",
+  "widget_range": "Rentang",
+  "widget_streak": "Rentetan %d",
+  "widget_mastery": "Penguasaan %d",
+  "widget_worlds_bosses": "Dunia %d • Bos %d",
+  "widget_quick_guess": "Tebak Cepat",
+  "widget_next_slot": "Slot Berikutnya"
 }
