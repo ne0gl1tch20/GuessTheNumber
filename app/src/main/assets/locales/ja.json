@@ -792,5 +792,9 @@
   "widget_mastery": "マスタリー %d",
   "widget_worlds_bosses": "ワールド %d • ボス %d",
   "widget_quick_guess": "クイック予想",
-  "widget_next_slot": "次のスロット"
+  "widget_next_slot": "次のスロット",
+  "endgame_goal_rift": "エンドレスリフトのティア10をクリア",
+  "endgame_goal_mastery": "すべての世界でマスタリー5に到達",
+  "endgame_claimed": "報酬受取済み",
+  "endgame_claim_reward": "報酬を受け取る"
 }
