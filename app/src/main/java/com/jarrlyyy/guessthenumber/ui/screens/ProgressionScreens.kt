@@ -104,7 +104,7 @@ fun HomeBaseScreen(state: GameState, onAction: (String, String) -> Unit, onBack:
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodexScreen(state: GameState, onBack: () -> Unit) {
+fun CodexScreen(state: GameState, onAction: (String, String) -> Unit, onBack: () -> Unit) {
     val locale = LocalAppLocaleManager.current
     val entries = listOf(
         Triple("world:verdant_grove", "codex_verdant_title", "Verdant Grove"),
@@ -125,6 +125,11 @@ fun CodexScreen(state: GameState, onBack: () -> Unit) {
             item {
                 Text(locale.getString("codex_progress", "%d / %d entries discovered", state.codexEntries.size, entries.size), style = MaterialTheme.typography.titleMedium)
                 LinearProgressIndicator(progress = { (state.codexEntries.size.toFloat() / entries.size).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth())
+            }
+            item {
+                Button(onClick = { onAction("claim_codex", "complete") }, enabled = state.codexEntries.size >= entries.size && !state.codexRewardClaimed, modifier = Modifier.fillMaxWidth()) {
+                    Text(locale.getString(if (state.codexRewardClaimed) "codex_reward_claimed" else "codex_claim_reward", if (state.codexRewardClaimed) "Completion reward claimed" else "Claim 100 Nebula completion reward"))
+                }
             }
             items(entries, key = { it.first }) { entry ->
                 val found = entry.first in state.codexEntries
