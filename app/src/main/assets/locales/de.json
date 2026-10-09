@@ -792,5 +792,9 @@
   "widget_mastery": "Meisterschaft %d",
   "widget_worlds_bosses": "Welten %d • Bosse %d",
   "widget_quick_guess": "Schnell raten",
-  "widget_next_slot": "Nächster Speicherplatz"
+  "widget_next_slot": "Nächster Speicherplatz",
+  "endgame_goal_rift": "Endlosen Riss auf Stufe 10 abschließen",
+  "endgame_goal_mastery": "Meisterschaftsstufe 5 in jeder Welt erreichen",
+  "endgame_claimed": "Belohnung abgeholt",
+  "endgame_claim_reward": "Belohnung abholen"
 }
