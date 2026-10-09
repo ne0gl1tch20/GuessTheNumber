@@ -119,8 +119,18 @@ fun WorldMapScreen(
                 }) {
                     Canvas(Modifier.fillMaxSize()) {
                         val pts = worlds.map { Offset(size.width * it.x, size.height * it.y) }
-                        for (i in 0 until pts.lastIndex) {
-                            drawLine(worldPathColor, pts[i], pts[i + 1], strokeWidth = 7f, cap = StrokeCap.Round)
+                        // The route graph branches from Crystal Caverns toward both later realms.
+                        val connections = listOf(0 to 1, 1 to 2, 1 to 3, 2 to 3)
+                        connections.forEach { (from, to) ->
+                            val routeUnlocked = worlds[from].id in state.unlockedWorldIds &&
+                                worlds[to].id in state.unlockedWorldIds
+                            drawLine(
+                                color = worldPathColor.copy(alpha = if (routeUnlocked) 0.95f else 0.45f),
+                                start = pts[from],
+                                end = pts[to],
+                                strokeWidth = if (routeUnlocked) 7f else 5f,
+                                cap = StrokeCap.Round
+                            )
                         }
                         worlds.forEachIndexed { i, node ->
                             if (state.correctGuesses >= node.secretAt) {
@@ -166,7 +176,7 @@ fun WorldMapScreen(
                             }
                         }
                     }
-                    worlds.filter { it.secretAt <= state.correctGuesses }.forEach { node ->
+                    worlds.filter { it.secretAt <= state.correctGuesses && it.id in state.unlockedWorldIds }.forEach { node ->
                         Surface(
                             onClick = { onProgressionAction("secret", node.secretId) },
                             modifier = Modifier.offset(x = mapWidth * node.x - 18.dp, y = mapHeight * node.y + 46.dp).size(36.dp),
@@ -213,7 +223,7 @@ fun WorldMapScreen(
                             Text(locale.getString("world_mastery_upgrade", "Increase mastery • %s Nebula", masteryCost.format()))
                         }
                     }
-                    if (world.secretAt <= state.correctGuesses) {
+                    if (world.secretAt <= state.correctGuesses && unlocked) {
                         Text(if (secretFound) locale.getString("secret_discovered", "Secret area discovered") else locale.getString("secret_available", "A hidden route has appeared! Tap its key on the map."), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodySmall)
                     }
                 }
