@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Sonsuz Yarık 10. seviyeyi tamamla",
   "endgame_goal_mastery": "Her dünyada ustalık seviyesini 5'e çıkar",
   "endgame_claimed": "Ödül alındı",
-  "endgame_claim_reward": "Ödülü al"
+  "endgame_claim_reward": "Ödülü al",
+  "music_control_previous": "Önceki",
+  "music_control_pause": "Duraklat",
+  "music_control_play": "Oynat",
+  "music_control_next": "Sonraki",
+  "music_control_stop": "Durdur"
 }
