@@ -781,5 +781,13 @@
   "map_fit_screen": "Iakma sa screen",
   "world_mastery_bonus": "+%d%% Pera sa bawat tamang hula sa mundong ito.",
   "beyond_numbers_title": "Higit Pa sa mga Numero",
-  "world_progress_summary": "Mga mundong nabuksan: %d / 4 • Mga boss na natalo: %d / 4"
+  "world_progress_summary": "Mga mundong nabuksan: %d / 4 • Mga boss na natalo: %d / 4",
+  "rift_title": "Walang Hanggang Rift",
+  "rift_description": "Labanan muli ang apat na boss sa tuloy-tuloy na hamon. Bawat panalo ay nagpapataas ng tier, HP ng boss at gantimpala.",
+  "rift_best_tier": "Pinakamataas na tier na nalampasan: %d",
+  "rift_active_tier": "Kasalukuyang tier: %d. Naghihintay ang susunod na boss sa World Map.",
+  "rift_requirement": "I-unlock ang Rift matapos talunin ang apat na boss ng mundo.",
+  "rift_stop": "Umalis sa Endless Rift",
+  "rift_start": "Simulan ang Endless Rift",
+  "rift_tier_label": "Endless Rift • Tier %d"
 }
