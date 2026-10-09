@@ -323,7 +323,11 @@ fun NavGraph(
                 )
             }
             composable(Screen.Arcade.route) {
-                ArcadeScreen(onEarnReward = onEarnMinigameReward, onBack = { navController.popBackStack() })
+                ArcadeScreen(
+                    onEarnReward = onEarnMinigameReward,
+                    onBack = { navController.popBackStack() },
+                    reducedMotion = state.settings.reducedMotion
+                )
             }
             composable(Screen.Stats.route) {
                 StatsScreen(state = state, onBack = { navController.popBackStack() })
@@ -405,7 +409,8 @@ fun NavGraph(
                         step = tutorialStep,
                         title = locale.getString("guided_tutorial_title_" + tutorialStep, "Guided Tutorial"),
                         instruction = locale.getString("guided_tutorial_instruction_" + tutorialStep, "Follow the highlighted action to continue."),
-                        stepLabel = locale.getString("guided_tutorial_step", "Step %d of 4 • Action required", tutorialStep + 1)
+                        stepLabel = locale.getString("guided_tutorial_step", "Step %d of 4 • Action required", tutorialStep + 1),
+                        reducedMotion = state.settings.reducedMotion
                     )
                 }
             }
