@@ -796,5 +796,10 @@
   "endgame_goal_rift": "엔들리스 리프트 10단계 클리어",
   "endgame_goal_mastery": "모든 월드에서 숙련도 5 달성",
   "endgame_claimed": "보상 수령 완료",
-  "endgame_claim_reward": "보상 받기"
+  "endgame_claim_reward": "보상 받기",
+  "music_control_previous": "이전",
+  "music_control_pause": "일시정지",
+  "music_control_play": "재생",
+  "music_control_next": "다음",
+  "music_control_stop": "정지"
 }
