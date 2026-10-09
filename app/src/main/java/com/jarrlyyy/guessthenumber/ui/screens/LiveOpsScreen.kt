@@ -83,9 +83,13 @@ fun LiveOpsScreen(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text(localizedText("Event Perks & Permanent Bonuses"), style = MaterialTheme.typography.titleMedium)
-                            Text(text = localizedText("Permanent Bonus Level: +${state.permanentEventBoosts} (Grants permanent money & currency multipliers across saves!)"),
+                            Text(text = "${localizedText("Permanent Bonus Level")}: +${state.permanentEventBoosts}",
                                 fontSize = 16.sp,
                                 color = MoneyGold
+                            )
+                            Text(text = localizedText("+2% money per level and +1 Nebula per correct guess every 5 levels, up to level 25. Applies to this save slot."),
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(text = localizedText("Participate in limited-time live ops events to claim rewards and permanently enhance your progression."),
                                 fontSize = 12.sp,
