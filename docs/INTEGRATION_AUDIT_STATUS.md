@@ -19,7 +19,7 @@
 - Kept reminder, progression and event notifications on separate channels and preserved destination extras for navigation.
 - Reminder scheduling and reboot restoration honor the reminder category switch and the selected 12/24/48-hour interval.
 - Expanded the home-screen widget with money, range, streak, mastery, world and boss metrics; added per-widget save-slot cycling and an Open Game action.
-- Added a compact widget layout alongside the expanded layout. Both widget layouts refresh after persisted gameplay saves through a throttled refresh coordinator.
+- Added a compact widget layout alongside the expanded layout. Both widget layouts refresh after persisted gameplay saves through a debounced refresh coordinator that publishes the latest saved state.
 - Removed the widget's duplicated gameplay engine/reward implementation. Widget actions no longer grant a free correct guess or duplicate boss/relic reward logic.
 
 ## Completed in the latest RPG integration pass
@@ -30,6 +30,7 @@
 - Mastery level 5 and 10 milestones grant Nebula and Codex entries; the secret-area discount reduces mastery upgrade costs.
 - Home Base upgrades now account for money spent, grant milestone Nebula at levels 5/10/15/20 and add Sanctuary Codex entries.
 - Boss and Endless Rift rewards now receive connected bonuses from relic set size, world mastery, Home Base and discovered secret areas.
+- Mastery upgrades now discount costs from the matching discovered secret, Home Base level and the complete four-relic set, capped at a 40% combined discount.
 - Mastery level 5 and 10 milestones add Codex entries and Nebula rewards. The endgame now includes a claimable goal for reaching mastery level 5 in every world.
 - Endgame goals expose reward-claim buttons when their requirements are met, and the Codex completion reward requires all 12 core world/boss/secret entries instead of being affected by bonus Codex entries.
 
