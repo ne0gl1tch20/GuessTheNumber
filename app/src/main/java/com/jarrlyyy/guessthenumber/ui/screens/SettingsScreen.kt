@@ -325,6 +325,36 @@ fun SettingsScreen(
                 }
             }
 
+            if (settings.notificationsEnabled) {
+                item {
+                    Text(locale.getString("notification_category_title", "Notification Categories"), style = MaterialTheme.typography.titleMedium)
+                }
+                item {
+                    NotificationCategorySwitch(
+                        title = locale.getString("notification_category_reminders", "Reminders"),
+                        description = locale.getString("notification_category_reminders_desc", "Periodic reminders to return to the game"),
+                        checked = settings.notificationRemindersEnabled,
+                        onCheckedChange = { onUpdateSettings(settings.copy(notificationRemindersEnabled = it)) }
+                    )
+                }
+                item {
+                    NotificationCategorySwitch(
+                        title = locale.getString("notification_category_progression", "Progression milestones"),
+                        description = locale.getString("notification_category_progression_desc", "World unlocks and boss victories"),
+                        checked = settings.notificationProgressionEnabled,
+                        onCheckedChange = { onUpdateSettings(settings.copy(notificationProgressionEnabled = it)) }
+                    )
+                }
+                item {
+                    NotificationCategorySwitch(
+                        title = locale.getString("notification_category_events", "Game events"),
+                        description = locale.getString("notification_category_events_desc", "New random events and limited-time event rewards"),
+                        checked = settings.notificationEventsEnabled,
+                        onCheckedChange = { onUpdateSettings(settings.copy(notificationEventsEnabled = it)) }
+                    )
+                }
+            }
+
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -485,3 +515,24 @@ fun SettingsScreen(
     }
 }
 
+
+
+@Composable
+private fun NotificationCategorySwitch(
+    title: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            Text(description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
