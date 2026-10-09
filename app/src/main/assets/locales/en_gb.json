@@ -653,5 +653,8 @@
   "boss_defeated": "Boss defeated",
   "world_locked_boss": "Unlock este mundo primero",
   "boss_fight": "Challenge boss",
-  "boss_requirements_pending": "Train more to fight"
+  "boss_requirements_pending": "Train more to fight",
+  "boss_hp_label": "Boss health",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "Attack boss"
 }
