@@ -792,5 +792,9 @@
   "widget_mastery": "Mistrzostwo %d",
   "widget_worlds_bosses": "Światy %d • Bossowie %d",
   "widget_quick_guess": "Szybki strzał",
-  "widget_next_slot": "Następny slot"
+  "widget_next_slot": "Następny slot",
+  "endgame_goal_rift": "Ukończ 10. poziom Nieskończonej Szczeliny",
+  "endgame_goal_mastery": "Osiągnij mistrzostwo 5 w każdym świecie",
+  "endgame_claimed": "Nagroda odebrana",
+  "endgame_claim_reward": "Odbierz nagrodę"
 }
