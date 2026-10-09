@@ -65,11 +65,13 @@ fun UltraScreen(
             // Currency Display
             item {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().animateContentSize(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(localizedText("Ultra Balance: ${state.ultra.format()}"), color = UltraPurple, fontSize = 20.sp)
+                        AnimatedContent(targetState = state.ultra.format(), label = "ultraBalance") { balance ->
+                            Text(localizedText("Ultra Balance: $balance"), color = UltraPurple, fontSize = 20.sp)
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(localizedText("Requirements: ${requiredMoney.format()} Money AND 1,000 Prestige (Reset #${state.ultraCount + 1})"))
                         Text(localizedText("Current Money: ${state.money.format()} | Current Prestige: ${state.prestige.format()}"))
