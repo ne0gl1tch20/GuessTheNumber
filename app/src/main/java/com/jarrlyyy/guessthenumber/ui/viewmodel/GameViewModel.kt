@@ -807,10 +807,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
         val context = getApplication<Application>()
         val workManager = WorkManager.getInstance(context)
-        if (!newSettings.notificationsEnabled) {
+        if (!newSettings.notificationsEnabled || !newSettings.notificationRemindersEnabled) {
             workManager.cancelUniqueWork(GameReminderWorker.WORK_NAME)
         } else if (
             !oldSettings.notificationsEnabled ||
+            !oldSettings.notificationRemindersEnabled ||
             newSettings.notificationIntervalHours != oldSettings.notificationIntervalHours
         ) {
             val intervalHours = newSettings.notificationIntervalHours.coerceIn(12L, 48L)
