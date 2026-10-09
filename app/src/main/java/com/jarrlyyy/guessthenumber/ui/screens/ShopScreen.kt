@@ -3,6 +3,8 @@ package com.jarrlyyy.guessthenumber.ui.screens
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -104,11 +106,16 @@ fun ShopScreen(
                 val equipped = state.equippedCosmeticId == item.id
                 val canAfford = state.nebula >= BigNumber(item.nebulaCost)
 
+                val targetCardColor = if (equipped) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                val cardColor = if (state.settings.reducedMotion) targetCardColor else animateColorAsState(targetValue = targetCardColor, label = "shopCardColor_${item.id}").value
+
                 Surface(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .then(if (state.settings.reducedMotion) Modifier else Modifier.animateItem(placementSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow, dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy)))
+                        .animateContentSize(),
                     shape = MaterialTheme.shapes.large,
-                    color = if (equipped) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                    tonalElevation = 2.dp
+                    color = cardColor,
+                    tonalElevation = if (equipped) 4.dp else 2.dp
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -125,14 +132,18 @@ fun ShopScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         if (item.isCosmetic && purchased) {
                             OutlinedButton(onClick = { onEquipCosmetic(item.id) }, enabled = !equipped) {
-                                Text(if (equipped) locale.getString("equipped", "Equipped") else locale.getString("equip", "Equip"))
+                                AnimatedContent(targetState = equipped, label = "cosmeticEquipState_${item.id}") { isEquipped ->
+                                    Text(if (isEquipped) locale.getString("equipped", "Equipped") else locale.getString("equip", "Equip"))
+                                }
                             }
                         } else {
                             Button(
                                 onClick = { onBuyShopItem(item.id, item.nebulaCost) },
                                 enabled = canAfford && !purchased
                             ) {
-                                Text(if (purchased) locale.getString("owned", "Owned") else locale.getString("acquire", "Acquire"))
+                                AnimatedContent(targetState = purchased, label = "shopPurchaseState_${item.id}") { isPurchased ->
+                                    Text(if (isPurchased) locale.getString("owned", "Owned") else locale.getString("acquire", "Acquire"))
+                                }
                             }
                         }
                     }
