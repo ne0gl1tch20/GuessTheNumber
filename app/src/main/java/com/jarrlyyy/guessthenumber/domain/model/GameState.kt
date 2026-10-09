@@ -70,6 +70,7 @@ data class GameState(
     val activeBossBattleWorldId: String? = null,
     val bossBattleMistakes: Map<String, Int> = emptyMap(),
     val codexRewardClaimed: Boolean = false,
+    val endgameRewardsClaimed: Set<String> = emptySet(),
     val endlessRiftTier: Int = 0,
     val endlessRiftBestTier: Int = 0,
     val endlessRiftActive: Boolean = false
