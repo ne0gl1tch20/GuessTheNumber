@@ -1,18 +1,6 @@
 name: Build Android APKs (Debug & Release)
 
 on:
-  push:
-    branches: [master]
-    paths-ignore:
-      - "app/src/main/assets/locales/**"
-      - "app/src/main/assets/changelogs.md"
-      - "MEMORY.md"
-  pull_request:
-    branches: [master]
-    paths-ignore:
-      - "app/src/main/assets/locales/**"
-      - "app/src/main/assets/changelogs.md"
-      - "MEMORY.md"
   workflow_dispatch:
 
 jobs:
