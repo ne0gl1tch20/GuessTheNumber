@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "받기",
   "daily_quest_claimed": "수령 완료",
-  "daily_quest_in_progress": "진행 중"
+  "daily_quest_in_progress": "진행 중",
+  "liveops_bonus_level_label": "영구 보너스 레벨",
+  "liveops_bonus_effect": "레벨당 머니 +2%, 5레벨마다 정답 시 성운 +1(최대 25레벨). 현재 저장 슬롯에 적용됩니다."
 }
