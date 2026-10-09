@@ -802,5 +802,14 @@
   "notification_category_progression": "Mga Yugto ng Progreso",
   "notification_category_progression_desc": "Pagbubukas ng mundo at pagkapanalo sa boss",
   "notification_category_events": "Mga Event sa Laro",
-  "notification_category_events_desc": "Mga bagong random event at limitadong reward"
+  "notification_category_events_desc": "Mga bagong random event at limitadong reward",
+  "widget_title": "🎯 Hulaan ang Numero",
+  "widget_slot": "Save slot %d • %s",
+  "widget_money": "Pera",
+  "widget_range": "Saklaw",
+  "widget_streak": "Sunod-sunod %d",
+  "widget_mastery": "Mastery %d",
+  "widget_worlds_bosses": "Mundo %d • Boss %d",
+  "widget_quick_guess": "Mabilis na Hula",
+  "widget_next_slot": "Susunod na Slot"
 }
