@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Klaim",
   "daily_quest_claimed": "Diklaim",
-  "daily_quest_in_progress": "Sedang berlangsung"
+  "daily_quest_in_progress": "Sedang berlangsung",
+  "liveops_bonus_level_label": "Level Bonus Permanen",
+  "liveops_bonus_effect": "+2% uang per level dan +1 Nebula untuk setiap tebakan benar tiap 5 level, hingga level 25. Berlaku untuk slot simpanan ini."
 }
