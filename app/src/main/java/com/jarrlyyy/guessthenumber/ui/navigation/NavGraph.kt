@@ -101,6 +101,27 @@ fun NavGraph(
         )
     } ?: Screen.Play.route
 
+    // Notifications can arrive while MainActivity is already alive. Keep the
+    // start route for cold launches and navigate on subsequent notification taps.
+    LaunchedEffect(initialDestination) {
+        val destination = initialDestination?.takeIf {
+            it in setOf(
+                Screen.Play.route,
+                Screen.WorldMap.route,
+                Screen.Relics.route,
+                Screen.HomeBase.route,
+                Screen.Codex.route,
+                Screen.Endgame.route,
+                Screen.MusicPlayer.route,
+                "live_ops",
+                "achievements"
+            )
+        }
+        if (destination != null && navController.currentDestination?.route != destination) {
+            navController.navigate(destination) { launchSingleTop = true }
+        }
+    }
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     var tutorialStep by rememberSaveable { mutableIntStateOf(0) }
