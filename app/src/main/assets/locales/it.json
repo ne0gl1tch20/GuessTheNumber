@@ -770,5 +770,11 @@
   "rift_requirement": "Sblocca il Rift dopo aver sconfitto tutti e quattro i boss del mondo.",
   "rift_stop": "Esci dal Rift infinito",
   "rift_start": "Avvia il Rift infinito",
-  "rift_tier_label": "Rift infinito • Livello %d"
+  "rift_tier_label": "Rift infinito • Livello %d",
+  "notification_reminder_title": "Indovina il numero",
+  "notification_reminder_body": "I tuoi numeri ti aspettano! Torna a giocare e indovina!",
+  "notification_progression_title": "Traguardo di progressione",
+  "notification_progression_body": "È disponibile un nuovo traguardo di progressione.",
+  "notification_event_title": "Un evento ti aspetta",
+  "notification_event_body": "È disponibile un evento a tempo limitato."
 }
