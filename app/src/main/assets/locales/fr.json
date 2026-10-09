@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Récupérer",
   "daily_quest_claimed": "Récupéré",
-  "daily_quest_in_progress": "En cours"
+  "daily_quest_in_progress": "En cours",
+  "liveops_bonus_level_label": "Niveau de bonus permanent",
+  "liveops_bonus_effect": "+2 % d’argent par niveau et +1 Nébuleuse par bonne réponse tous les 5 niveaux, jusqu’au niveau 25. S’applique à cet emplacement de sauvegarde."
 }
