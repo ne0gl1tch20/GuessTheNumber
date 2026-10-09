@@ -776,5 +776,12 @@
   "notification_progression_title": "Hito de progreso",
   "notification_progression_body": "Hay un nuevo hito de progreso disponible.",
   "notification_event_title": "Hay un evento esperándote",
-  "notification_event_body": "Hay un evento de tiempo limitado disponible."
+  "notification_event_body": "Hay un evento de tiempo limitado disponible.",
+  "notification_category_title": "Categorías de notificaciones",
+  "notification_category_reminders": "Recordatorios",
+  "notification_category_reminders_desc": "Avisos periódicos para volver al juego",
+  "notification_category_progression": "Hitos de progreso",
+  "notification_category_progression_desc": "Desbloqueos de mundos y victorias contra jefes",
+  "notification_category_events": "Eventos del juego",
+  "notification_category_events_desc": "Nuevos eventos aleatorios y recompensas por tiempo limitado"
 }
