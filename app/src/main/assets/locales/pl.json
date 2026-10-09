@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Ukończ 10. poziom Nieskończonej Szczeliny",
   "endgame_goal_mastery": "Osiągnij mistrzostwo 5 w każdym świecie",
   "endgame_claimed": "Nagroda odebrana",
-  "endgame_claim_reward": "Odbierz nagrodę"
+  "endgame_claim_reward": "Odbierz nagrodę",
+  "music_control_previous": "Poprzedni",
+  "music_control_pause": "Wstrzymaj",
+  "music_control_play": "Odtwórz",
+  "music_control_next": "Następny",
+  "music_control_stop": "Zatrzymaj"
 }
