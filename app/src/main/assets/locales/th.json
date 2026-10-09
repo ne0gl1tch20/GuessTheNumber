@@ -776,5 +776,12 @@
   "notification_progression_title": "ความสำเร็จความคืบหน้า",
   "notification_progression_body": "มีความคืบหน้าขั้นใหม่พร้อมแล้ว",
   "notification_event_title": "มีอีเวนต์รออยู่",
-  "notification_event_body": "อีเวนต์เกมแบบจำกัดเวลาพร้อมแล้ว"
+  "notification_event_body": "อีเวนต์เกมแบบจำกัดเวลาพร้อมแล้ว",
+  "notification_category_title": "หมวดหมู่การแจ้งเตือน",
+  "notification_category_reminders": "การเตือน",
+  "notification_category_reminders_desc": "การเตือนเป็นระยะให้กลับมาเล่นเกม",
+  "notification_category_progression": "ความคืบหน้าสำคัญ",
+  "notification_category_progression_desc": "ปลดล็อกโลกและเอาชนะบอส",
+  "notification_category_events": "อีเวนต์เกม",
+  "notification_category_events_desc": "อีเวนต์สุ่มใหม่และรางวัลจำกัดเวลา"
 }
