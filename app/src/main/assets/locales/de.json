@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "Abholen",
   "daily_quest_claimed": "Abgeholt",
-  "daily_quest_in_progress": "In Bearbeitung"
+  "daily_quest_in_progress": "In Bearbeitung",
+  "liveops_bonus_level_label": "Permanente Bonusstufe",
+  "liveops_bonus_effect": "+2 % Geld pro Stufe und +1 Nebula pro richtiger Antwort alle 5 Stufen, bis Stufe 25. Gilt für diesen Speicherplatz."
 }
