@@ -9,6 +9,8 @@ import androidx.core.app.NotificationCompat
 import com.jarrlyyy.guessthenumber.MainActivity
 import com.jarrlyyy.guessthenumber.R
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+import com.jarrlyyy.guessthenumber.data.store.SaveManager
+import org.json.JSONObject
 import kotlinx.coroutines.runBlocking
 
 object NotificationHelper {
@@ -27,8 +29,7 @@ object NotificationHelper {
 
     fun createNotificationChannels(context: Context) {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val locale = LocaleManager(context)
-        runBlocking { locale.loadLocale("en_us.json") }
+        val locale = createLocaleManager(context)
         listOf(
             NotificationChannel(CHANNEL_ID, locale.getString("notification_channel_reminders", "Game Reminders"), NotificationManager.IMPORTANCE_DEFAULT).apply {
                 description = locale.getString("notification_channel_reminders_desc", "Optional reminders to return to Guess The Number")
@@ -46,8 +47,7 @@ object NotificationHelper {
 
     fun show(context: Context, type: Type) {
         createNotificationChannels(context)
-        val locale = LocaleManager(context)
-        runBlocking { locale.loadLocale("en_us.json") }
+        val locale = createLocaleManager(context)
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra("notification_destination", type.destination)
@@ -67,6 +67,16 @@ object NotificationHelper {
         } catch (_: SecurityException) {
             // Permission can be denied on Android 13+.
         }
+    }
+
+    private fun createLocaleManager(context: Context): LocaleManager {
+        val locale = LocaleManager(context)
+        val tag = runCatching {
+            val raw = runBlocking { SaveManager(context).getAppPreferencesJson() }
+            JSONObject(raw).optString("locale", "en-US")
+        }.getOrDefault("en-US")
+        runBlocking { locale.loadLocaleForTag(tag) }
+        return locale
     }
 
     fun showReminderNotification(context: Context) = show(context, Type.REMINDER)
