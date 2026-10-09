@@ -790,6 +790,14 @@ private fun WorldProgressionBoard(
                     "ember_summit" -> state.correctGuesses >= 150 && totalUpgradeLevels >= 25 && state.prestigeCount >= 1
                     else -> state.correctGuesses >= 500 && totalUpgradeLevels >= 75 && state.prestigeCount >= 5 && state.ultraCount >= 1
                 }
+                val bossHp = when (world.id) {
+                    "verdant_grove" -> 3
+                    "crystal_caverns" -> 5
+                    "ember_summit" -> 7
+                    else -> 10
+                }
+                val bossDamage = (state.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, bossHp)
+                val bossHpRemaining = bossHp - bossDamage
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.extraLarge,
@@ -836,6 +844,19 @@ private fun WorldProgressionBoard(
                             Text(locale.getString(world.bossNameKey), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
                         }
                         Text(locale.getString(world.bossRequirementKey), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        if (unlocked && !defeated) {
+                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                Text(locale.getString("boss_hp_label"), style = MaterialTheme.typography.labelMedium)
+                                Spacer(Modifier.weight(1f))
+                                Text(locale.getString("boss_hp_progress", bossHpRemaining, bossHp), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.tertiary)
+                            }
+                            LinearProgressIndicator(
+                                progress = { bossHpRemaining.toFloat() / bossHp.toFloat() },
+                                modifier = Modifier.fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.error,
+                                trackColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        }
                         Text(locale.getString(world.rewardKey), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.tertiary)
                         Button(
                             onClick = { onAction(world.id, "boss") },
@@ -844,7 +865,7 @@ private fun WorldProgressionBoard(
                         ) {
                             Icon(if (defeated) Icons.Default.EmojiEvents else Icons.Default.SportsMma, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text(locale.getString(if (defeated) "boss_defeated" else if (!unlocked) "world_locked_boss" else if (canFight) "boss_fight" else "boss_requirements_pending"))
+                            Text(locale.getString(if (defeated) "boss_defeated" else if (!unlocked) "world_locked_boss" else if (canFight) "boss_attack" else "boss_requirements_pending"))
                         }
                     }
                 }
