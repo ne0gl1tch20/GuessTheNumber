@@ -653,5 +653,8 @@
   "boss_defeated": "ボス撃破済み",
   "world_locked_boss": "先にこの世界を解放",
   "boss_fight": "ボスに挑戦",
-  "boss_requirements_pending": "もっと強化して挑戦しよう"
+  "boss_requirements_pending": "もっと強化して挑戦しよう",
+  "boss_hp_label": "ボスHP",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "ボスを攻撃"
 }
