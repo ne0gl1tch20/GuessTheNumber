@@ -770,5 +770,11 @@
   "rift_requirement": "Schalte den Riss frei, indem du alle vier Weltbosse besiegst.",
   "rift_stop": "Endlosen Riss verlassen",
   "rift_start": "Endlosen Riss starten",
-  "rift_tier_label": "Endloser Riss • Stufe %d"
+  "rift_tier_label": "Endloser Riss • Stufe %d",
+  "notification_reminder_title": "Zahlenraten",
+  "notification_reminder_body": "Deine Zahlen vermissen dich! Komm zurück und rate die Zahl!",
+  "notification_progression_title": "Fortschrittsmeilenstein",
+  "notification_progression_body": "Ein neuer Fortschrittsmeilenstein ist verfügbar.",
+  "notification_event_title": "Ein Spielevent wartet",
+  "notification_event_body": "Ein zeitlich begrenztes Event ist verfügbar."
 }
