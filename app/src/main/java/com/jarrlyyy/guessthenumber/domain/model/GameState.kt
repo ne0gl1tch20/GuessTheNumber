@@ -72,6 +72,10 @@ data class GameState(
     val activeBossBattleWorldId: String? = null,
     val bossBattleMistakes: Map<String, Int> = emptyMap(),
     val codexRewardClaimed: Boolean = false
+    // Endless Rift is opt-in endgame progress; defaults preserve existing saves.
+    val endlessRiftTier: Int = 0,
+    val endlessRiftBestTier: Int = 0,
+    val endlessRiftActive: Boolean = false
 )
 
 @Serializable
