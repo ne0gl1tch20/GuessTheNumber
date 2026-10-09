@@ -43,7 +43,13 @@ data class GameState(
     val ultraCount: Long = 0,
     val liveOpsClaims: Map<String, Int> = emptyMap(),
     val permanentEventBoosts: Int = 0,
-    val lastRandomEventId: String? = null
+    val lastRandomEventId: String? = null,
+    val dailyQuestDate: String = "",
+    val dailyQuestGuesses: Int = 0,
+    val dailyQuestCorrectGuesses: Int = 0,
+    val dailyQuestBestStreak: Int = 0,
+    val dailyQuestUpgradePurchases: Int = 0,
+    val claimedDailyQuests: Set<String> = emptySet()
 )
 
 @Serializable
