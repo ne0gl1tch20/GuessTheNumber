@@ -4,6 +4,8 @@ import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
+import kotlinx.coroutines.delay
+import com.jarrlyyy.guessthenumber.ui.components.ExpressiveMilestoneBanner
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,6 +41,18 @@ fun PrestigeScreen(
     val requiredMoney = gameEngine.calculatePrestigeRequirement(state.prestigeCount)
     val prestigeReward = gameEngine.calculatePrestigeReward(state.money, state.prestigeCount)
     val canPrestige = state.money >= requiredMoney
+    var showPrestigeCelebration by remember { mutableStateOf(false) }
+    var observedPrestigeCount by remember { mutableStateOf(state.prestigeCount) }
+
+    LaunchedEffect(state.prestigeCount) {
+        val reachedNewPrestige = state.prestigeCount > observedPrestigeCount
+        observedPrestigeCount = state.prestigeCount
+        if (reachedNewPrestige) {
+            showPrestigeCelebration = true
+            delay(if (state.settings.reducedMotion) 700L else 2200L)
+            showPrestigeCelebration = false
+        }
+    }
 
     val upgrades = remember { JsonConfigRepository(context).loadPrestigeUpgrades() }
     val shopItems = remember { JsonConfigRepository(context).loadPrestigeShopItems() }
@@ -89,6 +103,15 @@ fun PrestigeScreen(
                         }
                     }
                 }
+            }
+
+            item {
+                ExpressiveMilestoneBanner(
+                    visible = showPrestigeCelebration,
+                    title = "Prestige achieved!",
+                    description = "A new reset is complete. Your next run starts now.",
+                    reducedMotion = state.settings.reducedMotion
+                )
             }
 
             // Prestige Upgrades Header
