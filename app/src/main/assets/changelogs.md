@@ -1,3 +1,14 @@
+# Changelog
+
+## v3.0.0 (Beyond the Numbers: Ultimate Expansion)
+
+- 🌌 **Endless Rift**: After defeating all four world bosses, unlock a persistent, repeatable boss gauntlet. Each victory advances the tier, raises boss HP, and scales Money and Nebula rewards.
+- ⚔️ **Escalating boss encounters**: Rift rematches use the existing phase-based guessing combat and miss penalties, with tier-scaled HP and rewards.
+- 💾 **Save-compatible progression**: Added defaulted per-save Rift tier, best-tier and active-run fields so older saves load without migration.
+- 🌍 **Integrated endgame flow**: Start or leave the Rift from Endgame Challenges, continue the current boss on the World Map, and see its scaled HP and current tier.
+- 🌐 **Localization**: Added the Rift interface strings to all 23 supported locale catalogs.
+- 📱 **Version**: Bumped to versionCode 18 / versionName 3.0.0.
+
 # 🚀 Guess The Number Simulator - Changelog
 
 ## v2.0.0 (Beyond the Numbers Major Expansion)
