@@ -792,5 +792,9 @@
   "widget_mastery": "숙련도 %d",
   "widget_worlds_bosses": "월드 %d • 보스 %d",
   "widget_quick_guess": "빠른 추측",
-  "widget_next_slot": "다음 슬롯"
+  "widget_next_slot": "다음 슬롯",
+  "endgame_goal_rift": "엔들리스 리프트 10단계 클리어",
+  "endgame_goal_mastery": "모든 월드에서 숙련도 5 달성",
+  "endgame_claimed": "보상 수령 완료",
+  "endgame_claim_reward": "보상 받기"
 }
