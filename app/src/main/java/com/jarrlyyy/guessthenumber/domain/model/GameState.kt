@@ -60,7 +60,8 @@ data class GameState(
     val unlockedWorldIds: Set<String> = setOf("verdant_grove"),
     val defeatedBossIds: Set<String> = emptySet(),
     val activeWorldId: String = "verdant_grove",
-    val worldBossVictories: Int = 0
+    val worldBossVictories: Int = 0,
+    val bossBattleProgress: Map<String, Int> = emptyMap()
 )
 
 @Serializable
