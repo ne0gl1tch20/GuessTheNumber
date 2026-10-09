@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,18 +11,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.data.audio.BackgroundMusicManager
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MusicPlayerScreen(
-    manager: BackgroundMusicManager,
-    onImport: () -> Unit,
-    onBack: () -> Unit
-) {
+fun MusicPlayerScreen(onBack: () -> Unit) {
+    val context = LocalContext.current
     val locale = LocalAppLocaleManager.current
+    val manager = remember { BackgroundMusicManager(context.applicationContext) }
+    DisposableEffect(Unit) { onDispose { manager.release() } }
+
     val library by manager.library.collectAsState()
     val queue by manager.queue.collectAsState()
     val playlists by manager.playlists.collectAsState()
@@ -31,8 +34,11 @@ fun MusicPlayerScreen(
     val shuffle by manager.shuffle.collectAsState()
     val repeat by manager.repeatMode.collectAsState()
     var playlistName by remember { mutableStateOf("") }
-
     val current = library.firstOrNull { it.id == currentTrackId }
+
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) manager.importTrack(uri)?.let { manager.playTrack(it.id) }
+    }
 
     Scaffold(
         topBar = {
@@ -42,21 +48,14 @@ fun MusicPlayerScreen(
             )
         }
     ) { padding ->
-        LazyColumn(
-            Modifier.fillMaxSize().padding(padding).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        LazyColumn(Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
                 Card {
                     Column(Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Default.MusicNote, null, Modifier.size(56.dp))
                         Text(current?.title ?: locale.getString("music_no_track", "No track selected"), style = MaterialTheme.typography.titleLarge)
                         if (current?.artist.orEmpty().isNotBlank()) Text(current.artist, style = MaterialTheme.typography.bodyMedium)
-                        Slider(
-                            value = position.toFloat().coerceIn(0f, duration.coerceAtLeast(1).toFloat()),
-                            onValueChange = { manager.seekTo(it.toInt()) },
-                            valueRange = 0f..duration.coerceAtLeast(1).toFloat()
-                        )
+                        Slider(value = position.toFloat().coerceIn(0f, duration.coerceAtLeast(1).toFloat()), onValueChange = { manager.seekTo(it.toInt()) }, valueRange = 0f..duration.coerceAtLeast(1).toFloat())
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             IconButton(onClick = { manager.previous() }) { Icon(Icons.Default.SkipPrevious, null) }
                             FilledIconButton(onClick = { if (playing) manager.pause() else manager.play() }) { Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, null) }
@@ -68,10 +67,8 @@ fun MusicPlayerScreen(
                 }
             }
             item {
-                Button(onClick = onImport, Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Add, null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(locale.getString("music_import", "Add local audio"))
+                Button(onClick = { picker.launch(arrayOf("audio/*")) }, Modifier.fillMaxWidth()) {
+                    Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(locale.getString("music_import", "Add local audio"))
                 }
             }
             item { Text(locale.getString("music_library", "Library"), style = MaterialTheme.typography.titleLarge) }
@@ -92,11 +89,7 @@ fun MusicPlayerScreen(
             item { Text(locale.getString("music_queue", "Queue (${queue.size})"), style = MaterialTheme.typography.titleLarge) }
             items(queue.indices.toList()) { index ->
                 val track = library.firstOrNull { it.id == queue[index] } ?: return@items
-                ListItem(
-                    headlineContent = { Text(track.title) },
-                    supportingContent = { Text(locale.getString("music_queue_position", "Position %d", index + 1)) },
-                    trailingContent = { IconButton(onClick = { manager.removeFromQueue(index) }) { Icon(Icons.Default.Close, null) } }
-                )
+                ListItem(headlineContent = { Text(track.title) }, supportingContent = { Text(locale.getString("music_queue_position", "Position %d", index + 1)) }, trailingContent = { IconButton(onClick = { manager.removeFromQueue(index) }) { Icon(Icons.Default.Close, null) } })
             }
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
