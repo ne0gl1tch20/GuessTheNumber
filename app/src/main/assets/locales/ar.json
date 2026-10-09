@@ -784,5 +784,14 @@
   "notification_category_progression": "مراحل التقدم",
   "notification_category_progression_desc": "فتح العوالم والانتصار على الزعماء",
   "notification_category_events": "فعاليات اللعبة",
-  "notification_category_events_desc": "فعاليات عشوائية جديدة ومكافآت محدودة الوقت"
+  "notification_category_events_desc": "فعاليات عشوائية جديدة ومكافآت محدودة الوقت",
+  "widget_title": "🎯 خمن الرقم",
+  "widget_slot": "خانة الحفظ %d • %s",
+  "widget_money": "المال",
+  "widget_range": "النطاق",
+  "widget_streak": "سلسلة %d",
+  "widget_mastery": "الإتقان %d",
+  "widget_worlds_bosses": "العوالم %d • الزعماء %d",
+  "widget_quick_guess": "تخمين سريع",
+  "widget_next_slot": "الخانة التالية"
 }
