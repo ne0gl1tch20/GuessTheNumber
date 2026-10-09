@@ -796,5 +796,10 @@
   "endgame_goal_rift": "Endlosen Riss auf Stufe 10 abschließen",
   "endgame_goal_mastery": "Meisterschaftsstufe 5 in jeder Welt erreichen",
   "endgame_claimed": "Belohnung abgeholt",
-  "endgame_claim_reward": "Belohnung abholen"
+  "endgame_claim_reward": "Belohnung abholen",
+  "music_control_previous": "Zurück",
+  "music_control_pause": "Pause",
+  "music_control_play": "Wiedergabe",
+  "music_control_next": "Weiter",
+  "music_control_stop": "Stopp"
 }
