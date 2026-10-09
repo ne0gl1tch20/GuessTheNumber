@@ -40,7 +40,8 @@ class GuessWidget : GlanceAppWidget() {
         val widgetPreferences = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
         val selectedSlot = (widgetPreferences[widgetSaveSlotKey] ?: saveManager.getActiveSlot()).coerceIn(1, MAX_SAVE_SLOTS)
         val state = saveManager.loadGame(selectedSlot)
-        val locale = LocaleManager(context).also { it.loadLocaleForTag(state.settings.locale) }
+        val locale = LocaleManager(context)
+        locale.loadLocaleForTag(state.settings.locale)
         provideContent {
             val prefs = currentState<Preferences>()
             val slot = (prefs[widgetSaveSlotKey] ?: selectedSlot).coerceIn(1, MAX_SAVE_SLOTS)
@@ -97,8 +98,9 @@ class QuickGuessActionCallback : ActionCallback {
 class CycleWidgetSaveSlotCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val saveManager = SaveManager(context)
+        val activeSlot = saveManager.getActiveSlot()
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { preferences ->
-            val current = (preferences[widgetSaveSlotKey] ?: saveManager.getActiveSlot()).coerceIn(1, MAX_SAVE_SLOTS)
+            val current = (preferences[widgetSaveSlotKey] ?: activeSlot).coerceIn(1, MAX_SAVE_SLOTS)
             preferences[widgetSaveSlotKey] = if (current >= MAX_SAVE_SLOTS) 1 else current + 1
         }
         GuessWidget().update(context, glanceId)
