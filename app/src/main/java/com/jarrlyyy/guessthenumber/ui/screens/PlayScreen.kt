@@ -42,12 +42,13 @@ fun PlayScreen(
     val guessInteractionSource = remember { MutableInteractionSource() }
 
     LaunchedEffect(state.correctGuesses, state.settings.reducedMotion) {
-        if (state.correctGuesses > observedCorrectGuesses) {
+        val foundNewNumber = state.correctGuesses > observedCorrectGuesses
+        observedCorrectGuesses = state.correctGuesses
+        if (foundNewNumber) {
             showCorrectCelebration = true
             delay(if (state.settings.reducedMotion) 700L else 1800L)
             showCorrectCelebration = false
         }
-        observedCorrectGuesses = state.correctGuesses
     }
 
     val feedbackRoot = remember {
