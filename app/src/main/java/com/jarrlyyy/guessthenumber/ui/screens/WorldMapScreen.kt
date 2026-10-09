@@ -208,6 +208,7 @@ fun WorldMapScreen(
                         val mastery = state.worldMasteryLevels[world.id] ?: 1
                         val masteryCost = BigNumber(10L * (mastery + 1L))
                         Text(locale.getString("world_mastery_label", "World mastery: %d", mastery))
+                        Text(locale.getString("world_mastery_bonus", "+%d%% Money per correct guess in this world.", mastery * 2), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
                         Button(onClick = { onProgressionAction("mastery", world.id) }, enabled = mastery < 10 && state.nebula >= masteryCost, modifier = Modifier.fillMaxWidth()) {
                             Text(locale.getString("world_mastery_upgrade", "Increase mastery • %s Nebula", masteryCost.format()))
                         }
