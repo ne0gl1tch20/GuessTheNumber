@@ -653,5 +653,8 @@
   "boss_defeated": "Đã đánh bại trùm",
   "world_locked_boss": "Hãy mở khóa thế giới này trước",
   "boss_fight": "Thách đấu trùm",
-  "boss_requirements_pending": "Hãy nâng cấp thêm trước khi chiến đấu"
+  "boss_requirements_pending": "Hãy nâng cấp thêm trước khi chiến đấu",
+  "boss_hp_label": "Máu của trùm",
+  "boss_hp_progress": "%d / %d HP",
+  "boss_attack": "Tấn công trùm"
 }
