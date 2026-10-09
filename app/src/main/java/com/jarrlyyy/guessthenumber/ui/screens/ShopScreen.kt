@@ -6,6 +6,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -105,6 +107,7 @@ fun ShopScreen(
                 val purchased = item.id in state.shopPurchases
                 val equipped = state.equippedCosmeticId == item.id
                 val canAfford = state.nebula >= BigNumber(item.nebulaCost)
+                val itemInteractionSource = remember(item.id) { MutableInteractionSource() }
 
                 val targetCardColor = if (equipped) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
                 val cardColor = if (state.settings.reducedMotion) targetCardColor else animateColorAsState(targetValue = targetCardColor, label = "shopCardColor_${item.id}").value
@@ -131,7 +134,16 @@ fun ShopScreen(
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         if (item.isCosmetic && purchased) {
-                            OutlinedButton(onClick = { onEquipCosmetic(item.id) }, enabled = !equipped) {
+                            OutlinedButton(
+                                onClick = { onEquipCosmetic(item.id) },
+                                enabled = !equipped,
+                                interactionSource = itemInteractionSource,
+                                modifier = Modifier.expressivePressScale(
+                                    interactionSource = itemInteractionSource,
+                                    enabled = !equipped,
+                                    reducedMotion = state.settings.reducedMotion
+                                )
+                            ) {
                                 AnimatedContent(targetState = equipped, label = "cosmeticEquipState_${item.id}") { isEquipped ->
                                     Text(if (isEquipped) locale.getString("equipped", "Equipped") else locale.getString("equip", "Equip"))
                                 }
@@ -139,7 +151,13 @@ fun ShopScreen(
                         } else {
                             Button(
                                 onClick = { onBuyShopItem(item.id, item.nebulaCost) },
-                                enabled = canAfford && !purchased
+                                enabled = canAfford && !purchased,
+                                interactionSource = itemInteractionSource,
+                                modifier = Modifier.expressivePressScale(
+                                    interactionSource = itemInteractionSource,
+                                    enabled = canAfford && !purchased,
+                                    reducedMotion = state.settings.reducedMotion
+                                )
                             ) {
                                 AnimatedContent(targetState = purchased, label = "shopPurchaseState_${item.id}") { isPurchased ->
                                     Text(if (isPurchased) locale.getString("owned", "Owned") else locale.getString("acquire", "Acquire"))
