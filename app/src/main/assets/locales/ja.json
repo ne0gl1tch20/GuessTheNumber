@@ -820,5 +820,7 @@
   "daily_quest_progress": "%d / %d",
   "daily_quest_claim": "受け取る",
   "daily_quest_claimed": "受取済み",
-  "daily_quest_in_progress": "進行中"
+  "daily_quest_in_progress": "進行中",
+  "liveops_bonus_level_label": "恒久ボーナスレベル",
+  "liveops_bonus_effect": "レベルごとにマネー獲得量が+2%。5レベルごとに正解時の星雲が+1（最大25レベル）。このセーブスロットに適用されます。"
 }
