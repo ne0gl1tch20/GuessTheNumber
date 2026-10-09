@@ -789,5 +789,11 @@
   "rift_requirement": "I-unlock ang Rift matapos talunin ang apat na boss ng mundo.",
   "rift_stop": "Umalis sa Endless Rift",
   "rift_start": "Simulan ang Endless Rift",
-  "rift_tier_label": "Endless Rift • Tier %d"
+  "rift_tier_label": "Endless Rift • Tier %d",
+  "notification_reminder_title": "Guess The Number",
+  "notification_reminder_body": "Namimiss ka ng mga numero mo! Bumalik at hulaan ang numero!",
+  "notification_progression_title": "Yugto ng pag-unlad",
+  "notification_progression_body": "May bagong milestone ng pag-unlad na handa na.",
+  "notification_event_title": "May naghihintay na event",
+  "notification_event_body": "May limitadong event sa laro na handa na."
 }
