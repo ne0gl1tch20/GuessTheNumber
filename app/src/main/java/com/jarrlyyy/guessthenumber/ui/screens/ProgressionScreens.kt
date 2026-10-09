@@ -149,7 +149,7 @@ fun CodexScreen(state: GameState, onAction: (String, String) -> Unit, onBack: ()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EndgameScreen(state: GameState, onNavigate: (String) -> Unit, onBack: () -> Unit) {
+fun EndgameScreen(state: GameState, onNavigate: (String) -> Unit, onAction: (String, String) -> Unit, onBack: () -> Unit) {
     val locale = LocalAppLocaleManager.current
     val bossesDefeated = state.defeatedBossIds.size.coerceAtMost(4)
     val goals = listOf(
@@ -165,6 +165,31 @@ fun EndgameScreen(state: GameState, onNavigate: (String) -> Unit, onBack: () -> 
                     Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(42.dp))
                     Text(locale.getString("endgame_subtitle", "Beyond the final portal"), style = MaterialTheme.typography.headlineSmall)
                     Text(locale.getString("endgame_description", "Complete long-term goals to prove your mastery of every system."), style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+                Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.AllInclusive, contentDescription = null, modifier = Modifier.size(34.dp))
+                        Spacer(Modifier.width(10.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(locale.getString("rift_title", "Endless Rift"), style = MaterialTheme.typography.titleLarge)
+                            Text(locale.getString("rift_description", "Rematch the four bosses in a looping gauntlet. Each victory raises the tier, increases boss HP and multiplies rewards."), style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                    Text(locale.getString("rift_best_tier", "Best cleared tier: %d", state.endlessRiftBestTier), style = MaterialTheme.typography.labelLarge)
+                    if (state.endlessRiftActive) {
+                        Text(locale.getString("rift_active_tier", "Current tier: %d. Your next boss is waiting on the World Map.", state.endlessRiftTier), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodyMedium)
+                    } else {
+                        Text(locale.getString("rift_requirement", "Unlock the Rift after defeating all four world bosses."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Button(
+                        onClick = { onAction(if (state.endlessRiftActive) "rift_stop" else "rift_start", "endless_rift") },
+                        enabled = state.endlessRiftActive || state.defeatedBossIds.containsAll(setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(locale.getString(if (state.endlessRiftActive) "rift_stop" else "rift_start", if (state.endlessRiftActive) "Leave Endless Rift" else "Start Endless Rift"))
+                    }
                 }
             }
             Text(locale.getString("endgame_goals", "Legacy goals"), style = MaterialTheme.typography.titleLarge)
