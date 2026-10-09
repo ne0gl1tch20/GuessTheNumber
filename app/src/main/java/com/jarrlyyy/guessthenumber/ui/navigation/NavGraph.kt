@@ -395,6 +395,30 @@ fun NavGraph(
                     onBack = { navController.popBackStack() }
                 )
             }
+            composable(Screen.WorldMap.route) {
+                WorldMapScreen(state = state, onWorldAction = viewModel::worldProgressAction, onProgressionAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+            }
+            composable(Screen.Relics.route) {
+                RelicsScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+            }
+            composable(Screen.HomeBase.route) {
+                HomeBaseScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+            }
+            composable(Screen.Codex.route) {
+                CodexScreen(state = state, onBack = { navController.popBackStack() })
+            }
+            composable(Screen.Endgame.route) {
+                EndgameScreen(state = state, onNavigate = { navController.navigate(it) }, onBack = { navController.popBackStack() })
+            }
+            composable(Screen.CloudBackup.route) {
+                CloudBackupScreen(state = state, onExportSave = onExportSave, onImportSave = onImportSave, onBack = { navController.popBackStack() })
+            }
+            composable(Screen.Staking.route) {
+                StakingScreen(state = state, onStakeResult = viewModel::settleStake, onBack = { navController.popBackStack() })
+            }
+            composable(Screen.Tutorial.route) {
+                TutorialScreen(onComplete = { viewModel.completeTutorial(); navController.popBackStack() })
+            }
             composable(Screen.ChangelogViewer.route) {
                 MarkdownViewerScreen(
                     assetFileName = "changelogs.md",
