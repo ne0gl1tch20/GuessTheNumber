@@ -653,5 +653,8 @@
   "boss_defeated": "Boss sconfitto",
   "world_locked_boss": "Sblocca prima questo mondo",
   "boss_fight": "Sfida il boss",
-  "boss_requirements_pending": "Potenzia ancora prima di combattere"
+  "boss_requirements_pending": "Potenzia ancora prima di combattere",
+  "boss_hp_label": "Salute del boss",
+  "boss_hp_progress": "%d / %d PS",
+  "boss_attack": "Attacca il boss"
 }
