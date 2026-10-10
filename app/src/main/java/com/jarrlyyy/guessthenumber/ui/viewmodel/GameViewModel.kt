@@ -213,6 +213,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             withContext(Dispatchers.Main) {
                 _gameState.value = finalState
+                GameLogger.configureStorage(File(getApplication<Application>().filesDir, "game_logs.txt"), finalState.settings.saveLogsToStorage)
+                GameLogger.configureVerbose(finalState.settings.verboseLogging)
                 GameLogger.log(LogLevel.DEBUG, LoggerCategory.STATE, "STATE_READY", "Loaded slot=$targetSlot with guesses=${finalState.attempts}, upgrades=${finalState.upgradeLevels.size}, activeWorld=${finalState.activeWorldId}.")
                 if (effectiveSanitized.dailyQuestDate != finalState.dailyQuestDate) saveGameAsync()
                 _isLoadingSave.value = false
@@ -433,8 +435,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun makeGuess(guess: Long) {
-        if (!AntiCheatService.validateGuessRate()) return
+        val correlationId = "guess-${System.nanoTime().toString(16)}"
+        if (!AntiCheatService.validateGuessRate()) {
+            GameLogger.log(LogLevel.WARN, LoggerCategory.GUESS, "GUESS_RATE_LIMITED", "Guess input was rate-limited.", correlationId)
+            return
+        }
         val currentState = refreshDailyQuestDay(_gameState.value)
+        GameLogger.log(LogLevel.DEBUG, LoggerCategory.GUESS, "GUESS_BEGIN", "Processing guess within range ${currentState.currentRangeMin}..${currentState.currentRangeMax}.", correlationId)
         val result = gameEngine.processGuess(currentState, guess)
         guessingBot.observeGuess(guess.coerceIn(currentState.currentRangeMin, currentState.currentRangeMax), result.feedback)
         if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
@@ -457,7 +464,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             NotificationHelper.showProgressionNotification(getApplication<Application>())
         }
         saveGameAsync()
-        GameLogger.log(LogLevel.INFO, LoggerCategory.GUESS, "MAKE_GUESS", "Guess $guess resulted in ${result.feedback}, reward: ${result.reward}")
+        GameLogger.log(
+            LogLevel.INFO,
+            LoggerCategory.GUESS,
+            "MAKE_GUESS",
+            "Guess $guess resulted in ${result.feedback}; reward=${result.reward}; attempts=${finalState.attempts}; streak=${finalState.streak}.",
+            correlationId
+        )
     }
 
     private fun checkAchievements(state: GameState) {
