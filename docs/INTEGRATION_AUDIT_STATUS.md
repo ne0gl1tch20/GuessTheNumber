@@ -73,6 +73,8 @@
 - Queue removal now adjusts the queue cursor when an earlier item is removed; removing the selected item no longer makes the next normal track skip the item that takes its place. An empty queue stops playback.
 - Confirmed `.github/workflows/build-apks.yml` uses `workflow_dispatch` only. No workflow was started and no build/test result is claimed.
 
+- Save-slot creation now refuses to overwrite malformed-primary or backup-only slots, protecting potentially recoverable progress. Slot metadata reads a validated backup when the primary is invalid so the UI can still display the recoverable save instead of presenting it as empty.
+
 ## Still requires the remaining integration pass
 
 - All 23 locale catalogs now have matching key coverage and no audited string-format placeholder mismatches. A separate manual review of older hardcoded/dynamically assembled UI text is still needed.
