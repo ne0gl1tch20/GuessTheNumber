@@ -891,5 +891,7 @@
   "guess_button": "Guess",
   "claim_reward_button": "Claim Reward",
   "done_button": "Done",
-  "close_button": "Close"
+  "close_button": "Close",
+  "crash_log_label": "Crash Log",
+  "crash_logs_copied_to_clipboard_toast": "Crash logs copied to clipboard!"
 }
