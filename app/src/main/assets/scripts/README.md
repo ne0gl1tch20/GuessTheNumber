@@ -24,4 +24,6 @@ Keep scripts small, composable and explicit about entry points. Shared helpers m
 
 All text uses localization keys. Assets are referenced by logical IDs, not file paths. Every script is checked for syntax, schema, API compatibility and allowed capabilities before it can run.
 
+Offline scripts, verified LiveOps scripts, the one-tap GO flow and the debug-only Dev Settings Lua Console must all use one shared Kotlin Lua engine facade and versioned host API. This folder contains content only: no per-script engine, UI bridge, command executor or runtime dependency belongs here. Developer console commands resolve registered script IDs through the shared registry; they do not run arbitrary paths or fetch source directly.
+
 Future remote LiveOps scripts should be distributed as verified, versioned bundles; they should not overwrite this bundled directory at runtime. Keep bundled content as the offline fallback.
