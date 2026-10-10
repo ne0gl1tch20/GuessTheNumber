@@ -77,7 +77,7 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
             }
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text(locale.getString("music_queue", "Queue (${queue.size})"), style = MaterialTheme.typography.titleLarge)
+                    Text(locale.getString("music_queue_format", "Queue (%d)", queue.size), style = MaterialTheme.typography.titleLarge)
                     TextButton(onClick = manager::clearQueue) { Text(locale.getString("clear", "Clear")) }
                 }
             }
