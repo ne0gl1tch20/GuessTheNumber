@@ -880,5 +880,6 @@
   "music_empty_queue": "Walang laman ang pila. Magpatugtog ng track o magdagdag mula sa library.",
   "music_empty_playlists": "Wala pang playlist. Gumawa ng isa para ayusin ang iyong musika.",
   "music_shuffle": "I-shuffle ang tugtugin",
-  "music_repeat": "Mode ng pag-uulit"
+  "music_repeat": "Mode ng pag-uulit",
+  "accessibility_warning": "Babala"
 }

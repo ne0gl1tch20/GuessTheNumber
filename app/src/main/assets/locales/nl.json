@@ -837,5 +837,6 @@
   "music_empty_queue": "De wachtrij is leeg. Speel een nummer af of voeg er een toe uit de bibliotheek.",
   "music_empty_playlists": "Nog geen afspeellijsten. Maak er een om je muziek te ordenen.",
   "music_shuffle": "Willekeurig afspelen",
-  "music_repeat": "Herhaalmodus"
+  "music_repeat": "Herhaalmodus",
+  "accessibility_warning": "Waarschuwing"
 }

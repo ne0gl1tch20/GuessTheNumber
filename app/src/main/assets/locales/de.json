@@ -837,5 +837,6 @@
   "music_empty_queue": "Die Warteschlange ist leer. Spiele einen Titel ab oder füge einen aus der Mediathek hinzu.",
   "music_empty_playlists": "Noch keine Playlists. Erstelle eine, um deine Musik zu ordnen.",
   "music_shuffle": "Zufallswiedergabe",
-  "music_repeat": "Wiederholungsmodus"
+  "music_repeat": "Wiederholungsmodus",
+  "accessibility_warning": "Warnung"
 }

@@ -837,5 +837,6 @@
   "music_empty_queue": "कतार खाली है। कोई ट्रैक चलाएँ या लाइब्रेरी से जोड़ें।",
   "music_empty_playlists": "अभी कोई प्लेलिस्ट नहीं है। संगीत व्यवस्थित करने के लिए बनाएँ।",
   "music_shuffle": "शफ़ल प्लेबैक",
-  "music_repeat": "दोहराने का मोड"
+  "music_repeat": "दोहराने का मोड",
+  "accessibility_warning": "चेतावनी"
 }

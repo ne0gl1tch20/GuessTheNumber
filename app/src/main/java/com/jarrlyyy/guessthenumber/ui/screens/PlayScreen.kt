@@ -166,7 +166,7 @@ fun PlayScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Icon(imageVector = Icons.Default.Star, contentDescription = "Money", tint = MoneyGold, modifier = Modifier.size(28.dp))
+                                Icon(imageVector = Icons.Default.Star, contentDescription = locale.getString("inspector_money", "Money"), tint = MoneyGold, modifier = Modifier.size(28.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
                                 AnimatedContent(
                                     targetState = state.money.format(),
@@ -580,7 +580,7 @@ fun PlayScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Warning,
-                                        contentDescription = "Warning",
+                                        contentDescription = locale.getString("accessibility_warning", "Warning"),
                                         tint = MaterialTheme.colorScheme.error,
                                         modifier = Modifier.size(18.dp)
                                     )

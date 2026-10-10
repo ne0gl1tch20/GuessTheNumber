@@ -880,5 +880,6 @@
   "music_empty_queue": "キューは空です。曲を再生するか、ライブラリから追加してください。",
   "music_empty_playlists": "プレイリストはまだありません。音楽を整理するために作成しましょう。",
   "music_shuffle": "シャッフル再生",
-  "music_repeat": "リピートモード"
+  "music_repeat": "リピートモード",
+  "accessibility_warning": "警告"
 }

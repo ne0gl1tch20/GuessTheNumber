@@ -837,5 +837,6 @@
   "music_empty_queue": "La coda è vuota. Riproduci un brano o aggiungilo dalla libreria.",
   "music_empty_playlists": "Non ci sono ancora playlist. Creane una per organizzare la musica.",
   "music_shuffle": "Riproduzione casuale",
-  "music_repeat": "Modalità ripetizione"
+  "music_repeat": "Modalità ripetizione",
+  "accessibility_warning": "Avviso"
 }

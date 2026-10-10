@@ -838,5 +838,6 @@
   "music_empty_queue": "قائمة الانتظار فارغة. شغّل مقطعًا أو أضفه من المكتبة.",
   "music_empty_playlists": "لا توجد قوائم تشغيل بعد. أنشئ قائمة لتنظيم الموسيقى.",
   "music_shuffle": "التشغيل العشوائي",
-  "music_repeat": "وضع التكرار"
+  "music_repeat": "وضع التكرار",
+  "accessibility_warning": "تحذير"
 }

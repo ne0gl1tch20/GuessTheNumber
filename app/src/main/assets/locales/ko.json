@@ -880,5 +880,6 @@
   "music_empty_queue": "대기열이 비어 있습니다. 트랙을 재생하거나 라이브러리에서 추가하세요.",
   "music_empty_playlists": "재생목록이 없습니다. 음악을 정리할 목록을 만들어 보세요.",
   "music_shuffle": "셔플 재생",
-  "music_repeat": "반복 모드"
+  "music_repeat": "반복 모드",
+  "accessibility_warning": "경고"
 }

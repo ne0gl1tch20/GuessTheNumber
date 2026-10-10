@@ -837,5 +837,6 @@
   "music_empty_queue": "Sıra boş. Bir parça çal veya kitaplıktan parça ekle.",
   "music_empty_playlists": "Henüz çalma listesi yok. Müziğini düzenlemek için bir liste oluştur.",
   "music_shuffle": "Karışık çalma",
-  "music_repeat": "Tekrarlama modu"
+  "music_repeat": "Tekrarlama modu",
+  "accessibility_warning": "Uyarı"
 }

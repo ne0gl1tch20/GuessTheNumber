@@ -837,5 +837,6 @@
   "music_empty_queue": "La file est vide. Lancez un morceau ou ajoutez-en un depuis la bibliothèque.",
   "music_empty_playlists": "Aucune playlist pour le moment. Créez-en une pour organiser votre musique.",
   "music_shuffle": "Lecture aléatoire",
-  "music_repeat": "Mode de répétition"
+  "music_repeat": "Mode de répétition",
+  "accessibility_warning": "Avertissement"
 }

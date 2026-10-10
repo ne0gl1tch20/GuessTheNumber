@@ -837,5 +837,6 @@
   "music_empty_queue": "La cola está vacía. Reproduce una pista o añádela desde la biblioteca.",
   "music_empty_playlists": "Todavía no hay listas. Crea una para organizar tu música.",
   "music_shuffle": "Reproducción aleatoria",
-  "music_repeat": "Modo de repetición"
+  "music_repeat": "Modo de repetición",
+  "accessibility_warning": "Advertencia"
 }

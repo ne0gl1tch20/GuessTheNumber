@@ -837,5 +837,6 @@
   "music_empty_queue": "คิวว่างอยู่ เล่นเพลงหรือเพิ่มเพลงจากคลัง",
   "music_empty_playlists": "ยังไม่มีเพลย์ลิสต์ สร้างเพลย์ลิสต์เพื่อจัดระเบียบเพลง",
   "music_shuffle": "สุ่มเล่นเพลง",
-  "music_repeat": "โหมดเล่นซ้ำ"
+  "music_repeat": "โหมดเล่นซ้ำ",
+  "accessibility_warning": "คำเตือน"
 }

@@ -18,6 +18,11 @@ def main()->int:
             for pattern in PATTERNS:
                 for m in pattern.finditer(line):
                     value=m.group(1).strip()
+                    # Ignore literals made only of Kotlin interpolation and separators.
+                    # These are dynamic values, not user-facing copy requiring translation.
+                    static_text = re.sub(r"\$\{[^}]+\}|\$[A-Za-z_]\w*", "", value)
+                    if not re.search(r"[A-Za-z]{2,}|[^\W\d_]{2,}", static_text, re.UNICODE):
+                        continue
                     if value and value!="•" and not value.startswith(("http://","https://","file://")):
                         findings.append(f"{rel}:{n}: {value}")
     print(f"Hardcoded-string audit: {len(findings)} candidate(s).")

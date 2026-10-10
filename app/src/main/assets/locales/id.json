@@ -837,5 +837,6 @@
   "music_empty_queue": "Antrean kosong. Putar trek atau tambahkan dari pustaka.",
   "music_empty_playlists": "Belum ada playlist. Buat playlist untuk mengatur musik.",
   "music_shuffle": "Putar secara acak",
-  "music_repeat": "Mode pengulangan"
+  "music_repeat": "Mode pengulangan",
+  "accessibility_warning": "Peringatan"
 }
