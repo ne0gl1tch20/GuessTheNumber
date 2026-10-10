@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Получено",
   "daily_quest_in_progress": "В процессе",
   "liveops_bonus_level_label": "Уровень постоянного бонуса",
-  "liveops_bonus_effect": "+2% денег за уровень и +1 Небула за каждый правильный ответ каждые 5 уровней, максимум до 25 уровня. Действует для этого слота сохранения."
+  "liveops_bonus_effect": "+2% денег за уровень и +1 Небула за каждый правильный ответ каждые 5 уровней, максимум до 25 уровня. Действует для этого слота сохранения.",
+  "music_player_title": "Офлайн-плеер",
+  "music_no_track": "Трек не выбран",
+  "music_import": "Добавить локальный аудиофайл",
+  "music_library": "Медиатека",
+  "music_queue_format": "Очередь (%d)",
+  "music_queue_position": "Позиция %d",
+  "music_playlist_name": "Название плейлиста",
+  "music_create_playlist": "Создать",
+  "music_playlists": "Плейлисты",
+  "music_playlist_tracks": "Треков: %d"
 }

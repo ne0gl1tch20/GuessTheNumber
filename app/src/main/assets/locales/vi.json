@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Đã nhận",
   "daily_quest_in_progress": "Đang thực hiện",
   "liveops_bonus_level_label": "Cấp thưởng vĩnh viễn",
-  "liveops_bonus_effect": "+2% tiền mỗi cấp và +1 Tinh vân cho mỗi lần đoán đúng sau mỗi 5 cấp, tối đa cấp 25. Chỉ áp dụng cho ô lưu này."
+  "liveops_bonus_effect": "+2% tiền mỗi cấp và +1 Tinh vân cho mỗi lần đoán đúng sau mỗi 5 cấp, tối đa cấp 25. Chỉ áp dụng cho ô lưu này.",
+  "music_player_title": "Trình phát nhạc ngoại tuyến",
+  "music_no_track": "Chưa chọn bản nhạc",
+  "music_import": "Thêm âm thanh trên thiết bị",
+  "music_library": "Thư viện",
+  "music_queue_format": "Hàng đợi (%d)",
+  "music_queue_position": "Vị trí %d",
+  "music_playlist_name": "Tên danh sách phát",
+  "music_create_playlist": "Tạo",
+  "music_playlists": "Danh sách phát",
+  "music_playlist_tracks": "%d bản nhạc"
 }

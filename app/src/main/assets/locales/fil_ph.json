@@ -865,5 +865,15 @@
   "inspector_none": "Wala",
   "inspector_running": "TUMATAKBO",
   "inspector_stopped": "HUMINTO",
-  "inspector_dropdown": "Dropdown"
+  "inspector_dropdown": "Dropdown",
+  "music_player_title": "Offline na Music Player",
+  "music_no_track": "Walang napiling track",
+  "music_import": "Magdagdag ng lokal na audio",
+  "music_library": "Aklatan",
+  "music_queue_format": "Pila (%d)",
+  "music_queue_position": "Posisyon %d",
+  "music_playlist_name": "Pangalan ng playlist",
+  "music_create_playlist": "Gumawa",
+  "music_playlists": "Mga playlist",
+  "music_playlist_tracks": "%d track"
 }

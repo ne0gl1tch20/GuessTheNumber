@@ -823,5 +823,15 @@
   "daily_quest_claimed": "تم الاستلام",
   "daily_quest_in_progress": "قيد التنفيذ",
   "liveops_bonus_level_label": "مستوى المكافأة الدائمة",
-  "liveops_bonus_effect": "+2% مال لكل مستوى و+1 سديم لكل إجابة صحيحة كل 5 مستويات، حتى المستوى 25. ينطبق على خانة الحفظ هذه."
+  "liveops_bonus_effect": "+2% مال لكل مستوى و+1 سديم لكل إجابة صحيحة كل 5 مستويات، حتى المستوى 25. ينطبق على خانة الحفظ هذه.",
+  "music_player_title": "مشغل موسيقى دون اتصال",
+  "music_no_track": "لم يتم اختيار مقطع",
+  "music_import": "إضافة ملف صوتي محلي",
+  "music_library": "المكتبة",
+  "music_queue_format": "قائمة الانتظار (%d)",
+  "music_queue_position": "الموضع %d",
+  "music_playlist_name": "اسم قائمة التشغيل",
+  "music_create_playlist": "إنشاء",
+  "music_playlists": "قوائم التشغيل",
+  "music_playlist_tracks": "%d مقاطع"
 }

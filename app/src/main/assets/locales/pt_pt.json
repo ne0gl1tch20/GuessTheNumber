@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Reclamado",
   "daily_quest_in_progress": "Em curso",
   "liveops_bonus_level_label": "Nível de bónus permanente",
-  "liveops_bonus_effect": "+2% de dinheiro por nível e +1 Nebula por resposta certa a cada 5 níveis, até ao nível 25. Aplica-se a esta ranhura de gravação."
+  "liveops_bonus_effect": "+2% de dinheiro por nível e +1 Nebula por resposta certa a cada 5 níveis, até ao nível 25. Aplica-se a esta ranhura de gravação.",
+  "music_player_title": "Leitor de música offline",
+  "music_no_track": "Nenhuma faixa selecionada",
+  "music_import": "Adicionar áudio local",
+  "music_library": "Biblioteca",
+  "music_queue_format": "Fila (%d)",
+  "music_queue_position": "Posição %d",
+  "music_playlist_name": "Nome da lista de reprodução",
+  "music_create_playlist": "Criar",
+  "music_playlists": "Listas de reprodução",
+  "music_playlist_tracks": "%d faixas"
 }

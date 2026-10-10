@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Riscosso",
   "daily_quest_in_progress": "In corso",
   "liveops_bonus_level_label": "Livello bonus permanente",
-  "liveops_bonus_effect": "+2% denaro per livello e +1 Nebula per risposta corretta ogni 5 livelli, fino al livello 25. Si applica a questo slot di salvataggio."
+  "liveops_bonus_effect": "+2% denaro per livello e +1 Nebula per risposta corretta ogni 5 livelli, fino al livello 25. Si applica a questo slot di salvataggio.",
+  "music_player_title": "Lettore musicale offline",
+  "music_no_track": "Nessuna traccia selezionata",
+  "music_import": "Aggiungi audio locale",
+  "music_library": "Libreria",
+  "music_queue_format": "Coda (%d)",
+  "music_queue_position": "Posizione %d",
+  "music_playlist_name": "Nome della playlist",
+  "music_create_playlist": "Crea",
+  "music_playlists": "Playlist",
+  "music_playlist_tracks": "%d tracce"
 }

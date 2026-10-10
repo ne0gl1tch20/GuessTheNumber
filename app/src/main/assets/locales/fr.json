@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Récupéré",
   "daily_quest_in_progress": "En cours",
   "liveops_bonus_level_label": "Niveau de bonus permanent",
-  "liveops_bonus_effect": "+2 % d’argent par niveau et +1 Nébuleuse par bonne réponse tous les 5 niveaux, jusqu’au niveau 25. S’applique à cet emplacement de sauvegarde."
+  "liveops_bonus_effect": "+2 % d’argent par niveau et +1 Nébuleuse par bonne réponse tous les 5 niveaux, jusqu’au niveau 25. S’applique à cet emplacement de sauvegarde.",
+  "music_player_title": "Lecteur de musique hors ligne",
+  "music_no_track": "Aucun morceau sélectionné",
+  "music_import": "Ajouter un fichier audio local",
+  "music_library": "Bibliothèque",
+  "music_queue_format": "File d’attente (%d)",
+  "music_queue_position": "Position %d",
+  "music_playlist_name": "Nom de la playlist",
+  "music_create_playlist": "Créer",
+  "music_playlists": "Playlists",
+  "music_playlist_tracks": "%d morceaux"
 }

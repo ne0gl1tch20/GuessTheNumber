@@ -822,5 +822,15 @@
   "daily_quest_claimed": "已領取",
   "daily_quest_in_progress": "進行中",
   "liveops_bonus_level_label": "永久加成等級",
-  "liveops_bonus_effect": "每級金錢獎勵 +2%，每 5 級每次猜對額外獲得 +1 星雲，最高 25 級。僅適用於目前存檔欄位。"
+  "liveops_bonus_effect": "每級金錢獎勵 +2%，每 5 級每次猜對額外獲得 +1 星雲，最高 25 級。僅適用於目前存檔欄位。",
+  "music_player_title": "離線音樂播放器",
+  "music_no_track": "尚未選擇曲目",
+  "music_import": "新增本機音訊",
+  "music_library": "音樂庫",
+  "music_queue_format": "播放佇列（%d）",
+  "music_queue_position": "位置 %d",
+  "music_playlist_name": "播放清單名稱",
+  "music_create_playlist": "建立",
+  "music_playlists": "播放清單",
+  "music_playlist_tracks": "%d 首曲目"
 }

@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Reclamado",
   "daily_quest_in_progress": "En curso",
   "liveops_bonus_level_label": "Nivel de bonificación permanente",
-  "liveops_bonus_effect": "+2% de dinero por nivel y +1 Nebulosa por acierto cada 5 niveles, hasta el nivel 25. Se aplica a esta ranura de guardado."
+  "liveops_bonus_effect": "+2% de dinero por nivel y +1 Nebulosa por acierto cada 5 niveles, hasta el nivel 25. Se aplica a esta ranura de guardado.",
+  "music_player_title": "Reproductor de música sin conexión",
+  "music_no_track": "No hay ninguna pista seleccionada",
+  "music_import": "Añadir audio local",
+  "music_library": "Biblioteca",
+  "music_queue_format": "Cola (%d)",
+  "music_queue_position": "Posición %d",
+  "music_playlist_name": "Nombre de la lista",
+  "music_create_playlist": "Crear",
+  "music_playlists": "Listas de reproducción",
+  "music_playlist_tracks": "%d pistas"
 }

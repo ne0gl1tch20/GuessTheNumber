@@ -865,5 +865,15 @@
   "inspector_none": "なし",
   "inspector_running": "実行中",
   "inspector_stopped": "停止中",
-  "inspector_dropdown": "ドロップダウン"
+  "inspector_dropdown": "ドロップダウン",
+  "music_player_title": "オフライン音楽プレーヤー",
+  "music_no_track": "曲が選択されていません",
+  "music_import": "端末内の音声を追加",
+  "music_library": "ライブラリ",
+  "music_queue_format": "キュー（%d）",
+  "music_queue_position": "位置 %d",
+  "music_playlist_name": "プレイリスト名",
+  "music_create_playlist": "作成",
+  "music_playlists": "プレイリスト",
+  "music_playlist_tracks": "%d 曲"
 }

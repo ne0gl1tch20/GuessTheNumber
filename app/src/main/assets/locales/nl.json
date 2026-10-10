@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Geclaimd",
   "daily_quest_in_progress": "Bezig",
   "liveops_bonus_level_label": "Permanent bonusniveau",
-  "liveops_bonus_effect": "+2% geld per niveau en +1 Nebula per goed antwoord elke 5 niveaus, tot niveau 25. Geldt voor deze opslagplek."
+  "liveops_bonus_effect": "+2% geld per niveau en +1 Nebula per goed antwoord elke 5 niveaus, tot niveau 25. Geldt voor deze opslagplek.",
+  "music_player_title": "Offline muziekspeler",
+  "music_no_track": "Geen nummer geselecteerd",
+  "music_import": "Lokale audio toevoegen",
+  "music_library": "Bibliotheek",
+  "music_queue_format": "Wachtrij (%d)",
+  "music_queue_position": "Positie %d",
+  "music_playlist_name": "Naam van afspeellijst",
+  "music_create_playlist": "Maken",
+  "music_playlists": "Afspeellijsten",
+  "music_playlist_tracks": "%d nummers"
 }

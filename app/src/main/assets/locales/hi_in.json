@@ -822,5 +822,15 @@
   "daily_quest_claimed": "ले लिया गया",
   "daily_quest_in_progress": "जारी है",
   "liveops_bonus_level_label": "स्थायी बोनस स्तर",
-  "liveops_bonus_effect": "हर स्तर पर +2% मनी और हर 5 स्तर पर प्रत्येक सही अनुमान के लिए +1 नेबुला, अधिकतम 25 स्तर तक। यह इसी सेव स्लॉट पर लागू है।"
+  "liveops_bonus_effect": "हर स्तर पर +2% मनी और हर 5 स्तर पर प्रत्येक सही अनुमान के लिए +1 नेबुला, अधिकतम 25 स्तर तक। यह इसी सेव स्लॉट पर लागू है।",
+  "music_player_title": "ऑफ़लाइन संगीत प्लेयर",
+  "music_no_track": "कोई ट्रैक नहीं चुना गया",
+  "music_import": "स्थानीय ऑडियो जोड़ें",
+  "music_library": "लाइब्रेरी",
+  "music_queue_format": "कतार (%d)",
+  "music_queue_position": "स्थान %d",
+  "music_playlist_name": "प्लेलिस्ट का नाम",
+  "music_create_playlist": "बनाएँ",
+  "music_playlists": "प्लेलिस्ट",
+  "music_playlist_tracks": "%d ट्रैक"
 }

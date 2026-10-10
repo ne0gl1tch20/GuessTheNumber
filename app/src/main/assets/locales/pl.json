@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Odebrano",
   "daily_quest_in_progress": "W toku",
   "liveops_bonus_level_label": "Poziom stałego bonusu",
-  "liveops_bonus_effect": "+2% pieniędzy na poziom i +1 Nebula za każdą poprawną odpowiedź co 5 poziomów, maksymalnie do poziomu 25. Dotyczy tego slotu zapisu."
+  "liveops_bonus_effect": "+2% pieniędzy na poziom i +1 Nebula za każdą poprawną odpowiedź co 5 poziomów, maksymalnie do poziomu 25. Dotyczy tego slotu zapisu.",
+  "music_player_title": "Odtwarzacz muzyki offline",
+  "music_no_track": "Nie wybrano utworu",
+  "music_import": "Dodaj lokalny plik audio",
+  "music_library": "Biblioteka",
+  "music_queue_format": "Kolejka (%d)",
+  "music_queue_position": "Pozycja %d",
+  "music_playlist_name": "Nazwa playlisty",
+  "music_create_playlist": "Utwórz",
+  "music_playlists": "Playlisty",
+  "music_playlist_tracks": "Utwory: %d"
 }

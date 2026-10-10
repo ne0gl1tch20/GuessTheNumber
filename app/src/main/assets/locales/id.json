@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Diklaim",
   "daily_quest_in_progress": "Sedang berlangsung",
   "liveops_bonus_level_label": "Level Bonus Permanen",
-  "liveops_bonus_effect": "+2% uang per level dan +1 Nebula untuk setiap tebakan benar tiap 5 level, hingga level 25. Berlaku untuk slot simpanan ini."
+  "liveops_bonus_effect": "+2% uang per level dan +1 Nebula untuk setiap tebakan benar tiap 5 level, hingga level 25. Berlaku untuk slot simpanan ini.",
+  "music_player_title": "Pemutar Musik Offline",
+  "music_no_track": "Belum ada trek yang dipilih",
+  "music_import": "Tambahkan audio lokal",
+  "music_library": "Pustaka",
+  "music_queue_format": "Antrean (%d)",
+  "music_queue_position": "Posisi %d",
+  "music_playlist_name": "Nama playlist",
+  "music_create_playlist": "Buat",
+  "music_playlists": "Playlist",
+  "music_playlist_tracks": "%d trek"
 }

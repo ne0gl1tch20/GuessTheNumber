@@ -865,5 +865,15 @@
   "inspector_none": "없음",
   "inspector_running": "실행 중",
   "inspector_stopped": "중지됨",
-  "inspector_dropdown": "드롭다운"
+  "inspector_dropdown": "드롭다운",
+  "music_player_title": "오프라인 음악 플레이어",
+  "music_no_track": "선택된 트랙이 없습니다",
+  "music_import": "로컬 오디오 추가",
+  "music_library": "라이브러리",
+  "music_queue_format": "대기열 (%d)",
+  "music_queue_position": "위치 %d",
+  "music_playlist_name": "재생목록 이름",
+  "music_create_playlist": "만들기",
+  "music_playlists": "재생목록",
+  "music_playlist_tracks": "트랙 %d개"
 }

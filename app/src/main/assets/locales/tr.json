@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Alındı",
   "daily_quest_in_progress": "Devam ediyor",
   "liveops_bonus_level_label": "Kalıcı Bonus Seviyesi",
-  "liveops_bonus_effect": "Her seviyede +%2 para ve her 5 seviyede doğru tahmin başına +1 Nebula, en fazla 25 seviye. Bu kayıt yuvası için geçerlidir."
+  "liveops_bonus_effect": "Her seviyede +%2 para ve her 5 seviyede doğru tahmin başına +1 Nebula, en fazla 25 seviye. Bu kayıt yuvası için geçerlidir.",
+  "music_player_title": "Çevrimdışı Müzik Çalar",
+  "music_no_track": "Parça seçilmedi",
+  "music_import": "Yerel ses ekle",
+  "music_library": "Kitaplık",
+  "music_queue_format": "Sıra (%d)",
+  "music_queue_position": "Konum %d",
+  "music_playlist_name": "Çalma listesi adı",
+  "music_create_playlist": "Oluştur",
+  "music_playlists": "Çalma listeleri",
+  "music_playlist_tracks": "%d parça"
 }

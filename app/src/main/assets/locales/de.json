@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Abgeholt",
   "daily_quest_in_progress": "In Bearbeitung",
   "liveops_bonus_level_label": "Permanente Bonusstufe",
-  "liveops_bonus_effect": "+2 % Geld pro Stufe und +1 Nebula pro richtiger Antwort alle 5 Stufen, bis Stufe 25. Gilt für diesen Speicherplatz."
+  "liveops_bonus_effect": "+2 % Geld pro Stufe und +1 Nebula pro richtiger Antwort alle 5 Stufen, bis Stufe 25. Gilt für diesen Speicherplatz.",
+  "music_player_title": "Offline-Musikplayer",
+  "music_no_track": "Kein Titel ausgewählt",
+  "music_import": "Lokale Audiodatei hinzufügen",
+  "music_library": "Mediathek",
+  "music_queue_format": "Warteschlange (%d)",
+  "music_queue_position": "Position %d",
+  "music_playlist_name": "Name der Playlist",
+  "music_create_playlist": "Erstellen",
+  "music_playlists": "Playlists",
+  "music_playlist_tracks": "%d Titel"
 }

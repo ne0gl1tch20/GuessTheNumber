@@ -865,5 +865,15 @@
   "inspector_none": "无",
   "inspector_running": "运行中",
   "inspector_stopped": "已停止",
-  "inspector_dropdown": "下拉菜单"
+  "inspector_dropdown": "下拉菜单",
+  "music_player_title": "离线音乐播放器",
+  "music_no_track": "未选择曲目",
+  "music_import": "添加本地音频",
+  "music_library": "音乐库",
+  "music_queue_format": "播放队列（%d）",
+  "music_queue_position": "位置 %d",
+  "music_playlist_name": "播放列表名称",
+  "music_create_playlist": "创建",
+  "music_playlists": "播放列表",
+  "music_playlist_tracks": "%d 首曲目"
 }

@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Claimed",
   "daily_quest_in_progress": "In progress",
   "liveops_bonus_level_label": "Permanent Bonus Level",
-  "liveops_bonus_effect": "+2% money per level and +1 Nebula per correct guess every 5 levels, up to level 25. Applies to this save slot."
+  "liveops_bonus_effect": "+2% money per level and +1 Nebula per correct guess every 5 levels, up to level 25. Applies to this save slot.",
+  "music_player_title": "Offline Music Player",
+  "music_no_track": "No track selected",
+  "music_import": "Add local audio",
+  "music_library": "Library",
+  "music_queue_format": "Queue (%d)",
+  "music_queue_position": "Position %d",
+  "music_playlist_name": "Playlist name",
+  "music_create_playlist": "Create",
+  "music_playlists": "Playlists",
+  "music_playlist_tracks": "%d tracks"
 }

@@ -822,5 +822,15 @@
   "daily_quest_claimed": "Resgatado",
   "daily_quest_in_progress": "Em andamento",
   "liveops_bonus_level_label": "Nível de bônus permanente",
-  "liveops_bonus_effect": "+2% de dinheiro por nível e +1 Nebula por resposta certa a cada 5 níveis, até o nível 25. Aplica-se a este espaço de salvamento."
+  "liveops_bonus_effect": "+2% de dinheiro por nível e +1 Nebula por resposta certa a cada 5 níveis, até o nível 25. Aplica-se a este espaço de salvamento.",
+  "music_player_title": "Reprodutor de música offline",
+  "music_no_track": "Nenhuma faixa selecionada",
+  "music_import": "Adicionar áudio local",
+  "music_library": "Biblioteca",
+  "music_queue_format": "Fila (%d)",
+  "music_queue_position": "Posição %d",
+  "music_playlist_name": "Nome da playlist",
+  "music_create_playlist": "Criar",
+  "music_playlists": "Playlists",
+  "music_playlist_tracks": "%d faixas"
 }
