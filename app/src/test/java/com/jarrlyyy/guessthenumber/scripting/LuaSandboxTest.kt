@@ -1,7 +1,6 @@
 package com.jarrlyyy.guessthenumber.scripting
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -50,5 +49,24 @@ class LuaSandboxTest {
         assertTrue(result.get("load_removed").toboolean())
         assertTrue(result.get("metatable_removed").toboolean())
         assertTrue(result.get("package_removed").toboolean())
+    }
+
+    @Test
+    fun boundsScriptLoggingByLineCountAndLength() {
+        val logs = mutableListOf<String>()
+        val longMessage = "x".repeat(700)
+        val source = buildString {
+            repeat(40) {
+                append("print(\"")
+                append(longMessage)
+                append("\")\n")
+            }
+            append("return {ok = true}")
+        }
+
+        LuaSandbox(logs::add).execute("bounded_logs", source)
+
+        assertEquals(32, logs.size)
+        assertTrue(logs.all { it.length <= 500 })
     }
 }
