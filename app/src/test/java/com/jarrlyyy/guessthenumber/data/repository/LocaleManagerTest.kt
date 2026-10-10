@@ -28,6 +28,25 @@ class LocaleManagerTest {
     }
 
     @Test
+    fun luaHubAndBundledActivityCopyResolveInEverySupportedLocale() = runBlocking {
+        val manager = LocaleManager(context)
+
+        LocaleManager.supportedLocales.forEach { supported ->
+            manager.loadLocale(supported.fileName)
+            assertTrue(manager.getStringByEnglish("Lua Activity Hub").isNotBlank())
+            assertTrue(manager.getStringByEnglish("Which number is a prime number?").isNotBlank())
+            val updated = manager.getString(
+                "lua_liveops_updated_format",
+                "Updated LiveOps bundle %d (%d scripts).",
+                3,
+                2
+            )
+            assertTrue(!updated.contains("%d"))
+            assertTrue(!updated.contains("%s"))
+        }
+    }
+
+    @Test
     fun localeFormattingUsesSelectedLocale() = runBlocking {
         val manager = LocaleManager(context)
 

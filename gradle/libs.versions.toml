@@ -16,6 +16,7 @@ kotlinxCoroutines = "1.8.1"
 lifecycleRuntimeKtx = "2.8.1"
 activityCompose = "1.9.0"
 media = "1.7.0"
+luaJme = "3.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25,6 +26,7 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-media = { group = "androidx.media", name = "media", version.ref = "media" }
+luaj-jme = { group = "org.luaj", name = "luaj-jme", version.ref = "luaJme" }
 
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }

@@ -16,7 +16,8 @@ object DefaultFeatureFlags {
         "seasonal_rewards" to true,
         "world_map" to true,
         "challenge_builder" to true,
-        "dev_console" to true
+        "dev_console" to true,
+        "lua_scripting" to true
     )
 }
 

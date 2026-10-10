@@ -4,18 +4,18 @@ An advanced, feature-rich incremental and arcade Android game built with **Jetpa
 
 **Why try it?** 🎮 You can play casually, optimize an automation build, hunt achievement tiers, or make a ridiculous custom mutator challenge. There is always another upgrade, reset, challenge, or combination waiting in the next run.
 
-## 🧩 Planned Lua Scripting Layer
+## 🧩 Lua Scripting Layer (Implementation in Progress)
 
-Lua is **planned, not implemented yet**. The Kotlin engine remains authoritative, and implementation is gated on a stable baseline with passing builds and tests. The plan covers reusable local scripts, temporary minigames, a constrained UI/game host API, a debug-only Lua Console inside Dev Settings, one shared reusable Kotlin engine facade for every script source and UI entry point, a future signed GitHub LiveOps bundle pipeline, and a simple one-tap **GO** flow for launching or resuming a featured activity after the runtime is ready.
+The first embedded LuaJ runtime and shared Kotlin engine facade are now implemented on the `feat/lua-runtime-engine` branch. The Lua Activity Hub has a working **GO** flow for the bundled offline Number Rush activity, and Dev Settings has typed `/lua` commands. Kotlin remains authoritative for save data, progression, and rewards.
 
 - [Lua implementation roadmap](docs/LUA_SCRIPTING_PLAN.md)
 - [Draft Lua host API contract](docs/LUA_API_DESIGN.md)
 - [GitHub LiveOps bundle delivery plan](docs/LIVEOPS_SCRIPT_BUNDLES_PLAN.md)
+- [Signed LiveOps bundle format](docs/LIVEOPS_BUNDLE_FORMAT.md)
+- [Copy-ready LiveOps repository template](liveops-template/README.md)
 - [Reserved reusable scripts directory](app/src/main/assets/scripts/README.md)
 
-These documents do not add a Lua dependency or enable script execution.
-
-The script sources are planned as two separate layers: offline Lua files bundled under `app/src/main/assets/scripts/`, and signed/versioned online event bundles from a separate planned `GuessTheNumber-LiveOps` GitHub content repository. Both will use the same restricted Kotlin host API, with bundled scripts as the offline fallback. No runtime or remote execution is enabled yet.
+The runtime uses an instruction-budgeted Lua sandbox with no exposed Android, Java bridge, filesystem, OS, network, package loader, or coroutine library. The signed LiveOps client is implemented but remains fail-closed until the `GuessTheNumber-LiveOps` content repository and trusted RSA public-key configuration are set up. No remote script is accepted without a valid signed manifest and matching script hashes.
 
 ---
 

@@ -1,7 +1,7 @@
 # Lua Scripting Layer: Implementation Plan
 
-**Status:** Planned only. No Lua runtime or dependency is installed by this plan.  
-**Priority:** After the current game is stable and existing tests/builds pass.  
+**Status:** Initial implementation on `feat/lua-runtime-engine`; validation/build and signed LiveOps key setup are still pending.  
+**Priority:** Stabilize the existing game while verifying this implementation. Do not merge without passing tests.  
 **Owner of game state:** Kotlin engine. Lua is an optional, constrained content layer.
 
 ## Goal
@@ -11,7 +11,7 @@ Add a small embedded Lua runtime above the existing Kotlin game engine. Use it f
 ## Non-goals
 
 - Do not replace the Kotlin engine, Compose UI, navigation, save manager, or existing command executor.
-- Do not add Lua during the current stability push.
+- Keep the Lua work on its feature branch until build, test, and startup checks pass.
 - Do not let scripts directly access Android APIs, files, network, reflection, arbitrary Kotlin objects, or the raw save file.
 - Do not download and execute an unverified script from GitHub.
 - Do not require internet for the main game or bundled scripts.
@@ -25,7 +25,7 @@ Lua implementation may begin only after:
 4. The current stability bugs are resolved and the baseline commit is recorded.
 5. A small runtime spike demonstrates that the selected Lua runtime works on minSdk 26 and the app's supported ABIs without breaking offline builds.
 
-If any gate fails, fix the baseline first. Keep this plan as documentation only until then.
+The runtime implementation has started on a feature branch, but it must not merge until the existing baseline and the new Lua tests pass. If any gate fails, fix the baseline first. The current LuaJ sandbox enforces a 32,768-character source limit and a 100,000-instruction budget, but it does not provide a hard heap-memory allocator limit. Keep remote scripts limited to the trusted signed publisher until memory behavior is validated on-device.
 
 ## Proposed architecture
 
@@ -68,22 +68,22 @@ Kotlin remains authoritative for currencies, upgrades, Prestige/Ultra progressio
 Finish the current game stabilization work, run the existing tests/builds, and record known issues and a baseline commit.
 
 ### M1 - Runtime feasibility spike
-Compare candidate Lua runtimes. Prototype a local bundled script that returns a value and calls one harmless host API. Measure startup, APK size, execution time, memory, and behavior on supported devices. Do not merge if limits or licensing are unclear.
+**Initial code added:** LuaJ 3.0.1 (MIT) with per-script globals, restricted standard libraries, and a bytecode instruction budget. A bundled Number Rush script returns a validated declarative activity model. Device startup, APK-size, memory, and minSdk 26 verification remain pending.
 
 ### M2 - Script bundle and version contract
-Define bundle manifest schema, script IDs, entry points, API compatibility range, content hash, signature verification, required assets, locale keys, permissions/capabilities, and rollback behavior.
+**Initial code added:** signed payload envelope, RSA/SHA-256 manifest verification, SHA-256 script verification, host API/app version checks, HTTPS-only fetch, bounded downloads, staging, and last-known-good bundle pointer. The separate content repository and trusted signing key are not configured yet.
 
 ### M3 - Kotlin host API v1
-Implement a narrow, typed API with tests. Begin with read-only game snapshots and structured log output. Add gameplay actions only after the authorization and validation layer is tested.
+**Initial code added:** shared `LuaEngine`, structured bounded logs, a `gtn.log` host call, validated activity result tables, and a Kotlin-owned answer lifecycle. No script can mutate currencies or save state.
 
 ### M4 - Reusable UI and minigame primitives
-Expose a constrained UI description/action model that maps to existing Compose components. Build one local-only minigame using reusable scripts and components. Keep layout creation declarative; no arbitrary UI code execution.
+**Initial code added:** the Lua Activity Hub renders a constrained activity definition returned by a bundled script and launches it with one GO tap. Rich reusable UI primitives remain future work.
 
 ### M5 - Developer console integration
 Keep the existing console and command executor. Add a script namespace/command group and a shared diagnostic stream so the console can show Kotlin app logs and Lua logs with source, level, script ID, event ID, and correlation ID. Lua commands must call the same validated host API, not bypass it.
 
 ### M5a - Dev Settings Lua Console
-Add a dedicated **Lua Console** section inside the existing debug-only Dev Settings screen, using the current console's input, output, clear/copy behavior, and central logger where practical. It must be hidden from release builds and obey the existing `dev_console` feature flag.
+**Initial code added:** a dedicated Lua Console section inside the debug-only Dev Settings screen, gated by the existing `dev_console` feature flag. It supports typed status/list/inspect/run/stop/logs/help commands; raw evaluation remains disabled.
 
 Planned commands:
 - `/lua status` — runtime availability, API version, and active instance state.
@@ -117,8 +117,8 @@ Reusable means one implementation and one versioned contract shared by offline s
 ### M6 - Offline event lifecycle
 Support bundled scripts and event definitions with deterministic start, tick/update, pause/resume, completion, cancellation, and cleanup. Add lifecycle tests and verify that ending an event removes temporary state and UI.
 
-### M7 - GitHub-hosted LiveOps (later)
-Build a content publishing pipeline, not a direct GitHub-to-runtime shortcut. Fetch a signed manifest, verify signatures and compatibility, download to a staging location, validate all files, atomically activate a known-good bundle, retain the previous bundle for rollback, and record version/activation status. Existing game remains playable offline using bundled content.
+### M7 - GitHub-hosted LiveOps
+**Initial client code added:** the hub can request a signed bundle refresh, and the client verifies manifest signatures and script hashes before activation. The external `GuessTheNumber-LiveOps` repository, its release files, RSA private signing key, and matching public-key Gradle property must be configured before online content can update. Missing keys fail closed; the bundled activity remains playable offline.
 
 ### M8 - Controlled rollout
 Use feature flags and a debug-only opt-in first. Release a single non-economy-changing event before permitting any scripted rewards. Expand only after crash, performance, rollback, and save-integrity checks pass.
