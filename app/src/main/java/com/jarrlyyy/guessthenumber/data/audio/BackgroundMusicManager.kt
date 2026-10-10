@@ -178,7 +178,7 @@ class BackgroundMusicManager private constructor(context: Context) {
         val currentQueue = _queue.value
         if (index !in currentQueue.indices) return
         val removedCurrentItem = index == queueIndex
-        val removedPlayingTrack = currentQueue.getOrNull(index) == _currentTrackId.value
+        val removedPlayingTrack = removedCurrentItem && currentQueue.getOrNull(index) == _currentTrackId.value
         if (removedPlayingTrack) skipRepeatOnceAfterQueueRemoval = true
         _queue.value = currentQueue.toMutableList().also { it.removeAt(index) }
         queueIndex = when {
