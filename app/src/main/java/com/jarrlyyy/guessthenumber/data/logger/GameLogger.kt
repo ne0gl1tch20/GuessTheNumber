@@ -11,78 +11,100 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.ConcurrentLinkedQueue
 
+/** Central logging boundary: verbose traces are opt-in in debug builds. */
 object GameLogger {
     private const val TAG = "GuessTheNumberGame"
-    private val _logs = ConcurrentLinkedQueue<LogEntry>()
-    private val _logFlow = MutableStateFlow<List<LogEntry>>(emptyList())
-    val logFlow: StateFlow<List<LogEntry>> = _logFlow.asStateFlow()
+    private val logs = ConcurrentLinkedQueue<LogEntry>()
+    private val mutableLogFlow = MutableStateFlow<List<LogEntry>>(emptyList())
+    val logFlow: StateFlow<List<LogEntry>> = mutableLogFlow.asStateFlow()
 
-    private var isPaused = false
-    @Volatile private var verboseEnabled = BuildConfig.DEBUG.not()
+    @Volatile private var paused = false
+    @Volatile private var verboseEnabled = false
+    @Volatile private var logStorageFile: File? = null
+    @Volatile private var saveToStorageEnabled = false
     private const val MAX_LOGS = 1000
-
-    private var logStorageFile: File? = null
-    private var saveToStorageEnabled = false
 
     fun configureVerbose(enabled: Boolean) {
         verboseEnabled = BuildConfig.DEBUG && enabled
+        log(LogLevel.INFO, LoggerCategory.STATE, "VERBOSE_LOGGING_CONFIGURED",
+            "Verbose diagnostics ${if (verboseEnabled) "enabled" else "disabled"}.")
     }
 
     fun configureStorage(file: File, enabled: Boolean) {
         logStorageFile = file
-        saveToStorageEnabled = enabled
+        saveToStorageEnabled = BuildConfig.DEBUG && enabled
     }
 
-    fun formatTimestamp(timestamp: Long): String {
-        val sdf = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
-        return sdf.format(Date(timestamp))
-    }
+    fun formatTimestamp(timestamp: Long): String =
+        SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault()).format(Date(timestamp))
 
-    fun log(level: LogLevel, category: LoggerCategory, event: String, message: String, correlationId: String? = null) {
-        if (isPaused) return
-        if (!verboseEnabled && (level == LogLevel.TRACE || level == LogLevel.DEBUG)) return
+    fun log(
+        level: LogLevel,
+        category: LoggerCategory,
+        event: String,
+        message: String,
+        correlationId: String? = null
+    ) {
+        if (paused) return
+        if (!BuildConfig.DEBUG && level !in setOf(LogLevel.WARN, LogLevel.ERROR, LogLevel.FATAL)) return
+        if (BuildConfig.DEBUG && !verboseEnabled && level in setOf(LogLevel.TRACE, LogLevel.DEBUG)) return
+
         val now = System.currentTimeMillis()
-        val entry = LogEntry(
-            timestamp = now,
-            level = level,
-            category = category,
-            event = event,
-            message = message,
-            correlationId = correlationId
-        )
-        _logs.add(entry)
-        while (_logs.size > MAX_LOGS) {
-            _logs.poll()
-        }
-        _logFlow.value = _logs.toList()
+        logs.add(LogEntry(now, level, category, event, message, correlationId))
+        while (logs.size > MAX_LOGS) logs.poll()
+        mutableLogFlow.value = logs.toList()
 
-        val timeStr = formatTimestamp(now)
-        val logString = "[$timeStr][$category][$level] $message ${correlationId?.let { "(CID: $it)" } ?: ""}"
-        
+        val line = buildString {
+            append("[")
+            append(formatTimestamp(now))
+            append("][")
+            append(category.name)
+            append("][")
+            append(level.name)
+            append("][")
+            append(event)
+            append("] ")
+            append(message)
+            correlationId?.let { append(" (CID: ").append(it).append(")") }
+        }
+
         if (saveToStorageEnabled) {
             try {
-                logStorageFile?.appendText("$logString\n")
-            } catch (_: Exception) {}
+                logStorageFile?.appendText("$line\n")
+            } catch (error: Exception) {
+                Log.w(TAG, "Could not persist diagnostic log (${error.javaClass.simpleName}).")
+            }
         }
 
         when (level) {
-            LogLevel.TRACE, LogLevel.DEBUG -> Log.d(TAG, logString)
-            LogLevel.INFO -> Log.i(TAG, logString)
-            LogLevel.WARN -> Log.w(TAG, logString)
-            LogLevel.ERROR, LogLevel.FATAL -> Log.e(TAG, logString)
+            LogLevel.TRACE, LogLevel.DEBUG -> Log.d(TAG, line)
+            LogLevel.INFO -> Log.i(TAG, line)
+            LogLevel.WARN -> Log.w(TAG, line)
+            LogLevel.ERROR, LogLevel.FATAL -> Log.e(TAG, line)
         }
     }
 
-    fun pause() { isPaused = true }
-    fun resume() { isPaused = false }
+    fun pause() { paused = true }
+    fun resume() { paused = false }
+
     fun clear() {
-        _logs.clear()
-        _logFlow.value = emptyList()
+        logs.clear()
+        mutableLogFlow.value = emptyList()
     }
 
-    fun exportLogs(): String {
-        return _logs.joinToString("\n") {
-            "[${formatTimestamp(it.timestamp)}][${it.category}][${it.level}] ${it.message}"
+    fun exportLogs(): String = logs.joinToString("\n") { entry ->
+        buildString {
+            append("[")
+            append(formatTimestamp(entry.timestamp))
+            append("][")
+            append(entry.category.name)
+            append("][")
+            append(entry.level.name)
+            append("][")
+            append(entry.event)
+            append("] ")
+            append(entry.message)
+            entry.correlationId?.let { append(" (CID: ").append(it).append(")") }
         }
     }
 }
