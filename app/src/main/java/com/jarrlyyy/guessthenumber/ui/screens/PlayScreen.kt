@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 
 import androidx.compose.animation.*
 import androidx.compose.animation.animateContentSize
