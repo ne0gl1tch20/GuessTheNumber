@@ -301,27 +301,37 @@ class BackgroundMusicManager private constructor(context: Context) {
     }
 
     private fun extractAlbumArt(path: String) {
+        val retriever = MediaMetadataRetriever()
         try {
-            MediaMetadataRetriever().use { retriever ->
-                retriever.setDataSource(path)
-                retriever.embeddedPicture?.let { bytes -> _albumArt.value = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) } ?: run { _albumArt.value = null }
-            }
-        } catch (_: Exception) { _albumArt.value = null }
+            retriever.setDataSource(path)
+            retriever.embeddedPicture?.let { bytes ->
+                _albumArt.value = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            } ?: run { _albumArt.value = null }
+        } catch (_: Exception) {
+            _albumArt.value = null
+        } finally {
+            runCatching { retriever.release() }
+        }
     }
 
     private data class Metadata(val title: String?, val artist: String?, val album: String?, val duration: Int)
 
-    private fun readMetadata(file: File): Metadata = try {
-        MediaMetadataRetriever().use { r ->
-            r.setDataSource(file.absolutePath)
+    private fun readMetadata(file: File): Metadata {
+        val retriever = MediaMetadataRetriever()
+        return try {
+            retriever.setDataSource(file.absolutePath)
             Metadata(
-                r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
-                r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST),
-                r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM),
-                r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toIntOrNull() ?: 0
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST),
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM),
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toIntOrNull() ?: 0
             )
+        } catch (_: Exception) {
+            Metadata(null, null, null, 0)
+        } finally {
+            runCatching { retriever.release() }
         }
-    } catch (_: Exception) { Metadata(null, null, null, 0) }
+    }
 
     private fun persistLibrary(items: List<Track>) {
         val array = JSONArray()
