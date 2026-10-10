@@ -47,13 +47,13 @@ fun WorldMapScreen(
     val world = worlds.firstOrNull { it.id == selectedWorld } ?: worlds.first()
     val unlocked = world.id in state.unlockedWorldIds
     val totalUpgrades = state.upgradeLevels.values.sum()
-    val canUnlock = world.unlockBossId == null || (
-        world.unlockBossId in state.defeatedBossIds &&
+    val canUnlock = world.unlockBossId?.let { requiredBossId ->
+        requiredBossId in state.defeatedBossIds &&
             state.correctGuesses >= world.unlockCorrectGuesses &&
             totalUpgrades >= world.unlockUpgradeCount &&
             state.prestigeCount >= world.unlockPrestigeCount &&
             state.ultraCount >= world.unlockUltraCount
-    )
+    } ?: true
     val canFight = state.endlessRiftActive || (
         state.correctGuesses >= world.fightCorrectGuesses &&
             totalUpgrades >= world.fightUpgradeCount &&
