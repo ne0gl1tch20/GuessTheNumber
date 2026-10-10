@@ -46,8 +46,9 @@ fun MoreScreen(
             .filter { it in defaultOrder }
             .let { it + defaultOrder.filterNot(it::contains) }
     }
-    val visibleOrder = remember(normalizedOrder, featureFlags) {
-        normalizedOrder.filter { route ->
+    var order by remember(normalizedOrder) { mutableStateOf(normalizedOrder) }
+    val visibleOrder = remember(order, featureFlags) {
+        order.filter { route ->
             when (route) {
                 "world_map" -> featureFlags["world_map"] == true
                 "live_ops" -> featureFlags["live_ops"] == true && featureFlags["seasonal_rewards"] == true
@@ -57,7 +58,6 @@ fun MoreScreen(
             }
         }
     }
-    var order by remember(normalizedOrder) { mutableStateOf(normalizedOrder) }
     var dragging by remember { mutableStateOf<String?>(null) }
     var dragDistance by remember { mutableFloatStateOf(0f) }
     var isReordering by remember { mutableStateOf(false) }
