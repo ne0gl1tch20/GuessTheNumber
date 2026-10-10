@@ -20,7 +20,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        val liveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl").orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-LiveOps/master/manifest.json").get()
+        val liveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl").orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-LiveOps/main/manifest.json").get()
         val liveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64").orElse("").get()
         buildConfigField("String", "LIVEOPS_MANIFEST_URL", "\"$liveOpsManifestUrl\"")
         buildConfigField("String", "LIVEOPS_PUBLIC_KEY_BASE64", "\"$liveOpsPublicKey\"")
