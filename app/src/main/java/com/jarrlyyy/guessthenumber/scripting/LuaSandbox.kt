@@ -1,22 +1,24 @@
 package com.jarrlyyy.guessthenumber.scripting
 
 import org.luaj.vm2.Globals
-import org.luaj.vm2.LuaThread
+import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.LuaThread
 import org.luaj.vm2.Varargs
+import org.luaj.vm2.lib.BaseLib
 import org.luaj.vm2.lib.Bit32Lib
 import org.luaj.vm2.lib.DebugLib
+import org.luaj.vm2.lib.MathLib
+import org.luaj.vm2.lib.PackageLib
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TableLib
 import org.luaj.vm2.lib.VarArgFunction
-import org.luaj.vm2.lib.BaseLib
-import org.luaj.vm2.lib.MathLib
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.LoadState
 
 /**
- * Per-script Lua environment. No Android context, Java bridge, filesystem, network,
- * package loader, OS library, or coroutine library is exposed to Lua.
+ * Per-script Lua environment. Only the small, explicit host API is exposed.
+ * Keep this sandbox isolated from Android, Java interop, files, and networking.
  */
 internal class LuaSandbox(
     private val onLog: (String) -> Unit
@@ -31,31 +33,35 @@ internal class LuaSandbox(
 
     private val compilerGlobals = Globals().apply {
         load(BaseLib())
-        load(MathLib())
         LoadState.install(this)
         LuaC.install(this)
     }
 
     fun validate(scriptId: String, source: String) {
-        require(source.isNotBlank()) { "Script is empty." }
-        require(source.length <= MAX_SOURCE_CHARS) { "Script exceeds the $MAX_SOURCE_CHARS character limit." }
+        checkSource(source)
         compilerGlobals.load(source, scriptId, Globals())
     }
 
     fun execute(scriptId: String, source: String): LuaValue {
-        require(source.isNotBlank()) { "Script is empty." }
-        require(source.length <= MAX_SOURCE_CHARS) { "Script exceeds the $MAX_SOURCE_CHARS character limit." }
+        checkSource(source)
 
         var logLines = 0
         val globals = Globals().apply {
             load(BaseLib())
+            // Keep the runtime Globals fully initialized for LuaJ's base
+            // runtime while removing dynamic loading from the script surface.
+            LoadState.install(this)
+            LuaC.install(this)
+            // LuaJ's library installers register themselves in package.loaded.
+            load(PackageLib())
             load(TableLib())
             load(MathLib())
             load(Bit32Lib())
             load(DebugLib())
         }
 
-        // Capture the hook setter internally, then remove the entire debug surface.
+        // LuaJ's hook belongs to a LuaThread. Configure that thread directly
+        // rather than calling debug.sethook from the main Kotlin thread.
         val setHook = globals.get("debug").get("sethook")
         globals.set("debug", LuaValue.NIL)
 
@@ -63,9 +69,9 @@ internal class LuaSandbox(
             "dofile", "loadfile", "load", "require", "collectgarbage",
             "getmetatable", "setmetatable", "rawset", "rawget"
         ).forEach { globals.set(it, LuaValue.NIL) }
-
-        // Large single-call allocations are unnecessary for bundled minigame content.
+        globals.get("package").let { if (!it.isnil()) globals.set("package", LuaValue.NIL) }
         globals.get("table").set("concat", LuaValue.NIL)
+
         globals.set("print", object : VarArgFunction() {
             override fun invoke(args: Varargs): Varargs {
                 if (logLines < MAX_LOG_LINES) {
@@ -91,32 +97,57 @@ internal class LuaSandbox(
         globals.set("gtn", api)
 
         val chunk = compilerGlobals.load(source, scriptId, globals)
-        val thread = LuaThread(globals, chunk)
         var instructions = 0
         val hook = object : org.luaj.vm2.lib.ZeroArgFunction() {
             override fun call(): LuaValue {
                 instructions += HOOK_INTERVAL
                 if (instructions > MAX_INSTRUCTIONS) {
+                    // LuaError can be swallowed by a script's pcall. A JVM Error
+                    // escapes Lua pcall and is surfaced when the thread resumes.
                     throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
                 }
                 return LuaValue.NIL
             }
         }
+
+        // Execute in an isolated LuaThread so instruction hooks are applied
+        // to the exact thread running the script.
+        val thread = LuaThread(globals, chunk)
         setHook.invoke(
             LuaValue.varargsOf(
-                arrayOf(thread, hook, LuaValue.valueOf(""), LuaValue.valueOf(HOOK_INTERVAL))
+                arrayOf(
+                    thread,
+                    hook,
+                    LuaValue.EMPTYSTRING,
+                    LuaValue.valueOf(HOOK_INTERVAL)
+                )
             )
         )
 
-        val resumed = thread.resume(LuaValue.NIL)
-        if (!resumed.arg1().toboolean()) {
-            val message = resumed.arg(2).tojstring()
-            if (message.contains("instruction budget", ignoreCase = true)) {
-                throw LuaBudgetExceededError(message)
+        return try {
+            val outcome = thread.resume(LuaValue.NIL)
+            // LuaThread.resume returns (true, results...) on success and
+            // (false, errorMessage) on failure.
+            if (!outcome.arg1().toboolean()) {
+                val message = outcome.arg(2).tojstring()
+                if (message.contains("instruction budget", ignoreCase = true)) {
+                    throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
+                }
+                throw LuaError(message)
             }
-            throw IllegalStateException(message.take(500))
+            outcome.arg(2)
+        } catch (error: LuaBudgetExceededError) {
+            throw error
+        } finally {
+            setHook.invoke(LuaValue.varargsOf(arrayOf(thread, LuaValue.NIL)))
         }
-        return resumed.arg(2)
+    }
+
+    private fun checkSource(source: String) {
+        require(source.length <= MAX_SOURCE_CHARS) {
+            "Script exceeds the $MAX_SOURCE_CHARS character limit."
+        }
+        require(source.isNotBlank()) { "Script is empty." }
     }
 }
 
