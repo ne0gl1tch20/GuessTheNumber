@@ -229,7 +229,8 @@ class CommandExecutor {
                     else -> "Usage: /logs <clear|pause|resume>"
                 }
             }
-\n            "/stats" -> {
+
+            "/stats" -> {
                 val stats = currentState.statistics
                 "Stats: Playtime=${stats.playtimeSeconds}s | Guesses=${currentState.correctGuesses}/${currentState.attempts} | Streak=${currentState.streak} (Best ${currentState.bestStreak}) | Money=${currentState.money} | Prestige=${currentState.prestige} | Ultra=${currentState.ultra} | Nebula=${currentState.nebula}"
             }
