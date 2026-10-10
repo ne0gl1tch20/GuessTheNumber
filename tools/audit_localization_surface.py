@@ -92,6 +92,10 @@ def scan_catalog_calls():
                 # asset-specific localization contract, not as literal keys here.
                 if "$" in key:
                     continue
+                # Dynamic catalog families such as achievement_tier_bronze
+                # are looked up by prefix plus asset value, not as literal keys.
+                if key.endswith("_") and any(existing.startswith(key) for existing in keys):
+                    continue
                 if not re.fullmatch(r"[a-z0-9_]+", key):
                     findings.append((rel, line_no, "English phrase used as key", key))
                 elif key not in keys:
