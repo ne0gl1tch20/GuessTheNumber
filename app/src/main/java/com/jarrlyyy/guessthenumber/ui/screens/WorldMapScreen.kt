@@ -21,21 +21,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
+import com.jarrlyyy.guessthenumber.data.repository.WorldDefinition
+import androidx.compose.ui.platform.LocalContext
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
-
-private data class WorldMapNode(
-    val id: String,
-    val nameKey: String,
-    val fallback: String,
-    val x: Float,
-    val y: Float,
-    val bossId: String,
-    val bossKey: String,
-    val bossFallback: String,
-    val hp: Int,
-    val secretId: String,
-    val secretAt: Long
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,34 +43,31 @@ fun WorldMapScreen(
     }
     var zoom by remember { mutableFloatStateOf(1f) }
     var pan by remember { mutableStateOf(Offset.Zero) }
-    val worlds = listOf(
-        WorldMapNode("verdant_grove", "world_verdant_name", "Verdant Grove", 0.16f, 0.24f, "verdant_guardian", "boss_verdant_name", "Verdant Guardian", 3, "whispering_hollow", 50),
-        WorldMapNode("crystal_caverns", "world_crystal_name", "Crystal Caverns", 0.43f, 0.43f, "crystal_golem", "boss_crystal_name", "Crystal Golem", 5, "shard_archive", 150),
-        WorldMapNode("ember_summit", "world_ember_name", "Ember Summit", 0.67f, 0.24f, "ember_dragon", "boss_ember_name", "Ember Dragon", 7, "ashen_vault", 300),
-        WorldMapNode("nebula_rift", "world_nebula_name", "Nebula Rift", 0.82f, 0.59f, "nebula_titan", "boss_nebula_name", "Nebula Titan", 10, "lost_observatory", 600)
-    )
+    val context = LocalContext.current
+    val worlds = remember { WorldConfigRepository(context).loadWorlds() }
     val world = worlds.firstOrNull { it.id == selectedWorld } ?: worlds.first()
     val unlocked = world.id in state.unlockedWorldIds
     val totalUpgrades = state.upgradeLevels.values.sum()
-    val canUnlock = when (world.id) {
-        "verdant_grove" -> true
-        "crystal_caverns" -> "verdant_guardian" in state.defeatedBossIds && state.correctGuesses >= 25 && totalUpgrades >= 5
-        "ember_summit" -> "crystal_golem" in state.defeatedBossIds && state.correctGuesses >= 100 && totalUpgrades >= 15 && state.prestigeCount >= 1
-        else -> "ember_dragon" in state.defeatedBossIds && state.correctGuesses >= 250 && totalUpgrades >= 40 && state.prestigeCount >= 3 && state.ultraCount >= 1
-    }
-    val canFight = state.endlessRiftActive || when (world.id) {
-        "verdant_grove" -> state.correctGuesses >= 10 && totalUpgrades >= 3
-        "crystal_caverns" -> state.correctGuesses >= 50 && totalUpgrades >= 10
-        "ember_summit" -> state.correctGuesses >= 150 && totalUpgrades >= 25 && state.prestigeCount >= 1
-        else -> state.correctGuesses >= 500 && totalUpgrades >= 75 && state.prestigeCount >= 5 && state.ultraCount >= 1
-    }
+    val canUnlock = world.unlockBossId == null || (
+        world.unlockBossId in state.defeatedBossIds &&
+            state.correctGuesses >= world.unlockCorrectGuesses &&
+            totalUpgrades >= world.unlockUpgradeCount &&
+            state.prestigeCount >= world.unlockPrestigeCount &&
+            state.ultraCount >= world.unlockUltraCount
+    )
+    val canFight = state.endlessRiftActive || (
+        state.correctGuesses >= world.fightCorrectGuesses &&
+            totalUpgrades >= world.fightUpgradeCount &&
+            state.prestigeCount >= world.fightPrestigeCount &&
+            state.ultraCount >= world.fightUltraCount
+    )
     val damage = state.bossBattleProgress[world.bossId] ?: 0
     val bossHp = world.hp + if (state.endlessRiftActive) ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
     val defeated = world.bossId in state.defeatedBossIds && !state.endlessRiftActive
     val secretFound = world.secretId in state.discoveredSecretIds
-    val worldRequirementKey = when (world.id) { "crystal_caverns" -> "world_crystal_requirement"; "ember_summit" -> "world_ember_requirement"; "nebula_rift" -> "world_nebula_requirement"; else -> "world_verdant_requirement" }
-    val bossRequirementKey = when (world.id) { "crystal_caverns" -> "boss_crystal_requirement"; "ember_summit" -> "boss_ember_requirement"; "nebula_rift" -> "boss_nebula_requirement"; else -> "boss_verdant_requirement" }
-    val bossRewardKey = when (world.id) { "crystal_caverns" -> "boss_crystal_reward"; "ember_summit" -> "boss_ember_reward"; "nebula_rift" -> "boss_nebula_reward"; else -> "boss_verdant_reward" }
+    val worldRequirementKey = world.worldRequirementKey
+    val bossRequirementKey = world.bossRequirementKey
+    val bossRewardKey = world.bossRewardKey
     Scaffold(
         topBar = {
             TopAppBar(
