@@ -1,4 +1,5 @@
 {
+  "schemaVersion": 1,
   "upgrades": [
     {
       "id": "reward_multiplier",
@@ -15,8 +16,8 @@
       "description": "Narrows the max target number range.",
       "maxLevel": 20,
       "baseCost": "500",
-      "costMultiplier": 2.0,
-      "effectPerLevel": 1.0
+      "costMultiplier": 2,
+      "effectPerLevel": 1
     },
     {
       "id": "critical_boost",
@@ -34,7 +35,7 @@
       "maxLevel": 25,
       "baseCost": "2500",
       "costMultiplier": 2.2,
-      "effectPerLevel": 100.0
+      "effectPerLevel": 100
     },
     {
       "id": "auto_efficiency",
@@ -79,7 +80,7 @@
       "maxLevel": 50,
       "baseCost": "50000",
       "costMultiplier": 2.2,
-      "effectPerLevel": 50.0
+      "effectPerLevel": 50
     },
     {
       "id": "ultra_efficiency",
@@ -87,8 +88,8 @@
       "description": "Amplifies Ultra reset currency rewards.",
       "maxLevel": 20,
       "baseCost": "100000",
-      "costMultiplier": 3.0,
-      "effectPerLevel": 1.0
+      "costMultiplier": 3,
+      "effectPerLevel": 1
     },
     {
       "id": "discount_bargain",
