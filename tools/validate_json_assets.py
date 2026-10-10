@@ -52,6 +52,61 @@ def main() -> int:
         except Exception as exc:
             errors.append(f"{path.relative_to(ROOT)}: invalid JSON: {exc}")
 
+    worlds_path = ROOT / "app" / "src" / "main" / "assets" / "game" / "worlds.json"
+    if worlds_path.exists():
+        try:
+            world_root = load(worlds_path)
+            worlds = world_root.get("worlds") if isinstance(world_root, dict) else None
+            required = {
+                "id", "nameKey", "fallback", "x", "y", "bossId", "bossKey",
+                "bossFallback", "hp", "secretId", "secretAt", "unlockBossId",
+                "unlockCorrectGuesses", "unlockUpgradeCount", "unlockPrestigeCount",
+                "unlockUltraCount", "fightCorrectGuesses", "fightUpgradeCount",
+                "fightPrestigeCount", "fightUltraCount", "worldRequirementKey",
+                "bossRequirementKey", "bossRewardKey",
+            }
+            if world_root.get("schemaVersion") != 1:
+                errors.append("game/worlds.json: schemaVersion must be 1")
+            if not isinstance(worlds, list) or not worlds:
+                errors.append("game/worlds.json: worlds must be a non-empty array")
+            else:
+                ids = [item.get("id") for item in worlds if isinstance(item, dict)]
+                boss_ids = [item.get("bossId") for item in worlds if isinstance(item, dict)]
+                if len(ids) != len(worlds) or len(set(ids)) != len(ids):
+                    errors.append("game/worlds.json: every world must be an object with a unique id")
+                if len(set(boss_ids)) != len(boss_ids):
+                    errors.append("game/worlds.json: bossId values must be unique")
+                for index, world in enumerate(worlds):
+                    prefix = f"game/worlds.json: worlds[{index}]"
+                    if not isinstance(world, dict):
+                        continue
+                    missing = required - set(world)
+                    if missing:
+                        errors.append(f"{prefix}: missing fields {', '.join(sorted(missing))}")
+                        continue
+                    for field in ("id", "nameKey", "fallback", "bossId", "bossKey",
+                                  "bossFallback", "secretId", "worldRequirementKey",
+                                  "bossRequirementKey", "bossRewardKey"):
+                        if not isinstance(world[field], str) or not world[field].strip():
+                            errors.append(f"{prefix}: {field} must be a non-empty string")
+                    if not isinstance(world["hp"], int) or not 1 <= world["hp"] <= 100000:
+                        errors.append(f"{prefix}: hp must be an integer between 1 and 100000")
+                    if not isinstance(world["secretAt"], int) or world["secretAt"] < 0:
+                        errors.append(f"{prefix}: secretAt must be a non-negative integer")
+                    for field in ("x", "y"):
+                        value = world[field]
+                        if not isinstance(value, (int, float)) or not 0 <= value <= 1:
+                            errors.append(f"{prefix}: {field} must be between 0 and 1")
+                    for field in ("unlockCorrectGuesses", "unlockUpgradeCount",
+                                  "unlockPrestigeCount", "unlockUltraCount",
+                                  "fightCorrectGuesses", "fightUpgradeCount",
+                                  "fightPrestigeCount", "fightUltraCount"):
+                        value = world[field]
+                        if not isinstance(value, int) or value < 0:
+                            errors.append(f"{prefix}: {field} must be a non-negative integer")
+        except Exception as exc:
+            errors.append(f"game/worlds.json: unable to validate world definitions: {exc}")
+
     locale_path = ROOT / "app" / "src" / "main" / "assets" / "locales" / "en_us.json"
     try:
         locale = load(locale_path)
