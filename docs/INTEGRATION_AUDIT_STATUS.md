@@ -141,3 +141,9 @@ Current app version: 3.0.1 (versionCode 19).
 - Fixed three invalid Maven artifact names in `gradle/libs.versions.toml`: coroutines dependencies now use `kotlinx-coroutines-core` and `kotlinx-coroutines-android`, and Glance uses `glance-appwidget`. The previous coordinates omitted the artifact-name prefixes, matching the dependency-resolution failures in recent Actions runs.
 - The Android emulator workflow is now manual-only. Pushes and pull requests no longer start emulator jobs; do not resume emulator tests until explicitly requested.
 - A new build workflow is expected from the dependency-coordinate commit. APK compilation and unit-test status remain pending until that run completes.
+
+## Endless Rift World Map alignment (2026-10-10)
+
+- The World Map's boss-start availability now follows the same Endless Rift override as `GameViewModel.worldProgressAction`, so an active Rift run does not show a disabled Start Battle button when the backend permits the battle.
+- During an active Endless Rift, the map hides the standard boss requirement and base reward copy because the current tier changes battle eligibility and scales the actual payout. The current Rift tier and live boss HP remain visible.
+- Validation status for this change: pending the current GitHub Actions unit-test, lint, full-check and APK-build workflow. No emulator tests were run.
