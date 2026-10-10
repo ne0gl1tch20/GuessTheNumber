@@ -24,7 +24,7 @@ class CommandExecutor {
         GameLogger.log(LogLevel.INFO, LoggerCategory.COMMAND, "EXEC_COMMAND", "Executing: $commandLine")
 
         return when (cmd) {
-            "/help" -> "Available commands:\n/give [money|prestige|ultra|nebula|all] <amount>\n/set [money|prestige|ultra|nebula] <amount>\n/reset [progression|prestige|ultra|all]\n/timeskip <seconds>\n/test antitimetravel\n/max_upgrades\n/unlock_all\n/win\n/speed <multiplier>\n/stats\n/matrix\n/konami\n/moneyprinter\n/easteregg\n/crash_test"
+            "/help" -> "Available commands:\n/give <currency> <amount>\n/set <currency> <amount>\n/reset <progression|prestige|ultra|all>\n/timeskip <seconds>\n/max_upgrades\n/unlock_all or /unlock all\n/win or /completeguess\n/speed <clicksPerSecond>\n/autoclicker <on|off>\n/setlevel <upgradeId> <level>\n/newnumber\n/state or /inspect\n/version\n/logs <clear|pause|resume>\n/stats\n/test antitimetravel\n/matrix\n/konami\n/moneyprinter\n/easteregg\n/crash_test"
             
             "/give" -> {
                 if (args.size < 2) return "Usage: /give <currency> <amount>"
