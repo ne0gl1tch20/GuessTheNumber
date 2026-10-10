@@ -180,7 +180,10 @@ class GameEngine(private val rng: Random = Random.Default) {
         return Pair(
             state.copy(
                 completedChallenges = state.completedChallenges + challengeId,
-                nebula = state.nebula + BigNumber(rewardNebula)
+                nebula = state.nebula + BigNumber(rewardNebula),
+                statistics = state.statistics.copy(
+                    nebulaEarned = state.statistics.nebulaEarned + rewardNebula
+                )
             ),
             true
         )
