@@ -98,3 +98,4 @@ Current app version: 3.0.1 (versionCode 19).
 - Queue removal now bypasses Repeat One once when the currently playing track is removed from the queue, so the deleted queue entry does not loop forever after its current playback ends. Manually choosing another track clears that one-shot bypass.
 - Achievement milestone payouts now increment `statistics.nebulaEarned` together with the actual Nebula balance, keeping lifetime earnings accurate when achievements unlock during gameplay.
 - Weekly/daily challenge claims now add their Nebula payout to `statistics.nebulaEarned` in the domain claim transaction, matching the balance change and preventing the challenge reward path from undercounting lifetime earnings.
+- Offline auto-clicker earnings now increment lifetime `moneyEarned` as well as the wallet balance, so the statistics screen includes money granted during startup catch-up.
