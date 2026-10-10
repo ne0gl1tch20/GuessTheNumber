@@ -89,3 +89,5 @@ Current app version: 3.0.1 (versionCode 19).
 - Live Ops reward labels now use locale catalog keys with format arguments for currency and claim counts, rather than constructing dynamic English strings that the exact-string translation lookup could never match. The permanent bonus text, claim buttons, and Back accessibility label also use existing localized catalog entries.
 - Both home-screen widgets now advance to the next populated save slot instead of stepping through every empty slot. If no valid saves exist, the current selection is retained rather than cycling into an arbitrary blank slot.
 - These are source-level changes only. No build, emulator run, or GitHub Actions workflow was started, so compilation and device behavior remain unverified.
+
+- Widget Play buttons now open the slot currently shown by that widget. MainActivity defers the requested switch until initial save loading has completed and crash recovery has been dismissed, avoiding a race with startup initialization; loading state is raised before the asynchronous load begins.
