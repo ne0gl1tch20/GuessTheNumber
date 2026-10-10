@@ -39,6 +39,7 @@ fun PlayScreen(
     incomePerSecond: com.jarrlyyy.guessthenumber.domain.model.BigNumber = com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    val worldDefinitions = remember { WorldConfigRepository(context).loadWorlds() }
     var guessInput by remember { mutableStateOf("") }
     val configRepository = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale) }
     val locale = configRepository.localeManager
@@ -100,30 +101,12 @@ fun PlayScreen(
         ) {
             if (state.activeBossBattleWorldId != null) {
                 item {
-                    val bossNameKey = when (state.activeBossBattleWorldId) {
-                        "verdant_grove" -> "boss_verdant_name"
-                        "crystal_caverns" -> "boss_crystal_name"
-                        "ember_summit" -> "boss_ember_name"
-                        else -> "boss_nebula_name"
-                    }
-                    val bossFallback = when (state.activeBossBattleWorldId) {
-                        "verdant_grove" -> "Verdant Guardian"
-                        "crystal_caverns" -> "Crystal Golem"
-                        "ember_summit" -> "Ember Dragon"
-                        else -> "Nebula Titan"
-                    }
-                    val bossId = when (state.activeBossBattleWorldId) {
-                        "verdant_grove" -> "verdant_guardian"
-                        "crystal_caverns" -> "crystal_golem"
-                        "ember_summit" -> "ember_dragon"
-                        else -> "nebula_titan"
-                    }
-                    val bossHp = when (state.activeBossBattleWorldId) {
-                        "verdant_grove" -> 3
-                        "crystal_caverns" -> 5
-                        "ember_summit" -> 7
-                        else -> 10
-                    }
+                    val bossWorld = worldDefinitions.firstOrNull { it.id == state.activeBossBattleWorldId }
+                        ?: worldDefinitions.first()
+                    val bossNameKey = bossWorld.bossKey
+                    val bossFallback = bossWorld.bossFallback
+                    val bossId = bossWorld.bossId
+                    val bossHp = bossWorld.hp
                     val bossDamage = (state.bossBattleProgress[bossId] ?: 0).coerceAtMost(bossHp)
                     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
                         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
