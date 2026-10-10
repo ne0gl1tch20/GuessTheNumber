@@ -938,5 +938,7 @@
   "dev_logs_copied_to_clipboard": "Logs copied to clipboard",
   "process_inspector_heading": "Variable & Process Inspector",
   "process_inspector_background_heading": "Active Background Processes & Loops",
-  "process_inspector_state_heading": "Complete Runtime Game State Variables"
+  "process_inspector_state_heading": "Complete Runtime Game State Variables",
+  "play_correct_celebration_title": "Nice guess!",
+  "play_correct_celebration_desc": "Secret number found. Your streak keeps growing."
 }
