@@ -63,6 +63,8 @@ internal class LuaSandbox(
             "dofile", "loadfile", "load", "require", "collectgarbage",
             "getmetatable", "setmetatable", "rawset", "rawget"
         ).forEach { globals.set(it, LuaValue.NIL) }
+        // Avoid an easy unbounded string-allocation path in event scripts.
+        globals.get("table").set("concat", LuaValue.NIL)
 
         // Bound output and avoid exposing an unbounded print sink.
         globals.set("print", object : VarArgFunction() {
