@@ -118,18 +118,17 @@ internal class LuaSandbox(
         )
 
         return try {
-            val result = thread.resume(LuaValue.NIL)
-            if (result.arg1().isstring() && result.arg1().tojstring().contains("instruction budget", true)) {
-                throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
-            }
-            if (thread.state.status == LuaThread.STATUS_DEAD && thread.state.error != null) {
-                val message = thread.state.error.orEmpty()
+            val outcome = thread.resume(LuaValue.NIL)
+            // LuaThread.resume follows Lua's coroutine.resume contract:
+            // (true, returnedValue) on success or (false, errorMessage) on failure.
+            if (!outcome.arg1().toboolean()) {
+                val message = outcome.arg(2).tojstring()
                 if (message.contains("instruction budget", ignoreCase = true)) {
                     throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
                 }
                 throw LuaError(message)
             }
-            result.arg1()
+            outcome.arg(2)
         } catch (error: LuaBudgetExceededError) {
             throw error
         } finally {
