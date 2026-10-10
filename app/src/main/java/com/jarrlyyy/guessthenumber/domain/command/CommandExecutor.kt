@@ -15,11 +15,9 @@ class CommandExecutor {
 
     fun execute(commandLine: String, currentState: GameState, onStateUpdate: (GameState) -> Unit): String {
         if (!DeveloperConfig.ENABLED) return "Developer mode is disabled."
-        val parts = commandLine.trim().split("\\s+".toRegex())
-        if (parts.isEmpty() || parts[0].isEmpty()) return "Invalid command."
-
-        val cmd = parts[0].lowercase()
-        val args = parts.drop(1)
+        val parsed = CommandParser.parse(commandLine) ?: return "Invalid command. Commands must start with '/'."
+        val cmd = parsed.name
+        val args = parsed.arguments
 
         GameLogger.log(LogLevel.INFO, LoggerCategory.COMMAND, "EXEC_COMMAND", "Executing: $commandLine")
 
