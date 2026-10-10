@@ -13,7 +13,7 @@ class GameReminderWorker(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            NotificationHelper.showReminderNotification(applicationContext)
+            NotificationHelper.showNow(applicationContext, NotificationHelper.Type.REMINDER)
             Result.success()
         } catch (e: Exception) {
             Result.failure()
