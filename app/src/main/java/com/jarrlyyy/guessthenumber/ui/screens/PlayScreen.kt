@@ -176,7 +176,7 @@ fun PlayScreen(
                                     },
                                     label = "MoneyAnimation"
                                 ) { moneyStr ->
-                                    Text(text = localizedText("Money: $moneyStr"),
+                                    Text(text = locale.getString("money_balance_format", "Money: %s", moneyStr),
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         style = MaterialTheme.typography.titleLarge
                                     )
@@ -191,7 +191,7 @@ fun PlayScreen(
                                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.25f),
                                 tonalElevation = 2.dp
                             ) {
-                                Text(text = localizedText("+$formattedIncome/s"),
+                                Text(text = locale.getString("income_rate_format", "+%s/s", formattedIncome),
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     style = MaterialTheme.typography.labelMedium,
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
