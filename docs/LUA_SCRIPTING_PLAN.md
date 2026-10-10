@@ -91,6 +91,36 @@ Build a content publishing pipeline, not a direct GitHub-to-runtime shortcut. Fe
 ### M8 - Controlled rollout
 Use feature flags and a debug-only opt-in first. Release a single non-economy-changing event before permitting any scripted rewards. Expand only after crash, performance, rollback, and save-integrity checks pass.
 
+## One-tap GO flow and manageable Lua hub
+
+The first user-facing Lua entry point should feel like a normal game feature, not a scripting tool. The planned screen is a small **Lua / Events hub** with one prominent **GO** button.
+
+### Player flow
+1. The hub selects the current featured event or minigame automatically.
+2. One tap on **GO** starts it immediately when its bundle is valid and ready. Do not make the player choose a script ID, type a command, or configure runtime settings.
+3. If an event is already running, the same button resumes it. If nothing is featured, show a clear empty state and keep the normal game playable.
+4. Show concise states: **Ready**, **Running**, **Paused**, **Offline content**, or **Unavailable**. If launch fails, explain briefly and return to the hub without affecting the save.
+5. Offer secondary actions for Details, Change activity, and Exit. Keep developer controls in Dev Settings, not in the player's main flow.
+
+### Keep the feature manageable
+- Ship one featured activity and a small, curated list first. Avoid building a full script marketplace or visual editor.
+- Bundle a sample minigame locally so GO works offline and can be tested without GitHub.
+- Reuse existing Compose components, navigation, localization, feature flags, and app logging.
+- Use a single lifecycle owner for start/resume/pause/stop/cleanup. Prevent duplicate launches from repeated taps.
+- Display activity name, short description, estimated session length, and a simple progress/status indicator.
+- Make Back/Exit reliably remove temporary UI, timers, and event state. Returning to the core guessing game must always work.
+- If Lua is disabled or broken, hide/disable the GO entry point and leave the rest of the game usable.
+
+### GO button acceptance checks
+- One tap starts a ready bundled activity; a second rapid tap does not create a duplicate instance.
+- Resume returns to the same active session when supported.
+- No internet connection does not block bundled activities.
+- Missing, incompatible, invalid, or crashing scripts show a friendly recoverable state.
+- Cancel/Exit cleans up all temporary resources and preserves the save.
+- All labels and errors are localized; app and Lua logs share a correlation ID for one launch attempt.
+
+**Scope rule:** design the GO flow now, but implement the real button only after the stability gate and runtime feasibility spike pass. Do not ship a decorative button that pretends Lua is working before a runtime exists.
+
 ## Definition of done
 
 - Core Kotlin game works when Lua is disabled, unavailable, or a script fails.
