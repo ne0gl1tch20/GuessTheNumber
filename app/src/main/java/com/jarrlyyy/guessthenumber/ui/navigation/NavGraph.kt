@@ -329,15 +329,6 @@ fun NavGraph(
                                     if (route == "changelog") Screen.ChangelogViewer.route else route
                                 )
                             },
-                            onUpdateBackgroundMusic = onUpdateBackgroundMusic,
-                            isPlayingMusic = isPlayingMusic,
-                            musicCurrentPosition = musicCurrentPosition,
-                            musicDuration = musicDuration,
-                            musicAlbumArt = musicAlbumArt,
-                            onPlayMusic = onPlayMusic,
-                            onPauseMusic = onPauseMusic,
-                            onStopMusic = onStopMusic,
-                            onSeekMusic = onSeekMusic,
                             onUpdateSettings = onUpdateSettings
                         ) }
                     }
