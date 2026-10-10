@@ -49,9 +49,12 @@ data class TalentDef(val id: String, val name: String, val description: String, 
 data class TalentConfigRoot(val talents: List<TalentDef>, val schemaVersion: Int = 1)
 @Serializable
 data class FeedbackMessagesRoot(
-    val tooLowMessages: List<String>,
-    val tooHighMessages: List<String>,
+    val tooLowMessages: List<String> = emptyList(),
+    val tooHighMessages: List<String> = emptyList(),
     val guessTipsAndClues: List<String> = emptyList(),
+    val tooLowMessagesCount: Int = 0,
+    val tooHighMessagesCount: Int = 0,
+    val guessTipsAndCluesCount: Int = 0,
     val schemaVersion: Int = 1
 )
 
@@ -347,8 +350,10 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             json.decodeFromString<FeedbackMessagesRoot>(jsonString).also {
                 ContentValidation.requireSupportedSchema(it.schemaVersion)
-                require(it.tooLowMessages.isNotEmpty() && it.tooHighMessages.isNotEmpty())
-                require((it.tooLowMessages + it.tooHighMessages + it.guessTipsAndClues).all(String::isNotBlank))
+                require((it.tooLowMessages.isNotEmpty() || it.tooLowMessagesCount in 1..1000) &&
+                    (it.tooHighMessages.isNotEmpty() || it.tooHighMessagesCount in 1..1000))
+                require(it.guessTipsAndCluesCount in 0..1000)
+                require((it.tooLowMessages + it.tooHighMessages + it.guessTipsAndClues).all { message -> message.isNotBlank() })
             }
         } catch (e: Exception) {
             GameLogger.log(
@@ -363,14 +368,23 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
             )
         }
 
+        val lowMessages = root.tooLowMessages.ifEmpty {
+            List(root.tooLowMessagesCount.coerceIn(0, 1000)) { "Too low! Try higher." }
+        }
+        val highMessages = root.tooHighMessages.ifEmpty {
+            List(root.tooHighMessagesCount.coerceIn(0, 1000)) { "Too high! Try lower." }
+        }
+        val tips = root.guessTipsAndClues.ifEmpty {
+            List(root.guessTipsAndCluesCount.coerceIn(0, 1000)) { "Try a different approach." }
+        }
         return FeedbackMessagesRoot(
-            tooLowMessages = root.tooLowMessages.mapIndexed { index, defaultMsg ->
+            tooLowMessages = lowMessages.mapIndexed { index, defaultMsg ->
                 localeManager.getString("feedback_toolow_$index", defaultMsg)
             },
-            tooHighMessages = root.tooHighMessages.mapIndexed { index, defaultMsg ->
+            tooHighMessages = highMessages.mapIndexed { index, defaultMsg ->
                 localeManager.getString("feedback_toohigh_$index", defaultMsg)
             },
-            guessTipsAndClues = root.guessTipsAndClues.mapIndexed { index, defaultMsg ->
+            guessTipsAndClues = tips.mapIndexed { index, defaultMsg ->
                 localeManager.getString("feedback_tip_$index", defaultMsg)
             }
         )
