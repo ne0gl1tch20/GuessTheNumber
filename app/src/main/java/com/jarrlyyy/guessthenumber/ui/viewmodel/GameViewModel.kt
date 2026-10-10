@@ -375,6 +375,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             val success = slotOperationMutex.withLock {
                 saveManager.duplicateSlot(sourceSlot, targetSlot)
             }
+            if (success) WidgetRefresh.request(getApplication<Application>())
             withContext(Dispatchers.Main) { onResult(success) }
         }
     }
@@ -397,6 +398,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 restored
             }
+            if (success) WidgetRefresh.request(getApplication<Application>())
             withContext(Dispatchers.Main) { onResult(success) }
         }
     }
@@ -900,8 +902,25 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun applySaveJson(slot: Int, raw: String, onResult: (Boolean) -> Unit) {
+        if (slot !in 1..MAX_SAVE_SLOTS) {
+            onResult(false)
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
-            val success = slotOperationMutex.withLock { saveManager.applySaveJson(slot, raw) }
+            val success = slotOperationMutex.withLock {
+                val applied = saveManager.applySaveJson(slot, raw)
+                if (applied && _activeSlot.value == slot) {
+                    val loaded = AntiCheatService.sanitizeCurrency(saveManager.loadGame(slot))
+                    withContext(Dispatchers.Main) {
+                        _gameState.value = loaded
+                        guessingBot.reset(loaded.currentRangeMin, loaded.currentRangeMax)
+                        lastIncomeMeasurement = loaded.money
+                        _incomePerSecond.value = BigNumber.ZERO
+                    }
+                }
+                applied
+            }
+            if (success) WidgetRefresh.request(getApplication<Application>())
             withContext(Dispatchers.Main) { onResult(success) }
         }
     }
