@@ -123,7 +123,7 @@ class CommandExecutor {
                 "All standard, prestige, and ultra upgrades maxed to peak levels!"
             }
 
-            "/unlock_all" -> {
+            "/unlock_all", "/unlock" -> {
                 val newState = currentState.copy(
                     achievements = setOf("correct_10", "streak_5", "millionaire"),
                     completedChallenges = setOf("daily_guess_50"),
@@ -136,7 +136,7 @@ class CommandExecutor {
                 "All achievements, challenges, shop items (including Nebula, Prestige, and Ultra shops), and tutorial unlocked!"
             }
 
-            "/win" -> {
+            "/win", "/completeguess" -> {
                 val reward = BigNumber(10000)
                 val newStreak = currentState.streak + 1
                 val newBestStreak = maxOf(currentState.bestStreak, newStreak)
@@ -184,7 +184,54 @@ class CommandExecutor {
                 "Auto-clicker speed set to $speed clicks/sec."
             }
 
-            "/stats" -> {
+
+            "/autoclicker" -> {
+                val requested = args.getOrNull(0)?.lowercase()
+                    ?: return "Usage: /autoclicker <on|off>"
+                val enabled = when (requested) {
+                    "on", "true", "1" -> true
+                    "off", "false", "0" -> false
+                    else -> return "Use /autoclicker on or /autoclicker off."
+                }
+                onStateUpdate(currentState.copy(autoClickerActive = enabled))
+                "Auto-clicker ${if (enabled) "enabled" else "disabled"}."
+            }
+
+            "/setlevel" -> {
+                if (args.size < 2) return "Usage: /setlevel <upgradeId> <level>"
+                val id = args[0].lowercase()
+                if (!id.matches(Regex("[a-z0-9_]{1,64}"))) return "Invalid upgrade ID."
+                val level = args[1].toIntOrNull()?.coerceIn(0, 1000)
+                    ?: return "Level must be an integer from 0 to 1000."
+                onStateUpdate(currentState.copy(upgradeLevels = currentState.upgradeLevels + (id to level)))
+                "Set upgrade '$id' to level $level."
+            }
+
+            "/newnumber" -> {
+                if (currentState.currentRangeMin >= currentState.currentRangeMax) return "Current guess range is invalid."
+                val target = java.util.concurrent.ThreadLocalRandom.current().nextLong(
+                    currentState.currentRangeMin,
+                    currentState.currentRangeMax + 1
+                )
+                onStateUpdate(currentState.copy(targetNumber = target, attempts = 0))
+                "Generated a new target in the current range."
+            }
+
+            "/state", "/inspect" -> {
+                "State: range=${currentState.currentRangeMin}..${currentState.currentRangeMax}, attempts=${currentState.attempts}, correct=${currentState.correctGuesses}, streak=${currentState.streak}, autoClicker=${currentState.autoClickerActive}, upgrades=${currentState.upgradeLevels.size}, activeBoss=${currentState.activeBossBattleWorldId ?: "none"}."
+            }
+
+            "/version" -> "GuessTheNumber ${BuildConfig.VERSION_NAME} (versionCode ${BuildConfig.VERSION_CODE}; debug=${BuildConfig.DEBUG})."
+
+            "/logs" -> {
+                when (args.getOrNull(0)?.lowercase()) {
+                    "clear" -> { GameLogger.clear(); "Developer logs cleared." }
+                    "pause" -> { GameLogger.pause(); "Developer log stream paused." }
+                    "resume" -> { GameLogger.resume(); "Developer log stream resumed." }
+                    else -> "Usage: /logs <clear|pause|resume>"
+                }
+            }
+\n            "/stats" -> {
                 val stats = currentState.statistics
                 "Stats: Playtime=${stats.playtimeSeconds}s | Guesses=${currentState.correctGuesses}/${currentState.attempts} | Streak=${currentState.streak} (Best ${currentState.bestStreak}) | Money=${currentState.money} | Prestige=${currentState.prestige} | Ultra=${currentState.ultra} | Nebula=${currentState.nebula}"
             }
