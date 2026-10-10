@@ -1,6 +1,8 @@
 package com.jarrlyyy.guessthenumber.data.repository
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -10,8 +12,9 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class WorldConfigRepositoryTest {
-    private fun loadWorlds(): List<WorldDefinition> =
-        WorldConfigRepository(RuntimeEnvironment.getApplication()).loadWorlds()
+    private fun repository() = WorldConfigRepository(RuntimeEnvironment.getApplication())
+
+    private fun loadWorlds(): List<WorldDefinition> = repository().loadWorlds()
 
     @Test
     fun bundledWorldsLoadWithExpectedBossStatsAndRewards() {
@@ -24,6 +27,24 @@ class WorldConfigRepositoryTest {
         assertEquals(listOf(3, 5, 7, 10), worlds.map { it.hp })
         assertEquals(listOf("25000", "100000", "500000", "5000000"), worlds.map { it.baseMoneyReward })
         assertEquals(listOf(10L, 25L, 75L, 250L), worlds.map { it.baseNebulaReward })
+    }
+
+
+    @Test
+    fun rejectsInvalidCoordinatesAndMissingBossReferences() {
+        val repository = repository()
+        val worlds = repository.loadWorlds()
+
+        assertTrue(repository.isValid(worlds))
+        assertFalse(repository.isValid(worlds.mapIndexed { index, world ->
+            if (index == 0) world.copy(x = 1.5f) else world
+        }))
+        assertFalse(repository.isValid(worlds.mapIndexed { index, world ->
+            if (index == 1) world.copy(unlockBossId = "missing_boss") else world
+        }))
+        assertFalse(repository.isValid(worlds.mapIndexed { index, world ->
+            if (index == 0) world.copy(baseNebulaReward = -1) else world
+        }))
     }
 
     @Test
