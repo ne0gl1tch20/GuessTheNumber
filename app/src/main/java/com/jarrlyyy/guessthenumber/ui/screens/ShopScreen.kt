@@ -64,7 +64,7 @@ fun ShopScreen(
                         Column {
                             Text(locale.getString("available_nebula", "Available Nebula"), style = MaterialTheme.typography.bodyMedium)
                             AnimatedContent(targetState = state.nebula.format(), label = "ShopNebulaAnimation") { nebulaStr ->
-                                Text(localizedText("$nebulaStr Nebula"), color = NebulaPink, style = MaterialTheme.typography.titleLarge)
+                                Text(locale.getString("shop_nebula_balance_format", "%s Nebula", nebulaStr), color = NebulaPink, style = MaterialTheme.typography.titleLarge)
                             }
                             state.equippedCosmeticId?.let { equipped ->
                                 Spacer(modifier = Modifier.height(6.dp))
