@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 object NotificationHelper {
     private val notificationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -52,32 +53,46 @@ object NotificationHelper {
 
     fun show(context: Context, type: Type) {
         val appContext = context.applicationContext
-        notificationScope.launch {
-            if (!isCategoryEnabled(appContext, type)) return@launch
-            createNotificationChannels(appContext)
-            val locale = createLocaleManager(appContext)
-            val intent = Intent(appContext, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                putExtra("notification_destination", type.destination)
-            }
-            val pendingIntent = PendingIntent.getActivity(appContext, type.id, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-            val notification = NotificationCompat.Builder(appContext, type.channelId)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(locale.getString(type.titleKey, type.fallbackTitle))
-                .setContentText(locale.getString(type.bodyKey, type.fallbackBody))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                // Progression can unlock several milestones in one action. Reuse the
-                // category notification without repeatedly sounding for the same ID.
-                .setOnlyAlertOnce(true)
-                .build()
-            try {
-                val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.notify(type.id, notification)
-            } catch (_: SecurityException) {
-                // Android 13+ notification permission may be denied.
-            }
+        notificationScope.launch { showNow(appContext, type) }
+    }
+
+    /** Performs the notification work before returning, for workers that may be stopped after completion. */
+    suspend fun showNow(context: Context, type: Type) = withContext(Dispatchers.IO) {
+        val appContext = context.applicationContext
+        if (!isCategoryEnabled(appContext, type)) return@withContext
+        createNotificationChannels(appContext)
+        val locale = createLocaleManager(appContext)
+        val intent = Intent(appContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("notification_destination", type.destination)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            appContext,
+            type.id,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val notification = NotificationCompat.Builder(appContext, type.channelId)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle(locale.getString(type.titleKey, type.fallbackTitle))
+            .setContentText(locale.getString(type.bodyKey, type.fallbackBody))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setOnlyAlertOnce(true)
+            .build()
+        try {
+            val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(type.id, notification)
+        } catch (_: SecurityException) {
+            // Android 13+ notification permission may be denied.
+        }
+    }
+
+    fun cancel(context: Context, type: Type) {
+        runCatching {
+            val manager = context.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.cancel(type.id)
         }
     }
 
