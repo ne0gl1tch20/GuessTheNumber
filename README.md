@@ -6,7 +6,7 @@ An advanced, feature-rich incremental and arcade Android game built with **Jetpa
 
 ## 🧩 Planned Lua Scripting Layer
 
-Lua is **planned, not implemented yet**. The Kotlin engine remains authoritative, and implementation is gated on a stable baseline with passing builds and tests. The plan covers reusable local scripts, temporary minigames, a constrained UI/game host API, shared developer-console diagnostics, a future signed GitHub LiveOps bundle pipeline, and a simple one-tap **GO** flow for launching or resuming a featured activity after the runtime is ready.
+Lua is **planned, not implemented yet**. The Kotlin engine remains authoritative, and implementation is gated on a stable baseline with passing builds and tests. The plan covers reusable local scripts, temporary minigames, a constrained UI/game host API, a debug-only Lua Console inside Dev Settings, one shared reusable Kotlin engine facade for every script source and UI entry point, a future signed GitHub LiveOps bundle pipeline, and a simple one-tap **GO** flow for launching or resuming a featured activity after the runtime is ready.
 
 - [Lua implementation roadmap](docs/LUA_SCRIPTING_PLAN.md)
 - [Draft Lua host API contract](docs/LUA_API_DESIGN.md)
