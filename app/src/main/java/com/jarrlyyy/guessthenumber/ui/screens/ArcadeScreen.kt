@@ -32,10 +32,8 @@ fun ArcadeScreen(
     reducedMotion: Boolean = false
 ) {
     val context = LocalContext.current
-    val locale = remember { JsonConfigRepository(context).localeManager }
-    val minigames = remember {
-        JsonConfigRepository(context).loadMinigames()
-    }
+    val locale = LocalAppLocaleManager.current
+    val minigames = remember { JsonConfigRepository(context).loadMinigames() }
 
     var activeMinigame by remember { mutableStateOf<MinigameDef?>(null) }
 
@@ -79,9 +77,9 @@ fun ArcadeScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
-                        Text(minigame.name, fontSize = 20.sp, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+                        Text(locale.getString("minigame_${minigame.id}_name", minigame.name), fontSize = 20.sp, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text(minigame.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(locale.getString("minigame_${minigame.id}_desc", minigame.description), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             onClick = { activeMinigame = minigame },
@@ -94,7 +92,7 @@ fun ArcadeScreen(
                                 )
                                 .fillMaxWidth()
                         ) {
-                            Text(LocalAppLocaleManager.current.getString("play_minigame_format", "Play %s", minigame.name), style = MaterialTheme.typography.titleMedium)
+                            Text(locale.getString("play_minigame_format", "Play %s", locale.getString("minigame_${minigame.id}_name", minigame.name)), style = MaterialTheme.typography.titleMedium)
                         }
                     }
                 }
