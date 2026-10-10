@@ -4,12 +4,12 @@
     {
       "id": "season_1_cyber_guess",
       "title": "Season 1: Cybernetic Guessing",
-      "description": "Claim up to 10 rewards of 10 Nebula each. Every claim also raises this save slot's permanent money and Nebula bonus level, up to level 25.",
+      "description": "Claim up to 20 rewards of 10 Nebula each. Every claim also raises this save slot's permanent money and Nebula bonus level, up to level 25.",
       "status": "ACTIVE",
       "startDate": "2024-01-01T00:00:00Z",
       "endDate": "2026-12-31T23:59:59Z",
       "currencyName": "Nebula",
-      "maxClaims": 10
+      "maxClaims": 20
     },
     {
       "id": "holiday_neon_rush",
