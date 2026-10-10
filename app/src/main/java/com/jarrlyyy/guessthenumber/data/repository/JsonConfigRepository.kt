@@ -77,6 +77,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 require(config.autoClickerIncomePerSec.toBigDecimalOrNull()?.signum() != null && config.autoClickerIncomePerSec.toBigDecimalOrNull()!!.signum() >= 0)
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             GameConfig()
         }
     }
@@ -96,6 +102,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 )
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             emptyList()
         }
     }
@@ -115,6 +127,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 )
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             emptyList()
         }
     }
@@ -134,6 +152,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 )
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             emptyList()
         }
     }
@@ -153,6 +177,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 )
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             emptyList()
         }
     }
@@ -172,6 +202,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 )
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             emptyList()
         }
     }
@@ -191,6 +227,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 )
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             emptyList()
         }
     }
@@ -211,6 +253,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 )
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             emptyList()
         }
     }
@@ -230,6 +278,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 )
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             emptyList()
         }
     }
@@ -250,6 +304,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 )
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             emptyList()
         }
     }
@@ -271,6 +331,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 )
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             emptyList()
         }
     }
@@ -285,6 +351,12 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
                 require((it.tooLowMessages + it.tooHighMessages + it.guessTipsAndClues).all(String::isNotBlank))
             }
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.SAVE,
+                "CONFIG_VALIDATION_FALLBACK",
+                "A bundled game configuration failed parsing or validation; a fallback will be used (${e.javaClass.simpleName})."
+            )
             FeedbackMessagesRoot(
                 listOf("Too low! Try higher."),
                 listOf("Too high! Try lower.")
