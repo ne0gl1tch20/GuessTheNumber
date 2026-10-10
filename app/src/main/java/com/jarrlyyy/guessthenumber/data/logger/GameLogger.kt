@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.data.logger
 
 import android.util.Log
+import com.jarrlyyy.guessthenumber.BuildConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,10 +18,15 @@ object GameLogger {
     val logFlow: StateFlow<List<LogEntry>> = _logFlow.asStateFlow()
 
     private var isPaused = false
+    @Volatile private var verboseEnabled = BuildConfig.DEBUG.not()
     private const val MAX_LOGS = 1000
 
     private var logStorageFile: File? = null
     private var saveToStorageEnabled = false
+
+    fun configureVerbose(enabled: Boolean) {
+        verboseEnabled = BuildConfig.DEBUG && enabled
+    }
 
     fun configureStorage(file: File, enabled: Boolean) {
         logStorageFile = file
@@ -34,6 +40,7 @@ object GameLogger {
 
     fun log(level: LogLevel, category: LoggerCategory, event: String, message: String, correlationId: String? = null) {
         if (isPaused) return
+        if (!verboseEnabled && (level == LogLevel.TRACE || level == LogLevel.DEBUG)) return
         val now = System.currentTimeMillis()
         val entry = LogEntry(
             timestamp = now,
