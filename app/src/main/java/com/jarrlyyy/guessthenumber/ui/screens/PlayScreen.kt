@@ -934,7 +934,7 @@ private fun WorldProgressionBoard(
                         HorizontalDivider()
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Icon(Icons.Default.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
-                            Text(locale.getString(world.bossNameKey), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                            Text(locale.getString(world.bossKey), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
                         }
                         Text(locale.getString(world.bossRequirementKey), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (unlocked && !defeated) {
@@ -950,7 +950,7 @@ private fun WorldProgressionBoard(
                                 trackColor = MaterialTheme.colorScheme.surfaceVariant
                             )
                         }
-                        Text(locale.getString(world.rewardKey), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.tertiary)
+                        Text(locale.getString(world.bossRewardKey), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.tertiary)
                         Button(
                             onClick = { onAction(world.id, "boss") },
                             enabled = unlocked && canFight && !defeated,
