@@ -70,6 +70,10 @@ class MusicPlaybackService : Service() {
         if (intent == null && !manager.isPlaying.value && manager.currentTrackId.value != null) {
             manager.play()
         }
+        if (intent?.action == ACTION_STOP) {
+            stopPlayback()
+            return START_NOT_STICKY
+        }
         if (intent?.action == Intent.ACTION_MEDIA_BUTTON) {
             MediaButtonReceiver.handleIntent(mediaSession, intent)
         } else {
@@ -78,7 +82,6 @@ class MusicPlaybackService : Service() {
                 ACTION_PAUSE -> manager.pause()
                 ACTION_NEXT -> manager.next()
                 ACTION_PREVIOUS -> manager.previous()
-                ACTION_STOP -> stopPlayback()
             }
         }
         updateSessionAndNotification()
@@ -96,7 +99,9 @@ class MusicPlaybackService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun stopPlayback() {
+        mainHandler.removeCallbacks(stateUpdater)
         manager.stop()
+        getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
