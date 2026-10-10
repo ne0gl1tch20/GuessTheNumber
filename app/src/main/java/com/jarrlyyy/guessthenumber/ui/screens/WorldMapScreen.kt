@@ -100,14 +100,14 @@ fun WorldMapScreen(
             )
         }
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(locale.getString("world_map_hint", "Pinch to zoom, drag to explore, and tap a world to inspect it."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             val worldPathColor = MaterialTheme.colorScheme.outlineVariant
             val unlockedWorldGlow = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
             val lockedWorldGlow = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
             val secretPathColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.65f)
             BoxWithConstraints(
-                Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(28.dp)).background(MaterialTheme.colorScheme.surfaceContainerLow)
+                Modifier.fillMaxWidth().height(360.dp).clip(RoundedCornerShape(28.dp)).background(MaterialTheme.colorScheme.surfaceContainerLow)
             ) {
                 val mapWidth = maxWidth
                 val mapHeight = maxHeight
