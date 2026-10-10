@@ -51,8 +51,6 @@ internal class LuaSandbox(
             load(MathLib())
             load(Bit32Lib())
             load(DebugLib())
-            LoadState.install(this)
-            LuaC.install(this)
         }
 
         // LuaJ's hook belongs to a LuaThread. Configure that thread directly
