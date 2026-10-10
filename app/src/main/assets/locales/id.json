@@ -832,5 +832,8 @@
   "music_playlist_name": "Nama playlist",
   "music_create_playlist": "Buat",
   "music_playlists": "Playlist",
-  "music_playlist_tracks": "%d trek"
+  "music_playlist_tracks": "%d trek",
+  "music_empty_library": "Pustaka musik kosong. Tambahkan audio dari perangkat ini untuk memulai.",
+  "music_empty_queue": "Antrean kosong. Putar trek atau tambahkan dari pustaka.",
+  "music_empty_playlists": "Belum ada playlist. Buat playlist untuk mengatur musik."
 }

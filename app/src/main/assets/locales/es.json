@@ -832,5 +832,8 @@
   "music_playlist_name": "Nombre de la lista",
   "music_create_playlist": "Crear",
   "music_playlists": "Listas de reproducción",
-  "music_playlist_tracks": "%d pistas"
+  "music_playlist_tracks": "%d pistas",
+  "music_empty_library": "Tu biblioteca está vacía. Añade audio de este dispositivo para empezar.",
+  "music_empty_queue": "La cola está vacía. Reproduce una pista o añádela desde la biblioteca.",
+  "music_empty_playlists": "Todavía no hay listas. Crea una para organizar tu música."
 }

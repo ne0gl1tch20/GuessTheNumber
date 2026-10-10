@@ -875,5 +875,8 @@
   "music_playlist_name": "Pangalan ng playlist",
   "music_create_playlist": "Gumawa",
   "music_playlists": "Mga playlist",
-  "music_playlist_tracks": "%d track"
+  "music_playlist_tracks": "%d track",
+  "music_empty_library": "Walang laman ang music library mo. Magdagdag ng audio mula sa device para magsimula.",
+  "music_empty_queue": "Walang laman ang pila. Magpatugtog ng track o magdagdag mula sa library.",
+  "music_empty_playlists": "Wala pang playlist. Gumawa ng isa para ayusin ang iyong musika."
 }

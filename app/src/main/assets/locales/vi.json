@@ -832,5 +832,8 @@
   "music_playlist_name": "Tên danh sách phát",
   "music_create_playlist": "Tạo",
   "music_playlists": "Danh sách phát",
-  "music_playlist_tracks": "%d bản nhạc"
+  "music_playlist_tracks": "%d bản nhạc",
+  "music_empty_library": "Thư viện nhạc đang trống. Thêm âm thanh từ thiết bị để bắt đầu.",
+  "music_empty_queue": "Hàng đợi đang trống. Phát một bản nhạc hoặc thêm từ thư viện.",
+  "music_empty_playlists": "Chưa có danh sách phát. Hãy tạo danh sách để sắp xếp nhạc."
 }

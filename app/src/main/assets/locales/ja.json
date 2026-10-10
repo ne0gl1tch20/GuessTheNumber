@@ -875,5 +875,8 @@
   "music_playlist_name": "プレイリスト名",
   "music_create_playlist": "作成",
   "music_playlists": "プレイリスト",
-  "music_playlist_tracks": "%d 曲"
+  "music_playlist_tracks": "%d 曲",
+  "music_empty_library": "音楽ライブラリは空です。この端末の音声を追加して始めましょう。",
+  "music_empty_queue": "キューは空です。曲を再生するか、ライブラリから追加してください。",
+  "music_empty_playlists": "プレイリストはまだありません。音楽を整理するために作成しましょう。"
 }

@@ -832,5 +832,8 @@
   "music_playlist_name": "प्लेलिस्ट का नाम",
   "music_create_playlist": "बनाएँ",
   "music_playlists": "प्लेलिस्ट",
-  "music_playlist_tracks": "%d ट्रैक"
+  "music_playlist_tracks": "%d ट्रैक",
+  "music_empty_library": "आपकी संगीत लाइब्रेरी खाली है। शुरू करने के लिए इस डिवाइस से ऑडियो जोड़ें।",
+  "music_empty_queue": "कतार खाली है। कोई ट्रैक चलाएँ या लाइब्रेरी से जोड़ें।",
+  "music_empty_playlists": "अभी कोई प्लेलिस्ट नहीं है। संगीत व्यवस्थित करने के लिए बनाएँ।"
 }

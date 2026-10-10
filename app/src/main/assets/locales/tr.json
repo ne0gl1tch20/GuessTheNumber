@@ -832,5 +832,8 @@
   "music_playlist_name": "Çalma listesi adı",
   "music_create_playlist": "Oluştur",
   "music_playlists": "Çalma listeleri",
-  "music_playlist_tracks": "%d parça"
+  "music_playlist_tracks": "%d parça",
+  "music_empty_library": "Müzik kitaplığın boş. Başlamak için bu cihazdan ses ekle.",
+  "music_empty_queue": "Sıra boş. Bir parça çal veya kitaplıktan parça ekle.",
+  "music_empty_playlists": "Henüz çalma listesi yok. Müziğini düzenlemek için bir liste oluştur."
 }

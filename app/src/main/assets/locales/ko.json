@@ -875,5 +875,8 @@
   "music_playlist_name": "재생목록 이름",
   "music_create_playlist": "만들기",
   "music_playlists": "재생목록",
-  "music_playlist_tracks": "트랙 %d개"
+  "music_playlist_tracks": "트랙 %d개",
+  "music_empty_library": "음악 라이브러리가 비어 있습니다. 기기에서 오디오를 추가해 시작하세요.",
+  "music_empty_queue": "대기열이 비어 있습니다. 트랙을 재생하거나 라이브러리에서 추가하세요.",
+  "music_empty_playlists": "재생목록이 없습니다. 음악을 정리할 목록을 만들어 보세요."
 }

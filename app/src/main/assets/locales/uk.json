@@ -832,5 +832,8 @@
   "music_playlist_name": "Назва плейлиста",
   "music_create_playlist": "Створити",
   "music_playlists": "Плейлисти",
-  "music_playlist_tracks": "Треків: %d"
+  "music_playlist_tracks": "Треків: %d",
+  "music_empty_library": "Музична бібліотека порожня. Додайте аудіо з цього пристрою, щоб почати.",
+  "music_empty_queue": "Черга порожня. Увімкніть трек або додайте його з бібліотеки.",
+  "music_empty_playlists": "Плейлистів ще немає. Створіть список, щоб упорядкувати музику."
 }

@@ -832,5 +832,8 @@
   "music_playlist_name": "Nome della playlist",
   "music_create_playlist": "Crea",
   "music_playlists": "Playlist",
-  "music_playlist_tracks": "%d tracce"
+  "music_playlist_tracks": "%d tracce",
+  "music_empty_library": "La libreria è vuota. Aggiungi audio da questo dispositivo per iniziare.",
+  "music_empty_queue": "La coda è vuota. Riproduci un brano o aggiungilo dalla libreria.",
+  "music_empty_playlists": "Non ci sono ancora playlist. Creane una per organizzare la musica."
 }

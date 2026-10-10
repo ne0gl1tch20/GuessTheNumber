@@ -832,5 +832,8 @@
   "music_playlist_name": "ชื่อเพลย์ลิสต์",
   "music_create_playlist": "สร้าง",
   "music_playlists": "เพลย์ลิสต์",
-  "music_playlist_tracks": "%d แทร็ก"
+  "music_playlist_tracks": "%d แทร็ก",
+  "music_empty_library": "คลังเพลงว่างอยู่ เพิ่มไฟล์เสียงจากอุปกรณ์นี้เพื่อเริ่มต้น",
+  "music_empty_queue": "คิวว่างอยู่ เล่นเพลงหรือเพิ่มเพลงจากคลัง",
+  "music_empty_playlists": "ยังไม่มีเพลย์ลิสต์ สร้างเพลย์ลิสต์เพื่อจัดระเบียบเพลง"
 }

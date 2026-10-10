@@ -832,5 +832,8 @@
   "music_playlist_name": "Nome da playlist",
   "music_create_playlist": "Criar",
   "music_playlists": "Playlists",
-  "music_playlist_tracks": "%d faixas"
+  "music_playlist_tracks": "%d faixas",
+  "music_empty_library": "Sua biblioteca está vazia. Adicione áudio deste dispositivo para começar.",
+  "music_empty_queue": "A fila está vazia. Reproduza uma faixa ou adicione uma da biblioteca.",
+  "music_empty_playlists": "Ainda não há playlists. Crie uma para organizar suas músicas."
 }

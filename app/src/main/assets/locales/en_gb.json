@@ -832,5 +832,8 @@
   "music_playlist_name": "Playlist name",
   "music_create_playlist": "Create",
   "music_playlists": "Playlists",
-  "music_playlist_tracks": "%d tracks"
+  "music_playlist_tracks": "%d tracks",
+  "music_empty_library": "Your music library is empty. Add audio from this device to get started.",
+  "music_empty_queue": "Your queue is empty. Play a track or add one from the library.",
+  "music_empty_playlists": "No playlists yet. Create one to organise your music."
 }

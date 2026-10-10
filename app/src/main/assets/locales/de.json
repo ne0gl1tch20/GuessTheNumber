@@ -832,5 +832,8 @@
   "music_playlist_name": "Name der Playlist",
   "music_create_playlist": "Erstellen",
   "music_playlists": "Playlists",
-  "music_playlist_tracks": "%d Titel"
+  "music_playlist_tracks": "%d Titel",
+  "music_empty_library": "Deine Mediathek ist leer. Füge Audio von diesem Gerät hinzu, um loszulegen.",
+  "music_empty_queue": "Die Warteschlange ist leer. Spiele einen Titel ab oder füge einen aus der Mediathek hinzu.",
+  "music_empty_playlists": "Noch keine Playlists. Erstelle eine, um deine Musik zu ordnen."
 }

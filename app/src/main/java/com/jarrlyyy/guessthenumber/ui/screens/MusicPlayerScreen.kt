@@ -96,7 +96,11 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
             }
             item { Button(onClick = { picker.launch(arrayOf("audio/*")) }, Modifier.fillMaxWidth()) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(locale.getString("music_import", "Add local audio")) } }
             item { Text(locale.getString("music_library", "Library"), style = MaterialTheme.typography.titleLarge) }
-            items(library, key = { it.id }) { track ->
+            if (library.isEmpty()) {
+                item {
+                    Text(locale.getString("music_empty_library", "Your music library is empty. Add audio from this device to get started."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            } else items(library, key = { it.id }) { track ->
                 ListItem(
                     headlineContent = { Text(track.title) },
                     supportingContent = { Text(track.artist.ifBlank { track.album }) },
@@ -114,7 +118,11 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
                     TextButton(onClick = manager::clearQueue) { Text(locale.getString("clear", "Clear")) }
                 }
             }
-            items(queue.indices.toList()) { index ->
+            if (queue.isEmpty()) {
+                item {
+                    Text(locale.getString("music_empty_queue", "Your queue is empty. Play a track or add one from the library."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            } else items(queue.indices.toList()) { index ->
                 val track = library.firstOrNull { it.id == queue[index] } ?: return@items
                 ListItem(
                     headlineContent = { Text(track.title) },
@@ -134,7 +142,11 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
                 }
             }
             item { Text(locale.getString("music_playlists", "Playlists"), style = MaterialTheme.typography.titleLarge) }
-            items(playlists.keys.toList()) { name ->
+            if (playlists.isEmpty()) {
+                item {
+                    Text(locale.getString("music_empty_playlists", "No playlists yet. Create one to organize your music."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            } else items(playlists.keys.toList()) { name ->
                 val ids = playlists[name].orEmpty()
                 ListItem(
                     headlineContent = { Text(name) },
