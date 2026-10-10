@@ -61,9 +61,46 @@ def scan_xml():
                     findings.append((rel, line_no, f"XML {attr}", match.group(1).strip()))
     return findings
 
+def scan_catalog_calls():
+    """Find English phrases that bypass or miss the canonical locale catalog."""
+    locale_path = ROOT / "app" / "src" / "main" / "assets" / "locales" / "en_us.json"
+    try:
+        import json
+        with locale_path.open("r", encoding="utf-8") as handle:
+            catalog = json.load(handle)
+    except Exception as exc:
+        return [(str(locale_path.relative_to(ROOT)), 1, "Catalog", f"cannot load en_us.json: {exc}")]
+
+    values = {value for value in catalog.values() if isinstance(value, str)}
+    keys = set(catalog)
+    findings = []
+    for path in KOTLIN_ROOT.rglob("*.kt"):
+        rel = str(path.relative_to(ROOT)).replace("\\\\", "/")
+        if any(part in rel for part in SKIP_PATH_PARTS):
+            continue
+        for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            for match in re.finditer(r'\\blocalizedText\\s*\\(\\s*"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"', line):
+                value = match.group(1).strip()
+                if "$" in value:
+                    findings.append((rel, line_no, "Dynamic localizedText", value))
+                elif probable_user_text(value) and value not in values:
+                    findings.append((rel, line_no, "Missing English catalog value", value))
+
+            for match in re.finditer(r'\\b[A-Za-z_]\\w*\\.getString\\s*\\(\\s*"([^"]+)"', line):
+                key = match.group(1).strip()
+                # IDs composed from data-driven asset IDs are validated by the
+                # asset-specific localization contract, not as literal keys here.
+                if "$" in key:
+                    continue
+                if not re.fullmatch(r"[a-z0-9_]+", key):
+                    findings.append((rel, line_no, "English phrase used as key", key))
+                elif key not in keys:
+                    findings.append((rel, line_no, "Missing locale key", key))
+    return findings
+
 def main() -> int:
-    findings = scan_kotlin() + scan_xml()
-    print(f"Localization surface audit: {len(findings)} candidate(s).")
+    findings = scan_kotlin() + scan_xml() + scan_catalog_calls()
+    print(f"Localization surface audit: {len(findings)} candidate(s), including missing catalog values and format-key issues.")
     for rel, line_no, kind, value in findings:
         print(f"  - {rel}:{line_no}: [{kind}] {value}")
     return 0
