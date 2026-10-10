@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import com.jarrlyyy.guessthenumber.ui.components.ExpressiveSaveLoadingScreen
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import com.jarrlyyy.guessthenumber.ui.navigation.NavGraph
 import com.jarrlyyy.guessthenumber.ui.screens.CrashRecoveryScreen
 import com.jarrlyyy.guessthenumber.ui.theme.GuessTheNumberTheme
@@ -19,6 +20,7 @@ import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 class MainActivity : ComponentActivity() {
     private val viewModel: GameViewModel by viewModels()
     private var notificationDestination by mutableStateOf<String?>(null)
+    private var pendingWidgetSaveSlot by mutableStateOf<Int?>(null)
 
     companion object {
         const val EXTRA_NOTIFICATION_DESTINATION = "notification_destination"
@@ -30,9 +32,8 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         notificationDestination = intent.getStringExtra(EXTRA_NOTIFICATION_DESTINATION)
-        intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
+        pendingWidgetSaveSlot = intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
             .takeIf { it in 1..MAX_SAVE_SLOTS }
-            ?.let(viewModel::switchSlot)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -44,13 +45,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         notificationDestination = savedInstanceState?.getString(STATE_NOTIFICATION_DESTINATION)
             ?: intent.getStringExtra(EXTRA_NOTIFICATION_DESTINATION)
-        intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
+        pendingWidgetSaveSlot = intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
             .takeIf { it in 1..MAX_SAVE_SLOTS }
-            ?.let(viewModel::switchSlot)
         setContent {
             val state by viewModel.gameState.collectAsState()
             val isLoadingSave by viewModel.isLoadingSave.collectAsState()
             val hasPreviousCrash by viewModel.hasPreviousCrash.collectAsState()
+            LaunchedEffect(isLoadingSave, hasPreviousCrash, pendingWidgetSaveSlot) {
+                val requestedSlot = pendingWidgetSaveSlot
+                if (requestedSlot != null && !isLoadingSave && !hasPreviousCrash) {
+                    pendingWidgetSaveSlot = null
+                    viewModel.switchSlot(requestedSlot)
+                }
+            }
             val offlineGains by viewModel.offlineGains.collectAsState()
             val incomePerSecond by viewModel.incomePerSecond.collectAsState()
             val showChangelogPopup by viewModel.showChangelogPopup.collectAsState()
