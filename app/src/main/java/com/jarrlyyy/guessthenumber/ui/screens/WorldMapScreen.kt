@@ -225,7 +225,20 @@ fun WorldMapScreen(
                     } else {
                         Text(locale.getString("boss_defeated", "Boss defeated"))
                         val mastery = state.worldMasteryLevels[world.id] ?: 1
-                        val masteryCost = BigNumber(10L * (mastery + 1L))
+                        val masteryBaseCost = BigNumber(10L * (mastery + 1L))
+                        val secretForMastery = mapOf(
+                            "verdant_grove" to "whispering_hollow",
+                            "crystal_caverns" to "shard_archive",
+                            "ember_summit" to "ashen_vault",
+                            "nebula_rift" to "lost_observatory"
+                        )[world.id]
+                        val secretDiscount = if (secretForMastery != null && secretForMastery in state.discoveredSecretIds) 0.20 else 0.0
+                        val sanctuaryDiscount = (state.homeBaseLevel * 0.01).coerceAtMost(0.20)
+                        val fullRelicSetDiscount = if (
+                            state.equippedRelicIds.containsAll(setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan"))
+                        ) 0.10 else 0.0
+                        val totalDiscount = (secretDiscount + sanctuaryDiscount + fullRelicSetDiscount).coerceAtMost(0.40)
+                        val masteryCost = masteryBaseCost * BigNumber(1.0 - totalDiscount)
                         Text(locale.getString("world_mastery_label", "World mastery: %d", mastery))
                         Text(locale.getString("world_mastery_bonus", "+%d%% Money per correct guess in this world.", mastery * 2), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
                         Button(onClick = { onProgressionAction("mastery", world.id) }, enabled = mastery < 10 && state.nebula >= masteryCost, modifier = Modifier.fillMaxWidth()) {
