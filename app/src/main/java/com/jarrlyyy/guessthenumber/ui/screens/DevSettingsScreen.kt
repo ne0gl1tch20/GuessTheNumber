@@ -60,6 +60,7 @@ fun DevSettingsScreen(
     var selectedSaveSlot by remember { mutableIntStateOf(1) }
     var saveSlotExpanded by remember { mutableStateOf(false) }
     var logSearchQuery by remember { mutableStateOf("") }
+    var selectedLogLevel by remember { mutableStateOf("ALL") }
     var isPaused by remember { mutableStateOf(false) }
 
     val logs by GameLogger.logFlow.collectAsState(initial = emptyList())
@@ -72,11 +73,13 @@ fun DevSettingsScreen(
 
     val suggestions = remember(commandInput) { CommandAutocomplete.suggest(commandInput) }
 
-    val filteredLogs = logs.filter {
-        logSearchQuery.isBlank() ||
-        it.message.contains(logSearchQuery, ignoreCase = true) ||
-        it.category.name.contains(logSearchQuery, ignoreCase = true) ||
-        it.level.name.contains(logSearchQuery, ignoreCase = true)
+    val filteredLogs = logs.filter { log ->
+        (selectedLogLevel == "ALL" || log.level.name == selectedLogLevel) &&
+            (logSearchQuery.isBlank() ||
+                log.message.contains(logSearchQuery, ignoreCase = true) ||
+                log.event.contains(logSearchQuery, ignoreCase = true) ||
+                log.category.name.contains(logSearchQuery, ignoreCase = true) ||
+                log.level.name.contains(logSearchQuery, ignoreCase = true))
     }.reversed()
 
     Scaffold(
@@ -433,6 +436,24 @@ fun DevSettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf("ALL", "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL").forEach { level ->
+                            FilterChip(
+                                selected = selectedLogLevel == level,
+                                onClick = { selectedLogLevel = level },
+                                label = { Text(level) }
+                            )
+                        }
+                    }
+                    Text(
+                        text = "${filteredLogs.size} matching log entries",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
@@ -502,7 +523,7 @@ fun DevSettingsScreen(
                                     LogLevel.INFO -> Color(0xFF50FA7B)
                                     else -> Color(0xFF8BE9FD)
                                 }
-                                Text(text = "[$timeStr][${log.category}][${log.level}] ${log.message}",
+                                Text(text = "[$timeStr][${log.category}][${log.level}][${log.event}] ${log.message}${log.correlationId?.let { " (CID: $it)" } ?: ""}",
                                     color = color,
                                     fontFamily = FontFamily.Monospace,
                                     fontSize = 11.sp,
