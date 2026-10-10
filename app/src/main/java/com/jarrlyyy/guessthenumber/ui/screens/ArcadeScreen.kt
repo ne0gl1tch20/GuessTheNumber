@@ -173,7 +173,7 @@ fun QuickGuessDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
                     onReward(1L, BigNumber((score * 500).toLong()))
                     onDismiss()
                 }) {
-                    Text(localizedText(localizedText("Claim Reward")))
+                    Text(localizedText(locale.getString("claim_reward_button", "Claim Reward")))
                 }
             }
         }
@@ -225,7 +225,7 @@ fun ReactionTestDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Uni
                     containerColor = if (state == "ready") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                 )
             ) {
-                Text(if (state == "clicked") localizedText("Claim Reward") else localizedText("TAP"))
+                Text(if (state == "clicked") locale.getString("claim_reward_button", "Claim Reward") else locale.getString("tap", "TAP"))
             }
         }
     )
@@ -274,7 +274,7 @@ fun LuckyNumberDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
                     }
                     onDismiss()
                 }) {
-                    Text(if (chosenBox == winningBox) "Claim Reward" else "Close")
+                    Text(if (chosenBox == winningBox) locale.getString("claim_reward_button", "Claim Reward") else locale.getString("close_button", "Close"))
                 }
             }
         }
@@ -342,7 +342,7 @@ fun MemoryMatchDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
                     }
                     onDismiss()
                 }) {
-                    Text(localizedText("Done"))
+                    Text(locale.getString("done_button", "Done"))
                 }
             }
         }
@@ -407,7 +407,7 @@ fun NumberRushDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
                     onReward(1L, BigNumber(7500))
                     onDismiss()
                 }) {
-                    Text(localizedText("Claim Reward"))
+                    Text(locale.getString("claim_reward_button", "Claim Reward"))
                 }
             }
         }
