@@ -15,18 +15,49 @@ data class LiveOpsEvent(
     val id: String,
     val title: String,
     val description: String,
-    val status: String, // UPCOMING, ACTIVE, ENDING, ARCHIVED
+    val status: String,
     val startDate: String,
     val endDate: String,
     val currencyName: String,
-    val maxClaims: Int
+    val maxClaims: Int,
+    val rewardNebula: Long = 10,
+    val permanentBoostPerClaim: Int = 1,
+    val minCorrectGuesses: Long = 0,
+    val minPrestigeCount: Long = 0,
+    val minUltraCount: Long = 0
 )
 
 @Serializable
 data class LiveOpsManifest(
     val manifestVersion: Int,
-    val events: List<LiveOpsEvent>
+    val events: List<LiveOpsEvent>,
+    val schemaVersion: Int = 1
 )
+
+object LiveOpsContentValidator {
+    fun validate(manifest: LiveOpsManifest) {
+        ContentValidation.requireSupportedSchema(manifest.schemaVersion)
+        require(manifest.manifestVersion in 1..2) { "Unsupported LiveOps manifest version ${manifest.manifestVersion}" }
+        ContentValidation.requireUniqueIds(manifest.events.map { it.id })
+        manifest.events.forEach { event ->
+            require(event.title.isNotBlank() && event.description.isNotBlank() && event.currencyName.isNotBlank()) {
+                "LiveOps event ${event.id} has blank display content"
+            }
+            require(event.status in setOf("UPCOMING", "ACTIVE", "ENDING", "ARCHIVED")) {
+                "LiveOps event ${event.id} has invalid status"
+            }
+            val start = Instant.parse(event.startDate)
+            val end = Instant.parse(event.endDate)
+            require(end.isAfter(start)) { "LiveOps event ${event.id} ends before it starts" }
+            require(event.maxClaims > 0 && event.rewardNebula >= 0 && event.permanentBoostPerClaim >= 0) {
+                "LiveOps event ${event.id} has invalid reward limits"
+            }
+            require(event.minCorrectGuesses >= 0 && event.minPrestigeCount >= 0 && event.minUltraCount >= 0) {
+                "LiveOps event ${event.id} has invalid eligibility requirements"
+            }
+        }
+    }
+}
 
 class LiveOpsRepository(private val context: Context) {
     private val json = Json { ignoreUnknownKeys = true }
@@ -34,27 +65,25 @@ class LiveOpsRepository(private val context: Context) {
     suspend fun loadLiveOpsEvents(): LiveOpsManifest = withContext(Dispatchers.IO) {
         // Live Ops remains fully usable offline and does not fetch remote data.
         try {
-            val inputStream = context.assets.open("game/liveops_manifest.json")
-            val jsonString = inputStream.bufferedReader().use { it.readText() }
+            val jsonString = context.assets.open("game/liveops_manifest.json").bufferedReader().use { it.readText() }
             val manifest = json.decodeFromString<LiveOpsManifest>(jsonString)
+            LiveOpsContentValidator.validate(manifest)
             val now = Instant.now()
             manifest.copy(events = manifest.events.map { event ->
-                val dates = runCatching {
-                    Instant.parse(event.startDate) to Instant.parse(event.endDate)
-                }.getOrNull()
+                val start = Instant.parse(event.startDate)
+                val end = Instant.parse(event.endDate)
                 val status = when {
                     event.status == "ARCHIVED" -> "ARCHIVED"
-                    dates == null -> event.status
-                    now.isBefore(dates.first) -> "UPCOMING"
-                    !now.isBefore(dates.second) -> "ARCHIVED"
+                    now.isBefore(start) -> "UPCOMING"
+                    !now.isBefore(end) -> "ARCHIVED"
                     event.status == "ENDING" -> "ENDING"
                     else -> "ACTIVE"
                 }
                 event.copy(status = status)
             })
         } catch (e: Exception) {
-            GameLogger.log(LogLevel.WARN, LoggerCategory.SAVE, "LIVEOPS_FALLBACK", "Failed to read bundled LiveOps manifest: ${e.message}")
-            LiveOpsManifest(manifestVersion = 1, events = emptyList())
+            GameLogger.log(LogLevel.WARN, LoggerCategory.SAVE, "LIVEOPS_FALLBACK", "Invalid bundled LiveOps manifest; using empty event list (${e.javaClass.simpleName}).")
+            LiveOpsManifest(manifestVersion = 2, events = emptyList())
         }
     }
 }
