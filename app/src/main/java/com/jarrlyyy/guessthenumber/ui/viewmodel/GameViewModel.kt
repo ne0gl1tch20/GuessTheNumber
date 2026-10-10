@@ -132,6 +132,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadGame(slot: Int = -1) {
+        _isLoadingSave.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else saveManager.getActiveSlot()
