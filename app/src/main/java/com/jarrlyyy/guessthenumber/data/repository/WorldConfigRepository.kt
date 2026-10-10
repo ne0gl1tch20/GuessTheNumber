@@ -59,7 +59,7 @@ class WorldConfigRepository(private val context: Context) {
             ?: defaultWorlds
     }
 
-    private fun isValid(worlds: List<WorldDefinition>): Boolean {
+    internal fun isValid(worlds: List<WorldDefinition>): Boolean {
         if (worlds.isEmpty() || worlds.map { it.id }.distinct().size != worlds.size) return false
         if (worlds.map { it.bossId }.distinct().size != worlds.size) return false
         if (worlds.map { it.secretId }.distinct().size != worlds.size) return false
