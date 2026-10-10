@@ -9,6 +9,7 @@ import org.luaj.vm2.lib.BaseLib
 import org.luaj.vm2.lib.Bit32Lib
 import org.luaj.vm2.lib.DebugLib
 import org.luaj.vm2.lib.MathLib
+import org.luaj.vm2.lib.PackageLib
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TableLib
 import org.luaj.vm2.lib.VarArgFunction
@@ -47,6 +48,9 @@ internal class LuaSandbox(
         var logLines = 0
         val globals = Globals().apply {
             load(BaseLib())
+            // LuaJ's library installers register themselves in package.loaded.
+            // Install PackageLib first, then remove the package surface below.
+            load(PackageLib())
             load(TableLib())
             load(MathLib())
             load(Bit32Lib())
