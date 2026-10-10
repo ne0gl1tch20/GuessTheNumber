@@ -160,3 +160,51 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - Added Phase 5 slot duplication and backup restoration workflow.
 - Updated app version metadata to `versionCode 9` / `versionName 1.10`.
 - Changelog entries continue using the existing Markdown heading and emoji-bullet format.
+
+## Beyond the Numbers: Roadmap to 1.0 Completion (2026-10-10)
+
+**The finish line is Phase 6 below. Do not treat small commits, plans, or a single successful build as project completion.** Work through phases in order, bundle related changes into meaningful commits, and verify claims against code and GitHub Actions.
+
+### Phase 1 — Establish the real baseline
+- Inspect current `master`, the latest workflow runs, integration audit, and relevant source/tests.
+- Record concrete remaining blockers tied to actual files and behavior.
+- Fix any build or test failures before expanding features.
+- No emulator tests unless the user explicitly authorizes them.
+
+### Phase 2 — Finish RPG integration
+Verify the full progression loop end to end: World Map, world unlocks and portals, bosses and combat, secret-area discovery/interactions, relic inventory/equipment/set bonuses, world mastery and milestone rewards, Home Base upgrades/discounts, Codex completion, Endless Rift, Prestige, Ultra, Nebula, and upgrade progression.
+- Confirm unlock requirements, reward ownership, persistence, save compatibility, and localization.
+- Prevent duplicate reward application, inconsistent costs, progression dead ends, and disconnected systems.
+
+### Phase 3 — Close the localization audit
+- Audit every user-visible surface: Compose screens, dialogs, toasts, errors, accessibility labels, notifications, widgets, dynamic strings and formatting placeholders.
+- Add required keys to the canonical English catalog and all 23 locale catalogs; use real translations where available and preserve placeholder contracts.
+- Fix language-switch updates and review hardcoded-text audit findings.
+- Exit only when locale validation passes, all catalogs have the required keys, and remaining audit findings are reviewed rather than ignored.
+
+### Phase 4 — Complete shared app systems
+- Music: local offline library, metadata, reusable full-screen player, saved playlists, playlist editing, queue/reordering, shuffle, repeat, playback controls, service/media-session/notification integration and failure recovery.
+- Notifications: real progression/game events, preference switches, channels, scheduling/reboot restoration and correct cold/warm navigation.
+- Widgets: accurate persisted game metrics, save-slot selection/cycling, useful layouts and refresh after relevant state changes.
+- Save slots, encrypted import/export, settings and restoration must work together without breaking old saves.
+
+### Phase 5 — Finish UI and gameplay polish
+- Complete navigation, animations/transitions, touch feedback, responsive layouts, loading/empty/error states, accessibility labels and theme/language behavior.
+- Balance progression costs/rewards and remove known gameplay inconsistencies.
+- Do not expand scope with unrelated features while earlier-phase blockers remain; defer new ideas to post-1.0.
+
+### Phase 6 — Release verification (THE FINISH LINE)
+- On the final source commit, run repository validation, localization checks, unit tests, lint, full Gradle checks, and Debug and Release APK builds.
+- Fix failures and rerun relevant checks; inspect workflow conclusions and generated artifacts.
+- Confirm the integration audit has no unresolved release blockers.
+- Declare 1.0 completion only when all required checks pass on the final commit and both APKs build successfully. A build pass alone does not prove all features are integrated.
+
+### Execution and reporting rules
+1. Continue implementation without repeatedly asking the user to approve already-authorized work.
+2. Prefer GitHub repository tools and conserve Composio quota.
+3. No emulator tests until explicitly approved.
+4. Do not claim a workflow passed until its actual conclusion is `success`; distinguish pending, cancelled, failed and successful runs.
+5. Keep progress reports short and evidence-based, with commit and Actions links for repository changes.
+6. For repository changes, include: “You can build it using GitHub Actions” with https://github.com/ne0gl1tch20/GuessTheNumber/actions/workflows/build-apks.yml.
+7. The roadmap is an ordered completion gate, not permission to stop after documenting it. Continue making integrated code changes toward Phase 6.
+
