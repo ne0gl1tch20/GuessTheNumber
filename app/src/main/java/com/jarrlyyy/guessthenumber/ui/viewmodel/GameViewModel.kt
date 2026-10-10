@@ -1134,16 +1134,18 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_HIT", "Hit boss $bossId: $nextDamage/$bossHp")
             return
         }
-        val baseMoneyReward = when (worldId) { "verdant_grove" -> BigNumber(25_000); "crystal_caverns" -> BigNumber(100_000); "ember_summit" -> BigNumber(500_000); else -> BigNumber(5_000_000) }
-        val baseNebulaReward = when (worldId) { "verdant_grove" -> 10L; "crystal_caverns" -> 25L; "ember_summit" -> 75L; else -> 250L }
+        val baseMoneyReward = BigNumber(world.baseMoneyReward)
+        val baseNebulaReward = world.baseNebulaReward
         if (state.endlessRiftActive) {
             val tierMultiplier = state.endlessRiftTier.coerceAtLeast(1)
             val (baseBonusMoney, baseBonusNebula) = progressionRewardBonus(state, baseMoneyReward)
             val moneyReward = (baseMoneyReward + baseBonusMoney) * BigNumber(tierMultiplier)
             val nebulaReward = (baseNebulaReward + baseBonusNebula) * tierMultiplier.toLong()
-            val order = listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift")
-            val nextWorld = order[(order.indexOf(worldId).coerceAtLeast(0) + 1) % order.size]
-            val nextBoss = when (nextWorld) { "verdant_grove" -> "verdant_guardian"; "crystal_caverns" -> "crystal_golem"; "ember_summit" -> "ember_dragon"; else -> "nebula_titan" }
+            val nextWorldDefinition = worldDefinitions[
+                (worldDefinitions.indexOf(world).coerceAtLeast(0) + 1) % worldDefinitions.size
+            ]
+            val nextWorld = nextWorldDefinition.id
+            val nextBoss = nextWorldDefinition.bossId
             val nextTier = state.endlessRiftTier + 1
             _gameState.value = state.copy(
                 money = state.money + moneyReward,
