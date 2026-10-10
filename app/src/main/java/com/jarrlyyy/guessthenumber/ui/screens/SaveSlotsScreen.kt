@@ -190,7 +190,7 @@ fun SaveSlotsScreen(
         var difficultyDraft by remember(slotNum) { mutableStateOf(difficultySelections[slotNum] ?: Difficulty.CLASSIC) }
         AlertDialog(
             onDismissRequest = { showCreateDialog = null },
-            title = { Text(localizedText("Create Save Slot $slotNum")) },
+            title = { Text(locale.getString("create_save_slot_format", "Create Save Slot %d", slotNum)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
@@ -378,7 +378,7 @@ fun SaveSlotsScreen(
                             viewModel.exportSave { json ->
                                 val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
                                 clipboard?.setPrimaryClip(
-                                    ClipData.newPlainText(locale.getString("GuessTheNumberSave", "GuessTheNumberSave"), json)
+                                    ClipData.newPlainText(locale.getString("save_export_label", "GuessTheNumberSave"), json)
                                 )
                                 android.widget.Toast.makeText(
                                     context,
