@@ -122,7 +122,7 @@ fun LiveOpsScreen(
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.primary
                                     )
-                                    Text(event.title, fontSize = 18.sp, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+                                    Text(locale.getString("liveops_event_${event.id}_title", event.title), fontSize = 18.sp, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
                                 }
                                 Surface(
                                     shape = MaterialTheme.shapes.small,
@@ -133,14 +133,14 @@ fun LiveOpsScreen(
                                     }
                                 ) {
                                     Text(
-                                        text = event.status,
+                                        text = locale.getString("liveops_status_${event.status.lowercase()}", event.status.lowercase().replaceFirstChar { it.uppercase() }),
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }
                             }
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(event.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(locale.getString("liveops_event_${event.id}_desc", event.description), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(modifier = Modifier.height(12.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -148,7 +148,7 @@ fun LiveOpsScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
-                                    Text(locale.getString("currency_label", "Currency: %s", event.currencyName), fontSize = 12.sp, style = MaterialTheme.typography.labelMedium)
+                                    Text(locale.getString("currency_label", "Currency: %s", localizedText(event.currencyName)), fontSize = 12.sp, style = MaterialTheme.typography.labelMedium)
                                     Text(locale.getString("claims_label", "Claims: %d / %d", claims, event.maxClaims), fontSize = 12.sp, color = MoneyGold)
                                 }
                                 Button(
