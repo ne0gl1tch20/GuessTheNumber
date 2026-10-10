@@ -44,6 +44,7 @@ class BackgroundMusicManager private constructor(context: Context) {
     private var mediaPlayer: MediaPlayer? = null
     private var progressJob: Job? = null
     private var queueIndex = 0
+    private var skipRepeatOnceAfterQueueRemoval = false
     private val _library = MutableStateFlow(loadLibrary())
     val library: StateFlow<List<Track>> = _library.asStateFlow()
     private val _queue = MutableStateFlow<List<String>>(loadQueue())
@@ -153,6 +154,7 @@ class BackgroundMusicManager private constructor(context: Context) {
         val currentQueue = _queue.value
         if (index !in currentQueue.indices) return
         val removedCurrentItem = index == queueIndex
+        if (removedCurrentItem) skipRepeatOnceAfterQueueRemoval = true
         _queue.value = currentQueue.toMutableList().also { it.removeAt(index) }
         queueIndex = when {
             _queue.value.isEmpty() -> 0
@@ -186,7 +188,12 @@ class BackgroundMusicManager private constructor(context: Context) {
     }
 
     private fun advance() {
-        if (_repeatMode.value == RepeatMode.ONE && _currentTrackId.value != null) { playTrack(_currentTrackId.value!!); return }
+        val skipRepeatForRemovedTrack = skipRepeatOnceAfterQueueRemoval
+        skipRepeatOnceAfterQueueRemoval = false
+        if (!skipRepeatForRemovedTrack && _repeatMode.value == RepeatMode.ONE && _currentTrackId.value != null) {
+            playTrack(_currentTrackId.value!!)
+            return
+        }
         if (_queue.value.isEmpty()) return
         queueIndex = if (_shuffle.value) Random.nextInt(_queue.value.size) else queueIndex + 1
         if (queueIndex >= _queue.value.size) {
@@ -202,7 +209,10 @@ class BackgroundMusicManager private constructor(context: Context) {
         if (track != null) playTrack(track.id) else if (!path.isNullOrEmpty()) startPath(path, null)
     }
 
-    fun playTrack(trackId: String) { _library.value.firstOrNull { it.id == trackId }?.let { startPath(it.path, it) } }
+    fun playTrack(trackId: String) {
+        skipRepeatOnceAfterQueueRemoval = false
+        _library.value.firstOrNull { it.id == trackId }?.let { startPath(it.path, it) }
+    }
 
     private fun startPath(path: String, track: Track?) {
         if (!File(path).exists()) { track?.let { removeTrack(it.id) }; stop(); return }
