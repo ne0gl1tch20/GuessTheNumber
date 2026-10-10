@@ -1,6 +1,8 @@
 package com.jarrlyyy.guessthenumber
 
 import android.os.Bundle
+import android.content.Intent
+import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -18,10 +20,33 @@ class MainActivity : ComponentActivity() {
     private val viewModel: GameViewModel by viewModels()
     private var notificationDestination by mutableStateOf<String?>(null)
 
+    companion object {
+        const val EXTRA_NOTIFICATION_DESTINATION = "notification_destination"
+        const val EXTRA_WIDGET_SAVE_SLOT = "widget_save_slot"
+        private const val STATE_NOTIFICATION_DESTINATION = "state_notification_destination"
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        notificationDestination = intent.getStringExtra(EXTRA_NOTIFICATION_DESTINATION)
+        intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
+            .takeIf { it in 1..MAX_SAVE_SLOTS }
+            ?.let(viewModel::switchSlot)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(STATE_NOTIFICATION_DESTINATION, notificationDestination)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notificationDestination = savedInstanceState?.getString(STATE_NOTIFICATION_DESTINATION)
             ?: intent.getStringExtra(EXTRA_NOTIFICATION_DESTINATION)
+        intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
+            .takeIf { it in 1..MAX_SAVE_SLOTS }
+            ?.let(viewModel::switchSlot)
         setContent {
             val state by viewModel.gameState.collectAsState()
             val isLoadingSave by viewModel.isLoadingSave.collectAsState()
