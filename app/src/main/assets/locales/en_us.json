@@ -822,5 +822,13 @@
   "music_control_next": "Next",
   "music_control_stop": "Stop",
   "liveops_bonus_level_label": "Permanent Bonus Level",
-  "liveops_bonus_effect": "+2% money per level and +1 Nebula per correct guess every 5 levels, up to level 25. Applies to this save slot."
+  "liveops_bonus_effect": "+2% money per level and +1 Nebula per correct guess every 5 levels, up to level 25. Applies to this save slot.",
+  "liveops_event_season_1_cyber_guess_title": "Season 1: Cybernetic Guessing",
+  "liveops_event_season_1_cyber_guess_desc": "Claim up to 20 rewards of 10 Nebula each. Every claim also raises this save slot's permanent money and Nebula bonus level, up to level 25.",
+  "liveops_event_holiday_neon_rush_title": "Neon Holiday Rush",
+  "liveops_event_holiday_neon_rush_desc": "Claim up to 5 rewards of 10 Nebula each. Every claim also raises this save slot's permanent money and Nebula bonus level, up to level 25.",
+  "liveops_status_active": "Active",
+  "liveops_status_upcoming": "Upcoming",
+  "liveops_status_ending": "Ending soon",
+  "liveops_status_archived": "Archived"
 }
