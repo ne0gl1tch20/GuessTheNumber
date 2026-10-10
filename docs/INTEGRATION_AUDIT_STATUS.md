@@ -63,6 +63,16 @@
 - A MediaPlayer prepare/start failure now releases the failed player and clears stale current-track, duration, progress and album-art state, including the persisted current-track pointer. This prevents the screen/media notification from continuing to represent a failed track as active.
 - The music changes were inspected at source level only; device playback, service recreation and headset/lock-screen controls still require runtime validation.
 
+## Follow-up integration fixes (2026-10-10)
+
+- Save-slot switching now cancels the switch when the current slot cannot be persisted, rather than changing the active slot and risking loss of unsaved progress.
+- Save initialization now catches non-cancellation failures and clears the loading indicator instead of leaving the app stuck in a loading state. Coroutine cancellation is rethrown normally.
+- Profile edits update the in-memory active state only after the updated save has been persisted successfully.
+- Creating or switching save slots requests a widget refresh so slot-aware widgets can reflect the selected state.
+- Autosave and asynchronous save paths refresh widgets only after successful persistence and log failed writes.
+- Queue removal now adjusts the queue cursor when an earlier item is removed; removing the selected item no longer makes the next normal track skip the item that takes its place. An empty queue stops playback.
+- Confirmed `.github/workflows/build-apks.yml` uses `workflow_dispatch` only. No workflow was started and no build/test result is claimed.
+
 ## Still requires the remaining integration pass
 
 - All 23 locale catalogs now have matching key coverage and no audited string-format placeholder mismatches. A separate manual review of older hardcoded/dynamically assembled UI text is still needed.
