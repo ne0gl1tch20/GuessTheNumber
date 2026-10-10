@@ -157,9 +157,9 @@ class BackgroundMusicManager private constructor(context: Context) {
         queueIndex = when {
             _queue.value.isEmpty() -> 0
             index < queueIndex -> queueIndex - 1
-            removedCurrentItem -> (index - 1).coerceAtLeast(-1)
+            removedCurrentItem -> index - 1
             else -> queueIndex
-        }.coerceAtLeast(0).coerceAtMost((_queue.value.size - 1).coerceAtLeast(0))
+        }.coerceAtMost((_queue.value.size - 1).coerceAtLeast(0))
         persistQueue()
         // If the currently selected queue entry was removed, let the playing track finish,
         // then advance to the item that took its place instead of skipping over it.
