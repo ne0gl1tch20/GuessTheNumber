@@ -51,8 +51,9 @@ class WorldConfigRepository(private val context: Context) {
             }
         }.getOrNull()
 
-        return loaded?.worlds
-            ?.takeIf { loaded.schemaVersion == 1 && isValid(it) }
+        return loaded
+            ?.takeIf { it.schemaVersion == 1 && isValid(it.worlds) }
+            ?.worlds
             ?: defaultWorlds
     }
 
