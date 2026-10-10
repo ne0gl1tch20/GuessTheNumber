@@ -57,6 +57,12 @@
 - Fresh-slot creation now checks slot occupancy and writes the new save inside one DataStore edit transaction, preventing concurrent create requests from overwriting a slot that another request just populated.
 - These changes were reviewed against the existing `SaveManager` implementation and preserve the current JSON/save schema. No build or GitHub Actions workflow was run, as requested.
 
+## Music restoration fixes (2026-10-10)
+
+- Startup restoration now filters persisted queue entries and playlist memberships against the currently available imported library, so stale IDs from removed or unavailable audio files are not exposed as playable items.
+- A MediaPlayer prepare/start failure now releases the failed player and clears stale current-track, duration, progress and album-art state, including the persisted current-track pointer. This prevents the screen/media notification from continuing to represent a failed track as active.
+- The music changes were inspected at source level only; device playback, service recreation and headset/lock-screen controls still require runtime validation.
+
 ## Still requires the remaining integration pass
 
 - All 23 locale catalogs now have matching key coverage and no audited string-format placeholder mismatches. A separate manual review of older hardcoded/dynamically assembled UI text is still needed.
