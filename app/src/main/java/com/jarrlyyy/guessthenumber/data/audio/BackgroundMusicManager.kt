@@ -110,7 +110,8 @@ class BackgroundMusicManager private constructor(context: Context) {
         runCatching { appContext.stopService(Intent(appContext, MusicPlaybackService::class.java)) }
     }
 
-    fun importTrack(uri: Uri, displayName: String? = null): Track? = try {
+    fun importTrack(uri: Uri, displayName: String? = null): Track? {
+        return try {
         val musicDir = File(appContext.filesDir, "music").apply { mkdirs() }
         val id = "track_${System.currentTimeMillis()}_${Random.nextInt(1000, 9999)}"
         val destination = File(musicDir, "$id.audio")
@@ -120,7 +121,8 @@ class BackgroundMusicManager private constructor(context: Context) {
         _library.value = _library.value + track
         persistLibrary(_library.value)
         track
-    } catch (_: Exception) { null }
+        } catch (_: Exception) { null }
+    }
 
     fun removeTrack(trackId: String) {
         val track = _library.value.firstOrNull { it.id == trackId } ?: return
