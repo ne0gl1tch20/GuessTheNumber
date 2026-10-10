@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.data.repository.LiveOpsEvent
 import com.jarrlyyy.guessthenumber.data.repository.LiveOpsRepository
+import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
 import kotlinx.coroutines.launch
@@ -36,9 +37,12 @@ fun LiveOpsScreen(
     val scope = rememberCoroutineScope()
     var events by remember { mutableStateOf<List<LiveOpsEvent>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var eventsEnabled by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         scope.launch {
+            val flags = FeatureFlagRepository(context).load()
+            eventsEnabled = flags["live_ops"] == true && flags["seasonal_rewards"] == true
             val manifest = LiveOpsRepository(context).loadLiveOpsEvents()
             events = manifest.events
             isLoading = false
@@ -101,9 +105,27 @@ fun LiveOpsScreen(
                     }
                 }
 
-                items(events) { event ->
+                if (!eventsEnabled) {
+                    item {
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text(localizedText("Seasonal events are disabled by the bundled feature flags."), style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    localizedText("Enable live_ops and seasonal_rewards in game/feature_flags.json to show event offers."),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+
+                items(events.filter { eventsEnabled }, key = { it.id }) { event ->
                     val claims = state.liveOpsClaims[event.id] ?: 0
-                    val canClaim = event.status == "ACTIVE" && claims < event.maxClaims
+                    val eligible = state.correctGuesses >= event.minCorrectGuesses &&
+                        state.prestigeCount >= event.minPrestigeCount &&
+                        state.ultraCount >= event.minUltraCount
+                    val canClaim = eventsEnabled && event.status == "ACTIVE" && claims < event.maxClaims && eligible
 
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -141,6 +163,14 @@ fun LiveOpsScreen(
                             }
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(locale.getString("liveops_event_${event.id}_desc", event.description), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                text = localizedText("Reward: +${event.rewardNebula} Nebula • Eligibility: ${event.minCorrectGuesses} correct guesses, ${event.minPrestigeCount} Prestige, ${event.minUltraCount} Ultra"),
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            if (!eligible) {
+                                Text(localizedText("You do not meet this event's requirements yet."), fontSize = 12.sp, color = MaterialTheme.colorScheme.error)
+                            }
                             Spacer(modifier = Modifier.height(12.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -156,7 +186,7 @@ fun LiveOpsScreen(
                                     enabled = canClaim,
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                                 ) {
-                                    Text(if (claims >= event.maxClaims) locale.getString("max_claimed", "Max Claimed") else locale.getString("claim_reward_nebula", "Claim Reward (+10 Nebula)"))
+                                    Text(if (claims >= event.maxClaims) locale.getString("max_claimed", "Max Claimed") else locale.getString("claim_reward_nebula", "Claim Reward (+%d Nebula)", event.rewardNebula))
                                 }
                             }
                         }
