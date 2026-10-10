@@ -69,7 +69,13 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/game_config.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<GameConfig>(jsonString)
+            json.decodeFromString<GameConfig>(jsonString).also { config ->
+                ContentValidation.requireSupportedSchema(config.schemaVersion)
+                require(config.startingRangeMin >= 0 && config.startingRangeMax > config.startingRangeMin)
+                require(config.criticalChance in 0.0..1.0 && config.maxUltraCap > 0)
+                require(config.startingMoney.toBigDecimalOrNull()?.signum() != null && config.startingMoney.toBigDecimalOrNull()!!.signum() >= 0)
+                require(config.autoClickerIncomePerSec.toBigDecimalOrNull()?.signum() != null && config.autoClickerIncomePerSec.toBigDecimalOrNull()!!.signum() >= 0)
+            }
         } catch (e: Exception) {
             GameConfig()
         }
@@ -79,7 +85,10 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/upgrades.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            val raw = json.decodeFromString<UpgradeConfigRoot>(jsonString).upgrades
+            val config = json.decodeFromString<UpgradeConfigRoot>(jsonString)
+            ContentValidation.requireSupportedSchema(config.schemaVersion)
+            val raw = config.upgrades
+            ContentValidation.validateUpgrades(raw)
             raw.map { up ->
                 up.copy(
                     name = localeManager.getString("upgrade_${up.id}_name", up.name),
@@ -95,7 +104,10 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/shop_items.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            val raw = json.decodeFromString<ShopConfigRoot>(jsonString).shopItems
+            val config = json.decodeFromString<ShopConfigRoot>(jsonString)
+            ContentValidation.requireSupportedSchema(config.schemaVersion)
+            val raw = config.shopItems
+            ContentValidation.validateShopItems(raw)
             raw.map { item ->
                 item.copy(
                     name = localeManager.getString("shop_item_${item.id}_name", item.name),
@@ -111,7 +123,10 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/achievements.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            val raw = json.decodeFromString<AchievementConfigRoot>(jsonString).achievements
+            val config = json.decodeFromString<AchievementConfigRoot>(jsonString)
+            ContentValidation.requireSupportedSchema(config.schemaVersion)
+            val raw = config.achievements
+            ContentValidation.validateAchievements(raw)
             raw.map { ach ->
                 ach.copy(
                     name = localeManager.getString("achievement_${ach.id}_name", ach.name),
@@ -127,7 +142,10 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/minigames.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            val raw = json.decodeFromString<MinigameConfigRoot>(jsonString).minigames
+            val config = json.decodeFromString<MinigameConfigRoot>(jsonString)
+            ContentValidation.requireSupportedSchema(config.schemaVersion)
+            val raw = config.minigames
+            ContentValidation.validateMinigames(raw)
             raw.map { mg ->
                 mg.copy(
                     name = localeManager.getString("minigame_${mg.id}_name", mg.name),
@@ -143,7 +161,10 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/challenges.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            val raw = json.decodeFromString<ChallengeConfigRoot>(jsonString).challenges
+            val config = json.decodeFromString<ChallengeConfigRoot>(jsonString)
+            ContentValidation.requireSupportedSchema(config.schemaVersion)
+            val raw = config.challenges
+            ContentValidation.validateChallenges(raw)
             raw.map { ch ->
                 ch.copy(
                     name = localeManager.getString("challenge_${ch.id}_name", ch.name),
@@ -159,7 +180,10 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/prestige_upgrades.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            val raw = json.decodeFromString<UpgradeConfigRoot>(jsonString).upgrades
+            val config = json.decodeFromString<UpgradeConfigRoot>(jsonString)
+            ContentValidation.requireSupportedSchema(config.schemaVersion)
+            val raw = config.upgrades
+            ContentValidation.validateUpgrades(raw)
             raw.map { up ->
                 up.copy(
                     name = localeManager.getString("prestige_${up.id}_name", up.name),
@@ -175,7 +199,11 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/prestige_shop.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            val raw = json.decodeFromString<PrestigeShopConfigRoot>(jsonString).shopItems
+            val config = json.decodeFromString<PrestigeShopConfigRoot>(jsonString)
+            ContentValidation.requireSupportedSchema(config.schemaVersion)
+            val raw = config.shopItems
+            ContentValidation.requireUniqueIds(raw.map { it.id })
+            require(raw.all { it.name.isNotBlank() && it.description.isNotBlank() && it.cost >= 0 }) { "Invalid shop content" }
             raw.map { item ->
                 item.copy(
                     name = localeManager.getString("prestige_shop_${item.id}_name", item.name),
@@ -191,7 +219,10 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/ultra_upgrades.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            val raw = json.decodeFromString<UpgradeConfigRoot>(jsonString).upgrades
+            val config = json.decodeFromString<UpgradeConfigRoot>(jsonString)
+            ContentValidation.requireSupportedSchema(config.schemaVersion)
+            val raw = config.upgrades
+            ContentValidation.validateUpgrades(raw)
             raw.map { up ->
                 up.copy(
                     name = localeManager.getString("ultra_${up.id}_name", up.name),
@@ -207,7 +238,11 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/ultra_shop.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            val raw = json.decodeFromString<UltraShopConfigRoot>(jsonString).shopItems
+            val config = json.decodeFromString<UltraShopConfigRoot>(jsonString)
+            ContentValidation.requireSupportedSchema(config.schemaVersion)
+            val raw = config.shopItems
+            ContentValidation.requireUniqueIds(raw.map { it.id })
+            require(raw.all { it.name.isNotBlank() && it.description.isNotBlank() && it.cost >= 0 }) { "Invalid shop content" }
             raw.map { item ->
                 item.copy(
                     name = localeManager.getString("ultra_shop_${item.id}_name", item.name),
@@ -225,7 +260,10 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         return try {
             val inputStream = context.assets.open("game/talents.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            val raw = json.decodeFromString<TalentConfigRoot>(jsonString).talents
+            val config = json.decodeFromString<TalentConfigRoot>(jsonString)
+            ContentValidation.requireSupportedSchema(config.schemaVersion)
+            val raw = config.talents
+            ContentValidation.validateTalents(raw)
             raw.map { t ->
                 t.copy(
                     name = localeManager.getString("talent_${t.id}_name", t.name),
@@ -241,7 +279,11 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
         val root = try {
             val inputStream = context.assets.open("game/guess_feedback_messages.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
-            json.decodeFromString<FeedbackMessagesRoot>(jsonString)
+            json.decodeFromString<FeedbackMessagesRoot>(jsonString).also {
+                ContentValidation.requireSupportedSchema(it.schemaVersion)
+                require(it.tooLowMessages.isNotEmpty() && it.tooHighMessages.isNotEmpty())
+                require((it.tooLowMessages + it.tooHighMessages + it.guessTipsAndClues).all(String::isNotBlank))
+            }
         } catch (e: Exception) {
             FeedbackMessagesRoot(
                 listOf("Too low! Try higher."),
