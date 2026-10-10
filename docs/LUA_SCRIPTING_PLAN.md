@@ -121,6 +121,72 @@ The first user-facing Lua entry point should feel like a normal game feature, no
 
 **Scope rule:** design the GO flow now, but implement the real button only after the stability gate and runtime feasibility spike pass. Do not ship a decorative button that pretends Lua is working before a runtime exists.
 
+## Two script sources: bundled offline + remote LiveOps
+
+Use two clearly separated sources behind one registry and one versioned Kotlin host API.
+
+### 1. Bundled offline scripts
+
+Location in this Android repository:
+
+```text
+app/src/main/assets/scripts/
+  README.md
+  manifest.json
+  common/
+  minigames/
+  events/
+  ui/
+```
+
+- Ship a small curated set with the APK so the GO button can launch an activity without internet.
+- Treat bundled scripts as the known-good fallback and pin them to the app release.
+- Keep script IDs stable and declare each script's entry point, schema version, host API range, capabilities, locale keys, and required assets in the manifest.
+- Do not overwrite these files with downloaded content at runtime.
+
+### 2. Remote LiveOps scripts
+
+Keep authoring and release artifacts in a **separate content-only GitHub repository**, provisionally named `GuessTheNumber-LiveOps` (name can be finalized before creation). This keeps event content/release history separate from Android engine changes.
+
+Suggested content repository:
+
+```text
+GuessTheNumber-LiveOps/
+  README.md
+  schemas/
+    liveops-manifest.schema.json
+  manifests/
+    stable.json
+    staging.json
+  bundles/
+    v1/
+      events/
+      minigames/
+      ui/
+      locales/
+  release-notes/
+```
+
+- Publish immutable, versioned bundles; do not point production clients at a mutable branch's raw Lua files.
+- CI validates Lua syntax, manifest schema, script IDs, API compatibility, declared capabilities, file sizes, locale keys, and bundle hashes before release.
+- Sign release manifests/bundles with a trusted signing key kept in GitHub Actions secrets. The app contains only the verification public key; never put a publishing token or signing private key in the APK.
+- The app downloads metadata, verifies signature/hash/schema/API compatibility, stages the bundle, then atomically activates it. Keep the last known-good bundle for rollback.
+- Online scripts are cached for offline reuse only after verification. If no valid cached bundle exists, use bundled content.
+- GitHub is the content host, not the trust boundary: HTTPS or a hash alone does not prove who published a bundle.
+
+### 3. Shared runtime and GO behavior
+
+The runtime resolves an activity by trusted ID through a single registry, regardless of whether its source is bundled or a verified cached LiveOps bundle. The GO button never accepts a URL or arbitrary source code.
+
+Suggested resolution order:
+1. Valid, eligible featured LiveOps activity when online and its signed bundle is verified.
+2. Previously verified cached LiveOps activity if still within its compatibility/expiry rules.
+3. Bundled offline featured activity.
+
+The app must explain when it falls back to offline content, prevent duplicate activity instances, and preserve the current game if an event cannot launch. Remote event rewards still require Kotlin-side eligibility and reward validation.
+
+**Repository status:** this describes the intended layout and pipeline only. It does not create the separate repository, install Lua, download scripts, or enable execution.
+
 ## Definition of done
 
 - Core Kotlin game works when Lua is disabled, unavailable, or a script fails.
