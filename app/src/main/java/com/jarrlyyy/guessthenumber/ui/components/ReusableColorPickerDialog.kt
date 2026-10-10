@@ -13,11 +13,12 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.unit.dp
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 @Composable
 fun ReusableColorPickerDialog(
     initialHex: String,
-    title: String = "🎨 Pick a color",
+    title: String? = null,
     onDismiss: () -> Unit,
     onApply: (String) -> Unit,
     onReset: (() -> Unit)? = null
@@ -52,10 +53,10 @@ fun ReusableColorPickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title) },
+        title = { Text(title ?: localizedText("🎨 Pick a color")) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Color", style = MaterialTheme.typography.labelLarge)
+                Text(localizedText("Color"), style = MaterialTheme.typography.labelLarge)
 
                 Box(
                     modifier = Modifier
@@ -103,7 +104,7 @@ fun ReusableColorPickerDialog(
                     }
                 }
 
-                Text("Hue: ${hue.toInt()}°")
+                Text(localizedText("Hue: %d°").format(hue.toInt()))
                 Slider(
                     value = hue,
                     onValueChange = { hue = it },
@@ -121,7 +122,7 @@ fun ReusableColorPickerDialog(
                         tonalElevation = 4.dp
                     ) {}
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Live preview", style = MaterialTheme.typography.labelLarge)
+                        Text(localizedText("Live preview"), style = MaterialTheme.typography.labelLarge)
                         Text(hex, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
@@ -139,17 +140,17 @@ fun ReusableColorPickerDialog(
                             value = next[2]
                         }
                     },
-                    label = { Text("Hex") },
+                    label = { Text(localizedText("Hex")) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         },
-        confirmButton = { Button(onClick = { onApply(hex) }) { Text("Apply") } },
+        confirmButton = { Button(onClick = { onApply(hex) }) { Text(localizedText("Apply")) } },
         dismissButton = {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                if (onReset != null) TextButton(onClick = onReset) { Text("Use theme") }
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                if (onReset != null) TextButton(onClick = onReset) { Text(localizedText("Use theme")) }
+                TextButton(onClick = onDismiss) { Text(localizedText("Cancel")) }
             }
         }
     )

@@ -940,5 +940,12 @@
   "process_inspector_background_heading": "Active Background Processes & Loops",
   "process_inspector_state_heading": "Complete Runtime Game State Variables",
   "play_correct_celebration_title": "Nice guess!",
-  "play_correct_celebration_desc": "Secret number found. Your streak keeps growing."
+  "play_correct_celebration_desc": "Secret number found. Your streak keeps growing.",
+  "color_picker_title": "🎨 Pick a color",
+  "color_picker_color": "Color",
+  "color_picker_hue": "Hue: %d°",
+  "color_picker_live_preview": "Live preview",
+  "color_picker_hex": "Hex",
+  "color_picker_apply": "Apply",
+  "color_picker_use_theme": "Use theme"
 }
