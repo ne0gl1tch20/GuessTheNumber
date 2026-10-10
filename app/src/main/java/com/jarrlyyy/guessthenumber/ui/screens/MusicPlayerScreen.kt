@@ -3,6 +3,11 @@ package com.jarrlyyy.guessthenumber.ui.screens
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -31,6 +36,7 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
     val currentTrackId by manager.currentTrackId.collectAsState()
     val position by manager.currentPosition.collectAsState()
     val duration by manager.duration.collectAsState()
+    val albumArt by manager.albumArt.collectAsState()
     val shuffle by manager.shuffle.collectAsState()
     val repeat by manager.repeatMode.collectAsState()
     var playlistName by remember { mutableStateOf("") }
@@ -47,14 +53,41 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
             item {
                 Card {
                     Column(Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.MusicNote, null, Modifier.size(56.dp))
+                        if (albumArt != null) {
+                            Image(
+                                bitmap = albumArt!!.asImageBitmap(),
+                                contentDescription = current?.title ?: locale.getString("music_no_track", "No track selected"),
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.size(220.dp).clip(RoundedCornerShape(28.dp))
+                            )
+                        } else {
+                            Surface(
+                                modifier = Modifier.size(220.dp),
+                                shape = RoundedCornerShape(28.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerHighest
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        Icons.Default.MusicNote,
+                                        contentDescription = current?.title ?: locale.getString("music_no_track", "No track selected"),
+                                        modifier = Modifier.size(76.dp),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
                         Text(current?.title ?: locale.getString("music_no_track", "No track selected"), style = MaterialTheme.typography.titleLarge)
-                        if (!current?.artist.isNullOrBlank()) Text(current?.artist.orEmpty(), style = MaterialTheme.typography.bodyMedium)
+                        val subtitle = current?.artist?.takeIf { it.isNotBlank() } ?: current?.album?.takeIf { it.isNotBlank() }
+                        if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodyMedium)
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(locale.formatDuration((position.coerceAtLeast(0) / 1000).toLong()), style = MaterialTheme.typography.labelSmall)
+                            Text(locale.formatDuration((duration.coerceAtLeast(0) / 1000).toLong()), style = MaterialTheme.typography.labelSmall)
+                        }
                         Slider(value = position.toFloat().coerceIn(0f, duration.coerceAtLeast(1).toFloat()), onValueChange = { manager.seekTo(it.toInt()) }, valueRange = 0f..duration.coerceAtLeast(1).toFloat())
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            IconButton(onClick = { manager.previous() }) { Icon(Icons.Default.SkipPrevious, null) }
-                            FilledIconButton(onClick = { if (playing) manager.pause() else manager.play() }) { Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, null) }
-                            IconButton(onClick = { manager.next() }) { Icon(Icons.Default.SkipNext, null) }
+                            IconButton(onClick = { manager.previous() }) { Icon(Icons.Default.SkipPrevious, contentDescription = locale.getString("music_control_previous", "Previous")) }
+                            FilledIconButton(onClick = { if (playing) manager.pause() else manager.play() }) { Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = locale.getString(if (playing) "music_control_pause" else "music_control_play", if (playing) "Pause" else "Play")) }
+                            IconButton(onClick = { manager.next() }) { Icon(Icons.Default.SkipNext, contentDescription = locale.getString("music_control_next", "Next")) }
                             IconButton(onClick = { manager.setShuffle(!shuffle) }) { Icon(Icons.Default.Shuffle, null, tint = if (shuffle) MaterialTheme.colorScheme.primary else LocalContentColor.current) }
                             IconButton(onClick = { manager.setRepeatMode(BackgroundMusicManager.RepeatMode.entries[(repeat.ordinal + 1) % BackgroundMusicManager.RepeatMode.entries.size]) }) { Icon(Icons.Default.Repeat, null, tint = if (repeat != BackgroundMusicManager.RepeatMode.OFF) MaterialTheme.colorScheme.primary else LocalContentColor.current) }
                         }

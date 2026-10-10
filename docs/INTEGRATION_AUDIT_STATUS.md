@@ -152,3 +152,9 @@ Current app version: 3.0.1 (versionCode 19).
 
 - Removed the progress poller's second end-of-track advance. MediaPlayer's completion listener is the single owner of automatic track advancement, preventing a near-simultaneous poll and completion callback from skipping two tracks.
 - The progress poller still updates the displayed playback position and duration. The change is covered by the repository's normal unit-test, lint, Gradle-check and APK-build workflow; no emulator tests were run.
+
+## Offline player presentation polish (2026-10-10)
+
+- Connected the already-extracted embedded album artwork to the reusable player screen, with a themed placeholder when a track has no artwork.
+- The player now shows elapsed and total playback time using the active locale's duration formatter, and uses album metadata when artist metadata is absent.
+- Added localized accessibility descriptions to previous/play-pause/next controls using existing catalog keys. No new locale keys were introduced.
