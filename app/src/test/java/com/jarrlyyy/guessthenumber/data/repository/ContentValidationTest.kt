@@ -4,7 +4,6 @@ import com.jarrlyyy.guessthenumber.domain.model.AchievementDef
 import com.jarrlyyy.guessthenumber.domain.model.ShopItemDef
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
 import org.junit.Assert.assertThrows
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ContentValidationTest {
@@ -53,6 +52,5 @@ class ContentValidationTest {
     @Test
     fun acceptsValidUniqueIds() {
         ContentValidation.requireUniqueIds(listOf("first", "second"))
-        assertTrue(true)
     }
 }
