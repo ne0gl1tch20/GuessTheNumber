@@ -134,3 +134,10 @@ Current app version: 3.0.1 (versionCode 19).
 - Gradle unit-test tasks repeatedly failed during dependency resolution before test execution. The runner reported that it could not find `org.jetbrains.kotlinx:coroutines-core:1.8.1`, `org.jetbrains.kotlinx:coroutines-android:1.8.1` and `androidx.glance:appwidget:1.2.0` in the configured Google Maven/Maven Central repositories. These versions are already present in a previously successful revision, so this is not yet evidence of a source compilation failure; the final run on the latest commit must confirm whether resolution recovers.
 - Emulator runtime tests did not start because their JVM unit-test step hit the same dependency-resolution failure.
 - **Not stable yet:** a fresh build and emulator run for the latest workflow configuration is pending. Lint, Gradle check, APK output and runtime behavior remain unverified.
+
+
+## Build blocker correction (2026-10-10)
+
+- Fixed three invalid Maven artifact names in `gradle/libs.versions.toml`: coroutines dependencies now use `kotlinx-coroutines-core` and `kotlinx-coroutines-android`, and Glance uses `glance-appwidget`. The previous coordinates omitted the artifact-name prefixes, matching the dependency-resolution failures in recent Actions runs.
+- The Android emulator workflow is now manual-only. Pushes and pull requests no longer start emulator jobs; do not resume emulator tests until explicitly requested.
+- A new build workflow is expected from the dependency-coordinate commit. APK compilation and unit-test status remain pending until that run completes.
