@@ -39,6 +39,7 @@ fun PrestigeScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val locale = com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager.current
     val gameEngine = GameEngine()
     val requiredMoney = gameEngine.calculatePrestigeRequirement(state.prestigeCount)
     val prestigeReward = gameEngine.calculatePrestigeReward(state.money, state.prestigeCount)
