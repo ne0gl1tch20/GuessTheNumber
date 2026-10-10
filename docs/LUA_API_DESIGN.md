@@ -112,6 +112,20 @@ These names are proposals. Do not provide a general `eval` command for arbitrary
 
 The log viewer should merge central app logs and Lua diagnostics using timestamp, level, source, event/script IDs and correlation ID. Preserve severity filtering and log-storage preferences. Bound log volume and redact arbitrary payloads.
 
+## One-tap GO entry point
+
+The player-facing entry point should be a normal localized Compose screen/card, not a raw console command.
+
+Proposed host/UI contract (illustrative, not implemented):
+- `activity.get_featured()` returns a validated featured activity descriptor or an empty result.
+- `activity.get_status()` returns a small state enum such as `READY`, `RUNNING`, `PAUSED`, `OFFLINE_READY`, or `UNAVAILABLE`.
+- The Compose **GO** button calls a typed Kotlin coordinator action like `startOrResumeFeaturedActivity()`. The coordinator resolves the trusted script ID itself; UI input never supplies arbitrary script source.
+- Kotlin guards against duplicate taps, verifies the bundle/API/capabilities, creates at most one active instance, and returns a typed result for the UI.
+- Lua cannot draw or control the GO button directly. Lua supplies validated activity metadata and content; Compose owns the button, accessibility, loading/disabled state, and navigation.
+- Secondary controls may show details, select another approved bundled activity, or exit. Keep advanced inspection and script control in the debug-only console.
+
+Use an explicit result type such as `Started(instanceId)`, `Resumed(instanceId)`, `AlreadyRunning(instanceId)`, or `Rejected(reasonCode)`. Localize user-facing messages from reason codes. The UI must never report success before Kotlin confirms the result.
+
 ## API versioning
 
 Every bundle declares:
