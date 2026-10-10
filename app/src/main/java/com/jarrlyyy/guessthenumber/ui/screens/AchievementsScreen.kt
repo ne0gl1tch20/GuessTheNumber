@@ -168,7 +168,7 @@ fun AchievementsScreen(
                                 text = locale.getString(
                                     "achievement_tier_format",
                                     "Tier: %s",
-                                    locale.getString("achievement_tier_" + achievement.tier, achievement.tier)
+                                    locale.getString("achievement_tier_" + achievement.tier, achievement.tier.replaceFirstChar { it.uppercase() })
                                 ),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.primary
