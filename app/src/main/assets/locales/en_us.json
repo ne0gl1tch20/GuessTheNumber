@@ -947,5 +947,6 @@
   "color_picker_live_preview": "Live preview",
   "color_picker_hex": "Hex",
   "color_picker_apply": "Apply",
-  "color_picker_use_theme": "Use theme"
+  "color_picker_use_theme": "Use theme",
+  "color_picker_cancel": "Cancel"
 }

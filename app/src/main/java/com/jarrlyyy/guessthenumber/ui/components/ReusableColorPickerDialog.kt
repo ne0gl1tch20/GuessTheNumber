@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.unit.dp
-import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 
 @Composable
 fun ReusableColorPickerDialog(
@@ -53,10 +53,10 @@ fun ReusableColorPickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title ?: localizedText("🎨 Pick a color")) },
+        title = { Text(title ?: LocalAppLocaleManager.current.getString("color_picker_title", "🎨 Pick a color")) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(localizedText("Color"), style = MaterialTheme.typography.labelLarge)
+                Text(LocalAppLocaleManager.current.getString("color_picker_color", "Color"), style = MaterialTheme.typography.labelLarge)
 
                 Box(
                     modifier = Modifier
@@ -104,7 +104,7 @@ fun ReusableColorPickerDialog(
                     }
                 }
 
-                Text(localizedText("Hue: %d°").format(hue.toInt()))
+                Text(LocalAppLocaleManager.current.getString("color_picker_hue", "Hue: %d°").format(hue.toInt()))
                 Slider(
                     value = hue,
                     onValueChange = { hue = it },
@@ -122,7 +122,7 @@ fun ReusableColorPickerDialog(
                         tonalElevation = 4.dp
                     ) {}
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(localizedText("Live preview"), style = MaterialTheme.typography.labelLarge)
+                        Text(LocalAppLocaleManager.current.getString("color_picker_live_preview", "Live preview"), style = MaterialTheme.typography.labelLarge)
                         Text(hex, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
@@ -140,17 +140,17 @@ fun ReusableColorPickerDialog(
                             value = next[2]
                         }
                     },
-                    label = { Text(localizedText("Hex")) },
+                    label = { Text(LocalAppLocaleManager.current.getString("color_picker_hex", "Hex")) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         },
-        confirmButton = { Button(onClick = { onApply(hex) }) { Text(localizedText("Apply")) } },
+        confirmButton = { Button(onClick = { onApply(hex) }) { Text(LocalAppLocaleManager.current.getString("color_picker_apply", "Apply")) } },
         dismissButton = {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                if (onReset != null) TextButton(onClick = onReset) { Text(localizedText("Use theme")) }
-                TextButton(onClick = onDismiss) { Text(localizedText("Cancel")) }
+                if (onReset != null) TextButton(onClick = onReset) { Text(LocalAppLocaleManager.current.getString("color_picker_use_theme", "Use theme")) }
+                TextButton(onClick = onDismiss) { Text(LocalAppLocaleManager.current.getString("color_picker_cancel", "Cancel")) }
             }
         }
     )
