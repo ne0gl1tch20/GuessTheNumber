@@ -2,6 +2,35 @@
 
 **Status:** Future design only. Remote Lua loading is not implemented.
 
+## Dedicated LiveOps content repository
+
+Keep remote Lua content outside the Android app repository. The proposed repository name is `GuessTheNumber-LiveOps`; create it only when ready to set up the release pipeline.
+
+Recommended top-level layout:
+
+```text
+schemas/
+manifests/stable.json
+manifests/staging.json
+bundles/v1/events/
+bundles/v1/minigames/
+bundles/v1/ui/
+bundles/v1/locales/
+release-notes/
+```
+
+The Android repository remains the source for the Kotlin engine, Lua runtime, host API, bundled offline scripts, and trusted verification public key. The LiveOps repository contains content, schemas, and release metadata only; it must not be treated as an executable plugin that can access the app freely.
+
+### Client source-selection policy
+
+1. Verify the signed current manifest and compatibility before offering its featured activity.
+2. Prefer a valid online activity when available and eligible.
+3. If offline, use a previously verified cached bundle that remains compatible.
+4. Otherwise launch a bundled activity from `assets/scripts/`.
+5. If every source fails validation, show a recoverable unavailable state and keep the core game playable.
+
+Do not download from arbitrary user-provided URLs or execute directly from a branch head. Use immutable release versions, signature verification, bounded staging, atomic activation, rollback, and Kotlin-validated rewards.
+
 ## Publishing flow
 
 1. A developer authors an event definition and Lua scripts in the repository.
