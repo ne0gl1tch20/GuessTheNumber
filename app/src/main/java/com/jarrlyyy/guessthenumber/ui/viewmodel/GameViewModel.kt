@@ -33,6 +33,7 @@ import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.repository.LiveOpsRepository
+import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -1504,8 +1505,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun claimLiveOpsEventReward(eventId: String) {
         viewModelScope.launch {
             liveOpsClaimMutex.withLock {
-                val manifest = withContext(Dispatchers.IO) {
-                    LiveOpsRepository(getApplication<Application>()).loadLiveOpsEvents()
+                val context = getApplication<Application>()
+                val (featureFlags, manifest) = withContext(Dispatchers.IO) {
+                    FeatureFlagRepository(context).load() to LiveOpsRepository(context).loadLiveOpsEvents()
+                }
+                if (featureFlags["live_ops"] != true || featureFlags["seasonal_rewards"] != true) {
+                    GameLogger.log(LogLevel.WARN, LoggerCategory.UI, "LIVEOPS_DISABLED", "Blocked event claim because LiveOps feature flags are disabled.")
+                    return@withLock
                 }
                 val event = manifest.events.firstOrNull { it.id == eventId } ?: return@withLock
                 val now = Instant.now()
@@ -1517,12 +1523,19 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val state = _gameState.value
                 val claims = state.liveOpsClaims[eventId] ?: 0
                 if (claims >= event.maxClaims) return@withLock
+                val eligible = state.correctGuesses >= event.minCorrectGuesses &&
+                    state.prestigeCount >= event.minPrestigeCount &&
+                    state.ultraCount >= event.minUltraCount
+                if (!eligible) {
+                    GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "LIVEOPS_INELIGIBLE", "Blocked event claim because progression requirements are not met: $eventId")
+                    return@withLock
+                }
 
-                val rewardNebula = 10L
+                val rewardNebula = event.rewardNebula
                 _gameState.value = state.copy(
                     nebula = state.nebula + BigNumber(rewardNebula),
                     liveOpsClaims = state.liveOpsClaims + (eventId to (claims + 1)),
-                    permanentEventBoosts = (state.permanentEventBoosts + 1).coerceAtMost(25),
+                    permanentEventBoosts = (state.permanentEventBoosts + event.permanentBoostPerClaim).coerceAtMost(25),
                     statistics = state.statistics.copy(
                         nebulaEarned = state.statistics.nebulaEarned + rewardNebula
                     )
