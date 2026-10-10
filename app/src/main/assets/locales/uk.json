@@ -957,7 +957,7 @@
   "play_correct_celebration_desc": "Таємне число знайдено. Ваша серія продовжує зростати.",
   "color_picker_title": "Вибір кольору",
   "color_picker_color": "Колір",
-  "color_picker_hue": "Відтінок",
+  "color_picker_hue": "Відтінок: %d°",
   "color_picker_live_preview": "Попередній перегляд наживо",
   "color_picker_hex": "Шістнадцятковий код",
   "color_picker_apply": "Застосувати",

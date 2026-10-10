@@ -957,7 +957,7 @@
   "play_correct_celebration_desc": "Секретное число найдено. Ваша серия продолжается.",
   "color_picker_title": "Выбор цвета",
   "color_picker_color": "Цвет",
-  "color_picker_hue": "Оттенок",
+  "color_picker_hue": "Оттенок: %d°",
   "color_picker_live_preview": "Предварительный просмотр",
   "color_picker_hex": "Шестнадцатеричный код",
   "color_picker_apply": "Применить",

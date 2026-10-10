@@ -957,7 +957,7 @@
   "play_correct_celebration_desc": "गुप्त संख्या मिल गई। आपकी स्ट्रीक बढ़ती जा रही है।",
   "color_picker_title": "रंग चयनकर्ता",
   "color_picker_color": "रंग",
-  "color_picker_hue": "ह्यू",
+  "color_picker_hue": "रंग: %d°",
   "color_picker_live_preview": "लाइव पूर्वावलोकन",
   "color_picker_hex": "हेक्स",
   "color_picker_apply": "लागू करें",

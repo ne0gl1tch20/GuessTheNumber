@@ -957,7 +957,7 @@
   "play_correct_celebration_desc": "Angka rahasia ditemukan. Streak-mu terus bertambah.",
   "color_picker_title": "Pemilih Warna",
   "color_picker_color": "Warna",
-  "color_picker_hue": "Rona",
+  "color_picker_hue": "Corak warna: %d°",
   "color_picker_live_preview": "Pratinjau Langsung",
   "color_picker_hex": "Heksadesimal",
   "color_picker_apply": "Terapkan",

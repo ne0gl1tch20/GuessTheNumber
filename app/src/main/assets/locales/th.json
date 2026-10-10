@@ -957,7 +957,7 @@
   "play_correct_celebration_desc": "พบตัวเลขลับแล้ว สตรีคของคุณยังเพิ่มขึ้นต่อไป",
   "color_picker_title": "ตัวเลือกสี",
   "color_picker_color": "สี",
-  "color_picker_hue": "เฉดสี",
+  "color_picker_hue": "เฉดสี: %d°",
   "color_picker_live_preview": "ตัวอย่างแบบเรียลไทม์",
   "color_picker_hex": "รหัส Hex",
   "color_picker_apply": "นำไปใช้",

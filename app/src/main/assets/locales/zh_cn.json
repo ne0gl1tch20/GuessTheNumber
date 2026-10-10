@@ -825,7 +825,7 @@
   "liveops_bonus_effect": "每级金钱奖励 +2%，每 5 级每次猜对额外获得 +1 星云，最高 25 级。仅适用于当前存档槽。",
   "color_picker_title": "颜色选择器",
   "color_picker_color": "颜色",
-  "color_picker_hue": "色相",
+  "color_picker_hue": "色相：%d°",
   "color_picker_live_preview": "实时预览",
   "color_picker_hex": "十六进制",
   "color_picker_apply": "应用",

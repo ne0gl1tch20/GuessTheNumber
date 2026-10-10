@@ -825,7 +825,7 @@
   "liveops_bonus_effect": "+2% pera bawat level at +1 Nebula sa bawat tamang hula kada 5 level, hanggang level 25. Para ito sa save slot na ito.",
   "color_picker_title": "Tagapili ng Kulay",
   "color_picker_color": "Kulay",
-  "color_picker_hue": "Hue",
+  "color_picker_hue": "Hue: %d°",
   "color_picker_live_preview": "Live Preview",
   "color_picker_hex": "Hex",
   "color_picker_apply": "Ilapat",

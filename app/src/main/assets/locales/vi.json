@@ -957,7 +957,7 @@
   "play_correct_celebration_desc": "Đã tìm thấy số bí mật. Chuỗi của bạn tiếp tục tăng.",
   "color_picker_title": "Bộ chọn màu",
   "color_picker_color": "Màu",
-  "color_picker_hue": "Sắc độ",
+  "color_picker_hue": "Sắc độ: %d°",
   "color_picker_live_preview": "Xem trước trực tiếp",
   "color_picker_hex": "Mã hex",
   "color_picker_apply": "Áp dụng",

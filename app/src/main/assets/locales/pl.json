@@ -957,7 +957,7 @@
   "play_correct_celebration_desc": "Znaleziono tajną liczbę. Twoja seria wciąż rośnie.",
   "color_picker_title": "Wybór koloru",
   "color_picker_color": "Kolor",
-  "color_picker_hue": "Odcień",
+  "color_picker_hue": "Odcień: %d°",
   "color_picker_live_preview": "Podgląd na żywo",
   "color_picker_hex": "Kod szesnastkowy",
   "color_picker_apply": "Zastosuj",

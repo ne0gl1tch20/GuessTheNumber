@@ -957,7 +957,7 @@
   "play_correct_celebration_desc": "Vous avez trouvé le nombre secret. Votre série continue de grandir.",
   "color_picker_title": "Sélecteur de couleur",
   "color_picker_color": "Couleur",
-  "color_picker_hue": "Teinte",
+  "color_picker_hue": "Teinte : %d°",
   "color_picker_live_preview": "Aperçu en direct",
   "color_picker_hex": "Hexadécimal",
   "color_picker_apply": "Appliquer",

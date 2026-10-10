@@ -825,7 +825,7 @@
   "liveops_bonus_effect": "レベルごとにマネー獲得量が+2%。5レベルごとに正解時の星雲が+1（最大25レベル）。このセーブスロットに適用されます。",
   "color_picker_title": "カラーピッカー",
   "color_picker_color": "色",
-  "color_picker_hue": "色相",
+  "color_picker_hue": "色相：%d°",
   "color_picker_live_preview": "ライブプレビュー",
   "color_picker_hex": "16進数",
   "color_picker_apply": "適用",

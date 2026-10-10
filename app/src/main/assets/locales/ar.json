@@ -958,7 +958,7 @@
   "play_correct_celebration_desc": "تم العثور على الرقم السري. تستمر سلسلتك في الازدياد.",
   "color_picker_title": "منتقي الألوان",
   "color_picker_color": "اللون",
-  "color_picker_hue": "درجة اللون",
+  "color_picker_hue": "درجة اللون: %d°",
   "color_picker_live_preview": "معاينة مباشرة",
   "color_picker_hex": "قيمة ست عشرية",
   "color_picker_apply": "تطبيق",

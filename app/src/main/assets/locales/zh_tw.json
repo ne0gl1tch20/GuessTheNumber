@@ -957,7 +957,7 @@
   "play_correct_celebration_desc": "找到秘密數字了。你的連勝持續增加。",
   "color_picker_title": "色彩選擇器",
   "color_picker_color": "色彩",
-  "color_picker_hue": "色相",
+  "color_picker_hue": "色相：%d°",
   "color_picker_live_preview": "即時預覽",
   "color_picker_hex": "十六進位",
   "color_picker_apply": "套用",

@@ -957,7 +957,7 @@
   "play_correct_celebration_desc": "Encontraste el número secreto. Tu racha sigue creciendo.",
   "color_picker_title": "Selector de color",
   "color_picker_color": "Color",
-  "color_picker_hue": "Tono",
+  "color_picker_hue": "Tono: %d°",
   "color_picker_live_preview": "Vista previa en directo",
   "color_picker_hex": "Hexadecimal",
   "color_picker_apply": "Aplicar",

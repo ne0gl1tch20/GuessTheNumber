@@ -825,7 +825,7 @@
   "liveops_bonus_effect": "레벨당 머니 +2%, 5레벨마다 정답 시 성운 +1(최대 25레벨). 현재 저장 슬롯에 적용됩니다.",
   "color_picker_title": "색상 선택기",
   "color_picker_color": "색상",
-  "color_picker_hue": "색조",
+  "color_picker_hue": "색조: %d°",
   "color_picker_live_preview": "실시간 미리보기",
   "color_picker_hex": "16진수",
   "color_picker_apply": "적용",
