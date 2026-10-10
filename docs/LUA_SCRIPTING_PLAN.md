@@ -82,6 +82,38 @@ Expose a constrained UI description/action model that maps to existing Compose c
 ### M5 - Developer console integration
 Keep the existing console and command executor. Add a script namespace/command group and a shared diagnostic stream so the console can show Kotlin app logs and Lua logs with source, level, script ID, event ID, and correlation ID. Lua commands must call the same validated host API, not bypass it.
 
+### M5a - Dev Settings Lua Console
+Add a dedicated **Lua Console** section inside the existing debug-only Dev Settings screen, using the current console's input, output, clear/copy behavior, and central logger where practical. It must be hidden from release builds and obey the existing `dev_console` feature flag.
+
+Planned commands:
+- `/lua status` — runtime availability, API version, and active instance state.
+- `/lua list` — list validated bundled scripts and verified cached LiveOps scripts with source/version labels.
+- `/lua inspect <script-id>` — show manifest metadata and allowed capabilities.
+- `/lua run <script-id>` — start a registered script through the normal coordinator.
+- `/lua stop <instance-id>` — cancel an instance and run cleanup.
+- `/lua logs` — show bounded, redacted Lua diagnostics.
+- `/lua eval <expression>` — **debug-only future REPL**, disabled by default until the runtime sandbox, execution/time limits, memory limits, and cancellation behavior have been demonstrated. It must never be available in release builds or accept network-fetched source.
+
+Typed commands are preferred over arbitrary evaluation. When the REPL is enabled for local development, it must use the same restricted host API and isolated runtime as packaged scripts, run locally only, enforce hard resource budgets, and show an explicit warning that arbitrary input is developer code. It must not provide unrestricted Java/Kotlin access, filesystem/network access, save editing, or a way to bypass existing dev-command authorization. Do not evaluate input by passing it into the existing game command executor.
+
+Acceptance checks: Dev Settings exposes the Lua console only in debug builds with the feature flag enabled; valid commands return structured output; malformed/unknown commands fail without crashing; stopping a script cleans up temporary UI/state; and the release artifact contains no Lua REPL entry point.
+
+### M5b - Shared Lua API engine and adapters
+Create one reusable scripting module/layer (package/module name to be decided during implementation) that owns the runtime coordinator, script registry, host API versions, bundle repository, action validator, UI renderer adapter, and diagnostics adapter. Compose screens, the Dev Settings console, bundled scripts, and LiveOps scripts must call this shared layer rather than implementing separate Lua bridges.
+
+Design boundaries:
+- **Runtime adapter:** wraps the selected Lua library and owns sandbox/resource limits; runtime-specific types do not leak into screens or game-engine code.
+- **Host API registry:** registers versioned, typed functions once and enforces per-script capabilities.
+- **Script registry + bundle repository:** resolve stable IDs across app assets and verified cached LiveOps bundles; source type is metadata, not a different execution path.
+- **UI adapter:** turns validated declarative UI descriptions into existing reusable Compose components and routes stable action IDs to known Kotlin handlers.
+- **Game adapter:** exposes read-only snapshots and approved action requests; the Kotlin engine remains the authority for state changes and rewards.
+- **Console adapter:** sends typed commands through the same coordinator and displays structured results/logs; console-only inspection privileges are not granted to scripts.
+- **Lifecycle/diagnostics adapter:** coordinates cancellation, cleanup, correlation IDs, bounded logs, and crash recovery.
+
+Expose a small stable facade to app code, for example `LuaEngine` / `LuaEngineFacade`, with operations such as `status()`, `listScripts()`, `inspectScript(id)`, `start(id)`, `stop(instanceId)`, and `observeDiagnostics()`. These are design names only. Keep construction through dependency injection, provide fake implementations for tests, and ensure app startup/core gameplay do not depend on Lua initialization succeeding.
+
+Reusable means one implementation and one versioned contract shared by offline scripts, verified LiveOps scripts, the GO activity flow, and developer tooling. It does not mean scripts can call arbitrary app APIs. Do not add a second scripting runtime or separate per-screen bridges.
+
 ### M6 - Offline event lifecycle
 Support bundled scripts and event definitions with deterministic start, tick/update, pause/resume, completion, cancellation, and cleanup. Add lifecycle tests and verify that ending an event removes temporary state and UI.
 
@@ -189,6 +221,10 @@ The app must explain when it falls back to offline content, prevent duplicate ac
 
 ## Definition of done
 
+- Dev Settings contains a debug-only Lua console behind the existing developer feature flag.
+- Typed console commands and any optional local REPL use the shared Lua engine facade and restricted host API.
+- Bundled scripts, verified LiveOps scripts, the GO flow, and Dev Settings share one runtime coordinator and one versioned API registry.
+- UI, game, diagnostics, bundle lookup, and lifecycle adapters are reusable and independently testable.
 - Core Kotlin game works when Lua is disabled, unavailable, or a script fails.
 - No script can directly access files, network, Android APIs, or arbitrary host objects.
 - All state changes are typed, validated, tested Kotlin engine actions.
