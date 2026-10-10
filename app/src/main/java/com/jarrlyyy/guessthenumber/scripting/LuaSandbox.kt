@@ -97,23 +97,37 @@ internal class LuaSandbox(
             override fun call(): LuaValue {
                 instructions += HOOK_INTERVAL
                 if (instructions > MAX_INSTRUCTIONS) {
-                    throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
+                    throw LuaError("Lua script exceeded its instruction budget.")
                 }
                 return LuaValue.NIL
             }
         }
 
-        // Hook the current Lua thread instead of creating a separate coroutine.
-        // This works consistently with the mobile JME runtime and is less fragile
-        // than depending on coroutine scheduling behavior.
-        setHook.invoke(
-            LuaValue.varargsOf(
-                arrayOf(hook, LuaValue.valueOf(""), LuaValue.valueOf(HOOK_INTERVAL))
-            )
+        // LuaJ's debug.sethook resolves the currently running Lua thread. Calling
+        // it directly from Kotlin happens outside that thread and can fail. Install
+        // the hook from a tiny Lua wrapper, then hide debug before the script runs.
+        globals.set("__gtn_run", chunk)
+        globals.set("__gtn_hook", hook)
+        val guardedChunk = compilerGlobals.load(
+            """
+            local run = __gtn_run
+            local hook = __gtn_hook
+            local sethook = debug.sethook
+            sethook(hook, "", $HOOK_INTERVAL)
+            debug = nil
+            __gtn_run = nil
+            __gtn_hook = nil
+            local ok, result = pcall(run)
+            sethook(nil, "", 0)
+            if not ok then error(result) end
+            return result
+            """.trimIndent(),
+            "${scriptId}_guard",
+            globals
         )
 
         return try {
-            chunk.call()
+            guardedChunk.call()
         } catch (error: LuaBudgetExceededError) {
             throw error
         } catch (error: LuaError) {
@@ -124,14 +138,10 @@ internal class LuaSandbox(
             }
             throw error
         } finally {
-            // Clear the hook even when a script errors so later scripts aren't affected.
-            runCatching {
-                setHook.invoke(
-                    LuaValue.varargsOf(
-                        arrayOf(LuaValue.NIL, LuaValue.valueOf(""), LuaValue.valueOf(0))
-                    )
-                )
-            }
+            // The wrapper normally clears the hook; remove temporary host references
+            // even if compilation or execution fails unexpectedly.
+            globals.set("__gtn_run", LuaValue.NIL)
+            globals.set("__gtn_hook", LuaValue.NIL)
         }
     }
 
