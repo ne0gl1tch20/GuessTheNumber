@@ -154,7 +154,8 @@ class BackgroundMusicManager private constructor(context: Context) {
         val currentQueue = _queue.value
         if (index !in currentQueue.indices) return
         val removedCurrentItem = index == queueIndex
-        if (removedCurrentItem) skipRepeatOnceAfterQueueRemoval = true
+        val removedPlayingTrack = currentQueue.getOrNull(index) == _currentTrackId.value
+        if (removedPlayingTrack) skipRepeatOnceAfterQueueRemoval = true
         _queue.value = currentQueue.toMutableList().also { it.removeAt(index) }
         queueIndex = when {
             _queue.value.isEmpty() -> 0
@@ -163,9 +164,10 @@ class BackgroundMusicManager private constructor(context: Context) {
             else -> queueIndex
         }.coerceAtMost((_queue.value.size - 1).coerceAtLeast(0))
         persistQueue()
-        // If the currently selected queue entry was removed, let the playing track finish,
-        // then advance to the item that took its place instead of skipping over it.
-        if (removedCurrentItem && _queue.value.isEmpty()) {
+        // Keep a removed playing track running until completion, but do not let Repeat One
+        // restart it after it has been removed from the queue.
+        if (removedPlayingTrack && _queue.value.isEmpty()) {
+            skipRepeatOnceAfterQueueRemoval = false
             stop()
         }
     }
