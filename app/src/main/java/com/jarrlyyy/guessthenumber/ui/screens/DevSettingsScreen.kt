@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
+import com.jarrlyyy.guessthenumber.domain.command.CommandAutocomplete
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import kotlinx.serialization.encodeToString
@@ -64,39 +65,12 @@ fun DevSettingsScreen(
     val logs by GameLogger.logFlow.collectAsState(initial = emptyList())
     val jsonSerializer = remember { Json { ignoreUnknownKeys = true; prettyPrint = true } }
 
-    val allCommands = listOf(
-        "/help",
-        "/give money ",
-        "/give prestige ",
-        "/give ultra ",
-        "/give nebula ",
-        "/give all ",
-        "/set money ",
-        "/set prestige ",
-        "/set ultra ",
-        "/set nebula ",
-        "/reset progression",
-        "/reset prestige",
-        "/reset ultra",
-        "/reset all",
-        "/timeskip ",
-        "/max_upgrades",
-        "/unlock_all",
-        "/win",
-        "/speed ",
-        "/stats",
-        "/matrix",
-        "/konami",
-        "/moneyprinter",
-        "/easteregg",
-        "/crash_test"
-    )
-
-    val suggestions = if (commandInput.isNotBlank()) {
-        allCommands.filter { it.startsWith(commandInput, ignoreCase = true) && it != commandInput }
-    } else {
-        emptyList()
+    LaunchedEffect(state.settings.verboseLogging, state.settings.saveLogsToStorage) {
+        GameLogger.configureVerbose(state.settings.verboseLogging)
+        GameLogger.configureStorage(File(context.filesDir, "game_logs.txt"), state.settings.saveLogsToStorage)
     }
+
+    val suggestions = remember(commandInput) { CommandAutocomplete.suggest(commandInput) }
 
     val filteredLogs = logs.filter {
         logSearchQuery.isBlank() ||
@@ -153,6 +127,27 @@ fun DevSettingsScreen(
                             checked = state.settings.saveLogsToStorage,
                             onCheckedChange = { enabled ->
                                 onUpdateSettings(state.settings.copy(saveLogsToStorage = enabled))
+                            }
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(localizedText("Verbose diagnostic logging"), style = MaterialTheme.typography.titleMedium, fontSize = 16.sp)
+                            Text(
+                                localizedText("Adds detailed TRACE and DEBUG events. Debug builds only; uses more storage and Logcat output."),
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = state.settings.verboseLogging,
+                            onCheckedChange = { enabled ->
+                                onUpdateSettings(state.settings.copy(verboseLogging = enabled))
                             }
                         )
                     }
@@ -231,19 +226,32 @@ fun DevSettingsScreen(
                         }
                     }
 
-                    // Autocomplete Suggestions Row
+                    // Suggestions are sourced from the command registry, not a UI-owned list.
                     if (suggestions.isNotEmpty()) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            suggestions.forEach { suggestion ->
-                                AssistChip(
-                                    onClick = { commandInput = suggestion },
-                                    label = { Text(suggestion) }
-                                )
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                suggestions.forEach { suggestion ->
+                                    TextButton(
+                                        onClick = { commandInput = suggestion.insertText },
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Column(modifier = Modifier.fillMaxWidth()) {
+                                            Text(
+                                                suggestion.title,
+                                                style = MaterialTheme.typography.labelLarge,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                            Text(
+                                                suggestion.description,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
