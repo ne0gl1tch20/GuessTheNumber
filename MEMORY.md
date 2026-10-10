@@ -218,3 +218,13 @@ Verify the full progression loop end to end: World Map, world unlocks and portal
 6. For repository changes, include: “You can build it using GitHub Actions” with https://github.com/ne0gl1tch20/GuessTheNumber/actions/workflows/build-apks.yml.
 7. The roadmap is an ordered completion gate, not permission to stop after documenting it. Continue making integrated code changes toward Phase 6.
 
+
+
+## Versioned Content, Feature Flags, LiveOps and Validation (2026-10-10)
+- Bundled game JSON assets now carry `schemaVersion: 1` (worlds already had it; LiveOps has both `schemaVersion: 1` and independent `manifestVersion: 2`). Config loaders reject unsupported schema versions and fall back to safe defaults/empty lists, with `CONFIG_VALIDATION_FALLBACK` warning logs.
+- Added `data/repository/ContentValidation.kt` for unique/nonblank IDs and validation of upgrade costs/multipliers, shop prices, achievement tiers/rewards, challenge rewards, minigame multipliers, and talent parent references. `JsonConfigRepository` applies these checks before exposing content. Game config validates range, critical chance, caps and numeric reward/income strings.
+- Fixed feedback-message config compatibility: `guess_feedback_messages.json` stores counts (30 low, 30 high, 55 tips), so the loader now expands the configured counts into localized message-key lookups rather than rejecting the asset.
+- Added `feature_flags.json` and `FeatureFlagRepository`. Current flags: `live_ops`, `seasonal_rewards`, `world_map`, `challenge_builder`, `dev_console`. Flags filter the More menu and are enforced at NavGraph destinations; LiveOps claims also check the flags.
+- LiveOps event data now declares `rewardNebula`, `permanentBoostPerClaim`, `minCorrectGuesses`, `minPrestigeCount`, and `minUltraCount`. The repository validates schema/manifest versions, unique IDs, status, timestamps, reward values and eligibility thresholds. UI displays requirements and rewards; the ViewModel rechecks eligibility and uses configured values at claim time. Holiday Neon Rush requires 100 correct guesses.
+- Added tests: `ContentValidationTest`, `JsonConfigRepositoryTest`, `LiveOpsRepositoryTest`; existing `WorldConfigRepositoryTest` and `GameEngineTest` cover world progression and game rules.
+- **Verification:** repository source and bundled JSON were inspected, including IDs/schema versions/reward values. Android build and unit tests have not been executed. Automatic push builds remain disabled to conserve GitHub Actions minutes; do not launch a workflow unless the user asks.
