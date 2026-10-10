@@ -24,6 +24,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.input.pointer.consumePositionChange
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.navigation.Screen
+import androidx.compose.ui.platform.LocalContext
+import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
+import com.jarrlyyy.guessthenumber.BuildConfig
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,11 +38,24 @@ fun MoreScreen(
 ) {
     var colorTarget by remember { mutableStateOf<String?>(null) }
 
+    val context = LocalContext.current
+    val featureFlags = remember { FeatureFlagRepository(context).load() }
     val defaultOrder = com.jarrlyyy.guessthenumber.domain.model.DEFAULT_MORE_SCREEN_ORDER
     val normalizedOrder = remember(state.settings.moreScreenOrder) {
         (state.settings.moreScreenOrder + defaultOrder).distinct()
             .filter { it in defaultOrder }
             .let { it + defaultOrder.filterNot(it::contains) }
+    }
+    val visibleOrder = remember(normalizedOrder, featureFlags) {
+        normalizedOrder.filter { route ->
+            when (route) {
+                "world_map" -> featureFlags["world_map"] == true
+                "live_ops" -> featureFlags["live_ops"] == true && featureFlags["seasonal_rewards"] == true
+                "mutators" -> featureFlags["challenge_builder"] == true
+                "dev_settings" -> BuildConfig.DEBUG && featureFlags["dev_console"] == true
+                else -> true
+            }
+        }
     }
     var order by remember(normalizedOrder) { mutableStateOf(normalizedOrder) }
     var dragging by remember { mutableStateOf<String?>(null) }
@@ -153,7 +169,7 @@ fun MoreScreen(
                 }
             }
 
-            items(order, key = { it }) { route ->
+            items(visibleOrder, key = { it }) { route ->
                 val selected = dragging == route
                 val animatedScale by animateFloatAsState(
                     targetValue = if (selected) 1.025f else 1f,
