@@ -191,7 +191,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val totalOfflineEarnings = earningsPerSec * BigNumber(effectiveSeconds.toDouble())
                 
                 finalState = finalState.copy(
-                    money = finalState.money + totalOfflineEarnings
+                    money = finalState.money + totalOfflineEarnings,
+                    statistics = finalState.statistics.copy(
+                        moneyEarned = finalState.statistics.moneyEarned + totalOfflineEarnings
+                    )
                 )
                 withContext(Dispatchers.Main) {
                     _offlineGains.value = totalOfflineEarnings
