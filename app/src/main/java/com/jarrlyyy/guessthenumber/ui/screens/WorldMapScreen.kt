@@ -69,7 +69,7 @@ fun WorldMapScreen(
         "ember_summit" -> "crystal_golem" in state.defeatedBossIds && state.correctGuesses >= 100 && totalUpgrades >= 15 && state.prestigeCount >= 1
         else -> "ember_dragon" in state.defeatedBossIds && state.correctGuesses >= 250 && totalUpgrades >= 40 && state.prestigeCount >= 3 && state.ultraCount >= 1
     }
-    val canFight = when (world.id) {
+    val canFight = state.endlessRiftActive || when (world.id) {
         "verdant_grove" -> state.correctGuesses >= 10 && totalUpgrades >= 3
         "crystal_caverns" -> state.correctGuesses >= 50 && totalUpgrades >= 10
         "ember_summit" -> state.correctGuesses >= 150 && totalUpgrades >= 25 && state.prestigeCount >= 1
@@ -204,8 +204,10 @@ fun WorldMapScreen(
                             Text(locale.getString("world_unlock", "Unlock world"))
                         }
                     } else if (!defeated) {
-                        Text(locale.getString(bossRequirementKey, "Battle requirements"), style = MaterialTheme.typography.bodySmall)
-                        Text(locale.getString(bossRewardKey, "Victory reward"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
+                        if (!state.endlessRiftActive) {
+                            Text(locale.getString(bossRequirementKey, "Battle requirements"), style = MaterialTheme.typography.bodySmall)
+                            Text(locale.getString(bossRewardKey, "Victory reward"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
+                        }
                         if (state.endlessRiftActive) {
                             Text(locale.getString("rift_tier_label", "Endless Rift • Tier %d", state.endlessRiftTier), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.tertiary)
                         }
