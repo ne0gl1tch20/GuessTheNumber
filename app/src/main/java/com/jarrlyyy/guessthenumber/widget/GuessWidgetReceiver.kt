@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.widget
 import android.content.Context
 import android.content.Intent
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.toMutablePreferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
@@ -53,7 +54,7 @@ class GuessWidget : GlanceAppWidget() {
                     Text(locale.getString("widget_slot", "Save slot %d • %s", slot, state.profileName.ifBlank { state.difficultyId }), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                     Spacer(GlanceModifier.height(6.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), horizontalAlignment = Alignment.Horizontal.Start) {
-                        Column(modifier = GlanceModifier.defaultWeight()) {
+                        Column(modifier = GlanceModifier) {
                             Text(locale.getString("widget_money", "Money"), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                             Text(state.money.format(), style = TextStyle(fontWeight = FontWeight.Bold, color = GlanceTheme.colors.primary))
                         }
@@ -101,7 +102,7 @@ class CycleWidgetSaveSlotCallback : ActionCallback {
         val current = (widgetState[widgetSaveSlotKey] ?: activeSlot).coerceIn(1, MAX_SAVE_SLOTS)
         val nextSlot = nextOccupiedSaveSlot(context, current)
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { preferences ->
-            preferences[widgetSaveSlotKey] = nextSlot
+            preferences.toMutablePreferences().apply { this[widgetSaveSlotKey] = nextSlot }
         }
         GuessWidget().update(context, glanceId)
     }
