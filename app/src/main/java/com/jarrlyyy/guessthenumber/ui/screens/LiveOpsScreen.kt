@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import androidx.compose.foundation.layout.*
@@ -31,6 +32,7 @@ fun LiveOpsScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val locale = LocalAppLocaleManager.current
     val scope = rememberCoroutineScope()
     var events by remember { mutableStateOf<List<LiveOpsEvent>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -49,7 +51,7 @@ fun LiveOpsScreen(
                 title = { Text(localizedText("Seasonal Events")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = localizedText("Back"))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -83,15 +85,15 @@ fun LiveOpsScreen(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text(localizedText("Event Perks & Permanent Bonuses"), style = MaterialTheme.typography.titleMedium)
-                            Text(text = "${localizedText("Permanent Bonus Level")}: +${state.permanentEventBoosts}",
+                            Text(text = "${locale.getString("liveops_bonus_level_label", "Permanent Bonus Level")}: +${state.permanentEventBoosts}",
                                 fontSize = 16.sp,
                                 color = MoneyGold
                             )
-                            Text(text = localizedText("+2% money per level and +1 Nebula per correct guess every 5 levels, up to level 25. Applies to this save slot."),
+                            Text(text = locale.getString("liveops_bonus_effect", "+2% money per level and +1 Nebula per correct guess every 5 levels, up to level 25. Applies to this save slot."),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Text(text = localizedText("Participate in limited-time live ops events to claim rewards and permanently enhance your progression."),
+                            Text(text = locale.getString("participate_live_ops_desc", "Participate in limited-time live ops events to claim rewards and permanently enhance your progression."),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -146,15 +148,15 @@ fun LiveOpsScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
-                                    Text(localizedText("Currency: ${event.currencyName}"), fontSize = 12.sp, style = MaterialTheme.typography.labelMedium)
-                                    Text(localizedText("Claims: $claims / ${event.maxClaims}"), fontSize = 12.sp, color = MoneyGold)
+                                    Text(locale.getString("currency_label", "Currency: %s", event.currencyName), fontSize = 12.sp, style = MaterialTheme.typography.labelMedium)
+                                    Text(locale.getString("claims_label", "Claims: %d / %d", claims, event.maxClaims), fontSize = 12.sp, color = MoneyGold)
                                 }
                                 Button(
                                     onClick = { onClaimReward(event.id) },
                                     enabled = canClaim,
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                                 ) {
-                                    Text(if (claims >= event.maxClaims) "Max Claimed" else "Claim Reward (+10 Nebula)")
+                                    Text(if (claims >= event.maxClaims) locale.getString("max_claimed", "Max Claimed") else locale.getString("claim_reward_nebula", "Claim Reward (+10 Nebula)"))
                                 }
                             }
                         }
