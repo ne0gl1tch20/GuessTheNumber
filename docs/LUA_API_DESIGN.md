@@ -98,17 +98,41 @@ Map the API to a small catalog of existing reusable app components, for example:
 
 All user-facing text should use locale keys. No script should inject arbitrary HTML, Compose code, or a new navigation route. Unsupported components should fail validation before the UI is rendered.
 
-## Console and diagnostics
+## Dev Settings Lua Console and diagnostics
 
-Keep the existing developer console as the command entry point. Add a distinct `/lua` command family only in debug builds, for example:
+Add a dedicated **Lua Console** section to the existing debug-only Dev Settings screen. Reuse its current console interaction patterns where possible, including command input, output history, clear/copy controls, and central logging. Gate it behind both `BuildConfig.DEBUG` and the existing `dev_console` feature flag; it must not appear in release builds.
+
+Proposed typed commands:
 - `/lua status`
 - `/lua list`
 - `/lua inspect <script-id>`
-- `/lua run <bundled-script-id>`
+- `/lua run <script-id>`
 - `/lua stop <instance-id>`
 - `/lua logs`
+- `/lua help`
 
-These names are proposals. Do not provide a general `eval` command for arbitrary typed Lua in release builds. A debug REPL, if ever added, must be debug-only, local-only, resource-limited, and clearly separated from production script execution.
+Unknown commands and invalid arguments return a localized or structured error, never crash the app. `/lua run` accepts only a registered stable script ID and uses the common coordinator; it must not accept a raw URL or source file path.
+
+An optional `/lua eval <expression>` REPL is a later, debug-only opt-in, disabled by default. It may be enabled only after the selected runtime can enforce instruction/time, memory, recursion, output, and cancellation limits. It must run locally in the same restricted sandbox as normal scripts and must never be included in release builds. Do not route Lua input through the existing Kotlin game-command parser, and do not expose unrestricted Java/Kotlin access, filesystem/network APIs, raw save data, or hidden bypasses for game commands.
+
+### Shared engine facade
+
+All callers use one app-level facade, with illustrative operations such as:
+
+```kotlin
+interface LuaEngineFacade {
+    fun status(): LuaEngineStatus
+    fun listScripts(): List<LuaScriptDescriptor>
+    fun inspectScript(scriptId: String): LuaScriptInspection?
+    suspend fun start(scriptId: String): LuaStartResult
+    suspend fun stop(instanceId: String): LuaStopResult
+    fun observeDiagnostics(): Flow<LuaDiagnostic>
+}
+```
+
+This is a design sketch, not committed implementation code. Exact signatures and coroutine types depend on the runtime spike. Compose screens, the GO flow, Dev Settings, bundled content, and verified LiveOps content all share the same registry, runtime coordinator, host API registry, action validator, UI adapter, and lifecycle manager. Avoid screen-specific bridges or duplicate runtimes.
+
+The facade delegates to adapters for runtime execution, trusted bundle resolution, typed host calls, declarative UI rendering, game-engine action validation, lifecycle cleanup, and structured diagnostics. Keep runtime-specific objects out of UI and game-domain APIs; inject the facade so unit tests can use a fake engine. Lua initialization failure must not prevent normal app startup or core gameplay.
 
 The log viewer should merge central app logs and Lua diagnostics using timestamp, level, source, event/script IDs and correlation ID. Preserve severity filtering and log-storage preferences. Bound log volume and redact arbitrary payloads.
 
