@@ -77,6 +77,17 @@ def main() -> int:
                     errors.append("game/worlds.json: every world must be an object with a unique id")
                 if len(set(boss_ids)) != len(boss_ids):
                     errors.append("game/worlds.json: bossId values must be unique")
+                secret_ids = [item.get("secretId") for item in worlds if isinstance(item, dict)]
+                if len(set(secret_ids)) != len(secret_ids):
+                    errors.append("game/worlds.json: secretId values must be unique")
+                known_boss_ids = set(boss_ids)
+                for index, world in enumerate(worlds):
+                    if isinstance(world, dict):
+                        required_boss = world.get("unlockBossId")
+                        if required_boss is not None and required_boss not in known_boss_ids:
+                            errors.append(
+                                f"game/worlds.json: worlds[{index}] unlockBossId must reference a known boss"
+                            )
                 for index, world in enumerate(worlds):
                     prefix = f"game/worlds.json: worlds[{index}]"
                     if not isinstance(world, dict):
