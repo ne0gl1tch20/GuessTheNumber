@@ -1,22 +1,22 @@
 package com.jarrlyyy.guessthenumber.scripting
 
 import org.luaj.vm2.Globals
-import org.luaj.vm2.LuaThread
+import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.Bit32Lib
 import org.luaj.vm2.lib.DebugLib
+import org.luaj.vm2.lib.MathLib
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TableLib
 import org.luaj.vm2.lib.VarArgFunction
 import org.luaj.vm2.lib.BaseLib
-import org.luaj.vm2.lib.MathLib
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.LoadState
 
 /**
- * Per-script Lua environment. No Android context, Java bridge, filesystem, network,
- * package loader, OS library, or coroutine library is exposed to Lua.
+ * Per-script Lua environment. Only the small, explicit host API is exposed.
+ * Keep this sandbox isolated from Android, Java interop, files, and networking.
  */
 internal class LuaSandbox(
     private val onLog: (String) -> Unit
@@ -37,14 +37,12 @@ internal class LuaSandbox(
     }
 
     fun validate(scriptId: String, source: String) {
-        require(source.isNotBlank()) { "Script is empty." }
-        require(source.length <= MAX_SOURCE_CHARS) { "Script exceeds the $MAX_SOURCE_CHARS character limit." }
+        checkSource(source)
         compilerGlobals.load(source, scriptId, Globals())
     }
 
     fun execute(scriptId: String, source: String): LuaValue {
-        require(source.isNotBlank()) { "Script is empty." }
-        require(source.length <= MAX_SOURCE_CHARS) { "Script exceeds the $MAX_SOURCE_CHARS character limit." }
+        checkSource(source)
 
         var logLines = 0
         val globals = Globals().apply {
@@ -53,9 +51,11 @@ internal class LuaSandbox(
             load(MathLib())
             load(Bit32Lib())
             load(DebugLib())
+            LoadState.install(this)
+            LuaC.install(this)
         }
 
-        // Capture the hook setter internally, then remove the entire debug surface.
+        // Capture the hook setter before removing the entire debug surface.
         val setHook = globals.get("debug").get("sethook")
         globals.set("debug", LuaValue.NIL)
 
@@ -64,8 +64,7 @@ internal class LuaSandbox(
             "getmetatable", "setmetatable", "rawset", "rawget"
         ).forEach { globals.set(it, LuaValue.NIL) }
 
-        // Large single-call allocations are unnecessary for bundled minigame content.
-        globals.get("table").set("concat", LuaValue.NIL)
+        // Bound output and avoid exposing an unbounded print sink.
         globals.set("print", object : VarArgFunction() {
             override fun invoke(args: Varargs): Varargs {
                 if (logLines < MAX_LOG_LINES) {
@@ -91,7 +90,6 @@ internal class LuaSandbox(
         globals.set("gtn", api)
 
         val chunk = compilerGlobals.load(source, scriptId, globals)
-        val thread = LuaThread(globals, chunk)
         var instructions = 0
         val hook = object : org.luaj.vm2.lib.ZeroArgFunction() {
             override fun call(): LuaValue {
@@ -102,21 +100,45 @@ internal class LuaSandbox(
                 return LuaValue.NIL
             }
         }
+
+        // Hook the current Lua thread instead of creating a separate coroutine.
+        // This works consistently with the mobile JME runtime and is less fragile
+        // than depending on coroutine scheduling behavior.
         setHook.invoke(
             LuaValue.varargsOf(
-                arrayOf(thread, hook, LuaValue.valueOf(""), LuaValue.valueOf(HOOK_INTERVAL))
+                arrayOf(hook, LuaValue.valueOf(""), LuaValue.valueOf(HOOK_INTERVAL))
             )
         )
 
-        val resumed = thread.resume(LuaValue.NIL)
-        if (!resumed.arg1().toboolean()) {
-            val message = resumed.arg(2).tojstring()
-            if (message.contains("instruction budget", ignoreCase = true)) {
-                throw LuaBudgetExceededError(message)
+        return try {
+            chunk.call()
+        } catch (error: LuaBudgetExceededError) {
+            throw error
+        } catch (error: LuaError) {
+            if (error.message.orEmpty().contains("instruction budget", ignoreCase = true) ||
+                error.cause is LuaBudgetExceededError
+            ) {
+                throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
             }
-            throw IllegalStateException(message.take(500))
+            throw error
+        } finally {
+            // Clear the hook even when a script errors so later scripts aren't affected.
+            runCatching {
+                setHook.invoke(
+                    LuaValue.varargsOf(
+                        arrayOf(LuaValue.NIL, LuaValue.valueOf(""), LuaValue.valueOf(0))
+                    )
+                )
+            }
         }
-        return resumed.arg(2)
+    }
+
+    private fun checkSource(source: String) {
+        // Check size first so whitespace-only oversized inputs still hit the size limit.
+        require(source.length <= MAX_SOURCE_CHARS) {
+            "Script exceeds the $MAX_SOURCE_CHARS character limit."
+        }
+        require(source.isNotBlank()) { "Script is empty." }
     }
 }
 
