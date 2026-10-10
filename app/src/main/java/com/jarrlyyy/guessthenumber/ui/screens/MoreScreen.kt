@@ -51,7 +51,7 @@ fun MoreScreen(
         order.filter { route ->
             when (route) {
                 "world_map" -> featureFlags["world_map"] == true
-                "lua_hub" -> featureFlags["lua_scripting"] == true
+                "lua_hub" -> BuildConfig.DEBUG && featureFlags["lua_scripting"] == true
                 "live_ops" -> featureFlags["live_ops"] == true && featureFlags["seasonal_rewards"] == true
                 "mutators" -> featureFlags["challenge_builder"] == true
                 "dev_settings" -> BuildConfig.DEBUG && featureFlags["dev_console"] == true
