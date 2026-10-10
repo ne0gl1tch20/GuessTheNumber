@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
-import com.jarrlyyy.guessthenumber.data.repository.WorldDefinition
 import androidx.compose.ui.platform.LocalContext
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 
