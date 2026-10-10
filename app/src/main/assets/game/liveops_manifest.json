@@ -4,21 +4,21 @@
     {
       "id": "season_1_cyber_guess",
       "title": "Season 1: Cybernetic Guessing",
-      "description": "Unlock exclusive cybernetic upgrades, double multiplier events, and seasonal currency! Claims permanently boost your multiplier and currency gains.",
+      "description": "Claim up to 10 rewards of 10 Nebula each. Every claim also raises this save slot's permanent money and Nebula bonus level, up to level 25.",
       "status": "ACTIVE",
       "startDate": "2024-01-01T00:00:00Z",
       "endDate": "2026-12-31T23:59:59Z",
-      "currencyName": "CyberTokens",
+      "currencyName": "Nebula",
       "maxClaims": 10
     },
     {
       "id": "holiday_neon_rush",
       "title": "Neon Holiday Rush",
-      "description": "High-speed guessing event with 3x reward multipliers and special holiday challenges. Claims permanently boost your multiplier and currency gains.",
+      "description": "Claim up to 5 rewards of 10 Nebula each. Every claim also raises this save slot's permanent money and Nebula bonus level, up to level 25.",
       "status": "UPCOMING",
       "startDate": "2026-11-01T00:00:00Z",
       "endDate": "2026-12-31T23:59:59Z",
-      "currencyName": "NeonCrystals",
+      "currencyName": "Nebula",
       "maxClaims": 5
     }
   ]
