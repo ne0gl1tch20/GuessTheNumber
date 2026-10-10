@@ -1,7 +1,6 @@
 package com.jarrlyyy.guessthenumber.data.repository
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -30,18 +29,15 @@ class WorldConfigRepositoryTest {
     @Test
     fun progressionRequirementsAreLoadedFromContent() {
         val worlds = loadWorlds()
-        val crystal = worlds.firstOrNull { it.id == "crystal_caverns" }
-        val ember = worlds.firstOrNull { it.id == "ember_summit" }
-        val nebula = worlds.firstOrNull { it.id == "nebula_rift" }
+        val crystal = worlds.first { it.id == "crystal_caverns" }
+        val ember = worlds.first { it.id == "ember_summit" }
+        val nebula = worlds.first { it.id == "nebula_rift" }
 
-        assertNotNull(crystal)
-        assertNotNull(ember)
-        assertNotNull(nebula)
-        assertEquals("verdant_guardian", crystal!!.unlockBossId)
+        assertEquals("verdant_guardian", crystal.unlockBossId)
         assertEquals(25L, crystal.unlockCorrectGuesses)
         assertEquals(5, crystal.unlockUpgradeCount)
-        assertEquals(1, ember!!.unlockPrestigeCount)
-        assertEquals(1, nebula!!.unlockUltraCount)
+        assertEquals(1, ember.unlockPrestigeCount)
+        assertEquals(1, nebula.unlockUltraCount)
         assertEquals(500L, nebula.fightCorrectGuesses)
         assertEquals(75, nebula.fightUpgradeCount)
     }
