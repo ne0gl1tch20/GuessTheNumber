@@ -28,7 +28,9 @@ data class WorldDefinition(
     val fightUltraCount: Int = 0,
     val worldRequirementKey: String,
     val bossRequirementKey: String,
-    val bossRewardKey: String
+    val bossRewardKey: String,
+    val baseMoneyReward: String = "0",
+    val baseNebulaReward: Long = 0
 )
 
 @Serializable
@@ -82,16 +84,19 @@ class WorldConfigRepository(private val context: Context) {
                 world.fightUltraCount >= 0 &&
                 world.worldRequirementKey.isNotBlank() &&
                 world.bossRequirementKey.isNotBlank() &&
-                world.bossRewardKey.isNotBlank()
+                world.bossRewardKey.isNotBlank() &&
+                world.baseMoneyReward.toBigDecimalOrNull()?.signum() != null &&
+                world.baseMoneyReward.toBigDecimalOrNull()!!.signum() >= 0 &&
+                world.baseNebulaReward >= 0
         }
     }
 
     private companion object {
         val defaultWorlds = listOf(
-            WorldDefinition("verdant_grove", "world_verdant_name", "Verdant Grove", 0.16f, 0.24f, "verdant_guardian", "boss_verdant_name", "Verdant Guardian", 3, "whispering_hollow", 50, null, 0, 0, 0, 0, 10, 3, 0, 0, "world_verdant_requirement", "boss_verdant_requirement", "boss_verdant_reward"),
-            WorldDefinition("crystal_caverns", "world_crystal_name", "Crystal Caverns", 0.43f, 0.43f, "crystal_golem", "boss_crystal_name", "Crystal Golem", 5, "shard_archive", 150, "verdant_guardian", 25, 5, 0, 0, 50, 10, 0, 0, "world_crystal_requirement", "boss_crystal_requirement", "boss_crystal_reward"),
-            WorldDefinition("ember_summit", "world_ember_name", "Ember Summit", 0.67f, 0.24f, "ember_dragon", "boss_ember_name", "Ember Dragon", 7, "ashen_vault", 300, "crystal_golem", 100, 15, 1, 0, 150, 25, 1, 0, "world_ember_requirement", "boss_ember_requirement", "boss_ember_reward"),
-            WorldDefinition("nebula_rift", "world_nebula_name", "Nebula Rift", 0.82f, 0.59f, "nebula_titan", "boss_nebula_name", "Nebula Titan", 10, "lost_observatory", 600, "ember_dragon", 250, 40, 3, 1, 500, 75, 5, 1, "world_nebula_requirement", "boss_nebula_requirement", "boss_nebula_reward")
+            WorldDefinition("verdant_grove", "world_verdant_name", "Verdant Grove", 0.16f, 0.24f, "verdant_guardian", "boss_verdant_name", "Verdant Guardian", 3, "whispering_hollow", 50, null, 0, 0, 0, 0, 10, 3, 0, 0, "world_verdant_requirement", "boss_verdant_requirement", "boss_verdant_reward", "25000", 10),
+            WorldDefinition("crystal_caverns", "world_crystal_name", "Crystal Caverns", 0.43f, 0.43f, "crystal_golem", "boss_crystal_name", "Crystal Golem", 5, "shard_archive", 150, "verdant_guardian", 25, 5, 0, 0, 50, 10, 0, 0, "world_crystal_requirement", "boss_crystal_requirement", "boss_crystal_reward", "100000", 25),
+            WorldDefinition("ember_summit", "world_ember_name", "Ember Summit", 0.67f, 0.24f, "ember_dragon", "boss_ember_name", "Ember Dragon", 7, "ashen_vault", 300, "crystal_golem", 100, 15, 1, 0, 150, 25, 1, 0, "world_ember_requirement", "boss_ember_requirement", "boss_ember_reward", "500000", 75),
+            WorldDefinition("nebula_rift", "world_nebula_name", "Nebula Rift", 0.82f, 0.59f, "nebula_titan", "boss_nebula_name", "Nebula Titan", 10, "lost_observatory", 600, "ember_dragon", 250, 40, 3, 1, 500, 75, 5, 1, "world_nebula_requirement", "boss_nebula_requirement", "boss_nebula_reward", "5000000", 250)
         )
     }
 }
