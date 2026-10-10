@@ -41,6 +41,17 @@ class LuaSandboxTest {
     }
 
     @Test
+    fun instructionBudgetCannotBeBypassedWithPcall() {
+        val error = org.junit.Assert.assertThrows(LuaBudgetExceededError::class.java) {
+            LuaSandbox {}.execute(
+                "protected_loop",
+                "pcall(function() while true do local x = 1 + 1 end end)"
+            )
+        }
+        assertTrue(error.message!!.contains("instruction budget"))
+    }
+
+    @Test
     fun doesNotAllowDynamicCodeLoadingOrMetatableMutation() {
         val result = LuaSandbox {}.execute(
             "restricted",
