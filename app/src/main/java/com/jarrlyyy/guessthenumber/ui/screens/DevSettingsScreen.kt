@@ -404,8 +404,8 @@ fun DevSettingsScreen(
                                 onClick = {
                                     val exported = GameLogger.exportLogs()
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    clipboard.setPrimaryClip(ClipData.newPlainText(locale.getString("Game Logs", "Game Logs"), exported))
-                                    Toast.makeText(context, locale.getString("Logs copied to clipboard", "Logs copied to clipboard"), Toast.LENGTH_SHORT).show()
+                                    clipboard.setPrimaryClip(ClipData.newPlainText(locale.getString("dev_game_logs_title", "Game Logs"), exported))
+                                    Toast.makeText(context, locale.getString("dev_logs_copied_to_clipboard", "Logs copied to clipboard"), Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.size(36.dp)
                             ) {
