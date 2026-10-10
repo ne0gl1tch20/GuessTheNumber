@@ -24,7 +24,9 @@
       "fightUltraCount": 0,
       "worldRequirementKey": "world_verdant_requirement",
       "bossRequirementKey": "boss_verdant_requirement",
-      "bossRewardKey": "boss_verdant_reward"
+      "bossRewardKey": "boss_verdant_reward",
+      "baseMoneyReward": "25000",
+      "baseNebulaReward": 10
     },
     {
       "id": "crystal_caverns",
@@ -49,7 +51,9 @@
       "fightUltraCount": 0,
       "worldRequirementKey": "world_crystal_requirement",
       "bossRequirementKey": "boss_crystal_requirement",
-      "bossRewardKey": "boss_crystal_reward"
+      "bossRewardKey": "boss_crystal_reward",
+      "baseMoneyReward": "100000",
+      "baseNebulaReward": 25
     },
     {
       "id": "ember_summit",
@@ -74,7 +78,9 @@
       "fightUltraCount": 0,
       "worldRequirementKey": "world_ember_requirement",
       "bossRequirementKey": "boss_ember_requirement",
-      "bossRewardKey": "boss_ember_reward"
+      "bossRewardKey": "boss_ember_reward",
+      "baseMoneyReward": "500000",
+      "baseNebulaReward": 75
     },
     {
       "id": "nebula_rift",
@@ -99,7 +105,9 @@
       "fightUltraCount": 1,
       "worldRequirementKey": "world_nebula_requirement",
       "bossRequirementKey": "boss_nebula_requirement",
-      "bossRewardKey": "boss_nebula_reward"
+      "bossRewardKey": "boss_nebula_reward",
+      "baseMoneyReward": "5000000",
+      "baseNebulaReward": 250
     }
   ]
 }
