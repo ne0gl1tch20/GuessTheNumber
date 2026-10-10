@@ -822,5 +822,13 @@
   "daily_quest_claimed": "已领取",
   "daily_quest_in_progress": "进行中",
   "liveops_bonus_level_label": "永久加成等级",
-  "liveops_bonus_effect": "每级金钱奖励 +2%，每 5 级每次猜对额外获得 +1 星云，最高 25 级。仅适用于当前存档槽。"
+  "liveops_bonus_effect": "每级金钱奖励 +2%，每 5 级每次猜对额外获得 +1 星云，最高 25 级。仅适用于当前存档槽。",
+  "color_picker_title": "🎨 选择颜色",
+  "color_picker_color": "颜色",
+  "color_picker_hue": "色相：%d°",
+  "color_picker_live_preview": "实时预览",
+  "color_picker_hex": "十六进制",
+  "color_picker_apply": "应用",
+  "color_picker_use_theme": "使用主题",
+  "color_picker_cancel": "取消"
 }

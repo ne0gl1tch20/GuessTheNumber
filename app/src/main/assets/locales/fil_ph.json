@@ -822,5 +822,13 @@
   "music_control_next": "Susunod",
   "music_control_stop": "Ihinto",
   "liveops_bonus_level_label": "Permanenteng Bonus Level",
-  "liveops_bonus_effect": "+2% pera bawat level at +1 Nebula sa bawat tamang hula kada 5 level, hanggang level 25. Para ito sa save slot na ito."
+  "liveops_bonus_effect": "+2% pera bawat level at +1 Nebula sa bawat tamang hula kada 5 level, hanggang level 25. Para ito sa save slot na ito.",
+  "color_picker_title": "🎨 Pumili ng kulay",
+  "color_picker_color": "Kulay",
+  "color_picker_hue": "Kulay: %d°",
+  "color_picker_live_preview": "Live na preview",
+  "color_picker_hex": "Hex",
+  "color_picker_apply": "Ilapat",
+  "color_picker_use_theme": "Gamitin ang tema",
+  "color_picker_cancel": "Kanselahin"
 }

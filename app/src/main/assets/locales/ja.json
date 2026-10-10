@@ -822,5 +822,13 @@
   "daily_quest_claimed": "受取済み",
   "daily_quest_in_progress": "進行中",
   "liveops_bonus_level_label": "恒久ボーナスレベル",
-  "liveops_bonus_effect": "レベルごとにマネー獲得量が+2%。5レベルごとに正解時の星雲が+1（最大25レベル）。このセーブスロットに適用されます。"
+  "liveops_bonus_effect": "レベルごとにマネー獲得量が+2%。5レベルごとに正解時の星雲が+1（最大25レベル）。このセーブスロットに適用されます。",
+  "color_picker_title": "🎨 色を選択",
+  "color_picker_color": "色",
+  "color_picker_hue": "色相: %d°",
+  "color_picker_live_preview": "ライブプレビュー",
+  "color_picker_hex": "16進数",
+  "color_picker_apply": "適用",
+  "color_picker_use_theme": "テーマを使用",
+  "color_picker_cancel": "キャンセル"
 }
