@@ -160,7 +160,7 @@ class MusicPlaybackService : Service() {
             .addAction(NotificationCompat.Action(if (manager.isPlaying.value) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play, label(if (manager.isPlaying.value) "music_control_pause" else "music_control_play", if (manager.isPlaying.value) "Pause" else "Play"), playPause))
             .addAction(NotificationCompat.Action(android.R.drawable.ic_media_next, label("music_control_next", "Next"), next))
             .addAction(NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, label("music_control_stop", "Stop"), stop))
-            .setStyle(NotificationCompat.MediaStyle().setMediaSession(mediaSession.sessionToken).setShowActionsInCompactView(0, 1, 2))
+            .setStyle(MediaStyle().setMediaSession(mediaSession.sessionToken).setShowActionsInCompactView(0, 1, 2))
             .build()
     }
 
