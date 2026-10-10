@@ -988,7 +988,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             else -> 0.0
         }
         val masteryRate = ((state.worldMasteryLevels[state.activeWorldId] ?: 0).coerceIn(0, 10) * 0.02)
-        val sanctuaryRate = (state.homeBaseLevel * 0.01).coerceAtMost(0.20)
+        // Keep Home Base and permanent event bonuses consistent across guess and boss/Rift rewards.
+        val sanctuaryRate = (state.homeBaseLevel.coerceAtLeast(0) * 0.02).coerceAtMost(0.40)
+        val eventRate = (state.permanentEventBoosts.coerceIn(0, 25) * 0.02)
         val secretId = mapOf(
             "verdant_grove" to "whispering_hollow",
             "crystal_caverns" to "shard_archive",
@@ -996,7 +998,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             "nebula_rift" to "lost_observatory"
         )[state.activeWorldId]
         val secretRate = if (secretId != null && secretId in state.discoveredSecretIds) 0.05 else 0.0
-        val bonusMoney = baseMoney * BigNumber(setRate + masteryRate + sanctuaryRate + secretRate)
+        val bonusMoney = baseMoney * BigNumber(setRate + masteryRate + sanctuaryRate + secretRate + eventRate)
         val bonusNebula = (if (relicCount == 4) 10L else 0L) +
             (if ((state.worldMasteryLevels[state.activeWorldId] ?: 0) >= 5) 5L else 0L) +
             (if (secretId != null && secretId in state.discoveredSecretIds) 5L else 0L)
