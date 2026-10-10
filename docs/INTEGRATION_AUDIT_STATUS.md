@@ -50,6 +50,13 @@
 - Aligned endgame goal display checks for bosses, secrets and relics with the stricter reward-claim checks, avoiding goals that appear complete but cannot be claimed.
 - Correct-guess Nebula bonuses from relics, secret discoveries and talents are now evaluated even if that guess produced no positive money payout.
 
+## Stability and save-integrity fixes (2026-10-10)
+
+- Backup recovery now writes a validated backup back to the primary save key, so a recoverable corrupted/missing primary save does not repeatedly fall back on every launch. The validated backup is retained until a later successful save replaces it.
+- Single-save imports now return the actual `saveGame` result. A storage write failure is no longer reported to the caller as a successful import.
+- Fresh-slot creation now checks slot occupancy and writes the new save inside one DataStore edit transaction, preventing concurrent create requests from overwriting a slot that another request just populated.
+- These changes were reviewed against the existing `SaveManager` implementation and preserve the current JSON/save schema. No build or GitHub Actions workflow was run, as requested.
+
 ## Still requires the remaining integration pass
 
 - All 23 locale catalogs now have matching key coverage and no audited string-format placeholder mismatches. A separate manual review of older hardcoded/dynamically assembled UI text is still needed.
