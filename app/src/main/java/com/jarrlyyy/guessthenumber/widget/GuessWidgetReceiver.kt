@@ -84,9 +84,11 @@ class CycleWidgetSaveSlotCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val saveManager = SaveManager(context)
         val activeSlot = saveManager.getActiveSlot()
+        val widgetState = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
+        val current = (widgetState[widgetSaveSlotKey] ?: activeSlot).coerceIn(1, MAX_SAVE_SLOTS)
+        val nextSlot = nextOccupiedSaveSlot(context, current)
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { preferences ->
-            val current = (preferences[widgetSaveSlotKey] ?: activeSlot).coerceIn(1, MAX_SAVE_SLOTS)
-            preferences[widgetSaveSlotKey] = if (current >= MAX_SAVE_SLOTS) 1 else current + 1
+            preferences[widgetSaveSlotKey] = nextSlot
         }
         GuessWidget().update(context, glanceId)
     }
