@@ -80,7 +80,7 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                             Icon(imageVector = Icons.Default.Analytics, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         }
                         Text(
-                            text = String.format("%.1f%%", accuracy),
+                            text = locale.formatPercent(accuracy.toDouble() / 100.0),
                             style = MaterialTheme.typography.displayMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -97,9 +97,9 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(localizedText("Correct: $correctGuesses"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                            Text(localizedText("Failed: $failedGuesses"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                            Text(localizedText("Total: $totalGuesses"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(locale.getString("stats_correct_guesses", "Correct: %s", locale.formatNumber(correctGuesses)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(locale.getString("stats_failed_guesses", "Failed: %s", locale.formatNumber(failedGuesses)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(locale.getString("stats_total_guesses", "Total: %s", locale.formatNumber(totalGuesses)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
                         }
                     }
                 }
