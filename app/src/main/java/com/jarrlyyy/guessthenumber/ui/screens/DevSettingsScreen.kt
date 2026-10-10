@@ -111,7 +111,7 @@ fun DevSettingsScreen(
                 title = { Text(localizedText("Developer Settings & Console")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 }
             )
@@ -189,7 +189,7 @@ fun DevSettingsScreen(
                                 val shareIntent = Intent.createChooser(sendIntent, "Share Zipped Logs")
                                 context.startActivity(shareIntent)
                             } catch (e: Exception) {
-                                Toast.makeText(context, "Failed to zip and share logs: ${e.message}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, locale.getString("dev_logs_zip_failed_format", "Failed to zip and share logs: %s", e.message ?: ""), Toast.LENGTH_SHORT).show()
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -269,7 +269,7 @@ fun DevSettingsScreen(
                     Button(onClick = {
                         onGetAppPreferencesJson {
                             appPreferencesJsonEditorInput = it
-                            Toast.makeText(context, "Loaded global app preferences", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, locale.getString("dev_loaded_app_preferences_toast", "Loaded global app preferences"), Toast.LENGTH_SHORT).show()
                         }
                     }, modifier = Modifier.weight(1f)) { Text(localizedText("Load App Preferences")) }
                     Button(onClick = {
@@ -303,7 +303,7 @@ fun DevSettingsScreen(
                     ExposedDropdownMenu(expanded = saveSlotExpanded, onDismissRequest = { saveSlotExpanded = false }) {
                         (1..10).forEach { slot ->
                             DropdownMenuItem(
-                                text = { Text(localizedText("Save Slot $slot")) },
+                                text = { Text(locale.getString("save_slot_label", "Save Slot %d", slot)) },
                                 onClick = { selectedSaveSlot = slot; saveSlotExpanded = false }
                             )
                         }
@@ -328,7 +328,7 @@ fun DevSettingsScreen(
                     Button(
                         onClick = {
                             onGetSaveJson(selectedSaveSlot) { raw -> saveJsonEditorInput = raw ?: ""; }
-                            Toast.makeText(context, "Loaded current state into editor", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, locale.getString("dev_loaded_save_to_editor_toast", "Loaded current state into editor"), Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.weight(1f)
                     ) {
@@ -341,13 +341,13 @@ fun DevSettingsScreen(
                             if (saveJsonEditorInput.isNotBlank()) {
                                 onApplySaveJson(selectedSaveSlot, saveJsonEditorInput) { success ->
                                     if (success) {
-                                        Toast.makeText(context, "Save applied successfully!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, locale.getString("dev_save_applied_toast", "Save applied successfully!"), Toast.LENGTH_SHORT).show()
                                     } else {
-                                        Toast.makeText(context, "Failed to apply invalid save JSON!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, locale.getString("invalid_save_json_toast", "Failed to apply invalid save JSON!"), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             } else {
-                                Toast.makeText(context, "Failed to apply invalid save json", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, locale.getString("invalid_save_json_toast", "Failed to apply invalid save JSON!"), Toast.LENGTH_SHORT).show()
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
@@ -396,7 +396,7 @@ fun DevSettingsScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
-                                    contentDescription = "Clear",
+                                    contentDescription = locale.getString("clear", "Clear"),
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -411,7 +411,7 @@ fun DevSettingsScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.ContentCopy,
-                                    contentDescription = "Copy",
+                                    contentDescription = locale.getString("copy", "Copy"),
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -494,7 +494,7 @@ fun DevSettingsScreen(
                                     LogLevel.INFO -> Color(0xFF50FA7B)
                                     else -> Color(0xFF8BE9FD)
                                 }
-                                Text(text = localizedText("[$timeStr][${log.category}][${log.level}] ${log.message}"),
+                                Text(text = "[$timeStr][${log.category}][${log.level}] ${log.message}",
                                     color = color,
                                     fontFamily = FontFamily.Monospace,
                                     fontSize = 11.sp,
