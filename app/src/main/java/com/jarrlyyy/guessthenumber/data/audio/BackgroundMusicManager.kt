@@ -204,7 +204,20 @@ class BackgroundMusicManager private constructor(context: Context) {
             extractAlbumArt(path)
             _isPlaying.value = true
             ensurePlaybackService()
-        } catch (_: Exception) { _isPlaying.value = false }
+        } catch (_: Exception) {
+            // A failed prepare/start must not leave a released player or stale "playing"
+            // metadata visible to the screen and media session.
+            runCatching { mediaPlayer?.release() }
+            mediaPlayer = null
+            _isPlaying.value = false
+            _currentPosition.value = 0
+            _duration.value = 0
+            _currentPath.value = null
+            _currentTrackId.value = null
+            _albumArt.value = null
+            preferences.edit().remove("current_track").apply()
+            stopPlaybackService()
+        }
     }
 
     fun play() {
@@ -263,7 +276,16 @@ class BackgroundMusicManager private constructor(context: Context) {
     }.getOrDefault(emptyList())
 
     private fun persistQueue() = preferences.edit().putString("queue", JSONArray(_queue.value).toString()).apply()
-    private fun loadQueue(): List<String> = runCatching { val a = JSONArray(preferences.getString("queue", "[]")); buildList { for (i in 0 until a.length()) add(a.getString(i)) } }.getOrDefault(emptyList())
+    private fun loadQueue(): List<String> = runCatching {
+        val validTrackIds = _library.value.mapTo(hashSetOf()) { it.id }
+        val array = JSONArray(preferences.getString("queue", "[]"))
+        buildList {
+            for (i in 0 until array.length()) {
+                val id = array.optString(i)
+                if (id in validTrackIds) add(id)
+            }
+        }
+    }.getOrDefault(emptyList())
     private fun loadRepeatMode() = runCatching { RepeatMode.valueOf(preferences.getString("repeat", RepeatMode.OFF.name)!!) }.getOrDefault(RepeatMode.OFF)
 
     private fun persistPlaylists() {
@@ -273,11 +295,17 @@ class BackgroundMusicManager private constructor(context: Context) {
     }
 
     private fun loadPlaylists(): Map<String, List<String>> = runCatching {
+        val validTrackIds = _library.value.mapTo(hashSetOf()) { it.id }
         val root = JSONObject(preferences.getString("playlists", "{}"))
         buildMap {
             root.keys().forEach { name ->
-                val a = root.getJSONArray(name)
-                put(name, buildList { for (i in 0 until a.length()) add(a.getString(i)) })
+                val array = root.getJSONArray(name)
+                put(name, buildList {
+                    for (i in 0 until array.length()) {
+                        val id = array.optString(i)
+                        if (id in validTrackIds) add(id)
+                    }
+                })
             }
         }
     }.getOrDefault(emptyMap())
