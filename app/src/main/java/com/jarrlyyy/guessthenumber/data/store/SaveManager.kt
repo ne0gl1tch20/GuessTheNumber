@@ -205,15 +205,31 @@ class SaveManager(private val context: Context) {
             val prefs = context.saveDataStore.data.first()
             val jsonString = prefs[sKey]
             if (jsonString != null && validateSave(jsonString)) {
-                sanitizeLoadedState(json.decodeFromString<GameState>(jsonString)).let { state -> state.copy(settings = globalPreferences.getSettings(), tutorialCompleted = globalPreferences.getSettings().tutorialCompleted) }
+                sanitizeLoadedState(json.decodeFromString<GameState>(jsonString)).let { state ->
+                    val settings = globalPreferences.getSettings()
+                    state.copy(settings = settings, tutorialCompleted = settings.tutorialCompleted)
+                }
             } else {
                 val backupString = prefs[bKey]
                 if (backupString != null && validateSave(backupString)) {
+                    // Restore the validated backup to the primary key so subsequent launches do
+                    // not repeatedly enter the recovery path. Keep the backup intact until a
+                    // later successful save replaces it.
+                    val recovered = sanitizeLoadedState(json.decodeFromString<GameState>(backupString))
+                    val recoveredJson = json.encodeToString(recovered)
+                    context.saveDataStore.edit { current ->
+                        val latestPrimary = current[sKey]
+                        if (latestPrimary == null || !validateSave(latestPrimary)) {
+                            current[sKey] = recoveredJson
+                        }
+                    }
                     GameLogger.log(LogLevel.WARN, LoggerCategory.SAVE, "RESTORE_BACKUP", "Restored slot $targetSlot from backup save.")
-                    sanitizeLoadedState(json.decodeFromString<GameState>(backupString)).let { state -> state.copy(settings = globalPreferences.getSettings(), tutorialCompleted = globalPreferences.getSettings().tutorialCompleted) }
+                    val settings = globalPreferences.getSettings()
+                    recovered.copy(settings = settings, tutorialCompleted = settings.tutorialCompleted)
                 } else {
                     GameLogger.log(LogLevel.INFO, LoggerCategory.SAVE, "NEW_GAME", "Initializing fresh game state for slot $targetSlot.")
-                    GameState(settings = globalPreferences.getSettings(), tutorialCompleted = globalPreferences.getSettings().tutorialCompleted)
+                    val settings = globalPreferences.getSettings()
+                    GameState(settings = settings, tutorialCompleted = settings.tutorialCompleted)
                 }
             }
         } catch (e: Exception) {
@@ -367,7 +383,6 @@ class SaveManager(private val context: Context) {
         return try {
             val state = json.decodeFromString<GameState>(jsonString)
             saveGame(state, if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot())
-            true
         } catch (_: Exception) { false }
     }
 
@@ -435,12 +450,6 @@ class SaveManager(private val context: Context) {
 
         val targetSlot = slot
         return try {
-            val prefs = context.saveDataStore.data.first()
-            val existing = prefs[getSaveKey(targetSlot)]
-            if (!existing.isNullOrEmpty() && validateSave(existing)) {
-                return false
-            }
-
             val freshState = GameState(
                 difficultyId = difficultyId,
                 profileName = profileName.trim().take(24),
@@ -450,12 +459,20 @@ class SaveManager(private val context: Context) {
                 lastSaveTimestamp = System.currentTimeMillis()
             )
             val freshJson = json.encodeToString(freshState)
+            var created = false
 
+            // Check and write within the same DataStore transaction. A stale pre-read could
+            // otherwise let two rapid create requests overwrite an already-created save.
             context.saveDataStore.edit { p ->
-                p.remove(getBackupKey(targetSlot))
-                p[getSaveKey(targetSlot)] = freshJson
-                p[activeSlotKey] = targetSlot
+                val existing = p[getSaveKey(targetSlot)]
+                if (existing.isNullOrEmpty() || !validateSave(existing)) {
+                    p.remove(getBackupKey(targetSlot))
+                    p[getSaveKey(targetSlot)] = freshJson
+                    p[activeSlotKey] = targetSlot
+                    created = true
+                }
             }
+            if (!created) return false
 
             GameLogger.log(
                 LogLevel.INFO,
