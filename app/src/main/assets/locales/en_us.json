@@ -893,5 +893,21 @@
   "done_button": "Done",
   "close_button": "Close",
   "crash_log_label": "Crash Log",
-  "crash_logs_copied_to_clipboard_toast": "Crash logs copied to clipboard!"
+  "crash_logs_copied_to_clipboard_toast": "Crash logs copied to clipboard!",
+  "music_player_title": "Offline Music Player",
+  "music_no_track": "No track selected",
+  "music_import": "Add local audio",
+  "music_library": "Library",
+  "music_queue_format": "Queue (%d)",
+  "music_queue_position": "Position %d",
+  "music_playlist_name": "Playlist name",
+  "music_create_playlist": "Create",
+  "music_playlists": "Playlists",
+  "music_playlist_tracks": "%d tracks",
+  "crash_detected_title": "⚠️ Unexpected Crash Detected",
+  "crash_detected_message": "The game encountered an unexpected error during the previous session and has safely recovered your last valid progress.",
+  "share_crash_logs_title": "Share Crash Logs",
+  "achievement_unlocked_banner": "Unlocked: %s",
+  "achievement_unlocked_fallback": "A new achievement is unlocked!",
+  "achievement_unlocked_title": "Achievement unlocked!"
 }
