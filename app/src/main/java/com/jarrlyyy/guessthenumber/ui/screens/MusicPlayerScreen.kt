@@ -49,7 +49,7 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
                     Column(Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Default.MusicNote, null, Modifier.size(56.dp))
                         Text(current?.title ?: locale.getString("music_no_track", "No track selected"), style = MaterialTheme.typography.titleLarge)
-                        if (current?.artist.orEmpty().isNotBlank()) Text(current.artist, style = MaterialTheme.typography.bodyMedium)
+                        if (!current?.artist.isNullOrBlank()) Text(current?.artist.orEmpty(), style = MaterialTheme.typography.bodyMedium)
                         Slider(value = position.toFloat().coerceIn(0f, duration.coerceAtLeast(1).toFloat()), onValueChange = { manager.seekTo(it.toInt()) }, valueRange = 0f..duration.coerceAtLeast(1).toFloat())
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             IconButton(onClick = { manager.previous() }) { Icon(Icons.Default.SkipPrevious, null) }
