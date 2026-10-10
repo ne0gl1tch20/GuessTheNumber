@@ -119,6 +119,22 @@ def main() -> int:
         errors.append(f"canonical locale unavailable: {exc}")
         locale = {}
 
+    if worlds_path.exists() and isinstance(locale, dict):
+        try:
+            world_root = load(worlds_path)
+            for index, world in enumerate(world_root.get("worlds", [])):
+                if not isinstance(world, dict):
+                    continue
+                for field in ("nameKey", "bossKey", "worldRequirementKey",
+                              "bossRequirementKey", "bossRewardKey"):
+                    key = world.get(field)
+                    if isinstance(key, str) and key not in locale:
+                        errors.append(
+                            f"game/worlds.json: worlds[{index}] references missing English locale key {key!r}"
+                        )
+        except Exception as exc:
+            errors.append(f"game/worlds.json: localization references could not be checked: {exc}")
+
     game_root = ROOT / "app" / "src" / "main" / "assets" / "game"
     for filename, prefix in GAME_RULES.items():
         path = game_root / filename
