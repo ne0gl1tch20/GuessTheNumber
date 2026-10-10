@@ -838,5 +838,6 @@
   "music_empty_playlists": "Belum ada playlist. Buat playlist untuk mengatur musik.",
   "music_shuffle": "Putar secara acak",
   "music_repeat": "Mode pengulangan",
-  "accessibility_warning": "Peringatan"
+  "accessibility_warning": "Peringatan",
+  "save_slot_name_label": "Nama penyimpanan"
 }

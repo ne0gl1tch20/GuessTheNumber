@@ -838,5 +838,6 @@
   "music_empty_playlists": "अभी कोई प्लेलिस्ट नहीं है। संगीत व्यवस्थित करने के लिए बनाएँ।",
   "music_shuffle": "शफ़ल प्लेबैक",
   "music_repeat": "दोहराने का मोड",
-  "accessibility_warning": "चेतावनी"
+  "accessibility_warning": "चेतावनी",
+  "save_slot_name_label": "सेव का नाम"
 }

@@ -838,5 +838,6 @@
   "music_empty_playlists": "Noch keine Playlists. Erstelle eine, um deine Musik zu ordnen.",
   "music_shuffle": "Zufallswiedergabe",
   "music_repeat": "Wiederholungsmodus",
-  "accessibility_warning": "Warnung"
+  "accessibility_warning": "Warnung",
+  "save_slot_name_label": "Spielstandname"
 }

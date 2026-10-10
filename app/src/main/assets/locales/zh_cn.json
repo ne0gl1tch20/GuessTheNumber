@@ -881,5 +881,6 @@
   "music_empty_playlists": "还没有播放列表。创建一个来整理音乐。",
   "music_shuffle": "随机播放",
   "music_repeat": "循环模式",
-  "accessibility_warning": "警告"
+  "accessibility_warning": "警告",
+  "save_slot_name_label": "存档名称"
 }

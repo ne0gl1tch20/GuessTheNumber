@@ -838,5 +838,6 @@
   "music_empty_playlists": "Non ci sono ancora playlist. Creane una per organizzare la musica.",
   "music_shuffle": "Riproduzione casuale",
   "music_repeat": "Modalità ripetizione",
-  "accessibility_warning": "Avviso"
+  "accessibility_warning": "Avviso",
+  "save_slot_name_label": "Nome del salvataggio"
 }

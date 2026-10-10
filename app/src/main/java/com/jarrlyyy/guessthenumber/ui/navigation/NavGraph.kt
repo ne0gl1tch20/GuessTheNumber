@@ -448,7 +448,7 @@ fun NavGraph(
                     composable(Screen.ChangelogViewer.route) {
                         MarkdownViewerScreen(
                             assetFileName = "changelogs.md",
-                            title = "Changelog",
+                            title = locale.getString("changelog", "Changelog"),
                             onBack = { navController.popBackStack() }
                         )
                     }

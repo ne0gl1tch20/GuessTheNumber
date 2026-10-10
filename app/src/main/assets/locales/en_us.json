@@ -1027,5 +1027,6 @@
   "music_empty_playlists": "No playlists yet. Create one to organize your music.",
   "music_shuffle": "Shuffle playback",
   "music_repeat": "Repeat mode",
-  "accessibility_warning": "Warning"
+  "accessibility_warning": "Warning",
+  "save_slot_name_label": "Save Name"
 }

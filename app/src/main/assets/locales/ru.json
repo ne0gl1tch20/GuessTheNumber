@@ -838,5 +838,6 @@
   "music_empty_playlists": "Плейлистов пока нет. Создайте список для своей музыки.",
   "music_shuffle": "Перемешать воспроизведение",
   "music_repeat": "Режим повтора",
-  "accessibility_warning": "Предупреждение"
+  "accessibility_warning": "Предупреждение",
+  "save_slot_name_label": "Название сохранения"
 }

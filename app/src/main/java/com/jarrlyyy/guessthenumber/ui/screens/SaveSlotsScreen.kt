@@ -196,10 +196,10 @@ fun SaveSlotsScreen(
                     OutlinedTextField(
                         value = createNameDraft,
                         onValueChange = { createNameDraft = it.take(24) },
-                        label = { Text(localizedText("Save Name")) },
+                        label = { Text(locale.getString("save_slot_name_label", "Save Name")) },
                         singleLine = true
                     )
-                    Text(localizedText("Icon"), style = MaterialTheme.typography.labelLarge)
+                    Text(locale.getString("save_profile_icon", "Icon"), style = MaterialTheme.typography.labelLarge)
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         SaveProfile.iconIds.forEach { iconId ->
                             FilterChip(

@@ -838,5 +838,6 @@
   "music_empty_playlists": "尚無播放清單。建立清單來整理音樂。",
   "music_shuffle": "隨機播放",
   "music_repeat": "循環模式",
-  "accessibility_warning": "警告"
+  "accessibility_warning": "警告",
+  "save_slot_name_label": "存檔名稱"
 }

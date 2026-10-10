@@ -881,5 +881,6 @@
   "music_empty_playlists": "Wala pang playlist. Gumawa ng isa para ayusin ang iyong musika.",
   "music_shuffle": "I-shuffle ang tugtugin",
   "music_repeat": "Mode ng pag-uulit",
-  "accessibility_warning": "Babala"
+  "accessibility_warning": "Babala",
+  "save_slot_name_label": "Pangalan ng Save"
 }

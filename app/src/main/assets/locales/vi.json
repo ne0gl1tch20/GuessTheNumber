@@ -838,5 +838,6 @@
   "music_empty_playlists": "Chưa có danh sách phát. Hãy tạo danh sách để sắp xếp nhạc.",
   "music_shuffle": "Phát ngẫu nhiên",
   "music_repeat": "Chế độ lặp lại",
-  "accessibility_warning": "Cảnh báo"
+  "accessibility_warning": "Cảnh báo",
+  "save_slot_name_label": "Tên bản lưu"
 }

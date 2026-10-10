@@ -838,5 +838,6 @@
   "music_empty_playlists": "Todavía no hay listas. Crea una para organizar tu música.",
   "music_shuffle": "Reproducción aleatoria",
   "music_repeat": "Modo de repetición",
-  "accessibility_warning": "Advertencia"
+  "accessibility_warning": "Advertencia",
+  "save_slot_name_label": "Nombre de la partida"
 }

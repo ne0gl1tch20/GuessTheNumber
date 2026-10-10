@@ -838,5 +838,6 @@
   "music_empty_playlists": "Nog geen afspeellijsten. Maak er een om je muziek te ordenen.",
   "music_shuffle": "Willekeurig afspelen",
   "music_repeat": "Herhaalmodus",
-  "accessibility_warning": "Waarschuwing"
+  "accessibility_warning": "Waarschuwing",
+  "save_slot_name_label": "Naam van opslag"
 }

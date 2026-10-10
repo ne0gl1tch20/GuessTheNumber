@@ -838,5 +838,6 @@
   "music_empty_playlists": "Плейлистів ще немає. Створіть список, щоб упорядкувати музику.",
   "music_shuffle": "Випадкове відтворення",
   "music_repeat": "Режим повтору",
-  "accessibility_warning": "Попередження"
+  "accessibility_warning": "Попередження",
+  "save_slot_name_label": "Назва збереження"
 }

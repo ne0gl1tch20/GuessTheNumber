@@ -839,5 +839,6 @@
   "music_empty_playlists": "لا توجد قوائم تشغيل بعد. أنشئ قائمة لتنظيم الموسيقى.",
   "music_shuffle": "التشغيل العشوائي",
   "music_repeat": "وضع التكرار",
-  "accessibility_warning": "تحذير"
+  "accessibility_warning": "تحذير",
+  "save_slot_name_label": "اسم الحفظ"
 }
