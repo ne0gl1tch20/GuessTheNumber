@@ -15,6 +15,8 @@ Lua is **planned, not implemented yet**. The Kotlin engine remains authoritative
 
 These documents do not add a Lua dependency or enable script execution.
 
+The script sources are planned as two separate layers: offline Lua files bundled under `app/src/main/assets/scripts/`, and signed/versioned online event bundles from a separate planned `GuessTheNumber-LiveOps` GitHub content repository. Both will use the same restricted Kotlin host API, with bundled scripts as the offline fallback. No runtime or remote execution is enabled yet.
+
 ---
 
 ## 🚀 Key Features
