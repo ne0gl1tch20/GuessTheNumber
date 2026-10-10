@@ -665,26 +665,27 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun bulkUpgradeCount(upgrade: com.jarrlyyy.guessthenumber.domain.model.UpgradeDef, currentLevel: Int, currency: BigNumber): Int {
         if (currentLevel >= upgrade.maxLevel) return 0
-        return when (_gameState.value.buyMultiplier) {
-            "10" -> minOf(10, upgrade.maxLevel - currentLevel)
-            "100" -> minOf(100, upgrade.maxLevel - currentLevel)
-            "MAX" -> {
-                var count = 0
-                var totalCost = BigNumber.ZERO
-                var level = currentLevel
-                val base = BigNumber(upgrade.baseCost)
-                val mult = BigNumber(upgrade.costMultiplier)
-                while (level < upgrade.maxLevel) {
-                    val nextCost = base * mult.pow(level)
-                    if (currency < totalCost + nextCost) break
-                    totalCost += nextCost
-                    count++
-                    level++
-                }
-                count
-            }
+        val requestedCount = when (_gameState.value.buyMultiplier) {
+            "10" -> 10
+            "100" -> 100
+            "MAX" -> upgrade.maxLevel - currentLevel
             else -> 1
+        }.coerceAtMost(upgrade.maxLevel - currentLevel)
+
+        // Return the largest affordable prefix for every bulk mode. This lets
+        // 10/100/MAX buy the levels the player can afford instead of failing
+        // the entire purchase when the full requested batch costs too much.
+        var count = 0
+        var totalCost = BigNumber.ZERO
+        val base = BigNumber(upgrade.baseCost)
+        val mult = BigNumber(upgrade.costMultiplier)
+        while (count < requestedCount) {
+            val nextCost = base * mult.pow(currentLevel + count)
+            if (currency < totalCost + nextCost) break
+            totalCost += nextCost
+            count++
         }
+        return count
     }
 
     fun buyPrestigeUpgrade(upgradeId: String, cost: BigNumber) {
