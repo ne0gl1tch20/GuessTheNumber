@@ -878,5 +878,7 @@
   "music_playlist_tracks": "%d 曲",
   "music_empty_library": "音楽ライブラリは空です。この端末の音声を追加して始めましょう。",
   "music_empty_queue": "キューは空です。曲を再生するか、ライブラリから追加してください。",
-  "music_empty_playlists": "プレイリストはまだありません。音楽を整理するために作成しましょう。"
+  "music_empty_playlists": "プレイリストはまだありません。音楽を整理するために作成しましょう。",
+  "music_shuffle": "シャッフル再生",
+  "music_repeat": "リピートモード"
 }

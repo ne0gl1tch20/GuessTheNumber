@@ -878,5 +878,7 @@
   "music_playlist_tracks": "%d track",
   "music_empty_library": "Walang laman ang music library mo. Magdagdag ng audio mula sa device para magsimula.",
   "music_empty_queue": "Walang laman ang pila. Magpatugtog ng track o magdagdag mula sa library.",
-  "music_empty_playlists": "Wala pang playlist. Gumawa ng isa para ayusin ang iyong musika."
+  "music_empty_playlists": "Wala pang playlist. Gumawa ng isa para ayusin ang iyong musika.",
+  "music_shuffle": "I-shuffle ang tugtugin",
+  "music_repeat": "Mode ng pag-uulit"
 }

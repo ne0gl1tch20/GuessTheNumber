@@ -88,8 +88,8 @@ fun MusicPlayerScreen(onBack: () -> Unit) {
                             IconButton(onClick = { manager.previous() }) { Icon(Icons.Default.SkipPrevious, contentDescription = locale.getString("music_control_previous", "Previous")) }
                             FilledIconButton(onClick = { if (playing) manager.pause() else manager.play() }) { Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = locale.getString(if (playing) "music_control_pause" else "music_control_play", if (playing) "Pause" else "Play")) }
                             IconButton(onClick = { manager.next() }) { Icon(Icons.Default.SkipNext, contentDescription = locale.getString("music_control_next", "Next")) }
-                            IconButton(onClick = { manager.setShuffle(!shuffle) }) { Icon(Icons.Default.Shuffle, null, tint = if (shuffle) MaterialTheme.colorScheme.primary else LocalContentColor.current) }
-                            IconButton(onClick = { manager.setRepeatMode(BackgroundMusicManager.RepeatMode.entries[(repeat.ordinal + 1) % BackgroundMusicManager.RepeatMode.entries.size]) }) { Icon(Icons.Default.Repeat, null, tint = if (repeat != BackgroundMusicManager.RepeatMode.OFF) MaterialTheme.colorScheme.primary else LocalContentColor.current) }
+                            IconButton(onClick = { manager.setShuffle(!shuffle) }) { Icon(Icons.Default.Shuffle, contentDescription = locale.getString("music_shuffle", "Shuffle playback"), tint = if (shuffle) MaterialTheme.colorScheme.primary else LocalContentColor.current) }
+                            IconButton(onClick = { manager.setRepeatMode(BackgroundMusicManager.RepeatMode.entries[(repeat.ordinal + 1) % BackgroundMusicManager.RepeatMode.entries.size]) }) { Icon(Icons.Default.Repeat, contentDescription = locale.getString("music_repeat", "Repeat mode"), tint = if (repeat != BackgroundMusicManager.RepeatMode.OFF) MaterialTheme.colorScheme.primary else LocalContentColor.current) }
                         }
                     }
                 }

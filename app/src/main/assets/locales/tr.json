@@ -835,5 +835,7 @@
   "music_playlist_tracks": "%d parça",
   "music_empty_library": "Müzik kitaplığın boş. Başlamak için bu cihazdan ses ekle.",
   "music_empty_queue": "Sıra boş. Bir parça çal veya kitaplıktan parça ekle.",
-  "music_empty_playlists": "Henüz çalma listesi yok. Müziğini düzenlemek için bir liste oluştur."
+  "music_empty_playlists": "Henüz çalma listesi yok. Müziğini düzenlemek için bir liste oluştur.",
+  "music_shuffle": "Karışık çalma",
+  "music_repeat": "Tekrarlama modu"
 }

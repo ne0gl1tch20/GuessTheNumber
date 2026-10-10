@@ -25,6 +25,7 @@ REQUIRED_SHARED_KEYS = {
     "music_queue_format", "music_queue_position", "music_playlist_name",
     "music_create_playlist", "music_playlists", "music_playlist_tracks",
     "music_empty_library", "music_empty_queue", "music_empty_playlists",
+    "music_shuffle", "music_repeat",
     "music_control_previous", "music_control_pause", "music_control_play",
     "music_control_next", "music_control_stop",
 }

@@ -835,5 +835,7 @@
   "music_playlist_tracks": "Utwory: %d",
   "music_empty_library": "Biblioteka muzyki jest pusta. Dodaj pliki audio z tego urządzenia, aby rozpocząć.",
   "music_empty_queue": "Kolejka jest pusta. Odtwórz utwór lub dodaj go z biblioteki.",
-  "music_empty_playlists": "Nie ma jeszcze playlist. Utwórz playlistę, aby uporządkować muzykę."
+  "music_empty_playlists": "Nie ma jeszcze playlist. Utwórz playlistę, aby uporządkować muzykę.",
+  "music_shuffle": "Odtwarzanie losowe",
+  "music_repeat": "Tryb powtarzania"
 }

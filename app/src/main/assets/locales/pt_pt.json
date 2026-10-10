@@ -835,5 +835,7 @@
   "music_playlist_tracks": "%d faixas",
   "music_empty_library": "A biblioteca está vazia. Adiciona áudio deste dispositivo para começar.",
   "music_empty_queue": "A fila está vazia. Reproduz uma faixa ou adiciona uma da biblioteca.",
-  "music_empty_playlists": "Ainda não existem listas. Cria uma para organizar a música."
+  "music_empty_playlists": "Ainda não existem listas. Cria uma para organizar a música.",
+  "music_shuffle": "Reprodução aleatória",
+  "music_repeat": "Modo de repetição"
 }

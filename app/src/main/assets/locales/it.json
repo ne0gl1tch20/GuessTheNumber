@@ -835,5 +835,7 @@
   "music_playlist_tracks": "%d tracce",
   "music_empty_library": "La libreria è vuota. Aggiungi audio da questo dispositivo per iniziare.",
   "music_empty_queue": "La coda è vuota. Riproduci un brano o aggiungilo dalla libreria.",
-  "music_empty_playlists": "Non ci sono ancora playlist. Creane una per organizzare la musica."
+  "music_empty_playlists": "Non ci sono ancora playlist. Creane una per organizzare la musica.",
+  "music_shuffle": "Riproduzione casuale",
+  "music_repeat": "Modalità ripetizione"
 }

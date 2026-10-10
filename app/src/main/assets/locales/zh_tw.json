@@ -835,5 +835,7 @@
   "music_playlist_tracks": "%d 首曲目",
   "music_empty_library": "音樂庫目前是空的。新增裝置中的音訊即可開始。",
   "music_empty_queue": "播放佇列是空的。播放曲目或從音樂庫新增。",
-  "music_empty_playlists": "尚無播放清單。建立清單來整理音樂。"
+  "music_empty_playlists": "尚無播放清單。建立清單來整理音樂。",
+  "music_shuffle": "隨機播放",
+  "music_repeat": "循環模式"
 }
