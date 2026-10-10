@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.toMutablePreferences
 import androidx.glance.Button
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -25,7 +26,6 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.defaultWeight
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
@@ -62,7 +62,7 @@ class CompactGuessWidget : GlanceAppWidget() {
                     Text(locale.getString("widget_slot", "Save slot %d • %s", slot, state.profileName.ifBlank { state.difficultyId }), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                     Spacer(GlanceModifier.height(4.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
-                        Column(modifier = GlanceModifier.defaultWeight()) {
+                        Column(modifier = GlanceModifier) {
                             Text(locale.getString("widget_money", "Money"), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                             Text(state.money.format(), style = TextStyle(fontWeight = FontWeight.Bold, color = GlanceTheme.colors.primary))
                         }
@@ -103,7 +103,7 @@ class CycleCompactWidgetSaveSlotCallback : ActionCallback {
         val current = (widgetState[compactWidgetSaveSlotKey] ?: activeSlot).coerceIn(1, MAX_SAVE_SLOTS)
         val nextSlot = nextOccupiedSaveSlot(context, current)
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { preferences ->
-            preferences[compactWidgetSaveSlotKey] = nextSlot
+            preferences.toMutablePreferences().apply { this[compactWidgetSaveSlotKey] = nextSlot }
         }
         CompactGuessWidget().update(context, glanceId)
     }
