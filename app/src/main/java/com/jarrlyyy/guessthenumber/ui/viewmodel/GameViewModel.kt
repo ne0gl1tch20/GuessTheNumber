@@ -1083,13 +1083,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val bossId = world.bossId
         if (action == "unlock") {
             if (worldId in state.unlockedWorldIds) return
-            val canUnlock = world.unlockBossId == null || (
-                world.unlockBossId in state.defeatedBossIds &&
+            val canUnlock = world.unlockBossId?.let { requiredBossId ->
+                requiredBossId in state.defeatedBossIds &&
                     state.correctGuesses >= world.unlockCorrectGuesses &&
                     totalUpgradeLevels >= world.unlockUpgradeCount &&
                     state.prestigeCount >= world.unlockPrestigeCount &&
                     state.ultraCount >= world.unlockUltraCount
-            )
+            } ?: true
             if (canUnlock) {
                 _gameState.value = state.copy(unlockedWorldIds = state.unlockedWorldIds + worldId, activeWorldId = worldId)
                 saveGameAsync()
