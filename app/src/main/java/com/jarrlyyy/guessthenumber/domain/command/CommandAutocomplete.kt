@@ -26,7 +26,9 @@ object CommandRegistry {
         DevCommandDefinition("/timeskip", "/timeskip <seconds>", "Simulate offline progress"),
         DevCommandDefinition("/max_upgrades", "/max_upgrades", "Max out available upgrades"),
         DevCommandDefinition("/unlock_all", "/unlock_all", "Unlock developer test content"),
+        DevCommandDefinition("/unlock", "/unlock all", "Alias for unlock_all", listOf("/unlock all")),
         DevCommandDefinition("/win", "/win", "Grant a test win"),
+        DevCommandDefinition("/completeguess", "/completeguess", "Alias for the test win"),
         DevCommandDefinition("/speed", "/speed <clicksPerSecond>", "Set auto-clicker speed"),
         DevCommandDefinition("/autoclicker", "/autoclicker <on|off>", "Toggle the in-game auto-clicker", listOf("/autoclicker on", "/autoclicker off")),
         DevCommandDefinition("/setlevel", "/setlevel <upgradeId> <level>", "Set a normal upgrade level"),
@@ -54,7 +56,7 @@ object CommandAutocomplete {
         val matches = if (!isTypingArgument) {
             CommandRegistry.commands
                 .filter { it.name.startsWith(parts.first(), ignoreCase = true) }
-                .map { CommandSuggestion(it.usage + if (it.usage.endsWith(">")) " " else "", it.usage, it.description) }
+                .map { CommandSuggestion(it.name + if (it.usage.contains("<") || it.argumentOptions.isNotEmpty()) " " else "", it.usage, it.description) }
         } else {
             val command = parts.first().lowercase()
             val typed = if (query.endsWith(" ")) "" else parts.last()
