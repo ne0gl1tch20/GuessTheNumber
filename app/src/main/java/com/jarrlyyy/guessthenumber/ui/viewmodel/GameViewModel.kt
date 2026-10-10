@@ -1439,8 +1439,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             slotOperationMutex.withLock {
                 val slot = _activeSlot.value
                 val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
-                saveManager.saveGame(state, slot)
-                WidgetRefresh.request(getApplication<Application>())
+                if (saveManager.saveGame(state, slot)) {
+                    WidgetRefresh.request(getApplication<Application>())
+                } else {
+                    GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "SAVE_ASYNC_FAILED", "Could not persist the latest game state for slot $slot.")
+                }
             }
         }
     }
@@ -1452,8 +1455,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 slotOperationMutex.withLock {
                     val slot = _activeSlot.value
                     val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
-                    saveManager.saveGame(state, slot)
-                    WidgetRefresh.request(getApplication<Application>())
+                    if (saveManager.saveGame(state, slot)) {
+                        WidgetRefresh.request(getApplication<Application>())
+                    } else {
+                        GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "AUTOSAVE_FAILED", "Could not persist the latest game state for slot $slot.")
+                    }
                 }
             }
         }
