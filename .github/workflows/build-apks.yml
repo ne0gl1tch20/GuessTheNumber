@@ -11,6 +11,8 @@ jobs:
   build:
     name: Validate, Test, and Build Debug/Release APKs
     runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_luaLiveOpsPublicKeyBase64: ${{ secrets.LUA_LIVEOPS_PUBLIC_KEY_BASE64 }}
 
     steps:
       - name: Checkout Repository
