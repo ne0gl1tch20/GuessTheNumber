@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
