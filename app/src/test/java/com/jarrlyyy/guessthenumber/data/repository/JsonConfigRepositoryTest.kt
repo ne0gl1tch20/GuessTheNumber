@@ -35,6 +35,9 @@ class JsonConfigRepositoryTest {
         assertFalse(repo.loadMinigames().isEmpty())
         assertFalse(repo.loadChallenges().isEmpty())
         assertFalse(repo.loadTalents().isEmpty())
-        assertTrue(repo.loadFeedbackMessages().tooLowMessages.isNotEmpty())
+        val feedback = repo.loadFeedbackMessages()
+        assertEquals(30, feedback.tooLowMessages.size)
+        assertEquals(30, feedback.tooHighMessages.size)
+        assertEquals(55, feedback.guessTipsAndClues.size)
     }
 }
