@@ -123,6 +123,18 @@ fun DevSettingsScreen(
                 }
             }
 
+            // Lua Activity Hub is a developer-only script testing surface.
+            item {
+                Button(
+                    onClick = { onNavigate("lua_hub") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(imageVector = Icons.Default.Code, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(localizedText("Lua Activity Hub"), fontSize = 16.sp)
+                }
+            }
+
             // Section 0.5: Log Storage Setting & Zip/Share
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
