@@ -359,10 +359,10 @@ fun NavGraph(
                         )
                     }
                     composable(Screen.LuaHub.route) {
-                        if (featureFlags["lua_scripting"] == true) {
+                        if (BuildConfig.DEBUG && featureFlags["lua_scripting"] == true) {
                             LuaActivityHubScreen(onBack = { navController.popBackStack() })
                         } else {
-                            FeatureDisabledScreen("Lua activities", onBack = { navController.popBackStack() })
+                            FeatureDisabledScreen("Lua activity testing is available in debug builds only", onBack = { navController.popBackStack() })
                         }
                     }
                     composable(Screen.Arcade.route) {
