@@ -150,9 +150,22 @@ class BackgroundMusicManager private constructor(context: Context) {
     fun enqueue(trackId: String) { if (trackId in _library.value.map { it.id }) { _queue.value = _queue.value + trackId; persistQueue() } }
 
     fun removeFromQueue(index: Int) {
-        if (index !in _queue.value.indices) return
-        _queue.value = _queue.value.toMutableList().also { it.removeAt(index) }
-        queueIndex = queueIndex.coerceIn(0, (_queue.value.size - 1).coerceAtLeast(0)); persistQueue()
+        val currentQueue = _queue.value
+        if (index !in currentQueue.indices) return
+        val removedCurrentItem = index == queueIndex
+        _queue.value = currentQueue.toMutableList().also { it.removeAt(index) }
+        queueIndex = when {
+            _queue.value.isEmpty() -> 0
+            index < queueIndex -> queueIndex - 1
+            removedCurrentItem -> (index - 1).coerceAtLeast(-1)
+            else -> queueIndex
+        }.coerceAtLeast(0).coerceAtMost((_queue.value.size - 1).coerceAtLeast(0))
+        persistQueue()
+        // If the currently selected queue entry was removed, let the playing track finish,
+        // then advance to the item that took its place instead of skipping over it.
+        if (removedCurrentItem && _queue.value.isEmpty()) {
+            stop()
+        }
     }
 
     fun moveQueue(from: Int, to: Int) {
