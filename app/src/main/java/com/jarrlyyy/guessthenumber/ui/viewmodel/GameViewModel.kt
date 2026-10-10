@@ -30,6 +30,7 @@ import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.RandomEventEngine
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
+import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.repository.LiveOpsRepository
 import java.util.concurrent.TimeUnit
@@ -1077,16 +1078,18 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun worldProgressAction(worldId: String, action: String) {
         val state = _gameState.value
         val totalUpgradeLevels = state.upgradeLevels.values.sum()
-        if (worldId !in listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift")) return
-        val bossId = when (worldId) { "verdant_grove" -> "verdant_guardian"; "crystal_caverns" -> "crystal_golem"; "ember_summit" -> "ember_dragon"; else -> "nebula_titan" }
+        val worldDefinitions = WorldConfigRepository(getApplication<Application>()).loadWorlds()
+        val world = worldDefinitions.firstOrNull { it.id == worldId } ?: return
+        val bossId = world.bossId
         if (action == "unlock") {
             if (worldId in state.unlockedWorldIds) return
-            val canUnlock = when (worldId) {
-                "crystal_caverns" -> "verdant_guardian" in state.defeatedBossIds && state.correctGuesses >= 25 && totalUpgradeLevels >= 5
-                "ember_summit" -> "crystal_golem" in state.defeatedBossIds && state.correctGuesses >= 100 && totalUpgradeLevels >= 15 && state.prestigeCount >= 1
-                "nebula_rift" -> "ember_dragon" in state.defeatedBossIds && state.correctGuesses >= 250 && totalUpgradeLevels >= 40 && state.prestigeCount >= 3 && state.ultraCount >= 1
-                else -> worldId == "verdant_grove"
-            }
+            val canUnlock = world.unlockBossId == null || (
+                world.unlockBossId in state.defeatedBossIds &&
+                    state.correctGuesses >= world.unlockCorrectGuesses &&
+                    totalUpgradeLevels >= world.unlockUpgradeCount &&
+                    state.prestigeCount >= world.unlockPrestigeCount &&
+                    state.ultraCount >= world.unlockUltraCount
+            )
             if (canUnlock) {
                 _gameState.value = state.copy(unlockedWorldIds = state.unlockedWorldIds + worldId, activeWorldId = worldId)
                 saveGameAsync()
@@ -1098,17 +1101,17 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (action == "boss") {
             if (worldId !in state.unlockedWorldIds || (bossId in state.defeatedBossIds && !state.endlessRiftActive)) return
             if (state.activeBossBattleWorldId == worldId) { _gameState.value = state.copy(activeBossBattleWorldId = null); saveGameAsync(); return }
-            val canFight = state.endlessRiftActive || when (worldId) {
-                "verdant_grove" -> state.correctGuesses >= 10 && totalUpgradeLevels >= 3
-                "crystal_caverns" -> state.correctGuesses >= 50 && totalUpgradeLevels >= 10
-                "ember_summit" -> state.correctGuesses >= 150 && totalUpgradeLevels >= 25 && state.prestigeCount >= 1
-                else -> state.correctGuesses >= 500 && totalUpgradeLevels >= 75 && state.prestigeCount >= 5 && state.ultraCount >= 1
-            }
+            val canFight = state.endlessRiftActive || (
+                state.correctGuesses >= world.fightCorrectGuesses &&
+                    totalUpgradeLevels >= world.fightUpgradeCount &&
+                    state.prestigeCount >= world.fightPrestigeCount &&
+                    state.ultraCount >= world.fightUltraCount
+            )
             if (canFight) { _gameState.value = state.copy(activeWorldId = worldId, activeBossBattleWorldId = worldId); saveGameAsync(); GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "BOSS_BATTLE_STARTED", "Started boss battle $bossId") }
             return
         }
         if (state.activeBossBattleWorldId != worldId || worldId !in state.unlockedWorldIds || (bossId in state.defeatedBossIds && !state.endlessRiftActive)) return
-        val baseBossHp = when (worldId) { "verdant_grove" -> 3; "crystal_caverns" -> 5; "ember_summit" -> 7; else -> 10 }
+        val baseBossHp = world.hp
         val bossHp = baseBossHp + if (state.endlessRiftActive) ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
         val damage = state.bossBattleProgress[bossId] ?: 0
         if (action == "boss_miss") {
