@@ -137,8 +137,8 @@ fun PlayScreen(
                 FilledTonalButton(
                     onClick = {
                         val hubIndex = 4 +
-                            if (state.activeBossBattleWorldId != null) 1 else 0 +
-                            if (state.lastRandomEventId != null) 1 else 0
+                            (if (state.activeBossBattleWorldId != null) 1 else 0) +
+                            (if (state.lastRandomEventId != null) 1 else 0)
                         scrollScope.launch {
                             listState.animateScrollToItem(hubIndex)
                         }
