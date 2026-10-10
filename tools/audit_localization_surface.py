@@ -79,14 +79,14 @@ def scan_catalog_calls():
         if any(part in rel for part in SKIP_PATH_PARTS):
             continue
         for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            for match in re.finditer(r'\\blocalizedText\\s*\\(\\s*"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"', line):
+            for match in re.finditer(r'\blocalizedText\s*\(\s*"([^"\\]*(?:\\.[^"\\]*)*)"', line):
                 value = match.group(1).strip()
                 if "$" in value:
                     findings.append((rel, line_no, "Dynamic localizedText", value))
                 elif probable_user_text(value) and value not in values:
                     findings.append((rel, line_no, "Missing English catalog value", value))
 
-            for match in re.finditer(r'\\b[A-Za-z_]\\w*\\.getString\\s*\\(\\s*"([^"]+)"', line):
+            for match in re.finditer(r'\b[A-Za-z_]\w*\.getString\s*\(\s*"([^"]+)"', line):
                 key = match.group(1).strip()
                 # IDs composed from data-driven asset IDs are validated by the
                 # asset-specific localization contract, not as literal keys here.
