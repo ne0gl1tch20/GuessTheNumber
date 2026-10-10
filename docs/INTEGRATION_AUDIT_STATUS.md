@@ -99,3 +99,4 @@ Current app version: 3.0.1 (versionCode 19).
 - Achievement milestone payouts now increment `statistics.nebulaEarned` together with the actual Nebula balance, keeping lifetime earnings accurate when achievements unlock during gameplay.
 - Weekly/daily challenge claims now add their Nebula payout to `statistics.nebulaEarned` in the domain claim transaction, matching the balance change and preventing the challenge reward path from undercounting lifetime earnings.
 - Offline auto-clicker earnings now increment lifetime `moneyEarned` as well as the wallet balance, so the statistics screen includes money granted during startup catch-up.
+- World unlock actions are now idempotent: tapping unlock again for an already-unlocked world no longer emits duplicate progression notifications or repeats unlock-side effects.
