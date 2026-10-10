@@ -893,6 +893,23 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             val success = slotOperationMutex.withLock { saveManager.applyAppPreferencesJson(raw) }
             if (success) {
                 val loaded = saveManager.loadGame(_activeSlot.value)
+                val settings = loaded.settings
+                val context = getApplication<Application>()
+                val workManager = WorkManager.getInstance(context)
+                if (!settings.notificationsEnabled || !settings.notificationRemindersEnabled) {
+                    workManager.cancelUniqueWork(GameReminderWorker.WORK_NAME)
+                } else {
+                    val intervalHours = settings.notificationIntervalHours.coerceIn(12L, 48L)
+                    val workRequest = PeriodicWorkRequestBuilder<GameReminderWorker>(
+                        intervalHours, TimeUnit.HOURS
+                    ).build()
+                    workManager.enqueueUniquePeriodicWork(
+                        GameReminderWorker.WORK_NAME,
+                        ExistingPeriodicWorkPolicy.UPDATE,
+                        workRequest
+                    )
+                }
+                WidgetRefresh.request(context)
                 withContext(Dispatchers.Main) {
                     _gameState.value = AntiCheatService.sanitizeCurrency(loaded)
                     updateLocaleRepo(_gameState.value.settings.locale)
