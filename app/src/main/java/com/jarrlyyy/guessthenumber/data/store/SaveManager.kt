@@ -128,9 +128,12 @@ class SaveManager(private val context: Context) {
         val s = slot.coerceIn(1, MAX_SAVE_SLOTS)
         return try {
             val prefs = context.saveDataStore.data.first()
-            val jsonString = prefs[getSaveKey(s)]
-            if (!jsonString.isNullOrEmpty() && validateSave(jsonString)) {
-                val state = json.decodeFromString<GameState>(jsonString)
+            val primary = prefs[getSaveKey(s)]
+            val backup = prefs[getBackupKey(s)]
+            val raw = primary?.takeIf { validateSave(it) }
+                ?: backup?.takeIf { validateSave(it) }
+            if (raw != null) {
+                val state = json.decodeFromString<GameState>(raw)
                 SaveSlotMetadata(
                     slotIndex = s,
                     isEmpty = false,
@@ -143,13 +146,13 @@ class SaveManager(private val context: Context) {
                     attempts = state.attempts,
                     correctGuesses = state.correctGuesses,
                     lastSaveTimestamp = state.lastSaveTimestamp,
-                    hasBackup = prefs[getBackupKey(s)]?.let { validateSave(it) } == true
+                    hasBackup = backup?.let { validateSave(it) } == true
                 )
             } else {
-                SaveSlotMetadata(slotIndex = s, isEmpty = true)
+                SaveSlotMetadata(slotIndex = s, isEmpty = primary.isNullOrEmpty() && backup.isNullOrEmpty())
             }
         } catch (e: Exception) {
-            SaveSlotMetadata(slotIndex = s, isEmpty = true)
+            SaveSlotMetadata(slotIndex = s, isEmpty = false, hasBackup = false)
         }
     }
 
