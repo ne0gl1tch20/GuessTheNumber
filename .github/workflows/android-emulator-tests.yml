@@ -1,8 +1,12 @@
 name: Android Emulator Crash Tests
 
-# Intentionally manual-only for now: emulator crash tests are slow.
+# Runs on master changes so gameplay and startup regressions are checked continuously.
 on:
   workflow_dispatch:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   emulator:
