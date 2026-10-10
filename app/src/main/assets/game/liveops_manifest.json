@@ -10,7 +10,12 @@
       "startDate": "2024-01-01T00:00:00Z",
       "endDate": "2026-12-31T23:59:59Z",
       "currencyName": "Nebula",
-      "maxClaims": 20
+      "maxClaims": 20,
+      "rewardNebula": 10,
+      "permanentBoostPerClaim": 1,
+      "minCorrectGuesses": 0,
+      "minPrestigeCount": 0,
+      "minUltraCount": 0
     },
     {
       "id": "holiday_neon_rush",
@@ -20,7 +25,12 @@
       "startDate": "2026-11-01T00:00:00Z",
       "endDate": "2026-12-31T23:59:59Z",
       "currencyName": "Nebula",
-      "maxClaims": 5
+      "maxClaims": 5,
+      "rewardNebula": 10,
+      "permanentBoostPerClaim": 1,
+      "minCorrectGuesses": 100,
+      "minPrestigeCount": 0,
+      "minUltraCount": 0
     }
   ]
 }
