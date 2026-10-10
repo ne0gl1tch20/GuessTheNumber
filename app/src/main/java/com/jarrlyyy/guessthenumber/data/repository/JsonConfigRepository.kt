@@ -17,40 +17,42 @@ data class GameConfig(
     val startingRangeMax: Long = 100,
     val criticalChance: Double = 0.05,
     val maxUltraCap: Int = 2000,
-    val autoClickerIncomePerSec: String = "500"
+    val autoClickerIncomePerSec: String = "500",
+    val schemaVersion: Int = 1
 )
 
 @Serializable
-data class UpgradeConfigRoot(val upgrades: List<UpgradeDef>)
+data class UpgradeConfigRoot(val upgrades: List<UpgradeDef>, val schemaVersion: Int = 1)
 @Serializable
-data class ShopConfigRoot(val shopItems: List<ShopItemDef>)
+data class ShopConfigRoot(val shopItems: List<ShopItemDef>, val schemaVersion: Int = 1)
 @Serializable
 data class PrestigeShopItemDef(val id: String, val name: String, val description: String, val cost: Long)
 @Serializable
-data class PrestigeShopConfigRoot(val shopItems: List<PrestigeShopItemDef>)
+data class PrestigeShopConfigRoot(val shopItems: List<PrestigeShopItemDef>, val schemaVersion: Int = 1)
 @Serializable
 data class UltraShopItemDef(val id: String, val name: String, val description: String, val cost: Long)
 @Serializable
-data class UltraShopConfigRoot(val shopItems: List<UltraShopItemDef>)
+data class UltraShopConfigRoot(val shopItems: List<UltraShopItemDef>, val schemaVersion: Int = 1)
 @Serializable
-data class AchievementConfigRoot(val achievements: List<AchievementDef>)
+data class AchievementConfigRoot(val achievements: List<AchievementDef>, val schemaVersion: Int = 1)
 @Serializable
 data class MinigameDef(val id: String, val name: String, val description: String, val rewardMultiplier: Double)
 @Serializable
-data class MinigameConfigRoot(val minigames: List<MinigameDef>)
+data class MinigameConfigRoot(val minigames: List<MinigameDef>, val schemaVersion: Int = 1)
 @Serializable
 data class ChallengeDef(val id: String, val name: String, val description: String, val rewardNebula: Long)
 @Serializable
-data class ChallengeConfigRoot(val challenges: List<ChallengeDef>)
+data class ChallengeConfigRoot(val challenges: List<ChallengeDef>, val schemaVersion: Int = 1)
 @Serializable
 data class TalentDef(val id: String, val name: String, val description: String, val cost: Long, val requiredParentId: String? = null)
 @Serializable
-data class TalentConfigRoot(val talents: List<TalentDef>)
+data class TalentConfigRoot(val talents: List<TalentDef>, val schemaVersion: Int = 1)
 @Serializable
 data class FeedbackMessagesRoot(
     val tooLowMessages: List<String>,
     val tooHighMessages: List<String>,
-    val guessTipsAndClues: List<String> = emptyList()
+    val guessTipsAndClues: List<String> = emptyList(),
+    val schemaVersion: Int = 1
 )
 
 class JsonConfigRepository(private val context: Context, private val localeTag: String = "en-US") {
