@@ -18,6 +18,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.jarrlyyy.guessthenumber.BuildConfig
+import androidx.compose.ui.platform.LocalContext
+import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -80,6 +82,8 @@ fun NavGraph(
     onNotificationDestinationHandled: () -> Unit = {}
 ) {
     val navController = rememberNavController()
+    val context = LocalContext.current
+    val featureFlags = remember { FeatureFlagRepository(context).load() }
     val locale = viewModel.localeManager
     if (!hasAnySave) {
         CompositionLocalProvider(LocalAppLocaleManager provides locale) {
@@ -372,18 +376,22 @@ fun NavGraph(
                     }
                     if (BuildConfig.DEBUG) {
                         composable(Screen.DevSettings.route) {
-                            DevSettingsScreen(
-                                state = state,
-                                onExecuteCommand = onExecuteDevCommand,
-                                onImportSave = onImportSave,
-                                onUpdateSettings = onUpdateSettings,
-                                onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
-                                onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
-                                onGetSaveJson = viewModel::getSaveJson,
-                                onApplySaveJson = viewModel::applySaveJson,
-                                onNavigate = { route -> navController.navigate(route) },
-                                onBack = { navController.popBackStack() }
-                            )
+                            if (BuildConfig.DEBUG && featureFlags["dev_console"] == true) {
+                                DevSettingsScreen(
+                                    state = state,
+                                    onExecuteCommand = onExecuteDevCommand,
+                                    onImportSave = onImportSave,
+                                    onUpdateSettings = onUpdateSettings,
+                                    onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
+                                    onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
+                                    onGetSaveJson = viewModel::getSaveJson,
+                                    onApplySaveJson = viewModel::applySaveJson,
+                                    onNavigate = { route -> navController.navigate(route) },
+                                    onBack = { navController.popBackStack() }
+                                )
+                            } else {
+                                FeatureDisabledScreen("Developer console", onBack = { navController.popBackStack() })
+                            }
                         }
                         composable("process_inspector") {
                             ProcessInspectorScreen(
@@ -405,11 +413,15 @@ fun NavGraph(
                         )
                     }
                     composable("live_ops") {
-                        LiveOpsScreen(
-                            state = state,
-                            onClaimReward = onClaimLiveOpsEventReward,
-                            onBack = { navController.popBackStack() }
-                        )
+                        if (featureFlags["live_ops"] == true && featureFlags["seasonal_rewards"] == true) {
+                            LiveOpsScreen(
+                                state = state,
+                                onClaimReward = onClaimLiveOpsEventReward,
+                                onBack = { navController.popBackStack() }
+                            )
+                        } else {
+                            FeatureDisabledScreen("Seasonal events", onBack = { navController.popBackStack() })
+                        }
                     }
                     composable("talent") {
                         TalentScreen(
@@ -419,16 +431,24 @@ fun NavGraph(
                         )
                     }
                     composable("mutators") {
-                        MutatorsScreen(
-                            state = state,
-                            onSelectMutator = { id, active -> viewModel.setMutatorActive(id, active) },
-                            onActivateChallengeBuilder = onActivateChallengeBuilder,
-                            onCompleteChallenge = { id, reward -> viewModel.claimChallenge(id, reward) },
-                            onBack = { navController.popBackStack() }
-                        )
+                        if (featureFlags["challenge_builder"] == true) {
+                            MutatorsScreen(
+                                state = state,
+                                onSelectMutator = { id, active -> viewModel.setMutatorActive(id, active) },
+                                onActivateChallengeBuilder = onActivateChallengeBuilder,
+                                onCompleteChallenge = { id, reward -> viewModel.claimChallenge(id, reward) },
+                                onBack = { navController.popBackStack() }
+                            )
+                        } else {
+                            FeatureDisabledScreen("Mutators and challenge builder", onBack = { navController.popBackStack() })
+                        }
                     }
                     composable(Screen.WorldMap.route) {
-                        WorldMapScreen(state = state, onWorldAction = viewModel::worldProgressAction, onProgressionAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        if (featureFlags["world_map"] == true) {
+                            WorldMapScreen(state = state, onWorldAction = viewModel::worldProgressAction, onProgressionAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        } else {
+                            FeatureDisabledScreen("World Map", onBack = { navController.popBackStack() })
+                        }
                     }
                     composable(Screen.Relics.route) {
                         RelicsScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
@@ -465,6 +485,20 @@ fun NavGraph(
                     }
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+private fun FeatureDisabledScreen(feature: String, onBack: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = androidx.compose.ui.Alignment.Center
+    ) {
+        Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+            Text("$feature is disabled in game/feature_flags.json")
+            Button(onClick = onBack) { Text("Back") }
         }
     }
 }
