@@ -166,14 +166,14 @@ fun QuickGuessDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
                     }
                     input = ""
                 }) {
-                    Text(localizedText("Guess"))
+                    Text(locale.getString("guess_button", "Guess"))
                 }
             } else {
                 Button(onClick = {
                     onReward(1L, BigNumber((score * 500).toLong()))
                     onDismiss()
                 }) {
-                    Text(localizedText("Claim Reward"))
+                    Text(localizedText(localizedText("Claim Reward")))
                 }
             }
         }
@@ -225,7 +225,7 @@ fun ReactionTestDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Uni
                     containerColor = if (state == "ready") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                 )
             ) {
-                Text(if (state == "clicked") "Claim Reward" else "TAP")
+                Text(if (state == "clicked") localizedText("Claim Reward") else localizedText("TAP"))
             }
         }
     )
@@ -407,7 +407,7 @@ fun NumberRushDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
                     onReward(1L, BigNumber(7500))
                     onDismiss()
                 }) {
-                    Text("Claim Reward")
+                    Text(localizedText("Claim Reward"))
                 }
             }
         }
