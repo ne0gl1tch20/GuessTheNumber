@@ -2,6 +2,12 @@
 
 **Planning directory only.** This folder is reserved for future bundled scripts after the Lua stability gate is passed. No Lua runtime or script execution is enabled by this README.
 
+## Source boundary
+
+This folder is the **offline, app-bundled source**. Remote event scripts belong in the separate planned `GuessTheNumber-LiveOps` content repository and must never be downloaded over or write into this folder. The runtime registry may resolve both sources, but only verified remote bundles may be cached in app-private storage.
+
+The initial offline catalog should stay small: one featured sample minigame plus reusable helpers. This lets the planned GO button work without network access and gives the app a fallback if LiveOps is unavailable.
+
 ## Intended organization
 
 ```text
