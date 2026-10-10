@@ -82,6 +82,10 @@ def main() -> int:
             elif not isinstance(data[key], str):
                 errors.append(f"{filename}: shared UI key {key!r} must be a string")
 
+        missing_translation_keys = baseline_keys - set(data)
+        for key in sorted(missing_translation_keys):
+            errors.append(f"{filename}: missing translation key {key!r}")
+
         for key in data:
             if key not in baseline_keys:
                 # Metadata is allowed to differ from the canonical translation set.
