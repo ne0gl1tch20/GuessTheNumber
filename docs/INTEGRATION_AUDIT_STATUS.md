@@ -147,3 +147,8 @@ Current app version: 3.0.1 (versionCode 19).
 - The World Map's boss-start availability now follows the same Endless Rift override as `GameViewModel.worldProgressAction`, so an active Rift run does not show a disabled Start Battle button when the backend permits the battle.
 - During an active Endless Rift, the map hides the standard boss requirement and base reward copy because the current tier changes battle eligibility and scales the actual payout. The current Rift tier and live boss HP remain visible.
 - Validation status for this change: pending the current GitHub Actions unit-test, lint, full-check and APK-build workflow. No emulator tests were run.
+
+## Music playback completion race (2026-10-10)
+
+- Removed the progress poller's second end-of-track advance. MediaPlayer's completion listener is the single owner of automatic track advancement, preventing a near-simultaneous poll and completion callback from skipping two tracks.
+- The progress poller still updates the displayed playback position and duration. The change is covered by the repository's normal unit-test, lint, Gradle-check and APK-build workflow; no emulator tests were run.

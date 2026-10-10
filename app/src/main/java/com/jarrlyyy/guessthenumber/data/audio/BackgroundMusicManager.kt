@@ -90,7 +90,6 @@ class BackgroundMusicManager private constructor(context: Context) {
                     try {
                         _currentPosition.value = player.currentPosition
                         _duration.value = player.duration
-                        if (!player.isPlaying && player.currentPosition >= player.duration - 250) advance()
                     } catch (_: Exception) {}
                 }
             }
