@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.widget
 
 import android.content.Context
+import android.content.Intent
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -21,7 +22,6 @@ import androidx.glance.Button
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.glance.appwidget.action.actionStartActivity
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.MainActivity
@@ -70,13 +70,26 @@ class GuessWidget : GlanceAppWidget() {
                     Text(locale.getString("widget_worlds_bosses", "Worlds %d • Bosses %d", state.unlockedWorldIds.size, state.defeatedBossIds.size), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                     Spacer(GlanceModifier.height(8.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), horizontalAlignment = Alignment.Horizontal.CenterHorizontally) {
-                        Button(text = locale.getString("play", "Play"), onClick = actionStartActivity<MainActivity>(), modifier = GlanceModifier.defaultWeight())
+                        Button(text = locale.getString("play", "Play"), onClick = actionRunCallback<OpenWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
                         Spacer(GlanceModifier.width(8.dp))
                         Button(text = locale.getString("widget_next_slot", "Next Slot"), onClick = actionRunCallback<CycleWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
                     }
                 }
             }
         }
+    }
+}
+
+class OpenWidgetSaveSlotCallback : ActionCallback {
+    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
+        val saveManager = SaveManager(context)
+        val widgetState = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
+        val slot = (widgetState[widgetSaveSlotKey] ?: saveManager.getActiveSlot()).coerceIn(1, MAX_SAVE_SLOTS)
+        val launchIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(MainActivity.EXTRA_WIDGET_SAVE_SLOT, slot)
+        }
+        context.startActivity(launchIntent)
     }
 }
 
