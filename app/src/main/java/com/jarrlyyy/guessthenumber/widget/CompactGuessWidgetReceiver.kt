@@ -66,15 +66,15 @@ class CompactGuessWidget : GlanceAppWidget() {
                             Text(locale.getString("widget_money", "Money"), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                             Text(state.money.format(), style = TextStyle(fontWeight = FontWeight.Bold, color = GlanceTheme.colors.primary))
                         }
-                        Column(modifier = GlanceModifier.defaultWeight()) {
+                        Column(modifier = GlanceModifier) {
                             Text(locale.getString("widget_streak", "Streak %d", state.streak), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                             Text(locale.getString("widget_worlds_bosses", "Worlds %d • Bosses %d", state.unlockedWorldIds.size, state.defeatedBossIds.size), style = TextStyle(color = GlanceTheme.colors.onBackground))
                         }
                     }
                     Row(modifier = GlanceModifier.fillMaxWidth()) {
-                        Button(text = locale.getString("play", "Play"), onClick = actionRunCallback<OpenCompactWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
+                        Button(text = locale.getString("play", "Play"), onClick = actionRunCallback<OpenCompactWidgetSaveSlotCallback>(), modifier = GlanceModifier)
                         Spacer(GlanceModifier.width(8.dp))
-                        Button(text = locale.getString("widget_next_slot", "Next Slot"), onClick = actionRunCallback<CycleCompactWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
+                        Button(text = locale.getString("widget_next_slot", "Next Slot"), onClick = actionRunCallback<CycleCompactWidgetSaveSlotCallback>(), modifier = GlanceModifier)
                     }
                 }
             }
