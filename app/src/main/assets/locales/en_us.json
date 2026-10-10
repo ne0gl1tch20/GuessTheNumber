@@ -830,5 +830,8 @@
   "liveops_status_active": "Active",
   "liveops_status_upcoming": "Upcoming",
   "liveops_status_ending": "Ending soon",
-  "liveops_status_archived": "Archived"
+  "liveops_status_archived": "Archived",
+  "stats_correct_guesses": "Correct: %s",
+  "stats_failed_guesses": "Failed: %s",
+  "stats_total_guesses": "Total: %s"
 }
