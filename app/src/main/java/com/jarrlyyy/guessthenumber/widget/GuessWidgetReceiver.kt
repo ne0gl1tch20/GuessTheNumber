@@ -3,7 +3,6 @@ package com.jarrlyyy.guessthenumber.widget
 import android.content.Context
 import android.content.Intent
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.toMutablePreferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
