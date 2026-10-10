@@ -784,7 +784,7 @@ private fun LootChestBoard(
                         Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            locale.getString("loot_drop_message", locale.getString("loot_tier_" + state.lastLootDropTier)),
+                            locale.getString("loot_drop_message", "A %s chest dropped!", locale.getString("loot_tier_" + state.lastLootDropTier)),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
