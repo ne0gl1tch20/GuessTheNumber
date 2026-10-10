@@ -68,7 +68,18 @@ class BackgroundMusicManager private constructor(context: Context) {
     private val _albumArt = MutableStateFlow<Bitmap?>(null)
     val albumArt: StateFlow<Bitmap?> = _albumArt.asStateFlow()
 
-    init { startProgressTracker() }
+    init {
+        val validTrackIds = _library.value.mapTo(hashSetOf()) { it.id }
+        if (_currentTrackId.value != null && _currentTrackId.value !in validTrackIds) {
+            _currentTrackId.value = null
+            preferences.edit().remove("current_track").apply()
+        }
+        // Persist the sanitized versions so missing imported files cannot leave stale queue
+        // and playlist IDs behind across every subsequent process restart.
+        persistQueue()
+        persistPlaylists()
+        startProgressTracker()
+    }
 
     private fun startProgressTracker() {
         progressJob?.cancel()
@@ -113,7 +124,14 @@ class BackgroundMusicManager private constructor(context: Context) {
 
     fun removeTrack(trackId: String) {
         val track = _library.value.firstOrNull { it.id == trackId } ?: return
-        if (_currentTrackId.value == trackId) stop()
+        if (_currentTrackId.value == trackId) {
+            stop()
+            _currentTrackId.value = null
+            _currentPath.value = null
+            _duration.value = 0
+            _albumArt.value = null
+            preferences.edit().remove("current_track").apply()
+        }
         runCatching { File(track.path).delete() }
         _library.value = _library.value.filterNot { it.id == trackId }
         persistLibrary(_library.value)
@@ -144,8 +162,14 @@ class BackgroundMusicManager private constructor(context: Context) {
     }
 
     fun playQueue(trackIds: List<String>, startIndex: Int = 0) {
-        _queue.value = trackIds.filter { id -> _library.value.any { it.id == id } }; persistQueue()
-        queueIndex = startIndex.coerceIn(0, (_queue.value.size - 1).coerceAtLeast(0)); playQueueIndex()
+        _queue.value = trackIds.filter { id -> _library.value.any { it.id == id } }
+        persistQueue()
+        queueIndex = startIndex.coerceIn(0, (_queue.value.size - 1).coerceAtLeast(0))
+        if (_queue.value.isEmpty()) {
+            stop()
+            return
+        }
+        playQueueIndex()
     }
 
     fun enqueue(trackId: String) { if (trackId in _library.value.map { it.id }) { _queue.value = _queue.value + trackId; persistQueue() } }
@@ -179,7 +203,12 @@ class BackgroundMusicManager private constructor(context: Context) {
         persistQueue()
     }
 
-    fun clearQueue() { _queue.value = emptyList(); queueIndex = 0; persistQueue() }
+    fun clearQueue() {
+        if (_currentTrackId.value in _queue.value) skipRepeatOnceAfterQueueRemoval = true
+        _queue.value = emptyList()
+        queueIndex = 0
+        persistQueue()
+    }
     fun setShuffle(enabled: Boolean) { _shuffle.value = enabled; preferences.edit().putBoolean("shuffle", enabled).apply() }
     fun setRepeatMode(mode: RepeatMode) { _repeatMode.value = mode; preferences.edit().putString("repeat", mode.name).apply() }
     fun next() = advance()
@@ -196,7 +225,10 @@ class BackgroundMusicManager private constructor(context: Context) {
             playTrack(_currentTrackId.value!!)
             return
         }
-        if (_queue.value.isEmpty()) return
+        if (_queue.value.isEmpty()) {
+            stop()
+            return
+        }
         queueIndex = if (_shuffle.value) Random.nextInt(_queue.value.size) else queueIndex + 1
         if (queueIndex >= _queue.value.size) {
             if (_repeatMode.value == RepeatMode.ALL) queueIndex = 0 else { stop(); return }
