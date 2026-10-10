@@ -213,6 +213,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 if (isNewVersion && !timeTravelDetected) {
                     _showChangelogPopup.value = true
                 }
+            }
             } catch (cancelled: kotlinx.coroutines.CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
