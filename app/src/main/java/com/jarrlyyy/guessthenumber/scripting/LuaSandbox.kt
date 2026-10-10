@@ -2,15 +2,16 @@ package com.jarrlyyy.guessthenumber.scripting
 
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
+import org.luaj.vm2.LuaThread
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
+import org.luaj.vm2.lib.BaseLib
 import org.luaj.vm2.lib.Bit32Lib
 import org.luaj.vm2.lib.DebugLib
 import org.luaj.vm2.lib.MathLib
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TableLib
 import org.luaj.vm2.lib.VarArgFunction
-import org.luaj.vm2.lib.BaseLib
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.LoadState
 
@@ -31,7 +32,6 @@ internal class LuaSandbox(
 
     private val compilerGlobals = Globals().apply {
         load(BaseLib())
-        load(MathLib())
         LoadState.install(this)
         LuaC.install(this)
     }
@@ -55,7 +55,8 @@ internal class LuaSandbox(
             LuaC.install(this)
         }
 
-        // Capture the hook setter before removing the entire debug surface.
+        // LuaJ's hook belongs to a LuaThread. Configure that thread directly
+        // rather than calling debug.sethook from the main Kotlin thread.
         val setHook = globals.get("debug").get("sethook")
         globals.set("debug", LuaValue.NIL)
 
@@ -63,10 +64,9 @@ internal class LuaSandbox(
             "dofile", "loadfile", "load", "require", "collectgarbage",
             "getmetatable", "setmetatable", "rawset", "rawget"
         ).forEach { globals.set(it, LuaValue.NIL) }
-        // Avoid an easy unbounded string-allocation path in event scripts.
+        globals.get("package").let { if (!it.isnil()) globals.set("package", LuaValue.NIL) }
         globals.get("table").set("concat", LuaValue.NIL)
 
-        // Bound output and avoid exposing an unbounded print sink.
         globals.set("print", object : VarArgFunction() {
             override fun invoke(args: Varargs): Varargs {
                 if (logLines < MAX_LOG_LINES) {
@@ -97,56 +97,48 @@ internal class LuaSandbox(
             override fun call(): LuaValue {
                 instructions += HOOK_INTERVAL
                 if (instructions > MAX_INSTRUCTIONS) {
-                    throw LuaError("Lua script exceeded its instruction budget.")
+                    // LuaError can be swallowed by a script's pcall. A JVM Error
+                    // escapes Lua pcall and is surfaced when the thread resumes.
+                    throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
                 }
                 return LuaValue.NIL
             }
         }
 
-        // LuaJ's debug.sethook resolves the currently running Lua thread. Calling
-        // it directly from Kotlin happens outside that thread and can fail. Install
-        // the hook from a tiny Lua wrapper, then hide debug before the script runs.
-        globals.set("__gtn_run", chunk)
-        globals.set("__gtn_hook", hook)
-        val guardedChunk = compilerGlobals.load(
-            """
-            local run = __gtn_run
-            local hook = __gtn_hook
-            local sethook = debug.sethook
-            sethook(hook, "", $HOOK_INTERVAL)
-            debug = nil
-            __gtn_run = nil
-            __gtn_hook = nil
-            local ok, result = pcall(run)
-            sethook(nil, "", 0)
-            if not ok then error(result) end
-            return result
-            """.trimIndent(),
-            "${scriptId}_guard",
-            globals
+        val thread = LuaThread(globals, chunk)
+        setHook.invoke(
+            LuaValue.varargsOf(
+                arrayOf(
+                    thread,
+                    hook,
+                    LuaValue.EMPTYSTRING,
+                    LuaValue.valueOf(HOOK_INTERVAL)
+                )
+            )
         )
 
         return try {
-            guardedChunk.call()
-        } catch (error: LuaBudgetExceededError) {
-            throw error
-        } catch (error: LuaError) {
-            if (error.message.orEmpty().contains("instruction budget", ignoreCase = true) ||
-                error.cause is LuaBudgetExceededError
-            ) {
+            val result = thread.resume(LuaValue.NIL)
+            if (result.arg1().isstring() && result.arg1().tojstring().contains("instruction budget", true)) {
                 throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
             }
+            if (thread.state.status == LuaThread.STATUS_DEAD && thread.state.error != null) {
+                val message = thread.state.error.orEmpty()
+                if (message.contains("instruction budget", ignoreCase = true)) {
+                    throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
+                }
+                throw LuaError(message)
+            }
+            result.arg1()
+        } catch (error: LuaBudgetExceededError) {
             throw error
         } finally {
-            // The wrapper normally clears the hook; remove temporary host references
-            // even if compilation or execution fails unexpectedly.
-            globals.set("__gtn_run", LuaValue.NIL)
-            globals.set("__gtn_hook", LuaValue.NIL)
+            // Drop the hook reference so completed threads can be collected.
+            setHook.invoke(LuaValue.varargsOf(arrayOf(thread, LuaValue.NIL)))
         }
     }
 
     private fun checkSource(source: String) {
-        // Check size first so whitespace-only oversized inputs still hit the size limit.
         require(source.length <= MAX_SOURCE_CHARS) {
             "Script exceeds the $MAX_SOURCE_CHARS character limit."
         }
