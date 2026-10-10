@@ -6,6 +6,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -21,6 +22,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -39,6 +41,8 @@ fun PlayScreen(
     incomePerSecond: com.jarrlyyy.guessthenumber.domain.model.BigNumber = com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    val listState = rememberLazyListState()
+    val scrollScope = rememberCoroutineScope()
     val worldDefinitions = remember { WorldConfigRepository(context).loadWorlds() }
     var guessInput by remember { mutableStateOf("") }
     val configRepository = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale) }
@@ -92,6 +96,7 @@ fun PlayScreen(
         }
     ) { padding ->
         androidx.compose.foundation.lazy.LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
@@ -100,7 +105,7 @@ fun PlayScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (state.activeBossBattleWorldId != null) {
-                item {
+                item(key = "active_boss_battle") {
                     val bossWorld = worldDefinitions.firstOrNull { it.id == state.activeBossBattleWorldId }
                         ?: worldDefinitions.first()
                     val bossNameKey = bossWorld.bossKey
@@ -128,7 +133,26 @@ fun PlayScreen(
                     }
                 }
             }
-            item {
+            item(key = "beyond_numbers_shortcut") {
+                FilledTonalButton(
+                    onClick = {
+                        val hubIndex = 4 +
+                            if (state.activeBossBattleWorldId != null) 1 else 0 +
+                            if (state.lastRandomEventId != null) 1 else 0
+                        scrollScope.launch {
+                            listState.animateScrollToItem(hubIndex)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Explore, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(locale.getString("beyond_numbers_title", "Beyond the Numbers"))
+                    Spacer(Modifier.weight(1f))
+                    Icon(Icons.Default.ArrowDownward, contentDescription = null)
+                }
+            }
+            item(key = "play_hero_stats") {
                 // Material 3 Expressive Hero Card with Organic Pulsing
                 Surface(
                     modifier = Modifier
@@ -259,7 +283,7 @@ fun PlayScreen(
                 }
             }
 
-            item {
+            item(key = "correct_guess_celebration") {
                 AnimatedVisibility(
                     visible = showCorrectCelebration,
                     enter = if (state.settings.reducedMotion) fadeIn() else scaleIn() + fadeIn(),
@@ -300,7 +324,7 @@ fun PlayScreen(
             }
 
             state.lastRandomEventId?.let { eventId ->
-                item {
+                item(key = "random_event_${eventId}") {
                     val eventName = locale.getString(
                         "random_event_" + eventId + "_name",
                         eventId
@@ -332,7 +356,7 @@ fun PlayScreen(
                 }
             }
 
-            item {
+            item(key = "number_guessing_panel") {
                 // Google-style M3 Expressive Action Card Container
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -579,7 +603,7 @@ fun PlayScreen(
                     }
                 }
             }
-            item {
+            item(key = "beyond_numbers_hub") {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
@@ -639,21 +663,21 @@ fun PlayScreen(
                     }
                 }
             }
-            item {
+            item(key = "daily_quest_board") {
                 DailyQuestBoard(
                     state = state,
                     locale = locale,
                     onClaim = onClaimDailyQuest
                 )
             }
-            item {
+            item(key = "loot_chest_board") {
                 LootChestBoard(
                     state = state,
                     locale = locale,
                     onOpen = onOpenLootChest
                 )
             }
-            item {
+            item(key = "world_progression_board") {
                 WorldProgressionBoard(
                     state = state,
                     locale = locale,
