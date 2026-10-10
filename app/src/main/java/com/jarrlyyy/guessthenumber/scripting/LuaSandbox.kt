@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.scripting
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.LuaThread
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.BaseLib
 import org.luaj.vm2.lib.Bit32Lib
@@ -47,8 +48,11 @@ internal class LuaSandbox(
         var logLines = 0
         val globals = Globals().apply {
             load(BaseLib())
+            // Keep the runtime Globals fully initialized for LuaJ's base
+            // runtime while removing dynamic loading from the script surface.
+            LoadState.install(this)
+            LuaC.install(this)
             // LuaJ's library installers register themselves in package.loaded.
-            // Install PackageLib first, then remove the package surface below.
             load(PackageLib())
             load(TableLib())
             load(MathLib())
@@ -106,12 +110,9 @@ internal class LuaSandbox(
             }
         }
 
-        // Run the chunk on this Globals instance's existing Lua thread.
-        // LuaThread.resume() is a low-level Java API and does not add the
-        // success boolean returned by Lua's coroutine.resume function.
-        // Treating its first return value as that boolean discarded the
-        // activity table and caused valid scripts to appear to fail.
-        val thread = globals.running
+        // Execute in an isolated LuaThread so instruction hooks are applied
+        // to the exact thread running the script.
+        val thread = LuaThread(globals, chunk)
         setHook.invoke(
             LuaValue.varargsOf(
                 arrayOf(
@@ -124,9 +125,20 @@ internal class LuaSandbox(
         )
 
         return try {
-            chunk.call()
+            val outcome = thread.resume(LuaValue.NIL)
+            // LuaThread.resume returns (true, results...) on success and
+            // (false, errorMessage) on failure.
+            if (!outcome.arg1().toboolean()) {
+                val message = outcome.arg(2).tojstring()
+                if (message.contains("instruction budget", ignoreCase = true)) {
+                    throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
+                }
+                throw LuaError(message)
+            }
+            outcome.arg(2)
+        } catch (error: LuaBudgetExceededError) {
+            throw error
         } finally {
-            // Remove the instruction hook even when the script throws.
             setHook.invoke(LuaValue.varargsOf(arrayOf(thread, LuaValue.NIL)))
         }
     }
