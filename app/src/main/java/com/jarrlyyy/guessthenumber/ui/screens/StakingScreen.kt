@@ -63,11 +63,11 @@ fun StakingScreen(
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(localizedText("Current Streak: ${state.streak} (Best: ${state.bestStreak})"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                        Text(locale.getString("staking_streak_format", "Current Streak: %d (Best: %d)", state.streak, state.bestStreak), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(localizedText("Money: ${state.money.format()}"), color = MoneyGold, fontSize = 16.sp)
+                        Text(locale.getString("staking_money_format", "Money: %s", state.money.format()), color = MoneyGold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(localizedText("Stake a portion of your money on a 50/50 'Lucky Guess' coin flip. Win to double your stake (+streak multiplier bonus), lose to forfeit it!"), fontSize = 13.sp)
+                        Text(locale.getString("staking_description", "Stake a portion of your money on a 50/50 'Lucky Guess' coin flip. Win to double your stake (+streak multiplier bonus), lose to forfeit it!"), fontSize = 13.sp)
                     }
                 }
             }
@@ -76,7 +76,7 @@ fun StakingScreen(
                 OutlinedTextField(
                     value = stakeInput,
                     onValueChange = { stakeInput = it },
-                    label = { Text(localizedText("Stake Amount")) },
+                    label = { Text(locale.getString("staking_amount_label", "Stake Amount")) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -111,7 +111,7 @@ fun StakingScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = MoneyGold)
                 ) {
-                    Text(localizedText("Stake & Flip (50/50)"), color = MaterialTheme.colorScheme.onBackground)
+                    Text(locale.getString("staking_flip_button", "Stake & Flip (50/50)"), color = MaterialTheme.colorScheme.onBackground)
                 }
             }
 
