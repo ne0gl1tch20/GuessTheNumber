@@ -73,7 +73,7 @@ jobs:
         run: ./gradlew assembleDebug
 
       - name: Build Release APK (Unsigned)
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --stacktrace
 
       - name: Upload Test and Lint Reports
         if: always()
