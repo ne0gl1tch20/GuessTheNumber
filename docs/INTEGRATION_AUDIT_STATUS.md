@@ -91,3 +91,4 @@ Current app version: 3.0.1 (versionCode 19).
 - These are source-level changes only. No build, emulator run, or GitHub Actions workflow was started, so compilation and device behavior remain unverified.
 
 - Widget Play buttons now open the slot currently shown by that widget. MainActivity defers the requested switch until initial save loading has completed and crash recovery has been dismissed, avoiding a race with startup initialization; loading state is raised before the asynchronous load begins.
+- Boss and Endless Rift payout bonuses now include the permanent Live Ops money boost, and Home Base uses the same 2%-per-level rate (capped at 40%) across correct-guess and progression reward paths. This closes a gap where a save-slot permanent bonus and Home Base level affected guess payouts but not progression payouts consistently.
