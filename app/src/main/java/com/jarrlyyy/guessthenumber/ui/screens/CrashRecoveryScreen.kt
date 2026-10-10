@@ -92,7 +92,7 @@ fun CrashRecoveryScreen(locale: LocaleManager, onDismiss: () -> Unit, reducedMot
                             putExtra(Intent.EXTRA_TEXT, crashLog)
                             type = "text/plain"
                         }
-                        val shareIntent = Intent.createChooser(sendIntent, "Share Crash Logs")
+                        val shareIntent = Intent.createChooser(sendIntent, locale.getString("share_crash_logs_title", "Share Crash Logs"))
                         context.startActivity(shareIntent)
                     },
                     modifier = Modifier.weight(1f)
