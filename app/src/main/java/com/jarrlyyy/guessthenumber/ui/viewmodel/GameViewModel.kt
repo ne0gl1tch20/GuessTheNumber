@@ -133,7 +133,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadGame(slot: Int = -1) {
         viewModelScope.launch(Dispatchers.IO) {
-            val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else saveManager.getActiveSlot()
+            try {
+                val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else saveManager.getActiveSlot()
             saveManager.setActiveSlot(targetSlot)
             _activeSlot.value = targetSlot
 
@@ -211,6 +212,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 if (isNewVersion && !timeTravelDetected) {
                     _showChangelogPopup.value = true
+                }
+            } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "LOAD_INITIALIZATION_FAILED", "Save initialization failed: ${error.message}")
+                withContext(Dispatchers.Main) {
+                    _isLoadingSave.value = false
                 }
             }
         }
