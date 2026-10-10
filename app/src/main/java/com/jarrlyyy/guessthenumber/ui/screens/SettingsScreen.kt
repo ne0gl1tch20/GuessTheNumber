@@ -48,10 +48,10 @@ fun SettingsScreen(
     ) { isGranted ->
         if (isGranted) {
             onUpdateSettings(settings.copy(notificationsEnabled = true))
-            Toast.makeText(context, "Notifications enabled!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, locale.getString("notifications_enabled_toast", "Notifications enabled!"), Toast.LENGTH_SHORT).show()
         } else {
             onUpdateSettings(settings.copy(notificationsEnabled = false))
-            Toast.makeText(context, "Notification permission denied.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, locale.getString("notification_permission_denied_toast", "Notification permission denied."), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -61,7 +61,7 @@ fun SettingsScreen(
                 title = { Text(localizedText("Settings & Save Management")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 }
             )
@@ -312,7 +312,7 @@ fun SettingsScreen(
                             ) {
                                 intervalOptions.forEach { hours ->
                                     DropdownMenuItem(
-                                        text = { Text(localizedText("$hours Hours")) },
+                                        text = { Text(locale.getString("hours_format", "%d Hours", hours)) },
                                         onClick = {
                                             onUpdateSettings(settings.copy(notificationIntervalHours = hours))
                                             expanded = false
@@ -419,7 +419,7 @@ fun SettingsScreen(
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(localizedText("Master Volume: ${(settings.volume * 100).toInt()}%"), style = MaterialTheme.typography.bodyLarge)
+                    Text(locale.getString("master_volume_format", "Master Volume: %d%%", (settings.volume * 100).toInt()), style = MaterialTheme.typography.bodyLarge)
                     Slider(
                         value = settings.volume,
                         onValueChange = { onUpdateSettings(settings.copy(volume = it)) },
@@ -498,7 +498,7 @@ fun SettingsScreen(
                     onClick = {
                         onResetData()
                         showResetDialog = false
-                        Toast.makeText(context, "All game data has been reset.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, locale.getString("all_game_data_reset_toast", "All game data has been reset."), Toast.LENGTH_SHORT).show()
                     },
                     enabled = confirmResetCheck,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
