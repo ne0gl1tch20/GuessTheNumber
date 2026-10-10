@@ -204,7 +204,7 @@ class BackgroundMusicManager private constructor(context: Context) {
     }
 
     fun clearQueue() {
-        if (_currentTrackId.value in _queue.value) skipRepeatOnceAfterQueueRemoval = true
+        if (_currentTrackId.value?.let { it in _queue.value } == true) skipRepeatOnceAfterQueueRemoval = true
         _queue.value = emptyList()
         queueIndex = 0
         persistQueue()
