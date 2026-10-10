@@ -73,11 +73,13 @@ class LocaleManager(private val context: Context) {
 
     fun isRtl(): Boolean = currentLocale.language in setOf("ar", "fa", "he", "ur")
 
-    fun getString(key: String, default: String = key): String =
-        translations.optString(key, default)
+    fun getString(key: String, default: String = key): String {
+        val fallback = if (default == key) getStringByEnglish(key) else default
+        return translations.optString(key, fallback)
+    }
 
     fun getString(key: String, vararg formatArgs: Any): String =
-        formatString(translations.optString(key, key), *formatArgs)
+        formatString(translations.optString(key, getStringByEnglish(key)), *formatArgs)
 
     fun getStringByEnglish(english: String): String {
         val keys = englishCatalog.keys()
@@ -90,8 +92,10 @@ class LocaleManager(private val context: Context) {
         return english
     }
 
-    fun getString(key: String, default: String, vararg formatArgs: Any): String =
-        formatString(translations.optString(key, default), *formatArgs)
+    fun getString(key: String, default: String, vararg formatArgs: Any): String {
+        val fallback = if (default == key) getStringByEnglish(key) else default
+        return formatString(translations.optString(key, fallback), *formatArgs)
+    }
 
     fun formatNumber(value: Long): String =
         NumberFormat.getIntegerInstance(currentLocale).format(value)
