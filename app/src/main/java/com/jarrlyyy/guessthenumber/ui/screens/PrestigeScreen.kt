@@ -120,7 +120,7 @@ fun PrestigeScreen(
             item {
                 ExpressiveMilestoneBanner(
                     visible = showPrestigeCelebration,
-                    title = "Prestige achieved!",
+                    title = locale.getString("prestige_achieved_title", "Prestige achieved!"),
                     description = "A new reset is complete. Your next run starts now.",
                     reducedMotion = state.settings.reducedMotion
                 )

@@ -839,5 +839,12 @@
   "music_shuffle": "Перемешать воспроизведение",
   "music_repeat": "Режим повтора",
   "accessibility_warning": "Предупреждение",
-  "save_slot_name_label": "Название сохранения"
+  "save_slot_name_label": "Название сохранения",
+  "ultra_achieved_title": "Ultra достигнут!",
+  "prestige_achieved_title": "Prestige достигнут!",
+  "settings_custom_theme_color": "🎨 Пользовательский цвет темы",
+  "stats_prestige_resets": "Сбросы Prestige",
+  "stats_ultra_resets": "Сбросы Ultra",
+  "stats_total_playtime": "Общее время игры",
+  "stats_current_number_range": "Текущий диапазон чисел"
 }

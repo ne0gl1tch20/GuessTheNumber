@@ -839,5 +839,12 @@
   "music_shuffle": "Phát ngẫu nhiên",
   "music_repeat": "Chế độ lặp lại",
   "accessibility_warning": "Cảnh báo",
-  "save_slot_name_label": "Tên bản lưu"
+  "save_slot_name_label": "Tên bản lưu",
+  "ultra_achieved_title": "Đạt Ultra!",
+  "prestige_achieved_title": "Đạt Prestige!",
+  "settings_custom_theme_color": "🎨 Màu giao diện tùy chỉnh",
+  "stats_prestige_resets": "Lần đặt lại Prestige",
+  "stats_ultra_resets": "Lần đặt lại Ultra",
+  "stats_total_playtime": "Tổng thời gian chơi",
+  "stats_current_number_range": "Phạm vi số hiện tại"
 }

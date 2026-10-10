@@ -839,5 +839,12 @@
   "music_shuffle": "शफ़ल प्लेबैक",
   "music_repeat": "दोहराने का मोड",
   "accessibility_warning": "चेतावनी",
-  "save_slot_name_label": "सेव का नाम"
+  "save_slot_name_label": "सेव का नाम",
+  "ultra_achieved_title": "Ultra प्राप्त हुआ!",
+  "prestige_achieved_title": "Prestige प्राप्त हुआ!",
+  "settings_custom_theme_color": "🎨 कस्टम थीम रंग",
+  "stats_prestige_resets": "Prestige रीसेट",
+  "stats_ultra_resets": "Ultra रीसेट",
+  "stats_total_playtime": "कुल खेलने का समय",
+  "stats_current_number_range": "वर्तमान संख्या सीमा"
 }

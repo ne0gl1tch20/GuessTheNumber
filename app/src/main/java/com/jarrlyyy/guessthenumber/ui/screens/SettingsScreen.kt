@@ -460,7 +460,7 @@ fun SettingsScreen(
         }
         ReusableColorPickerDialog(
             initialHex = current,
-            title = "🎨 Custom Theme Color",
+            title = locale.getString("settings_custom_theme_color", "🎨 Custom Theme Color"),
             onDismiss = { colorTarget = null },
             onApply = { hex ->
                 val updated = when (target) {

@@ -840,5 +840,12 @@
   "music_shuffle": "التشغيل العشوائي",
   "music_repeat": "وضع التكرار",
   "accessibility_warning": "تحذير",
-  "save_slot_name_label": "اسم الحفظ"
+  "save_slot_name_label": "اسم الحفظ",
+  "ultra_achieved_title": "تم تحقيق Ultra!",
+  "prestige_achieved_title": "تم تحقيق Prestige!",
+  "settings_custom_theme_color": "🎨 لون سمة مخصص",
+  "stats_prestige_resets": "عمليات إعادة ضبط Prestige",
+  "stats_ultra_resets": "عمليات إعادة ضبط Ultra",
+  "stats_total_playtime": "إجمالي وقت اللعب",
+  "stats_current_number_range": "نطاق الأرقام الحالي"
 }

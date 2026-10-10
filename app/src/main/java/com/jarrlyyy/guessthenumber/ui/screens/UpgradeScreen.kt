@@ -31,6 +31,7 @@ fun UpgradeScreen(
     onUpdateMultiplier: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
+    val locale = LocalAppLocaleManager.current
     val upgrades = remember {
         JsonConfigRepository(context).loadUpgrades()
     }
@@ -201,7 +202,7 @@ fun UpgradeScreen(
                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                             ) {
                                 AnimatedContent(targetState = level, label = "upgradeLevel_${upgrade.id}") { animatedLevel ->
-                                    Text(text = "Level: $animatedLevel / ${if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel}",
+                                    Text(text = locale.getString("upgrade_level_format", "Level: %d / %s", animatedLevel, if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel.toString()),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)

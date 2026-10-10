@@ -839,5 +839,12 @@
   "music_shuffle": "Karışık çalma",
   "music_repeat": "Tekrarlama modu",
   "accessibility_warning": "Uyarı",
-  "save_slot_name_label": "Kayıt adı"
+  "save_slot_name_label": "Kayıt adı",
+  "ultra_achieved_title": "Ultra elde edildi!",
+  "prestige_achieved_title": "Prestige elde edildi!",
+  "settings_custom_theme_color": "🎨 Özel tema rengi",
+  "stats_prestige_resets": "Prestige sıfırlamaları",
+  "stats_ultra_resets": "Ultra sıfırlamaları",
+  "stats_total_playtime": "Toplam oynama süresi",
+  "stats_current_number_range": "Geçerli sayı aralığı"
 }

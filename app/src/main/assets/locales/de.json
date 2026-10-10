@@ -839,5 +839,12 @@
   "music_shuffle": "Zufallswiedergabe",
   "music_repeat": "Wiederholungsmodus",
   "accessibility_warning": "Warnung",
-  "save_slot_name_label": "Spielstandname"
+  "save_slot_name_label": "Spielstandname",
+  "ultra_achieved_title": "Ultra erreicht!",
+  "prestige_achieved_title": "Prestige erreicht!",
+  "settings_custom_theme_color": "🎨 Benutzerdefinierte Themenfarbe",
+  "stats_prestige_resets": "Prestige-Resets",
+  "stats_ultra_resets": "Ultra-Resets",
+  "stats_total_playtime": "Gesamte Spielzeit",
+  "stats_current_number_range": "Aktueller Zahlenbereich"
 }

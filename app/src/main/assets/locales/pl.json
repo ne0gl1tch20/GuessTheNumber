@@ -839,5 +839,12 @@
   "music_shuffle": "Odtwarzanie losowe",
   "music_repeat": "Tryb powtarzania",
   "accessibility_warning": "Ostrzeżenie",
-  "save_slot_name_label": "Nazwa zapisu"
+  "save_slot_name_label": "Nazwa zapisu",
+  "ultra_achieved_title": "Osiągnięto Ultra!",
+  "prestige_achieved_title": "Osiągnięto Prestige!",
+  "settings_custom_theme_color": "🎨 Niestandardowy kolor motywu",
+  "stats_prestige_resets": "Resetowania Prestige",
+  "stats_ultra_resets": "Resetowania Ultra",
+  "stats_total_playtime": "Łączny czas gry",
+  "stats_current_number_range": "Bieżący zakres liczb"
 }

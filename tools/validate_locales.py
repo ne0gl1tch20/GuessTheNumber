@@ -28,6 +28,9 @@ REQUIRED_SHARED_KEYS = {
     "music_shuffle", "music_repeat",
     "accessibility_warning",
     "save_slot_name_label",
+    "ultra_achieved_title", "prestige_achieved_title", "settings_custom_theme_color",
+    "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime",
+    "stats_current_number_range",
     "music_control_previous", "music_control_pause", "music_control_play",
     "music_control_next", "music_control_stop",
 }

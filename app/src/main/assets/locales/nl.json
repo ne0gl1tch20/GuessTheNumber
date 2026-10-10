@@ -839,5 +839,12 @@
   "music_shuffle": "Willekeurig afspelen",
   "music_repeat": "Herhaalmodus",
   "accessibility_warning": "Waarschuwing",
-  "save_slot_name_label": "Naam van opslag"
+  "save_slot_name_label": "Naam van opslag",
+  "ultra_achieved_title": "Ultra bereikt!",
+  "prestige_achieved_title": "Prestige bereikt!",
+  "settings_custom_theme_color": "🎨 Aangepaste themakleur",
+  "stats_prestige_resets": "Prestige-resets",
+  "stats_ultra_resets": "Ultra-resets",
+  "stats_total_playtime": "Totale speeltijd",
+  "stats_current_number_range": "Huidig getalbereik"
 }

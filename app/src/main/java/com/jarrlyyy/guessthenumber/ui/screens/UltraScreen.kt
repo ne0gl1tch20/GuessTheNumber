@@ -119,7 +119,7 @@ fun UltraScreen(
             item {
                 ExpressiveMilestoneBanner(
                     visible = showUltraCelebration,
-                    title = "Ultra achieved!",
+                    title = locale.getString("ultra_achieved_title", "Ultra achieved!"),
                     description = "Your cosmic reset is complete. Time to build bigger.",
                     reducedMotion = state.settings.reducedMotion
                 )

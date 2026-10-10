@@ -120,14 +120,14 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                 ) {
                     StatMetricCard(
                         modifier = Modifier.weight(1f),
-                        title = "Money Earned",
+                        title = locale.getString("inspector_money_earned", "Money Earned"),
                         value = stats.moneyEarned.format(),
                         icon = Icons.Default.TrendingUp,
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                     StatMetricCard(
                         modifier = Modifier.weight(1f),
-                        title = "Money Spent",
+                        title = locale.getString("inspector_money_spent", "Money Spent"),
                         value = stats.moneySpent.format(),
                         icon = Icons.Default.ShoppingCart,
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -142,14 +142,14 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                 ) {
                     StatMetricCard(
                         modifier = Modifier.weight(1f),
-                        title = "Current Streak",
+                        title = locale.getString("inspector_current_streak", "Current Streak"),
                         value = "${state.streak}",
                         icon = Icons.Default.LocalFireDepartment,
                         containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                     StatMetricCard(
                         modifier = Modifier.weight(1f),
-                        title = "Best Streak",
+                        title = locale.getString("inspector_best_streak", "Best Streak"),
                         value = "${state.bestStreak}",
                         icon = Icons.Default.EmojiEvents,
                         containerColor = MaterialTheme.colorScheme.secondaryContainer
@@ -169,19 +169,19 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     StatDetailRow(
-                        title = "Prestige Resets",
+                        title = locale.getString("stats_prestige_resets", "Prestige Resets"),
                         value = "${stats.prestigesCount}",
                         icon = Icons.Default.Star,
                         description = "Times reset for Prestige tokens"
                     )
                     StatDetailRow(
-                        title = "Ultra Resets",
+                        title = locale.getString("stats_ultra_resets", "Ultra Resets"),
                         value = "${stats.ultrasCount}",
                         icon = Icons.Default.AutoAwesome,
                         description = "Times reset for Ultra tokens"
                     )
                     StatDetailRow(
-                        title = "Nebula Earned",
+                        title = locale.getString("inspector_nebula_earned", "Nebula Earned"),
                         value = "${stats.nebulaEarned}",
                         icon = Icons.Default.BrightnessHigh,
                         description = "Total Nebula crystals gathered"
@@ -202,19 +202,19 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     StatDetailRow(
-                        title = "Total Playtime",
+                        title = locale.getString("stats_total_playtime", "Total Playtime"),
                         value = playtimeFormatted,
                         icon = Icons.Default.Schedule,
                         description = "Active game session duration"
                     )
                     StatDetailRow(
-                        title = "Arcade Minigames Played",
+                        title = locale.getString("inspector_arcade_played", "Arcade Minigames Played"),
                         value = "${stats.arcadePlayed}",
                         icon = Icons.Default.SportsEsports,
                         description = "Total arcade rounds completed"
                     )
                     StatDetailRow(
-                        title = "Current Number Range",
+                        title = locale.getString("stats_current_number_range", "Current Number Range"),
                         value = "${state.currentRangeMin} - ${state.currentRangeMax}",
                         icon = Icons.Default.SwapHoriz,
                         description = "Active guessing bounds"

@@ -882,5 +882,12 @@
   "music_shuffle": "シャッフル再生",
   "music_repeat": "リピートモード",
   "accessibility_warning": "警告",
-  "save_slot_name_label": "セーブ名"
+  "save_slot_name_label": "セーブ名",
+  "ultra_achieved_title": "Ultra達成！",
+  "prestige_achieved_title": "Prestige達成！",
+  "settings_custom_theme_color": "🎨 カスタムテーマカラー",
+  "stats_prestige_resets": "Prestigeリセット回数",
+  "stats_ultra_resets": "Ultraリセット回数",
+  "stats_total_playtime": "総プレイ時間",
+  "stats_current_number_range": "現在の数値範囲"
 }

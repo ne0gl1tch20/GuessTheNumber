@@ -882,5 +882,12 @@
   "music_shuffle": "随机播放",
   "music_repeat": "循环模式",
   "accessibility_warning": "警告",
-  "save_slot_name_label": "存档名称"
+  "save_slot_name_label": "存档名称",
+  "ultra_achieved_title": "达成 Ultra！",
+  "prestige_achieved_title": "达成 Prestige！",
+  "settings_custom_theme_color": "🎨 自定义主题颜色",
+  "stats_prestige_resets": "Prestige 重置次数",
+  "stats_ultra_resets": "Ultra 重置次数",
+  "stats_total_playtime": "总游戏时间",
+  "stats_current_number_range": "当前数字范围"
 }

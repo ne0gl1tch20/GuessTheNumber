@@ -839,5 +839,12 @@
   "music_shuffle": "Reprodução aleatória",
   "music_repeat": "Modo de repetição",
   "accessibility_warning": "Aviso",
-  "save_slot_name_label": "Nome da gravação"
+  "save_slot_name_label": "Nome da gravação",
+  "ultra_achieved_title": "Ultra alcançado!",
+  "prestige_achieved_title": "Prestige alcançado!",
+  "settings_custom_theme_color": "🎨 Cor de tema personalizada",
+  "stats_prestige_resets": "Reinícios Prestige",
+  "stats_ultra_resets": "Reinícios Ultra",
+  "stats_total_playtime": "Tempo total de jogo",
+  "stats_current_number_range": "Intervalo numérico atual"
 }

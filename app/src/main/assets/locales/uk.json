@@ -839,5 +839,12 @@
   "music_shuffle": "Випадкове відтворення",
   "music_repeat": "Режим повтору",
   "accessibility_warning": "Попередження",
-  "save_slot_name_label": "Назва збереження"
+  "save_slot_name_label": "Назва збереження",
+  "ultra_achieved_title": "Досягнуто Ultra!",
+  "prestige_achieved_title": "Досягнуто Prestige!",
+  "settings_custom_theme_color": "🎨 Власний колір теми",
+  "stats_prestige_resets": "Скидання Prestige",
+  "stats_ultra_resets": "Скидання Ultra",
+  "stats_total_playtime": "Загальний час гри",
+  "stats_current_number_range": "Поточний діапазон чисел"
 }

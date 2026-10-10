@@ -20,7 +20,6 @@ PATTERNS = [
     ("Toast", re.compile(r'\b(?:android\.widget\.)?Toast\.makeText\s*\([^,]+,\s*"([^"\\]{2,})"')),
     ("Snackbar", re.compile(r'\bshowSnackbar\s*\(\s*"([^"\\]{2,})"')),
     ("Dialog title", re.compile(r'\btitle\s*=\s*"([^"\\]{2,})"')),
-    ("Label", re.compile(r'\blabel\s*=\s*"([^"\\]{2,})"')),
 ]
 
 IGNORE_PREFIXES = ("http://", "https://", "file://", "TAG", "UTF-8", "/help", "/reset", "BUY_")
@@ -30,6 +29,12 @@ def probable_user_text(value: str) -> bool:
     value = value.strip()
     if len(value) < 2 or value.startswith(IGNORE_PREFIXES):
         return False
+    # Strip Kotlin-only interpolations before deciding whether static user copy remains.
+    # Purely dynamic values and animation/test trace labels are not translatable text.
+    static_text = re.sub(r"\$\{[^}]+\}|\$[A-Za-z_]\w*", "", value)
+    if not any(ch.isalpha() for ch in static_text):
+        return False
+    value = static_text.strip()
     if re.fullmatch(r"[A-Za-z0-9_./:-]+", value) and (
         "_" in value or "/" in value or value.startswith(("http", "file"))
     ):

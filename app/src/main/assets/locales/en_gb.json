@@ -839,5 +839,12 @@
   "music_shuffle": "Shuffle playback",
   "music_repeat": "Repeat mode",
   "accessibility_warning": "Warning",
-  "save_slot_name_label": "Save Name"
+  "save_slot_name_label": "Save Name",
+  "ultra_achieved_title": "Ultra achieved!",
+  "prestige_achieved_title": "Prestige achieved!",
+  "settings_custom_theme_color": "🎨 Custom Theme Colour",
+  "stats_prestige_resets": "Prestige Resets",
+  "stats_ultra_resets": "Ultra Resets",
+  "stats_total_playtime": "Total Playtime",
+  "stats_current_number_range": "Current Number Range"
 }

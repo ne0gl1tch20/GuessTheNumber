@@ -882,5 +882,12 @@
   "music_shuffle": "I-shuffle ang tugtugin",
   "music_repeat": "Mode ng pag-uulit",
   "accessibility_warning": "Babala",
-  "save_slot_name_label": "Pangalan ng Save"
+  "save_slot_name_label": "Pangalan ng Save",
+  "ultra_achieved_title": "Naabot ang Ultra!",
+  "prestige_achieved_title": "Naabot ang Prestige!",
+  "settings_custom_theme_color": "🎨 Pasadyang Kulay ng Tema",
+  "stats_prestige_resets": "Mga Prestige Reset",
+  "stats_ultra_resets": "Mga Ultra Reset",
+  "stats_total_playtime": "Kabuuang Oras ng Paglalaro",
+  "stats_current_number_range": "Kasalukuyang Saklaw ng Numero"
 }

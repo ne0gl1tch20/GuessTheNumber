@@ -839,5 +839,12 @@
   "music_shuffle": "Putar secara acak",
   "music_repeat": "Mode pengulangan",
   "accessibility_warning": "Peringatan",
-  "save_slot_name_label": "Nama penyimpanan"
+  "save_slot_name_label": "Nama penyimpanan",
+  "ultra_achieved_title": "Ultra tercapai!",
+  "prestige_achieved_title": "Prestige tercapai!",
+  "settings_custom_theme_color": "🎨 Warna Tema Kustom",
+  "stats_prestige_resets": "Reset Prestige",
+  "stats_ultra_resets": "Reset Ultra",
+  "stats_total_playtime": "Total Waktu Bermain",
+  "stats_current_number_range": "Rentang Angka Saat Ini"
 }

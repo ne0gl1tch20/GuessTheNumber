@@ -839,5 +839,12 @@
   "music_shuffle": "สุ่มเล่นเพลง",
   "music_repeat": "โหมดเล่นซ้ำ",
   "accessibility_warning": "คำเตือน",
-  "save_slot_name_label": "ชื่อเซฟ"
+  "save_slot_name_label": "ชื่อเซฟ",
+  "ultra_achieved_title": "ปลดล็อก Ultra แล้ว!",
+  "prestige_achieved_title": "ปลดล็อก Prestige แล้ว!",
+  "settings_custom_theme_color": "🎨 สีธีมแบบกำหนดเอง",
+  "stats_prestige_resets": "รีเซ็ต Prestige",
+  "stats_ultra_resets": "รีเซ็ต Ultra",
+  "stats_total_playtime": "เวลาเล่นทั้งหมด",
+  "stats_current_number_range": "ช่วงตัวเลขปัจจุบัน"
 }

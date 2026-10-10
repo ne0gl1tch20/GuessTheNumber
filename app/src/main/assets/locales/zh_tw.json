@@ -839,5 +839,12 @@
   "music_shuffle": "隨機播放",
   "music_repeat": "循環模式",
   "accessibility_warning": "警告",
-  "save_slot_name_label": "存檔名稱"
+  "save_slot_name_label": "存檔名稱",
+  "ultra_achieved_title": "達成 Ultra！",
+  "prestige_achieved_title": "達成 Prestige！",
+  "settings_custom_theme_color": "🎨 自訂主題色彩",
+  "stats_prestige_resets": "Prestige 重置次數",
+  "stats_ultra_resets": "Ultra 重置次數",
+  "stats_total_playtime": "總遊玩時間",
+  "stats_current_number_range": "目前數字範圍"
 }
