@@ -82,3 +82,10 @@
 - Run the manual GitHub Actions validation/build and resolve compiler/lint/runtime issues before calling the pass build-verified.
 
 Current app version: 3.0.1 (versionCode 19).
+
+
+## Additional integration pass (2026-10-10)
+
+- Live Ops reward labels now use locale catalog keys with format arguments for currency and claim counts, rather than constructing dynamic English strings that the exact-string translation lookup could never match. The permanent bonus text, claim buttons, and Back accessibility label also use existing localized catalog entries.
+- Both home-screen widgets now advance to the next populated save slot instead of stepping through every empty slot. If no valid saves exist, the current selection is retained rather than cycling into an arbitrary blank slot.
+- These are source-level changes only. No build, emulator run, or GitHub Actions workflow was started, so compilation and device behavior remain unverified.
