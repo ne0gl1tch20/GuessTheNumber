@@ -2,7 +2,6 @@ package com.jarrlyyy.guessthenumber.scripting
 
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
-import org.luaj.vm2.LuaThread
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.BaseLib
@@ -107,7 +106,12 @@ internal class LuaSandbox(
             }
         }
 
-        val thread = LuaThread(globals, chunk)
+        // Run the chunk on this Globals instance's existing Lua thread.
+        // LuaThread.resume() is a low-level Java API and does not add the
+        // success boolean returned by Lua's coroutine.resume function.
+        // Treating its first return value as that boolean discarded the
+        // activity table and caused valid scripts to appear to fail.
+        val thread = globals.running
         setHook.invoke(
             LuaValue.varargsOf(
                 arrayOf(
@@ -120,21 +124,9 @@ internal class LuaSandbox(
         )
 
         return try {
-            val outcome = thread.resume(LuaValue.NIL)
-            // LuaThread.resume follows Lua's coroutine.resume contract:
-            // (true, returnedValue) on success or (false, errorMessage) on failure.
-            if (!outcome.arg1().toboolean()) {
-                val message = outcome.arg(2).tojstring()
-                if (message.contains("instruction budget", ignoreCase = true)) {
-                    throw LuaBudgetExceededError("Lua script exceeded its instruction budget.")
-                }
-                throw LuaError(message)
-            }
-            outcome.arg(2)
-        } catch (error: LuaBudgetExceededError) {
-            throw error
+            chunk.call()
         } finally {
-            // Drop the hook reference so completed threads can be collected.
+            // Remove the instruction hook even when the script throws.
             setHook.invoke(LuaValue.varargsOf(arrayOf(thread, LuaValue.NIL)))
         }
     }
