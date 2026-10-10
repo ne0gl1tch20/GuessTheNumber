@@ -186,7 +186,7 @@ fun LiveOpsScreen(
                                     enabled = canClaim,
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                                 ) {
-                                    Text(if (claims >= event.maxClaims) locale.getString("max_claimed", "Max Claimed") else locale.getString("claim_reward_nebula", "Claim Reward (+%d Nebula)", event.rewardNebula))
+                                    Text(if (claims >= event.maxClaims) locale.getString("max_claimed", "Max Claimed") else locale.getString("claim_reward_nebula", "Claim Reward (+%d ${event.currencyName})", event.rewardNebula))
                                 }
                             }
                         }
