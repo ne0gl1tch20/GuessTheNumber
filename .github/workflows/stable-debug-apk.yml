@@ -6,6 +6,8 @@ on:
 jobs:
   build-debug:
     runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_luaLiveOpsPublicKeyBase64: ${{ secrets.LUA_LIVEOPS_PUBLIC_KEY_BASE64 }}
     permissions:
       contents: read
 
