@@ -419,6 +419,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     _incomePerSecond.value = BigNumber.ZERO
                 }
             }
+            WidgetRefresh.request(getApplication<Application>())
         }
     }
 
@@ -836,6 +837,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 lastIncomeMeasurement = fresh.money
                 _incomePerSecond.value = BigNumber.ZERO
             }
+            WidgetRefresh.request(getApplication<Application>())
             withContext(Dispatchers.Main) { backgroundMusicManager.stop() }
         }
     }
