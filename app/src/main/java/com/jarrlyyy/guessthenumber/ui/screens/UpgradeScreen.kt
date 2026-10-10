@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 import androidx.compose.animation.*
@@ -111,7 +112,7 @@ fun UpgradeScreen(
                         Column {
                             Text(localizedText("Available Money"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                             AnimatedContent(targetState = state.money.format(), label = "UpgradeMoneyAnimation") { moneyStr ->
-                                Text(localizedText("$moneyStr Money"), color = MoneyGold, style = MaterialTheme.typography.titleLarge)
+                                Text(LocalAppLocaleManager.current.getString("available_money_format", "%s Money", moneyStr), color = MoneyGold, style = MaterialTheme.typography.titleLarge)
                             }
                         }
                         Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null, tint = MoneyGold, modifier = Modifier.size(32.dp))
@@ -139,7 +140,7 @@ fun UpgradeScreen(
                             shape = MaterialTheme.shapes.medium,
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                         ) {
-                            Text(localizedText("${state.buyMultiplier}x"), style = MaterialTheme.typography.labelLarge)
+                            Text(LocalAppLocaleManager.current.getString("multiplier_format", "%sx", state.buyMultiplier), style = MaterialTheme.typography.labelLarge)
                             Spacer(modifier = Modifier.width(8.dp))
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
@@ -153,7 +154,7 @@ fun UpgradeScreen(
                         ) {
                             multipliers.forEach { mult ->
                                 DropdownMenuItem(
-                                    text = { Text(localizedText("$mult x"), style = MaterialTheme.typography.bodyMedium) },
+                                    text = { Text(LocalAppLocaleManager.current.getString("multiplier_option_format", "%s x", mult), style = MaterialTheme.typography.bodyMedium) },
                                     onClick = {
                                         onUpdateMultiplier(mult)
                                         expanded = false
@@ -209,7 +210,7 @@ fun UpgradeScreen(
                             }
                             if (!isMaxed) {
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text(localizedText("Cost (${state.buyMultiplier}x): ${totalCost.format()}"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(LocalAppLocaleManager.current.getString("upgrade_cost_format", "Cost (%sx): %s Money", state.buyMultiplier, totalCost.format()), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                         Spacer(modifier = Modifier.width(12.dp))
