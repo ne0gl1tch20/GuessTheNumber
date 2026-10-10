@@ -1,5 +1,15 @@
 # Project Memory: Gamified Guess the Number Simulator (v3.0.0 Update)
 
+
+## Developer Console and Diagnostics Update (2026-10-10)
+- Added a registry-backed developer command autocomplete layer in `domain/command/CommandAutocomplete.kt`, including `DevCommand`, `CommandParser`, `CommandRegistry` and `CommandAutocomplete`. Suggestions include command descriptions and argument choices instead of being hard-coded in the screen.
+- Added real debug commands: `/autoclicker on|off`, `/setlevel <upgradeId> <level>`, `/newnumber`, `/state`, `/inspect`, `/version`, `/logs clear|pause|resume`, plus `/unlock all` and `/completeguess` aliases. `/help` documents them.
+- Dev Settings now has a persisted `verboseLogging` switch, severity filters, matching-entry count, and log entries show event names and correlation IDs. Existing developer routes remain gated to debug builds.
+- `GameLogger` defaults verbose traces off, accepts TRACE/DEBUG only when verbose mode is enabled in debug builds, and limits release logging to WARN/ERROR/FATAL. File log storage is debug-only. Guess processing logs begin/rate-limit/result events with a correlation ID.
+- Added unit tests for command autocomplete and parsing in `app/src/test/java/com/jarrlyyy/guessthenumber/domain/CommandAutocompleteTest.kt`.
+- **Verification status:** changes were inspected through GitHub file fetches, but the Android build and unit tests have not been run. Automatic builds on push are disabled to conserve Actions resources; do not start a manual workflow unless explicitly requested.
+
+
 ## Project Overview
 
 **Current player-facing pitch:** Start with a simple number guess, then build a run around upgrades, Frenzy streaks, random events, achievement tiers, cosmetics, stackable mutators, and custom challenges. v1.12 is intended to feel like a game you can keep poking at because every run can be pushed, optimized, or made weird in a different way. 🎮✨
