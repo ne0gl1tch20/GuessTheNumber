@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import androidx.compose.animation.animateContentSize
 
 import androidx.compose.foundation.layout.*
@@ -93,7 +94,7 @@ fun ArcadeScreen(
                                 )
                                 .fillMaxWidth()
                         ) {
-                            Text("Play ${minigame.name}", style = MaterialTheme.typography.titleMedium)
+                            Text(LocalAppLocaleManager.current.getString("play_minigame_format", "Play %s", minigame.name), style = MaterialTheme.typography.titleMedium)
                         }
                     }
                 }
@@ -116,6 +117,7 @@ fun ArcadeScreen(
 
 @Composable
 fun QuickGuessDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit) {
+    val locale = LocalAppLocaleManager.current
     var score by remember { mutableStateOf(0) }
     var timeLeft by remember { mutableStateOf(10) }
     var target by remember { mutableStateOf(Random.nextLong(1, 10)) }
@@ -138,11 +140,11 @@ fun QuickGuessDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (!gameOver) {
-                    Text("Time left: ${timeLeft}s", fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+                    Text(locale.getString("time_left_format", "Time left: %ds", timeLeft), fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Score: $score", fontSize = 18.sp)
+                    Text(locale.getString("score_format", "Score: %d", score), fontSize = 18.sp)
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text("Guess number (1-9): Target $target", fontSize = 16.sp)
+                    Text(locale.getString("guess_number_target_format", "Guess number (1-9): Target %d", target), fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = input,
@@ -151,8 +153,8 @@ fun QuickGuessDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
                         singleLine = true
                     )
                 } else {
-                    Text("Game Over! Score: $score", fontSize = 20.sp)
-                    Text("Earned: 1 Nebula & ${score * 500} Money")
+                    Text(locale.getString("game_over_format", "Game Over! Score: %d", score), fontSize = 20.sp)
+                    Text(locale.getString("earned_minigame_format", "Earned: 1 Nebula & %s Money", BigNumber((score * 500).toLong()).format()))
                 }
             }
         },
@@ -166,14 +168,14 @@ fun QuickGuessDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
                     }
                     input = ""
                 }) {
-                    Text("Guess")
+                    Text(localizedText("Guess"))
                 }
             } else {
                 Button(onClick = {
                     onReward(1L, BigNumber((score * 500).toLong()))
                     onDismiss()
                 }) {
-                    Text("Claim Reward")
+                    Text(localizedText("Claim Reward"))
                 }
             }
         }
@@ -182,6 +184,7 @@ fun QuickGuessDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
 
 @Composable
 fun ReactionTestDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit) {
+    val locale = LocalAppLocaleManager.current
     var state by remember { mutableStateOf("wait") } // wait, ready, clicked
     var startTime by remember { mutableStateOf(0L) }
     var reactionTime by remember { mutableStateOf(0L) }
@@ -202,7 +205,7 @@ fun ReactionTestDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Uni
                 when (state) {
                     "wait" -> Text(localizedText("Wait for green..."), fontSize = 20.sp, color = MaterialTheme.colorScheme.error)
                     "ready" -> Text(localizedText("TAP NOW!"), fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
-                    "clicked" -> Text("Reaction: ${reactionTime}ms", fontSize = 20.sp)
+                    "clicked" -> Text(locale.getString("reaction_time_format", "Reaction: %dms", reactionTime), fontSize = 20.sp)
                 }
             }
         },
@@ -232,6 +235,7 @@ fun ReactionTestDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Uni
 
 @Composable
 fun LuckyNumberDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit) {
+    val locale = LocalAppLocaleManager.current
     var chosenBox by remember { mutableStateOf<Int?>(null) }
     val winningBox = remember { Random.nextInt(1, 4) }
 
@@ -251,15 +255,15 @@ fun LuckyNumberDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
                                 },
                                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
                             ) {
-                                Text("Box $i", fontSize = 16.sp)
+                                Text(locale.getString("box_format", "Box %d", i), fontSize = 16.sp)
                             }
                         }
                     }
                 } else {
                     if (chosenBox == winningBox) {
-                        Text("🎉 Jackpot! Box $chosenBox was the lucky box! Won 1 Nebula & 5,000 Money!", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+                        Text(locale.getString("jackpot_win_format", "🎉 Jackpot! Box %d was the lucky box! Won 1 Nebula & 5,000 Money!", chosenBox!!), fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
                     } else {
-                        Text("❌ Box $chosenBox was empty! The winning box was Box $winningBox. Better luck next time!", fontSize = 16.sp, color = MaterialTheme.colorScheme.error)
+                        Text(locale.getString("empty_box_format", "❌ Box %d was empty! The winning box was Box %d. Better luck next time!", chosenBox!!, winningBox), fontSize = 16.sp, color = MaterialTheme.colorScheme.error)
                     }
                 }
             }
@@ -281,10 +285,12 @@ fun LuckyNumberDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
 
 @Composable
 fun MemoryMatchDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit) {
+    val locale = LocalAppLocaleManager.current
     val sequence = remember { List(3) { Random.nextInt(1, 10) } }
     var showDigits by remember { mutableStateOf(true) }
     var input by remember { mutableStateOf("") }
     var resultText by remember { mutableStateOf("") }
+    var answerCorrect by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         delay(2000)
@@ -297,7 +303,7 @@ fun MemoryMatchDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (showDigits) {
-                    Text("Memorize: ${sequence.joinToString(" ")}", fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
+                    Text(locale.getString("memorize_format", "Memorize: %s", sequence.joinToString(" ")), fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
                 } else if (resultText.isEmpty()) {
                     Text(localizedText("Enter the 3 digits (e.g. 123):"), fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(8.dp))
@@ -322,21 +328,23 @@ fun MemoryMatchDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
                 Button(onClick = {
                     val expected = sequence.joinToString("")
                     if (input.trim() == expected) {
-                        resultText = "Correct! Won 1 Nebula!"
+                        answerCorrect = true
+                        resultText = locale.getString("memory_correct", "Correct! Won 1 Nebula!")
                     } else {
-                        resultText = "Incorrect! Expected $expected"
+                        answerCorrect = false
+                        resultText = locale.getString("memory_incorrect_format", "Incorrect! Expected %s", expected)
                     }
                 }) {
                     Text(localizedText("Submit"))
                 }
             } else if (resultText.isNotEmpty()) {
                 Button(onClick = {
-                    if (resultText.contains("Correct")) {
+                    if (answerCorrect) {
                         onReward(1L, BigNumber(10000))
                     }
                     onDismiss()
                 }) {
-                    Text("Done")
+                    Text(localizedText("Done"))
                 }
             }
         }
@@ -345,6 +353,7 @@ fun MemoryMatchDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
 
 @Composable
 fun NumberRushDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit) {
+    val locale = LocalAppLocaleManager.current
     var currentTarget by remember { mutableStateOf(1) }
     val numbers = remember { (1..5).shuffled() }
     var finished by remember { mutableStateOf(false) }
@@ -355,7 +364,7 @@ fun NumberRushDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (!finished) {
-                    Text("Tap numbers in order: $currentTarget to 5", fontSize = 16.sp)
+                    Text(locale.getString("tap_numbers_order_format", "Tap numbers in order: %d to 5", currentTarget), fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(16.dp))
                     // Use a vertical arrangement or wrap layout with generous touch targets and padding
                     Column(
