@@ -1038,6 +1038,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (worldId !in listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift")) return
         val bossId = when (worldId) { "verdant_grove" -> "verdant_guardian"; "crystal_caverns" -> "crystal_golem"; "ember_summit" -> "ember_dragon"; else -> "nebula_titan" }
         if (action == "unlock") {
+            if (worldId in state.unlockedWorldIds) return
             val canUnlock = when (worldId) {
                 "crystal_caverns" -> "verdant_guardian" in state.defeatedBossIds && state.correctGuesses >= 25 && totalUpgradeLevels >= 5
                 "ember_summit" -> "crystal_golem" in state.defeatedBossIds && state.correctGuesses >= 100 && totalUpgradeLevels >= 15 && state.prestigeCount >= 1
