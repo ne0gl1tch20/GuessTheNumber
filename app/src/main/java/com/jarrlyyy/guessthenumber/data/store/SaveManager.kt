@@ -465,8 +465,10 @@ class SaveManager(private val context: Context) {
             // otherwise let two rapid create requests overwrite an already-created save.
             context.saveDataStore.edit { p ->
                 val existing = p[getSaveKey(targetSlot)]
-                if (existing.isNullOrEmpty() || !validateSave(existing)) {
-                    p.remove(getBackupKey(targetSlot))
+                val existingBackup = p[getBackupKey(targetSlot)]
+                // A malformed primary or a backup-only slot may still contain recoverable
+                // progress. Never treat either as an empty slot during fresh-slot creation.
+                if (existing.isNullOrEmpty() && existingBackup.isNullOrEmpty()) {
                     p[getSaveKey(targetSlot)] = freshJson
                     p[activeSlotKey] = targetSlot
                     created = true
