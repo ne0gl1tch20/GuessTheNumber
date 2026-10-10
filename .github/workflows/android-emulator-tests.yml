@@ -1,6 +1,10 @@
 name: Android Emulator Crash Tests
 
 # Runs on master changes so gameplay and startup regressions are checked continuously.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
   push:
