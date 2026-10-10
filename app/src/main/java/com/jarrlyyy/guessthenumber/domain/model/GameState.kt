@@ -118,6 +118,7 @@ data class GameSettings(
     val volume: Float = 1.0f,
     val reduceFlashes: Boolean = false,
     val saveLogsToStorage: Boolean = false,
+    val verboseLogging: Boolean = false,
     val backgroundMusicPath: String? = null,
     val musicLibraryPaths: List<String> = emptyList(),
     val musicQueuePaths: List<String> = emptyList(),
