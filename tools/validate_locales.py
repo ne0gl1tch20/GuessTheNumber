@@ -20,6 +20,13 @@ EXPECTED = {
     "nl.json": "nl-NL", "ar.json": "ar-SA",
 }
 PLACEHOLDER_RE = re.compile(r"%(?!%)(?:(?:\d+)\$)?[-+#0(]*\d*(?:\.\d+)?[a-zA-Z]")
+REQUIRED_SHARED_KEYS = {
+    "music_player_title", "music_no_track", "music_import", "music_library",
+    "music_queue_format", "music_queue_position", "music_playlist_name",
+    "music_create_playlist", "music_playlists", "music_playlist_tracks",
+    "music_control_previous", "music_control_pause", "music_control_play",
+    "music_control_next", "music_control_stop",
+}
 
 def load(path: Path) -> dict:
     with path.open("r", encoding="utf-8") as handle:
@@ -61,6 +68,12 @@ def main() -> int:
             errors.append(f"{filename}: missing locale_language")
         if not data.get("locale_code"):
             errors.append(f"{filename}: missing locale_code")
+
+        for key in REQUIRED_SHARED_KEYS:
+            if key not in data:
+                errors.append(f"{filename}: missing required shared UI key {key!r}")
+            elif not isinstance(data[key], str):
+                errors.append(f"{filename}: shared UI key {key!r} must be a string")
 
         for key in data:
             if key not in baseline_keys:

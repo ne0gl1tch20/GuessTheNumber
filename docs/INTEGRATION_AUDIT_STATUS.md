@@ -146,7 +146,7 @@ Current app version: 3.0.1 (versionCode 19).
 
 - The World Map's boss-start availability now follows the same Endless Rift override as `GameViewModel.worldProgressAction`, so an active Rift run does not show a disabled Start Battle button when the backend permits the battle.
 - During an active Endless Rift, the map hides the standard boss requirement and base reward copy because the current tier changes battle eligibility and scales the actual payout. The current Rift tier and live boss HP remain visible.
-- Validation status for this change: pending the current GitHub Actions unit-test, lint, full-check and APK-build workflow. No emulator tests were run.
+- The change passed the complete GitHub Actions workflow (unit tests, lint, full Gradle check and Debug/Release APK builds). No emulator tests were run.
 
 ## Music playback completion race (2026-10-10)
 
@@ -158,3 +158,10 @@ Current app version: 3.0.1 (versionCode 19).
 - Connected the already-extracted embedded album artwork to the reusable player screen, with a themed placeholder when a track has no artwork.
 - The player now shows elapsed and total playback time using the active locale's duration formatter, and uses album metadata when artist metadata is absent.
 - Added localized accessibility descriptions to previous/play-pause/next controls using existing catalog keys. No new locale keys were introduced.
+
+
+## Offline music localization release gate (2026-10-10)
+
+- Added all ten reusable-player labels to the 22 non-canonical locale catalogs with translated text and preserved format placeholders.
+- Extended `tools/validate_locales.py` to require the ten player labels plus the five shared media-control labels in every locale overlay. This prevents the music player from silently falling back to English for missing catalog entries.
+- Validation run #113 passed for the translation update. The new required-key gate is included in the next full workflow run.
