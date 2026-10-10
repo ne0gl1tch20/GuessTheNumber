@@ -30,7 +30,7 @@ fun ProcessInspectorScreen(
                 title = { Text(localizedText("Variable & Process Inspector"), style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = localizedText("Back"))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -58,13 +58,13 @@ fun ProcessInspectorScreen(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        ProcessCardRow(name = "Auto-Clicker Loop", active = state.autoClickerActive, detail = "Speed: ${state.autoClickerSpeed} clicks/sec", icon = Icons.Default.Autorenew)
+                        ProcessCardRow(name = localizedText("Auto-Clicker Loop"), active = state.autoClickerActive, detail = LocalAppLocaleManager.current.getString("inspector_speed_format", "Speed: %s clicks/sec", state.autoClickerSpeed), icon = Icons.Default.Autorenew)
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                        ProcessCardRow(name = "Auto-Save Worker", active = true, detail = "Interval: Every 30 seconds", icon = Icons.Default.Save)
+                        ProcessCardRow(name = localizedText("Auto-Save Worker"), active = true, detail = localizedText("Interval: Every 30 seconds"), icon = Icons.Default.Save)
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                        ProcessCardRow(name = "Playtime Timer", active = true, detail = "Elapsed: ${state.statistics.playtimeSeconds}s", icon = Icons.Default.Schedule)
+                        ProcessCardRow(name = localizedText("Playtime Timer"), active = true, detail = LocalAppLocaleManager.current.getString("inspector_elapsed_format", "Elapsed: %ss", state.statistics.playtimeSeconds), icon = Icons.Default.Schedule)
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                        ProcessCardRow(name = "WorkManager Notifications", active = state.settings.notificationsEnabled, detail = "Frequency: ${state.settings.notificationIntervalHours}h", icon = Icons.Default.Notifications)
+                        ProcessCardRow(name = localizedText("WorkManager Notifications"), active = state.settings.notificationsEnabled, detail = LocalAppLocaleManager.current.getString("inspector_frequency_format", "Frequency: %sh", state.settings.notificationIntervalHours), icon = Icons.Default.Notifications)
                     }
                 }
             }
@@ -78,78 +78,78 @@ fun ProcessInspectorScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     // Currencies & Resets
-                    VariableGroupCard(title = "Currencies & Economy", icon = Icons.Default.MonetizationOn) {
-                        VariableRowItem(key = "Money", value = state.money.format())
-                        VariableRowItem(key = "Prestige", value = state.prestige.format())
-                        VariableRowItem(key = "Ultra", value = state.ultra.format())
-                        VariableRowItem(key = "Nebula", value = state.nebula.format())
-                        VariableRowItem(key = "Money Earned", value = state.statistics.moneyEarned.format())
-                        VariableRowItem(key = "Money Spent", value = state.statistics.moneySpent.format())
+                    VariableGroupCard(title = localizedText("Currencies & Economy"), icon = Icons.Default.MonetizationOn) {
+                        VariableRowItem(key = localizedText("Money"), value = state.money.format())
+                        VariableRowItem(key = localizedText("Prestige"), value = state.prestige.format())
+                        VariableRowItem(key = localizedText("Ultra"), value = state.ultra.format())
+                        VariableRowItem(key = localizedText("Nebula"), value = state.nebula.format())
+                        VariableRowItem(key = localizedText("Money Earned"), value = state.statistics.moneyEarned.format())
+                        VariableRowItem(key = localizedText("Money Spent"), value = state.statistics.moneySpent.format())
                     }
 
                     // Guessing Engine & Game State
-                    VariableGroupCard(title = "Guessing Engine & Ranges", icon = Icons.Default.Casino) {
-                        VariableRowItem(key = "Current Range Min", value = state.currentRangeMin.toString())
-                        VariableRowItem(key = "Current Range Max", value = state.currentRangeMax.toString())
-                        VariableRowItem(key = "Target Number", value = state.targetNumber.toString())
-                        VariableRowItem(key = "Total Attempts", value = state.attempts.toString())
-                        VariableRowItem(key = "Correct Guesses (State)", value = state.correctGuesses.toString())
-                        VariableRowItem(key = "Current Streak", value = state.streak.toString())
-                        VariableRowItem(key = "Best Streak", value = state.bestStreak.toString())
-                        VariableRowItem(key = "Buy Multiplier", value = state.buyMultiplier)
-                        VariableRowItem(key = "Auto-Clicker Active", value = state.autoClickerActive.toString())
-                        VariableRowItem(key = "Auto-Clicker Speed", value = "${state.autoClickerSpeed}")
-                        VariableRowItem(key = "Tutorial Completed", value = state.tutorialCompleted.toString())
+                    VariableGroupCard(title = localizedText("Guessing Engine & Ranges"), icon = Icons.Default.Casino) {
+                        VariableRowItem(key = localizedText("Current Range Min"), value = state.currentRangeMin.toString())
+                        VariableRowItem(key = localizedText("Current Range Max"), value = state.currentRangeMax.toString())
+                        VariableRowItem(key = localizedText("Target Number"), value = state.targetNumber.toString())
+                        VariableRowItem(key = localizedText("Total Attempts"), value = state.attempts.toString())
+                        VariableRowItem(key = localizedText("Correct Guesses (State)"), value = state.correctGuesses.toString())
+                        VariableRowItem(key = localizedText("Current Streak"), value = state.streak.toString())
+                        VariableRowItem(key = localizedText("Best Streak"), value = state.bestStreak.toString())
+                        VariableRowItem(key = localizedText("Buy Multiplier"), value = state.buyMultiplier)
+                        VariableRowItem(key = localizedText("Auto-Clicker Active"), value = state.autoClickerActive.toString())
+                        VariableRowItem(key = localizedText("Auto-Clicker Speed"), value = "${state.autoClickerSpeed}")
+                        VariableRowItem(key = localizedText("Tutorial Completed"), value = state.tutorialCompleted.toString())
                     }
 
                     // Statistics & Counts
-                    VariableGroupCard(title = "Statistics & Counters", icon = Icons.Default.Analytics) {
-                        VariableRowItem(key = "Total Guesses (Stats)", value = state.statistics.totalGuesses.toString())
-                        VariableRowItem(key = "Correct Guesses (Stats)", value = state.statistics.correctGuesses.toString())
-                        VariableRowItem(key = "Failed Guesses", value = state.statistics.failedGuesses.toString())
-                        VariableRowItem(key = "Prestiges Count", value = state.statistics.prestigesCount.toString())
-                        VariableRowItem(key = "Ultras Count", value = state.statistics.ultrasCount.toString())
-                        VariableRowItem(key = "Nebula Earned", value = state.statistics.nebulaEarned.toString())
-                        VariableRowItem(key = "Playtime Seconds", value = "${state.statistics.playtimeSeconds}s")
-                        VariableRowItem(key = "Arcade Played", value = "${state.statistics.arcadePlayed}")
-                        VariableRowItem(key = "Arcade Best Scores", value = state.statistics.arcadeBestScores.toString())
+                    VariableGroupCard(title = localizedText("Statistics & Counters"), icon = Icons.Default.Analytics) {
+                        VariableRowItem(key = localizedText("Total Guesses (Stats)"), value = state.statistics.totalGuesses.toString())
+                        VariableRowItem(key = localizedText("Correct Guesses (Stats)"), value = state.statistics.correctGuesses.toString())
+                        VariableRowItem(key = localizedText("Failed Guesses"), value = state.statistics.failedGuesses.toString())
+                        VariableRowItem(key = localizedText("Prestiges Count"), value = state.statistics.prestigesCount.toString())
+                        VariableRowItem(key = localizedText("Ultras Count"), value = state.statistics.ultrasCount.toString())
+                        VariableRowItem(key = localizedText("Nebula Earned"), value = state.statistics.nebulaEarned.toString())
+                        VariableRowItem(key = localizedText("Playtime Seconds"), value = "${state.statistics.playtimeSeconds}s")
+                        VariableRowItem(key = localizedText("Arcade Played"), value = "${state.statistics.arcadePlayed}")
+                        VariableRowItem(key = localizedText("Arcade Best Scores"), value = state.statistics.arcadeBestScores.toString())
                     }
 
                     // Settings & Preferences
-                    VariableGroupCard(title = "Settings & Preferences", icon = Icons.Default.Settings) {
-                        VariableRowItem(key = "Music Enabled", value = state.settings.musicEnabled.toString())
-                        VariableRowItem(key = "Sound Enabled", value = state.settings.soundEnabled.toString())
-                        VariableRowItem(key = "Vibration Enabled", value = state.settings.vibrationEnabled.toString())
-                        VariableRowItem(key = "Notifications Enabled", value = state.settings.notificationsEnabled.toString())
-                        VariableRowItem(key = "Notification Interval", value = "${state.settings.notificationIntervalHours}h")
-                        VariableRowItem(key = "Theme Mode", value = state.settings.themeMode)
-                        VariableRowItem(key = "Number Notation", value = state.settings.numberNotation)
-                        VariableRowItem(key = "Reduced Motion", value = state.settings.reducedMotion.toString())
-                        VariableRowItem(key = "Volume Level", value = "${state.settings.volume}")
-                        VariableRowItem(key = "Reduce Flashes", value = state.settings.reduceFlashes.toString())
-                        VariableRowItem(key = "Save Logs to Storage", value = state.settings.saveLogsToStorage.toString())
-                        VariableRowItem(key = "Background Music Path", value = state.settings.backgroundMusicPath ?: "None")
+                    VariableGroupCard(title = localizedText("Settings & Preferences"), icon = Icons.Default.Settings) {
+                        VariableRowItem(key = localizedText("Music Enabled"), value = state.settings.musicEnabled.toString())
+                        VariableRowItem(key = localizedText("Sound Enabled"), value = state.settings.soundEnabled.toString())
+                        VariableRowItem(key = localizedText("Vibration Enabled"), value = state.settings.vibrationEnabled.toString())
+                        VariableRowItem(key = localizedText("Notifications Enabled"), value = state.settings.notificationsEnabled.toString())
+                        VariableRowItem(key = localizedText("Notification Interval"), value = "${state.settings.notificationIntervalHours}h")
+                        VariableRowItem(key = localizedText("Theme Mode"), value = state.settings.themeMode)
+                        VariableRowItem(key = localizedText("Number Notation"), value = state.settings.numberNotation)
+                        VariableRowItem(key = localizedText("Reduced Motion"), value = state.settings.reducedMotion.toString())
+                        VariableRowItem(key = localizedText("Volume Level"), value = "${state.settings.volume}")
+                        VariableRowItem(key = localizedText("Reduce Flashes"), value = state.settings.reduceFlashes.toString())
+                        VariableRowItem(key = localizedText("Save Logs to Storage"), value = state.settings.saveLogsToStorage.toString())
+                        VariableRowItem(key = localizedText("Background Music Path"), value = state.settings.backgroundMusicPath ?: localizedText("None"))
                     }
 
                     // Collections & Maps
-                    VariableGroupCard(title = "Collections & Upgrades", icon = Icons.Default.Category) {
-                        VariableRowItem(key = "Upgrade Levels Count", value = "${state.upgradeLevels.size} items\n${state.upgradeLevels.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }}")
-                        VariableRowItem(key = "Prestige Upgrades Count", value = "${state.prestigeUpgradeLevels.size} items\n${state.prestigeUpgradeLevels.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }}")
-                        VariableRowItem(key = "Ultra Upgrades Count", value = "${state.ultraUpgradeLevels.size} items\n${state.ultraUpgradeLevels.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }}")
-                        VariableRowItem(key = "Shop Purchases", value = "${state.shopPurchases.size} items\n${state.shopPurchases}")
-                        VariableRowItem(key = "Prestige Purchases", value = "${state.prestigeShopPurchases.size} items\n${state.prestigeShopPurchases}")
-                        VariableRowItem(key = "Ultra Purchases", value = "${state.ultraShopPurchases.size} items\n${state.ultraShopPurchases}")
-                        VariableRowItem(key = "Achievements Unlocked", value = "${state.achievements.size} items\n${state.achievements}")
-                        VariableRowItem(key = "Completed Challenges", value = "${state.completedChallenges.size} items\n${state.completedChallenges}")
+                    VariableGroupCard(title = localizedText("Collections & Upgrades"), icon = Icons.Default.Category) {
+                        VariableRowItem(key = localizedText("Upgrade Levels Count"), value = "${state.upgradeLevels.size} items\n${state.upgradeLevels.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }}")
+                        VariableRowItem(key = localizedText("Prestige Upgrades Count"), value = "${state.prestigeUpgradeLevels.size} items\n${state.prestigeUpgradeLevels.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }}")
+                        VariableRowItem(key = localizedText("Ultra Upgrades Count"), value = "${state.ultraUpgradeLevels.size} items\n${state.ultraUpgradeLevels.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }}")
+                        VariableRowItem(key = localizedText("Shop Purchases"), value = "${state.shopPurchases.size} items\n${state.shopPurchases}")
+                        VariableRowItem(key = localizedText("Prestige Purchases"), value = "${state.prestigeShopPurchases.size} items\n${state.prestigeShopPurchases}")
+                        VariableRowItem(key = localizedText("Ultra Purchases"), value = "${state.ultraShopPurchases.size} items\n${state.ultraShopPurchases}")
+                        VariableRowItem(key = localizedText("Achievements Unlocked"), value = "${state.achievements.size} items\n${state.achievements}")
+                        VariableRowItem(key = localizedText("Completed Challenges"), value = "${state.completedChallenges.size} items\n${state.completedChallenges}")
                     }
 
                     // Meta Timestamps & Anti-Cheat
-                    VariableGroupCard(title = "Meta Timestamps & Anti-Cheat", icon = Icons.Default.Security) {
-                        VariableRowItem(key = "Last Save Timestamp", value = state.lastSaveTimestamp.toString())
-                        VariableRowItem(key = "Last Saved Version", value = state.lastSavedVersion)
-                        VariableRowItem(key = "Time Travel Penalty Until", value = state.timeTravelPenaltyUntil.toString())
-                        VariableRowItem(key = "Prestige Count (Root)", value = state.prestigeCount.toString())
-                        VariableRowItem(key = "Ultra Count (Root)", value = state.ultraCount.toString())
+                    VariableGroupCard(title = localizedText("Meta Timestamps & Anti-Cheat"), icon = Icons.Default.Security) {
+                        VariableRowItem(key = localizedText("Last Save Timestamp"), value = state.lastSaveTimestamp.toString())
+                        VariableRowItem(key = localizedText("Last Saved Version"), value = state.lastSavedVersion)
+                        VariableRowItem(key = localizedText("Time Travel Penalty Until"), value = state.timeTravelPenaltyUntil.toString())
+                        VariableRowItem(key = localizedText("Prestige Count (Root)"), value = state.prestigeCount.toString())
+                        VariableRowItem(key = localizedText("Ultra Count (Root)"), value = state.ultraCount.toString())
                     }
                 }
             }
@@ -188,7 +188,7 @@ fun ProcessCardRow(name: String, active: Boolean, detail: String, icon: ImageVec
             color = if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.errorContainer
         ) {
             Text(
-                text = if (active) "RUNNING" else "STOPPED",
+                text = if (active) localizedText("RUNNING") else localizedText("STOPPED"),
                 style = MaterialTheme.typography.labelMedium,
                 color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)

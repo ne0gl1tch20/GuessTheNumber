@@ -144,7 +144,7 @@ fun UpgradeScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = "Dropdown"
+                                contentDescription = localizedText("Dropdown")
                             )
                         }
 
