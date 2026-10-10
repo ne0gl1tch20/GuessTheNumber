@@ -58,22 +58,22 @@ class GuessWidget : GlanceAppWidget() {
                             Text(locale.getString("widget_money", "Money"), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                             Text(state.money.format(), style = TextStyle(fontWeight = FontWeight.Bold, color = GlanceTheme.colors.primary))
                         }
-                        Column(modifier = GlanceModifier.defaultWeight()) {
+                        Column(modifier = GlanceModifier) {
                             Text(locale.getString("widget_range", "Range"), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                             Text("${state.currentRangeMin}–${state.currentRangeMax}", style = TextStyle(color = GlanceTheme.colors.onBackground))
                         }
                     }
                     Spacer(GlanceModifier.height(4.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), horizontalAlignment = Alignment.Horizontal.Start) {
-                        Text(locale.getString("widget_streak", "Streak %d", state.streak), modifier = GlanceModifier.defaultWeight(), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
-                        Text(locale.getString("widget_mastery", "Mastery %d", state.worldMasteryLevels.values.sum()), modifier = GlanceModifier.defaultWeight(), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
+                        Text(locale.getString("widget_streak", "Streak %d", state.streak), modifier = GlanceModifier, style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
+                        Text(locale.getString("widget_mastery", "Mastery %d", state.worldMasteryLevels.values.sum()), modifier = GlanceModifier, style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                     }
                     Text(locale.getString("widget_worlds_bosses", "Worlds %d • Bosses %d", state.unlockedWorldIds.size, state.defeatedBossIds.size), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant))
                     Spacer(GlanceModifier.height(8.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), horizontalAlignment = Alignment.Horizontal.CenterHorizontally) {
-                        Button(text = locale.getString("play", "Play"), onClick = actionRunCallback<OpenWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
+                        Button(text = locale.getString("play", "Play"), onClick = actionRunCallback<OpenWidgetSaveSlotCallback>(), modifier = GlanceModifier)
                         Spacer(GlanceModifier.width(8.dp))
-                        Button(text = locale.getString("widget_next_slot", "Next Slot"), onClick = actionRunCallback<CycleWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
+                        Button(text = locale.getString("widget_next_slot", "Next Slot"), onClick = actionRunCallback<CycleWidgetSaveSlotCallback>(), modifier = GlanceModifier)
                     }
                 }
             }
