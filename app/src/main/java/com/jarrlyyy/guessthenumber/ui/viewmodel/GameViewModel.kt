@@ -120,6 +120,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         AppErrorHandler.init(application.filesDir)
         _hasPreviousCrash.value = AppErrorHandler.hasPreviousCrash()
         GameLogger.configureStorage(File(application.filesDir, "game_logs.txt"), _gameState.value.settings.saveLogsToStorage)
+        GameLogger.configureVerbose(_gameState.value.settings.verboseLogging)
+        GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "APP_INITIALIZED", "GameViewModel initialized; debugBuild=${BuildConfig.DEBUG}.")
 
         // Crash recovery is the first boot layer. Do not touch save data or start game
         // background jobs until the user has acknowledged the previous crash.
@@ -133,6 +135,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadGame(slot: Int = -1) {
+        GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "LOAD_REQUESTED", "Save load requested for slot=$slot (active slot will be used when unspecified).")
         _isLoadingSave.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -156,6 +159,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             val loaded = saveManager.loadGame(targetSlot)
+            GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_READ", "Read save data for slot=$targetSlot; applying state validation.")
             val sanitized = AntiCheatService.sanitizeCurrency(loaded)
 
             // Auto-detect system locale on fresh boot if default en-US is set
@@ -209,6 +213,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             withContext(Dispatchers.Main) {
                 _gameState.value = finalState
+                GameLogger.log(LogLevel.DEBUG, LoggerCategory.STATE, "STATE_READY", "Loaded slot=$targetSlot with guesses=${finalState.attempts}, upgrades=${finalState.upgradeLevels.size}, activeWorld=${finalState.activeWorldId}.")
                 if (effectiveSanitized.dailyQuestDate != finalState.dailyQuestDate) saveGameAsync()
                 _isLoadingSave.value = false
                 if (timeTravelDetected) {
@@ -880,6 +885,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         _gameState.update { it.copy(settings = newSettings) }
         viewModelScope.launch(Dispatchers.IO) { saveManager.saveAppPreferences(newSettings) }
         GameLogger.configureStorage(File(getApplication<Application>().filesDir, "game_logs.txt"), newSettings.saveLogsToStorage)
+        GameLogger.configureVerbose(newSettings.verboseLogging)
+        GameLogger.log(LogLevel.INFO, LoggerCategory.STATE, "LOGGING_SETTINGS_CHANGED", "Verbose logging ${if (newSettings.verboseLogging) "enabled" else "disabled"}; file logging ${if (newSettings.saveLogsToStorage) "enabled" else "disabled"}.")
         saveGameAsync()
 
         val context = getApplication<Application>()
@@ -1518,7 +1525,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             slotOperationMutex.withLock {
                 val slot = _activeSlot.value
                 val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
+                GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_ASYNC_BEGIN", "Persisting game state for slot=$slot.")
                 if (saveManager.saveGame(state, slot)) {
+                    GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_ASYNC_OK", "Game state persisted for slot=$slot.")
                     WidgetRefresh.request(getApplication<Application>())
                 } else {
                     GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "SAVE_ASYNC_FAILED", "Could not persist the latest game state for slot $slot.")
