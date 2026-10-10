@@ -1,7 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
-import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
@@ -20,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.jarrlyyy.guessthenumber.ui.components.ReusableColorPickerDialog
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.input.pointer.consumePositionChange
@@ -35,11 +33,7 @@ fun MoreScreen(
     onNavigate: (String) -> Unit,
     onUpdateSettings: (com.jarrlyyy.guessthenumber.domain.model.GameSettings) -> Unit
 ) {
-    val context = LocalContext.current
-    val locale = LocalAppLocaleManager.current
     var colorTarget by remember { mutableStateOf<String?>(null) }
-
-    val currentMusicPath = state.settings.backgroundMusicPath
 
     val defaultOrder = com.jarrlyyy.guessthenumber.domain.model.DEFAULT_MORE_SCREEN_ORDER
     val normalizedOrder = remember(state.settings.moreScreenOrder) {
@@ -102,26 +96,6 @@ fun MoreScreen(
         "endgame" to Icons.Default.AutoAwesome,
         "staking" to Icons.Default.Casino
     )
-
-    val audioPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri != null) {
-            try {
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                    val musicFile = File(context.filesDir, "background_music.mp3")
-                    musicFile.outputStream().use { outputStream ->
-                        inputStream.copyTo(outputStream)
-                    }
-                    onUpdateBackgroundMusic(musicFile.absolutePath)
-                    onPlayMusic()
-                    Toast.makeText(context, "Background music saved & playing!", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(context, "Failed to load audio: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
 
     Scaffold(
         topBar = {
