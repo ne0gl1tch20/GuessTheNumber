@@ -17,6 +17,22 @@ data class CommandSuggestion(
     val description: String
 )
 
+data class DevCommand(
+    val name: String,
+    val arguments: List<String>,
+    val rawInput: String
+)
+
+object CommandParser {
+    fun parse(input: String): DevCommand? {
+        val trimmed = input.trim()
+        if (trimmed.isEmpty()) return null
+        val parts = trimmed.split(Regex("\\s+"))
+        val name = parts.firstOrNull()?.lowercase()?.takeIf { it.startsWith("/") } ?: return null
+        return DevCommand(name = name, arguments = parts.drop(1), rawInput = trimmed)
+    }
+}
+
 object CommandRegistry {
     val commands = listOf(
         DevCommandDefinition("/help", "/help", "Show all developer commands"),
