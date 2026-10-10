@@ -504,7 +504,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (newAchievements.size > state.achievements.size) {
             _gameState.value = state.copy(
                 achievements = newAchievements,
-                nebula = state.nebula + BigNumber(nebulaReward)
+                nebula = state.nebula + BigNumber(nebulaReward),
+                statistics = state.statistics.copy(
+                    nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+                )
             )
         }
     }
