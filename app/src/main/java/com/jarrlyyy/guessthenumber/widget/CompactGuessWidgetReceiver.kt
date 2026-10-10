@@ -84,10 +84,13 @@ class CompactGuessWidget : GlanceAppWidget() {
 
 class CycleCompactWidgetSaveSlotCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        val activeSlot = SaveManager(context).getActiveSlot()
+        val saveManager = SaveManager(context)
+        val activeSlot = saveManager.getActiveSlot()
+        val widgetState = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
+        val current = (widgetState[compactWidgetSaveSlotKey] ?: activeSlot).coerceIn(1, MAX_SAVE_SLOTS)
+        val nextSlot = nextOccupiedSaveSlot(context, current)
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { preferences ->
-            val current = (preferences[compactWidgetSaveSlotKey] ?: activeSlot).coerceIn(1, MAX_SAVE_SLOTS)
-            preferences[compactWidgetSaveSlotKey] = if (current >= MAX_SAVE_SLOTS) 1 else current + 1
+            preferences[compactWidgetSaveSlotKey] = nextSlot
         }
         CompactGuessWidget().update(context, glanceId)
     }
