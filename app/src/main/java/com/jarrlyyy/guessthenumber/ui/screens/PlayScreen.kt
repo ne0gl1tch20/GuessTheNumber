@@ -828,21 +828,8 @@ private fun WorldProgressionBoard(
     locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager,
     onAction: (String, String) -> Unit
 ) {
-    data class WorldDef(
-        val id: String,
-        val nameKey: String,
-        val bossId: String,
-        val bossNameKey: String,
-        val worldRequirementKey: String,
-        val bossRequirementKey: String,
-        val rewardKey: String
-    )
-    val worlds = listOf(
-        WorldDef("verdant_grove", "world_verdant_name", "verdant_guardian", "boss_verdant_name", "world_verdant_requirement", "boss_verdant_requirement", "boss_verdant_reward"),
-        WorldDef("crystal_caverns", "world_crystal_name", "crystal_golem", "boss_crystal_name", "world_crystal_requirement", "boss_crystal_requirement", "boss_crystal_reward"),
-        WorldDef("ember_summit", "world_ember_name", "ember_dragon", "boss_ember_name", "world_ember_requirement", "boss_ember_requirement", "boss_ember_reward"),
-        WorldDef("nebula_rift", "world_nebula_name", "nebula_titan", "boss_nebula_name", "world_nebula_requirement", "boss_nebula_requirement", "boss_nebula_reward")
-    )
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val worlds = remember { WorldConfigRepository(context).loadWorlds() }
     val totalUpgradeLevels = state.upgradeLevels.values.sum()
     Card(
         modifier = Modifier.fillMaxWidth().animateContentSize(),
@@ -862,31 +849,21 @@ private fun WorldProgressionBoard(
             }
             worlds.forEachIndexed { index, world ->
                 val unlocked = world.id in state.unlockedWorldIds
-                val defeated = world.bossId in state.defeatedBossIds
-                val previousBossId = when (index) {
-                    1 -> "verdant_guardian"
-                    2 -> "crystal_golem"
-                    3 -> "ember_dragon"
-                    else -> ""
-                }
-                val canUnlock = when (world.id) {
-                    "crystal_caverns" -> previousBossId in state.defeatedBossIds && state.correctGuesses >= 25 && totalUpgradeLevels >= 5
-                    "ember_summit" -> previousBossId in state.defeatedBossIds && state.correctGuesses >= 100 && totalUpgradeLevels >= 15 && state.prestigeCount >= 1
-                    "nebula_rift" -> previousBossId in state.defeatedBossIds && state.correctGuesses >= 250 && totalUpgradeLevels >= 40 && state.prestigeCount >= 3 && state.ultraCount >= 1
-                    else -> false
-                }
-                val canFight = when (world.id) {
-                    "verdant_grove" -> state.correctGuesses >= 10 && totalUpgradeLevels >= 3
-                    "crystal_caverns" -> state.correctGuesses >= 50 && totalUpgradeLevels >= 10
-                    "ember_summit" -> state.correctGuesses >= 150 && totalUpgradeLevels >= 25 && state.prestigeCount >= 1
-                    else -> state.correctGuesses >= 500 && totalUpgradeLevels >= 75 && state.prestigeCount >= 5 && state.ultraCount >= 1
-                }
-                val bossHp = when (world.id) {
-                    "verdant_grove" -> 3
-                    "crystal_caverns" -> 5
-                    "ember_summit" -> 7
-                    else -> 10
-                }
+                val defeated = world.bossId in state.defeatedBossIds && !state.endlessRiftActive
+                val canUnlock = world.unlockBossId?.let { requiredBossId ->
+                    requiredBossId in state.defeatedBossIds &&
+                        state.correctGuesses >= world.unlockCorrectGuesses &&
+                        totalUpgradeLevels >= world.unlockUpgradeCount &&
+                        state.prestigeCount >= world.unlockPrestigeCount &&
+                        state.ultraCount >= world.unlockUltraCount
+                } ?: false
+                val canFight = state.endlessRiftActive || (
+                    state.correctGuesses >= world.fightCorrectGuesses &&
+                        totalUpgradeLevels >= world.fightUpgradeCount &&
+                        state.prestigeCount >= world.fightPrestigeCount &&
+                        state.ultraCount >= world.fightUltraCount
+                )
+                val bossHp = world.hp + if (state.endlessRiftActive) ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
                 val bossDamage = (state.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, bossHp)
                 val bossHpRemaining = bossHp - bossDamage
                 Surface(
