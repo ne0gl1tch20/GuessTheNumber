@@ -100,3 +100,23 @@ Current app version: 3.0.1 (versionCode 19).
 - Weekly/daily challenge claims now add their Nebula payout to `statistics.nebulaEarned` in the domain claim transaction, matching the balance change and preventing the challenge reward path from undercounting lifetime earnings.
 - Offline auto-clicker earnings now increment lifetime `moneyEarned` as well as the wallet balance, so the statistics screen includes money granted during startup catch-up.
 - World unlock actions are now idempotent: tapping unlock again for an already-unlocked world no longer emits duplicate progression notifications or repeats unlock-side effects.
+
+## Latest stabilization and localization pass (source changes; validation pending)
+
+- Expanded `tools/audit_localization_surface.py` so it now checks literal `localizedText` phrases against the canonical English catalog, flags dynamic interpolation passed into phrase-based localization, and identifies literal `getString` keys that are missing or use English sentences instead of stable key IDs. This is a source audit, not a compiler; run it in CI and triage remaining findings before declaring the audit complete.
+- Arcade minigame names and descriptions now resolve from the active app locale instead of creating a separate locale manager that could drift after language changes. Dynamic prompts, scores, timers, reaction times, box results, memory results, reward labels and Number Rush prompts use format-aware catalog lookups. Memory-match rewards now depend on an explicit correctness flag rather than checking translated display text.
+- Settings and Staking dynamic values now use locale-aware formats. The English catalog has entries for the newly audited settings, staking, Arcade, Ultra/Prestige and crash-recovery messages. Existing locale overlays inherit these entries from the English catalog until translated overlays are completed; full translation parity still needs a fresh validation report.
+- `LocaleManager` now attempts to resolve phrase-based fallbacks against the English catalog when a call does not provide a separate default. This improves legacy `localizedText` call coverage; dynamic phrases have been moved to keyed format calls in the reviewed screens.
+- Removed the old, duplicate More-screen audio import/dialog path and its unused navigation arguments. The More hub now links to the reusable full-screen offline music player instead of exposing a second, partially separate player implementation.
+- Music state restoration now removes missing track IDs from persisted queue/playlists and clears a stale persisted current-track ID. Empty queue playback now stops cleanly, and removing a non-current duplicate of the playing track no longer incorrectly consumes the Repeat One bypass.
+- Notification delivery now has an awaitable worker-facing path, so `GameReminderWorker` waits for notification handling instead of completing while its fire-and-forget coroutine may still be pending. Category cancellation is available, and disabling global/category notification settings clears already-posted notifications. App-preference JSON imports now resynchronize reminder work and widgets.
+- Music service stop now removes the foreground notification and scheduled notification updater before stopping, preventing the service loop from reposting a stale playback notification.
+
+### Remaining release gates
+
+- Run localization/JSON/version checks, the expanded localization-surface audit, Kotlin preflight, Gradle unit tests, lint and debug/release APK builds on the latest `master` revision.
+- Run the Android emulator workflow and inspect test results/logs for startup, crash recovery, save-slot switching, notification navigation, widget launch routing and music playback lifecycle.
+- Review and translate any newly added English catalog entries across all 23 locale overlays; confirm placeholder parity and audit findings after running the repository scripts.
+- Finish balancing review with gameplay tests for relic set thresholds, mastery costs/milestones, secret-area gates, Home Base level caps, boss/Rift payout scaling and one-time endgame claims. Source review alone does not establish stable progression balance.
+
+**Status: not yet stable.** These are committed source changes. Build, lint, unit-test and emulator results have not been obtained for this revision.
