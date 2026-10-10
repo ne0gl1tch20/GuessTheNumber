@@ -250,6 +250,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     guessingBot.reset(freshState.currentRangeMin, freshState.currentRangeMax)
                     lastIncomeMeasurement = freshState.money
                     _incomePerSecond.value = BigNumber.ZERO
+                    WidgetRefresh.request(getApplication<Application>())
                     true
                 }
             }
@@ -270,9 +271,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     profileName = name.trim().take(24),
                     profileIconId = iconId
                 )
-                saveManager.saveGame(updated, slot)
-                if (_activeSlot.value == slot) {
+                val saved = saveManager.saveGame(updated, slot)
+                if (saved && _activeSlot.value == slot) {
                     _gameState.value = AntiCheatService.sanitizeCurrency(updated)
+                    WidgetRefresh.request(getApplication<Application>())
                 }
             }
         }
@@ -288,7 +290,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     try {
                         val currentSlot = _activeSlot.value
                         val currentState = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
-                        saveManager.saveGame(currentState, currentSlot)
+                        // Do not switch away from unsaved progress. DataStore failures must
+                        // leave the current slot selected and its in-memory state untouched.
+                        if (!saveManager.saveGame(currentState, currentSlot)) {
+                            GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "SLOT_SWITCH_SAVE_FAILED", "Save slot switch cancelled because the current slot could not be saved.")
+                            return@withLock
+                        }
                         saveManager.setActiveSlot(slot)
                         val loaded = saveManager.loadGame(slot)
                         val sanitized = AntiCheatService.sanitizeCurrency(loaded)
@@ -299,6 +306,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                             lastIncomeMeasurement = sanitized.money
                             _incomePerSecond.value = BigNumber.ZERO
                         }
+                        WidgetRefresh.request(getApplication<Application>())
                     } finally {
                         withContext(Dispatchers.Main) {
                             _isLoadingSave.value = false
