@@ -63,7 +63,8 @@ def main() -> int:
                 "unlockCorrectGuesses", "unlockUpgradeCount", "unlockPrestigeCount",
                 "unlockUltraCount", "fightCorrectGuesses", "fightUpgradeCount",
                 "fightPrestigeCount", "fightUltraCount", "worldRequirementKey",
-                "bossRequirementKey", "bossRewardKey",
+                "bossRequirementKey", "bossRewardKey", "baseMoneyReward",
+                "baseNebulaReward",
             }
             if world_root.get("schemaVersion") != 1:
                 errors.append("game/worlds.json: schemaVersion must be 1")
@@ -104,6 +105,10 @@ def main() -> int:
                         value = world[field]
                         if not isinstance(value, int) or value < 0:
                             errors.append(f"{prefix}: {field} must be a non-negative integer")
+                    if not isinstance(world["baseMoneyReward"], str) or not world["baseMoneyReward"].isdigit():
+                        errors.append(f"{prefix}: baseMoneyReward must be a non-negative integer string")
+                    if not isinstance(world["baseNebulaReward"], int) or world["baseNebulaReward"] < 0:
+                        errors.append(f"{prefix}: baseNebulaReward must be a non-negative integer")
         except Exception as exc:
             errors.append(f"game/worlds.json: unable to validate world definitions: {exc}")
 
