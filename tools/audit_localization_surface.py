@@ -29,6 +29,11 @@ def probable_user_text(value: str) -> bool:
     value = value.strip()
     if len(value) < 2 or value.startswith(IGNORE_PREFIXES):
         return False
+    # Regex scans can stop at the nested quote in a Kotlin template such as
+    # "${locale.getString("key", "Fallback")}: $value". A fragment beginning
+    # with an unterminated interpolation is expression syntax, not visible copy.
+    if value.startswith("${") and "}" not in value:
+        return False
     # Strip Kotlin-only interpolations before deciding whether static user copy remains.
     # Purely dynamic values and animation/test trace labels are not translatable text.
     static_text = re.sub(r"\$\{[^}]+\}|\$[A-Za-z_]\w*", "", value)
