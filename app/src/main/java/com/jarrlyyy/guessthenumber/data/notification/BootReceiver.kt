@@ -25,9 +25,16 @@ class BootReceiver : BroadcastReceiver() {
                 val preferences = runCatching {
                     JSONObject(SaveManager(appContext).getAppPreferencesJson())
                 }.getOrElse { JSONObject() }
-                val enabled = preferences.optBoolean("notificationsEnabled", true) && preferences.optBoolean("notificationRemindersEnabled", true)
+                val notificationsEnabled = preferences.optBoolean("notificationsEnabled", true)
+                val remindersEnabled = preferences.optBoolean("notificationRemindersEnabled", true)
+                val enabled = notificationsEnabled && remindersEnabled
                 val intervalHours = preferences.optLong("notificationIntervalHours", 24L).coerceIn(12L, 48L)
                 val workManager = WorkManager.getInstance(appContext)
+                if (!notificationsEnabled) {
+                    NotificationHelper.Type.values().forEach { NotificationHelper.cancel(appContext, it) }
+                } else if (!remindersEnabled) {
+                    NotificationHelper.cancel(appContext, NotificationHelper.Type.REMINDER)
+                }
                 if (!enabled) {
                     workManager.cancelUniqueWork(GameReminderWorker.WORK_NAME)
                 } else {
