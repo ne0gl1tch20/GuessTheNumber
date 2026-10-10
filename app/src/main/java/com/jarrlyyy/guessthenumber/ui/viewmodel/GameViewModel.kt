@@ -848,6 +848,17 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun cancelDisabledNotifications(settings: GameSettings) {
+        val context = getApplication<Application>()
+        if (!settings.notificationsEnabled) {
+            NotificationHelper.Type.values().forEach { NotificationHelper.cancel(context, it) }
+            return
+        }
+        if (!settings.notificationRemindersEnabled) NotificationHelper.cancel(context, NotificationHelper.Type.REMINDER)
+        if (!settings.notificationProgressionEnabled) NotificationHelper.cancel(context, NotificationHelper.Type.PROGRESSION)
+        if (!settings.notificationEventsEnabled) NotificationHelper.cancel(context, NotificationHelper.Type.EVENT)
+    }
+
     fun updateSettings(newSettings: GameSettings) {
         val oldSettings = _gameState.value.settings
         if (newSettings.locale != oldSettings.locale) {
@@ -859,6 +870,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         saveGameAsync()
 
         val context = getApplication<Application>()
+        cancelDisabledNotifications(newSettings)
         val workManager = WorkManager.getInstance(context)
         if (!newSettings.notificationsEnabled || !newSettings.notificationRemindersEnabled) {
             workManager.cancelUniqueWork(GameReminderWorker.WORK_NAME)
@@ -895,6 +907,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val loaded = saveManager.loadGame(_activeSlot.value)
                 val settings = loaded.settings
                 val context = getApplication<Application>()
+                cancelDisabledNotifications(settings)
                 val workManager = WorkManager.getInstance(context)
                 if (!settings.notificationsEnabled || !settings.notificationRemindersEnabled) {
                     workManager.cancelUniqueWork(GameReminderWorker.WORK_NAME)
