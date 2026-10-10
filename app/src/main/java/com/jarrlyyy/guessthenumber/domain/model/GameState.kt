@@ -94,7 +94,7 @@ data class GameStatistics(
 
 val DEFAULT_MORE_SCREEN_ORDER = buildList {
     addAll(listOf(
-        "world_map", "achievements", "live_ops", "mutators", "talent", "relics",
+        "world_map", "achievements", "live_ops", "lua_hub", "mutators", "talent", "relics",
         "home_base", "codex", "endgame", "arcade", "stats", "changelog", "settings", "about"
     ))
     if (BuildConfig.DEBUG) add("dev_settings")

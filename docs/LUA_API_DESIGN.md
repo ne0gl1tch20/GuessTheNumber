@@ -1,6 +1,6 @@
 # Lua Host API: Draft Contract
 
-**Status:** Design draft only. API names are illustrative and must not be treated as implemented.
+**Status:** Partially implemented on `feat/lua-runtime-engine`. The shared LuaEngine facade, `gtn.log`, bounded activity-table contract, instruction-budgeted sandbox, debug console commands, and GO hub exist. The broader game/UI/event namespaces below remain future design.
 
 ## API design rules
 
@@ -61,7 +61,7 @@ The actual bridge must not accept arbitrary callbacks, function source strings, 
 
 ## Candidate Kotlin bridge interfaces
 
-These are conceptual boundaries, not code commitments:
+These boundaries describe the intended reusable API; only the logging host function and activity result schema are implemented in the first slice:
 
 - `LuaRuntimeCoordinator`: owns runtime lifecycle, cancellation, resource budgets and script errors.
 - `LuaScriptRegistry`: maps trusted script IDs to validated local bundle entries.
@@ -130,7 +130,7 @@ interface LuaEngineFacade {
 }
 ```
 
-This is a design sketch, not committed implementation code. Exact signatures and coroutine types depend on the runtime spike. Compose screens, the GO flow, Dev Settings, bundled content, and verified LiveOps content all share the same registry, runtime coordinator, host API registry, action validator, UI adapter, and lifecycle manager. Avoid screen-specific bridges or duplicate runtimes.
+The current `LuaEngine` facade implements `status`, `listScripts`, `inspectScript`, `start`, `stop`, and diagnostics. The full Flow-based diagnostics API and richer adapters remain planned. Compose screens, the GO flow, Dev Settings, bundled content, and verified LiveOps content all share the same registry, runtime coordinator, host API registry, action validator, UI adapter, and lifecycle manager. Avoid screen-specific bridges or duplicate runtimes.
 
 The facade delegates to adapters for runtime execution, trusted bundle resolution, typed host calls, declarative UI rendering, game-engine action validation, lifecycle cleanup, and structured diagnostics. Keep runtime-specific objects out of UI and game-domain APIs; inject the facade so unit tests can use a fake engine. Lua initialization failure must not prevent normal app startup or core gameplay.
 

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "hostApiVersion": 1,
+  "scripts": [
+    {
+      "id": "number_rush",
+      "file": "minigames/number_rush.lua",
+      "title": "Number Rush",
+      "description": "A quick Lua-powered number challenge.",
+      "featured": true,
+      "hostApiVersion": 1
+    }
+  ]
+}

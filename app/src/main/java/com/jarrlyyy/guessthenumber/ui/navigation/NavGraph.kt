@@ -358,6 +358,13 @@ fun NavGraph(
                             onBack = { navController.popBackStack() }
                         )
                     }
+                    composable(Screen.LuaHub.route) {
+                        if (featureFlags["lua_scripting"] == true) {
+                            LuaActivityHubScreen(onBack = { navController.popBackStack() })
+                        } else {
+                            FeatureDisabledScreen("Lua activities", onBack = { navController.popBackStack() })
+                        }
+                    }
                     composable(Screen.Arcade.route) {
                         ArcadeScreen(
                             onEarnReward = onEarnMinigameReward,

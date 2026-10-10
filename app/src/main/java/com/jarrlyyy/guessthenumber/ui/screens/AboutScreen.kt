@@ -30,7 +30,8 @@ fun AboutScreen(
         OpenSourceLibrary("Kotlinx Serialization", "Apache 2.0", "JetBrains"),
         OpenSourceLibrary("Kotlinx Coroutines", "Apache 2.0", "JetBrains"),
         OpenSourceLibrary("DataStore Preferences", "Apache 2.0", "Google"),
-        OpenSourceLibrary("Navigation Compose", "Apache 2.0", "Google")
+        OpenSourceLibrary("Navigation Compose", "Apache 2.0", "Google"),
+        OpenSourceLibrary("LuaJ", "MIT", "LuaJ project; James Roseborough and Ian Farmer")
     )
 
     Scaffold(

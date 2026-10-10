@@ -5,6 +5,7 @@
     "seasonal_rewards": true,
     "world_map": true,
     "challenge_builder": true,
-    "dev_console": true
+    "dev_console": true,
+    "lua_scripting": true
   }
 }

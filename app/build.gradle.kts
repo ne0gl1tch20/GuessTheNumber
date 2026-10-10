@@ -20,6 +20,10 @@ android {
     compileSdk = 37
 
     defaultConfig {
+        val liveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl").orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-LiveOps/master/manifest.json").get()
+        val liveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64").orElse("").get()
+        buildConfigField("String", "LIVEOPS_MANIFEST_URL", "\"$liveOpsManifestUrl\"")
+        buildConfigField("String", "LIVEOPS_PUBLIC_KEY_BASE64", "\"$liveOpsPublicKey\"")
         applicationId = "com.jarrlyyy.guessthenumber"
         minSdk = 26
         targetSdk = 35
@@ -100,6 +104,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.luaj.jme)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation("androidx.work:work-runtime-ktx:2.9.0")

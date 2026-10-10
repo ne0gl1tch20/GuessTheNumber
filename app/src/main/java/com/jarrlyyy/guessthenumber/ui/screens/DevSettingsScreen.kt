@@ -35,6 +35,10 @@ import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.domain.command.CommandAutocomplete
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.scripting.LuaEngine
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -62,6 +66,11 @@ fun DevSettingsScreen(
     var logSearchQuery by remember { mutableStateOf("") }
     var selectedLogLevel by remember { mutableStateOf("ALL") }
     var isPaused by remember { mutableStateOf(false) }
+    var luaCommandInput by remember { mutableStateOf("/lua status") }
+    var luaCommandOutput by remember { mutableStateOf("") }
+    var luaCommandBusy by remember { mutableStateOf(false) }
+    val luaEngine = remember(context) { LuaEngine.get(context) }
+    val coroutineScope = rememberCoroutineScope()
 
     val logs by GameLogger.logFlow.collectAsState(initial = emptyList())
     val jsonSerializer = remember { Json { ignoreUnknownKeys = true; prettyPrint = true } }
@@ -195,6 +204,63 @@ fun DevSettingsScreen(
                         Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(localizedText("Zip & Share Logs from Storage"), fontSize = 14.sp)
+                    }
+                }
+            }
+
+            // Debug-only Lua commands share the engine used by the player-facing GO flow.
+            item {
+                HorizontalDivider()
+                Text(localizedText("Lua Console"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(
+                    localizedText("Run registered local or verified LiveOps script IDs. Raw Lua evaluation is disabled."),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp
+                )
+            }
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = luaCommandInput,
+                        onValueChange = { luaCommandInput = it },
+                        label = { Text(localizedText("Lua command (e.g. /lua status)")) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            onClick = {
+                                if (!luaCommandBusy && luaCommandInput.isNotBlank()) {
+                                    coroutineScope.launch {
+                                        luaCommandBusy = true
+                                        luaCommandOutput = withContext(Dispatchers.Default) {
+                                            luaEngine.executeConsoleCommand(luaCommandInput)
+                                        }
+                                        luaCommandBusy = false
+                                    }
+                                }
+                            },
+                            enabled = !luaCommandBusy && luaCommandInput.isNotBlank(),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            if (luaCommandBusy) CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                            else Icon(Icons.Default.PlayArrow, contentDescription = null)
+                            Spacer(Modifier.width(6.dp))
+                            Text(localizedText("Execute Lua command"))
+                        }
+                        OutlinedButton(onClick = { luaCommandOutput = "" }) {
+                            Text(localizedText("Clear"))
+                        }
+                    }
+                    if (luaCommandOutput.isNotBlank()) {
+                        Card(Modifier.fillMaxWidth()) {
+                            Text(
+                                luaCommandOutput,
+                                modifier = Modifier.padding(12.dp),
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 12.sp
+                            )
+                        }
                     }
                 }
             }
