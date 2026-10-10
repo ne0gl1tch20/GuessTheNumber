@@ -75,9 +75,9 @@ fun CrashRecoveryScreen(locale: LocaleManager, onDismiss: () -> Unit, reducedMot
                 Button(
                     onClick = {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText(locale.getString("Crash Log", "Crash Log"), crashLog)
+                        val clip = ClipData.newPlainText(locale.getString("crash_log_label", "Crash Log"), crashLog)
                         clipboard.setPrimaryClip(clip)
-                        Toast.makeText(context, locale.getString("Crash logs copied to clipboard!", "Crash logs copied to clipboard!"), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, locale.getString("crash_logs_copied_to_clipboard_toast", "Crash logs copied to clipboard!"), Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.weight(1f)
                 ) {
