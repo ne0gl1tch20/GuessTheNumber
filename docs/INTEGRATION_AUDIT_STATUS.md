@@ -96,3 +96,4 @@ Current app version: 3.0.1 (versionCode 19).
 - The bundled Live Ops manifest now describes the currency the claim handler actually awards: Nebula. Event descriptions also state the real per-claim reward and per-save permanent bonus effect instead of advertising unimplemented CyberTokens/NeonCrystals.
 - The bundled event claim caps now permit up to 25 total permanent bonus-level increases across the two events (20 + 5), matching the documented level-25 cap instead of making levels 16–25 unreachable from the shipped manifest.
 - Queue removal now bypasses Repeat One once when the currently playing track is removed from the queue, so the deleted queue entry does not loop forever after its current playback ends. Manually choosing another track clears that one-shot bypass.
+- Achievement milestone payouts now increment `statistics.nebulaEarned` together with the actual Nebula balance, keeping lifetime earnings accurate when achievements unlock during gameplay.
