@@ -692,12 +692,18 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val upgrade = JsonConfigRepository(getApplication()).loadPrestigeUpgrades().find { it.id == upgradeId } ?: return
         val currentLevel = state.prestigeUpgradeLevels[upgradeId] ?: 0
         val count = bulkUpgradeCount(upgrade, currentLevel, state.prestige)
-        if (count <= 0 || state.prestige < cost) return
+        if (count <= 0) return
 
+        // Bulk purchases must charge every level bought, not just the single-level
+        // price passed by the UI. Otherwise 10/MAX purchases grant free levels.
+        val actualCost = (0 until count).fold(BigNumber.ZERO) { total, offset ->
+            total + BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(currentLevel + offset)
+        }
+        if (state.prestige < actualCost) return
         val newLevel = minOf(upgrade.maxLevel, currentLevel + count)
         val newLevels = state.prestigeUpgradeLevels.toMutableMap()
         newLevels[upgradeId] = newLevel
-        val newPrestige = state.prestige - cost
+        val newPrestige = state.prestige - actualCost
         _gameState.value = state.copy(prestige = newPrestige, prestigeUpgradeLevels = newLevels)
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_PRESTIGE_UPGRADE", "Bought prestige upgrade $upgradeId to level $newLevel")
@@ -708,12 +714,17 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val upgrade = JsonConfigRepository(getApplication()).loadUltraUpgrades().find { it.id == upgradeId } ?: return
         val currentLevel = state.ultraUpgradeLevels[upgradeId] ?: 0
         val count = bulkUpgradeCount(upgrade, currentLevel, state.ultra)
-        if (count <= 0 || state.ultra < cost) return
+        if (count <= 0) return
 
+        // Keep Ultra bulk purchases economically consistent with Prestige.
+        val actualCost = (0 until count).fold(BigNumber.ZERO) { total, offset ->
+            total + BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(currentLevel + offset)
+        }
+        if (state.ultra < actualCost) return
         val newLevel = minOf(upgrade.maxLevel, currentLevel + count)
         val newLevels = state.ultraUpgradeLevels.toMutableMap()
         newLevels[upgradeId] = newLevel
-        val newUltra = state.ultra - cost
+        val newUltra = state.ultra - actualCost
         _gameState.value = state.copy(ultra = newUltra, ultraUpgradeLevels = newLevels)
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_ULTRA_UPGRADE", "Bought ultra upgrade $upgradeId to level $newLevel")
