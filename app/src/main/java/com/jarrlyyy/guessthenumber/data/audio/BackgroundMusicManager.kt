@@ -124,7 +124,10 @@ class BackgroundMusicManager private constructor(context: Context) {
 
     fun removeTrack(trackId: String) {
         val track = _library.value.firstOrNull { it.id == trackId } ?: return
-        if (_currentTrackId.value == trackId) {
+        val previousQueue = _queue.value
+        val previousQueueIndex = queueIndex
+        val wasPlaying = _currentTrackId.value == trackId
+        if (wasPlaying) {
             stop()
             _currentTrackId.value = null
             _currentPath.value = null
@@ -135,7 +138,9 @@ class BackgroundMusicManager private constructor(context: Context) {
         runCatching { File(track.path).delete() }
         _library.value = _library.value.filterNot { it.id == trackId }
         persistLibrary(_library.value)
-        _queue.value = _queue.value.filterNot { it == trackId }
+        val removedBeforeCursor = previousQueue.take(previousQueueIndex.coerceAtLeast(0)).count { it == trackId }
+        _queue.value = previousQueue.filterNot { it == trackId }
+        queueIndex = (previousQueueIndex - removedBeforeCursor).coerceIn(0, (_queue.value.lastIndex).coerceAtLeast(0))
         persistQueue()
         _playlists.value = _playlists.value.mapValues { (_, ids) -> ids.filterNot { it == trackId } }
         persistPlaylists()
