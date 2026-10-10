@@ -66,7 +66,7 @@ fun PrestigeScreen(
                 title = { Text(localizedText("Prestige Hub & Upgrades")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 }
             )
@@ -87,12 +87,12 @@ fun PrestigeScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         AnimatedContent(targetState = state.prestige.format(), label = "prestigeBalance") { balance ->
-                            Text(localizedText("Prestige Balance: $balance"), color = PrestigeBlue, fontSize = 20.sp)
+                            Text(locale.getString("prestige_balance_format", "Prestige Balance: %s", balance), color = PrestigeBlue, fontSize = 20.sp)
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(localizedText("Requirement: ${requiredMoney.format()} Money (Reset #${state.prestigeCount + 1})"))
-                        Text(localizedText("Current Money: ${state.money.format()}"))
-                        Text(localizedText("Preview Reward: +${prestigeReward.format()} Prestige"))
+                        Text(locale.getString("prestige_requirements_format", "Requirement: %s Money (Reset #%d)", requiredMoney.format(), state.prestigeCount + 1))
+                        Text(locale.getString("prestige_current_money_format", "Current Money: %s", state.money.format()))
+                        Text(locale.getString("prestige_preview_reward_format", "Preview Reward: +%s Prestige", prestigeReward.format()))
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(localizedText("🔄 Reset Info: Resets all regular Money, Upgrade Levels, and resets guessing range back to 1-100. Each prestige increases the money requirement for the next prestige."), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.height(12.dp))
@@ -136,13 +136,13 @@ fun PrestigeScreen(
                     Text(localizedText("Buy Multiplier:"), style = MaterialTheme.typography.titleMedium)
                     Box(Modifier.wrapContentSize(Alignment.TopEnd)) {
                         OutlinedButton(onClick = { expanded = true }, shape = MaterialTheme.shapes.medium, contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
-                            Text(localizedText("${state.buyMultiplier}x"), style = MaterialTheme.typography.labelLarge)
+                            Text(locale.getString("multiplier_format", "%sx", state.buyMultiplier), style = MaterialTheme.typography.labelLarge)
                             Spacer(Modifier.width(8.dp))
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = locale.getString("dropdown", "Dropdown"))
                         }
                         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                             multipliers.forEach { mult ->
-                                DropdownMenuItem(text = { Text(localizedText("$mult x"), style = MaterialTheme.typography.bodyMedium) }, onClick = { onUpdateMultiplier(mult); expanded = false })
+                                DropdownMenuItem(text = { Text(locale.getString("multiplier_option_format", "%s x", mult), style = MaterialTheme.typography.bodyMedium) }, onClick = { onUpdateMultiplier(mult); expanded = false })
                             }
                         }
                     }
@@ -191,11 +191,11 @@ fun PrestigeScreen(
                             Text(upgrade.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(Modifier.height(6.dp))
                             Surface(shape = MaterialTheme.shapes.extraSmall, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)) {
-                                Text(localizedText("Level: ") + level + " / " + if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+                                Text(locale.getString("upgrade_level_format", "Level: %d / %s", level, if (upgrade.maxLevel >= 999999) locale.getString("maxed_label", "MAX") else upgrade.maxLevel.toString()), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
                             }
                             if (!isMaxed) {
                                 Spacer(Modifier.height(4.dp))
-                                Text(localizedText("Cost (${state.buyMultiplier}x): ${totalCost.format()} Prestige"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(locale.getString("prestige_upgrade_cost_format", "Cost (%sx): %s Prestige", state.buyMultiplier, totalCost.format()), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             } else {
                                 Spacer(Modifier.height(4.dp))
                                 Text(localizedText("MAXED"), style = MaterialTheme.typography.bodySmall, color = PrestigeBlue)
@@ -231,7 +231,7 @@ fun PrestigeScreen(
                             Text(item.name, fontSize = 18.sp)
                             Text(item.description, fontSize = 14.sp)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text(localizedText("Cost: ${item.cost} Prestige"), color = PrestigeBlue)
+                            Text(locale.getString("prestige_shop_cost_format", "Cost: %s Prestige", item.cost), color = PrestigeBlue)
                         }
                         Button(
                             onClick = { onBuyPrestigeShopItem(item.id, item.cost) },
