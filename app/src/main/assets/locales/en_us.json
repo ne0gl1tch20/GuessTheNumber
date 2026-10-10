@@ -887,5 +887,9 @@
   "dev_save_applied_toast": "Save applied successfully!",
   "save_slot_label": "Save Slot %d",
   "copy": "Copy",
-  "clear": "Clear"
+  "clear": "Clear",
+  "guess_button": "Guess",
+  "claim_reward_button": "Claim Reward",
+  "done_button": "Done",
+  "close_button": "Close"
 }
