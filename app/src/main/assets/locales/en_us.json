@@ -880,5 +880,12 @@
   "ultra_reset_info": "🔄 Reset Info: Resets all regular Money, Prestige balance, Upgrade Levels, and Prestige Upgrade Levels. Each ultra increases the money requirement for the next ultra.",
   "ultra_upgrade_tree_title": "Ultra Upgrade Tree (JSON Driven)",
   "buy_multiplier_label": "Buy Multiplier:",
-  "ultra_shop_title": "Ultra Shop (JSON Driven)"
+  "ultra_shop_title": "Ultra Shop (JSON Driven)",
+  "dev_logs_zip_failed_format": "Failed to zip and share logs: %s",
+  "dev_loaded_app_preferences_toast": "Loaded global app preferences",
+  "dev_loaded_save_to_editor_toast": "Loaded current state into editor",
+  "dev_save_applied_toast": "Save applied successfully!",
+  "save_slot_label": "Save Slot %d",
+  "copy": "Copy",
+  "clear": "Clear"
 }
