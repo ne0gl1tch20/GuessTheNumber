@@ -4,6 +4,17 @@ An advanced, feature-rich incremental and arcade Android game built with **Jetpa
 
 **Why try it?** 🎮 You can play casually, optimize an automation build, hunt achievement tiers, or make a ridiculous custom mutator challenge. There is always another upgrade, reset, challenge, or combination waiting in the next run.
 
+## 🧩 Planned Lua Scripting Layer
+
+Lua is **planned, not implemented yet**. The Kotlin engine remains authoritative, and implementation is gated on a stable baseline with passing builds and tests. The plan covers reusable local scripts, temporary minigames, a constrained UI/game host API, shared developer-console diagnostics, and a future signed GitHub LiveOps bundle pipeline.
+
+- [Lua implementation roadmap](docs/LUA_SCRIPTING_PLAN.md)
+- [Draft Lua host API contract](docs/LUA_API_DESIGN.md)
+- [GitHub LiveOps bundle delivery plan](docs/LIVEOPS_SCRIPT_BUNDLES_PLAN.md)
+- [Reserved reusable scripts directory](app/src/main/assets/scripts/README.md)
+
+These documents do not add a Lua dependency or enable script execution.
+
 ---
 
 ## 🚀 Key Features
