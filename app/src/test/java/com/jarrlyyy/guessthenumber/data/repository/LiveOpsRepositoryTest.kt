@@ -1,6 +1,8 @@
 package com.jarrlyyy.guessthenumber.data.repository
 
+import com.jarrlyyy.guessthenumber.scripting.LuaSeasonalEventCatalog
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -20,6 +22,33 @@ class LiveOpsRepositoryTest {
         assertTrue(manifest.events.isNotEmpty())
         assertTrue(manifest.events.all { it.rewardNebula >= 0 && it.maxClaims > 0 })
         assertEquals(100L, manifest.events.first { it.id == "holiday_neon_rush" }.minCorrectGuesses)
+    }
+
+    @Test
+    fun bundledLuaCatalogMatchesUnchangedJsonFallback() {
+        val context = RuntimeEnvironment.getApplication()
+        val jsonManifest = context.assets.open("game/liveops_manifest.json").bufferedReader().use {
+            Json { ignoreUnknownKeys = true }.decodeFromString<LiveOpsManifest>(it.readText())
+        }
+        val luaManifest = LuaSeasonalEventCatalog(context).loadBundled()
+
+        assertEquals(jsonManifest.schemaVersion, luaManifest.schemaVersion)
+        assertEquals(jsonManifest.manifestVersion, luaManifest.manifestVersion)
+        assertEquals(jsonManifest.events, luaManifest.events)
+    }
+
+    @Test
+    fun repositoryFallsBackToJsonWhenLuaCatalogFails() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        val manifest = LiveOpsRepository(context) {
+            throw IllegalStateException("simulated Lua catalog failure")
+        }.loadLiveOpsEvents()
+
+        assertEquals(2, manifest.manifestVersion)
+        assertEquals(
+            setOf("season_1_cyber_guess", "holiday_neon_rush"),
+            manifest.events.map { it.id }.toSet()
+        )
     }
 
     @Test
