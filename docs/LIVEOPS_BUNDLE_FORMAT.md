@@ -2,6 +2,8 @@
 
 A copy-ready repository scaffold, sample script, signing helper and manual publishing workflow live in [`liveops-template/`](../liveops-template/README.md). Copy its contents into the separate content repository before enabling remote updates.
 
+The Lua Activity Hub is exposed from the app's **More** menu when the bundled `lua_scripting` feature flag is enabled, including release builds. The developer console remains debug-only. Keep the flag disabled if the activity hub is not ready for a given distribution.
+
 The Android client reads the HTTPS URL configured by `luaLiveOpsManifestUrl`. The default points to [`ne0gl1tch20/GuessTheNumber-LiveOps`](https://github.com/ne0gl1tch20/GuessTheNumber-LiveOps), which publishes the signed manifest and its source scripts.
 
 ## Repository layout
