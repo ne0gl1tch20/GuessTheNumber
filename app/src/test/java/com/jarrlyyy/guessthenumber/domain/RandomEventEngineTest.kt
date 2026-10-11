@@ -1,43 +1,40 @@
 package com.jarrlyyy.guessthenumber.domain
 
-import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.RandomEventEngine
-import kotlin.random.Random
+import com.jarrlyyy.guessthenumber.domain.model.RandomEventType
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RandomEventEngineTest {
 
     @Test
-    fun randomEventsAreOccasionalAndProduceStateChanges() {
-        val engine = RandomEventEngine(Random(1234))
-        val state = GameState(money = BigNumber(10_000), streak = 3)
-        var triggered = 0
+    fun everyLuaApprovedEventTypeAppliesAValidatedStateChange() {
+        val engine = RandomEventEngine()
+        val initial = GameState()
 
-        repeat(100) {
-            val result = engine.roll(state)
-            if (result != null) {
-                triggered++
-                assertTrue(result.state.statistics.randomEventsTriggered > 0)
-            }
+        RandomEventType.values().forEach { type ->
+            val result = engine.apply(initial, type)
+
+            assertEquals(type, result.type)
+            assertEquals(1L, result.state.statistics.randomEventsTriggered)
+            assertEquals(type.name.lowercase(), result.state.lastRandomEventId)
+            assertNotNull(result.state)
         }
-
-        assertTrue(triggered > 0)
-        assertTrue(triggered < 100)
     }
 
     @Test
-    fun randomEventEngineSupportsVariedEventTypes() {
-        val engine = RandomEventEngine(Random(9876))
-        val state = GameState(money = BigNumber(10_000), currentRangeMax = 100)
+    fun eventRewardsRemainBoundedByKotlinEventHandlers() {
+        val engine = RandomEventEngine()
+        val initial = GameState()
 
-        val types = buildSet {
-            repeat(500) {
-                engine.roll(state)?.let { add(it.type) }
-            }
-        }
+        val cosmicGift = engine.apply(initial, RandomEventType.COSMIC_GIFT)
+        assertTrue(cosmicGift.state.nebula > initial.nebula)
 
-        assertTrue(types.size >= 4)
+        val streakSurge = engine.apply(initial, RandomEventType.STREAK_SURGE)
+        assertEquals(initial.streak + 2, streakSurge.state.streak)
+        assertTrue(streakSurge.state.bestStreak >= streakSurge.state.streak)
     }
 }
