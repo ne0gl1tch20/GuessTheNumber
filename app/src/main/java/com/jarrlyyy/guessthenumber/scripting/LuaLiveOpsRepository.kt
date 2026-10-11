@@ -46,6 +46,14 @@ internal data class LuaRemoteScript(
     val capabilities: List<String> = listOf("log")
 )
 
+
+internal fun validateIncomingVersion(incomingVersion: Int, activeVersion: Int, highestAcceptedVersion: Int) {
+    require(incomingVersion > 0) { "Invalid LiveOps bundle version." }
+    require(incomingVersion >= maxOf(activeVersion, highestAcceptedVersion)) {
+        "LiveOps bundle version is older than the highest accepted version."
+    }
+}
+
 sealed interface LuaLiveOpsRefreshResult {
     data class Updated(val bundleVersion: Int, val scriptCount: Int) : LuaLiveOpsRefreshResult
     data class Unchanged(val bundleVersion: Int, val scriptCount: Int) : LuaLiveOpsRefreshResult
@@ -84,9 +92,7 @@ class LuaLiveOpsRepository(private val context: Context) {
             validatePayload(payload)
             val activeVersion = readVersion(activePointer)
             val highestAcceptedVersion = maxOf(activeVersion, readVersion(highestVersionFile))
-            require(payload.bundleVersion >= highestAcceptedVersion) {
-                "LiveOps bundle version is older than the highest accepted version."
-            }
+            validateIncomingVersion(payload.bundleVersion, activeVersion, highestAcceptedVersion)
             if (payload.bundleVersion == activeVersion && activeVersion == highestAcceptedVersion) {
                 return@withContext LuaLiveOpsRefreshResult.Unchanged(payload.bundleVersion, payload.scripts.size)
             }
