@@ -29,6 +29,7 @@ import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.RandomEventEngine
+import com.jarrlyyy.guessthenumber.scripting.LuaRandomEventSelector
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
@@ -70,6 +71,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val gameEngine = GameEngine()
     private val guessingBot = GuessingBot()
     private val randomEventEngine = RandomEventEngine()
+    private val luaRandomEventSelector by lazy { LuaRandomEventSelector(getApplication<Application>()) }
     private val commandExecutor = CommandExecutor()
     private val backgroundMusicManager = BackgroundMusicManager(application)
 
@@ -1603,7 +1605,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 delay(60_000L)
                 val event = withContext(Dispatchers.Main) {
                     val currentState = _gameState.value
-                    randomEventEngine.roll(currentState)?.also { _gameState.value = it.state }
+                    luaRandomEventSelector.roll()?.let { eventType ->
+                        randomEventEngine.apply(currentState, eventType).also { _gameState.value = it.state }
+                    }
                 } ?: continue
                 saveGameAsync()
                 GameLogger.log(
