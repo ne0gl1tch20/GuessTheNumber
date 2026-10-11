@@ -64,4 +64,24 @@ class LuaLiveOpsRepositoryTest {
         assertTrue(error.message!!.contains("Duplicate LiveOps script IDs"))
     }
 
+    @Test
+    fun rejectsVersionBelowHighWaterMarkAfterRollback() {
+        val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            validateIncomingVersion(incomingVersion = 2, activeVersion = 2, highestAcceptedVersion = 3)
+        }
+        assertTrue(error.message!!.contains("highest accepted version"))
+    }
+
+    @Test
+    fun allowsReactivationOfHighestVersionAfterRollback() {
+        validateIncomingVersion(incomingVersion = 3, activeVersion = 2, highestAcceptedVersion = 3)
+    }
+
+    @Test
+    fun rejectsNonPositiveIncomingVersion() {
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            validateIncomingVersion(incomingVersion = 0, activeVersion = 0, highestAcceptedVersion = 0)
+        }
+    }
+
 }
