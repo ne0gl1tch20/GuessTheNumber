@@ -28,15 +28,22 @@ class LuaRandomEventSelector(context: Context) {
                 RandomEventType.values().firstOrNull { it.name == typeName }
                     ?: throw IllegalArgumentException("Random-event script returned an unknown event type.")
             }
+        } catch (error: LuaBudgetExceededError) {
+            logFailure(error.message ?: "Lua random-event selection exceeded its instruction budget.")
+            null
         } catch (error: Exception) {
-            GameLogger.log(
-                LogLevel.WARN,
-                LoggerCategory.GAME,
-                "LUA_RANDOM_EVENT_FAILED",
-                (error.message ?: "Lua random-event selection failed.").take(240)
-            )
+            logFailure(error.message ?: "Lua random-event selection failed.")
             null
         }
+    }
+
+    private fun logFailure(message: String) {
+        GameLogger.log(
+            LogLevel.WARN,
+            LoggerCategory.GAME,
+            "LUA_RANDOM_EVENT_FAILED",
+            message.take(240)
+        )
     }
 
     private companion object {
