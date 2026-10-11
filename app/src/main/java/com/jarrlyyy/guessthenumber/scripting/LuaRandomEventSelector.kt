@@ -13,26 +13,30 @@ import com.jarrlyyy.guessthenumber.domain.model.RandomEventType
 class LuaRandomEventSelector(context: Context) {
     private val appContext = context.applicationContext
 
-    fun roll(): RandomEventType? = try {
-        val source = appContext.assets.open(SCRIPT_PATH).bufferedReader().use { it.readText() }
-        val result = LuaSandbox {}.execute(SCRIPT_ID, source)
-        require(result.istable()) { "Random-event script must return a table." }
+    fun roll(): RandomEventType? {
+        return try {
+            val source = appContext.assets.open(SCRIPT_PATH).bufferedReader().use { it.readText() }
+            val result = LuaSandbox {}.execute(SCRIPT_ID, source)
+            require(result.istable()) { "Random-event script must return a table." }
 
-        if (!result.get("trigger").toboolean()) return null
-
-        val typeValue = result.get("type")
-        require(typeValue.isstring()) { "Random-event script must return an event type." }
-        val typeName = typeValue.tojstring()
-        RandomEventType.values().firstOrNull { it.name == typeName }
-            ?: throw IllegalArgumentException("Random-event script returned an unknown event type.")
-    } catch (error: Exception) {
-        GameLogger.log(
-            LogLevel.WARN,
-            LoggerCategory.GAME,
-            "LUA_RANDOM_EVENT_FAILED",
-            (error.message ?: "Lua random-event selection failed.").take(240)
-        )
-        null
+            if (!result.get("trigger").toboolean()) {
+                null
+            } else {
+                val typeValue = result.get("type")
+                require(typeValue.isstring()) { "Random-event script must return an event type." }
+                val typeName = typeValue.tojstring()
+                RandomEventType.values().firstOrNull { it.name == typeName }
+                    ?: throw IllegalArgumentException("Random-event script returned an unknown event type.")
+            }
+        } catch (error: Exception) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.GAME,
+                "LUA_RANDOM_EVENT_FAILED",
+                (error.message ?: "Lua random-event selection failed.").take(240)
+            )
+            null
+        }
     }
 
     private companion object {
