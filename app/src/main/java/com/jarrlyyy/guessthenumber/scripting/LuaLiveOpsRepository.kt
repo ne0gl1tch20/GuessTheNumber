@@ -175,10 +175,11 @@ class LuaLiveOpsRepository(private val context: Context) {
             .sortedDescending()
         for (version in candidates) {
             val verified = runCatching { verifiedBundleAt(version) }.getOrNull() ?: continue
-            val pointerTemp = File(root, "active_bundle.rollback.tmp")
             return runCatching {
-                pointerTemp.writeText(verified.first.bundleVersion.toString())
-                android.system.Os.rename(pointerTemp.absolutePath, activePointer.absolutePath)
+                // Older installs may not have a high-water marker yet. Preserve the
+                // pre-rollback active version before moving the active pointer backwards.
+                writeVersionAtomically(highestVersionFile, maxOf(currentVersion, readVersion(highestVersionFile)))
+                writeVersionAtomically(activePointer, verified.first.bundleVersion)
                 GameLogger.log(
                     LogLevel.WARN,
                     LoggerCategory.UI,
