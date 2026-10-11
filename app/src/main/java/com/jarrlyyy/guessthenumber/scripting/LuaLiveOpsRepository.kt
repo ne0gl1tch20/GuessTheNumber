@@ -25,7 +25,7 @@ private data class SignedLuaManifest(
 )
 
 @Serializable
-private data class LuaRemotePayload(
+internal data class LuaRemotePayload(
     val schemaVersion: Int,
     val hostApiVersion: Int,
     val minAppVersionCode: Int,
@@ -35,7 +35,7 @@ private data class LuaRemotePayload(
 )
 
 @Serializable
-private data class LuaRemoteScript(
+internal data class LuaRemoteScript(
     val id: String,
     val fileName: String,
     val title: String,
@@ -67,6 +67,7 @@ class LuaLiveOpsRepository(private val context: Context) {
     private val json = Json { ignoreUnknownKeys = false }
     private val root = File(context.filesDir, "lua-liveops")
     private val activePointer = File(root, "active_bundle.txt")
+    private val highestVersionFile = File(root, "highest_bundle_version.txt")
 
     suspend fun refresh(): LuaLiveOpsRefreshResult = withContext(Dispatchers.IO) {
         try {
@@ -81,11 +82,12 @@ class LuaLiveOpsRepository(private val context: Context) {
             verifySignature(payloadBytes, envelope.signatureBase64)
             val payload = json.decodeFromString<LuaRemotePayload>(payloadBytes.toString(Charsets.UTF_8))
             validatePayload(payload)
-            val currentVersion = activePointer.takeIf { it.isFile }?.readText()?.trim()?.toIntOrNull() ?: 0
-            require(payload.bundleVersion >= currentVersion) {
-                "LiveOps bundle version is older than the active version."
+            val activeVersion = readVersion(activePointer)
+            val highestAcceptedVersion = maxOf(activeVersion, readVersion(highestVersionFile))
+            require(payload.bundleVersion >= highestAcceptedVersion) {
+                "LiveOps bundle version is older than the highest accepted version."
             }
-            if (payload.bundleVersion == currentVersion) {
+            if (payload.bundleVersion == activeVersion && activeVersion == highestAcceptedVersion) {
                 return@withContext LuaLiveOpsRefreshResult.Unchanged(payload.bundleVersion, payload.scripts.size)
             }
 
@@ -105,12 +107,15 @@ class LuaLiveOpsRepository(private val context: Context) {
                 File(staging, script.fileName).writeBytes(bytes)
             }
 
+            // Re-verify the complete staged directory before replacing any active bundle.
+            verifyBundleDirectory(staging, payload.bundleVersion)
             val active = File(root, "bundle-${payload.bundleVersion}")
             active.deleteRecursively()
             check(staging.renameTo(active)) { "Could not activate the verified LiveOps bundle." }
-            val pointerTemp = File(root, "active_bundle.tmp")
-            pointerTemp.writeText(payload.bundleVersion.toString())
-            android.system.Os.rename(pointerTemp.absolutePath, activePointer.absolutePath)
+
+            // Preserve the highest accepted version even when recovery switches the active pointer back.
+            writeVersionAtomically(highestVersionFile, payload.bundleVersion)
+            writeVersionAtomically(activePointer, payload.bundleVersion)
 
             GameLogger.log(
                 LogLevel.INFO,
@@ -178,7 +183,7 @@ class LuaLiveOpsRepository(private val context: Context) {
                     LogLevel.WARN,
                     LoggerCategory.UI,
                     "LUA_LIVEOPS_ROLLBACK",
-                    "Rolled back to verified LiveOps bundle ${verified.first.bundleVersion}."
+                    "Rolled back to verified LiveOps bundle ${verified.first.bundleVersion}; highest accepted version remains ${readVersion(highestVersionFile)}."
                 )
                 true
             }.getOrDefault(false)
@@ -191,26 +196,36 @@ class LuaLiveOpsRepository(private val context: Context) {
         verifiedBundleAt(version)
     }.getOrNull()
 
-    private fun verifiedBundleAt(version: Int): Pair<LuaRemotePayload, File> {
-        val dir = File(root, "bundle-$version")
+    private fun verifiedBundleAt(version: Int): Pair<LuaRemotePayload, File> =
+        verifyBundleDirectory(File(root, "bundle-$version"), version)
+
+    private fun verifyBundleDirectory(dir: File, expectedVersion: Int): Pair<LuaRemotePayload, File> {
         val envelopeFile = File(dir, "signed_manifest.json")
-        require(envelopeFile.isFile && envelopeFile.length() <= MAX_MANIFEST_BYTES)
-        val envelope = json.decodeFromString<SignedLuaManifest>(envelopeFile.readText())
+        require(envelopeFile.isFile && envelopeFile.length() <= MAX_MANIFEST_BYTES) {
+            "Staged bundle is missing its signed manifest or exceeds the size limit."
+        }
+        val envelopeBytes = envelopeFile.readBytes()
+        val envelope = json.decodeFromString<SignedLuaManifest>(envelopeBytes.toString(Charsets.UTF_8))
         val payloadBytes = Base64.decode(envelope.payloadBase64, Base64.DEFAULT)
         verifySignature(payloadBytes, envelope.signatureBase64)
         val payload = json.decodeFromString<LuaRemotePayload>(payloadBytes.toString(Charsets.UTF_8))
         validatePayload(payload)
-        require(payload.bundleVersion == version)
+        require(payload.bundleVersion == expectedVersion) { "Bundle version does not match its directory." }
         payload.scripts.forEach { script ->
             val file = File(dir, script.fileName)
-            require(file.isFile && file.length() <= MAX_SCRIPT_BYTES)
+            require(file.isFile && file.length() in 1..MAX_SCRIPT_BYTES.toLong()) {
+                "Bundle is missing script ${script.id} or its size is invalid."
+            }
             val bytes = file.readBytes()
-            require(sha256(bytes).equals(script.sha256, ignoreCase = true))
+            require(sha256(bytes).equals(script.sha256, ignoreCase = true)) {
+                "Script hash mismatch for ${script.id}."
+            }
+            LuaSandbox {}.validate(script.id, bytes.toString(Charsets.UTF_8))
         }
         return payload to dir
     }
 
-    private fun validatePayload(payload: LuaRemotePayload) {
+    internal fun validatePayload(payload: LuaRemotePayload) {
         require(payload.schemaVersion == 1) { "Unsupported LiveOps bundle schema." }
         require(payload.hostApiVersion == LuaEngine.HOST_API_VERSION) { "LiveOps bundle requires an unsupported host API." }
         require(BuildConfig.VERSION_CODE in payload.minAppVersionCode..payload.maxAppVersionCode) {
@@ -222,6 +237,9 @@ class LuaLiveOpsRepository(private val context: Context) {
         }
         require(payload.scripts.size in 1..MAX_SCRIPTS) { "LiveOps script count is outside the supported limit." }
         require(payload.scripts.map { it.id }.distinct().size == payload.scripts.size) { "Duplicate LiveOps script IDs." }
+        require(payload.scripts.map { it.fileName }.distinct().size == payload.scripts.size) {
+            "Duplicate LiveOps script file names."
+        }
         payload.scripts.forEach { script ->
             require(script.id.matches(Regex("[a-z0-9_-]{1,64}"))) { "Invalid LiveOps script ID." }
             require(script.fileName.matches(Regex("[a-zA-Z0-9_-]{1,80}\\.lua"))) { "Invalid LiveOps script file name." }
@@ -276,6 +294,19 @@ class LuaLiveOpsRepository(private val context: Context) {
         } finally {
             connection.disconnect()
         }
+    }
+
+    private fun readVersion(file: File): Int =
+        runCatching { file.takeIf { it.isFile }?.readText()?.trim()?.toIntOrNull() ?: 0 }.getOrDefault(0)
+
+    private fun writeVersionAtomically(file: File, version: Int) {
+        check(version > 0) { "Bundle version must be positive." }
+        check(file.parentFile?.exists() == true || file.parentFile?.mkdirs() == true) {
+            "Could not create LiveOps storage directory."
+        }
+        val temp = File(file.parentFile, "${file.name}.tmp")
+        temp.writeText(version.toString())
+        android.system.Os.rename(temp.absolutePath, file.absolutePath)
     }
 
     private fun sha256(bytes: ByteArray): String =
