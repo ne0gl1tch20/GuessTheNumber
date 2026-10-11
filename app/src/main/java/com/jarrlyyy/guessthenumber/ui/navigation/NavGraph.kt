@@ -362,7 +362,16 @@ fun NavGraph(
                         if (featureFlags["lua_scripting"] == true) {
                             LuaActivityHubScreen(onBack = { navController.popBackStack() })
                         } else {
-                            FeatureDisabledScreen("Lua activities", onBack = { navController.popBackStack() })
+                            FeatureDisabledScreen("Activity Hub", onBack = { navController.popBackStack() })
+                        }
+                    }
+                    if (BuildConfig.DEBUG) {
+                        composable(Screen.LuaTestingHub.route) {
+                            if (featureFlags["dev_console"] == true) {
+                                LuaTestingHubScreen(onBack = { navController.popBackStack() })
+                            } else {
+                                FeatureDisabledScreen("Lua Testing Hub", onBack = { navController.popBackStack() })
+                            }
                         }
                     }
                     composable(Screen.Arcade.route) {
