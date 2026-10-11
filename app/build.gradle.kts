@@ -21,7 +21,13 @@ android {
 
     defaultConfig {
         val liveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl").orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-LiveOps/main/manifest.json").get()
-        val liveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64").orElse("").get()
+        // The base64-encoded DER key may be line-wrapped in GitHub Actions secrets.
+        // Remove whitespace before embedding it so generated BuildConfig.java stays valid
+        // and Android's Base64 decoder receives only the encoded key bytes.
+        val liveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64")
+            .orElse("")
+            .get()
+            .filterNot(Char::isWhitespace)
         buildConfigField("String", "LIVEOPS_MANIFEST_URL", "\"$liveOpsManifestUrl\"")
         buildConfigField("String", "LIVEOPS_PUBLIC_KEY_BASE64", "\"$liveOpsPublicKey\"")
         applicationId = "com.jarrlyyy.guessthenumber"
