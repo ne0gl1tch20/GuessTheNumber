@@ -22,7 +22,7 @@ internal object LuaActivityPayloadValidator {
         require(count in 2..6) { "Activity must provide 2 to 6 answer options." }
         (1..count).forEach { index ->
             val option = options.get(index)
-            require(option.isstring()) { "Activity answer options must be strings." }
+            require(option.type() == LuaValue.TSTRING) { "Activity answer options must be strings." }
             val text = option.tojstring().trim()
             require(text.isNotEmpty() && text.length <= 120) {
                 "Activity answer options must be nonblank and at most 120 characters."
@@ -30,7 +30,7 @@ internal object LuaActivityPayloadValidator {
         }
 
         val correct = result.get("correct_option")
-        require(correct.isnumber()) { "Activity answer key must be an integer option number." }
+        require(correct.type() == LuaValue.TNUMBER) { "Activity answer key must be an integer option number." }
         val correctNumber = correct.todouble()
         require(correctNumber.isFinite() && correctNumber % 1.0 == 0.0 &&
             correctNumber >= 1.0 && correctNumber <= count.toDouble()
@@ -39,7 +39,7 @@ internal object LuaActivityPayloadValidator {
 
     private fun LuaValue.requiredText(field: String, maxLength: Int): String {
         val value = get(field)
-        require(value.isstring()) { "Lua activity field '$field' must be a string." }
+        require(value.type() == LuaValue.TSTRING) { "Lua activity field '$field' must be a string." }
         val text = value.tojstring().trim()
         require(text.isNotEmpty() && text.length <= maxLength) {
             "Lua activity field '$field' must be nonblank and at most $maxLength characters."
