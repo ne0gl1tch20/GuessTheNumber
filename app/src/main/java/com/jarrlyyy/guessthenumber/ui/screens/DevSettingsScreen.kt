@@ -123,15 +123,15 @@ fun DevSettingsScreen(
                 }
             }
 
-            // Lua Activity Hub is a developer-only script testing surface.
+            // Keep Lua testing tools separate from the player-facing Activity Hub.
             item {
                 Button(
-                    onClick = { onNavigate("lua_hub") },
+                    onClick = { onNavigate("lua_testing_hub") },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(imageVector = Icons.Default.Code, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Lua Activity Hub"), fontSize = 16.sp)
+                    Text(localizedText("Lua Testing Hub"), fontSize = 16.sp)
                 }
             }
 
