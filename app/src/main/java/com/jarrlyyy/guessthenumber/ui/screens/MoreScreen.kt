@@ -52,6 +52,7 @@ fun MoreScreen(
             when (route) {
                 "world_map" -> featureFlags["world_map"] == true
                 "lua_hub" -> featureFlags["lua_scripting"] == true
+                "lua_testing_hub" -> BuildConfig.DEBUG && featureFlags["dev_console"] == true
                 "live_ops" -> featureFlags["live_ops"] == true && featureFlags["seasonal_rewards"] == true
                 "mutators" -> featureFlags["challenge_builder"] == true
                 "dev_settings" -> BuildConfig.DEBUG && featureFlags["dev_console"] == true
@@ -85,7 +86,8 @@ fun MoreScreen(
         "save_slots" to "Save Slots",
         "music" to localizedText("Background Music Player"),
         "world_map" to localizedText("World Map"),
-        "lua_hub" to localizedText("Lua Activity Hub"),
+        "lua_hub" to localizedText("Activity Hub"),
+        "lua_testing_hub" to localizedText("Lua Testing Hub"),
         "relics" to localizedText("Relic Collection"),
         "home_base" to localizedText("Home Base"),
         "codex" to localizedText("Explorer's Codex"),
@@ -109,6 +111,7 @@ fun MoreScreen(
         "music" to Icons.Default.MusicNote,
         "world_map" to Icons.Default.Map,
         "lua_hub" to Icons.Default.PlayArrow,
+        "lua_testing_hub" to Icons.Default.Code,
         "relics" to Icons.Default.Diamond,
         "home_base" to Icons.Default.Home,
         "codex" to Icons.Default.MenuBook,

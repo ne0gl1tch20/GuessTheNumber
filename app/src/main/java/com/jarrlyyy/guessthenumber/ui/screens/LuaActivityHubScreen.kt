@@ -73,7 +73,7 @@ fun LuaActivityHubScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(localizedText("Lua Activity Hub")) },
+                title = { Text(localizedText("Activity Hub")) },
                 navigationIcon = {
                     androidx.compose.material3.IconButton(onClick = { engine.stop(); onBack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
