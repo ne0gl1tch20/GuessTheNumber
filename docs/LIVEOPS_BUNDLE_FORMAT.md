@@ -2,7 +2,7 @@
 
 A copy-ready repository scaffold, sample script, signing helper and manual publishing workflow live in [`liveops-template/`](../liveops-template/README.md). Copy its contents into the separate content repository before enabling remote updates.
 
-The Android client reads the HTTPS URL configured by `luaLiveOpsManifestUrl`. The default points to the planned `ne0gl1tch20/GuessTheNumber-LiveOps` repository; that repository must be created and populated before online updates can work.
+The Android client reads the HTTPS URL configured by `luaLiveOpsManifestUrl`. The default points to [`ne0gl1tch20/GuessTheNumber-LiveOps`](https://github.com/ne0gl1tch20/GuessTheNumber-LiveOps), which publishes the signed manifest and its source scripts.
 
 ## Repository layout
 
@@ -32,7 +32,7 @@ The RSA signature is `SHA256withRSA` over the decoded `payloadBase64` bytes. Do 
 - `bundleVersion`: monotonically increasing positive integer
 - `scripts`: 1 to 50 unique entries
 
-Each script entry contains `id`, `fileName`, `title`, `description`, `sha256`, `featured`, `hostApiVersion` and `capabilities`. IDs must match `[a-z0-9_-]{1,64}`; file names must be plain `.lua` names without directories; the initial allowed capability is only `log`. Each script must return the same bounded activity table schema as the bundled Number Rush sample. Remote scripts cannot grant rewards or modify saves.
+Each script entry contains `id`, `fileName`, `title`, `description`, `sha256`, `featured`, `hostApiVersion` and `capabilities`. IDs must match `[a-z0-9_-]{1,64}`; file names must be plain `.lua` names without directories; the initial allowed capability is only `log`. Each script must return a bounded activity table with `title`, `description`, `prompt`, `options`, `correct_option`, `success_message` and `failure_message`, matching the bundled Number Rush sample. `options` must contain 2–6 answers and `correct_option` is a 1-based index. Remote scripts cannot grant rewards or modify saves.
 
 ## Signing key setup
 
@@ -56,3 +56,34 @@ python3 tools/sign_lua_liveops_bundle.py --payload payload.json --scripts-dir sc
 The private-key environment variable should contain a path to the protected PEM file. Commit the generated manifest and the referenced scripts together. Increase `bundleVersion` for every published change. Keep prior Git tags/commits so a known-good bundle can be restored.
 
 The app stages and validates all files before changing its active-bundle pointer. The previous bundle directory is retained and can be selected automatically if a featured script fails. The current sandbox limits source size and interpreted instructions but does not enforce a hard heap-memory cap, so publish only trusted scripts until on-device memory behavior is validated. For localized activity copy, use English strings already present in the app locale catalog; new arbitrary LiveOps copy currently falls back to its English text. Online delivery is optional; bundled scripts remain usable without a connection.
+
+
+## Bundle version and refresh behavior
+
+Treat `bundleVersion` as a monotonically increasing publication number, not a script count or app version:
+
+- Start at a positive integer and increment it whenever publishing changed payload or script content.
+- The client accepts a version newer than the active bundle and retains the previous bundle for rollback.
+- Refreshing the exact version already active is an idempotent no-op. The app reports that the bundle is already up to date rather than repeatedly warning.
+- A version older than the active bundle is rejected so an old manifest cannot silently roll back the client.
+- If you need to restore older content, republish that content under a new, higher bundle version rather than lowering the version number.
+
+For the current LiveOps repository, bundle version `2` is the first publication with the valid Welcome activity. Publish through the content repository's GitHub Actions workflow after merging changes to `main`; confirm the workflow succeeds before testing refresh in the app.
+
+## Activity script contract
+
+A Lua activity file must return a table as its final result. Minimal shape:
+
+```lua
+return {
+    title = "Welcome to LiveOps",
+    description = "A short activity description.",
+    prompt = "Which statement is correct?",
+    options = { "Correct answer", "Incorrect answer" },
+    correct_option = 1,
+    success_message = "Correct!",
+    failure_message = "Try again."
+}
+```
+
+Keep `correct_option` within the 1-based range of `options`. A script that only logs messages, returns no value, or returns a non-table is rejected by the activity loader and the app may fall back to the bundled featured activity. Logging with `gtn.log(...)` is useful for diagnostics, but does not replace the returned table.
