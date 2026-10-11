@@ -48,6 +48,7 @@ private data class LuaRemoteScript(
 
 sealed interface LuaLiveOpsRefreshResult {
     data class Updated(val bundleVersion: Int, val scriptCount: Int) : LuaLiveOpsRefreshResult
+    data class Unchanged(val bundleVersion: Int, val scriptCount: Int) : LuaLiveOpsRefreshResult
     data class Unavailable(val reason: String) : LuaLiveOpsRefreshResult
 }
 
@@ -81,7 +82,12 @@ class LuaLiveOpsRepository(private val context: Context) {
             val payload = json.decodeFromString<LuaRemotePayload>(payloadBytes.toString(Charsets.UTF_8))
             validatePayload(payload)
             val currentVersion = activePointer.takeIf { it.isFile }?.readText()?.trim()?.toIntOrNull() ?: 0
-            require(payload.bundleVersion > currentVersion) { "LiveOps bundle version must increase to preserve rollback." }
+            require(payload.bundleVersion >= currentVersion) {
+                "LiveOps bundle version is older than the active version."
+            }
+            if (payload.bundleVersion == currentVersion) {
+                return@withContext LuaLiveOpsRefreshResult.Unchanged(payload.bundleVersion, payload.scripts.size)
+            }
 
             val staging = File(root, "bundle-${payload.bundleVersion}.staging")
             staging.deleteRecursively()
