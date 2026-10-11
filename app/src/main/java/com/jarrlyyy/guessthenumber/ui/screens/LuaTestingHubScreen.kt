@@ -88,7 +88,7 @@ fun LuaTestingHubScreen(onBack: () -> Unit) {
                         onClick = {
                             scripts = engine.listScripts()
                             status = engine.status()
-                            output = localizedText("Script list and runtime status refreshed.")
+                            output = locale.getStringByEnglish("Script list and runtime status refreshed.")
                         },
                         modifier = Modifier.weight(1f)
                     ) { Text(localizedText("Refresh status")) }
@@ -96,7 +96,7 @@ fun LuaTestingHubScreen(onBack: () -> Unit) {
                         onClick = {
                             val stopped = engine.stop()
                             status = engine.status()
-                            output = if (stopped) localizedText("Active Lua activity stopped.") else localizedText("No Lua activity was running.")
+                            output = if (stopped) locale.getStringByEnglish("Active Lua activity stopped.") else locale.getStringByEnglish("No Lua activity was running.")
                         },
                         modifier = Modifier.weight(1f)
                     ) {
@@ -130,8 +130,8 @@ fun LuaTestingHubScreen(onBack: () -> Unit) {
                                 scope.launch {
                                     val result = withContext(Dispatchers.Default) { engine.start(script.id) }
                                     output = when (result) {
-                                        is LuaStartResult.Started -> localizedText("Started ${result.activity.title} (instance ${result.activity.instanceId}).")
-                                        is LuaStartResult.Rejected -> localizedText("Script rejected: ${result.reason}")
+                                        is LuaStartResult.Started -> locale.getStringByEnglish("Started ${result.activity.title} (instance ${result.activity.instanceId}).")
+                                        is LuaStartResult.Rejected -> locale.getStringByEnglish("Script rejected: ${result.reason}")
                                     }
                                     status = engine.status()
                                     running = false
