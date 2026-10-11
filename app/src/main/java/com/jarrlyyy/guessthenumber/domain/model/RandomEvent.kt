@@ -17,26 +17,14 @@ data class RandomEventResult(
     val state: GameState
 )
 
+/**
+ * Applies a validated event selected by the Lua event script.
+ * Lua never receives GameState or writes currencies/progression directly.
+ */
 class RandomEventEngine(
     private val rng: Random = Random.Default
 ) {
-    companion object {
-        const val TRIGGER_CHANCE = 0.35
-    }
-
-    fun roll(state: GameState): RandomEventResult? {
-        if (rng.nextDouble() >= TRIGGER_CHANCE) return null
-
-        val type = when (rng.nextInt(100)) {
-            in 0..29 -> RandomEventType.CASH_BURST
-            in 30..49 -> RandomEventType.NEBULA_RAIN
-            in 50..59 -> RandomEventType.JACKPOT
-            in 60..69 -> RandomEventType.STREAK_SURGE
-            in 70..79 -> RandomEventType.RANGE_SHUFFLE
-            in 80..94 -> RandomEventType.TAX_REFUND
-            else -> RandomEventType.COSMIC_GIFT
-        }
-
+    fun apply(state: GameState, type: RandomEventType): RandomEventResult {
         val updated = when (type) {
             RandomEventType.CASH_BURST -> {
                 val bonus = maxOf(BigNumber(100), state.money * BigNumber(0.10))
