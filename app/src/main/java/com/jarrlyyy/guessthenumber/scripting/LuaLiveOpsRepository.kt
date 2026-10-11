@@ -303,8 +303,13 @@ class LuaLiveOpsRepository(private val context: Context) {
         }
     }
 
-    private fun readVersion(file: File): Int =
-        runCatching { file.takeIf { it.isFile }?.readText()?.trim()?.toIntOrNull() ?: 0 }.getOrDefault(0)
+    private fun readVersion(file: File): Int {
+        if (!file.exists()) return 0
+        val version = file.readText().trim().toIntOrNull()
+            ?: throw IllegalStateException("Stored LiveOps version marker is invalid.")
+        require(version >= 0) { "Stored LiveOps version marker is negative." }
+        return version
+    }
 
     private fun writeVersionAtomically(file: File, version: Int) {
         check(version > 0) { "Bundle version must be positive." }
