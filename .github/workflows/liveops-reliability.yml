@@ -1,0 +1,45 @@
+name: LiveOps reliability checks
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "app/src/main/java/com/jarrlyyy/guessthenumber/scripting/**"
+      - "app/src/test/java/com/jarrlyyy/guessthenumber/scripting/**"
+      - "docs/LIVEOPS_BUNDLE_FORMAT.md"
+      - "docs/LIVEOPS_RELIABILITY_TEST_PLAN.md"
+      - ".github/workflows/liveops-reliability.yml"
+  push:
+    branches: [master]
+    paths:
+      - "app/src/main/java/com/jarrlyyy/guessthenumber/scripting/**"
+      - "app/src/test/java/com/jarrlyyy/guessthenumber/scripting/**"
+      - "docs/LIVEOPS_BUNDLE_FORMAT.md"
+      - "docs/LIVEOPS_RELIABILITY_TEST_PLAN.md"
+      - ".github/workflows/liveops-reliability.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  reliability:
+    runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_luaLiveOpsPublicKeyBase64: ""
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Run Lua and LiveOps unit tests
+        run: ./gradlew testDebugUnitTest --no-daemon
+      - name: Run Android lint
+        run: ./gradlew lintDebug --no-daemon
