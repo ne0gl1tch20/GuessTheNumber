@@ -62,6 +62,23 @@ class LuaActivityPayloadValidatorTest {
     }
 
     @Test
+    fun rejectsStringInsteadOfNumericAnswerKey() {
+        val result = execute(
+            """
+            return {
+              title = "Test", description = "Test", prompt = "Pick one",
+              options = {"A", "B"}, correct_option = "1",
+              success_message = "Good", failure_message = "Try again"
+            }
+            """.trimIndent()
+        )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            LuaActivityPayloadValidator.validate(result)
+        }
+    }
+
+    @Test
     fun rejectsMissingOrBlankRequiredText() {
         val result = execute(
             """
