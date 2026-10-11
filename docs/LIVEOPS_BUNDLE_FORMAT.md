@@ -55,7 +55,7 @@ python3 tools/sign_lua_liveops_bundle.py --payload payload.json --scripts-dir sc
 
 The private-key environment variable should contain a path to the protected PEM file. Commit the generated manifest and the referenced scripts together. Increase `bundleVersion` for every published change. Keep prior Git tags/commits so a known-good bundle can be restored.
 
-The app stages and validates all files before changing its active-bundle pointer. The previous bundle directory is retained and can be selected automatically if a featured script fails. The current sandbox limits source size and interpreted instructions but does not enforce a hard heap-memory cap, so publish only trusted scripts until on-device memory behavior is validated. For localized activity copy, use English strings already present in the app locale catalog; new arbitrary LiveOps copy currently falls back to its English text. Online delivery is optional; bundled scripts remain usable without a connection.
+The app stages and validates all files, then re-verifies the staged manifest and every staged script before changing its active-bundle pointer. The previous bundle directory is retained and can be selected automatically if a featured script fails. A separate highest-accepted-version marker prevents recovery from weakening version checks. The current sandbox limits source size and interpreted instructions but does not enforce a hard heap-memory cap, so publish only trusted scripts until on-device memory behavior is validated. For localized activity copy, use English strings already present in the app locale catalog; new arbitrary LiveOps copy currently falls back to its English text. Online delivery is optional; bundled scripts remain usable without a connection.
 
 
 ## Bundle version and refresh behavior
@@ -65,8 +65,10 @@ Treat `bundleVersion` as a monotonically increasing publication number, not a sc
 - Start at a positive integer and increment it whenever publishing changed payload or script content.
 - The client accepts a version newer than the active bundle and retains the previous bundle for rollback.
 - Refreshing the exact version already active is an idempotent no-op. The app reports that the bundle is already up to date rather than repeatedly warning.
-- A version older than the active bundle is rejected so an old manifest cannot silently roll back the client.
+- A version older than the highest accepted bundle version is rejected, even if recovery temporarily points the app at an older cached bundle.
+- The highest accepted version is stored separately from the active pointer. Recovery can switch the active pointer to a previously verified bundle without lowering the anti-rollback high-water mark.
 - If you need to restore older content, republish that content under a new, higher bundle version rather than lowering the version number.
+- The publisher validates IDs, filenames, metadata, capabilities, UTF-8 source and source size. It rejects duplicate filenames and refuses to publish changed payload bytes at the same or a lower bundle version.
 
 For the current LiveOps repository, bundle version `2` is the first publication with the valid Welcome activity. Publish through the content repository's GitHub Actions workflow after merging changes to `main`; confirm the workflow succeeds before testing refresh in the app.
 
