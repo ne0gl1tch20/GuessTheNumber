@@ -205,6 +205,8 @@ fun LuaActivityHubScreen(onBack: () -> Unit) {
                             feedback = when (result) {
                                 is LuaLiveOpsRefreshResult.Updated ->
                                     locale.getString("lua_liveops_updated_format", "Updated LiveOps bundle %d (%d scripts).", result.bundleVersion, result.scriptCount)
+                                is LuaLiveOpsRefreshResult.Unchanged ->
+                                    locale.getString("lua_liveops_unchanged_format", "LiveOps bundle %d is already up to date (%d scripts).", result.bundleVersion, result.scriptCount)
                                 is LuaLiveOpsRefreshResult.Unavailable -> result.reason
                             }
                             scripts = withContext(Dispatchers.IO) { engine.listScripts() }
