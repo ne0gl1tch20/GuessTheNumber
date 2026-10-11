@@ -20,4 +20,48 @@ class LuaLiveOpsRepositoryTest {
             assertTrue((result as LuaLiveOpsRefreshResult.Unavailable).reason.contains("signing key"))
         }
     }
+    @Test
+    fun rejectsDuplicateScriptFileNamesBeforeActivation() {
+        val repository = LuaLiveOpsRepository(RuntimeEnvironment.getApplication())
+        val hash = "a".repeat(64)
+        val payload = LuaRemotePayload(
+            schemaVersion = 1,
+            hostApiVersion = LuaEngine.HOST_API_VERSION,
+            minAppVersionCode = 19,
+            maxAppVersionCode = 999999,
+            bundleVersion = 3,
+            scripts = listOf(
+                LuaRemoteScript("welcome", "shared.lua", "Welcome", "Welcome activity", hash),
+                LuaRemoteScript("second", "shared.lua", "Second", "Second activity", hash)
+            )
+        )
+
+        val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            repository.validatePayload(payload)
+        }
+        assertTrue(error.message!!.contains("Duplicate LiveOps script file names"))
+    }
+
+    @Test
+    fun rejectsDuplicateScriptIdsBeforeActivation() {
+        val repository = LuaLiveOpsRepository(RuntimeEnvironment.getApplication())
+        val hash = "b".repeat(64)
+        val payload = LuaRemotePayload(
+            schemaVersion = 1,
+            hostApiVersion = LuaEngine.HOST_API_VERSION,
+            minAppVersionCode = 19,
+            maxAppVersionCode = 999999,
+            bundleVersion = 3,
+            scripts = listOf(
+                LuaRemoteScript("duplicate", "first.lua", "First", "First activity", hash),
+                LuaRemoteScript("duplicate", "second.lua", "Second", "Second activity", hash)
+            )
+        )
+
+        val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            repository.validatePayload(payload)
+        }
+        assertTrue(error.message!!.contains("Duplicate LiveOps script IDs"))
+    }
+
 }
