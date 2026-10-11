@@ -28,6 +28,8 @@ import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.LiveOpsClaimDefinition
+import com.jarrlyyy.guessthenumber.domain.model.LiveOpsClaimPolicy
 import com.jarrlyyy.guessthenumber.domain.model.RandomEventEngine
 import com.jarrlyyy.guessthenumber.scripting.LuaRandomEventSelector
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
@@ -1523,25 +1525,28 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 if (event.status != "ACTIVE" || !withinDates) return@withLock
 
                 val state = _gameState.value
-                val claims = state.liveOpsClaims[eventId] ?: 0
-                if (claims >= event.maxClaims) return@withLock
-                val eligible = state.correctGuesses >= event.minCorrectGuesses &&
-                    state.prestigeCount >= event.minPrestigeCount &&
-                    state.ultraCount >= event.minUltraCount
-                if (!eligible) {
-                    GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "LIVEOPS_INELIGIBLE", "Blocked event claim because progression requirements are not met: $eventId")
-                    return@withLock
-                }
-
-                val rewardNebula = event.rewardNebula
-                _gameState.value = state.copy(
-                    nebula = state.nebula + BigNumber(rewardNebula),
-                    liveOpsClaims = state.liveOpsClaims + (eventId to (claims + 1)),
-                    permanentEventBoosts = (state.permanentEventBoosts + event.permanentBoostPerClaim).coerceAtMost(25),
-                    statistics = state.statistics.copy(
-                        nebulaEarned = state.statistics.nebulaEarned + rewardNebula
+                val updatedState = LiveOpsClaimPolicy.apply(
+                    state = state,
+                    event = LiveOpsClaimDefinition(
+                        id = event.id,
+                        maxClaims = event.maxClaims,
+                        rewardNebula = event.rewardNebula,
+                        permanentBoostPerClaim = event.permanentBoostPerClaim,
+                        minCorrectGuesses = event.minCorrectGuesses,
+                        minPrestigeCount = event.minPrestigeCount,
+                        minUltraCount = event.minUltraCount
                     )
                 )
+                if (updatedState == null) {
+                    if (state.correctGuesses < event.minCorrectGuesses ||
+                        state.prestigeCount < event.minPrestigeCount ||
+                        state.ultraCount < event.minUltraCount
+                    ) {
+                        GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "LIVEOPS_INELIGIBLE", "Blocked event claim because progression requirements are not met: $eventId")
+                    }
+                    return@withLock
+                }
+                _gameState.value = updatedState
                 saveGameAsync()
                 GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "LIVEOPS_CLAIM", "Claimed Live Ops reward: $eventId")
             }
