@@ -81,7 +81,7 @@
 - Continue the numerical RPG balance review across stacked relic, mastery, Home Base, secret and permanent-event bonuses; current formulas are connected, but have not been play-tested for late-game pacing.
 - Run the manual GitHub Actions validation/build and resolve compiler/lint/runtime issues before calling the pass build-verified.
 
-Current app version: 3.0.1 (versionCode 19).
+Current app version: 3.0.2 (versionCode 20).
 
 
 ## Additional integration pass (2026-10-10)
