@@ -232,7 +232,7 @@ Verify the full progression loop end to end: World Map, world unlocks and portal
 
 ## Joy Phase Roadmap and LiveOps Temporary Locale Packs (2026-10-12)
 
-- The joy-focused roadmap currently spans 14 planned PRs, #24–#37. Treat the sequence as a focused plan that can be adjusted if validation shows tasks should be combined or split.
+- The joy-focused roadmap now spans 21 planned PRs, #24–#44. Treat the sequence as focused work that can be adjusted after implementation and validation.
 - PR #24: celebrate winning-streak milestones (currently open; do not assume checks passed or that it merged).
 - PR #25: improve high/low guess feedback.
 - PR #26: make correct guesses feel more satisfying.
@@ -241,22 +241,25 @@ Verify the full progression loop end to end: World Map, world unlocks and portal
 - PR #29: improve achievement unlock celebrations.
 - PR #30: make random events feel more exciting.
 - PR #31: improve early-game goals and progression.
-- PR #32: localize Lua minigame/activity payload text. Inspect the current Lua engine, payload validator, and locale resolver before choosing the key-based payload schema.
-- PR #33: localize Lua random events and related messages.
-- PR #34: test Lua localization across supported locales, language switching, missing keys, and fallback behavior.
-- PR #35: define and integrate LiveOps-delivered temporary locale packs so translations for limited-time activities can update without an APK release.
-- PR #36: validate, cache, expire, replace, and recover temporary locale packs, including offline fallback and malformed-pack rejection.
-- PR #37: final joy-phase gameplay, localization, LiveOps, save-compatibility, and regression review.
+- PR #32: add requirement-based unlocks to the More Hub. Prefer showing ordinary progression-locked entries with a lock indicator; tapping one opens a localized panel showing all unmet requirements and current progress. Hide only debug-only or explicitly disabled/unavailable entries. Keep progression requirements separate from feature flags, recheck unlocks when navigating/performing actions, preserve saved shortcut order, and never expose debug-only routes in release.
+- PR #33: localize Lua minigame/activity payload text. Inspect the current Lua engine, payload validator, and locale resolver before choosing the key-based payload schema.
+- PR #34: localize Lua random events and related messages.
+- PR #35: test Lua localization across supported locales, language switching, missing keys, and fallback behavior.
+- PR #36: define and integrate LiveOps-delivered temporary locale packs so translations for limited-time activities can update without an APK release.
+- PR #37: validate, cache, expire, replace, and recover temporary locale packs, including offline fallback and malformed-pack rejection.
+- PR #38: final joy-phase gameplay, localization, LiveOps, save-compatibility, and regression review.
+- PRs #39–#44: staged C++/NDK integration: #39 architecture audit and baseline; #40 NDK/CMake and native test scaffold; #41 narrow JNI bridge; #42 port one bounded deterministic engine computation; #43 Kotlin/native parity and failure tests; #44 native integration, ABI, regression, and measured-performance review.
 - Temporary locale packs are translation data only, never executable Lua or remotely downloaded code. Kotlin remains authoritative for locale resolution, schema validation, lifecycle, persistence, rewards, and eligibility; Lua stays sandboxed and returns approved localization keys/arguments.
 - Locale packs should declare locale, pack ID/version, expiry, and translated key/value strings. Validate schema, allowed keys, payload size, and expiry before activation. Cache accepted packs for offline use; when missing, invalid, or expired, fall back to the built-in locale and existing locale fallback rules. Keep built-in translations untouched.
 - The installed app must first contain the downloader, validator, cache/expiry handling, and locale resolver; LiveOps cannot add those capabilities to an older installed APK by itself.
+- Existing feature_flags.json/FeatureFlagRepository gates are not the same as player progression unlocks. The More Hub unlock work must model and display requirement progress separately rather than treating a hidden/disabled feature flag as a locked progression feature.
 - Preserve offline operation and existing saves/gameplay. Avoid unrelated dependencies or scope expansion. CI/build verification must be checked from GitHub Actions before claiming success; workflows are manual-only unless the user explicitly asks to start one.
 
 
 ## Planned C++/NDK Engine Integration (2026-10-12)
 
 - The user wants C++/NDK engine integration tracked in the GuessTheNumber roadmap as a planned workstream.
-- Roadmap PRs #38–#43 follow the joy/Lua localization/LiveOps locale-pack phases (#24–#37): #38 architecture audit and baseline; #39 NDK/CMake and native test scaffold; #40 narrow JNI bridge; #41 port one bounded deterministic engine computation; #42 Kotlin/native parity and failure tests; #43 native integration, ABI, regression, and measured-performance review.
+- Roadmap PRs #39–#44 follow the joy, More Hub unlock, Lua localization, and LiveOps locale-pack phases (#24–#38): #39 architecture audit and baseline; #40 NDK/CMake and native test scaffold; #41 narrow JNI bridge; #42 port one bounded deterministic engine computation; #43 Kotlin/native parity and failure tests; #44 native integration, ABI, regression, and measured-performance review.
 - This is a staged integration, not a full rewrite. Kotlin remains authoritative for app lifecycle, game state, persistence, UI, localization, LiveOps networking, eligibility, and rewards. Native code must not become a competing source of truth.
 - Before choosing what to port, inspect the current engine architecture and capture baseline correctness/performance measurements. Port only a bounded component with a clear reason to be native; do not claim speed gains without measured evidence.
 - JNI must validate inputs, handle errors explicitly, and allow a Kotlin fallback. Test supported ABIs, Debug/Release builds, parity, edge cases, and native failure recovery.
