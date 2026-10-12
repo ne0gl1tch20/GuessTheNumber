@@ -1,9 +1,9 @@
 # Joy Phase Roadmap
 
 **Last updated:** 2026-10-12  
-**Planned scope:** 21 focused PRs (#24–#44), subject to adjustment after implementation and test results. The C++/NDK phase is planned after the joy, Lua localization, and LiveOps locale work.
+**Planned scope:** 22 focused PRs (#24–#45), subject to adjustment after implementation and test results. The C++/NDK phase is planned after the joy, math-strategy, Lua localization, and LiveOps locale work.
 
-The goal is to make GuessTheNumber feel more rewarding and lively without destabilizing existing gameplay, saves, localization, or offline behavior. Keep changes focused and validate each PR before continuing.
+The goal is to make GuessTheNumber feel more rewarding and lively while growing it beyond random guessing into number sense and efficient mathematical strategy, without destabilizing existing gameplay, saves, localization, or offline behavior. Keep changes focused and validate each PR before continuing.
 
 | PR | Focus | Planned work |
 |---|---|---|
@@ -15,19 +15,19 @@ The goal is to make GuessTheNumber feel more rewarding and lively without destab
 | #29 | Achievement unlocks | Improve achievement unlock presentation while preserving existing achievement definitions and rewards. |
 | #30 | Random events | Make existing random-event announcements more distinctive and readable without changing event odds or effects. |
 | #31 | Early-game goals | Improve discoverability and feedback for existing early-game goals and progression; avoid unnecessary new systems. |
-| #32 | More Hub unlock requirements | Make progression-based More Hub features unlock through clear, testable requirements. Prefer visible locked entries with a lock state; tapping one while locked opens a localized requirements panel showing each unmet condition and current progress. Hide only entries that are debug-only or explicitly disabled/unavailable, not ordinary progression-locked content. Recheck requirements at navigation/action time and keep feature flags separate from player progression unlocks. Preserve saved shortcut order and never expose debug-only routes in release. |
-| #33 | Lua activity localization | Use approved locale keys and arguments for Lua minigame titles, descriptions, choices, and feedback. Inspect the current Lua engine, payload validator, and locale resolver before finalizing the payload contract. |
-| #34 | Lua random-event localization | Route player-facing Lua random-event messages through the same controlled localization resolver. Do not leave hardcoded player-facing text in scripts. |
-| #35 | Localization verification | Test supported locales, language switching, formatting arguments, missing keys, malformed payloads, and defined fallback behavior. |
-| #36 | Temporary LiveOps locale packs | Define the locale-pack schema and integrate delivery of temporary translation data for limited-time activities, without requiring an APK release for each translation update. |
-| #37 | Locale-pack lifecycle and recovery | Validate packs, enforce allowed keys and size limits, cache accepted packs, handle versions and expiry, reject malformed content, and fall back to built-in locales when packs are unavailable or expired. |
-| #38 | Final joy/localization regression review | Review gameplay feel, locale coverage, Lua boundaries, LiveOps failure/offline behavior, save compatibility, and regression tests before native-engine work. |
-| #39 | Native engine architecture and baseline | Audit the current Kotlin/Lua engine boundaries, define a narrow C++/NDK responsibility, capture baseline tests and performance measurements, and document ABI/32-bit compatibility requirements before adding native code. |
-| #40 | NDK build and native test scaffold | Add the smallest maintainable CMake/NDK setup and native test path; keep Kotlin-only builds and existing app behavior working. No gameplay migration in this step. |
-| #41 | Minimal JNI bridge | Add a small, versioned JNI interface with input validation, explicit error handling, and Kotlin fallback behavior. Do not expose save files, UI, network access, or unrestricted reward mutation to native code. |
-| #42 | Port one bounded engine component | Move only one well-defined, deterministic computation into C++ after baseline evidence supports it. Keep Kotlin as the source of truth for game state, persistence, eligibility, and rewards. |
-| #43 | Kotlin/native parity and failure tests | Compare Kotlin and native outputs for the selected component, test edge cases, malformed inputs, JNI failures, and fallback behavior across supported ABIs. |
-| #44 | Native integration regression and performance review | Verify Debug/Release builds, device ABI coverage, gameplay/save compatibility, Lua sandbox boundaries, offline behavior, and measured performance. Keep the native path only if it is stable and provides a justified benefit. |
+| #33 | More Hub unlock requirements | Make progression-based More Hub features unlock through clear, testable requirements. Prefer visible locked entries with a lock state; tapping one while locked opens a localized requirements panel showing each unmet condition and current progress. Hide only entries that are debug-only or explicitly disabled/unavailable, not ordinary progression-locked content. Recheck requirements at navigation/action time and keep feature flags separate from player progression unlocks. Preserve saved shortcut order and never expose debug-only routes in release. |
+| #34 | Lua activity localization | Use approved locale keys and arguments for Lua minigame titles, descriptions, choices, and feedback. Inspect the current Lua engine, payload validator, and locale resolver before finalizing the payload contract. |
+| #35 | Lua random-event localization | Route player-facing Lua random-event messages through the same controlled localization resolver. Do not leave hardcoded player-facing text in scripts. |
+| #36 | Localization verification | Test supported locales, language switching, formatting arguments, missing keys, malformed payloads, and defined fallback behavior. |
+| #37 | Temporary LiveOps locale packs | Define the locale-pack schema and integrate delivery of temporary translation data for limited-time activities, without requiring an APK release for each translation update. |
+| #38 | Locale-pack lifecycle and recovery | Validate packs, enforce allowed keys and size limits, cache accepted packs, handle versions and expiry, reject malformed content, and fall back to built-in locales when packs are unavailable or expired. |
+| #39 | Final joy/localization regression review | Review gameplay feel, locale coverage, Lua boundaries, LiveOps failure/offline behavior, save compatibility, and regression tests before native-engine work. |
+| #40 | Native engine architecture and baseline | Audit the current Kotlin/Lua engine boundaries, define a narrow C++/NDK responsibility, capture baseline tests and performance measurements, and document ABI/32-bit compatibility requirements before adding native code. |
+| #41 | NDK build and native test scaffold | Add the smallest maintainable CMake/NDK setup and native test path; keep Kotlin-only builds and existing app behavior working. No gameplay migration in this step. |
+| #42 | Minimal JNI bridge | Add a small, versioned JNI interface with input validation, explicit error handling, and Kotlin fallback behavior. Do not expose save files, UI, network access, or unrestricted reward mutation to native code. |
+| #43 | Port one bounded engine component | Move only one well-defined, deterministic computation into C++ after baseline evidence supports it. Keep Kotlin as the source of truth for game state, persistence, eligibility, and rewards. |
+| #44 | Kotlin/native parity and failure tests | Compare Kotlin and native outputs for the selected component, test edge cases, malformed inputs, JNI failures, and fallback behavior across supported ABIs. |
+| #45 | Native integration regression and performance review | Verify Debug/Release builds, device ABI coverage, gameplay/save compatibility, Lua sandbox boundaries, offline behavior, and measured performance. Keep the native path only if it is stable and provides a justified benefit. |
 
 ## Temporary LiveOps locale pack design
 
@@ -54,7 +54,7 @@ Expected flow:
 - Do not claim a PR is merged or checks passed without verifying GitHub status. Workflows are manual-only unless explicitly requested.
 
 
-## Planned C++/NDK engine integration (#39–#44)
+## Planned C++/NDK engine integration (#40–#45)
 
 The project will plan a staged native-engine integration rather than rewriting the whole app in C++. Kotlin remains the application and gameplay authority. C++/NDK is intended for a narrowly scoped engine computation with a clear reason to be native; it must not become a second source of truth for game state.
 
