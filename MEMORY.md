@@ -251,3 +251,14 @@ Verify the full progression loop end to end: World Map, world unlocks and portal
 - Locale packs should declare locale, pack ID/version, expiry, and translated key/value strings. Validate schema, allowed keys, payload size, and expiry before activation. Cache accepted packs for offline use; when missing, invalid, or expired, fall back to the built-in locale and existing locale fallback rules. Keep built-in translations untouched.
 - The installed app must first contain the downloader, validator, cache/expiry handling, and locale resolver; LiveOps cannot add those capabilities to an older installed APK by itself.
 - Preserve offline operation and existing saves/gameplay. Avoid unrelated dependencies or scope expansion. CI/build verification must be checked from GitHub Actions before claiming success; workflows are manual-only unless the user explicitly asks to start one.
+
+
+## Planned C++/NDK Engine Integration (2026-10-12)
+
+- The user wants C++/NDK engine integration tracked in the GuessTheNumber roadmap as a planned workstream.
+- Roadmap PRs #38–#43 follow the joy/Lua localization/LiveOps locale-pack phases (#24–#37): #38 architecture audit and baseline; #39 NDK/CMake and native test scaffold; #40 narrow JNI bridge; #41 port one bounded deterministic engine computation; #42 Kotlin/native parity and failure tests; #43 native integration, ABI, regression, and measured-performance review.
+- This is a staged integration, not a full rewrite. Kotlin remains authoritative for app lifecycle, game state, persistence, UI, localization, LiveOps networking, eligibility, and rewards. Native code must not become a competing source of truth.
+- Before choosing what to port, inspect the current engine architecture and capture baseline correctness/performance measurements. Port only a bounded component with a clear reason to be native; do not claim speed gains without measured evidence.
+- JNI must validate inputs, handle errors explicitly, and allow a Kotlin fallback. Test supported ABIs, Debug/Release builds, parity, edge cases, and native failure recovery.
+- Preserve the Lua sandbox. Lua must not receive direct JNI/native access or unrestricted save/reward mutation capabilities.
+- Confirm actual Android NDK/CMake and ABI configuration during implementation rather than assuming a target ABI. Avoid unrelated dependencies and preserve existing saves, offline operation, and gameplay.
