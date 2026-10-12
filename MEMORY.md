@@ -228,3 +228,26 @@ Verify the full progression loop end to end: World Map, world unlocks and portal
 - LiveOps event data now declares `rewardNebula`, `permanentBoostPerClaim`, `minCorrectGuesses`, `minPrestigeCount`, and `minUltraCount`. The repository validates schema/manifest versions, unique IDs, status, timestamps, reward values and eligibility thresholds. UI displays requirements and rewards; the ViewModel rechecks eligibility and uses configured values at claim time. Holiday Neon Rush requires 100 correct guesses.
 - Added tests: `ContentValidationTest`, `JsonConfigRepositoryTest`, `LiveOpsRepositoryTest`; existing `WorldConfigRepositoryTest` and `GameEngineTest` cover world progression and game rules.
 - **Verification:** repository source and bundled JSON were inspected, including IDs/schema versions/reward values. Android build and unit tests have not been executed. Automatic push builds remain disabled to conserve GitHub Actions minutes; do not launch a workflow unless the user asks.
+
+
+## Joy Phase Roadmap and LiveOps Temporary Locale Packs (2026-10-12)
+
+- The joy-focused roadmap currently spans 14 planned PRs, #24–#37. Treat the sequence as a focused plan that can be adjusted if validation shows tasks should be combined or split.
+- PR #24: celebrate winning-streak milestones (currently open; do not assume checks passed or that it merged).
+- PR #25: improve high/low guess feedback.
+- PR #26: make correct guesses feel more satisfying.
+- PR #27: improve Money and upgrade purchase feedback.
+- PR #28: celebrate Prestige, Ultra, and Nebula milestones.
+- PR #29: improve achievement unlock celebrations.
+- PR #30: make random events feel more exciting.
+- PR #31: improve early-game goals and progression.
+- PR #32: localize Lua minigame/activity payload text. Inspect the current Lua engine, payload validator, and locale resolver before choosing the key-based payload schema.
+- PR #33: localize Lua random events and related messages.
+- PR #34: test Lua localization across supported locales, language switching, missing keys, and fallback behavior.
+- PR #35: define and integrate LiveOps-delivered temporary locale packs so translations for limited-time activities can update without an APK release.
+- PR #36: validate, cache, expire, replace, and recover temporary locale packs, including offline fallback and malformed-pack rejection.
+- PR #37: final joy-phase gameplay, localization, LiveOps, save-compatibility, and regression review.
+- Temporary locale packs are translation data only, never executable Lua or remotely downloaded code. Kotlin remains authoritative for locale resolution, schema validation, lifecycle, persistence, rewards, and eligibility; Lua stays sandboxed and returns approved localization keys/arguments.
+- Locale packs should declare locale, pack ID/version, expiry, and translated key/value strings. Validate schema, allowed keys, payload size, and expiry before activation. Cache accepted packs for offline use; when missing, invalid, or expired, fall back to the built-in locale and existing locale fallback rules. Keep built-in translations untouched.
+- The installed app must first contain the downloader, validator, cache/expiry handling, and locale resolver; LiveOps cannot add those capabilities to an older installed APK by itself.
+- Preserve offline operation and existing saves/gameplay. Avoid unrelated dependencies or scope expansion. CI/build verification must be checked from GitHub Actions before claiming success; workflows are manual-only unless the user explicitly asks to start one.
