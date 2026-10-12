@@ -228,3 +228,47 @@ Verify the full progression loop end to end: World Map, world unlocks and portal
 - LiveOps event data now declares `rewardNebula`, `permanentBoostPerClaim`, `minCorrectGuesses`, `minPrestigeCount`, and `minUltraCount`. The repository validates schema/manifest versions, unique IDs, status, timestamps, reward values and eligibility thresholds. UI displays requirements and rewards; the ViewModel rechecks eligibility and uses configured values at claim time. Holiday Neon Rush requires 100 correct guesses.
 - Added tests: `ContentValidationTest`, `JsonConfigRepositoryTest`, `LiveOpsRepositoryTest`; existing `WorldConfigRepositoryTest` and `GameEngineTest` cover world progression and game rules.
 - **Verification:** repository source and bundled JSON were inspected, including IDs/schema versions/reward values. Android build and unit tests have not been executed. Automatic push builds remain disabled to conserve GitHub Actions minutes; do not launch a workflow unless the user asks.
+
+
+## Joy Phase Roadmap and LiveOps Temporary Locale Packs (2026-10-12)
+
+- The joy-focused roadmap now spans 22 planned PRs, #24–#45. Treat the sequence as focused work that can be adjusted after implementation and validation.
+- PR #24: celebrate winning-streak milestones (currently open; do not assume checks passed or that it merged).
+- PR #25: improve high/low guess feedback.
+- PR #26: make correct guesses feel more satisfying.
+- PR #27: improve Money and upgrade purchase feedback.
+- PR #28: celebrate Prestige, Ultra, and Nebula milestones.
+- PR #29: improve achievement unlock celebrations.
+- PR #30: make random events feel more exciting.
+- PR #31: improve early-game goals and progression.
+- PR #32: add math strategy and number mastery. Build on existing high/low clues and dynamic math analysis so players can narrow ranges efficiently using interval bounds, midpoints, parity, deltas, and other relevant number patterns. Add optional guided examples/challenges that encourage fewer guesses and clear reasoning without exposing the hidden target, forcing school-style tests, or changing core fairness/reward rules. Localize all explanations and test calculations against the real guessing rules.
+- PR #33: add requirement-based unlocks to the More Hub. Prefer showing ordinary progression-locked entries with a lock indicator; tapping one opens a localized panel showing all unmet requirements and current progress. Hide only debug-only or explicitly disabled/unavailable entries. Keep progression requirements separate from feature flags, recheck unlocks when navigating/performing actions, preserve saved shortcut order, and never expose debug-only routes in release.
+- PR #34: localize Lua minigame/activity payload text. Inspect the current Lua engine, payload validator, and locale resolver before choosing the key-based payload schema.
+- PR #35: localize Lua random events and related messages.
+- PR #36: test Lua localization across supported locales, language switching, missing keys, and fallback behavior.
+- PR #37: define and integrate LiveOps-delivered temporary locale packs so translations for limited-time activities can update without an APK release.
+- PR #38: validate, cache, expire, replace, and recover temporary locale packs, including offline fallback and malformed-pack rejection.
+- PR #39: final joy-phase gameplay, localization, LiveOps, save-compatibility, and regression review.
+- PRs #40–#45: staged C++/NDK integration: #40 architecture audit and baseline; #41 NDK/CMake and native test scaffold; #42 narrow JNI bridge; #43 port one bounded deterministic engine computation; #44 Kotlin/native parity and failure tests; #45 native integration, ABI, regression, and measured-performance review.
+- Temporary locale packs are translation data only, never executable Lua or remotely downloaded code. Kotlin remains authoritative for locale resolution, schema validation, lifecycle, persistence, rewards, and eligibility; Lua stays sandboxed and returns approved localization keys/arguments.
+- Locale packs should declare locale, pack ID/version, expiry, and translated key/value strings. Validate schema, allowed keys, payload size, and expiry before activation. Cache accepted packs for offline use; when missing, invalid, or expired, fall back to the built-in locale and existing locale fallback rules. Keep built-in translations untouched.
+- The installed app must first contain the downloader, validator, cache/expiry handling, and locale resolver; LiveOps cannot add those capabilities to an older installed APK by itself.
+- Existing feature_flags.json/FeatureFlagRepository gates are not the same as player progression unlocks. The More Hub unlock work must model and display requirement progress separately rather than treating a hidden/disabled feature flag as a locked progression feature.
+- Preserve offline operation and existing saves/gameplay. Avoid unrelated dependencies or scope expansion. CI/build verification must be checked from GitHub Actions before claiming success; workflows are manual-only unless the user explicitly asks to start one.
+
+
+## Math Strategy and Number Mastery (2026-10-12)
+
+- The user wants GuessTheNumber to be more than repeatedly guessing: gameplay should help players use numbers efficiently and apply mathematical reasoning.
+- Planned PR #32 builds on existing high/low feedback and dynamic math clues (interval bounds, midpoint, parity, deltas, modulus where relevant) to teach efficient narrowing of the search range through optional examples and challenges.
+- Reward efficient reasoning/fewer guesses without revealing the hidden target, forcing school-style tests, or changing core fairness/reward rules. Localize every player-facing explanation and validate calculations against the actual engine rules. Inspect existing mechanics first to avoid duplicating features that already exist.
+
+## Planned C++/NDK Engine Integration (2026-10-12)
+
+- The user wants C++/NDK engine integration tracked in the GuessTheNumber roadmap as a planned workstream.
+- Roadmap PRs #40–#45 follow the joy, math strategy, More Hub unlock, Lua localization, and LiveOps locale-pack phases (#24–#39): #40 architecture audit and baseline; #41 NDK/CMake and native test scaffold; #42 narrow JNI bridge; #43 port one bounded deterministic engine computation; #44 Kotlin/native parity and failure tests; #45 native integration, ABI, regression, and measured-performance review.
+- This is a staged integration, not a full rewrite. Kotlin remains authoritative for app lifecycle, game state, persistence, UI, localization, LiveOps networking, eligibility, and rewards. Native code must not become a competing source of truth.
+- Before choosing what to port, inspect the current engine architecture and capture baseline correctness/performance measurements. Port only a bounded component with a clear reason to be native; do not claim speed gains without measured evidence.
+- JNI must validate inputs, handle errors explicitly, and allow a Kotlin fallback. Test supported ABIs, Debug/Release builds, parity, edge cases, and native failure recovery.
+- Preserve the Lua sandbox. Lua must not receive direct JNI/native access or unrestricted save/reward mutation capabilities.
+- Confirm actual Android NDK/CMake and ABI configuration during implementation rather than assuming a target ABI. Avoid unrelated dependencies and preserve existing saves, offline operation, and gameplay.
