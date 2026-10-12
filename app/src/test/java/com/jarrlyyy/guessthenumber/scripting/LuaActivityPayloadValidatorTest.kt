@@ -95,6 +95,91 @@ class LuaActivityPayloadValidatorTest {
         }
     }
 
+    @Test
+    fun acceptsMinimumAndMaximumSupportedOptionCounts() {
+        val twoOptions = execute(
+            """
+            return {
+              title = "Test", description = "A test", prompt = "Pick one",
+              options = {"A", "B"}, correct_option = 1,
+              success_message = "Good", failure_message = "Try again"
+            }
+            """.trimIndent()
+        )
+        LuaActivityPayloadValidator.validate(twoOptions)
+
+        val sixOptions = execute(
+            """
+            return {
+              title = "Test", description = "A test", prompt = "Pick one",
+              options = {"A", "B", "C", "D", "E", "F"}, correct_option = 6,
+              success_message = "Good", failure_message = "Try again"
+            }
+            """.trimIndent()
+        )
+        LuaActivityPayloadValidator.validate(sixOptions)
+    }
+
+    @Test
+    fun rejectsOptionCountsOutsideSupportedRange() {
+        listOf(
+            "{\"A\"}",
+            "{\"A\", \"B\", \"C\", \"D\", \"E\", \"F\", \"G\"}"
+        ).forEach { options ->
+            val result = execute(
+                """
+                return {
+                  title = "Test", description = "A test", prompt = "Pick one",
+                  options = $options, correct_option = 1,
+                  success_message = "Good", failure_message = "Try again"
+                }
+                """.trimIndent()
+            )
+            assertThrows(IllegalArgumentException::class.java) {
+                LuaActivityPayloadValidator.validate(result)
+            }
+        }
+    }
+
+    @Test
+    fun rejectsBlankAndOversizedAnswerOptions() {
+        listOf(
+            "{\"A\", \"   \"}",
+            "{\"A\", \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"}"
+        ).forEach { options ->
+            val result = execute(
+                """
+                return {
+                  title = "Test", description = "A test", prompt = "Pick one",
+                  options = $options, correct_option = 1,
+                  success_message = "Good", failure_message = "Try again"
+                }
+                """.trimIndent()
+            )
+            assertThrows(IllegalArgumentException::class.java) {
+                LuaActivityPayloadValidator.validate(result)
+            }
+        }
+    }
+
+    @Test
+    fun rejectsNonFiniteAnswerKeys() {
+        listOf("1 / 0", "0 / 0").forEach { answer ->
+            val result = execute(
+                """
+                return {
+                  title = "Test", description = "A test", prompt = "Pick one",
+                  options = {"A", "B"}, correct_option = $answer,
+                  success_message = "Good", failure_message = "Try again"
+                }
+                """.trimIndent()
+            )
+            assertThrows(IllegalArgumentException::class.java) {
+                LuaActivityPayloadValidator.validate(result)
+            }
+        }
+    }
+
     private fun payload() = execute(
         """
         return {
