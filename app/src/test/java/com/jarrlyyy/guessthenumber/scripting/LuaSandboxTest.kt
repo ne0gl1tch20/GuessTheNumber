@@ -112,4 +112,22 @@ class LuaSandboxTest {
         )
         assertTrue(recovered.get("recovered").toboolean())
     }
+
+    @Test
+    fun sandboxDoesNotExposeRewardMutationApisToScripts() {
+        val result = LuaSandbox {}.execute(
+            "reward_boundary",
+            """
+            return {
+              gtn_reward = gtn.reward == nil,
+              direct_reward = reward == nil,
+              kotlin_reward_method = earnMinigameReward == nil
+            }
+            """.trimIndent()
+        )
+
+        assertTrue(result.get("gtn_reward").toboolean())
+        assertTrue(result.get("direct_reward").toboolean())
+        assertTrue(result.get("kotlin_reward_method").toboolean())
+    }
 }
