@@ -139,6 +139,7 @@ class LuaEngine private constructor(context: Context) {
                     ?: return reject("The signed LiveOps script is not available in the verified cache.")
             }
             val result = LuaSandbox { line -> log(scriptId, line) }.execute(scriptId, source)
+            LuaActivityPayloadValidator.validate(result)
             val definition = parseActivity(entry, result)
             activeActivity = definition
             lastAnswerCorrect = null
