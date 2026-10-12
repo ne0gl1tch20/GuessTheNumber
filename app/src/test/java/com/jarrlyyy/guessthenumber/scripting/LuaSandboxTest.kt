@@ -1,8 +1,10 @@
 package com.jarrlyyy.guessthenumber.scripting
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.luaj.vm2.LuaError
 
 class LuaSandboxTest {
     @Test
@@ -79,5 +81,35 @@ class LuaSandboxTest {
 
         assertEquals(32, logs.size)
         assertTrue(logs.all { it.length <= 500 })
+    }
+
+    @Test
+    fun runtimeFailureDoesNotPreventSubsequentScriptExecution() {
+        val sandbox = LuaSandbox {}
+
+        assertThrows(LuaError::class.java) {
+            sandbox.execute("runtime_failure", "error('script failed')")
+        }
+
+        val recovered = sandbox.execute(
+            "after_runtime_failure",
+            "return {recovered = true}"
+        )
+        assertTrue(recovered.get("recovered").toboolean())
+    }
+
+    @Test
+    fun instructionBudgetFailureDoesNotPreventSubsequentScriptExecution() {
+        val sandbox = LuaSandbox {}
+
+        assertThrows(LuaBudgetExceededError::class.java) {
+            sandbox.execute("budget_failure", "while true do local x = 1 + 1 end")
+        }
+
+        val recovered = sandbox.execute(
+            "after_budget_failure",
+            "return {recovered = true}"
+        )
+        assertTrue(recovered.get("recovered").toboolean())
     }
 }
