@@ -1,13 +1,13 @@
 # Joy Phase Roadmap
 
 **Last updated:** 2026-10-12  
-**Planned scope:** 22 focused PRs (#24–#45), subject to adjustment after implementation and test results. The C++/NDK phase is planned after the joy, math-strategy, Lua localization, and LiveOps locale work.
+**Planned scope:** 23 focused PRs (#24–#46), subject to adjustment after implementation and test results. The C++/NDK phase is planned after the joy, math-strategy, Lua localization, and LiveOps locale work; build-channel-aware updating follows as a separate delivery-system task.
 
 The goal is to make GuessTheNumber feel more rewarding and lively while growing it beyond random guessing into number sense and efficient mathematical strategy, without destabilizing existing gameplay, saves, localization, or offline behavior. Keep changes focused and validate each PR before continuing.
 
 | PR | Focus | Planned work |
 |---|---|---|
-| #24 | Winning-streak celebrations | Give existing correct-guess celebrations a stronger payoff at streaks of 5, 10, 25, and 50. **Current PR; open at time of writing.** |
+| #24 | Winning-streak celebrations | Give existing correct-guess celebrations a stronger payoff at streaks of 5, 10, 25, and 50. **Merged.** |
 | #25 | High/low feedback | Make higher/lower clues clearer and more satisfying while retaining the existing guessing rules. |
 | #26 | Correct-guess feel | Improve the feedback and motion around a correct guess using existing UI patterns and reduced-motion preferences. |
 | #27 | Money and upgrades | Give purchase success, affordability, and upgrade progress clearer feedback without changing reward balance. |
@@ -29,6 +29,7 @@ The goal is to make GuessTheNumber feel more rewarding and lively while growing 
 | #43 | Port one bounded engine component | Move only one well-defined, deterministic computation into C++ after baseline evidence supports it. Keep Kotlin as the source of truth for game state, persistence, eligibility, and rewards. |
 | #44 | Kotlin/native parity and failure tests | Compare Kotlin and native outputs for the selected component, test edge cases, malformed inputs, JNI failures, and fallback behavior across supported ABIs. |
 | #45 | Native integration regression and performance review | Verify Debug/Release builds, device ABI coverage, gameplay/save compatibility, Lua sandbox boundaries, offline behavior, and measured performance. Keep the native path only if it is stable and provides a justified benefit. |
+| #46 | Build-channel-aware updates and About menu | Add an About-menu update section that identifies the installed build channel and checks the matching update source. **Production/release builds** check GitHub Releases and offer compatible production releases only. **Debug builds** check the latest designated stable Debug APK published through GitHub Actions artifacts, not production Releases. Detect the channel from trusted build configuration rather than a user-editable setting; never offer a debug APK to a production build. Show installed version/channel, available version, release notes and a clear install action. Handle artifact expiry, API/download access, rate limits, missing metadata, incompatible versions, interrupted downloads and offline use gracefully. Validate checksums/signatures where the publishing pipeline provides trusted verification, and test both build variants without making updates mandatory. |
 
 ## Temporary LiveOps locale pack design
 
@@ -51,9 +52,11 @@ Expected flow:
 - Preserve existing save compatibility, reward rules, claim limits, and offline play.
 - Every player-facing string, including Lua activity and random-event text, must use the localization system.
 - Test language switching, formatting arguments, missing/malformed translations, pack expiry, corrupted packs, offline startup, and fallback behavior.
+- Build updates must be channel-aware: production uses GitHub Releases; debug uses the designated stable Debug APK from GitHub Actions artifacts. Keep release and debug update feeds separate and identify the active channel in About.
+- Define how the stable debug artifact is selected and retrieved, including artifact retention/expiry, metadata, version compatibility, access limits, and integrity verification. Do not assume an Actions artifact is permanent or anonymously downloadable.
+- Test update discovery and failure cases for both Debug and Release variants. Updating must remain optional and offline gameplay must continue to work.
 - Keep each PR focused. Avoid unrelated dependencies and scope expansion.
 - Do not claim a PR is merged or checks passed without verifying GitHub status. Workflows are manual-only unless explicitly requested.
-
 
 ## Planned C++/NDK engine integration (#40–#45)
 
