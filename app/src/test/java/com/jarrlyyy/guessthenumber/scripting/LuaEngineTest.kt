@@ -70,4 +70,38 @@ class LuaEngineTest {
         engine.stop()
     }
 
+
+    @Test
+    fun invalidAnswerDoesNotConsumeTheSingleSubmission() {
+        val engine = LuaEngine.get(RuntimeEnvironment.getApplication())
+        engine.stop()
+        val started = engine.startFeaturedActivity() as LuaStartResult.Started
+        val activity = started.activity
+
+        assertTrue(engine.submitAnswer(-1) is LuaAnswerResult.Rejected)
+        assertTrue(engine.submitAnswer(activity.options.size) is LuaAnswerResult.Rejected)
+        assertTrue(engine.submitAnswer(activity.correctOption) is LuaAnswerResult.Answered)
+        assertTrue(engine.submitAnswer(activity.correctOption) is LuaAnswerResult.Rejected)
+
+        engine.stop(activity.instanceId)
+    }
+
+    @Test
+    fun incorrectAnswerConsumesAttemptAndNewInstanceResetsSubmissionState() {
+        val engine = LuaEngine.get(RuntimeEnvironment.getApplication())
+        engine.stop()
+        val first = engine.startFeaturedActivity() as LuaStartResult.Started
+        val activity = first.activity
+        val wrongOption = activity.options.indices.first { it != activity.correctOption }
+
+        val wrongAnswer = engine.submitAnswer(wrongOption)
+        assertTrue(wrongAnswer is LuaAnswerResult.Answered && !wrongAnswer.correct)
+        assertTrue(engine.submitAnswer(activity.correctOption) is LuaAnswerResult.Rejected)
+
+        assertTrue(engine.stop(activity.instanceId))
+        val next = engine.startFeaturedActivity() as LuaStartResult.Started
+        assertTrue(next.activity.instanceId != activity.instanceId)
+        assertTrue(engine.submitAnswer(next.activity.correctOption) is LuaAnswerResult.Answered)
+        engine.stop(next.activity.instanceId)
+    }
 }
