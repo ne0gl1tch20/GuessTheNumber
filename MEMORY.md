@@ -12,14 +12,14 @@
 
 ## Project Overview
 
-**Current player-facing pitch:** Start with a simple number guess, then build a run around upgrades, Frenzy streaks, random events, achievement tiers, cosmetics, stackable mutators, and custom challenges. v1.12 is intended to feel like a game you can keep poking at because every run can be pushed, optimized, or made weird in a different way. 🎮✨
+**Current player-facing pitch:** Start with a simple number guess, then build a run around upgrades, Frenzy streaks, random events, achievement tiers, cosmetics, stackable mutators, custom challenges, world progression, boss battles, and endgame challenges. The current app metadata is **v3.0.2 (versionCode 20)**. 🎮✨
 
-A fully polished, feature-complete Android incremental game combining classic guess-the-number mechanics with deep idle progression, reset role hierarchy, anti-cheat protection, offline progression, JSON data-driven assets, startup loading splash screen for safe save data synchronization, 10 Save Slot System, developer settings with raw save editor, crash recovery with copyable & shareable crash logs, unified Dev Console logs UI inside an independent scrollable console box, non-crash log storage saving to Android/data files, background music selector/player in More navbar saving audio files to Android/data, crash recovery, interactive tutorial onboarding, and Material 3 Jetpack Compose UI with standard tab navigation. Version `v3.0.0` (versionCode 18).
+A feature-rich Android incremental/arcade game built with Kotlin and Jetpack Compose, including classic guessing, idle upgrades, Prestige/Ultra/Nebula progression, anti-cheat/time-travel protections, offline progress, JSON-driven content, 10 save slots, encrypted backup/restore, crash recovery, developer console, player-selected background music, tutorial onboarding, Material 3 UI, world progression, boss battles, relics, Home Base, Codex, and Endless Rift. Current app version: `v3.0.2` (versionCode 20).
 
 
 
 ## v3.0.0 Beyond the Numbers Ultimate Expansion
-- Current app metadata in `app/build.gradle.kts`: versionName `3.0.1`, versionCode `19`.
+- Current app metadata in `app/build.gradle.kts`: versionName `3.0.2`, versionCode `20`. v3.0.2 records the merged PR #24 streak-milestone celebration feature; no build/test result should be inferred from the version bump alone.
 - Added a save-compatible Endless Rift loop, unlocked only after all four world bosses are defeated. Rift tier, best cleared tier and active state are persisted in `GameState` with defaults for old saves.
 - Rift runs rematch bosses in a repeating four-world order. Each victory scales the next boss by +2 HP per tier, multiplies that victory's Money and Nebula rewards by the current tier, records the best cleared tier and automatically advances to the next world.
 - The World Map displays tier-scaled boss HP and the active Rift tier, and uses the existing guessing combat, phase rules and miss penalties for Rift rematches.
@@ -28,7 +28,7 @@ A fully polished, feature-complete Android incremental game combining classic gu
 - Changelog updated for v3.0.0. The v3.0.1 cleanup removes the redundant More Hub tutorial and export/import entries and their standalone destinations; action-driven tutorial and Save Slots backup/restore remain available. Build/runtime validation must be confirmed from GitHub Actions before describing a commit as build-verified.
 
 ## v2.0.0 Beyond the Numbers Expansion
-- Current release metadata in `app/build.gradle.kts`: versionName `2.0.0`, versionCode `17`.
+- Historical v2.0.0 release metadata: versionName `2.0.0`, versionCode `17`.
 - Added backward-compatible per-save fields: `relicInventory`, `equippedRelicIds`, `worldMasteryLevels`, `discoveredSecretIds`, `codexEntries`, `homeBaseLevel`, `activeBossBattleWorldId`, `bossBattleMistakes`, and `codexRewardClaimed`.
 - Added `WorldMapScreen.kt`: pinch/gesture zoom, drag panning, clickable world nodes, unlock requirements, secret-area markers, boss health, phase display and mastery upgrades.
 - Boss combat is guessing-driven: starting a battle makes correct manual or auto-clicker guesses damage the active boss. Misses push progress back every 4 misses in phase 1, every 3 in phase 2 and every 2 in phase 3. World mastery adds 2% correct-guess Money per level, up to 20%. Boss victories grant their one-time Money/Nebula reward, relic, Codex entries and initial world mastery.
@@ -232,8 +232,8 @@ Verify the full progression loop end to end: World Map, world unlocks and portal
 
 ## Joy Phase Roadmap and LiveOps Temporary Locale Packs (2026-10-12)
 
-- The joy-focused roadmap now spans 22 planned PRs, #24–#45. Treat the sequence as focused work that can be adjusted after implementation and validation.
-- PR #24: celebrate winning-streak milestones (currently open; do not assume checks passed or that it merged).
+- The joy-focused roadmap now covers PRs #24–#80. PR #24 is merged; #25 is the active roadmap PR, and the remaining entries are planned work subject to implementation and validation.
+- PR #24: merged winning-streak milestone celebrations at streaks of 5, 10, 25, and 50. The correct-guess banner reuses existing localized achievement-title keys. Merge status is confirmed; build/runtime test status must be checked separately.
 - PR #25: improve high/low guess feedback.
 - PR #26: make correct guesses feel more satisfying.
 - PR #27: improve Money and upgrade purchase feedback.
@@ -272,3 +272,18 @@ Verify the full progression loop end to end: World Map, world unlocks and portal
 - JNI must validate inputs, handle errors explicitly, and allow a Kotlin fallback. Test supported ABIs, Debug/Release builds, parity, edge cases, and native failure recovery.
 - Preserve the Lua sandbox. Lua must not receive direct JNI/native access or unrestricted save/reward mutation capabilities.
 - Confirm actual Android NDK/CMake and ABI configuration during implementation rather than assuming a target ABI. Avoid unrelated dependencies and preserve existing saves, offline operation, and gameplay.
+
+## Current Release and Work State (2026-10-12)
+
+- Current app version is **3.0.2**, versionCode **20**, in `app/build.gradle.kts`. This patch version records the already-merged PR #24 winning-streak celebration behavior, which was missing from the previous changelog. Release notes are in `app/src/main/assets/changelogs.md`; do not claim build, unit-test, or device-test success unless GitHub Actions/results confirm it.
+- PR #24 is merged. At streaks of 5, 10, 25, or 50, the correct-guess celebration changes to an achievement-style banner and uses existing localized achievement title keys.
+- The active roadmap document is `docs/JOY_PHASE_ROADMAP.md` on branch `docs/build-channel-updater-roadmap`, associated with PR #25: https://github.com/ne0gl1tch20/GuessTheNumber/pull/25. The roadmap covers PRs #24–#80. PR #25 is the high/low feedback work; the rest are plans until implemented and verified.
+- The current branch now contains roadmap, memory, changelog, app version metadata, and integration-audit version-reference updates. No build, CI workflow, emulator, or physical-device test has been started in this pass.
+- The roadmap plans joy/gameplay improvements (#25–#33), Lua localization and temporary LiveOps locale packs (#34–#39), staged optional C++/NDK work (#40–#45), build-channel-aware updating (#46), tiered testing and boundary hardening (#47–#48), game-feel/navigation/onboarding/save/performance/accessibility/localization/release work (#49–#57), privacy/trust/return-friendly goals/notifications/tutorial discovery (#58–#61), Material 3 Expressive interaction/motion (#62), expanded settings (#63), player-selected background music (#64), optional Google Play Games/cloud saves after platform setup (#65), developer test dashboard (#66), Live Events Engine and related challenge/event/recap/simulator/What's New/release-readiness work (#67–#74), and multiplayer (#75–#80). The roadmap file is the detailed source of truth for acceptance criteria.
+- Multiplayer is planned only, not implemented. Start with opt-in local peer-to-peer play over Wi-Fi/local network, with Bluetooth as a fallback when Wi-Fi cannot connect and both devices support the selected method. Use a transport-independent protocol and host-authoritative match state; keep multiplayer separate from single-player saves, currencies, achievements, and rewards. Initial local-network play should not require accounts, Play Console setup, a cloud server, or internet access.
+- Multiplayer sequence: #75 architecture/transport fallback design; #76 Wi-Fi-first lobby with Bluetooth fallback; #77 guessing mode; #78 reusable minigame framework and a first minigame; #79 Wi-Fi/Bluetooth diagnostics and two-device regression checklist; #80 privacy, reliability, and release gate.
+- Two physical Android devices are required for real transport testing. Plan manual tests for same Wi-Fi, phone hotspot, Bluetooth-only fallback, permission denial, disabled Bluetooth, incompatible versions, app background/foreground, host exit, disconnect/reconnect, repeated messages, and cleanup. Simulated tests do not replace physical-device tests.
+- Cross-network internet multiplayer is explicitly out of initial scope; it may require signaling and relay/network infrastructure. Do not add accounts, public matchmaking, relay services, or online requirements unless separately approved.
+- Preserve the user's constraints: offline single-player remains functional; Kotlin stays authoritative for gameplay state, saves, localization, eligibility, and rewards; Lua remains sandboxed and never receives unrestricted save/reward/JNI/network access; C++ is limited to a measured, bounded component with Kotlin fallback; do not add features or dependencies outside the focused PR; workflows/builds/device tests are manual-only unless explicitly requested.
+- App version policy for this pass: bump to 3.0.2 / versionCode 20 because a merged gameplay change needed release documentation. Do not bump again for roadmap-only edits. Planned PRs belong in the roadmap/MEMORY.md, never as completed release notes.
+
