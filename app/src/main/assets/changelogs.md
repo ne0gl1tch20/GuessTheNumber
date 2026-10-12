@@ -1,3 +1,8 @@
+## v3.0.2 (Winning-Streak Celebrations)
+
+- 🎉 **Streak milestone celebrations**: Correct-guess celebrations now switch to an achievement-style banner at winning streaks of 5, 10, 25, and 50, reusing the existing localized achievement names.
+- 🎮 **Version**: versionCode 20 / versionName 3.0.2.
+
 ## v3.0.1 (Streamlined More Hub)
 
 - Removed the redundant Interactive Tutorial and Save Export / Import shortcuts from More. The action-driven tutorial remains available through its existing button action, and encrypted backup/restore remains on Save Slots.
