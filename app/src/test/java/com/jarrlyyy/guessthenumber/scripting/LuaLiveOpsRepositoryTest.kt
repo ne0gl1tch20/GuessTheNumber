@@ -84,4 +84,55 @@ class LuaLiveOpsRepositoryTest {
         }
     }
 
+
+    @Test
+    fun cachedEntriesFailClosedWhenNoVerifiedActiveBundleExists() {
+        val context = RuntimeEnvironment.getApplication()
+        val liveOpsRoot = java.io.File(context.filesDir, "lua-liveops")
+        liveOpsRoot.deleteRecursively()
+        liveOpsRoot.mkdirs()
+
+        try {
+            val repository = LuaLiveOpsRepository(context)
+            assertTrue(repository.loadVerifiedCachedEntries().isEmpty())
+            assertTrue(repository.readVerifiedCachedScript(
+                LuaScriptEntry(
+                    id = "unverified",
+                    file = "unverified.lua",
+                    title = "Unverified",
+                    description = "Must not execute",
+                    source = "liveops"
+                )
+            ) == null)
+        } finally {
+            liveOpsRoot.deleteRecursively()
+        }
+    }
+
+    @Test
+    fun rejectsUnsupportedRemoteCapabilitiesBeforeActivation() {
+        val repository = LuaLiveOpsRepository(RuntimeEnvironment.getApplication())
+        val payload = LuaRemotePayload(
+            schemaVersion = 1,
+            hostApiVersion = LuaEngine.HOST_API_VERSION,
+            minAppVersionCode = 19,
+            maxAppVersionCode = 999999,
+            bundleVersion = 4,
+            scripts = listOf(
+                LuaRemoteScript(
+                    id = "unsupported_capability",
+                    fileName = "unsupported.lua",
+                    title = "Unsupported",
+                    description = "Requests an unavailable host capability",
+                    sha256 = "c".repeat(64),
+                    capabilities = listOf("log", "filesystem")
+                )
+            )
+        )
+
+        val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            repository.validatePayload(payload)
+        }
+        assertTrue(error.message!!.contains("unsupported capability"))
+    }
 }
