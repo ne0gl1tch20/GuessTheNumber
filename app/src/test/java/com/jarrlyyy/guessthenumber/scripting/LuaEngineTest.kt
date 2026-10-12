@@ -48,4 +48,26 @@ class LuaEngineTest {
         assertTrue(engine.start("not_registered") is LuaStartResult.Rejected)
         assertTrue(engine.submitAnswer(999) is LuaAnswerResult.Rejected)
     }
+
+    @Test
+    fun repeatedStartIsIdempotentAndStaleStopCannotEndCurrentActivity() {
+        val engine = LuaEngine.get(RuntimeEnvironment.getApplication())
+        engine.stop()
+
+        val first = engine.startFeaturedActivity()
+        assertTrue(first is LuaStartResult.Started)
+        val activity = (first as LuaStartResult.Started).activity
+
+        val repeated = engine.start(activity.id)
+        assertTrue(repeated is LuaStartResult.Started)
+        assertEquals(activity.instanceId, (repeated as LuaStartResult.Started).activity.instanceId)
+
+        assertFalse(engine.stop("stale-instance-id"))
+        assertEquals(activity.instanceId, engine.status().activeInstanceId)
+
+        assertTrue(engine.stop(activity.instanceId))
+        assertTrue(engine.startFeaturedActivity() is LuaStartResult.Started)
+        engine.stop()
+    }
+
 }
