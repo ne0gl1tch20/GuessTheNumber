@@ -285,6 +285,13 @@ fun PlayScreen(
             }
 
             item(key = "correct_guess_celebration") {
+                val streakMilestoneNameKey = when (state.streak) {
+                    5 -> "achievement_streak_5_name"
+                    10 -> "achievement_streak_10_name"
+                    25 -> "achievement_streak_25_name"
+                    50 -> "achievement_streak_50_name"
+                    else -> null
+                }
                 AnimatedVisibility(
                     visible = showCorrectCelebration,
                     enter = if (state.settings.reducedMotion) fadeIn() else scaleIn() + fadeIn(),
@@ -309,12 +316,20 @@ fun PlayScreen(
                             )
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = locale.getString("play_correct_celebration_title", "Nice guess!"),
+                                    text = if (streakMilestoneNameKey != null) {
+                                        locale.getString("achievement_unlocked_title", "Achievement unlocked!")
+                                    } else {
+                                        locale.getString("play_correct_celebration_title", "Nice guess!")
+                                    },
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onTertiaryContainer
                                 )
                                 Text(
-                                    text = locale.getString("play_correct_celebration_desc", "Secret number found. Your streak keeps growing."),
+                                    text = if (streakMilestoneNameKey != null) {
+                                        locale.getString(streakMilestoneNameKey, "Streak milestone")
+                                    } else {
+                                        locale.getString("play_correct_celebration_desc", "Secret number found. Your streak keeps growing.")
+                                    },
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onTertiaryContainer
                                 )
