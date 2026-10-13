@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "A quick Lua-powered number challenge.",
   "lua_number_rush_prompt": "Which number is a prime number?",
   "lua_number_rush_success": "Correct! You spotted the prime number.",
-  "lua_number_rush_failure": "Not quite. 29 is the prime number."
+  "lua_number_rush_failure": "Not quite. 29 is the prime number.",
+  "math_strategy_title": "🧠 Math Strategy",
+  "math_strategy_description": "The midpoint sits halfway between the lowest and highest numbers. Try it, then use the higher/lower clue to guide your next guess.",
+  "math_strategy_try_midpoint": "Try midpoint: %s"
 }
