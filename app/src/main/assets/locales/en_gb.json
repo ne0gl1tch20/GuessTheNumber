@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "Not quite. 29 is the prime number.",
   "math_strategy_title": "🧠 Math Strategy",
   "math_strategy_description": "The midpoint sits halfway between the lowest and highest numbers. Try it, then use the higher/lower clue to guide your next guess.",
-  "math_strategy_try_midpoint": "Try midpoint: %s"
+  "math_strategy_try_midpoint": "Try midpoint: %s",
+  "more_locked_short": "Locked · tap to view requirements",
+  "more_unlock_dialog_title": "Unlock requirements",
+  "more_unlock_first_boss": "Defeat your first world boss to unlock this feature.",
+  "more_unlock_all_bosses": "Defeat all four world bosses to unlock this feature.",
+  "more_unlock_boss_progress": "World bosses defeated: %d / 4",
+  "more_unlock_first_boss_progress": "First boss defeated: %s"
 }
