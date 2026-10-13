@@ -18,6 +18,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
@@ -139,9 +142,20 @@ fun WorldMapScreen(
                     worlds.forEach { node ->
                         val isUnlocked = node.id in state.unlockedWorldIds
                         val isSelected = node.id == selectedWorld
+                        val nodeStatus = when {
+                            node.bossId in state.defeatedBossIds -> locale.getString("boss_defeated", "Boss defeated")
+                            isUnlocked -> locale.getString("world_status_unlocked", "Unlocked")
+                            else -> locale.getString("world_status_locked", "Locked")
+                        }
                         Surface(
                             onClick = { if (!state.endlessRiftActive || node.id == state.activeWorldId) { selectedWorld = node.id; if (isUnlocked) onProgressionAction("select_world", node.id) } },
-                            modifier = Modifier.offset(x = mapWidth * node.x - 54.dp, y = mapHeight * node.y - 35.dp).width(108.dp),
+                            modifier = Modifier
+                                .offset(x = mapWidth * node.x - 54.dp, y = mapHeight * node.y - 35.dp)
+                                .width(108.dp)
+                                .semantics {
+                                    contentDescription = "${locale.getString(node.nameKey, node.fallback)}, $nodeStatus"
+                                    selected = isSelected
+                                },
                             shape = RoundedCornerShape(22.dp),
                             color = when {
                                 isSelected -> MaterialTheme.colorScheme.primaryContainer
