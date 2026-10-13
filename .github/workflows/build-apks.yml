@@ -60,7 +60,7 @@ jobs:
         run: python3 tools/build_preflight.py
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -80,6 +80,18 @@ jobs:
       - name: Build Release APK (Unsigned)
         run: ./gradlew assembleRelease --stacktrace
 
+      - name: Write Debug Artifact Metadata
+        run: >-
+          python3 tools/write_build_artifact_metadata.py
+          --channel debug
+          --apk app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Write Release Artifact Metadata
+        run: >-
+          python3 tools/write_build_artifact_metadata.py
+          --channel release
+          --apk app/build/outputs/apk/release/app-release-unsigned.apk
+
       - name: Upload Test and Lint Reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -95,10 +107,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: GuessTheNumber-debug
-          path: app/build/outputs/apk/debug/*.apk
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/debug/*.build-metadata.json
+            app/build/outputs/apk/debug/*.sha256
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
           name: GuessTheNumber-release
-          path: app/build/outputs/apk/release/*.apk
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/release/*.build-metadata.json
+            app/build/outputs/apk/release/*.sha256

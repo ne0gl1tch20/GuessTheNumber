@@ -30,6 +30,7 @@ def check_required_paths(errors: list[str]) -> None:
         ".github/workflows/build-apks.yml",
         "tools/build_preflight.py",
         "tools/preflight_compile_check.py",
+        "tools/write_build_artifact_metadata.py",
     ]
     for item in required:
         if not (ROOT / item).is_file():
@@ -51,8 +52,9 @@ def check_wrapper_contract(errors: list[str]) -> None:
         if parsed.scheme != "https" or not parsed.netloc:
             errors.append("Gradle distributionUrl must use HTTPS")
 
-    if "distributionSha256Sum=" not in properties:
-        print("NOTE  Gradle wrapper has no distributionSha256Sum pin")
+    checksums = re.findall(r"(?m)^distributionSha256Sum=([0-9a-fA-F]+)$", properties)
+    if len(checksums) != 1 or not re.fullmatch(r"[0-9a-fA-F]{64}", checksums[0]):
+        errors.append("Gradle wrapper must pin one valid 64-character distributionSha256Sum")
 
 
 def check_xml_well_formed(errors: list[str], notes: list[str]) -> None:
@@ -77,6 +79,12 @@ def check_workflow_python_commands(errors: list[str], notes: list[str]) -> None:
     except (OSError, UnicodeDecodeError) as exc:
         errors.append(f"cannot read workflow: {exc}")
         return
+
+    if "uses: gradle/actions/setup-gradle@v4" not in workflow:
+        errors.append("workflow must use setup-gradle v4 for wrapper validation")
+
+    if "tools/write_build_artifact_metadata.py" not in workflow:
+        errors.append("workflow must write build metadata for APK artifacts")
 
     commands = re.findall(r"python3\s+([\w./-]+\.py)", workflow)
     if not commands:
