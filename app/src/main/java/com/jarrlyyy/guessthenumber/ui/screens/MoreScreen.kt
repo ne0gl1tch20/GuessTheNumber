@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.consumePositionChange
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.navigation.Screen
 import androidx.compose.ui.platform.LocalContext
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
 import com.jarrlyyy.guessthenumber.BuildConfig
 
@@ -37,7 +38,9 @@ fun MoreScreen(
     onUpdateSettings: (com.jarrlyyy.guessthenumber.domain.model.GameSettings) -> Unit
 ) {
     var colorTarget by remember { mutableStateOf<String?>(null) }
+    var showRequirementsFor by remember { mutableStateOf<String?>(null) }
 
+    val locale = LocalAppLocaleManager.current
     val context = LocalContext.current
     val featureFlags = remember { FeatureFlagRepository(context).load() }
     val defaultOrder = com.jarrlyyy.guessthenumber.domain.model.DEFAULT_MORE_SCREEN_ORDER
@@ -59,6 +62,19 @@ fun MoreScreen(
                 else -> true
             }
         }
+    }
+    val allBossIds = remember {
+        setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+    }
+    val defeatedBossCount = state.defeatedBossIds.count { it in allBossIds }
+    val firstBossDefeated = defeatedBossCount > 0
+    val allBossesDefeated = state.defeatedBossIds.containsAll(allBossIds)
+    val lockedRoutes = buildSet {
+        if (!firstBossDefeated) {
+            add("relics")
+            add("codex")
+        }
+        if (!allBossesDefeated) add("endgame")
     }
     var dragging by remember { mutableStateOf<String?>(null) }
     var dragDistance by remember { mutableFloatStateOf(0f) }
@@ -177,6 +193,7 @@ fun MoreScreen(
 
             items(visibleOrder, key = { it }) { route ->
                 val selected = dragging == route
+                val isLocked = route in lockedRoutes
                 val animatedScale by animateFloatAsState(
                     targetValue = if (selected) 1.025f else 1f,
                     animationSpec = androidx.compose.animation.core.spring(
@@ -237,12 +254,16 @@ fun MoreScreen(
                                 }
                             } else {
                                 Modifier.clickable {
-                                    when (route) {
-                                        "ultra", "prestige" -> onNavigate(route)
-                                        "save_slots" -> onNavigate(Screen.SaveSlots.route)
-                                        "changelog" -> onNavigate(Screen.ChangelogViewer.route)
-                                        "music" -> onNavigate(Screen.MusicPlayer.route)
-                                        else -> onNavigate(route)
+                                    if (isLocked) {
+                                        showRequirementsFor = route
+                                    } else {
+                                        when (route) {
+                                            "ultra", "prestige" -> onNavigate(route)
+                                            "save_slots" -> onNavigate(Screen.SaveSlots.route)
+                                            "changelog" -> onNavigate(Screen.ChangelogViewer.route)
+                                            "music" -> onNavigate(Screen.MusicPlayer.route)
+                                            else -> onNavigate(route)
+                                        }
                                     }
                                 }
                             }
@@ -268,17 +289,25 @@ fun MoreScreen(
                             if (luminance > 0.55f) Color.Black else Color.White
                         } else MaterialTheme.colorScheme.onSurfaceVariant
                         Icon(
-                            imageVector = icons[route] ?: Icons.Default.Circle,
+                            imageVector = if (isLocked) Icons.Default.Lock else icons[route] ?: Icons.Default.Circle,
                             contentDescription = null,
-                            tint = contentTint
+                            tint = if (isLocked) MaterialTheme.colorScheme.outline else contentTint
                         )
                         Spacer(Modifier.width(14.dp))
-                        Text(
-                            labels[route] ?: route,
-                            modifier = Modifier.weight(1f),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = contentTint
-                        )
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(
+                                labels[route] ?: route,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = if (isLocked) MaterialTheme.colorScheme.onSurfaceVariant else contentTint
+                            )
+                            if (isLocked) {
+                                Text(
+                                    locale.getString("more_locked_short", "Locked · tap to view requirements"),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                         if (isReordering) {
                             Icon(Icons.Default.DragHandle, contentDescription = localizedText("Reorder"), tint = contentTint)
                         } else {
@@ -288,13 +317,62 @@ fun MoreScreen(
                             ) {
                                 Icon(Icons.Default.Palette, contentDescription = null, tint = contentTint)
                             }
-                            Icon(Icons.Default.ChevronRight, contentDescription = localizedText("Open"), tint = contentTint)
+                            Icon(
+                                imageVector = if (isLocked) Icons.Default.Lock else Icons.Default.ChevronRight,
+                                contentDescription = if (isLocked) locale.getString("more_locked_short", "Locked · tap to view requirements") else localizedText("Open"),
+                                tint = if (isLocked) MaterialTheme.colorScheme.outline else contentTint
+                            )
                         }
                     }
                 }
             }
 
         }
+    }
+
+    if (showRequirementsFor != null) {
+        val route = showRequirementsFor!!
+        val requirementText = when (route) {
+            "relics", "codex" -> locale.getString(
+                "more_unlock_first_boss",
+                "Defeat your first world boss to unlock this feature."
+            )
+            "endgame" -> locale.getString(
+                "more_unlock_all_bosses",
+                "Defeat all four world bosses to unlock this feature."
+            )
+            else -> ""
+        }
+        AlertDialog(
+            onDismissRequest = { showRequirementsFor = null },
+            icon = { Icon(Icons.Default.Lock, contentDescription = null) },
+            title = { Text(locale.getString("more_unlock_dialog_title", "Unlock requirements")) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(requirementText)
+                    Text(
+                        locale.getString("more_unlock_boss_progress", "World bosses defeated: %d / 4", defeatedBossCount),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    if (route == "relics" || route == "codex") {
+                        Text(
+                            locale.getString(
+                                "more_unlock_first_boss_progress",
+                                "First boss defeated: %s",
+                                if (firstBossDefeated) locale.getString("yes", "Yes") else locale.getString("no", "No")
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showRequirementsFor = null }) {
+                    Text(locale.getString("close", "Close"))
+                }
+            }
+        )
     }
 
     if (colorTarget != null) {
