@@ -6,6 +6,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import com.jarrlyyy.guessthenumber.ui.theme.GuessTheNumberTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -91,9 +92,10 @@ private fun PreviewStateGallery(
     heading: String,
     stateTitle: String,
     detail: String,
-    icon: String
+    icon: String,
+    themeMode: String = "System"
 ) {
-    MaterialTheme {
+    GuessTheNumberTheme(themeMode = themeMode) {
         Surface(color = MaterialTheme.colorScheme.background) {
             Column(
                 modifier = Modifier.padding(20.dp),
@@ -146,7 +148,20 @@ private fun ThemeStatePreview() {
         heading = "Theme preview",
         stateTitle = "Night mode",
         detail = "Check text and surfaces against the active theme colors.",
-        icon = "🌙"
+        icon = "🌙",
+        themeMode = "Dark"
+    )
+}
+
+@Preview(name = "Light theme state", showBackground = true)
+@Composable
+private fun LightThemeStatePreview() {
+    PreviewStateGallery(
+        heading = "Theme preview",
+        stateTitle = "Light mode",
+        detail = "Check text and surfaces against the active theme colors.",
+        icon = "☀️",
+        themeMode = "Light"
     )
 }
 
