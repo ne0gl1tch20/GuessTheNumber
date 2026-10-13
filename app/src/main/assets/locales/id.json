@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "Belum tepat. 29 adalah bilangan prima.",
   "math_strategy_title": "🧠 Strategi Angka",
   "math_strategy_description": "Titik tengah berada tepat di antara angka terkecil dan terbesar. Coba angka ini, lalu gunakan petunjuk lebih tinggi atau lebih rendah untuk tebakan berikutnya.",
-  "math_strategy_try_midpoint": "Coba titik tengah: %s"
+  "math_strategy_try_midpoint": "Coba titik tengah: %s",
+  "more_locked_short": "Terkunci · ketuk untuk melihat syarat",
+  "more_unlock_dialog_title": "Syarat membuka fitur",
+  "more_unlock_first_boss": "Kalahkan bos dunia pertamamu untuk membuka fitur ini.",
+  "more_unlock_all_bosses": "Kalahkan keempat bos dunia untuk membuka fitur ini.",
+  "more_unlock_boss_progress": "Bos dunia yang dikalahkan: %d / 4",
+  "more_unlock_first_boss_progress": "Bos pertama dikalahkan: %s"
 }
