@@ -43,12 +43,11 @@ object UpdateChannelChecker {
             "html_url",
             "https://github.com/ne0gl1tch20/GuessTheNumber/releases/latest"
         )
-        val notes = release.optString("body").take(1200)
         return Result.Available(
             AvailableUpdate(
-                title = "Release $tag",
+                title = "v$tag",
                 url = releaseUrl,
-                details = notes
+                details = release.optString("body").take(1200)
             )
         )
     }
@@ -80,9 +79,9 @@ object UpdateChannelChecker {
 
             return Result.Available(
                 AvailableUpdate(
-                    title = "Stable Debug APK",
+                    title = "#${run.optLong("run_number")}",
                     url = run.optString("html_url"),
-                    details = "A successful stable Debug APK artifact is available from this workflow run."
+                    details = ""
                 )
             )
         }
