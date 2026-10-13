@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "Короткое числовое испытание на Lua.",
   "lua_number_rush_prompt": "Какое число является простым?",
   "lua_number_rush_success": "Верно! Вы нашли простое число.",
-  "lua_number_rush_failure": "Не совсем. Простое число — 29."
+  "lua_number_rush_failure": "Не совсем. Простое число — 29.",
+  "math_strategy_title": "🧠 Числовая стратегия",
+  "math_strategy_description": "Середина находится ровно между наименьшим и наибольшим числами. Попробуй её, а затем используй подсказку «выше» или «ниже» для следующей попытки.",
+  "math_strategy_try_midpoint": "Попробовать середину: %s"
 }
