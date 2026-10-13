@@ -1,3 +1,10 @@
+## Standing Changelog Rule (2026-10-13)
+
+- Whenever a code, UI, gameplay, localization, configuration, or other player-facing app change is implemented, update `app/src/main/assets/changelogs.md` in the same change/PR so the changelog does not fall behind.
+- Describe only changes actually implemented; keep planned work in the Joy Phase roadmap, not in completed/released changelog entries.
+- Preserve the current app version unless a version bump is explicitly part of the release work. Do not imply a build or tests passed without verified results.
+- The user confirmed PR #36 (undocumented changes changelog update) is merged.
+
 # Project Memory: Gamified Guess the Number Simulator (v3.0.0 Update)
 
 
