@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "Nicht ganz. 29 ist die Primzahl.",
   "math_strategy_title": "🧠 Zahlenstrategie",
   "math_strategy_description": "Der Mittelpunkt liegt genau zwischen der kleinsten und größten Zahl. Probiere ihn aus und nutze danach den Hinweis „höher“ oder „niedriger“ für deinen nächsten Tipp.",
-  "math_strategy_try_midpoint": "Mittelpunkt versuchen: %s"
+  "math_strategy_try_midpoint": "Mittelpunkt versuchen: %s",
+  "more_locked_short": "Gesperrt · tippen für Voraussetzungen",
+  "more_unlock_dialog_title": "Freischaltbedingungen",
+  "more_unlock_first_boss": "Besiege deinen ersten Weltboss, um diese Funktion freizuschalten.",
+  "more_unlock_all_bosses": "Besiege alle vier Weltbosse, um diese Funktion freizuschalten.",
+  "more_unlock_boss_progress": "Besiegte Weltbosse: %d / 4",
+  "more_unlock_first_boss_progress": "Erster Boss besiegt: %s"
 }
