@@ -143,7 +143,7 @@ Before completion trace every visible button, screen, route, currency, suffix, u
 
 ## 📌 PROJECT MEMORY
 
-Always create and maintain `MEMORY.md` in the project root. Store current state, architecture, major features, implementation decisions, known issues, TODOs and continuation context. **Read MEMORY.md before significant changes and update it whenever the project meaningfully changes.** Never store secrets, API keys, passwords, tokens or sensitive credentials.
+Always create and maintain `.openai/MEMORY.md` under `.openai/`. Store current state, architecture, major features, implementation decisions, known issues, TODOs and continuation context. **Read MEMORY.md before significant changes and update it whenever the project meaningfully changes.** Never store secrets, API keys, passwords, tokens or sensitive credentials.
 
 ## 🚀 ACCEPTANCE
 
