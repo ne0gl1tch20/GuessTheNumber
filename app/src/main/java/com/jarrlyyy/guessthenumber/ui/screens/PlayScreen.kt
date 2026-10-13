@@ -717,7 +717,6 @@ private fun EarlyGoalBoard(
     locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 ) {
     data class Goal(
-        val id: String,
         val titleKey: String,
         val descriptionKey: String,
         val progressLabel: String,
@@ -732,7 +731,6 @@ private fun EarlyGoalBoard(
     val moneyProgress = (state.money.value.toDouble() / 1_000_000.0).coerceIn(0.0, 1.0).toFloat()
     val goals = listOf(
         Goal(
-            id = "correct_10",
             titleKey = "achievement_correct_10_name",
             descriptionKey = "achievement_correct_10_desc",
             progressLabel = locale.getString("achievement_progress_format", correctProgress, 10),
@@ -741,7 +739,6 @@ private fun EarlyGoalBoard(
             reward = 10L
         ),
         Goal(
-            id = "streak_5",
             titleKey = "achievement_streak_5_name",
             descriptionKey = "achievement_streak_5_desc",
             progressLabel = locale.getString("achievement_progress_format", streakProgress, 5),
@@ -750,7 +747,6 @@ private fun EarlyGoalBoard(
             reward = 25L
         ),
         Goal(
-            id = "millionaire",
             titleKey = "achievement_millionaire_name",
             descriptionKey = "achievement_millionaire_desc",
             progressLabel = state.money.format(state.settings.numberNotation),
