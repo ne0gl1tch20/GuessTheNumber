@@ -44,13 +44,22 @@ def read_gradle_version() -> tuple[str, str]:
     return version_match.group(1), checksum.group(1).lower()
 
 
+def display_path(path: Path) -> str:
+    """Prefer repository-relative paths while supporting external absolute paths."""
+    try:
+        return str(path.resolve().relative_to(ROOT))
+    except ValueError:
+        return str(path.resolve())
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--channel", choices=("debug", "release"), required=True)
     parser.add_argument("--apk", type=Path, required=True)
     args = parser.parse_args()
 
-    apk = args.apk
+    apk = args.apk if args.apk.is_absolute() else ROOT / args.apk
+    apk = apk.resolve()
     if not apk.is_file():
         parser.error(f"APK does not exist: {apk}")
 
@@ -79,8 +88,8 @@ def main() -> int:
         json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     checksum_path.write_text(f"{digest}  {apk.name}\n", encoding="utf-8")
-    print(f"Wrote {metadata_path.relative_to(ROOT)}")
-    print(f"Wrote {checksum_path.relative_to(ROOT)}")
+    print(f"Wrote {display_path(metadata_path)}")
+    print(f"Wrote {display_path(checksum_path)}")
     return 0
 
 
