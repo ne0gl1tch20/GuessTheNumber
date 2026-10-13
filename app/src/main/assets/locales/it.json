@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "Non proprio. 29 è il numero primo.",
   "math_strategy_title": "🧠 Strategia numerica",
   "math_strategy_description": "Il punto medio è esattamente tra il numero più basso e quello più alto. Provalo, poi usa l’indizio «più alto» o «più basso» per il tentativo successivo.",
-  "math_strategy_try_midpoint": "Prova il punto medio: %s"
+  "math_strategy_try_midpoint": "Prova il punto medio: %s",
+  "more_locked_short": "Bloccato · tocca per vedere i requisiti",
+  "more_unlock_dialog_title": "Requisiti di sblocco",
+  "more_unlock_first_boss": "Sconfiggi il tuo primo boss mondiale per sbloccare questa funzione.",
+  "more_unlock_all_bosses": "Sconfiggi tutti e quattro i boss mondiali per sbloccare questa funzione.",
+  "more_unlock_boss_progress": "Boss mondiali sconfitti: %d / 4",
+  "more_unlock_first_boss_progress": "Primo boss sconfitto: %s"
 }

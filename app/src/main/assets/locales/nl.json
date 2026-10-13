@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "Niet helemaal. 29 is het priemgetal.",
   "math_strategy_title": "🧠 Getallenstrategie",
   "math_strategy_description": "Het midden ligt precies tussen het laagste en hoogste getal. Probeer het en gebruik daarna de aanwijzing hoger of lager voor je volgende gok.",
-  "math_strategy_try_midpoint": "Midden proberen: %s"
+  "math_strategy_try_midpoint": "Midden proberen: %s",
+  "more_locked_short": "Vergrendeld · tik voor vereisten",
+  "more_unlock_dialog_title": "Ontgrendelingsvereisten",
+  "more_unlock_first_boss": "Versla je eerste wereldbaas om deze functie te ontgrendelen.",
+  "more_unlock_all_bosses": "Versla alle vier wereldbazen om deze functie te ontgrendelen.",
+  "more_unlock_boss_progress": "Verslagen wereldbazen: %d / 4",
+  "more_unlock_first_boss_progress": "Eerste baas verslagen: %s"
 }

@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "不太對。29 是質數。",
   "math_strategy_title": "🧠 數字策略",
   "math_strategy_description": "中間值位於目前最小值和最大值的正中間。試著猜這個數，再根據偏高或偏低的提示決定下一次猜測。",
-  "math_strategy_try_midpoint": "試試中間值：%s"
+  "math_strategy_try_midpoint": "試試中間值：%s",
+  "more_locked_short": "已鎖定 · 點擊查看條件",
+  "more_unlock_dialog_title": "解鎖條件",
+  "more_unlock_first_boss": "擊敗第一個世界首領即可解鎖此功能。",
+  "more_unlock_all_bosses": "擊敗全部四個世界首領即可解鎖此功能。",
+  "more_unlock_boss_progress": "已擊敗的世界首領：%d / 4",
+  "more_unlock_first_boss_progress": "已擊敗第一個首領：%s"
 }

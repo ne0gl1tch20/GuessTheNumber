@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "違います。29 が素数です。",
   "math_strategy_title": "🧠 数字の作戦",
   "math_strategy_description": "中央値は、最小値と最大値のちょうど中間です。まず試してから、「もっと大きい／小さい」のヒントを次の予想に活用しましょう。",
-  "math_strategy_try_midpoint": "中央値を試す：%s"
+  "math_strategy_try_midpoint": "中央値を試す：%s",
+  "more_locked_short": "ロック中 · タップして条件を確認",
+  "more_unlock_dialog_title": "アンロック条件",
+  "more_unlock_first_boss": "この機能をアンロックするには、最初のワールドボスを倒してください。",
+  "more_unlock_all_bosses": "この機能をアンロックするには、4体すべてのワールドボスを倒してください。",
+  "more_unlock_boss_progress": "撃破したワールドボス: %d / 4",
+  "more_unlock_first_boss_progress": "最初のボス撃破: %s"
 }

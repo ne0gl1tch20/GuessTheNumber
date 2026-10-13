@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "아쉽네요. 29가 소수입니다.",
   "math_strategy_title": "🧠 숫자 전략",
   "math_strategy_description": "중간값은 가장 작은 숫자와 가장 큰 숫자의 한가운데입니다. 먼저 중간값을 시도한 뒤, 높거나 낮다는 힌트를 다음 추측에 활용하세요.",
-  "math_strategy_try_midpoint": "중간값 시도: %s"
+  "math_strategy_try_midpoint": "중간값 시도: %s",
+  "more_locked_short": "잠김 · 탭하여 조건 확인",
+  "more_unlock_dialog_title": "잠금 해제 조건",
+  "more_unlock_first_boss": "이 기능을 잠금 해제하려면 첫 번째 월드 보스를 처치하세요.",
+  "more_unlock_all_bosses": "이 기능을 잠금 해제하려면 월드 보스 4마리를 모두 처치하세요.",
+  "more_unlock_boss_progress": "처치한 월드 보스: %d / 4",
+  "more_unlock_first_boss_progress": "첫 번째 보스 처치: %s"
 }

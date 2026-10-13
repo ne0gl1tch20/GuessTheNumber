@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "Não foi dessa vez. 29 é o número primo.",
   "math_strategy_title": "🧠 Estratégia numérica",
   "math_strategy_description": "O ponto médio fica exatamente entre o menor e o maior número. Experimente e use a dica de mais alto ou mais baixo na próxima tentativa.",
-  "math_strategy_try_midpoint": "Tentar ponto médio: %s"
+  "math_strategy_try_midpoint": "Tentar ponto médio: %s",
+  "more_locked_short": "Bloqueado · toque para ver os requisitos",
+  "more_unlock_dialog_title": "Requisitos para desbloquear",
+  "more_unlock_first_boss": "Derrote seu primeiro chefe mundial para desbloquear este recurso.",
+  "more_unlock_all_bosses": "Derrote os quatro chefes mundiais para desbloquear este recurso.",
+  "more_unlock_boss_progress": "Chefes mundiais derrotados: %d / 4",
+  "more_unlock_first_boss_progress": "Primeiro chefe derrotado: %s"
 }

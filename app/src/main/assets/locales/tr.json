@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "Tam değil. Asal sayı 29.",
   "math_strategy_title": "🧠 Sayı Stratejisi",
   "math_strategy_description": "Orta nokta, en küçük ve en büyük sayının tam ortasındadır. Önce bunu dene, ardından sonraki tahminin için daha yüksek veya daha düşük ipucunu kullan.",
-  "math_strategy_try_midpoint": "Orta noktayı dene: %s"
+  "math_strategy_try_midpoint": "Orta noktayı dene: %s",
+  "more_locked_short": "Kilitli · gereksinimleri görmek için dokun",
+  "more_unlock_dialog_title": "Kilidi açma koşulları",
+  "more_unlock_first_boss": "Bu özelliğin kilidini açmak için ilk dünya bossunu yen.",
+  "more_unlock_all_bosses": "Bu özelliğin kilidini açmak için dört dünya bossunun tamamını yen.",
+  "more_unlock_boss_progress": "Yenilen dünya bossları: %d / 4",
+  "more_unlock_first_boss_progress": "İlk boss yenildi: %s"
 }

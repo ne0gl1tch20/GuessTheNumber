@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "Chưa đúng. 29 là số nguyên tố.",
   "math_strategy_title": "🧠 Chiến lược số",
   "math_strategy_description": "Điểm giữa nằm chính giữa số nhỏ nhất và số lớn nhất. Hãy thử số này, rồi dùng gợi ý cao hơn hoặc thấp hơn để chọn lần đoán tiếp theo.",
-  "math_strategy_try_midpoint": "Thử điểm giữa: %s"
+  "math_strategy_try_midpoint": "Thử điểm giữa: %s",
+  "more_locked_short": "Đã khóa · nhấn để xem yêu cầu",
+  "more_unlock_dialog_title": "Điều kiện mở khóa",
+  "more_unlock_first_boss": "Đánh bại trùm thế giới đầu tiên để mở khóa tính năng này.",
+  "more_unlock_all_bosses": "Đánh bại cả bốn trùm thế giới để mở khóa tính năng này.",
+  "more_unlock_boss_progress": "Số trùm thế giới đã đánh bại: %d / 4",
+  "more_unlock_first_boss_progress": "Đã đánh bại trùm đầu tiên: %s"
 }
