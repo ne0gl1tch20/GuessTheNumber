@@ -1,3 +1,13 @@
+## Unreleased (Post-v3.0.2 Development Updates)
+
+- 🎯 **Early progression goals**: Added live progress and reward spotlights for the existing Novice Guesser, Streak Master, and Number Millionaire milestones on the Play screen.
+- 🧮 **Optional Math Strategy Lab**: Added a collapsible midpoint guide that can suggest a guess without submitting it automatically or revealing the hidden target.
+- 🔒 **Progression-locked More Hub entries**: Relic Collection and Explorer's Codex remain visible until the first world boss is defeated; Endgame Challenges unlock after all four world bosses are defeated. Locked entries explain the requirements and current progress, and navigation enforces the same gates.
+- 🔄 **Build-channel-aware update discovery**: The About screen can check GitHub Releases for release builds and recent successful Stable Debug APK workflow artifacts for debug builds. Results link to official GitHub pages; the app does not silently download or install APKs.
+- 🌐 **Localization updates**: Added the new More Hub lock/requirements text across the supported locale catalogs.
+- 🛠️ **Project organization**: Moved internal AI planning notes and roadmaps under `.openai/`; these internal documents are not part of the player-facing app.
+- ℹ️ **Version status**: These are development updates on top of versionCode 20 / versionName 3.0.2. No app version bump is included in this changelog-only update.
+
 ## v3.0.2 (Winning-Streak Celebrations)
 
 - 🎉 **Streak milestone celebrations**: Correct-guess celebrations now switch to an achievement-style banner at winning streaks of 5, 10, 25, and 50, reusing the existing localized achievement names.
