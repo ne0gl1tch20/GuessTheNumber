@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "Un défi numérique rapide propulsé par Lua.",
   "lua_number_rush_prompt": "Quel nombre est un nombre premier ?",
   "lua_number_rush_success": "Correct ! Vous avez trouvé le nombre premier.",
-  "lua_number_rush_failure": "Pas tout à fait. 29 est le nombre premier."
+  "lua_number_rush_failure": "Pas tout à fait. 29 est le nombre premier.",
+  "math_strategy_title": "🧠 Stratégie numérique",
+  "math_strategy_description": "Le milieu se trouve à mi-chemin entre le nombre le plus bas et le plus haut. Essaie-le, puis utilise l’indice « plus haut » ou « plus bas » pour ton prochain essai.",
+  "math_strategy_try_midpoint": "Essayer le milieu : %s"
 }

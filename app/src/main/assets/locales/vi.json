@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "Thử thách số nhanh bằng Lua.",
   "lua_number_rush_prompt": "Số nào là số nguyên tố?",
   "lua_number_rush_success": "Chính xác! Bạn đã tìm ra số nguyên tố.",
-  "lua_number_rush_failure": "Chưa đúng. 29 là số nguyên tố."
+  "lua_number_rush_failure": "Chưa đúng. 29 là số nguyên tố.",
+  "math_strategy_title": "🧠 Chiến lược số",
+  "math_strategy_description": "Điểm giữa nằm chính giữa số nhỏ nhất và số lớn nhất. Hãy thử số này, rồi dùng gợi ý cao hơn hoặc thấp hơn để chọn lần đoán tiếp theo.",
+  "math_strategy_try_midpoint": "Thử điểm giữa: %s"
 }

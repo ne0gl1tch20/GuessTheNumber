@@ -1057,5 +1057,8 @@
   "lua_number_rush_description": "تحدٍ سريع للأرقام باستخدام Lua.",
   "lua_number_rush_prompt": "أي رقم هو عدد أولي؟",
   "lua_number_rush_success": "صحيح! لقد عثرت على العدد الأولي.",
-  "lua_number_rush_failure": "ليس تمامًا. 29 هو العدد الأولي."
+  "lua_number_rush_failure": "ليس تمامًا. 29 هو العدد الأولي.",
+  "math_strategy_title": "🧠 استراتيجية الأرقام",
+  "math_strategy_description": "يقع المنتصف تمامًا بين أصغر رقم وأكبر رقم. جرّبه، ثم استخدم تلميح أعلى أو أقل لتوجيه تخمينك التالي.",
+  "math_strategy_try_midpoint": "جرّب المنتصف: %s"
 }

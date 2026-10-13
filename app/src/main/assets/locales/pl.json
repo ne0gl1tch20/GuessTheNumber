@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "Szybkie wyzwanie liczbowe w Lua.",
   "lua_number_rush_prompt": "Która liczba jest liczbą pierwszą?",
   "lua_number_rush_success": "Dobrze! Znaleziono liczbę pierwszą.",
-  "lua_number_rush_failure": "Nie całkiem. Liczbą pierwszą jest 29."
+  "lua_number_rush_failure": "Nie całkiem. Liczbą pierwszą jest 29.",
+  "math_strategy_title": "🧠 Strategia liczbowa",
+  "math_strategy_description": "Środek przedziału leży dokładnie między najmniejszą a największą liczbą. Wypróbuj go, a potem wykorzystaj wskazówkę „wyżej” lub „niżej” przy kolejnym zgadywaniu.",
+  "math_strategy_try_midpoint": "Wypróbuj środek: %s"
 }

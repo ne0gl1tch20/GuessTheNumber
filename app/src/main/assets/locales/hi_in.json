@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "Lua से जुड़ी एक तेज़ संख्या चुनौती।",
   "lua_number_rush_prompt": "कौन-सी संख्या अभाज्य है?",
   "lua_number_rush_success": "सही! आपने अभाज्य संख्या पहचान ली।",
-  "lua_number_rush_failure": "सही नहीं। 29 अभाज्य संख्या है।"
+  "lua_number_rush_failure": "सही नहीं। 29 अभाज्य संख्या है।",
+  "math_strategy_title": "🧠 संख्या रणनीति",
+  "math_strategy_description": "मध्य मान सबसे छोटी और सबसे बड़ी संख्या के बीच ठीक बीच में होता है। इसे आज़माएँ, फिर अगले अनुमान के लिए ऊँची या नीची संख्या वाला संकेत इस्तेमाल करें।",
+  "math_strategy_try_midpoint": "मध्य मान आज़माएँ: %s"
 }

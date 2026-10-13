@@ -46,6 +46,7 @@ fun PlayScreen(
     val scrollScope = rememberCoroutineScope()
     val worldDefinitions = remember { WorldConfigRepository(context).loadWorlds() }
     var guessInput by remember { mutableStateOf("") }
+    var showMathStrategy by remember { mutableStateOf(false) }
     val configRepository = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale) }
     val locale = configRepository.localeManager
     var lastFeedback by remember { mutableStateOf(locale.getString("guess_prompt", "Guess a number between ${state.currentRangeMin} and ${state.currentRangeMax}")) }
@@ -372,6 +373,65 @@ fun PlayScreen(
                 }
             }
 
+            item(key = "math_strategy_lab") {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        TextButton(
+                            onClick = { showMathStrategy = !showMathStrategy },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.Psychology, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                locale.getString("math_strategy_title", "🧠 Math Strategy"),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Spacer(Modifier.weight(1f))
+                            Icon(
+                                if (showMathStrategy) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                contentDescription = null
+                            )
+                        }
+                        AnimatedVisibility(
+                            visible = showMathStrategy,
+                            enter = if (state.settings.reducedMotion) fadeIn() else expandVertically() + fadeIn(),
+                            exit = if (state.settings.reducedMotion) fadeOut() else shrinkVertically() + fadeOut()
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Text(
+                                    locale.getString(
+                                        "math_strategy_description",
+                                        "The midpoint sits halfway between the lowest and highest numbers. Try it, then use the higher/lower clue to guide your next guess."
+                                    ),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                val strategyMidpoint = state.currentRangeMin +
+                                    (state.currentRangeMax - state.currentRangeMin) / 2
+                                FilledTonalButton(
+                                    onClick = { guessInput = strategyMidpoint.toString() },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Icon(Icons.Default.TipsAndUpdates, contentDescription = null)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        locale.getString(
+                                            "math_strategy_try_midpoint",
+                                            "Try midpoint: %s",
+                                            locale.formatNumber(strategyMidpoint)
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             item(key = "number_guessing_panel") {
                 // Google-style M3 Expressive Action Card Container
                 Surface(

@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "Eine kurze Lua-Zahlenherausforderung.",
   "lua_number_rush_prompt": "Welche Zahl ist eine Primzahl?",
   "lua_number_rush_success": "Richtig! Du hast die Primzahl gefunden.",
-  "lua_number_rush_failure": "Nicht ganz. 29 ist die Primzahl."
+  "lua_number_rush_failure": "Nicht ganz. 29 ist die Primzahl.",
+  "math_strategy_title": "🧠 Zahlenstrategie",
+  "math_strategy_description": "Der Mittelpunkt liegt genau zwischen der kleinsten und größten Zahl. Probiere ihn aus und nutze danach den Hinweis „höher“ oder „niedriger“ für deinen nächsten Tipp.",
+  "math_strategy_try_midpoint": "Mittelpunkt versuchen: %s"
 }
