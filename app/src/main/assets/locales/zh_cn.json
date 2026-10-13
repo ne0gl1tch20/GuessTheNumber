@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "一个快速的 Lua 数字挑战。",
   "lua_number_rush_prompt": "哪个数字是质数？",
   "lua_number_rush_success": "正确！你找到了质数。",
-  "lua_number_rush_failure": "不太对。29 是质数。"
+  "lua_number_rush_failure": "不太对。29 是质数。",
+  "math_strategy_title": "🧠 数字策略",
+  "math_strategy_description": "中间值位于当前最小值和最大值的正中间。试着猜这个数，再根据偏高或偏低的提示决定下一次猜测。",
+  "math_strategy_try_midpoint": "尝试中间值：%s"
 }
