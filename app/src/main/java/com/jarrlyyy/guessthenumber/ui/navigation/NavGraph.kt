@@ -467,16 +467,49 @@ fun NavGraph(
                         }
                     }
                     composable(Screen.Relics.route) {
-                        RelicsScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        val bossIds = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+                        val defeatedCount = state.defeatedBossIds.count { it in bossIds }
+                        if (defeatedCount > 0) {
+                            RelicsScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        } else {
+                            FeatureProgressionLockedScreen(
+                                title = locale.getString("relics_title", "Relic Collection"),
+                                requirement = locale.getString("more_unlock_first_boss", "Defeat your first world boss to unlock this feature."),
+                                progress = locale.getString("more_unlock_boss_progress", "World bosses defeated: %d / 4", defeatedCount),
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
                     }
                     composable(Screen.HomeBase.route) {
                         HomeBaseScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
                     }
                     composable(Screen.Codex.route) {
-                        CodexScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        val bossIds = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+                        val defeatedCount = state.defeatedBossIds.count { it in bossIds }
+                        if (defeatedCount > 0) {
+                            CodexScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        } else {
+                            FeatureProgressionLockedScreen(
+                                title = locale.getString("codex_title", "Explorer's Codex"),
+                                requirement = locale.getString("more_unlock_first_boss", "Defeat your first world boss to unlock this feature."),
+                                progress = locale.getString("more_unlock_boss_progress", "World bosses defeated: %d / 4", defeatedCount),
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
                     }
                     composable(Screen.Endgame.route) {
-                        EndgameScreen(state = state, onNavigate = { navController.navigate(it) }, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        val bossIds = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+                        val defeatedCount = state.defeatedBossIds.count { it in bossIds }
+                        if (state.defeatedBossIds.containsAll(bossIds)) {
+                            EndgameScreen(state = state, onNavigate = { navController.navigate(it) }, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        } else {
+                            FeatureProgressionLockedScreen(
+                                title = locale.getString("endgame_title", "Endgame Challenges"),
+                                requirement = locale.getString("more_unlock_all_bosses", "Defeat all four world bosses to unlock this feature."),
+                                progress = locale.getString("more_unlock_boss_progress", "World bosses defeated: %d / 4", defeatedCount),
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
                     }
                     composable(Screen.Staking.route) {
                         StakingScreen(state = state, onStakeResult = viewModel::settleStake, onBack = { navController.popBackStack() })
@@ -515,6 +548,35 @@ private fun FeatureDisabledScreen(feature: String, onBack: () -> Unit) {
         Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
             Text("$feature is disabled in game/feature_flags.json")
             Button(onClick = onBack) { Text("Back") }
+        }
+    }
+}
+
+
+@Composable
+private fun FeatureProgressionLockedScreen(
+    title: String,
+    requirement: String,
+    progress: String,
+    onBack: () -> Unit
+) {
+    val locale = LocalAppLocaleManager.current
+    Column(
+        modifier = Modifier.fillMaxSize().padding(24.dp),
+        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+    ) {
+        androidx.compose.material3.Icon(
+            imageVector = androidx.compose.material.icons.Icons.Default.Lock,
+            contentDescription = null,
+            modifier = Modifier.padding(bottom = 12.dp).size(42.dp),
+            tint = MaterialTheme.colorScheme.outline
+        )
+        Text(title, style = MaterialTheme.typography.headlineSmall)
+        Text(requirement, modifier = Modifier.padding(top = 8.dp), style = MaterialTheme.typography.bodyMedium)
+        Text(progress, modifier = Modifier.padding(top = 8.dp), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Button(onClick = onBack, modifier = Modifier.padding(top = 20.dp)) {
+            Text(locale.getString("back", "Back"))
         }
     }
 }
