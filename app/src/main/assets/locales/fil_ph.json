@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "Isang mabilis na Lua-powered na hamon sa numero.",
   "lua_number_rush_prompt": "Aling numero ang prime number?",
   "lua_number_rush_success": "Tama! Natukoy mo ang prime number.",
-  "lua_number_rush_failure": "Hindi pa. Ang 29 ang prime number."
+  "lua_number_rush_failure": "Hindi pa. Ang 29 ang prime number.",
+  "math_strategy_title": "🧠 Diskarte sa Math",
+  "math_strategy_description": "Nasa gitna ang midpoint sa pinakamababa at pinakamataas na numero. Subukan ito, pagkatapos gamitin ang pahiwatig na mas mataas o mas mababa para sa susunod mong hula.",
+  "math_strategy_try_midpoint": "Subukan ang midpoint: %s"
 }
