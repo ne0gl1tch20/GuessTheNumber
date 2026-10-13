@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "Nie całkiem. Liczbą pierwszą jest 29.",
   "math_strategy_title": "🧠 Strategia liczbowa",
   "math_strategy_description": "Środek przedziału leży dokładnie między najmniejszą a największą liczbą. Wypróbuj go, a potem wykorzystaj wskazówkę „wyżej” lub „niżej” przy kolejnym zgadywaniu.",
-  "math_strategy_try_midpoint": "Wypróbuj środek: %s"
+  "math_strategy_try_midpoint": "Wypróbuj środek: %s",
+  "more_locked_short": "Zablokowane · dotknij, aby zobaczyć wymagania",
+  "more_unlock_dialog_title": "Wymagania odblokowania",
+  "more_unlock_first_boss": "Pokonaj pierwszego bossa świata, aby odblokować tę funkcję.",
+  "more_unlock_all_bosses": "Pokonaj wszystkich czterech bossów świata, aby odblokować tę funkcję.",
+  "more_unlock_boss_progress": "Pokonani bossowie świata: %d / 4",
+  "more_unlock_first_boss_progress": "Pierwszy boss pokonany: %s"
 }
