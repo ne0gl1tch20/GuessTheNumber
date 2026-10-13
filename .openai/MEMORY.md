@@ -320,3 +320,28 @@ Verify the full progression loop end to end: World Map, world unlocks and portal
 - PRs #81–#90 are **planning only**. Do not bump app version or write release notes for roadmap-only additions. Preserve offline play, backward-compatible saves, localization requirements, Kotlin authority, Lua sandboxing, and the measured-only C++ rule.
 - Changes made in this turn updated `docs/JOY_PHASE_ROADMAP.md` and this memory file on branch `docs/build-channel-updater-roadmap`, associated with PR #25: https://github.com/ne0gl1tch20/GuessTheNumber/pull/25. They are not merged into `master`.
 - No build, test, emulator run, physical-device test, or GitHub Actions workflow was started. Do not imply these new roadmap items are implemented or validated.
+
+
+## Latest consolidated decisions (2026-10-13)
+
+This section supersedes older notes where they conflict with the user's latest explicit decisions. Historical entries above are retained as project history.
+
+### Official release version
+- The user explicitly decided that **the official release-day app version will be `1.0.0`**.
+- Treat the older version history as the Alpha-to-Beta development era. The official public release starts at 1.0.0.
+- The development baseline previously recorded as `3.0.2` / versionCode `20` is not to be changed merely because of this plan. Apply the release version when the user authorizes official release work, and reconcile version metadata/release notes then.
+
+### Current roadmap additions
+- The current detailed roadmap is `.openai/docs/JOY_PHASE_ROADMAP.md`, with **71 planned PRs (#24–#94)** as last recorded. Verify current branch content before relying on that count.
+- PR #93 is planned for Compose previews, hover guidance/tooltips, touch and keyboard alternatives, and extended accessibility including TalkBack, scalable text, contrast, touch targets, reduced motion, and previews for loading/empty/error/theme/localized states.
+- PR #94 is planned for app-wide hardening across all screens, features, gameplay logic, persistence, security, and engine boundaries. It includes navigation/back behavior, state restoration, loading/empty/error/retry handling, lifecycle cancellation, input validation, migrations, reward idempotency, offline behavior, permissions/privacy, update flows, and Debug/Release feature gating.
+- **Settings localization acceptance rule:** every setting, including toggles, selectors, sliders, dropdowns, and advanced options, must have a localized title and localized plain-language description explaining what it controls and its practical effect. Examples: “Enable haptics” explains when vibration happens; “Enable background music” explains optional playback behavior. Descriptions must reflect actual behavior, refresh on language changes, use correct localized placeholders, cover supported locales, and clarify global versus per-save scope. Remove or implement dead/misleading controls.
+- Audit Kotlin/Lua/C++ boundaries where present. Kotlin remains authoritative for gameplay state, persistence, reward eligibility, and claims. Lua must be resource-bounded and unable to reach restricted filesystem/network/JNI or directly mutate saves/rewards. C++/NDK remains conditional on a narrow justified use case and measured benefit; keep Kotlin fallback and parity/failure coverage. Do not force a native port if it is not beneficial.
+- Implement findings in focused PRs, not one risky rewrite. Preserve offline-first play, saves, balance, accessibility, privacy, and reward rules. Planned items are not implemented until code is changed and verified.
+
+### Repository workflow reminders
+- PR #39 (https://github.com/ne0gl1tch20/GuessTheNumber/pull/39) was last recorded open on branch `build/pr87-reproducible-artifacts`; re-check current status before relying on it.
+- User does not need actual device performance traces for PR #38's protocol. Do not initiate device profiling based on that task.
+- Never start builds, tests, emulators, physical-device tests, or GitHub Actions unless explicitly authorized. Do not claim checks passed without observing results.
+- Whenever app code/UI/gameplay/localization/config/player-facing behavior changes, update `app/src/main/assets/changelogs.md` in the same PR. Changelog entries must describe implemented changes only; planned work belongs in the roadmap.
+- For repository-change responses, include https://github.com/ne0gl1tch20/GuessTheNumber/actions and the exact sentence: **“You can build it using GitHub Actions.”**
