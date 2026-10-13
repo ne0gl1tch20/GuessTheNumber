@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "เกมท้าทายตัวเลขด้วย Lua แบบรวดเร็ว",
   "lua_number_rush_prompt": "ตัวเลขใดเป็นจำนวนเฉพาะ?",
   "lua_number_rush_success": "ถูกต้อง! คุณพบจำนวนเฉพาะแล้ว",
-  "lua_number_rush_failure": "ยังไม่ถูกต้อง 29 เป็นจำนวนเฉพาะ"
+  "lua_number_rush_failure": "ยังไม่ถูกต้อง 29 เป็นจำนวนเฉพาะ",
+  "math_strategy_title": "🧠 กลยุทธ์ตัวเลข",
+  "math_strategy_description": "จุดกึ่งกลางอยู่ระหว่างตัวเลขที่น้อยที่สุดและมากที่สุดพอดี ลองเดาตัวนี้ แล้วใช้คำใบ้ว่าสูงกว่าหรือต่ำกว่าเพื่อช่วยเดาครั้งต่อไป",
+  "math_strategy_try_midpoint": "ลองจุดกึ่งกลาง: %s"
 }
