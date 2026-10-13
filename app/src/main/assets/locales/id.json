@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "Tantangan angka singkat dengan Lua.",
   "lua_number_rush_prompt": "Angka mana yang merupakan bilangan prima?",
   "lua_number_rush_success": "Benar! Kamu menemukan bilangan prima.",
-  "lua_number_rush_failure": "Belum tepat. 29 adalah bilangan prima."
+  "lua_number_rush_failure": "Belum tepat. 29 adalah bilangan prima.",
+  "math_strategy_title": "🧠 Strategi Angka",
+  "math_strategy_description": "Titik tengah berada tepat di antara angka terkecil dan terbesar. Coba angka ini, lalu gunakan petunjuk lebih tinggi atau lebih rendah untuk tebakan berikutnya.",
+  "math_strategy_try_midpoint": "Coba titik tengah: %s"
 }
