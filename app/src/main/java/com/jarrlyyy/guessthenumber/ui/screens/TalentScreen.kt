@@ -18,6 +18,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
@@ -107,9 +110,18 @@ fun TalentScreen(state: GameState, onBuyTalent: (String, Long) -> Unit, onBack: 
                     talents.forEach { node ->
                         val bought = node.id in state.prestigeShopPurchases
                         val parentReady = node.parent == null || node.parent in state.prestigeShopPurchases
+                        val nodeTitle = locale.getString(node.titleKey, node.title)
+                        val nodeCost = locale.getString("talent_node_cost", "%d Prestige", node.cost)
+                        val nodeStatus = locale.getString(if (bought) "unlocked" else "locked", if (bought) "Unlocked" else "Locked")
                         Surface(
                             onClick = { selectedId = node.id },
-                            modifier = Modifier.offset(x = w * node.x - 60.dp, y = h * node.y - 35.dp).width(120.dp),
+                            modifier = Modifier
+                                .offset(x = w * node.x - 60.dp, y = h * node.y - 35.dp)
+                                .width(120.dp)
+                                .semantics {
+                                    contentDescription = "$nodeTitle, $nodeCost, $nodeStatus"
+                                    this.selected = node.id == selectedId
+                                },
                             shape = RoundedCornerShape(22.dp),
                             color = when { node.id == selectedId -> MaterialTheme.colorScheme.primaryContainer; bought -> MaterialTheme.colorScheme.tertiaryContainer; parentReady -> MaterialTheme.colorScheme.surface; else -> MaterialTheme.colorScheme.surfaceVariant },
                             border = if (node.id == selectedId) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
@@ -117,8 +129,8 @@ fun TalentScreen(state: GameState, onBuyTalent: (String, Long) -> Unit, onBack: 
                         ) {
                             Column(Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Icon(if (bought) Icons.Default.CheckCircle else if (parentReady) Icons.Default.Star else Icons.Default.Lock, contentDescription = null, tint = if (bought) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary)
-                                Text(locale.getString(node.titleKey, node.title), style = MaterialTheme.typography.labelMedium, maxLines = 2)
-                                Text(locale.getString("talent_node_cost", "%d Prestige", node.cost), style = MaterialTheme.typography.labelSmall)
+                                Text(nodeTitle, style = MaterialTheme.typography.labelMedium, maxLines = 2)
+                                Text(nodeCost, style = MaterialTheme.typography.labelSmall)
                             }
                         }
                     }

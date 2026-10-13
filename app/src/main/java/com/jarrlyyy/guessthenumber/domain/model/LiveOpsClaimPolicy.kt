@@ -25,6 +25,12 @@ object LiveOpsClaimPolicy {
             event.minPrestigeCount < 0 || event.minUltraCount < 0
         ) return null
 
+        // Refuse to settle rewards against corrupted progression/boost state. Clamping a
+        // negative stored value here could turn an invalid save into a successful claim.
+        if (state.correctGuesses < 0L || state.prestigeCount < 0L ||
+            state.ultraCount < 0L || state.permanentEventBoosts < 0
+        ) return null
+
         val claims = state.liveOpsClaims[event.id] ?: 0
         if (claims < 0 || claims >= event.maxClaims) return null
 
