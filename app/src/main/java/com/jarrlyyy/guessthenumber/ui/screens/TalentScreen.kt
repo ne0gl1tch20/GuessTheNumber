@@ -120,7 +120,7 @@ fun TalentScreen(state: GameState, onBuyTalent: (String, Long) -> Unit, onBack: 
                                 .width(120.dp)
                                 .semantics {
                                     contentDescription = "$nodeTitle, $nodeCost, $nodeStatus"
-                                    selected = node.id == selectedId
+                                    this.selected = node.id == selectedId
                                 },
                             shape = RoundedCornerShape(22.dp),
                             color = when { node.id == selectedId -> MaterialTheme.colorScheme.primaryContainer; bought -> MaterialTheme.colorScheme.tertiaryContainer; parentReady -> MaterialTheme.colorScheme.surface; else -> MaterialTheme.colorScheme.surfaceVariant },
