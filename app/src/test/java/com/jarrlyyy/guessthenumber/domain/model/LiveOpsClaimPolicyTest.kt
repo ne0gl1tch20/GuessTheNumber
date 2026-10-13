@@ -56,6 +56,33 @@ class LiveOpsClaimPolicyTest {
     }
 
     @Test
+    fun rejectsClaimWhenLifetimeNebulaStatisticWouldOverflow() {
+        val nearLimit = eligibleState.copy(
+            statistics = eligibleState.statistics.copy(nebulaEarned = Long.MAX_VALUE - 5L)
+        )
+
+        assertNull(LiveOpsClaimPolicy.apply(nearLimit, event))
+    }
+
+    @Test
+    fun rejectsClaimWhenLifetimeNebulaStatisticIsAlreadyNegative() {
+        val corruptedStatistic = eligibleState.copy(
+            statistics = eligibleState.statistics.copy(nebulaEarned = -1L)
+        )
+
+        assertNull(LiveOpsClaimPolicy.apply(corruptedStatistic, event))
+    }
+
+    @Test
+    fun clampsPermanentBoostWithoutIntegerOverflow() {
+        val invalidLargeValue = eligibleState.copy(permanentEventBoosts = Int.MAX_VALUE)
+        val updated = LiveOpsClaimPolicy.apply(invalidLargeValue, event)
+
+        assertNotNull(updated)
+        assertEquals(25, updated!!.permanentEventBoosts)
+    }
+
+    @Test
     fun invalidClaimDefinitionIsRejected() {
         assertNull(LiveOpsClaimPolicy.apply(eligibleState, event.copy(maxClaims = 0)))
         assertNull(LiveOpsClaimPolicy.apply(eligibleState, event.copy(rewardNebula = -1)))

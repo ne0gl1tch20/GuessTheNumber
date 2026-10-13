@@ -28,6 +28,10 @@ object LiveOpsClaimPolicy {
         val claims = state.liveOpsClaims[event.id] ?: 0
         if (claims < 0 || claims >= event.maxClaims) return null
 
+        // Long statistics must never wrap into a negative value after a reward.
+        val nebulaEarned = state.statistics.nebulaEarned
+        if (nebulaEarned < 0L || event.rewardNebula > Long.MAX_VALUE - nebulaEarned) return null
+
         val eligible = state.correctGuesses >= event.minCorrectGuesses &&
             state.prestigeCount >= event.minPrestigeCount &&
             state.ultraCount >= event.minUltraCount
@@ -36,9 +40,11 @@ object LiveOpsClaimPolicy {
         return state.copy(
             nebula = state.nebula + BigNumber(event.rewardNebula),
             liveOpsClaims = state.liveOpsClaims + (event.id to (claims + 1)),
-            permanentEventBoosts = (state.permanentEventBoosts + event.permanentBoostPerClaim).coerceAtMost(25),
+            permanentEventBoosts = (
+                state.permanentEventBoosts.toLong() + event.permanentBoostPerClaim.toLong()
+            ).coerceIn(0L, 25L).toInt(),
             statistics = state.statistics.copy(
-                nebulaEarned = state.statistics.nebulaEarned + event.rewardNebula
+                nebulaEarned = nebulaEarned + event.rewardNebula
             )
         )
     }
