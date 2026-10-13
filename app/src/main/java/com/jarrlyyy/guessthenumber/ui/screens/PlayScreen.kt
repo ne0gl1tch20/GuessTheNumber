@@ -619,6 +619,12 @@ fun PlayScreen(
                     }
                 }
             }
+            item(key = "early_goal_board") {
+                EarlyGoalBoard(
+                    state = state,
+                    locale = locale
+                )
+            }
             item(key = "beyond_numbers_hub") {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -699,6 +705,130 @@ fun PlayScreen(
                     locale = locale,
                     onAction = onWorldAction
                 )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun EarlyGoalBoard(
+    state: GameState,
+    locale: com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+) {
+    data class Goal(
+        val id: String,
+        val titleKey: String,
+        val descriptionKey: String,
+        val progressLabel: String,
+        val progressFraction: Float,
+        val complete: Boolean,
+        val reward: Long
+    )
+
+    val correctProgress = state.correctGuesses.coerceIn(0, 10).toInt()
+    val streakProgress = state.bestStreak.coerceIn(0, 5)
+    val moneyGoal = com.jarrlyyy.guessthenumber.domain.model.BigNumber(1_000_000)
+    val moneyProgress = (state.money.value.toDouble() / 1_000_000.0).coerceIn(0.0, 1.0).toFloat()
+    val goals = listOf(
+        Goal(
+            id = "correct_10",
+            titleKey = "achievement_correct_10_name",
+            descriptionKey = "achievement_correct_10_desc",
+            progressLabel = locale.getString("achievement_progress_format", correctProgress, 10),
+            progressFraction = correctProgress / 10f,
+            complete = state.correctGuesses >= 10,
+            reward = 10L
+        ),
+        Goal(
+            id = "streak_5",
+            titleKey = "achievement_streak_5_name",
+            descriptionKey = "achievement_streak_5_desc",
+            progressLabel = locale.getString("achievement_progress_format", streakProgress, 5),
+            progressFraction = streakProgress / 5f,
+            complete = state.bestStreak >= 5,
+            reward = 25L
+        ),
+        Goal(
+            id = "millionaire",
+            titleKey = "achievement_millionaire_name",
+            descriptionKey = "achievement_millionaire_desc",
+            progressLabel = state.money.format(state.settings.numberNotation),
+            progressFraction = moneyProgress,
+            complete = state.money >= moneyGoal,
+            reward = 50L
+        )
+    )
+
+    Card(
+        modifier = Modifier.fillMaxWidth().animateContentSize(),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+    ) {
+        Column(
+            Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Surface(
+                    shape = MaterialTheme.shapes.large,
+                    color = MaterialTheme.colorScheme.primaryContainer
+                ) {
+                    Icon(
+                        Icons.Default.EmojiEvents,
+                        contentDescription = null,
+                        modifier = Modifier.padding(10.dp),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+                Column(Modifier.weight(1f)) {
+                    Text(locale.getString("achievement_progress_title"), style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        locale.getString("achievement_progress_desc"),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            goals.forEach { goal ->
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(locale.getString(goal.titleKey), style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                locale.getString(goal.descriptionKey),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                locale.getString(if (goal.complete) "unlocked" else "locked"),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = if (goal.complete) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                locale.getString("reward_format", goal.reward.toString()),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        }
+                    }
+                    LinearProgressIndicator(
+                        progress = { goal.progressFraction.coerceIn(0f, 1f) },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = if (goal.complete) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                    Text(goal.progressLabel, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
     }
