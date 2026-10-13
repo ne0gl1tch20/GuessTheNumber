@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "Pas tout à fait. 29 est le nombre premier.",
   "math_strategy_title": "🧠 Stratégie numérique",
   "math_strategy_description": "Le milieu se trouve à mi-chemin entre le nombre le plus bas et le plus haut. Essaie-le, puis utilise l’indice « plus haut » ou « plus bas » pour ton prochain essai.",
-  "math_strategy_try_midpoint": "Essayer le milieu : %s"
+  "math_strategy_try_midpoint": "Essayer le milieu : %s",
+  "more_locked_short": "Verrouillé · appuyez pour voir les conditions",
+  "more_unlock_dialog_title": "Conditions de déblocage",
+  "more_unlock_first_boss": "Battez votre premier boss mondial pour débloquer cette fonctionnalité.",
+  "more_unlock_all_bosses": "Battez les quatre boss mondiaux pour débloquer cette fonctionnalité.",
+  "more_unlock_boss_progress": "Boss mondiaux vaincus : %d / 4",
+  "more_unlock_first_boss_progress": "Premier boss vaincu : %s"
 }
