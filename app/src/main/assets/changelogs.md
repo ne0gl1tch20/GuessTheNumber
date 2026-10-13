@@ -1,6 +1,6 @@
 ## Unreleased (Post-v3.0.2 Development Updates)
 
-- ♿ **Guidance and UI previews**: Added a TalkBack-labeled guidance button with hover/long-press tooltip support and preview fixtures for loading, empty, error, theme, and Filipino-localized states. Essential actions remain normal button clicks.
+- ♿ **Guidance and UI previews**: Added a TalkBack-labeled guidance button with hover/long-press tooltip support and preview fixtures for loading, empty, error, app-themed light/dark modes, and Filipino-localized states. Essential actions remain normal button clicks.
 
 - 🎯 **Early progression goals**: Added live progress and reward spotlights for the existing Novice Guesser, Streak Master, and Number Millionaire milestones on the Play screen.
 - 🧮 **Optional Math Strategy Lab**: Added a collapsible midpoint guide that can suggest a guess without submitting it automatically or revealing the hidden target.
