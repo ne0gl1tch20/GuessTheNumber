@@ -21,6 +21,7 @@ class LocaleManagerTest {
         LocaleManager.supportedLocales.forEach { supported ->
             manager.loadLocale(supported.fileName)
             assertEquals(supported.tag, manager.getCurrentLocaleTag())
+            assertEquals("RTL metadata mismatch for ${supported.tag}", supported.rtl, manager.isRtl())
             assertTrue(manager.getString("play").isNotBlank())
             assertTrue(manager.getString("settings").isNotBlank())
             assertTrue(manager.getString("save_slots").isNotBlank())
@@ -44,6 +45,27 @@ class LocaleManagerTest {
             assertTrue(!updated.contains("%d"))
             assertTrue(!updated.contains("%s"))
         }
+    }
+
+    @Test
+    fun switchingLocalesOnTheSameManagerRefreshesTextFormattingAndDirection() = runBlocking {
+        val manager = LocaleManager(context)
+
+        manager.loadLocaleForTag("en-US")
+        assertEquals("Settings", manager.getString("settings"))
+        assertEquals(false, manager.isRtl())
+
+        manager.loadLocaleForTag("fil-PH")
+        assertEquals("Mga Setting", manager.getString("settings"))
+        assertEquals(false, manager.isRtl())
+
+        manager.loadLocaleForTag("ar-SA")
+        assertEquals("الإعدادات", manager.getString("settings"))
+        assertEquals(true, manager.isRtl())
+
+        manager.loadLocaleForTag("en-US")
+        assertEquals("Settings", manager.getString("settings"))
+        assertEquals(false, manager.isRtl())
     }
 
     @Test
