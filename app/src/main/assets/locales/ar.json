@@ -1060,5 +1060,11 @@
   "lua_number_rush_failure": "ليس تمامًا. 29 هو العدد الأولي.",
   "math_strategy_title": "🧠 استراتيجية الأرقام",
   "math_strategy_description": "يقع المنتصف تمامًا بين أصغر رقم وأكبر رقم. جرّبه، ثم استخدم تلميح أعلى أو أقل لتوجيه تخمينك التالي.",
-  "math_strategy_try_midpoint": "جرّب المنتصف: %s"
+  "math_strategy_try_midpoint": "جرّب المنتصف: %s",
+  "more_locked_short": "مقفل · اضغط لعرض المتطلبات",
+  "more_unlock_dialog_title": "متطلبات الفتح",
+  "more_unlock_first_boss": "اهزم أول زعيم عالمي لفتح هذه الميزة.",
+  "more_unlock_all_bosses": "اهزم زعماء العالم الأربعة لفتح هذه الميزة.",
+  "more_unlock_boss_progress": "زعماء العالم المهزومون: %d / 4",
+  "more_unlock_first_boss_progress": "تم هزيمة الزعيم الأول: %s"
 }
