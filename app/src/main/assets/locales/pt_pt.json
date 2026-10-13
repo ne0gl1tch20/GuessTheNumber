@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "Um desafio numérico rápido com Lua.",
   "lua_number_rush_prompt": "Que número é primo?",
   "lua_number_rush_success": "Correto! Encontraste o número primo.",
-  "lua_number_rush_failure": "Não exatamente. 29 é o número primo."
+  "lua_number_rush_failure": "Não exatamente. 29 é o número primo.",
+  "math_strategy_title": "🧠 Estratégia numérica",
+  "math_strategy_description": "O ponto médio fica exatamente entre o número mais baixo e o mais alto. Experimenta-o e usa a pista de mais alto ou mais baixo na próxima tentativa.",
+  "math_strategy_try_midpoint": "Experimentar ponto médio: %s"
 }
