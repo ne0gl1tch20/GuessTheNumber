@@ -80,6 +80,12 @@ def check_workflow_python_commands(errors: list[str], notes: list[str]) -> None:
         errors.append(f"cannot read workflow: {exc}")
         return
 
+    if "uses: gradle/actions/setup-gradle@v4" not in workflow:
+        errors.append("workflow must use setup-gradle v4 for wrapper validation")
+
+    if "tools/write_build_artifact_metadata.py" not in workflow:
+        errors.append("workflow must write build metadata for APK artifacts")
+
     commands = re.findall(r"python3\s+([\w./-]+\.py)", workflow)
     if not commands:
         errors.append("workflow contains no explicit python3 script commands")
