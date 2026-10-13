@@ -38,6 +38,9 @@ jobs:
       - name: Validate Localizations
         run: python3 tools/validate_locales.py
 
+      - name: Validate Localization Release Gate
+        run: python3 tools/validate_localization_release_gate.py
+
       - name: Validate Version Metadata
         run: python3 tools/validate_versions.py
 
