@@ -1056,5 +1056,8 @@
   "lua_number_rush_description": "Een korte cijferuitdaging met Lua.",
   "lua_number_rush_prompt": "Welk getal is een priemgetal?",
   "lua_number_rush_success": "Goed! Je hebt het priemgetal gevonden.",
-  "lua_number_rush_failure": "Niet helemaal. 29 is het priemgetal."
+  "lua_number_rush_failure": "Niet helemaal. 29 is het priemgetal.",
+  "math_strategy_title": "🧠 Getallenstrategie",
+  "math_strategy_description": "Het midden ligt precies tussen het laagste en hoogste getal. Probeer het en gebruik daarna de aanwijzing hoger of lager voor je volgende gok.",
+  "math_strategy_try_midpoint": "Midden proberen: %s"
 }
