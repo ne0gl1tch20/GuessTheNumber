@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Battez votre premier boss mondial pour débloquer cette fonctionnalité.",
   "more_unlock_all_bosses": "Battez les quatre boss mondiaux pour débloquer cette fonctionnalité.",
   "more_unlock_boss_progress": "Boss mondiaux vaincus : %d / 4",
-  "more_unlock_first_boss_progress": "Premier boss vaincu : %s"
+  "more_unlock_first_boss_progress": "Premier boss vaincu : %s",
+  "update_channel_label": "Canal de mise à jour : %s",
+  "update_channel_release": "Canal de publication",
+  "update_channel_debug": "Canal de débogage",
+  "update_check": "Rechercher des mises à jour",
+  "update_checking": "Recherche des mises à jour…",
+  "update_available": "Une mise à jour est disponible.",
+  "update_up_to_date": "Vous êtes à jour.",
+  "update_unavailable": "Impossible de vérifier les mises à jour. Réessayez plus tard.",
+  "update_open": "Ouvrir la page de mise à jour"
 }

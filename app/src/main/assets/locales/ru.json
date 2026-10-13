@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Победите первого мирового босса, чтобы разблокировать эту функцию.",
   "more_unlock_all_bosses": "Победите всех четырёх мировых боссов, чтобы разблокировать эту функцию.",
   "more_unlock_boss_progress": "Побеждённые мировые боссы: %d / 4",
-  "more_unlock_first_boss_progress": "Первый босс побеждён: %s"
+  "more_unlock_first_boss_progress": "Первый босс побеждён: %s",
+  "update_channel_label": "Канал обновлений: %s",
+  "update_channel_release": "Канал релиза",
+  "update_channel_debug": "Канал отладки",
+  "update_check": "Проверить обновления",
+  "update_checking": "Проверка обновлений…",
+  "update_available": "Доступно обновление.",
+  "update_up_to_date": "У вас последняя версия.",
+  "update_unavailable": "Не удалось проверить обновления. Попробуйте позже.",
+  "update_open": "Открыть страницу обновления"
 }

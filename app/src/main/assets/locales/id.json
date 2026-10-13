@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Kalahkan bos dunia pertamamu untuk membuka fitur ini.",
   "more_unlock_all_bosses": "Kalahkan keempat bos dunia untuk membuka fitur ini.",
   "more_unlock_boss_progress": "Bos dunia yang dikalahkan: %d / 4",
-  "more_unlock_first_boss_progress": "Bos pertama dikalahkan: %s"
+  "more_unlock_first_boss_progress": "Bos pertama dikalahkan: %s",
+  "update_channel_label": "Saluran pembaruan: %s",
+  "update_channel_release": "Saluran rilis",
+  "update_channel_debug": "Saluran debug",
+  "update_check": "Periksa pembaruan",
+  "update_checking": "Memeriksa pembaruan…",
+  "update_available": "Pembaruan tersedia.",
+  "update_up_to_date": "Versi sudah terbaru.",
+  "update_unavailable": "Tidak dapat memeriksa pembaruan. Coba lagi nanti.",
+  "update_open": "Buka halaman pembaruan"
 }

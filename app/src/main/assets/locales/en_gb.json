@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Defeat your first world boss to unlock this feature.",
   "more_unlock_all_bosses": "Defeat all four world bosses to unlock this feature.",
   "more_unlock_boss_progress": "World bosses defeated: %d / 4",
-  "more_unlock_first_boss_progress": "First boss defeated: %s"
+  "more_unlock_first_boss_progress": "First boss defeated: %s",
+  "update_channel_label": "Update channel: %s",
+  "update_channel_release": "Release channel",
+  "update_channel_debug": "Debug channel",
+  "update_check": "Check for updates",
+  "update_checking": "Checking for updates…",
+  "update_available": "An update is available.",
+  "update_up_to_date": "You're up to date.",
+  "update_unavailable": "Couldn't check for updates. Try again later.",
+  "update_open": "Open update page"
 }

@@ -30,6 +30,8 @@ android {
             .filterNot(Char::isWhitespace)
         buildConfigField("String", "LIVEOPS_MANIFEST_URL", "\"$liveOpsManifestUrl\"")
         buildConfigField("String", "LIVEOPS_PUBLIC_KEY_BASE64", "\"$liveOpsPublicKey\"")
+        val buildCommitSha = System.getenv("GITHUB_SHA") ?: "unknown"
+        buildConfigField("String", "GIT_COMMIT_SHA", "\"$buildCommitSha\"")
         applicationId = "com.jarrlyyy.guessthenumber"
         minSdk = 26
         targetSdk = 35
@@ -55,6 +57,7 @@ android {
 
     buildTypes {
         release {
+            buildConfigField("String", "UPDATE_CHANNEL", "\"release\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -62,6 +65,7 @@ android {
             )
         }
         debug {
+            buildConfigField("String", "UPDATE_CHANNEL", "\"debug\"")
             applicationIdSuffix = ".debug"
             isDebuggable = true
             if (hasProjectDebugKeystore) {

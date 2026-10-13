@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "击败第一个世界首领即可解锁此功能。",
   "more_unlock_all_bosses": "击败全部四个世界首领即可解锁此功能。",
   "more_unlock_boss_progress": "已击败的世界首领：%d / 4",
-  "more_unlock_first_boss_progress": "已击败第一个首领：%s"
+  "more_unlock_first_boss_progress": "已击败第一个首领：%s",
+  "update_channel_label": "更新渠道：%s",
+  "update_channel_release": "正式版渠道",
+  "update_channel_debug": "调试版渠道",
+  "update_check": "检查更新",
+  "update_checking": "正在检查更新…",
+  "update_available": "有可用更新。",
+  "update_up_to_date": "当前已是最新版本。",
+  "update_unavailable": "无法检查更新，请稍后重试。",
+  "update_open": "打开更新页面"
 }

@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "เอาชนะบอสโลกตัวแรกเพื่อปลดล็อกฟีเจอร์นี้",
   "more_unlock_all_bosses": "เอาชนะบอสโลกทั้ง 4 ตัวเพื่อปลดล็อกฟีเจอร์นี้",
   "more_unlock_boss_progress": "บอสโลกที่เอาชนะแล้ว: %d / 4",
-  "more_unlock_first_boss_progress": "เอาชนะบอสตัวแรกแล้ว: %s"
+  "more_unlock_first_boss_progress": "เอาชนะบอสตัวแรกแล้ว: %s",
+  "update_channel_label": "ช่องทางอัปเดต: %s",
+  "update_channel_release": "ช่องทางรุ่นเผยแพร่",
+  "update_channel_debug": "ช่องทางดีบัก",
+  "update_check": "ตรวจสอบการอัปเดต",
+  "update_checking": "กำลังตรวจสอบการอัปเดต…",
+  "update_available": "มีอัปเดตพร้อมใช้งาน",
+  "update_up_to_date": "คุณใช้เวอร์ชันล่าสุดแล้ว",
+  "update_unavailable": "ตรวจสอบการอัปเดตไม่ได้ โปรดลองอีกครั้งภายหลัง",
+  "update_open": "เปิดหน้าการอัปเดต"
 }

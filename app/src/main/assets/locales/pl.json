@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Pokonaj pierwszego bossa świata, aby odblokować tę funkcję.",
   "more_unlock_all_bosses": "Pokonaj wszystkich czterech bossów świata, aby odblokować tę funkcję.",
   "more_unlock_boss_progress": "Pokonani bossowie świata: %d / 4",
-  "more_unlock_first_boss_progress": "Pierwszy boss pokonany: %s"
+  "more_unlock_first_boss_progress": "Pierwszy boss pokonany: %s",
+  "update_channel_label": "Kanał aktualizacji: %s",
+  "update_channel_release": "Kanał wydania",
+  "update_channel_debug": "Kanał debugowania",
+  "update_check": "Sprawdź aktualizacje",
+  "update_checking": "Sprawdzanie aktualizacji…",
+  "update_available": "Dostępna jest aktualizacja.",
+  "update_up_to_date": "Masz najnowszą wersję.",
+  "update_unavailable": "Nie można sprawdzić aktualizacji. Spróbuj później.",
+  "update_open": "Otwórz stronę aktualizacji"
 }

@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Versla je eerste wereldbaas om deze functie te ontgrendelen.",
   "more_unlock_all_bosses": "Versla alle vier wereldbazen om deze functie te ontgrendelen.",
   "more_unlock_boss_progress": "Verslagen wereldbazen: %d / 4",
-  "more_unlock_first_boss_progress": "Eerste baas verslagen: %s"
+  "more_unlock_first_boss_progress": "Eerste baas verslagen: %s",
+  "update_channel_label": "Updatekanaal: %s",
+  "update_channel_release": "Releasekanaal",
+  "update_channel_debug": "Debugkanaal",
+  "update_check": "Controleren op updates",
+  "update_checking": "Updates controleren…",
+  "update_available": "Er is een update beschikbaar.",
+  "update_up_to_date": "Je bent up-to-date.",
+  "update_unavailable": "Updates controleren is mislukt. Probeer het later opnieuw.",
+  "update_open": "Updatepagina openen"
 }

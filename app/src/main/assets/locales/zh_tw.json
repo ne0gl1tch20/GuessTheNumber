@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "擊敗第一個世界首領即可解鎖此功能。",
   "more_unlock_all_bosses": "擊敗全部四個世界首領即可解鎖此功能。",
   "more_unlock_boss_progress": "已擊敗的世界首領：%d / 4",
-  "more_unlock_first_boss_progress": "已擊敗第一個首領：%s"
+  "more_unlock_first_boss_progress": "已擊敗第一個首領：%s",
+  "update_channel_label": "更新管道：%s",
+  "update_channel_release": "正式版管道",
+  "update_channel_debug": "偵錯版管道",
+  "update_check": "檢查更新",
+  "update_checking": "正在檢查更新…",
+  "update_available": "有可用更新。",
+  "update_up_to_date": "目前已是最新版本。",
+  "update_unavailable": "無法檢查更新，請稍後再試。",
+  "update_open": "開啟更新頁面"
 }

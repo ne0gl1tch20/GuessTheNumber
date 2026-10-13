@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Talunin ang una mong world boss para ma-unlock ang feature na ito.",
   "more_unlock_all_bosses": "Talunin ang lahat ng apat na world boss para ma-unlock ang feature na ito.",
   "more_unlock_boss_progress": "Mga world boss na natalo: %d / 4",
-  "more_unlock_first_boss_progress": "Natalo na ang unang boss: %s"
+  "more_unlock_first_boss_progress": "Natalo na ang unang boss: %s",
+  "update_channel_label": "Channel ng update: %s",
+  "update_channel_release": "Release channel",
+  "update_channel_debug": "Debug channel",
+  "update_check": "Tingnan ang mga update",
+  "update_checking": "Tinitingnan ang mga update…",
+  "update_available": "May available na update.",
+  "update_up_to_date": "Pinakabago na ang bersyon mo.",
+  "update_unavailable": "Hindi masuri ang mga update. Subukan ulit mamaya.",
+  "update_open": "Buksan ang pahina ng update"
 }

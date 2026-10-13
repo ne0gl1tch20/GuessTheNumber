@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Besiege deinen ersten Weltboss, um diese Funktion freizuschalten.",
   "more_unlock_all_bosses": "Besiege alle vier Weltbosse, um diese Funktion freizuschalten.",
   "more_unlock_boss_progress": "Besiegte Weltbosse: %d / 4",
-  "more_unlock_first_boss_progress": "Erster Boss besiegt: %s"
+  "more_unlock_first_boss_progress": "Erster Boss besiegt: %s",
+  "update_channel_label": "Update-Kanal: %s",
+  "update_channel_release": "Release-Kanal",
+  "update_channel_debug": "Debug-Kanal",
+  "update_check": "Nach Updates suchen",
+  "update_checking": "Suche nach Updates…",
+  "update_available": "Ein Update ist verfügbar.",
+  "update_up_to_date": "Du bist auf dem neuesten Stand.",
+  "update_unavailable": "Updates konnten nicht geprüft werden. Versuche es später erneut.",
+  "update_open": "Update-Seite öffnen"
 }
