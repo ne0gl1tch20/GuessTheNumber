@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Derrote seu primeiro chefe mundial para desbloquear este recurso.",
   "more_unlock_all_bosses": "Derrote os quatro chefes mundiais para desbloquear este recurso.",
   "more_unlock_boss_progress": "Chefes mundiais derrotados: %d / 4",
-  "more_unlock_first_boss_progress": "Primeiro chefe derrotado: %s"
+  "more_unlock_first_boss_progress": "Primeiro chefe derrotado: %s",
+  "update_channel_label": "Canal de atualização: %s",
+  "update_channel_release": "Canal de lançamento",
+  "update_channel_debug": "Canal de depuração",
+  "update_check": "Verificar atualizações",
+  "update_checking": "Verificando atualizações…",
+  "update_available": "Há uma atualização disponível.",
+  "update_up_to_date": "Você está usando a versão mais recente.",
+  "update_unavailable": "Não foi possível verificar atualizações. Tente novamente mais tarde.",
+  "update_open": "Abrir página da atualização"
 }

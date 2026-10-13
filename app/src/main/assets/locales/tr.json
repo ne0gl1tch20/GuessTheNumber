@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Bu özelliğin kilidini açmak için ilk dünya bossunu yen.",
   "more_unlock_all_bosses": "Bu özelliğin kilidini açmak için dört dünya bossunun tamamını yen.",
   "more_unlock_boss_progress": "Yenilen dünya bossları: %d / 4",
-  "more_unlock_first_boss_progress": "İlk boss yenildi: %s"
+  "more_unlock_first_boss_progress": "İlk boss yenildi: %s",
+  "update_channel_label": "Güncelleme kanalı: %s",
+  "update_channel_release": "Yayın kanalı",
+  "update_channel_debug": "Hata ayıklama kanalı",
+  "update_check": "Güncellemeleri denetle",
+  "update_checking": "Güncellemeler denetleniyor…",
+  "update_available": "Bir güncelleme var.",
+  "update_up_to_date": "En güncel sürümü kullanıyorsunuz.",
+  "update_unavailable": "Güncellemeler denetlenemedi. Daha sonra tekrar deneyin.",
+  "update_open": "Güncelleme sayfasını aç"
 }

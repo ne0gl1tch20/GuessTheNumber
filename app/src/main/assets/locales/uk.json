@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Переможіть першого світового боса, щоб розблокувати цю функцію.",
   "more_unlock_all_bosses": "Переможіть усіх чотирьох світових босів, щоб розблокувати цю функцію.",
   "more_unlock_boss_progress": "Переможені світові боси: %d / 4",
-  "more_unlock_first_boss_progress": "Першого боса переможено: %s"
+  "more_unlock_first_boss_progress": "Першого боса переможено: %s",
+  "update_channel_label": "Канал оновлень: %s",
+  "update_channel_release": "Канал релізу",
+  "update_channel_debug": "Канал налагодження",
+  "update_check": "Перевірити оновлення",
+  "update_checking": "Перевірка оновлень…",
+  "update_available": "Доступне оновлення.",
+  "update_up_to_date": "У вас найновіша версія.",
+  "update_unavailable": "Не вдалося перевірити оновлення. Спробуйте пізніше.",
+  "update_open": "Відкрити сторінку оновлення"
 }

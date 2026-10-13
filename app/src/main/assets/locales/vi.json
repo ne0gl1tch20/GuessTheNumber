@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "Đánh bại trùm thế giới đầu tiên để mở khóa tính năng này.",
   "more_unlock_all_bosses": "Đánh bại cả bốn trùm thế giới để mở khóa tính năng này.",
   "more_unlock_boss_progress": "Số trùm thế giới đã đánh bại: %d / 4",
-  "more_unlock_first_boss_progress": "Đã đánh bại trùm đầu tiên: %s"
+  "more_unlock_first_boss_progress": "Đã đánh bại trùm đầu tiên: %s",
+  "update_channel_label": "Kênh cập nhật: %s",
+  "update_channel_release": "Kênh phát hành",
+  "update_channel_debug": "Kênh gỡ lỗi",
+  "update_check": "Kiểm tra cập nhật",
+  "update_checking": "Đang kiểm tra cập nhật…",
+  "update_available": "Có bản cập nhật.",
+  "update_up_to_date": "Bạn đang dùng phiên bản mới nhất.",
+  "update_unavailable": "Không thể kiểm tra cập nhật. Hãy thử lại sau.",
+  "update_open": "Mở trang cập nhật"
 }

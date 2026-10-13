@@ -6,7 +6,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
+import com.jarrlyyy.guessthenumber.data.repository.UpdateChannelChecker
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,6 +33,16 @@ fun AboutScreen(
     val versionName = BuildConfig.VERSION_NAME
     val versionCode = BuildConfig.VERSION_CODE
     val locale = viewModel.localeManager
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var checkingUpdates by remember { mutableStateOf(false) }
+    var updateMessage by remember { mutableStateOf<String?>(null) }
+    var availableUpdate by remember { mutableStateOf<UpdateChannelChecker.AvailableUpdate?>(null) }
+    val channelLabel = if (BuildConfig.UPDATE_CHANNEL == "debug") {
+        locale.getString("update_channel_debug", "Debug channel")
+    } else {
+        locale.getString("update_channel_release", "Release channel")
+    }
 
     val libraries = listOf(
         OpenSourceLibrary("Jetpack Compose", "Apache 2.0", "Google / Android Open Source Project"),
@@ -78,6 +98,65 @@ fun AboutScreen(
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.primary
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            locale.getString("update_channel_label", "Update channel: %s", channelLabel),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    checkingUpdates = true
+                                    updateMessage = null
+                                    availableUpdate = null
+                                    when (val result = UpdateChannelChecker.check()) {
+                                        is UpdateChannelChecker.Result.Available -> {
+                                            availableUpdate = result.update
+                                            updateMessage = locale.getString("update_available", "An update is available.")
+                                        }
+                                        UpdateChannelChecker.Result.UpToDate -> {
+                                            updateMessage = locale.getString("update_up_to_date", "You're up to date.")
+                                        }
+                                        UpdateChannelChecker.Result.Unavailable -> {
+                                            updateMessage = locale.getString("update_unavailable", "Couldn't check for updates. Try again later.")
+                                        }
+                                    }
+                                    checkingUpdates = false
+                                }
+                            },
+                            enabled = !checkingUpdates,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            if (checkingUpdates) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(locale.getString("update_checking", "Checking for updates…"))
+                            } else {
+                                Text(locale.getString("update_check", "Check for updates"))
+                            }
+                        }
+                        updateMessage?.let { message ->
+                            Text(message, style = MaterialTheme.typography.bodyMedium)
+                        }
+                        availableUpdate?.let { update ->
+                            Text(update.title, style = MaterialTheme.typography.titleSmall)
+                            if (update.details.isNotBlank()) {
+                                Text(update.details, style = MaterialTheme.typography.bodySmall)
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(update.url)))
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(locale.getString("update_open", "Open update page"))
+                            }
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             locale.getString(

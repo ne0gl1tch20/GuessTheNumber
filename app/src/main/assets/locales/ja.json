@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "この機能をアンロックするには、最初のワールドボスを倒してください。",
   "more_unlock_all_bosses": "この機能をアンロックするには、4体すべてのワールドボスを倒してください。",
   "more_unlock_boss_progress": "撃破したワールドボス: %d / 4",
-  "more_unlock_first_boss_progress": "最初のボス撃破: %s"
+  "more_unlock_first_boss_progress": "最初のボス撃破: %s",
+  "update_channel_label": "更新チャンネル: %s",
+  "update_channel_release": "リリースチャンネル",
+  "update_channel_debug": "デバッグチャンネル",
+  "update_check": "更新を確認",
+  "update_checking": "更新を確認中…",
+  "update_available": "更新があります。",
+  "update_up_to_date": "最新バージョンです。",
+  "update_unavailable": "更新を確認できませんでした。後でもう一度お試しください。",
+  "update_open": "更新ページを開く"
 }

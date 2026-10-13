@@ -1066,5 +1066,14 @@
   "more_unlock_first_boss": "اهزم أول زعيم عالمي لفتح هذه الميزة.",
   "more_unlock_all_bosses": "اهزم زعماء العالم الأربعة لفتح هذه الميزة.",
   "more_unlock_boss_progress": "زعماء العالم المهزومون: %d / 4",
-  "more_unlock_first_boss_progress": "تم هزيمة الزعيم الأول: %s"
+  "more_unlock_first_boss_progress": "تم هزيمة الزعيم الأول: %s",
+  "update_channel_label": "قناة التحديث: %s",
+  "update_channel_release": "قناة الإصدار",
+  "update_channel_debug": "قناة التصحيح",
+  "update_check": "التحقق من التحديثات",
+  "update_checking": "جارٍ التحقق من التحديثات…",
+  "update_available": "يتوفر تحديث.",
+  "update_up_to_date": "أنت تستخدم أحدث إصدار.",
+  "update_unavailable": "تعذر التحقق من التحديثات. حاول لاحقًا.",
+  "update_open": "فتح صفحة التحديث"
 }

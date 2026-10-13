@@ -1065,5 +1065,14 @@
   "more_unlock_first_boss": "इस सुविधा को अनलॉक करने के लिए अपना पहला वर्ल्ड बॉस हराएँ।",
   "more_unlock_all_bosses": "इस सुविधा को अनलॉक करने के लिए सभी चार वर्ल्ड बॉस हराएँ।",
   "more_unlock_boss_progress": "हराए गए वर्ल्ड बॉस: %d / 4",
-  "more_unlock_first_boss_progress": "पहला बॉस हराया: %s"
+  "more_unlock_first_boss_progress": "पहला बॉस हराया: %s",
+  "update_channel_label": "अपडेट चैनल: %s",
+  "update_channel_release": "रिलीज़ चैनल",
+  "update_channel_debug": "डीबग चैनल",
+  "update_check": "अपडेट देखें",
+  "update_checking": "अपडेट देखे जा रहे हैं…",
+  "update_available": "अपडेट उपलब्ध है।",
+  "update_up_to_date": "आपका संस्करण नवीनतम है।",
+  "update_unavailable": "अपडेट नहीं देख सके। बाद में फिर कोशिश करें।",
+  "update_open": "अपडेट पेज खोलें"
 }
