@@ -1,5 +1,7 @@
 ## Unreleased (Post-v3.0.2 Development Updates)
 
+- ♿ **Accessible progression maps**: World Map and Prestige Skill Tree nodes now expose localized names, lock/unlock status, costs where applicable, and selected state to accessibility services instead of relying on color, borders, or emoji alone.
+
 - ♿ **Guidance and UI previews**: Added a TalkBack-labeled guidance button with hover/long-press tooltip support and preview fixtures for loading, empty, error, app-themed light/dark modes, and Filipino-localized states. Essential actions remain normal button clicks.
 
 - 🎯 **Early progression goals**: Added live progress and reward spotlights for the existing Novice Guesser, Streak Master, and Number Millionaire milestones on the Play screen.
