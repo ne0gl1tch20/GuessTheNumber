@@ -6,6 +6,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -566,11 +567,10 @@ private fun FeatureProgressionLockedScreen(
         verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
         horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
     ) {
-        androidx.compose.material3.Icon(
-            imageVector = androidx.compose.material.icons.Icons.Default.Lock,
-            contentDescription = null,
+        Text(
+            text = "🔒",
             modifier = Modifier.padding(bottom = 12.dp).size(42.dp),
-            tint = MaterialTheme.colorScheme.outline
+            style = MaterialTheme.typography.headlineMedium
         )
         Text(title, style = MaterialTheme.typography.headlineSmall)
         Text(requirement, modifier = Modifier.padding(top = 8.dp), style = MaterialTheme.typography.bodyMedium)
