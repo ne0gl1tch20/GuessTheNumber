@@ -1059,5 +1059,11 @@
   "lua_number_rush_failure": "ยังไม่ถูกต้อง 29 เป็นจำนวนเฉพาะ",
   "math_strategy_title": "🧠 กลยุทธ์ตัวเลข",
   "math_strategy_description": "จุดกึ่งกลางอยู่ระหว่างตัวเลขที่น้อยที่สุดและมากที่สุดพอดี ลองเดาตัวนี้ แล้วใช้คำใบ้ว่าสูงกว่าหรือต่ำกว่าเพื่อช่วยเดาครั้งต่อไป",
-  "math_strategy_try_midpoint": "ลองจุดกึ่งกลาง: %s"
+  "math_strategy_try_midpoint": "ลองจุดกึ่งกลาง: %s",
+  "more_locked_short": "ล็อกอยู่ · แตะเพื่อดูเงื่อนไข",
+  "more_unlock_dialog_title": "เงื่อนไขการปลดล็อก",
+  "more_unlock_first_boss": "เอาชนะบอสโลกตัวแรกเพื่อปลดล็อกฟีเจอร์นี้",
+  "more_unlock_all_bosses": "เอาชนะบอสโลกทั้ง 4 ตัวเพื่อปลดล็อกฟีเจอร์นี้",
+  "more_unlock_boss_progress": "บอสโลกที่เอาชนะแล้ว: %d / 4",
+  "more_unlock_first_boss_progress": "เอาชนะบอสตัวแรกแล้ว: %s"
 }
