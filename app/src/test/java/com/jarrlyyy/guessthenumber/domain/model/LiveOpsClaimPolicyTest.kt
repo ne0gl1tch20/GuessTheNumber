@@ -83,8 +83,27 @@ class LiveOpsClaimPolicyTest {
     }
 
     @Test
+    fun rejectsClaimsWhenStoredProgressionOrBoostStateIsNegative() {
+        val corruptedStates = listOf(
+            eligibleState.copy(correctGuesses = -1L),
+            eligibleState.copy(prestigeCount = -1L),
+            eligibleState.copy(ultraCount = -1L),
+            eligibleState.copy(permanentEventBoosts = -1)
+        )
+
+        corruptedStates.forEach { corrupted ->
+            assertNull(LiveOpsClaimPolicy.apply(corrupted, event))
+        }
+    }
+
+    @Test
     fun invalidClaimDefinitionIsRejected() {
+        assertNull(LiveOpsClaimPolicy.apply(eligibleState, event.copy(id = " ")))
         assertNull(LiveOpsClaimPolicy.apply(eligibleState, event.copy(maxClaims = 0)))
         assertNull(LiveOpsClaimPolicy.apply(eligibleState, event.copy(rewardNebula = -1)))
+        assertNull(LiveOpsClaimPolicy.apply(eligibleState, event.copy(permanentBoostPerClaim = -1)))
+        assertNull(LiveOpsClaimPolicy.apply(eligibleState, event.copy(minCorrectGuesses = -1)))
+        assertNull(LiveOpsClaimPolicy.apply(eligibleState, event.copy(minPrestigeCount = -1)))
+        assertNull(LiveOpsClaimPolicy.apply(eligibleState, event.copy(minUltraCount = -1)))
     }
 }
