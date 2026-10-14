@@ -523,6 +523,19 @@ fun SettingsScreen(
             }
 
             item {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(locale.getString("sfx_volume_format", "Sound Effects Volume: %d%%", (settings.sfxVolume * 100).toInt()), style = MaterialTheme.typography.bodyLarge)
+                    Text(locale.getString("settings_desc_sfx_volume", "Adjust sound-effect loudness independently of background music."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Slider(
+                        value = settings.sfxVolume,
+                        onValueChange = { onUpdateSettings(settings.copy(sfxVolume = it)) },
+                        valueRange = 0f..1f,
+                        enabled = settings.soundEnabled
+                    )
+                }
+            }
+
+            item {
                 HorizontalDivider()
             }
 
