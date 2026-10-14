@@ -1074,5 +1074,18 @@
   "update_available": "업데이트가 있습니다.",
   "update_up_to_date": "최신 버전입니다.",
   "update_unavailable": "업데이트를 확인할 수 없습니다. 나중에 다시 시도하세요.",
-  "update_open": "업데이트 페이지 열기"
+  "update_open": "업데이트 페이지 열기",
+  "settings_desc_language": "게임 텍스트와 메뉴에 사용할 언어를 선택합니다.",
+  "settings_desc_theme_mode": "기기 테마를 따를지 다크, 라이트 또는 AMOLED 모드를 사용할지 선택합니다.",
+  "settings_desc_theme_preset": "미리 준비된 색상 팔레트를 선택하거나 직접 색상을 설정합니다.",
+  "settings_desc_theme_colors": "앱의 기본, 보조, 세 번째 색상을 사용자 지정합니다. 변경 사항은 즉시 적용됩니다.",
+  "settings_desc_number_notation": "큰 숫자의 표시 방식을 선택합니다: 표준, 과학, 공학.",
+  "settings_desc_notifications": "선택 사항인 게임 알림과 리마인더를 켭니다. 언제든 끌 수 있습니다.",
+  "settings_desc_reminder_frequency": "예약된 리마인더 사이의 시간을 시간 단위로 선택합니다.",
+  "settings_desc_sound_fx": "게임 내 상호작용 효과음을 켜거나 끕니다.",
+  "settings_desc_vibration": "상호작용 중 앱에서 발생하는 진동을 켜거나 끕니다.",
+  "settings_desc_reduce_flashes": "번쩍임과 갑작스러운 시각적 변화를 줄입니다.",
+  "settings_desc_reduced_motion": "화면 전환 애니메이션을 부드럽게 하거나 끕니다.",
+  "settings_desc_master_volume": "앱 음량을 무음부터 최대로 설정합니다.",
+  "settings_desc_reset_all_data": "저장된 게임 진행 상황이 삭제됩니다. 계속하려면 추가 확인이 필요합니다."
 }

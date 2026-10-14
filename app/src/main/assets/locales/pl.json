@@ -1074,5 +1074,18 @@
   "update_available": "Dostępna jest aktualizacja.",
   "update_up_to_date": "Masz najnowszą wersję.",
   "update_unavailable": "Nie można sprawdzić aktualizacji. Spróbuj później.",
-  "update_open": "Otwórz stronę aktualizacji"
+  "update_open": "Otwórz stronę aktualizacji",
+  "settings_desc_language": "Wybierz język tekstów i menu gry.",
+  "settings_desc_theme_mode": "Wybierz, czy aplikacja ma używać motywu urządzenia, czy trybu ciemnego, jasnego lub AMOLED.",
+  "settings_desc_theme_preset": "Wybierz gotową paletę albo dostosuj kolory samodzielnie.",
+  "settings_desc_theme_colors": "Dostosuj podstawowy, dodatkowy i trzeciorzędny kolor aplikacji. Zmiany są stosowane od razu.",
+  "settings_desc_number_notation": "Wybierz sposób wyświetlania dużych liczb: standardowy, naukowy lub inżynierski.",
+  "settings_desc_notifications": "Włącz opcjonalne przypomnienia i powiadomienia gry. Możesz je wyłączyć w dowolnym momencie.",
+  "settings_desc_reminder_frequency": "Wybierz liczbę godzin między zaplanowanymi przypomnieniami.",
+  "settings_desc_sound_fx": "Włącz lub wyłącz efekty dźwiękowe interakcji w grze.",
+  "settings_desc_vibration": "Włącz lub wyłącz wibracje aplikacji podczas interakcji.",
+  "settings_desc_reduce_flashes": "Ogranicz błyski i nagłe zmiany obrazu.",
+  "settings_desc_reduced_motion": "Złagodź lub wyłącz animowane przejścia ekranów.",
+  "settings_desc_master_volume": "Ustaw głośność aplikacji od wyciszenia do maksimum.",
+  "settings_desc_reset_all_data": "Spowoduje to usunięcie zapisanego postępu gry. Przed kontynuacją wymagane jest dodatkowe potwierdzenie."
 }

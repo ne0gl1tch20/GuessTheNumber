@@ -83,6 +83,7 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(locale.getString("language", "Language"), style = MaterialTheme.typography.bodyLarge)
+                    Text(locale.getString("settings_desc_language", "Choose the language used for game text and menus."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     var expanded by remember { mutableStateOf(false) }
                     val languageMap = LocaleManager.supportedLocales.associate { it.tag to it.displayName }
                     val currentLangName = languageMap[settings.locale] ?: LocaleManager.supportedLocales.first().displayName
@@ -124,6 +125,7 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(localizedText("Theme Appearance"), style = MaterialTheme.typography.bodyLarge)
+                    Text(locale.getString("settings_desc_theme_mode", "Choose whether the app follows your device theme or uses Dark, Light or AMOLED mode."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     var expanded by remember { mutableStateOf(false) }
                     val themeOptions = listOf("System", "Dark", "Light", "AMOLED")
                     ExposedDropdownMenuBox(
@@ -160,6 +162,7 @@ fun SettingsScreen(
 
             item {
                 Text(localizedText("Theme Colors"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                Text(locale.getString("settings_desc_theme_colors", "Customize the app’s primary, secondary and tertiary colors. Changes apply immediately."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 val presets = listOf(
                     "Neon" to listOf("#7C4DFF", "#00BCD4", "#00C853"),
                     "Sunset" to listOf("#FF4081", "#FF9800", "#FFC107"),
@@ -206,6 +209,7 @@ fun SettingsScreen(
                             )
                         }
                     }
+                    Text(locale.getString("settings_desc_theme_preset", "Choose a ready-made color set or customize the colors yourself."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     listOf(
                         "Primary" to settings.customPrimaryColor,
                         "Secondary" to settings.customSecondaryColor,
@@ -224,6 +228,7 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(localizedText("Number Notation"), style = MaterialTheme.typography.bodyLarge)
+                    Text(locale.getString("settings_desc_number_notation", "Choose how large numbers are displayed: Standard, Scientific or Engineering."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     var expanded by remember { mutableStateOf(false) }
                     val notationOptions = listOf("Standard", "Scientific", "Engineering")
                     ExposedDropdownMenuBox(
@@ -266,7 +271,7 @@ fun SettingsScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                         Text(localizedText("Push Notifications & Reminders"), style = MaterialTheme.typography.bodyLarge)
-                        Text(localizedText("Get periodic reminder notifications"), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(locale.getString("settings_desc_notifications", "Enable optional game reminders and notifications. You can turn them off at any time."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(
                         checked = settings.notificationsEnabled,
@@ -290,6 +295,7 @@ fun SettingsScreen(
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(localizedText("Reminder Frequency"), style = MaterialTheme.typography.bodyMedium)
+                        Text(locale.getString("settings_desc_reminder_frequency", "Choose how many hours pass between scheduled reminders."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         var expanded by remember { mutableStateOf(false) }
                         val intervalOptions = listOf(12L, 24L, 48L)
                         ExposedDropdownMenuBox(
@@ -361,7 +367,10 @@ fun SettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(localizedText("Sound FX"), style = MaterialTheme.typography.bodyLarge)
+                    Column(modifier = Modifier.weight(1f).padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(localizedText("Sound FX"), style = MaterialTheme.typography.bodyLarge)
+                        Text(locale.getString("settings_desc_sound_fx", "Turn sound effects for in-game interactions on or off."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                     Switch(
                         checked = settings.soundEnabled,
                         onCheckedChange = { onUpdateSettings(settings.copy(soundEnabled = it)) }
@@ -375,7 +384,10 @@ fun SettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(localizedText("Vibration"), style = MaterialTheme.typography.bodyLarge)
+                    Column(modifier = Modifier.weight(1f).padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(localizedText("Vibration"), style = MaterialTheme.typography.bodyLarge)
+                        Text(locale.getString("settings_desc_vibration", "Turn app-triggered vibration during interactions on or off."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                     Switch(
                         checked = settings.vibrationEnabled,
                         onCheckedChange = { onUpdateSettings(settings.copy(vibrationEnabled = it)) }
@@ -391,7 +403,7 @@ fun SettingsScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                         Text(localizedText("Reduce Flashes"), style = MaterialTheme.typography.bodyLarge)
-                        Text(localizedText("Visual comfort & accessibility"), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(locale.getString("settings_desc_reduce_flashes", "Reduce flashes and sudden visual changes for greater visual comfort."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(
                         checked = settings.reduceFlashes,
@@ -408,7 +420,7 @@ fun SettingsScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                         Text(localizedText("Reduced Motion"), style = MaterialTheme.typography.bodyLarge)
-                        Text(localizedText("Soften or disable expressive screen transitions"), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(locale.getString("settings_desc_reduced_motion", "Soften or disable animated screen transitions."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(
                         checked = settings.reducedMotion,
@@ -420,6 +432,7 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(locale.getString("master_volume_format", "Master Volume: %d%%", (settings.volume * 100).toInt()), style = MaterialTheme.typography.bodyLarge)
+                    Text(locale.getString("settings_desc_master_volume", "Set the app’s audio level from silent to maximum."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Slider(
                         value = settings.volume,
                         onValueChange = { onUpdateSettings(settings.copy(volume = it)) },
@@ -437,6 +450,7 @@ fun SettingsScreen(
             }
 
             item {
+                Text(locale.getString("settings_desc_reset_all_data", "This clears saved game progress. An extra confirmation is required before continuing."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Button(
                     onClick = {
                         confirmResetCheck = false

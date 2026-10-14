@@ -1074,5 +1074,18 @@
   "update_available": "Pembaruan tersedia.",
   "update_up_to_date": "Versi sudah terbaru.",
   "update_unavailable": "Tidak dapat memeriksa pembaruan. Coba lagi nanti.",
-  "update_open": "Buka halaman pembaruan"
+  "update_open": "Buka halaman pembaruan",
+  "settings_desc_language": "Pilih bahasa untuk teks dan menu game.",
+  "settings_desc_theme_mode": "Pilih apakah aplikasi mengikuti tema perangkat atau menggunakan mode Gelap, Terang, atau AMOLED.",
+  "settings_desc_theme_preset": "Pilih palet warna siap pakai atau sesuaikan warna sendiri.",
+  "settings_desc_theme_colors": "Sesuaikan warna primer, sekunder, dan tersier aplikasi. Perubahan langsung diterapkan.",
+  "settings_desc_number_notation": "Pilih tampilan angka besar: Standar, Ilmiah, atau Teknik.",
+  "settings_desc_notifications": "Aktifkan pengingat dan notifikasi game opsional. Anda dapat menonaktifkannya kapan saja.",
+  "settings_desc_reminder_frequency": "Pilih jumlah jam di antara pengingat terjadwal.",
+  "settings_desc_sound_fx": "Aktifkan atau nonaktifkan efek suara untuk interaksi dalam game.",
+  "settings_desc_vibration": "Aktifkan atau nonaktifkan getaran aplikasi saat berinteraksi.",
+  "settings_desc_reduce_flashes": "Kurangi kilatan dan perubahan visual yang tiba-tiba.",
+  "settings_desc_reduced_motion": "Perhalus atau nonaktifkan transisi layar animasi.",
+  "settings_desc_master_volume": "Atur volume aplikasi dari senyap hingga maksimum.",
+  "settings_desc_reset_all_data": "Tindakan ini menghapus progres game yang tersimpan. Konfirmasi tambahan diperlukan sebelum melanjutkan."
 }

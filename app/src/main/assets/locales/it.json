@@ -1074,5 +1074,18 @@
   "update_available": "È disponibile un aggiornamento.",
   "update_up_to_date": "La versione è aggiornata.",
   "update_unavailable": "Impossibile controllare gli aggiornamenti. Riprova più tardi.",
-  "update_open": "Apri pagina aggiornamento"
+  "update_open": "Apri pagina aggiornamento",
+  "settings_desc_language": "Scegli la lingua usata per i testi e i menu del gioco.",
+  "settings_desc_theme_mode": "Scegli se l’app deve seguire il tema del dispositivo o usare la modalità Scura, Chiara o AMOLED.",
+  "settings_desc_theme_preset": "Scegli una palette predefinita oppure personalizza i colori.",
+  "settings_desc_theme_colors": "Personalizza i colori primario, secondario e terziario dell’app. Le modifiche sono immediate.",
+  "settings_desc_number_notation": "Scegli come visualizzare i numeri grandi: standard, scientifico o ingegneristico.",
+  "settings_desc_notifications": "Attiva i promemoria e le notifiche facoltativi del gioco. Puoi disattivarli in qualsiasi momento.",
+  "settings_desc_reminder_frequency": "Scegli quante ore devono trascorrere tra i promemoria programmati.",
+  "settings_desc_sound_fx": "Attiva o disattiva gli effetti sonori delle interazioni di gioco.",
+  "settings_desc_vibration": "Attiva o disattiva la vibrazione dell’app durante le interazioni.",
+  "settings_desc_reduce_flashes": "Riduci i lampi e i cambiamenti visivi improvvisi.",
+  "settings_desc_reduced_motion": "Attenua o disattiva le transizioni animate tra schermate.",
+  "settings_desc_master_volume": "Imposta il volume dell’app da silenzioso al massimo.",
+  "settings_desc_reset_all_data": "Questa azione cancella i progressi di gioco salvati. È richiesta un’ulteriore conferma prima di continuare."
 }

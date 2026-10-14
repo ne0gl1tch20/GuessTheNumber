@@ -1074,5 +1074,18 @@
   "update_available": "更新があります。",
   "update_up_to_date": "最新バージョンです。",
   "update_unavailable": "更新を確認できませんでした。後でもう一度お試しください。",
-  "update_open": "更新ページを開く"
+  "update_open": "更新ページを開く",
+  "settings_desc_language": "ゲーム内のテキストとメニューに使う言語を選びます。",
+  "settings_desc_theme_mode": "端末のテーマに合わせるか、ダーク・ライト・AMOLED モードを使うか選びます。",
+  "settings_desc_theme_preset": "用意された配色を選ぶか、色をカスタマイズします。",
+  "settings_desc_theme_colors": "アプリのプライマリ、セカンダリ、ターシャリの色を設定します。変更はすぐに反映されます。",
+  "settings_desc_number_notation": "大きな数の表示方法を選びます：標準、科学、工学。",
+  "settings_desc_notifications": "任意のゲームリマインダーと通知を有効にします。いつでもオフにできます。",
+  "settings_desc_reminder_frequency": "スケジュールされたリマインダーの間隔を時間単位で選びます。",
+  "settings_desc_sound_fx": "ゲーム内の操作音をオンまたはオフにします。",
+  "settings_desc_vibration": "操作時にアプリが発生させる振動をオンまたはオフにします。",
+  "settings_desc_reduce_flashes": "点滅や急な視覚変化を減らします。",
+  "settings_desc_reduced_motion": "画面遷移のアニメーションを弱めるか無効にします。",
+  "settings_desc_master_volume": "アプリの音量をミュートから最大まで調整します。",
+  "settings_desc_reset_all_data": "保存されたゲームの進行状況を消去します。続行するには追加の確認が必要です。"
 }

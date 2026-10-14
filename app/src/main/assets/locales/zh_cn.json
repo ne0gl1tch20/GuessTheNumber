@@ -1074,5 +1074,18 @@
   "update_available": "有可用更新。",
   "update_up_to_date": "当前已是最新版本。",
   "update_unavailable": "无法检查更新，请稍后重试。",
-  "update_open": "打开更新页面"
+  "update_open": "打开更新页面",
+  "settings_desc_language": "选择游戏文本和菜单使用的语言。",
+  "settings_desc_theme_mode": "选择跟随设备主题，或使用深色、浅色或 AMOLED 模式。",
+  "settings_desc_theme_preset": "选择预设配色，或自行自定义颜色。",
+  "settings_desc_theme_colors": "自定义应用的主色、次色和第三强调色。更改会立即生效。",
+  "settings_desc_number_notation": "选择大数字的显示方式：标准、科学或工程。",
+  "settings_desc_notifications": "开启可选的游戏提醒和通知。你可以随时关闭。",
+  "settings_desc_reminder_frequency": "选择定时提醒之间的小时数。",
+  "settings_desc_sound_fx": "开启或关闭游戏交互音效。",
+  "settings_desc_vibration": "开启或关闭应用在交互时触发的振动。",
+  "settings_desc_reduce_flashes": "减少闪光和突然的视觉变化。",
+  "settings_desc_reduced_motion": "减弱或关闭屏幕切换动画。",
+  "settings_desc_master_volume": "将应用音量从静音调整到最大。",
+  "settings_desc_reset_all_data": "此操作会清除已保存的游戏进度。继续前需要再次确认。"
 }
