@@ -916,9 +916,7 @@
   "reduced_motion_label": "Bawasan ang Galaw",
   "reduced_motion_description": "Palambutin o i-disable ang mga transition ng screen",
   "sfx_volume_format": "Lakas ng sound effects: %d%%",
-
   "settings_desc_sfx_volume": "Isaayos ang lakas ng sound effects nang hiwalay sa background music.",
-
   "master_volume_format": "Master Volume: %d%%",
   "save_data_management_title": "Pamamahala ng Save Data",
   "reset_all_game_data_label": "I-reset ang Lahat ng Game Data",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Bawasan ang mga flash at biglaang pagbabago sa itsura ng screen.",
   "settings_desc_reduced_motion": "Pahinain o i-off ang mga animated na paglipat ng screen.",
   "settings_desc_master_volume": "Itakda ang lakas ng tunog ng app mula tahimik hanggang pinakamalakas.",
-  "settings_desc_reset_all_data": "Mabubura nito ang naka-save na progreso ng laro. Kailangan ng isa pang kumpirmasyon bago magpatuloy."
+  "settings_desc_reset_all_data": "Mabubura nito ang naka-save na progreso ng laro. Kailangan ng isa pang kumpirmasyon bago magpatuloy.",
+  "more_feature_discovery_title": "Mabilis na tour",
+  "more_feature_discovery_step_1": "May sarili itong mga tool at progreso. Silipin muna, pagkatapos piliin kung ano ang gusto mong tuklasin.",
+  "more_feature_discovery_step_2": "Puwede kang bumalik sa feature na ito mula sa More Hub anumang oras.",
+  "more_feature_discovery_skip": "Laktawan at buksan"
 }
