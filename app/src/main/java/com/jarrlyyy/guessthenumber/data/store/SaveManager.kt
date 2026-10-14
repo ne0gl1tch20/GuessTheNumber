@@ -166,7 +166,13 @@ class SaveManager(private val context: Context) {
             context.saveDataStore.edit { prefs ->
                 val currentState = prefs[sKey]
                 if (currentState != null) {
-                    prefs[bKey] = currentState
+                    // Never replace a recoverable backup with a corrupt primary save.
+                    if (validateSave(currentState)) {
+                        prefs[bKey] = currentState
+                    } else if (prefs[bKey]?.let(::validateSave) != true) {
+                        // Discard a backup only when it is already unusable too.
+                        prefs.remove(bKey)
+                    }
                 }
                 prefs[sKey] = jsonString
             }
