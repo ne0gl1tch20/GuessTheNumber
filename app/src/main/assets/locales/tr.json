@@ -873,9 +873,7 @@
   "reduced_motion_label": "Hareketi Azalt",
   "reduced_motion_description": "Ekran geçişlerini yumuşatır veya kapatır",
   "sfx_volume_format": "Ses Efektleri Seviyesi: %d%%",
-
   "settings_desc_sfx_volume": "Ses efektlerinin seviyesini arka plan müziğinden bağımsız ayarlayın.",
-
   "master_volume_format": "Ana Ses: %d%%",
   "save_data_management_title": "Kayıt Verilerini Yönet",
   "reset_all_game_data_label": "Tüm Oyun Verilerini Sıfırla",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Flaşları ve ani görsel değişiklikleri azaltın.",
   "settings_desc_reduced_motion": "Animasyonlu ekran geçişlerini yumuşatın veya devre dışı bırakın.",
   "settings_desc_master_volume": "Uygulama ses düzeyini sessizden en yükseğe ayarlayın.",
-  "settings_desc_reset_all_data": "Bu işlem kayıtlı oyun ilerlemesini siler. Devam etmeden önce ek onay gerekir."
+  "settings_desc_reset_all_data": "Bu işlem kayıtlı oyun ilerlemesini siler. Devam etmeden önce ek onay gerekir.",
+  "more_feature_discovery_title": "Kısa tanıtım",
+  "more_feature_discovery_step_1": "Bu özelliğin kendine ait araçları ve ilerlemesi var. Kısaca göz atıp keşfetmek istediğini seç.",
+  "more_feature_discovery_step_2": "İstediğin zaman More Hub üzerinden bu özelliğe dönebilirsin.",
+  "more_feature_discovery_skip": "Atla ve aç"
 }
