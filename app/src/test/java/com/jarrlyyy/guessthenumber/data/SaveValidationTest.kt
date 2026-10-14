@@ -64,6 +64,20 @@ class SaveValidationTest {
     }
 
     @Test
+    fun atomicGameUpdateRejectsInvalidTransformedStateWithoutReplacingSave() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = SaveManager(context)
+        manager.saveGame(GameState(money = BigNumber(100)), 1)
+
+        val updated = manager.updateGameAtomically(1) {
+            it.copy(money = BigNumber(-1))
+        }
+
+        assertNull(updated)
+        assertEquals(BigNumber(100), manager.loadGame(1).money)
+    }
+
+    @Test
     fun corruptPrimaryCannotOverwriteLastKnownGoodBackup() = runBlocking {
         val context = RuntimeEnvironment.getApplication()
         val manager = SaveManager(context)
