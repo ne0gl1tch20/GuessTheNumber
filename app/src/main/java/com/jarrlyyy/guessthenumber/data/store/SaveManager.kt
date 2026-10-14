@@ -196,8 +196,12 @@ class SaveManager(private val context: Context) {
                 val current = sanitizeLoadedState(json.decodeFromString<GameState>(currentJson))
                 val updated = transform(current).copy(lastSaveTimestamp = System.currentTimeMillis())
                 val storedUpdated = if (globalPreferences.isMigrationCompleted()) updated.copy(settings = GameSettings()) else updated
+                val updatedJson = json.encodeToString(storedUpdated)
+                // Validate the transformed state before committing either key. A bad transform
+                // must not create an invalid primary that only gets repaired on the next load.
+                if (!validateSave(updatedJson)) return@edit
                 prefs[bKey] = currentJson
-                prefs[sKey] = json.encodeToString(storedUpdated)
+                prefs[sKey] = updatedJson
                 updatedState = updated
             }
             updatedState
