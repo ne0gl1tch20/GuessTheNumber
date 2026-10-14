@@ -873,6 +873,10 @@
   "visual_comfort_description": "الراحة البصرية وإمكانية الوصول",
   "reduced_motion_label": "تقليل الحركة",
   "reduced_motion_description": "تخفيف انتقالات الشاشة أو تعطيلها",
+  "sfx_volume_format": "مستوى صوت المؤثرات: %d%%",
+
+  "settings_desc_sfx_volume": "اضبط مستوى المؤثرات الصوتية بشكل مستقل عن موسيقى الخلفية.",
+
   "master_volume_format": "مستوى الصوت الرئيسي: %d%%",
   "save_data_management_title": "إدارة بيانات الحفظ",
   "reset_all_game_data_label": "إعادة ضبط جميع بيانات اللعبة",
