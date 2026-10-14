@@ -35,7 +35,7 @@ import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 @Composable
 fun NavGraph(
     state: GameState,
-    onMakeGuess: (Long) -> Unit,
+    onMakeGuess: (Long) -> Boolean,
     incomePerSecond: BigNumber,
     onBuyUpgrade: (String, BigNumber) -> Unit,
     onBuyShopItem: (String, Long) -> Unit,
@@ -311,8 +311,9 @@ fun NavGraph(
                 ) {
                     composable(Screen.Play.route) {
                         ExpressiveScreen(enabled = !state.settings.reducedMotion) { PlayScreen(state = state, onMakeGuess = { guess ->
-                            onMakeGuess(guess)
-                            if (tutorialActive && tutorialStep == 0) tutorialStep = 1
+                            val accepted = onMakeGuess(guess)
+                            if (accepted && tutorialActive && tutorialStep == 0) tutorialStep = 1
+                            accepted
                         }, onClaimDailyQuest = viewModel::claimDailyQuest, onOpenLootChest = viewModel::openLootChest, onWorldAction = viewModel::worldProgressAction, onNavigateProgression = { route -> navController.navigate(route) }, incomePerSecond = incomePerSecond) }
                     }
                     composable(Screen.Upgrade.route) {
