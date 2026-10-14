@@ -39,7 +39,7 @@ internal class WindowsDebugUpdateClient(
             ?: return null
 
         val assets = latest.first.assets()
-        val manifestAsset = assets.firstOrNull {
+        val manifestAsset = assets.mapNotNull { it as? JsonObject }.firstOrNull {
             it["name"]?.jsonPrimitive?.content == MANIFEST_ASSET
         } ?: return null
         val manifestUrl = manifestAsset["browser_download_url"]?.jsonPrimitive?.content ?: return null
@@ -52,7 +52,7 @@ internal class WindowsDebugUpdateClient(
         if (manifest["tag"]?.jsonPrimitive?.content != latest.second) return null
         if (compareVersions(version, installedVersion) <= 0) return null
 
-        val installerAsset = assets.firstOrNull {
+        val installerAsset = assets.mapNotNull { it as? JsonObject }.firstOrNull {
             it["name"]?.jsonPrimitive?.content == assetName
         } ?: return null
         val downloadUrl = installerAsset["browser_download_url"]?.jsonPrimitive?.content ?: return null
