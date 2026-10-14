@@ -17,7 +17,8 @@ typealias ShopItemDef = SharedShopItemDef
 typealias AchievementDef = SharedAchievementDef
 
 val DEFAULT_MORE_SCREEN_ORDER = buildList {
-    addAll(com.jarrlyyy.guessthenumber.shared.domain.DEFAULT_MORE_SCREEN_ORDER)
+    val sharedOrder = com.jarrlyyy.guessthenumber.shared.domain.DEFAULT_MORE_SCREEN_ORDER
+    addAll(sharedOrder.take(15))
     if (BuildConfig.DEBUG) addAll(listOf("dev_settings", "lua_testing_hub"))
-    addAll(listOf("staking", "ultra", "prestige", "save_slots", "music"))
+    addAll(sharedOrder.drop(15))
 }
