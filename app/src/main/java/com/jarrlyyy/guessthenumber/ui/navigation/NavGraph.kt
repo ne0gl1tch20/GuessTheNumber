@@ -25,6 +25,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.screens.*
+import com.jarrlyyy.guessthenumber.ui.components.FeatureTourOverlay
 import com.jarrlyyy.guessthenumber.ui.components.ExpressiveScreen
 import com.jarrlyyy.guessthenumber.ui.components.expressiveSelection
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
@@ -524,6 +525,7 @@ fun NavGraph(
                         )
                     }
                 }
+                FeatureTourOverlay(route = currentRoute, state = state, onUpdateSettings = onUpdateSettings)
                 if (tutorialActive) {
                     Box(Modifier.fillMaxSize(), contentAlignment = if (tutorialStep == 0 || tutorialStep == 3) androidx.compose.ui.Alignment.TopCenter else androidx.compose.ui.Alignment.BottomCenter) {
                         GuidedTutorialOverlay(
