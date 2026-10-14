@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,13 +45,10 @@ fun main() = application {
 @Composable
 private fun DesktopGameScreen() {
     val engine = remember { GameEngine() }
-    var gameState by remember {
-        mutableStateOf(
-            GameState(
-                currentRangeMax = DifficultyRules.baseRangeMax(DifficultyRules.CLASSIC),
-                targetNumber = Random.nextLong(1L, 101L)
-            )
-        )
+    val saveStore = remember { DesktopSaveStore() }
+    var gameState by remember { mutableStateOf(saveStore.loadOrDefault()) }
+    LaunchedEffect(gameState) {
+        saveStore.save(gameState)
     }
     var guess by remember { mutableStateOf("") }
     var feedback by remember { mutableStateOf("Guess a number to earn money.") }
