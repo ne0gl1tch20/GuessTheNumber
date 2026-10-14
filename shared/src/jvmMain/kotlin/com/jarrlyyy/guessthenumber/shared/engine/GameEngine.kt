@@ -45,7 +45,7 @@ class GameEngine(private val rng: Random = Random.Default) {
 
     fun getRangeMax(state: GameState): Long {
         val betterRangeLevel = state.upgradeLevels["better_range"] ?: 0
-        val base = Difficulty.rangeMax(state.difficultyId, betterRangeLevel)
+        val base = DifficultyRules.rangeMax(state.difficultyId, betterRangeLevel)
         val active = validateMutators(state.activeMutators)
         return if ("mut_hardcore" in active) base * 2L else base
     }
@@ -91,7 +91,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             val talentMult = if (state.shopPurchases.contains("talent_reward_1") || state.upgradeLevels.containsKey("talent_reward_1")) BigNumber(1.5) else BigNumber.ONE
             val mutatorMult = mutatorRewardMultiplier(state)
 
-            val difficultyMultiplier = BigNumber(Difficulty.rewardMultiplier(state.difficultyId))
+            val difficultyMultiplier = BigNumber(DifficultyRules.rewardMultiplier(state.difficultyId))
             val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier
             val totalReward = maxOf(BigNumber(10), calculatedReward)
             val newMoney = state.money + totalReward
@@ -125,7 +125,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             return GuessResult(feedback, totalReward, isCrit, newStreak, updatedState)
         } else {
             val newAttempts = state.attempts + 1
-            val difficultyPenalty = state.money * BigNumber(Difficulty.wrongGuessPenalty(state.difficultyId))
+            val difficultyPenalty = state.money * BigNumber(DifficultyRules.wrongGuessPenalty(state.difficultyId))
             val taxPenalty = if ("mut_tax" in state.activeMutators) state.money * BigNumber(0.05) else BigNumber.ZERO
             val newMoney = maxOf(BigNumber.ZERO, state.money - difficultyPenalty - taxPenalty)
 
