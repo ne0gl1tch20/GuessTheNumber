@@ -116,6 +116,7 @@ data class GameSettings(
     val locale: String = "en-US",
     val reducedMotion: Boolean = false,
     val volume: Float = 1.0f,
+    val sfxVolume: Float = 1.0f,
     val reduceFlashes: Boolean = false,
     val saveLogsToStorage: Boolean = false,
     val verboseLogging: Boolean = false,
