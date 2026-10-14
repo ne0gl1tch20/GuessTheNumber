@@ -1,3 +1,7 @@
+## Unreleased (Accessible Player Feedback)
+
+- ♿ **Screen-reader announcements**: Correct-guess celebrations, random-event cards and shared progression milestone banners now expose their combined message as a polite live region, so TalkBack can announce changing feedback without relying on color, icons or animation. Gameplay and rewards are unchanged.
+
 ## Unreleased (Random Event Announcements)
 
 - 🎲 **More exciting random-event announcements**: Lucky events now use event-specific icons and theme-aware color treatments, with a clearer title/description layout and an entrance animation that respects reduced motion. Repeated events of the same type are announced again. Event selection odds, rewards, effects, and save data are unchanged.
