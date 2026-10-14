@@ -17,6 +17,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
@@ -32,6 +34,7 @@ fun UpgradeScreen(
     onUpdateMultiplier: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
+    val hapticFeedback = LocalHapticFeedback.current
     val locale = LocalAppLocaleManager.current
     val upgrades = remember {
         JsonConfigRepository(context).loadUpgrades()
@@ -181,6 +184,9 @@ fun UpgradeScreen(
                     val levelBeforeUpdate = previousLevel
                     previousLevel = level
                     if (level > levelBeforeUpdate) {
+                        if (state.settings.vibrationEnabled) {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
+                        }
                         purchaseHighlight = true
                         delay(if (state.settings.reducedMotion) 450L else 700L)
                         purchaseHighlight = false
