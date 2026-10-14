@@ -127,7 +127,9 @@ class BackgroundMusicManager private constructor(context: Context) {
             // Imported files come from user-selected content providers. Bound the copy so
             // a huge or unbounded stream cannot unexpectedly fill the app's private storage.
             var totalBytes = 0L
-            appContext.contentResolver.openInputStream(uri)?.use { input ->
+            val inputStream = appContext.contentResolver.openInputStream(uri)
+                ?: throw IllegalStateException("Unable to open the selected music file.")
+            inputStream.use { input ->
                 FileOutputStream(target).use { output ->
                     val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                     while (true) {
@@ -140,7 +142,7 @@ class BackgroundMusicManager private constructor(context: Context) {
                         output.write(buffer, 0, read)
                     }
                 }
-            } ?: return null
+            }
 
             require(totalBytes > 0L) { "Music file is empty." }
             val metadata = readMetadata(target)
@@ -154,8 +156,9 @@ class BackgroundMusicManager private constructor(context: Context) {
                 album = metadata.album.orEmpty().take(160),
                 duration = metadata.duration.coerceAtLeast(0)
             )
-            _library.value = _library.value + track
-            persistLibrary(_library.value)
+            val updatedLibrary = _library.value + track
+            persistLibrary(updatedLibrary)
+            _library.value = updatedLibrary
             track
         } catch (_: Exception) {
             // A rejected/failed import must not leave a partial file consuming storage.
