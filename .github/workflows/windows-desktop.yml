@@ -42,10 +42,19 @@ jobs:
     name: Compile and package Windows desktop app
     runs-on: windows-latest
     timeout-minutes: 30
+    env:
+      GTN_WINDOWS_PACKAGE_VERSION: 1.0.${{ github.run_number }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Write desktop build version resource
+        shell: pwsh
+        run: |
+          $resourceDir = "desktopApp/src/jvmMain/resources"
+          New-Item -ItemType Directory -Path $resourceDir -Force | Out-Null
+          Set-Content -Path (Join-Path $resourceDir "windows-build.properties") -Value "version=$env:GTN_WINDOWS_PACKAGE_VERSION" -Encoding ascii
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -66,8 +75,6 @@ jobs:
 
       - name: Build versioned Windows installer
         shell: pwsh
-        env:
-          GTN_WINDOWS_PACKAGE_VERSION: 1.0.${{ github.run_number }}
         run: .\\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache
 
       - name: Show packaged files
