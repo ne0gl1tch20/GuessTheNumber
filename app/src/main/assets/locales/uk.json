@@ -872,6 +872,14 @@
   "visual_comfort_description": "Візуальний комфорт і доступність",
   "reduced_motion_label": "Зменшити рух",
   "reduced_motion_description": "Пом’якшити або вимкнути анімовані переходи екрана",
+  "more_feature_discovery_title": "Короткий огляд",
+
+  "more_feature_discovery_step_1": "Ця функція має власні інструменти та прогрес. Озирніться, а потім виберіть, що дослідити.",
+
+  "more_feature_discovery_step_2": "Ви можете будь-коли повернутися до цієї функції через More Hub.",
+
+  "more_feature_discovery_skip": "Пропустити й відкрити",
+
   "master_volume_format": "Основна гучність: %d%%",
   "save_data_management_title": "Керування збереженнями",
   "reset_all_game_data_label": "Скинути всі ігрові дані",
