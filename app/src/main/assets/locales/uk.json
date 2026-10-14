@@ -873,9 +873,7 @@
   "reduced_motion_label": "Зменшити рух",
   "reduced_motion_description": "Пом’якшити або вимкнути анімовані переходи екрана",
   "sfx_volume_format": "Гучність звукових ефектів: %d%%",
-
   "settings_desc_sfx_volume": "Налаштуйте гучність звукових ефектів окремо від фонової музики.",
-
   "master_volume_format": "Основна гучність: %d%%",
   "save_data_management_title": "Керування збереженнями",
   "reset_all_game_data_label": "Скинути всі ігрові дані",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Зменште спалахи та раптові візуальні зміни.",
   "settings_desc_reduced_motion": "Пом’якшіть або вимкніть анімовані переходи між екранами.",
   "settings_desc_master_volume": "Налаштуйте гучність застосунку від беззвучного режиму до максимуму.",
-  "settings_desc_reset_all_data": "Це видалить збережений ігровий прогрес. Перед продовженням потрібне додаткове підтвердження."
+  "settings_desc_reset_all_data": "Це видалить збережений ігровий прогрес. Перед продовженням потрібне додаткове підтвердження.",
+  "more_feature_discovery_title": "Короткий огляд",
+  "more_feature_discovery_step_1": "Ця функція має власні інструменти та прогрес. Озирніться, а потім виберіть, що дослідити.",
+  "more_feature_discovery_step_2": "Ви можете будь-коли повернутися до цієї функції через More Hub.",
+  "more_feature_discovery_skip": "Пропустити й відкрити"
 }
