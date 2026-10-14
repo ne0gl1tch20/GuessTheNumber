@@ -63,6 +63,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "rules.pro"
             )
+            if (hasProjectDebugKeystore) {
+                signingConfig = signingConfigs.getByName("projectDebug")
+            }
         }
         debug {
             buildConfigField("String", "UPDATE_CHANNEL", "\"debug\"")
@@ -91,6 +94,8 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    ndkVersion = "30.0.16248370"
+    buildToolsVersion = "36.0.0"
 }
 
 kotlin {
