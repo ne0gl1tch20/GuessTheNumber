@@ -131,7 +131,8 @@ data class GameSettings(
     val customTertiaryColor: String = "#00C853",
     val moreScreenOrder: List<String> = DEFAULT_MORE_SCREEN_ORDER,
     val moreScreenButtonColors: Map<String, String> = emptyMap(),
-    val tutorialCompleted: Boolean = false
+    val tutorialCompleted: Boolean = false,
+    val tutorialSeenFeatures: Set<String> = emptySet()
 )
 
 @Serializable
