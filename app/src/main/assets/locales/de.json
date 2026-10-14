@@ -873,9 +873,7 @@
   "reduced_motion_label": "Bewegungen reduzieren",
   "reduced_motion_description": "Ausdrucksstarke Bildschirmübergänge abschwächen oder deaktivieren",
   "sfx_volume_format": "Lautstärke der Soundeffekte: %d%%",
-
   "settings_desc_sfx_volume": "Regelt die Lautstärke der Soundeffekte unabhängig von der Hintergrundmusik.",
-
   "master_volume_format": "Hauptlautstärke: %d%%",
   "save_data_management_title": "Speicherdaten verwalten",
   "reset_all_game_data_label": "Alle Spieldaten zurücksetzen",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Reduziere blinkende und plötzlich wechselnde visuelle Effekte.",
   "settings_desc_reduced_motion": "Schwäche Bildschirmübergänge ab oder deaktiviere sie.",
   "settings_desc_master_volume": "Stelle die App-Lautstärke von stumm bis maximal ein.",
-  "settings_desc_reset_all_data": "Damit wird dein gespeicherter Spielfortschritt gelöscht. Vor dem Fortfahren ist eine zusätzliche Bestätigung nötig."
+  "settings_desc_reset_all_data": "Damit wird dein gespeicherter Spielfortschritt gelöscht. Vor dem Fortfahren ist eine zusätzliche Bestätigung nötig.",
+  "more_feature_discovery_title": "Kurzer Überblick",
+  "more_feature_discovery_step_1": "Diese Funktion hat eigene Werkzeuge und Fortschritte. Schau kurz hinein und entscheide dann, was du erkunden möchtest.",
+  "more_feature_discovery_step_2": "Du kannst jederzeit über den More Hub zu dieser Funktion zurückkehren.",
+  "more_feature_discovery_skip": "Überspringen und öffnen"
 }
