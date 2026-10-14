@@ -11,7 +11,7 @@ import kotlinx.serialization.json.Json
  * are written explicitly to preserve the Android save representation.
  */
 object GameStateCodec {
-    private val json = Json {
+    val json: Json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
     }
