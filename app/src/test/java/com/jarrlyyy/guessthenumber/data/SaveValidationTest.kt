@@ -3,6 +3,9 @@ package com.jarrlyyy.guessthenumber.data
 import com.jarrlyyy.guessthenumber.domain.engine.AntiCheatService
 import com.jarrlyyy.guessthenumber.domain.engine.AntiTimeTravelService
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
+import com.jarrlyyy.guessthenumber.data.store.saveDataStore
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import org.junit.Assert.*
@@ -57,6 +60,23 @@ class SaveValidationTest {
 
         assertEquals(BigNumber(150), updated?.money)
         assertEquals(BigNumber(150), manager.loadGame(1).money)
+    }
+
+    @Test
+    fun corruptPrimaryCannotOverwriteLastKnownGoodBackup() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = SaveManager(context)
+        val primaryKey = stringPreferencesKey("game_state_slot_1_json")
+
+        manager.saveGame(GameState(money = BigNumber(100)), 1)
+        manager.saveGame(GameState(money = BigNumber(200)), 1)
+
+        context.saveDataStore.edit { it[primaryKey] = "{corrupt" }
+        manager.saveGame(GameState(money = BigNumber(300)), 1)
+
+        // Simulate another interrupted/corrupt write after the new primary was saved.
+        context.saveDataStore.edit { it[primaryKey] = "{corrupt-again" }
+        assertEquals(BigNumber(100), manager.loadGame(1).money)
     }
 
     @Test
