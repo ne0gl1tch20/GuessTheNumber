@@ -3,7 +3,7 @@
 - 🧭 **Feature tours after navigation**: Eligible feature screens now render first, then show their own first-visit tour. Opening a feature from More no longer interrupts navigation with a generic popup first. Tour completion is saved per feature.
 - 🌐 **Feature-aware tour titles**: Tour titles use the localized feature name where available, with localized tour controls and a delayed presentation after screen entry.
 - 🐛 **Nebula reward formatting**: Fixed the locale-string overload bug that could leave `Reward: +%s Nebula` unformatted; added a regression test for a concrete reward value.
-- 📦 **Installable channel updates**: About can discover the correct release/debug asset, download APK archives, validate package identity and signing certificate, safely extract APKs, and pass valid APK sets to Android's installer.
+- 📦 **Installable channel updates**: About can discover the correct release/debug asset, download release APKs or debug ZIP archives, validate package identity and signing certificate, safely extract APK sets when needed, and pass compatible APKs to Android's installer.
 - 🔐 **Update installation handling**: Added the scoped update cache path, install-permission flow, installer result receiver, archive size/path limits and signing metadata compatibility fixes.
 - 🧪 **Build and test maintenance**: Fixed Compose named-argument errors and nullable signing metadata found by the first CI run.
 - 🏷️ **App version**: versionCode 21 / versionName 3.0.3.
