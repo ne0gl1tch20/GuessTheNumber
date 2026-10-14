@@ -109,7 +109,11 @@ fun ShopScreen(
                 val canAfford = state.nebula >= BigNumber(item.nebulaCost)
                 val itemInteractionSource = remember(item.id) { MutableInteractionSource() }
 
-                val targetCardColor = if (equipped) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                val targetCardColor = when {
+                    equipped -> MaterialTheme.colorScheme.primaryContainer
+                    purchased -> MaterialTheme.colorScheme.tertiaryContainer
+                    else -> MaterialTheme.colorScheme.surfaceVariant
+                }
                 val cardColor = if (state.settings.reducedMotion) targetCardColor else animateColorAsState(targetValue = targetCardColor, label = "shopCardColor_${item.id}").value
 
                 Surface(
