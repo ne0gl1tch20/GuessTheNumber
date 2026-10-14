@@ -1,6 +1,15 @@
 ## Unreleased (Cross-Core Runtime Hardening)
 
 - 💾 **Preserve recoverable saves**: Saving over a corrupted primary no longer overwrites a valid last-known-good backup.
+- 💾 **Reject impossible save state**: Save validation now rejects out-of-range targets and negative economy/progression counters so recovery can prefer a valid backup.
+- 🎵 **Bound music imports**: Imported tracks are capped at 100 MiB; empty, oversized, or failed imports are rejected and partial files are cleaned up.
+- 🎵 **Lower idle progress polling**: Music progress refresh now polls less often while paused or idle.
+- 🌐 **Locale resilience**: Locale catalog references are safely published across threads, and invalid currency codes fall back to a plain localized number instead of throwing.
+- 🧪 **Regression coverage**: Added tests for recoverable save backups, invalid saved state, and invalid currency formatting.
+
+## Unreleased (Cross-Core Runtime Hardening)
+
+- 💾 **Preserve recoverable saves**: Saving over a corrupted primary no longer overwrites a valid last-known-good backup.
 - 🎵 **Bound music imports**: Imported tracks are capped at 100 MiB; empty, oversized, or failed imports are rejected and partial files are cleaned up.
 - 🧪 **Regression coverage**: Added a save-recovery test for a corrupt primary followed by another save.
 
