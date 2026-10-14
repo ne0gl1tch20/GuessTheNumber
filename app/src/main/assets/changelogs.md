@@ -2,6 +2,8 @@
 
 - 🛍️ **Clearer shop purchase state**: Purchased items now receive a distinct theme-aware card color, while equipped cosmetics keep their existing selected styling. The transition respects reduced motion.
 
+- ⬆️ **Upgrade purchase feedback**: Upgrade cards briefly highlight after their level increases, making successful purchases easier to notice. The highlight fades back automatically and respects reduced motion.
+
 - 🎯 **Clearer guess feedback**: High, low, and correct guesses now use distinct icons and theme-aware feedback cards. Feedback transitions respect the reduced-motion setting, and Blindfolded Oracle hides feedback from both the Guess button and keyboard submission paths.
 
 ## Unreleased (Cross-Core Runtime Hardening)
