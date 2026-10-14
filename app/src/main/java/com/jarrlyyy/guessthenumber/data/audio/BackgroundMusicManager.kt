@@ -121,13 +121,14 @@ class BackgroundMusicManager private constructor(context: Context) {
         return try {
             val musicDir = File(appContext.filesDir, "music").apply { mkdirs() }
             val id = "track_${System.currentTimeMillis()}_${Random.nextInt(1000, 9999)}"
-            destination = File(musicDir, "$id.audio")
+            val target = File(musicDir, "$id.audio")
+            destination = target
 
             // Imported files come from user-selected content providers. Bound the copy so
             // a huge or unbounded stream cannot unexpectedly fill the app's private storage.
             var totalBytes = 0L
             appContext.contentResolver.openInputStream(uri)?.use { input ->
-                FileOutputStream(destination).use { output ->
+                FileOutputStream(target).use { output ->
                     val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                     while (true) {
                         val read = input.read(buffer)
@@ -142,13 +143,13 @@ class BackgroundMusicManager private constructor(context: Context) {
             } ?: return null
 
             require(totalBytes > 0L) { "Music file is empty." }
-            val metadata = readMetadata(destination)
+            val metadata = readMetadata(target)
             val track = Track(
                 id = id,
-                path = destination.absolutePath,
+                path = target.absolutePath,
                 title = displayName?.takeIf { it.isNotBlank() }?.take(160)
                     ?: metadata.title?.takeIf { it.isNotBlank() }
-                    ?: destination.nameWithoutExtension,
+                    ?: target.nameWithoutExtension,
                 artist = metadata.artist.orEmpty().take(160),
                 album = metadata.album.orEmpty().take(160),
                 duration = metadata.duration.coerceAtLeast(0)
