@@ -873,9 +873,7 @@
   "reduced_motion_label": "ลดการเคลื่อนไหว",
   "reduced_motion_description": "ลดหรือปิดการเปลี่ยนหน้าจอแบบเคลื่อนไหว",
   "sfx_volume_format": "ระดับเสียงเอฟเฟกต์: %d%%",
-
   "settings_desc_sfx_volume": "ปรับระดับเสียงเอฟเฟกต์แยกจากเพลงพื้นหลัง",
-
   "master_volume_format": "ระดับเสียงหลัก: %d%%",
   "save_data_management_title": "จัดการข้อมูลบันทึก",
   "reset_all_game_data_label": "รีเซ็ตข้อมูลเกมทั้งหมด",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "ลดแสงกะพริบและการเปลี่ยนภาพอย่างฉับพลัน",
   "settings_desc_reduced_motion": "ลดความนุ่มนวลหรือปิดแอนิเมชันเปลี่ยนหน้าจอ",
   "settings_desc_master_volume": "ตั้งระดับเสียงของแอปตั้งแต่ปิดเสียงจนถึงสูงสุด",
-  "settings_desc_reset_all_data": "การดำเนินการนี้จะลบความคืบหน้าของเกมที่บันทึกไว้ ต้องยืนยันเพิ่มเติมก่อนดำเนินการต่อ"
+  "settings_desc_reset_all_data": "การดำเนินการนี้จะลบความคืบหน้าของเกมที่บันทึกไว้ ต้องยืนยันเพิ่มเติมก่อนดำเนินการต่อ",
+  "more_feature_discovery_title": "แนะนำอย่างย่อ",
+  "more_feature_discovery_step_1": "ฟีเจอร์นี้มีเครื่องมือและความคืบหน้าของตัวเอง ลองดูคร่าว ๆ แล้วเลือกสิ่งที่ต้องการสำรวจ",
+  "more_feature_discovery_step_2": "คุณกลับมาที่ฟีเจอร์นี้จาก More Hub ได้ทุกเมื่อ",
+  "more_feature_discovery_skip": "ข้ามและเปิด"
 }
