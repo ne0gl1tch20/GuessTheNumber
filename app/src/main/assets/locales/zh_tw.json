@@ -872,6 +872,10 @@
   "visual_comfort_description": "視覺舒適與無障礙",
   "reduced_motion_label": "減少動態效果",
   "reduced_motion_description": "柔化或關閉富有表現力的畫面轉場動畫",
+  "sfx_volume_format": "音效音量：%d%%",
+
+  "settings_desc_sfx_volume": "單獨調整音效音量，不影響背景音樂。",
+
   "master_volume_format": "主音量：%d%%",
   "save_data_management_title": "存檔資料管理",
   "reset_all_game_data_label": "重設所有遊戲資料",
