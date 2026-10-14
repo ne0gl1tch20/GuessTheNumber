@@ -31,7 +31,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: windows-desktop-${{ github.workflow }}-${{ github.ref }}
@@ -58,15 +58,17 @@ jobs:
 
       - name: Run shared tests and compile desktop app
         shell: pwsh
-        run: .\gradlew.bat :shared:jvmTest :desktopApp:compileKotlinJvm
+        run: .\\gradlew.bat :shared:jvmTest :desktopApp:compileKotlinJvm
 
       - name: Inspect desktop packaging tasks
         shell: pwsh
-        run: .\gradlew.bat :desktopApp:tasks --all
+        run: .\\gradlew.bat :desktopApp:tasks --all
 
-      - name: Build Windows installer
+      - name: Build versioned Windows installer
         shell: pwsh
-        run: .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache
+        env:
+          GTN_WINDOWS_PACKAGE_VERSION: 1.0.${{ github.run_number }}
+        run: .\\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache
 
       - name: Show packaged files
         shell: pwsh
@@ -76,10 +78,51 @@ jobs:
             throw "Windows MSI output directory was not created."
           }
 
-      - name: Upload Windows installer
+      - name: Prepare debug channel package
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        shell: pwsh
+        run: |
+          $msi = Get-ChildItem -Path "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File | Select-Object -First 1
+          if (-not $msi) { throw "Expected Windows MSI was not found." }
+          $packageDir = Join-Path $env:RUNNER_TEMP "gtn-windows-debug"
+          New-Item -ItemType Directory -Path $packageDir -Force | Out-Null
+          Copy-Item $msi.FullName (Join-Path $packageDir "GuessTheNumber-Windows-Desktop.msi")
+          $zip = Join-Path $env:RUNNER_TEMP "GuessTheNumber-Windows-Desktop.zip"
+          Compress-Archive -Path (Join-Path $packageDir "*") -DestinationPath $zip -Force
+          $hash = (Get-FileHash -Path $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          $manifest = @{
+            channel = "windows-debug"
+            version = "1.0.${{ github.run_number }}"
+            runNumber = "${{ github.run_number }}"
+            runAttempt = "${{ github.run_attempt }}"
+            commit = "${{ github.sha }}"
+            assetName = "GuessTheNumber-Windows-Desktop.zip"
+            sha256 = $hash
+            tag = "windows-debug-${{ github.run_number }}-${{ github.run_attempt }}"
+          } | ConvertTo-Json
+          Set-Content -Path (Join-Path $env:RUNNER_TEMP "windows-debug-manifest.json") -Value $manifest -Encoding utf8
+          "GTN_DEBUG_ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "GTN_DEBUG_MANIFEST=$env:RUNNER_TEMP/windows-debug-manifest.json" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Upload Windows installer artifact
         uses: actions/upload-artifact@v4
         with:
           name: GuessTheNumber-Windows-Desktop
           path: desktopApp/build/compose/binaries/main/msi/*.msi
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish versioned Windows Debug release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: windows-debug-${{ github.run_number }}-${{ github.run_attempt }}
+          name: GuessTheNumber Windows Debug ${{ github.run_number }}.${{ github.run_attempt }}
+          body: |
+            Automated Windows Debug channel build from commit ${{ github.sha }}.
+            This is a development build, not a production release.
+          prerelease: true
+          make_latest: false
+          files: |
+            ${{ env.GTN_DEBUG_ZIP }}
+            ${{ env.GTN_DEBUG_MANIFEST }}
