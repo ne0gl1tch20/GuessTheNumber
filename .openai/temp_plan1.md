@@ -27,6 +27,17 @@
 - Keep updater status accurate: checking, downloading, extracting, validating, awaiting permission, awaiting installer confirmation, installed/failed/cancelled. Never report success before the installer result confirms it.
 - Add focused tests for channel-to-asset selection, archive scanning and validation, safe extraction, no APK found, multiple APKs, permission flow, cancellation, network failures, and mismatched package/signature. Avoid emulator-heavy tests unless explicitly requested.
 
+
+## 3. Windows MSI in-place upgrades for the Kotlin Multiplatform migration
+
+- The Windows KMP build must upgrade the existing GuessTheNumber Windows MSI installation in place. Installing an update must not fail with “Another version of this product is already installed” or require users to manually uninstall first.
+- Inspect the current Windows MSI/WiX packaging before changing installer metadata. Preserve the existing **UpgradeCode** so the new MSI remains in the same product family; do not invent a replacement UpgradeCode.
+- Follow the installer technology's major/minor upgrade rules. For a WiX MSI major upgrade, keep the product identity and upgrade detection configuration compatible, increase `ProductVersion`, and generate a new `ProductCode` for each major-upgrade package as required by the existing WiX version/configuration. Do not blindly reuse a ProductCode or change identity fields without checking the current installer.
+- Keep the existing product display name, manufacturer, installation directory conventions, executable launch identity where practical, and per-user save/data locations compatible with the old installation.
+- Configure and verify upgrade detection/removal so the new MSI replaces the old version cleanly, without leaving duplicate GTN installations or deleting user saves/configuration during upgrade or rollback.
+- Test the actual migration path from an installed existing GTN MSI to the KMP Windows MSI, including a normal upgrade, repeated install/update, downgrade handling, and recovery after a failed upgrade. Verify installed files, shortcuts, uninstall entry, version reporting, and save-data preservation.
+- Keep the Windows installer identity independent from Android's application ID/signing rules; Windows MSI upgrade identity is governed by MSI/WiX product and upgrade metadata.
+
 ## Acceptance criteria
 
 - First-time tour appears only after the destination screen is visible and is specific/localized to that feature.
@@ -35,3 +46,4 @@
 - The updater safely finds and validates APKs in the downloaded ZIP, then opens the supported Android installation flow.
 - Unknown-source permission is requested only when needed, and the user remains in control of confirming installation.
 - Existing save data, channel separation, offline gameplay, and app signing expectations remain intact.
+- Windows KMP MSI upgrades an existing GTN MSI in place using the verified existing UpgradeCode and correct ProductCode/ProductVersion rules; saves remain intact and no duplicate installation is left.
