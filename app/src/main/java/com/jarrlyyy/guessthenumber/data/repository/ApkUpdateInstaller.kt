@@ -104,11 +104,23 @@ class ApkUpdateInstaller(private val context: Context) {
         require(hasMatchingSignature(info)) { "APK signing certificate does not match the installed app." }
     }
 
+    @Suppress("DEPRECATION")
     private fun hasMatchingSignature(candidate: PackageInfo): Boolean {
-        val installed = context.packageManager.getPackageInfo(context.packageName, if (Build.VERSION.SDK_INT >= 28) PackageManager.GET_SIGNING_CERTIFICATES else PackageManager.GET_SIGNATURES)
-        val installedSignatures = if (Build.VERSION.SDK_INT >= 28) installed.signingInfo.apkContentsSigners else @Suppress("DEPRECATION") installed.signatures
-        val candidateSignatures = if (Build.VERSION.SDK_INT >= 28) candidate.signingInfo.apkContentsSigners else @Suppress("DEPRECATION") candidate.signatures
-        return installedSignatures.any { installedSig -> candidateSignatures.any { candidateSig -> sha256(installedSig) == sha256(candidateSig) } }
+        val flags = if (Build.VERSION.SDK_INT >= 28) PackageManager.GET_SIGNING_CERTIFICATES else PackageManager.GET_SIGNATURES
+        val installed = context.packageManager.getPackageInfo(context.packageName, flags)
+        val installedSignatures: Array<out Signature> = if (Build.VERSION.SDK_INT >= 28) {
+            installed.signingInfo?.apkContentsSigners ?: emptyArray()
+        } else {
+            installed.signatures ?: emptyArray()
+        }
+        val candidateSignatures: Array<out Signature> = if (Build.VERSION.SDK_INT >= 28) {
+            candidate.signingInfo?.apkContentsSigners ?: emptyArray()
+        } else {
+            candidate.signatures ?: emptyArray()
+        }
+        return installedSignatures.isNotEmpty() && installedSignatures.any { installedSig ->
+            candidateSignatures.any { candidateSig -> sha256(installedSig) == sha256(candidateSig) }
+        }
     }
 
     private fun sha256(signature: Signature): String = MessageDigest.getInstance("SHA-256").digest(signature.toByteArray()).joinToString("") { "%02x".format(it) }
