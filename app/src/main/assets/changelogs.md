@@ -1,6 +1,16 @@
+## v3.0.3 (First-Run Tours & Update Reliability)
+
+- 🧭 **Feature tours after navigation**: Eligible feature screens now render first, then show their own first-visit tour. Opening a feature from More no longer interrupts navigation with a generic popup first. Tour completion is saved per feature.
+- 🌐 **Feature-aware tour titles**: Tour titles use the localized feature name where available, with localized tour controls and a delayed presentation after screen entry.
+- 🐛 **Nebula reward formatting**: Fixed the locale-string overload bug that could leave `Reward: +%s Nebula` unformatted; added a regression test for a concrete reward value.
+- 📦 **Installable channel updates**: About can discover the correct release/debug asset, download release APKs or debug ZIP archives, validate package identity and signing certificate, safely extract APK sets when needed, and pass compatible APKs to Android's installer.
+- 🔐 **Update installation handling**: Added the scoped update cache path, install-permission flow, installer result receiver, archive size/path limits and signing metadata compatibility fixes.
+- 🧪 **Build and test maintenance**: Fixed Compose named-argument errors and nullable signing metadata found by the first CI run.
+- 🏷️ **App version**: versionCode 21 / versionName 3.0.3.
+
 ## Unreleased (Player Experience)
 
-- 🧭 **More Hub feature discovery**: First-time visits to eligible More Hub features now show a short two-step popup with Next, Done, and Skip-and-open. Completion is saved in global settings; Settings, About, and developer/testing routes are excluded. Dismissing the popup leaves it available to show again.
+- 🧭 **More Hub feature discovery**: Selecting an unlocked feature now opens its destination immediately; the destination shows its localized first-run tour after rendering. Tour completion or dismissal is saved per feature, while Settings, About and developer/testing routes remain excluded.
 - 🔊 **Independent SFX mixer foundation**: Added a separate sound-effects volume preference and a resilient asset lookup/player API. Missing `assets/sfx/` folders or clips return a not-found result without interrupting gameplay; no bundled sound assets are added in this phase.
 - 🛍️ **Purchase feedback**: Successful Nebula shop purchases briefly highlight the purchased item, and successful upgrades highlight the upgrade card. Feedback respects reduced-motion preferences and uses the existing vibration setting.
 - 🏆 **Queued achievement celebrations**: When several achievements unlock together, each announcement is shown in sequence instead of being overwritten. Achievement celebrations respect reduced motion and the existing vibration setting.
