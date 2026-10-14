@@ -1,5 +1,7 @@
 ## Unreleased (Post-v3.0.2 Development Updates)
 
+- 🎨 **Live theme preview**: Settings now previews the selected primary, secondary, and tertiary colors in a sample game card and action button, updating immediately as theme colors change.
+
 - ⚙️ **Clearer Settings sections**: Grouped notification controls, audio/feedback controls, and visual-comfort preferences under distinct localized headings and dividers, while preserving existing settings behavior.
 
 - ⚙️ **Clearer Settings descriptions**: Added localized plain-language descriptions for language, theme appearance and colors, number notation, reminders, sound effects, vibration, visual comfort, reduced motion, master volume, and the destructive data-reset action across all supported locale catalogs.
