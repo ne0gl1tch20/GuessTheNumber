@@ -31,6 +31,12 @@ compose.desktop {
             targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi)
             packageName = "GuessTheNumber"
             packageVersion = "1.0.0"
+
+            windows {
+                menu = true
+                menuGroup = "GuessTheNumber"
+                shortcut = true
+            }
         }
     }
 }
