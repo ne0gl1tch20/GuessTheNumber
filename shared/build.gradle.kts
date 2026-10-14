@@ -20,6 +20,7 @@ kotlin {
 
         jvmMain.dependencies {
             implementation(libs.kotlinx.serialization.json)
+            api(libs.luaj.jme)
         }
     }
 }

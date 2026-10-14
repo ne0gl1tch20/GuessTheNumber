@@ -39,7 +39,7 @@ class GameEngineTest {
         val result = engine.processGuess(initial, 49)
 
         assertEquals(GuessFeedback.TOO_LOW, result.feedback)
-        assertEquals(BigNumber(980), result.newState.money)
+        assertEquals(0, result.newState.money.compareTo(BigNumber(980)))
         assertEquals(1L, result.newState.attempts)
         assertEquals(0, result.newState.streak)
         assertEquals(BigNumber.ZERO, result.reward)

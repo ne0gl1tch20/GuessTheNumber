@@ -1,4 +1,4 @@
-package com.jarrlyyy.guessthenumber.domain.model
+package com.jarrlyyy.guessthenumber.shared.domain
 
 /**
  * The bounded, Kotlin-owned reward policy for a seasonal LiveOps claim.

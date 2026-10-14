@@ -1,4 +1,4 @@
-package com.jarrlyyy.guessthenumber.scripting
+package com.jarrlyyy.guessthenumber.shared.scripting
 
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
@@ -20,7 +20,7 @@ import org.luaj.vm2.LoadState
  * Per-script Lua environment. Only the small, explicit host API is exposed.
  * Keep this sandbox isolated from Android, Java interop, files, and networking.
  */
-internal class LuaSandbox(
+class LuaSandbox(
     private val onLog: (String) -> Unit
 ) {
     companion object {
@@ -151,4 +151,4 @@ internal class LuaSandbox(
     }
 }
 
-internal class LuaBudgetExceededError(message: String) : Error(message)
+class LuaBudgetExceededError(message: String) : Error(message)

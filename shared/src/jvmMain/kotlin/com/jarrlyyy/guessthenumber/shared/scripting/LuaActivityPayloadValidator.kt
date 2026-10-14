@@ -1,4 +1,4 @@
-package com.jarrlyyy.guessthenumber.scripting
+package com.jarrlyyy.guessthenumber.shared.scripting
 
 import org.luaj.vm2.LuaValue
 
@@ -6,7 +6,7 @@ import org.luaj.vm2.LuaValue
  * Strictly validates Lua activity output before the Kotlin UI model is created.
  * Rejects malformed values instead of silently converting or truncating script content.
  */
-internal object LuaActivityPayloadValidator {
+object LuaActivityPayloadValidator {
     fun validate(result: LuaValue) {
         require(result.istable()) { "Lua activity must return a table." }
 

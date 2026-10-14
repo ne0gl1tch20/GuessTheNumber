@@ -1,4 +1,4 @@
-package com.jarrlyyy.guessthenumber.domain.model
+package com.jarrlyyy.guessthenumber.shared.domain
 
 import kotlin.random.Random
 
