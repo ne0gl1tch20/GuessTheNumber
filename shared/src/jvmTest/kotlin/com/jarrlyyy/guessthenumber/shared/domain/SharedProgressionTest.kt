@@ -10,7 +10,7 @@ class SharedProgressionTest {
         val initial = GameState(money = BigNumber(1_000))
         val result = RandomEventEngine().apply(initial, RandomEventType.CASH_BURST)
 
-        assertEquals(BigNumber(1_100), result.state.money)
+        assertEquals(0, result.state.money.compareTo(BigNumber(1_100)))
         assertEquals(1L, result.state.statistics.randomEventsTriggered)
         assertEquals("cash_burst", result.state.lastRandomEventId)
     }
