@@ -421,18 +421,35 @@ fun MoreScreen(
     }
 
     if (colorTarget != null) {
+        val route = colorTarget!!
+        val themeDefault = MaterialTheme.colorScheme.surfaceContainerHigh
+        val defaultHex = "#%02X%02X%02X".format(
+            (themeDefault.red * 255).toInt(),
+            (themeDefault.green * 255).toInt(),
+            (themeDefault.blue * 255).toInt()
+        )
         ReusableColorPickerDialog(
-            initialColorHex = state.settings.moreScreenButtonColors[colorTarget!!],
+            initialHex = state.settings.moreScreenButtonColors[route] ?: defaultHex,
+            title = "🎨 ${labels[route] ?: route}",
             onDismiss = { colorTarget = null },
-            onColorSelected = { colorHex ->
-                val target = colorTarget ?: return@ReusableColorPickerDialog
+            onApply = { hex ->
                 onUpdateSettings(
                     state.settings.copy(
-                        moreScreenButtonColors = state.settings.moreScreenButtonColors + (target to colorHex)
+                        moreScreenButtonColors = state.settings.moreScreenButtonColors + (route to hex)
+                    )
+                )
+                colorTarget = null
+            },
+            onReset = {
+                onUpdateSettings(
+                    state.settings.copy(
+                        moreScreenButtonColors = state.settings.moreScreenButtonColors - route
                     )
                 )
                 colorTarget = null
             }
         )
     }
+
+
 }
