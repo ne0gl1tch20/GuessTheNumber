@@ -61,6 +61,12 @@ fun FeatureTourOverlay(
         "relics" -> locale.getString("relics_hint", "Defeat world bosses to discover relics. Equip up to four for stronger set bonuses.")
         "endgame" -> locale.getString("endgame_description", "Complete long-term goals to prove your mastery of every system.")
         "live_ops" -> locale.getString("participate_live_ops_desc", "Participate in limited-time events to claim rewards and enhance progression.")
+        "play" -> locale.getString("play_correct_celebration_desc", "Find the hidden number and build your winning streak.")
+        "upgrade" -> locale.getString("upgrade_reward_multiplier_desc", "Upgrades improve rewards and make future guesses more effective.")
+        "shop" -> locale.getString("shop_item_nebula_boost_desc", "Spend Nebula on lasting boosts and useful upgrades.")
+        "codex" -> locale.getString("endgame_description", "Track discoveries and learn more about the worlds and bosses.")
+        "arcade" -> locale.getString("more_feature_discovery_step_1", "Try short minigames to earn extra rewards.")
+        "stats" -> locale.getString("more_feature_discovery_step_1", "Review your progress, streaks and game milestones.")
         "mutators" -> locale.getString("challenge_builder_desc", "Combine mutators and build a custom goal.")
         else -> locale.getString("more_feature_discovery_step_1", "Explore this feature's tools and progress, then choose what to try first.")
     }
