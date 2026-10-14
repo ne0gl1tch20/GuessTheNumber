@@ -30,7 +30,11 @@ compose.desktop {
         nativeDistributions {
             targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi)
             packageName = "GuessTheNumber"
-            packageVersion = "1.0.0"
+            // CI supplies a monotonically increasing MSI version for update testing.
+            // Local development keeps the existing fallback version.
+            packageVersion = providers.environmentVariable("GTN_WINDOWS_PACKAGE_VERSION")
+                .orElse("1.0.0")
+                .get()
 
             windows {
                 menu = true
