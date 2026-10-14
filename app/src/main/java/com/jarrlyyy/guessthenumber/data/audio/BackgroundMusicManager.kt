@@ -24,6 +24,7 @@ class BackgroundMusicManager private constructor(context: Context) {
     enum class RepeatMode { OFF, ONE, ALL }
 
     companion object {
+        private const val MAX_IMPORT_BYTES = 100L * 1024L * 1024L
         private val instances = WeakHashMap<Context, BackgroundMusicManager>()
 
         @Synchronized
@@ -110,17 +111,50 @@ class BackgroundMusicManager private constructor(context: Context) {
     }
 
     fun importTrack(uri: Uri, displayName: String? = null): Track? {
+        var destination: File? = null
         return try {
-        val musicDir = File(appContext.filesDir, "music").apply { mkdirs() }
-        val id = "track_${System.currentTimeMillis()}_${Random.nextInt(1000, 9999)}"
-        val destination = File(musicDir, "$id.audio")
-        appContext.contentResolver.openInputStream(uri)?.use { input -> FileOutputStream(destination).use { output -> input.copyTo(output) } } ?: return null
-        val metadata = readMetadata(destination)
-        val track = Track(id, destination.absolutePath, displayName ?: metadata.title ?: destination.nameWithoutExtension, metadata.artist.orEmpty(), metadata.album.orEmpty(), metadata.duration)
-        _library.value = _library.value + track
-        persistLibrary(_library.value)
-        track
-        } catch (_: Exception) { null }
+            val musicDir = File(appContext.filesDir, "music").apply { mkdirs() }
+            val id = "track_${System.currentTimeMillis()}_${Random.nextInt(1000, 9999)}"
+            destination = File(musicDir, "$id.audio")
+
+            // Imported files come from user-selected content providers. Bound the copy so
+            // a huge or unbounded stream cannot unexpectedly fill the app's private storage.
+            var totalBytes = 0L
+            appContext.contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(destination).use { output ->
+                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                    while (true) {
+                        val read = input.read(buffer)
+                        if (read < 0) break
+                        totalBytes += read
+                        require(totalBytes <= MAX_IMPORT_BYTES) {
+                            "Music file exceeds the 100 MiB import limit."
+                        }
+                        output.write(buffer, 0, read)
+                    }
+                }
+            } ?: return null
+
+            require(totalBytes > 0L) { "Music file is empty." }
+            val metadata = readMetadata(destination)
+            val track = Track(
+                id = id,
+                path = destination.absolutePath,
+                title = displayName?.takeIf { it.isNotBlank() }?.take(160)
+                    ?: metadata.title?.takeIf { it.isNotBlank() }
+                    ?: destination.nameWithoutExtension,
+                artist = metadata.artist.orEmpty().take(160),
+                album = metadata.album.orEmpty().take(160),
+                duration = metadata.duration.coerceAtLeast(0)
+            )
+            _library.value = _library.value + track
+            persistLibrary(_library.value)
+            track
+        } catch (_: Exception) {
+            // A rejected/failed import must not leave a partial file consuming storage.
+            destination?.let { runCatching { it.delete() } }
+            null
+        }
     }
 
     fun removeTrack(trackId: String) {
