@@ -86,12 +86,18 @@ class BackgroundMusicManager private constructor(context: Context) {
         progressJob?.cancel()
         progressJob = scope.launch {
             while (isActive) {
-                delay(200)
-                mediaPlayer?.let { player ->
+                val player = mediaPlayer
+                val activelyPlaying = player != null && _isPlaying.value
+                // Keep UI progress responsive during playback without waking the main
+                // dispatcher five times a second when paused or idle.
+                delay(if (activelyPlaying) 500L else 2_000L)
+                if (player != null) {
                     try {
                         _currentPosition.value = player.currentPosition
                         _duration.value = player.duration
-                    } catch (_: Exception) {}
+                    } catch (_: Exception) {
+                        // MediaPlayer may be released between a snapshot and a read.
+                    }
                 }
             }
         }
