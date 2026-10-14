@@ -13,6 +13,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
+import com.jarrlyyy.guessthenumber.shared.domain.GameStateCodec
 import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.encodeToString
@@ -56,7 +57,7 @@ class SaveManager(private val context: Context) {
     private fun getSaveKey(slot: Int) = stringPreferencesKey("game_state_slot_${slot}_json")
     private fun getBackupKey(slot: Int) = stringPreferencesKey("game_state_slot_${slot}_backup_json")
 
-    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+    private val json = GameStateCodec.json
 
     suspend fun getActiveSlot(): Int {
         val prefs = context.saveDataStore.data.first()
