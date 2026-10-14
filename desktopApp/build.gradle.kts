@@ -18,7 +18,7 @@ val generateWindowsBuildVersion by tasks.registering {
         file.parentFile.mkdirs()
         file.writeText(
             "package com.jarrlyyy.guessthenumber.desktop.update\n\n" +
-                "internal const val WINDOWS_BUILD_VERSION = \"\${windowsPackageVersion.get()}\"\n"
+                "internal const val WINDOWS_BUILD_VERSION = \"" + windowsPackageVersion.get() + "\"\n"
         )
     }
 }
