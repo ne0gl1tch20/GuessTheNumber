@@ -872,6 +872,10 @@
   "visual_comfort_description": "Візуальний комфорт і доступність",
   "reduced_motion_label": "Зменшити рух",
   "reduced_motion_description": "Пом’якшити або вимкнути анімовані переходи екрана",
+  "sfx_volume_format": "Гучність звукових ефектів: %d%%",
+
+  "settings_desc_sfx_volume": "Налаштуйте гучність звукових ефектів окремо від фонової музики.",
+
   "master_volume_format": "Основна гучність: %d%%",
   "save_data_management_title": "Керування збереженнями",
   "reset_all_game_data_label": "Скинути всі ігрові дані",
