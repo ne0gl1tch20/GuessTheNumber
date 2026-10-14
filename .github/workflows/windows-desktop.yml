@@ -58,7 +58,7 @@ jobs:
 
       - name: Run shared tests and compile desktop app
         shell: pwsh
-        run: .\gradlew.bat :shared:jvmTest :desktopApp:compileKotlin
+        run: .\gradlew.bat :shared:jvmTest :desktopApp:compileKotlinJvm
 
       - name: Build Windows MSI installer
         shell: pwsh
