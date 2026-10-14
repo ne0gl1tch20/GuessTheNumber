@@ -873,9 +873,7 @@
   "reduced_motion_label": "Reduzir movimento",
   "reduced_motion_description": "Suaviza ou desativa as transições expressivas do ecrã",
   "sfx_volume_format": "Volume dos efeitos sonoros: %d%%",
-
   "settings_desc_sfx_volume": "Ajuste o volume dos efeitos sonoros independentemente da música de fundo.",
-
   "master_volume_format": "Volume principal: %d%%",
   "save_data_management_title": "Gestão dos dados guardados",
   "reset_all_game_data_label": "Repor todos os dados do jogo",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Reduza os flashes e as alterações visuais repentinas.",
   "settings_desc_reduced_motion": "Suavize ou desative as transições animadas entre ecrãs.",
   "settings_desc_master_volume": "Defina o volume da aplicação entre o silêncio e o máximo.",
-  "settings_desc_reset_all_data": "Esta ação apaga o progresso guardado do jogo. É necessária uma confirmação adicional antes de continuar."
+  "settings_desc_reset_all_data": "Esta ação apaga o progresso guardado do jogo. É necessária uma confirmação adicional antes de continuar.",
+  "more_feature_discovery_title": "Visita rápida",
+  "more_feature_discovery_step_1": "Esta funcionalidade tem ferramentas e progresso próprios. Explore brevemente e escolha o que pretende descobrir.",
+  "more_feature_discovery_step_2": "Pode regressar a esta funcionalidade através do More Hub sempre que quiser.",
+  "more_feature_discovery_skip": "Ignorar e abrir"
 }
