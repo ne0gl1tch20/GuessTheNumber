@@ -1,39 +1,24 @@
 package com.jarrlyyy.guessthenumber.domain.model
 
+import com.jarrlyyy.guessthenumber.shared.domain.DifficultyRules
+
 object Difficulty {
-    const val CLASSIC = "classic"
-    const val HARD = "hard"
-    const val EXTREME = "extreme"
+    const val CLASSIC = DifficultyRules.CLASSIC
+    const val HARD = DifficultyRules.HARD
+    const val EXTREME = DifficultyRules.EXTREME
 
-    val ids: List<String> = listOf(CLASSIC, HARD, EXTREME)
+    val ids: List<String> = DifficultyRules.ids
 
-    fun isValid(id: String): Boolean = id in ids
+    fun isValid(id: String): Boolean = DifficultyRules.isValid(id)
 
-    fun nameKey(id: String): String = when (id) {
-        HARD -> "difficulty_hard"
-        EXTREME -> "difficulty_extreme"
-        else -> "difficulty_classic"
-    }
+    fun nameKey(id: String): String = DifficultyRules.nameKey(id)
 
-    fun baseRangeMax(id: String): Long = when (id) {
-        HARD -> 150L
-        EXTREME -> 250L
-        else -> 100L
-    }
+    fun baseRangeMax(id: String): Long = DifficultyRules.baseRangeMax(id)
 
     fun rangeMax(id: String, betterRangeLevel: Int): Long =
-        maxOf(50L, baseRangeMax(id) - (betterRangeLevel * 5L))
+        DifficultyRules.rangeMax(id, betterRangeLevel)
 
-    fun rewardMultiplier(id: String): Double = when (id) {
-        HARD -> 1.5
-        EXTREME -> 2.5
-        else -> 1.0
-    }
+    fun rewardMultiplier(id: String): Double = DifficultyRules.rewardMultiplier(id)
 
-    fun wrongGuessPenalty(id: String): Double = when (id) {
-        HARD -> 0.02
-        EXTREME -> 0.05
-        else -> 0.0
-    }
-
+    fun wrongGuessPenalty(id: String): Double = DifficultyRules.wrongGuessPenalty(id)
 }
