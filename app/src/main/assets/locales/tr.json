@@ -872,6 +872,14 @@
   "visual_comfort_description": "Görsel Konfor ve Erişilebilirlik",
   "reduced_motion_label": "Hareketi Azalt",
   "reduced_motion_description": "Ekran geçişlerini yumuşatır veya kapatır",
+  "more_feature_discovery_title": "Kısa tanıtım",
+
+  "more_feature_discovery_step_1": "Bu özelliğin kendine ait araçları ve ilerlemesi var. Kısaca göz atıp keşfetmek istediğini seç.",
+
+  "more_feature_discovery_step_2": "İstediğin zaman More Hub üzerinden bu özelliğe dönebilirsin.",
+
+  "more_feature_discovery_skip": "Atla ve aç",
+
   "master_volume_format": "Ana Ses: %d%%",
   "save_data_management_title": "Kayıt Verilerini Yönet",
   "reset_all_game_data_label": "Tüm Oyun Verilerini Sıfırla",
