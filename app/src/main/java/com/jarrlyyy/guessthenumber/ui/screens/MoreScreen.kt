@@ -39,6 +39,7 @@ fun MoreScreen(
 ) {
     var colorTarget by remember { mutableStateOf<String?>(null) }
     var showRequirementsFor by remember { mutableStateOf<String?>(null) }
+    var showReplayToursConfirmation by remember { mutableStateOf(false) }
     val openFeature: (String) -> Unit = { route ->
         when (route) {
             "ultra", "prestige" -> onNavigate(route)
@@ -190,6 +191,16 @@ fun MoreScreen(
                         }
                     }
 
+                    OutlinedButton(
+                        onClick = { showReplayToursConfirmation = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isReordering
+                    ) {
+                        Icon(Icons.Default.Replay, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(localizedText("Replay Feature Tours"))
+                    }
+
                     if (isReordering) {
                         Text(
                             localizedText("Hold and drag to rearrange"),
@@ -333,6 +344,37 @@ fun MoreScreen(
         }
     }
 
+    if (showReplayToursConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showReplayToursConfirmation = false },
+            icon = { Icon(Icons.Default.Replay, contentDescription = null) },
+            title = { Text(locale.getString("replay_feature_tours_title", "Replay feature tours?")) },
+            text = {
+                Text(
+                    locale.getString(
+                        "replay_feature_tours_description",
+                        "This will make completed feature tours appear again the next time you open each feature."
+                    )
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onUpdateSettings(state.settings.copy(tutorialSeenFeatures = emptySet()))
+                        showReplayToursConfirmation = false
+                    }
+                ) {
+                    Text(locale.getString("replay_feature_tours_confirm", "Replay tours"))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showReplayToursConfirmation = false }) {
+                    Text(locale.getString("cancel", "Cancel"))
+                }
+            }
+        )
+    }
+
     if (showRequirementsFor != null) {
         val route = showRequirementsFor!!
         val requirementText = when (route) {
@@ -379,35 +421,18 @@ fun MoreScreen(
     }
 
     if (colorTarget != null) {
-        val route = colorTarget!!
-        val themeDefault = MaterialTheme.colorScheme.surfaceContainerHigh
-        val defaultHex = "#%02X%02X%02X".format(
-            (themeDefault.red * 255).toInt(),
-            (themeDefault.green * 255).toInt(),
-            (themeDefault.blue * 255).toInt()
-        )
         ReusableColorPickerDialog(
-            initialHex = state.settings.moreScreenButtonColors[route] ?: defaultHex,
-            title = "🎨 ${labels[route] ?: route}",
+            initialColorHex = state.settings.moreScreenButtonColors[colorTarget!!],
             onDismiss = { colorTarget = null },
-            onApply = { hex ->
+            onColorSelected = { colorHex ->
+                val target = colorTarget ?: return@ReusableColorPickerDialog
                 onUpdateSettings(
                     state.settings.copy(
-                        moreScreenButtonColors = state.settings.moreScreenButtonColors + (route to hex)
-                    )
-                )
-                colorTarget = null
-            },
-            onReset = {
-                onUpdateSettings(
-                    state.settings.copy(
-                        moreScreenButtonColors = state.settings.moreScreenButtonColors - route
+                        moreScreenButtonColors = state.settings.moreScreenButtonColors + (target to colorHex)
                     )
                 )
                 colorTarget = null
             }
         )
     }
-
-
 }
