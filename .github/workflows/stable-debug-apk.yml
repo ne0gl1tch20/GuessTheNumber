@@ -10,54 +10,39 @@ jobs:
       ORG_GRADLE_PROJECT_luaLiveOpsPublicKeyBase64: ${{ secrets.LUA_LIVEOPS_PUBLIC_KEY_BASE64 }}
     permissions:
       contents: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
           cache: gradle
-
       - name: Validate Localizations
         run: python3 tools/validate_locales.py
-
       - name: Validate Version Metadata
         run: python3 tools/validate_versions.py
-
       - name: Validate All JSON Assets
         run: python3 tools/validate_json_assets.py
-
       - name: Audit Repository Localization Surface
         run: python3 tools/audit_localization_surface.py
-
       - name: Audit Hardcoded UI Strings
         run: python3 tools/validate_hardcoded_strings.py
-
       - name: Fast Kotlin Preflight Check
         run: python3 tools/preflight_compile_check.py
-
       - name: Build Preflight
         run: python3 tools/build_preflight.py
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest --no-daemon
-
       - name: Run Lint
         run: ./gradlew lintDebug --no-daemon
-
       - name: Run Full Gradle Check
         run: ./gradlew check --no-daemon
-
       - name: Restore stable debug keystore
         env:
           KEYSTORE_B64: ${{ secrets.GTN_DEBUG_KEYSTORE_BASE64 }}
@@ -66,40 +51,34 @@ jobs:
           mkdir -p "$RUNNER_TEMP/gtn-signing"
           printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/gtn-signing/debug.keystore"
           chmod 600 "$RUNNER_TEMP/gtn-signing/debug.keystore"
-
       - name: Build signed debug APK
         env:
           GTN_DEBUG_KEYSTORE_PATH: ${{ runner.temp }}/gtn-signing/debug.keystore
         run: ./gradlew assembleDebug --no-daemon
-
       - name: Create installable debug archive
         run: |
           mkdir -p "$RUNNER_TEMP/gtn-debug"
           cp app/build/outputs/apk/debug/*.apk "$RUNNER_TEMP/gtn-debug/GuessTheNumber-debug.apk"
           cd "$RUNNER_TEMP/gtn-debug"
           zip -q "$GITHUB_WORKSPACE/GuessTheNumber-debug.zip" GuessTheNumber-debug.apk
-
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: GuessTheNumber-debug-${{ github.run_number }}
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-
       - name: Upload installable debug archive
         uses: actions/upload-artifact@v4
         with:
           name: GuessTheNumber-debug.zip
           path: GuessTheNumber-debug.zip
           if-no-files-found: error
-
       - name: Publish debug-latest release asset
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view debug-latest >/dev/null 2>&1 || gh release create debug-latest --title "GuessTheNumber Debug Latest" --notes "Automatically refreshed stable debug build."
+          gh release view debug-latest >/dev/null 2>&1 || gh release create debug-latest --target "$GITHUB_SHA" --title "GuessTheNumber Debug Latest" --notes "Automatically refreshed stable debug build."
           gh release upload debug-latest GuessTheNumber-debug.zip --clobber
-
       - name: Remove signing material
         if: always()
         run: rm -rf "$RUNNER_TEMP/gtn-signing" "$RUNNER_TEMP/gtn-debug"
