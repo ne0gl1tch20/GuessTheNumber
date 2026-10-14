@@ -23,5 +23,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Guess The Number"
-include(":app")
+include(":app", ":shared")
  
