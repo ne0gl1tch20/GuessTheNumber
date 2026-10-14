@@ -66,12 +66,12 @@ jobs:
 
       - name: Build Windows installer
         shell: pwsh
-        run: .\gradlew.bat :desktopApp:package
+        run: .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheNumber-Windows-Package
+          name: GuessTheNumber-Windows-Desktop
           path: desktopApp/build/compose/binaries/main/**
           if-no-files-found: warn
           retention-days: 14
