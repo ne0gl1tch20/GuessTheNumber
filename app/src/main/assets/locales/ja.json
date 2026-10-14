@@ -915,6 +915,10 @@
   "visual_comfort_description": "視覚的な快適さとアクセシビリティ",
   "reduced_motion_label": "動きを減らす",
   "reduced_motion_description": "画面遷移の動きを弱めるか無効にします",
+  "sfx_volume_format": "効果音の音量: %d%%",
+
+  "settings_desc_sfx_volume": "BGMとは別に効果音の音量を調整します。",
+
   "master_volume_format": "マスター音量：%d%%",
   "save_data_management_title": "セーブデータ管理",
   "reset_all_game_data_label": "すべてのゲームデータをリセット",
