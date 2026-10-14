@@ -1,5 +1,6 @@
 ## Unreleased (Cross-Core Runtime Hardening)
 
+- 🎯 **Accurate guess feedback**: Keyboard and button submissions now share one handler, and rate-limited guesses show a localized retry message instead of misleading high/low/correct feedback. Feedback uses the same clamped number the game engine evaluates.
 - 💾 **Preserve recoverable saves**: Saving over a corrupted primary no longer overwrites a valid last-known-good backup.
 - 💾 **Reject impossible save state**: Save validation now rejects out-of-range targets and negative economy/progression counters so recovery can prefer a valid backup.
 - 🎵 **Bound music imports**: Imported tracks are capped at 100 MiB; empty, oversized, or failed imports are rejected and partial files are cleaned up.
