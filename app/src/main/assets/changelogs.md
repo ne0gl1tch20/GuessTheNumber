@@ -7,12 +7,6 @@
 - 🌐 **Locale resilience**: Locale catalog references are safely published across threads, and invalid currency codes fall back to a plain localized number instead of throwing.
 - 🧪 **Regression coverage**: Added tests for recoverable save backups, invalid saved state, and invalid currency formatting.
 
-## Unreleased (Cross-Core Runtime Hardening)
-
-- 💾 **Preserve recoverable saves**: Saving over a corrupted primary no longer overwrites a valid last-known-good backup.
-- 🎵 **Bound music imports**: Imported tracks are capped at 100 MiB; empty, oversized, or failed imports are rejected and partial files are cleaned up.
-- 🧪 **Regression coverage**: Added a save-recovery test for a corrupt primary followed by another save.
-
 ## Unreleased (Post-v3.0.2 Development Updates)
 
 - 🎨 **Live theme preview**: Settings now previews the selected primary, secondary, and tertiary colors in a sample game card and action button, updating immediately as theme colors change.
