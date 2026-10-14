@@ -1,5 +1,7 @@
 ## Unreleased (Player Experience)
 
+- 🛍️ **Purchase feedback**: Successful Nebula shop purchases briefly highlight the purchased item, and successful upgrades highlight the upgrade card. Feedback respects reduced-motion preferences and uses the existing vibration setting.
+- 🏆 **Queued achievement celebrations**: When several achievements unlock together, each announcement is shown in sequence instead of being overwritten. Achievement celebrations respect reduced motion and the existing vibration setting.
 - 🎯 **Accurate guess feedback**: Keyboard and button submissions now share one handler, and rate-limited guesses show a localized retry message instead of misleading high/low/correct feedback. Feedback uses the same clamped number the game engine evaluates.
 - 🎯 **Clearer guess feedback**: High, low, and correct guesses now use distinct icons and theme-aware feedback cards. Feedback transitions respect the reduced-motion setting, and Blindfolded Oracle hides feedback from both the Guess button and keyboard submission paths.
 

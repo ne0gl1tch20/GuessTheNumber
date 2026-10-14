@@ -17,6 +17,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -34,10 +36,12 @@ fun AchievementsScreen(
     val context = LocalContext.current
     val configRepo = remember(state.settings.locale) { JsonConfigRepository(context, state.settings.locale) }
     val locale = configRepo.localeManager
+    val hapticFeedback = LocalHapticFeedback.current
     val achievements = remember(state.settings.locale) {
         configRepo.loadAchievements()
     }
     var observedAchievements by remember { mutableStateOf(state.achievements) }
+    val pendingUnlockCelebrations = remember { mutableStateListOf<String>() }
     var showUnlockCelebration by remember { mutableStateOf(false) }
     var unlockCelebrationText by remember { mutableStateOf("") }
 
@@ -45,15 +49,35 @@ fun AchievementsScreen(
         val newlyUnlocked = state.achievements - observedAchievements
         observedAchievements = state.achievements
         if (newlyUnlocked.isNotEmpty()) {
-            val achievementName = achievements.firstOrNull { it.id in newlyUnlocked }?.name
-            unlockCelebrationText = if (achievementName != null) {
-                locale.getString("achievement_unlocked_banner", "Unlocked: %s", achievementName)
-            } else {
-                locale.getString("achievement_unlocked_fallback", "A new achievement is unlocked!")
+            val orderedUnlocks = achievements.filter { it.id in newlyUnlocked }
+            orderedUnlocks.forEach { achievement ->
+                val message = locale.getString("achievement_unlocked_banner", "Unlocked: %s", achievement.name)
+                if (message !in pendingUnlockCelebrations && message != unlockCelebrationText) {
+                    pendingUnlockCelebrations.add(message)
+                }
             }
-            showUnlockCelebration = true
-            delay(if (state.settings.reducedMotion) 700L else 2200L)
-            showUnlockCelebration = false
+            val knownIds = orderedUnlocks.map { it.id }.toSet()
+            if (newlyUnlocked.any { it !in knownIds }) {
+                val fallback = locale.getString("achievement_unlocked_fallback", "A new achievement is unlocked!")
+                if (fallback !in pendingUnlockCelebrations && fallback != unlockCelebrationText) {
+                    pendingUnlockCelebrations.add(fallback)
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(pendingUnlockCelebrations.firstOrNull(), state.settings.reducedMotion) {
+        val nextCelebration = pendingUnlockCelebrations.firstOrNull() ?: return@LaunchedEffect
+        unlockCelebrationText = nextCelebration
+        showUnlockCelebration = true
+        if (state.settings.vibrationEnabled) {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+        delay(if (state.settings.reducedMotion) 700L else 2200L)
+        showUnlockCelebration = false
+        delay(if (state.settings.reducedMotion) 100L else 220L)
+        if (pendingUnlockCelebrations.firstOrNull() == nextCelebration) {
+            pendingUnlockCelebrations.removeAt(0)
         }
     }
 
