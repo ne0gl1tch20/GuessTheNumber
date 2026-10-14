@@ -192,6 +192,14 @@ class LocaleManagerTest {
     }
 
     @Test
+    fun invalidCurrencyCodeFallsBackWithoutThrowing() {
+        val manager = LocaleManager(context)
+        val formatted = manager.formatCurrency(BigDecimal("1234.50"), "not-a-currency")
+        assertTrue(formatted.isNotBlank())
+        assertTrue(formatted.contains("1") || formatted.contains("1,"))
+    }
+
+    @Test
     fun rtlLocaleIsDetected() = runBlocking {
         val manager = LocaleManager(context)
         manager.loadLocaleForTag("ar-SA")

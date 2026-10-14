@@ -3,11 +3,15 @@ package com.jarrlyyy.guessthenumber.data
 import com.jarrlyyy.guessthenumber.domain.engine.AntiCheatService
 import com.jarrlyyy.guessthenumber.domain.engine.AntiTimeTravelService
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
+import com.jarrlyyy.guessthenumber.data.store.saveDataStore
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import org.junit.Assert.*
 import org.robolectric.RuntimeEnvironment
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.encodeToString
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -57,6 +61,57 @@ class SaveValidationTest {
 
         assertEquals(BigNumber(150), updated?.money)
         assertEquals(BigNumber(150), manager.loadGame(1).money)
+    }
+
+    @Test
+    fun atomicGameUpdateRejectsInvalidTransformedStateWithoutReplacingSave() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = SaveManager(context)
+        manager.saveGame(GameState(money = BigNumber(100)), 1)
+
+        val updated = manager.updateGameAtomically(1) {
+            it.copy(money = BigNumber(-1))
+        }
+
+        assertNull(updated)
+        assertEquals(BigNumber(100), manager.loadGame(1).money)
+    }
+
+    @Test
+    fun corruptPrimaryCannotOverwriteLastKnownGoodBackup() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = SaveManager(context)
+        val primaryKey = stringPreferencesKey("game_state_slot_1_json")
+
+        manager.saveGame(GameState(money = BigNumber(100)), 1)
+        manager.saveGame(GameState(money = BigNumber(200)), 1)
+
+        context.saveDataStore.edit { it[primaryKey] = "{corrupt" }
+        manager.saveGame(GameState(money = BigNumber(300)), 1)
+
+        // Simulate another interrupted/corrupt write after the new primary was saved.
+        context.saveDataStore.edit { it[primaryKey] = "{corrupt-again" }
+        assertEquals(BigNumber(100), manager.loadGame(1).money)
+    }
+
+    @Test
+    fun saveValidationRejectsImpossibleTargetsAndNegativeEconomyCounters() {
+        val manager = SaveManager(RuntimeEnvironment.getApplication())
+        val json = kotlinx.serialization.json.Json { encodeDefaults = true }
+
+        val impossibleTarget = GameState(
+            currentRangeMin = 1,
+            currentRangeMax = 100,
+            targetNumber = 101
+        )
+        val negativeUpgrade = GameState(upgradeLevels = mapOf("reward_multiplier" to -1))
+        val negativeStatistics = GameState(
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(moneySpent = BigNumber(-1))
+        )
+
+        assertFalse(manager.validateSave(json.encodeToString(GameState.serializer(), impossibleTarget)))
+        assertFalse(manager.validateSave(json.encodeToString(GameState.serializer(), negativeUpgrade)))
+        assertFalse(manager.validateSave(json.encodeToString(GameState.serializer(), negativeStatistics)))
     }
 
     @Test
