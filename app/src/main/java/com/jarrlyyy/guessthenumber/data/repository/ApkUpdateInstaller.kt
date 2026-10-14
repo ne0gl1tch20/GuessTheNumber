@@ -1,12 +1,12 @@
 package com.jarrlyyy.guessthenumber.data.repository
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.Signature
 import android.os.Build
-import android.os.Environment
 import android.content.pm.PackageInstaller
 import java.io.File
 import java.io.FileInputStream
@@ -24,7 +24,7 @@ class ApkUpdateInstaller(private val context: Context) {
         private const val MAX_ENTRIES = 128
     }
 
-    fun install(downloadUrl: String): Result {
+    fun install(downloadUrl: String): Result<Unit> {
         val root = File(context.cacheDir, "updates").apply { mkdirs() }
         val archive = File(root, "update.zip")
         val extracted = File(root, "extracted-${System.currentTimeMillis()}")
@@ -70,6 +70,7 @@ class ApkUpdateInstaller(private val context: Context) {
 
     private fun extractSafely(archive: File, destination: File) {
         destination.mkdirs()
+        val root = destination.canonicalFile
         var entries = 0
         var extractedBytes = 0L
         ZipInputStream(FileInputStream(archive)).use { zip ->
@@ -79,7 +80,7 @@ class ApkUpdateInstaller(private val context: Context) {
                 require(entries <= MAX_ENTRIES) { "Update archive contains too many files." }
                 require(!entry.isDirectory) { "Directories are not accepted in the update archive." }
                 val target = File(destination, entry.name).canonicalFile
-                require(target.path.startsWith(destination.canonicalFile.path + File.separator)) { "Unsafe ZIP path." }
+                require(target.path.startsWith(root.path + File.separator)) { "Unsafe ZIP path." }
                 target.parentFile?.mkdirs()
                 FileOutputStream(target).use { output ->
                     val buffer = ByteArray(32 * 1024)
@@ -104,10 +105,7 @@ class ApkUpdateInstaller(private val context: Context) {
     }
 
     private fun hasMatchingSignature(candidate: PackageInfo): Boolean {
-        val installed = context.packageManager.getPackageInfo(
-            context.packageName,
-            if (Build.VERSION.SDK_INT >= 28) PackageManager.GET_SIGNING_CERTIFICATES else PackageManager.GET_SIGNATURES
-        )
+        val installed = context.packageManager.getPackageInfo(context.packageName, if (Build.VERSION.SDK_INT >= 28) PackageManager.GET_SIGNING_CERTIFICATES else PackageManager.GET_SIGNATURES)
         val installedSignatures = if (Build.VERSION.SDK_INT >= 28) installed.signingInfo.apkContentsSigners else @Suppress("DEPRECATION") installed.signatures
         val candidateSignatures = if (Build.VERSION.SDK_INT >= 28) candidate.signingInfo.apkContentsSigners else @Suppress("DEPRECATION") candidate.signatures
         return installedSignatures.any { installedSig -> candidateSignatures.any { candidateSig -> sha256(installedSig) == sha256(candidateSig) } }
@@ -121,14 +119,17 @@ class ApkUpdateInstaller(private val context: Context) {
         params.setSize(apks.sumOf { it.length() })
         val sessionId = installer.createSession(params)
         installer.openSession(sessionId).use { session ->
-            apks.sortedWith(compareBy<File> { if (it.nameWithoutExtension.contains("base", true)) 0 else 1 }.thenBy { it.name }).forEachIndexed { index, apk ->
+            apks.sortedWith(compareBy<File> { if (it.name.equals("base.apk", true)) 0 else 1 }.thenBy { it.name }).forEach { apk ->
                 FileInputStream(apk).use { input ->
-                    session.openWrite("apk-$index-${apk.name}", 0, apk.length()).use { output -> input.copyTo(output) }
+                    session.openWrite(apk.name, 0, apk.length()).use { output ->
+                        input.copyTo(output)
+                        session.fsync(output)
+                    }
                 }
             }
-            session.fsync(session.openWrite("metadata", 0, 0).also { it.close() })
             val intent = Intent(context, UpdateInstallReceiver::class.java).setAction(UpdateInstallReceiver.ACTION_RESULT)
-            session.commit(android.app.PendingIntent.getBroadcast(context, sessionId, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE).intentSender)
+            val pending = PendingIntent.getBroadcast(context, sessionId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            session.commit(pending.intentSender)
         }
     }
 }
