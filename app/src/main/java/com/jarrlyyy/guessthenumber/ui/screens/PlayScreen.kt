@@ -17,6 +17,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -46,6 +48,7 @@ fun PlayScreen(
     incomePerSecond: com.jarrlyyy.guessthenumber.domain.model.BigNumber = com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    val hapticFeedback = LocalHapticFeedback.current
     val listState = rememberLazyListState()
     val scrollScope = rememberCoroutineScope()
     val worldDefinitions = remember { WorldConfigRepository(context).loadWorlds() }
@@ -630,11 +633,20 @@ fun PlayScreen(
                                 val g = guessInput.toLongOrNull()
                                 if (g != null) {
                                     onMakeGuess(g)
-                                    feedbackTone = when {
+                                    val resolvedTone = when {
                                         "mut_blind" in state.activeMutators -> GuessFeedbackTone.Neutral
                                         g < state.targetNumber -> GuessFeedbackTone.TooLow
                                         g > state.targetNumber -> GuessFeedbackTone.TooHigh
                                         else -> GuessFeedbackTone.Correct
+                                    }
+                                    feedbackTone = resolvedTone
+                                    if (state.settings.vibrationEnabled) {
+                                        when (resolvedTone) {
+                                            GuessFeedbackTone.Correct -> hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
+                                            GuessFeedbackTone.TooLow, GuessFeedbackTone.TooHigh ->
+                                                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            GuessFeedbackTone.Neutral -> Unit
+                                        }
                                     }
                                     lastFeedback = if ("mut_blind" in state.activeMutators) {
                                         locale.getString("blind_feedback", "Feedback hidden by Blindfolded Oracle.")
@@ -712,11 +724,20 @@ fun PlayScreen(
                                 val g = guessInput.toLongOrNull()
                                 if (g != null) {
                                     onMakeGuess(g)
-                                    feedbackTone = when {
+                                    val resolvedTone = when {
                                         "mut_blind" in state.activeMutators -> GuessFeedbackTone.Neutral
                                         g < state.targetNumber -> GuessFeedbackTone.TooLow
                                         g > state.targetNumber -> GuessFeedbackTone.TooHigh
                                         else -> GuessFeedbackTone.Correct
+                                    }
+                                    feedbackTone = resolvedTone
+                                    if (state.settings.vibrationEnabled) {
+                                        when (resolvedTone) {
+                                            GuessFeedbackTone.Correct -> hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
+                                            GuessFeedbackTone.TooLow, GuessFeedbackTone.TooHigh ->
+                                                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            GuessFeedbackTone.Neutral -> Unit
+                                        }
                                     }
                                     lastFeedback = if ("mut_blind" in state.activeMutators) {
                                         locale.getString("blind_feedback", "Feedback hidden by Blindfolded Oracle.")
