@@ -39,9 +39,6 @@ fun MoreScreen(
 ) {
     var colorTarget by remember { mutableStateOf<String?>(null) }
     var showRequirementsFor by remember { mutableStateOf<String?>(null) }
-    var showFeatureDiscoveryFor by remember { mutableStateOf<String?>(null) }
-    var featureDiscoveryStep by remember { mutableIntStateOf(0) }
-    val discoveryExcludedRoutes = setOf("settings", "about", "dev_settings", "lua_testing_hub")
     val openFeature: (String) -> Unit = { route ->
         when (route) {
             "ultra", "prestige" -> onNavigate(route)
@@ -268,12 +265,6 @@ fun MoreScreen(
                                 Modifier.clickable {
                                     if (isLocked) {
                                         showRequirementsFor = route
-                                    } else if (
-                                        route !in discoveryExcludedRoutes &&
-                                        route !in state.settings.tutorialSeenFeatures
-                                    ) {
-                                        showFeatureDiscoveryFor = route
-                                        featureDiscoveryStep = 0
                                     } else {
                                         openFeature(route)
                                     }
@@ -340,48 +331,6 @@ fun MoreScreen(
             }
 
         }
-    }
-
-    if (showFeatureDiscoveryFor != null) {
-        val route = showFeatureDiscoveryFor!!
-        val finishDiscovery: () -> Unit = {
-            onUpdateSettings(state.settings.copy(
-                tutorialSeenFeatures = state.settings.tutorialSeenFeatures + route
-            ))
-            showFeatureDiscoveryFor = null
-            openFeature(route)
-        }
-        AlertDialog(
-            onDismissRequest = { showFeatureDiscoveryFor = null },
-            title = { Text(locale.getString("more_feature_discovery_title", "Quick tour")) },
-            text = {
-                Text(
-                    locale.getString(
-                        if (featureDiscoveryStep == 0) "more_feature_discovery_step_1" else "more_feature_discovery_step_2",
-                        if (featureDiscoveryStep == 0) "This feature has its own tools and progress. Take a quick look, then choose what to explore." else "You can return to this feature from the More Hub whenever you want."
-                    )
-                )
-            },
-            confirmButton = {
-                Button(onClick = {
-                    if (featureDiscoveryStep == 0) featureDiscoveryStep = 1 else finishDiscovery()
-                }) {
-                    Text(locale.getString(if (featureDiscoveryStep == 0) "next" else "done", if (featureDiscoveryStep == 0) "Next" else "Done"))
-                }
-            },
-            dismissButton = {
-                Row {
-                    TextButton(onClick = finishDiscovery) {
-                        Text(locale.getString("more_feature_discovery_skip", "Skip and open"))
-                    }
-                    if (featureDiscoveryStep > 0) {
-                        TextButton(onClick = { featureDiscoveryStep = 0 }) {
-                            Text(locale.getString("back", "Back"))
-                        }
-                    }
-                }
-            }
-        )
     }
 
     if (showRequirementsFor != null) {
