@@ -192,14 +192,16 @@ fun SettingsScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            Button(
-                                onClick = {},
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = previewPrimary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
-                                )
+                            Surface(
+                                shape = MaterialTheme.shapes.extraLarge,
+                                color = previewPrimary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             ) {
-                                Text(locale.getString("guess_button", "Guess"))
+                                Text(
+                                    locale.getString("guess_button", "Guess"),
+                                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.labelLarge
+                                )
                             }
                         }
                         Row(
