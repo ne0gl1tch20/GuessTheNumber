@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import com.jarrlyyy.guessthenumber.desktop.update.WINDOWS_BUILD_VERSION
+import com.jarrlyyy.guessthenumber.desktop.update.WindowsBuildVersion
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugInstaller
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdate
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdateClient
@@ -50,7 +50,7 @@ fun main() = application {
                 status = "Checking for Windows Debug updates…"
                 try {
                     availableUpdate = withContext(Dispatchers.IO) {
-                        updateClient.findLatestUpdate(WINDOWS_BUILD_VERSION)
+                        updateClient.findLatestUpdate(WindowsBuildVersion.current)
                     }
                     status = if (availableUpdate == null) {
                         "You're using the latest published Windows Debug build."
@@ -78,7 +78,7 @@ fun main() = application {
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text("Windows Debug updates", style = MaterialTheme.typography.titleMedium)
-                        Text("Installed version: $WINDOWS_BUILD_VERSION")
+                        Text("Installed version: $WindowsBuildVersion.current")
                         Text(status)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Button(
