@@ -10,12 +10,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.BuildConfig
 
- data class OpenSourceLibrary(val name: String, val license: String, val author: String)
+data class OpenSourceLibrary(val name: String, val license: String, val author: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,14 +36,12 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
     var updateMessage by remember { mutableStateOf<String?>(null) }
     var availableUpdate by remember { mutableStateOf<UpdateChannelChecker.AvailableUpdate?>(null) }
     val channelLabel = if (BuildConfig.UPDATE_CHANNEL == "debug") locale.getString("update_channel_debug", "Debug channel") else locale.getString("update_channel_release", "Release channel")
-
     val libraries = listOf(
         OpenSourceLibrary("Jetpack Compose", "Apache 2.0", "Google / Android Open Source Project"),
         OpenSourceLibrary("Material 3", "Apache 2.0", "Google"), OpenSourceLibrary("Kotlinx Serialization", "Apache 2.0", "JetBrains"),
         OpenSourceLibrary("Kotlinx Coroutines", "Apache 2.0", "JetBrains"), OpenSourceLibrary("DataStore Preferences", "Apache 2.0", "Google"),
         OpenSourceLibrary("Navigation Compose", "Apache 2.0", "Google"), OpenSourceLibrary("LuaJ", "MIT", "LuaJ project; James Roseborough and Ian Farmer")
     )
-
     Scaffold(topBar = {
         TopAppBar(title = { Text(locale.getString("about_title", "About & Open Source Licenses")) }, navigationIcon = {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back")) }
@@ -75,29 +68,24 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                                 checkingUpdates = false
                             }
                         }, enabled = !checkingUpdates && !installingUpdate, Modifier.fillMaxWidth()) {
-                            if (checkingUpdates) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp); Spacer(Modifier.width(8.dp)); Text(locale.getString("update_checking", "Checking for updates…")) }
-                            else Text(locale.getString("update_check", "Check for updates"))
+                            if (checkingUpdates) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp); Spacer(Modifier.width(8.dp)); Text(locale.getString("update_checking", "Checking for updates…")) } else Text(locale.getString("update_check", "Check for updates"))
                         }
                         updateMessage?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
                         availableUpdate?.let { update ->
                             Text(update.title, style = MaterialTheme.typography.titleSmall)
                             if (update.details.isNotBlank()) Text(update.details, style = MaterialTheme.typography.bodySmall)
                             Button(onClick = {
-                                if (!android.os.Environment.isExternalStorageManager() && android.os.Build.VERSION.SDK_INT >= 30) {
-                                    // This branch is intentionally not used for APK installation; Android package installs use app-private cache.
-                                }
                                 if (!context.packageManager.canRequestPackageInstalls()) {
-                                    val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${context.packageName}"))
-                                    context.startActivity(intent)
+                                    context.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${context.packageName}")))
                                     updateMessage = locale.getString("update_permission_required", "Allow this app to install updates, then return and tap Install again.")
-                                    return@Button
-                                }
-                                scope.launch {
-                                    installingUpdate = true
-                                    updateMessage = locale.getString("update_downloading", "Downloading and preparing update…")
-                                    val result = withContext(Dispatchers.IO) { ApkUpdateInstaller(context).install(update.downloadUrl) }
-                                    installingUpdate = false
-                                    updateMessage = result.fold({ locale.getString("update_install_started", "Installation started. Confirm the Android installer prompt.") }, { locale.getString("update_install_failed", "Update failed: %s", it.message ?: "unknown error") })
+                                } else {
+                                    scope.launch {
+                                        installingUpdate = true
+                                        updateMessage = locale.getString("update_downloading", "Downloading and preparing update…")
+                                        val result = withContext(Dispatchers.IO) { ApkUpdateInstaller(context).install(update.downloadUrl) }
+                                        installingUpdate = false
+                                        updateMessage = result.fold({ locale.getString("update_install_started", "Installation started. Confirm the Android installer prompt.") }, { locale.getString("update_install_failed", "Update failed: %s", it.message ?: "unknown error") })
+                                    }
                                 }
                             }, enabled = !installingUpdate, Modifier.fillMaxWidth()) {
                                 if (installingUpdate) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp) else Text(locale.getString("update_install", "Install update"))
