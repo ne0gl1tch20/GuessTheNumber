@@ -67,7 +67,7 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                                 }
                                 checkingUpdates = false
                             }
-                        }, enabled = !checkingUpdates && !installingUpdate, Modifier.fillMaxWidth()) {
+                        }, enabled = !checkingUpdates && !installingUpdate, modifier = Modifier.fillMaxWidth()) {
                             if (checkingUpdates) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp); Spacer(Modifier.width(8.dp)); Text(locale.getString("update_checking", "Checking for updates…")) } else Text(locale.getString("update_check", "Check for updates"))
                         }
                         updateMessage?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
@@ -87,10 +87,10 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                                         updateMessage = result.fold({ locale.getString("update_install_started", "Installation started. Confirm the Android installer prompt.") }, { locale.getString("update_install_failed", "Update failed: %s", it.message ?: "unknown error") })
                                     }
                                 }
-                            }, enabled = !installingUpdate, Modifier.fillMaxWidth()) {
+                            }, enabled = !installingUpdate, modifier = Modifier.fillMaxWidth()) {
                                 if (installingUpdate) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp) else Text(locale.getString("update_install", "Install update"))
                             }
-                            OutlinedButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(update.url))) }, Modifier.fillMaxWidth()) { Text(locale.getString("update_open", "Open update page")) }
+                            OutlinedButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(update.url))) }, modifier = Modifier.fillMaxWidth()) { Text(locale.getString("update_open", "Open update page")) }
                         }
                         Spacer(Modifier.height(8.dp))
                         Text(locale.getString("about_description", "A polished Android incremental game combining classic guessing mechanics with deep prestige/ultra progression, anti-cheat protection, offline progression! Made with love by @jarrlyyy!"))
