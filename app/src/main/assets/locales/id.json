@@ -873,9 +873,7 @@
   "reduced_motion_label": "Kurangi Gerakan",
   "reduced_motion_description": "Lembutkan atau nonaktifkan transisi layar ekspresif",
   "sfx_volume_format": "Volume Efek Suara: %d%%",
-
   "settings_desc_sfx_volume": "Atur kerasnya efek suara secara terpisah dari musik latar.",
-
   "master_volume_format": "Volume Utama: %d%%",
   "save_data_management_title": "Pengelolaan Data Simpanan",
   "reset_all_game_data_label": "Atur Ulang Semua Data Game",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Kurangi kilatan dan perubahan visual yang tiba-tiba.",
   "settings_desc_reduced_motion": "Perhalus atau nonaktifkan transisi layar animasi.",
   "settings_desc_master_volume": "Atur volume aplikasi dari senyap hingga maksimum.",
-  "settings_desc_reset_all_data": "Tindakan ini menghapus progres game yang tersimpan. Konfirmasi tambahan diperlukan sebelum melanjutkan."
+  "settings_desc_reset_all_data": "Tindakan ini menghapus progres game yang tersimpan. Konfirmasi tambahan diperlukan sebelum melanjutkan.",
+  "more_feature_discovery_title": "Tur singkat",
+  "more_feature_discovery_step_1": "Fitur ini memiliki alat dan progresnya sendiri. Lihat sebentar, lalu pilih apa yang ingin dijelajahi.",
+  "more_feature_discovery_step_2": "Kamu bisa kembali ke fitur ini dari Hub Lainnya kapan saja.",
+  "more_feature_discovery_skip": "Lewati dan buka"
 }

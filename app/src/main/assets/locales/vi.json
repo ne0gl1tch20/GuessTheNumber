@@ -873,9 +873,7 @@
   "reduced_motion_label": "Giảm chuyển động",
   "reduced_motion_description": "Làm dịu hoặc tắt chuyển cảnh biểu cảm",
   "sfx_volume_format": "Âm lượng hiệu ứng âm thanh: %d%%",
-
   "settings_desc_sfx_volume": "Điều chỉnh âm lượng hiệu ứng riêng biệt với nhạc nền.",
-
   "master_volume_format": "Âm lượng chính: %d%%",
   "save_data_management_title": "Quản lý dữ liệu lưu",
   "reset_all_game_data_label": "Đặt lại toàn bộ dữ liệu trò chơi",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Giảm nháy sáng và thay đổi hình ảnh đột ngột.",
   "settings_desc_reduced_motion": "Làm dịu hoặc tắt chuyển cảnh hoạt hình.",
   "settings_desc_master_volume": "Điều chỉnh âm lượng ứng dụng từ im lặng đến tối đa.",
-  "settings_desc_reset_all_data": "Thao tác này sẽ xóa tiến trình trò chơi đã lưu. Cần xác nhận thêm trước khi tiếp tục."
+  "settings_desc_reset_all_data": "Thao tác này sẽ xóa tiến trình trò chơi đã lưu. Cần xác nhận thêm trước khi tiếp tục.",
+  "more_feature_discovery_title": "Hướng dẫn nhanh",
+  "more_feature_discovery_step_1": "Tính năng này có công cụ và tiến trình riêng. Hãy xem qua rồi chọn nội dung bạn muốn khám phá.",
+  "more_feature_discovery_step_2": "Bạn có thể quay lại tính năng này từ More Hub bất cứ lúc nào.",
+  "more_feature_discovery_skip": "Bỏ qua và mở"
 }

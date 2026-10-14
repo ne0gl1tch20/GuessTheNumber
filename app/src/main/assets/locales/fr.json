@@ -873,9 +873,7 @@
   "reduced_motion_label": "Réduire les mouvements",
   "reduced_motion_description": "Adoucit ou désactive les transitions expressives de l’écran",
   "sfx_volume_format": "Volume des effets sonores : %d%%",
-
   "settings_desc_sfx_volume": "Règle le volume des effets sonores indépendamment de la musique de fond.",
-
   "master_volume_format": "Volume principal : %d%%",
   "save_data_management_title": "Gestion des données de sauvegarde",
   "reset_all_game_data_label": "Réinitialiser toutes les données du jeu",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Réduisez les flashs et les changements visuels soudains.",
   "settings_desc_reduced_motion": "Adoucissez ou désactivez les transitions animées entre les écrans.",
   "settings_desc_master_volume": "Réglez le volume de l’application du silence au maximum.",
-  "settings_desc_reset_all_data": "Cette action efface la progression enregistrée. Une confirmation supplémentaire est requise avant de continuer."
+  "settings_desc_reset_all_data": "Cette action efface la progression enregistrée. Une confirmation supplémentaire est requise avant de continuer.",
+  "more_feature_discovery_title": "Visite guidée",
+  "more_feature_discovery_step_1": "Cette fonctionnalité possède ses propres outils et sa propre progression. Jetez-y un œil, puis choisissez ce que vous souhaitez explorer.",
+  "more_feature_discovery_step_2": "Vous pouvez revenir à cette fonctionnalité depuis le Hub Plus à tout moment.",
+  "more_feature_discovery_skip": "Ignorer et ouvrir"
 }

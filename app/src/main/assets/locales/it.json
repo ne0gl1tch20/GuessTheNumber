@@ -873,9 +873,7 @@
   "reduced_motion_label": "Riduci movimento",
   "reduced_motion_description": "Attenua o disattiva le transizioni animate dello schermo",
   "sfx_volume_format": "Volume effetti sonori: %d%%",
-
   "settings_desc_sfx_volume": "Regola il volume degli effetti sonori indipendentemente dalla musica di sottofondo.",
-
   "master_volume_format": "Volume principale: %d%%",
   "save_data_management_title": "Gestione dati di salvataggio",
   "reset_all_game_data_label": "Reimposta tutti i dati di gioco",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Riduci i lampi e i cambiamenti visivi improvvisi.",
   "settings_desc_reduced_motion": "Attenua o disattiva le transizioni animate tra schermate.",
   "settings_desc_master_volume": "Imposta il volume dell’app da silenzioso al massimo.",
-  "settings_desc_reset_all_data": "Questa azione cancella i progressi di gioco salvati. È richiesta un’ulteriore conferma prima di continuare."
+  "settings_desc_reset_all_data": "Questa azione cancella i progressi di gioco salvati. È richiesta un’ulteriore conferma prima di continuare.",
+  "more_feature_discovery_title": "Breve guida",
+  "more_feature_discovery_step_1": "Questa funzione ha strumenti e progressi propri. Dai un’occhiata e poi scegli cosa esplorare.",
+  "more_feature_discovery_step_2": "Puoi tornare a questa funzione dal More Hub quando vuoi.",
+  "more_feature_discovery_skip": "Salta e apri"
 }

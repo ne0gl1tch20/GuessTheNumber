@@ -873,9 +873,7 @@
   "reduced_motion_label": "Beweging verminderen",
   "reduced_motion_description": "Verzacht of schakelt expressieve schermovergangen uit",
   "sfx_volume_format": "Volume geluidseffecten: %d%%",
-
   "settings_desc_sfx_volume": "Pas het volume van geluidseffecten onafhankelijk van de achtergrondmuziek aan.",
-
   "master_volume_format": "Hoofdvolume: %d%%",
   "save_data_management_title": "Opgeslagen gegevens beheren",
   "reset_all_game_data_label": "Alle gamegegevens resetten",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Verminder flitsen en plotselinge visuele veranderingen.",
   "settings_desc_reduced_motion": "Verzacht of schakel geanimeerde schermovergangen uit.",
   "settings_desc_master_volume": "Stel het appvolume in van stil tot maximaal.",
-  "settings_desc_reset_all_data": "Hiermee wordt opgeslagen spelvoortgang gewist. Je moet extra bevestigen voordat je doorgaat."
+  "settings_desc_reset_all_data": "Hiermee wordt opgeslagen spelvoortgang gewist. Je moet extra bevestigen voordat je doorgaat.",
+  "more_feature_discovery_title": "Korte rondleiding",
+  "more_feature_discovery_step_1": "Deze functie heeft eigen hulpmiddelen en voortgang. Bekijk ze kort en kies daarna wat je wilt verkennen.",
+  "more_feature_discovery_step_2": "Je kunt altijd via de More Hub terugkeren naar deze functie.",
+  "more_feature_discovery_skip": "Overslaan en openen"
 }
