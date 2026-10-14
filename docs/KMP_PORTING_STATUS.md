@@ -28,12 +28,14 @@ These PRs are intentionally stacked and remain unmerged until reviewed/merged in
 - The existing BigDecimal-based `BigNumber` is moved to `shared/jvmMain` without changing its string serialization.
 - `GameState`, settings, statistics and item-definition models are moved to `shared/jvmMain`.
 - The existing `GameEngine` is moved without intentionally changing reward formulas.
+- The feedback-driven `GuessingBot` is now in `commonMain`.
+- Backward-clock detection is a deterministic shared policy; Android retains its system-clock/logging adapter.
 - Random-event rewards and bounded LiveOps claim rules are shared.
 - Additional progression services still need auditing and migration, including upgrade purchases, prestige/ultra reset orchestration, boss/world/relic/mastery logic and challenge flows.
 
 ### Step 4 — persistence
 
-- A shared JSON codec uses `ignoreUnknownKeys = true` and `encodeDefaults = true`, matching the existing Android save JSON policy.
+- A shared JSON codec uses `ignoreUnknownKeys = true` and `encodeDefaults = true`, matching the existing Android save JSON policy; Android `SaveManager` now uses the same `Json` configuration.
 - The desktop adapter uses atomic file replacement and a last-known-good backup in `~/.guessthenumber/`.
 - Android continues using its DataStore/encryption/recovery implementation through compatibility aliases. The desktop save format is JSON-compatible, but cross-platform save import/export UX and deeper corruption/fault-injection coverage remain to be added.
 
@@ -50,7 +52,8 @@ These PRs are intentionally stacked and remain unmerged until reviewed/merged in
 ### Step 7 — Lua and localization
 
 - The instruction-budgeted LuaJ sandbox and strict activity payload validator are moved to `shared/jvmMain`, and Android keeps compatibility facades.
-- LuaJ stays JVM-specific. The desktop host still needs bundled script resources, activity catalog/UI integration and a complete host API flow.
+- The Windows UI now loads the bundled Number Rush Lua activity through the shared sandbox and validates its payload before displaying it.
+- LuaJ stays JVM-specific. The complete activity catalog/host API, script lifecycle, Kotlin-owned activity rewards and remote signed LiveOps bundle flow still need integration on desktop.
 - Localization catalogs and formatting still need a platform-neutral catalog/formatting layer; Android locale/resource integrations remain Android-specific.
 
 ### Step 8 — verification and parity
