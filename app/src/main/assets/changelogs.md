@@ -1,5 +1,6 @@
 ## Unreleased (Player Experience)
 
+- 🔊 **Independent SFX mixer foundation**: Added a separate sound-effects volume preference and a resilient asset lookup/player API. Missing `assets/sfx/` folders or clips return a not-found result without interrupting gameplay; no bundled sound assets are added in this phase.
 - 🎯 **Accurate guess feedback**: Keyboard and button submissions now share one handler, and rate-limited guesses show a localized retry message instead of misleading high/low/correct feedback. Feedback uses the same clamped number the game engine evaluates.
 - 🎯 **Clearer guess feedback**: High, low, and correct guesses now use distinct icons and theme-aware feedback cards. Feedback transitions respect the reduced-motion setting, and Blindfolded Oracle hides feedback from both the Guess button and keyboard submission paths.
 
