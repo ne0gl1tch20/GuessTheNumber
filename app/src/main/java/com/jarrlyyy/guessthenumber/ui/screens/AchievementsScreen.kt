@@ -38,6 +38,7 @@ fun AchievementsScreen(
         configRepo.loadAchievements()
     }
     var observedAchievements by remember { mutableStateOf(state.achievements) }
+    val pendingUnlockCelebrations = remember { mutableStateListOf<String>() }
     var showUnlockCelebration by remember { mutableStateOf(false) }
     var unlockCelebrationText by remember { mutableStateOf("") }
 
@@ -45,15 +46,32 @@ fun AchievementsScreen(
         val newlyUnlocked = state.achievements - observedAchievements
         observedAchievements = state.achievements
         if (newlyUnlocked.isNotEmpty()) {
-            val achievementName = achievements.firstOrNull { it.id in newlyUnlocked }?.name
-            unlockCelebrationText = if (achievementName != null) {
-                locale.getString("achievement_unlocked_banner", "Unlocked: %s", achievementName)
-            } else {
-                locale.getString("achievement_unlocked_fallback", "A new achievement is unlocked!")
+            val orderedUnlocks = achievements.filter { it.id in newlyUnlocked }
+            orderedUnlocks.forEach { achievement ->
+                val message = locale.getString("achievement_unlocked_banner", "Unlocked: %s", achievement.name)
+                if (message !in pendingUnlockCelebrations && message != unlockCelebrationText) {
+                    pendingUnlockCelebrations.add(message)
+                }
             }
-            showUnlockCelebration = true
-            delay(if (state.settings.reducedMotion) 700L else 2200L)
-            showUnlockCelebration = false
+            val knownIds = orderedUnlocks.map { it.id }.toSet()
+            if (newlyUnlocked.any { it !in knownIds }) {
+                val fallback = locale.getString("achievement_unlocked_fallback", "A new achievement is unlocked!")
+                if (fallback !in pendingUnlockCelebrations && fallback != unlockCelebrationText) {
+                    pendingUnlockCelebrations.add(fallback)
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(pendingUnlockCelebrations.firstOrNull(), state.settings.reducedMotion) {
+        val nextCelebration = pendingUnlockCelebrations.firstOrNull() ?: return@LaunchedEffect
+        unlockCelebrationText = nextCelebration
+        showUnlockCelebration = true
+        delay(if (state.settings.reducedMotion) 700L else 2200L)
+        showUnlockCelebration = false
+        delay(if (state.settings.reducedMotion) 100L else 220L)
+        if (pendingUnlockCelebrations.firstOrNull() == nextCelebration) {
+            pendingUnlockCelebrations.removeAt(0)
         }
     }
 
