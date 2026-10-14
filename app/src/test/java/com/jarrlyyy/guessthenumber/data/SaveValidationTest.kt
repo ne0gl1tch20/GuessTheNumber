@@ -11,6 +11,7 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import org.junit.Assert.*
 import org.robolectric.RuntimeEnvironment
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.encodeToString
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
