@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.desktop
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -75,50 +76,54 @@ private fun DesktopGameScreen() {
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .widthIn(max = 560.dp)
-                .align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Text("Guess The Number", style = MaterialTheme.typography.headlineLarge)
-            Spacer(Modifier.height(12.dp))
-            Text("A first Windows desktop shell powered by the shared Kotlin rules.")
-            Spacer(Modifier.height(24.dp))
-            OutlinedTextField(
-                value = guess,
-                onValueChange = { guess = it.filter(Char::isDigit).take(3) },
-                label = { Text("Your guess (1–100)") },
-                singleLine = true,
-                enabled = !hasWon,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(12.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .widthIn(max = 560.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Button(onClick = submitGuess, enabled = !hasWon && guess.isNotBlank()) {
-                    Text("Guess")
-                }
-                Button(
-                    onClick = {
-                        targetNumber = Random.nextLong(1L, 101L)
-                        guess = ""
-                        attempts = 0
-                        hasWon = false
-                        feedback = "New number chosen. Guess from 1 to 100."
-                    }
+                Text("Guess The Number", style = MaterialTheme.typography.headlineLarge)
+                Spacer(Modifier.height(12.dp))
+                Text("A first Windows desktop shell powered by the shared Kotlin rules.")
+                Spacer(Modifier.height(24.dp))
+                OutlinedTextField(
+                    value = guess,
+                    onValueChange = { guess = it.filter(Char::isDigit).take(3) },
+                    label = { Text("Your guess (1–100)") },
+                    singleLine = true,
+                    enabled = !hasWon,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("New game")
+                    Button(onClick = submitGuess, enabled = !hasWon && guess.isNotBlank()) {
+                        Text("Guess")
+                    }
+                    Button(
+                        onClick = {
+                            targetNumber = Random.nextLong(1L, 101L)
+                            guess = ""
+                            attempts = 0
+                            hasWon = false
+                            feedback = "New number chosen. Guess from 1 to 100."
+                        }
+                    ) {
+                        Text("New game")
+                    }
                 }
+                Spacer(Modifier.height(16.dp))
+                Text(feedback, style = MaterialTheme.typography.bodyLarge)
+                Spacer(Modifier.height(8.dp))
+                Text("Guesses: $attempts", style = MaterialTheme.typography.bodyMedium)
             }
-            Spacer(Modifier.height(16.dp))
-            Text(feedback, style = MaterialTheme.typography.bodyLarge)
-            Spacer(Modifier.height(8.dp))
-            Text("Guesses: $attempts", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
