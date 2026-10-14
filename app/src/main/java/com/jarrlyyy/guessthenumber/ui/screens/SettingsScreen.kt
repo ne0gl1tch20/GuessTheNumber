@@ -163,6 +163,60 @@ fun SettingsScreen(
             item {
                 Text(localizedText("Theme Colors"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
                 Text(locale.getString("settings_desc_theme_colors", "Customize the app’s primary, secondary and tertiary colors. Changes apply immediately."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                val previewPrimary = runCatching { Color(android.graphics.Color.parseColor(settings.customPrimaryColor)) }.getOrDefault(MaterialTheme.colorScheme.primary)
+                val previewSecondary = runCatching { Color(android.graphics.Color.parseColor(settings.customSecondaryColor)) }.getOrDefault(MaterialTheme.colorScheme.secondary)
+                val previewTertiary = runCatching { Color(android.graphics.Color.parseColor(settings.customTertiaryColor)) }.getOrDefault(MaterialTheme.colorScheme.tertiary)
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            locale.getString("color_picker_live_preview", "Live preview"),
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(localizedText("Beyond the Numbers"), style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    locale.getString("play_correct_celebration_desc", "Secret number found. Your streak keeps growing."),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Button(
+                                onClick = {},
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = previewPrimary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                )
+                            ) {
+                                Text(locale.getString("guess_button", "Guess"))
+                            }
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            listOf(previewPrimary, previewSecondary, previewTertiary).forEachIndexed { index, color ->
+                                Surface(
+                                    modifier = Modifier.weight(1f).height(8.dp),
+                                    shape = MaterialTheme.shapes.extraLarge,
+                                    color = color
+                                ) {}
+                            }
+                        }
+                    }
+                }
                 val presets = listOf(
                     "Neon" to listOf("#7C4DFF", "#00BCD4", "#00C853"),
                     "Sunset" to listOf("#FF4081", "#FF9800", "#FFC107"),
