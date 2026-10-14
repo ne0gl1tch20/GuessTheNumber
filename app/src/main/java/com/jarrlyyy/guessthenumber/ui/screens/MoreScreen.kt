@@ -39,6 +39,7 @@ fun MoreScreen(
 ) {
     var colorTarget by remember { mutableStateOf<String?>(null) }
     var showRequirementsFor by remember { mutableStateOf<String?>(null) }
+    var showReplayToursConfirmation by remember { mutableStateOf(false) }
     val openFeature: (String) -> Unit = { route ->
         when (route) {
             "ultra", "prestige" -> onNavigate(route)
@@ -190,6 +191,16 @@ fun MoreScreen(
                         }
                     }
 
+                    OutlinedButton(
+                        onClick = { showReplayToursConfirmation = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isReordering
+                    ) {
+                        Icon(Icons.Default.Replay, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(localizedText("Replay Feature Tours"))
+                    }
+
                     if (isReordering) {
                         Text(
                             localizedText("Hold and drag to rearrange"),
@@ -331,6 +342,37 @@ fun MoreScreen(
             }
 
         }
+    }
+
+    if (showReplayToursConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showReplayToursConfirmation = false },
+            icon = { Icon(Icons.Default.Replay, contentDescription = null) },
+            title = { Text(locale.getString("replay_feature_tours_title", "Replay feature tours?")) },
+            text = {
+                Text(
+                    locale.getString(
+                        "replay_feature_tours_description",
+                        "This will make completed feature tours appear again the next time you open each feature."
+                    )
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onUpdateSettings(state.settings.copy(tutorialSeenFeatures = emptySet()))
+                        showReplayToursConfirmation = false
+                    }
+                ) {
+                    Text(locale.getString("replay_feature_tours_confirm", "Replay tours"))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showReplayToursConfirmation = false }) {
+                    Text(locale.getString("cancel", "Cancel"))
+                }
+            }
+        )
     }
 
     if (showRequirementsFor != null) {
