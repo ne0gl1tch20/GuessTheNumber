@@ -872,6 +872,14 @@
   "visual_comfort_description": "Visueel comfort en toegankelijkheid",
   "reduced_motion_label": "Beweging verminderen",
   "reduced_motion_description": "Verzacht of schakelt expressieve schermovergangen uit",
+  "more_feature_discovery_title": "Korte rondleiding",
+
+  "more_feature_discovery_step_1": "Deze functie heeft eigen hulpmiddelen en voortgang. Bekijk ze kort en kies daarna wat je wilt verkennen.",
+
+  "more_feature_discovery_step_2": "Je kunt altijd via de More Hub terugkeren naar deze functie.",
+
+  "more_feature_discovery_skip": "Overslaan en openen",
+
   "master_volume_format": "Hoofdvolume: %d%%",
   "save_data_management_title": "Opgeslagen gegevens beheren",
   "reset_all_game_data_label": "Alle gamegegevens resetten",
