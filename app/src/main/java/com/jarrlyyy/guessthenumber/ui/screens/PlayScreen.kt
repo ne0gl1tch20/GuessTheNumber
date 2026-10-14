@@ -383,7 +383,7 @@ fun PlayScreen(
             }
 
             state.lastRandomEventId?.let { eventId ->
-                item(key = "random_event_${eventId}") {
+                item(key = "random_event_${state.statistics.randomEventsTriggered}_${eventId}") {
                     val eventName = locale.getString(
                         "random_event_" + eventId + "_name",
                         eventId
@@ -392,24 +392,75 @@ fun PlayScreen(
                         "random_event_" + eventId + "_desc",
                         ""
                     )
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.tertiaryContainer,
-                        tonalElevation = 5.dp
+                    val eventIcon = when (eventId) {
+                        "cash_burst" -> Icons.Default.CardGiftcard
+                        "nebula_rain" -> Icons.Default.AutoAwesome
+                        "jackpot" -> Icons.Default.EmojiEvents
+                        "streak_surge" -> Icons.Default.LocalFireDepartment
+                        "range_shuffle" -> Icons.Default.Explore
+                        "tax_refund" -> Icons.Default.CardGiftcard
+                        "cosmic_gift" -> Icons.Default.Diamond
+                        else -> Icons.Default.AutoAwesome
+                    }
+                    val eventContainerColor = when (eventId) {
+                        "cash_burst", "streak_surge" -> MaterialTheme.colorScheme.primaryContainer
+                        "nebula_rain", "tax_refund" -> MaterialTheme.colorScheme.secondaryContainer
+                        "jackpot", "cosmic_gift" -> MaterialTheme.colorScheme.tertiaryContainer
+                        else -> MaterialTheme.colorScheme.surfaceContainerHigh
+                    }
+                    val eventContentColor = when (eventId) {
+                        "cash_burst", "streak_surge" -> MaterialTheme.colorScheme.onPrimaryContainer
+                        "nebula_rain", "tax_refund" -> MaterialTheme.colorScheme.onSecondaryContainer
+                        "jackpot", "cosmic_gift" -> MaterialTheme.colorScheme.onTertiaryContainer
+                        else -> MaterialTheme.colorScheme.onSurface
+                    }
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = if (state.settings.reducedMotion) {
+                            fadeIn(animationSpec = tween(100))
+                        } else {
+                            fadeIn(animationSpec = tween(220)) +
+                                scaleIn(initialScale = 0.96f, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+                        }
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = locale.getString("random_event_active", "⚡ Random Event: %s", eventName),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onTertiaryContainer
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = eventDescription,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onTertiaryContainer
-                            )
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.extraLarge,
+                            color = eventContainerColor,
+                            tonalElevation = 5.dp
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalAlignment = Alignment.Top,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Surface(
+                                    shape = MaterialTheme.shapes.large,
+                                    color = eventContentColor.copy(alpha = 0.10f)
+                                ) {
+                                    Icon(
+                                        imageVector = eventIcon,
+                                        contentDescription = null,
+                                        tint = eventContentColor,
+                                        modifier = Modifier.padding(10.dp).size(28.dp)
+                                    )
+                                }
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                                ) {
+                                    Text(
+                                        text = locale.getString("random_event_active", "⚡ Random Event: %s", eventName),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = eventContentColor
+                                    )
+                                    Text(
+                                        text = eventDescription,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = eventContentColor
+                                    )
+                                }
+                            }
                         }
                     }
                 }
