@@ -264,13 +264,22 @@ fun SettingsScreen(
             }
 
             item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        locale.getString("notifications_reminders_title", "Push Notifications & Reminders"),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    HorizontalDivider()
+                }
+            }
+
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                        Text(localizedText("Push Notifications & Reminders"), style = MaterialTheme.typography.bodyLarge)
                         Text(locale.getString("settings_desc_notifications", "Enable optional game reminders and notifications. You can turn them off at any time."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(
@@ -362,13 +371,19 @@ fun SettingsScreen(
             }
 
             item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(locale.getString("sound_fx_label", "Sound FX"), style = MaterialTheme.typography.titleMedium)
+                    HorizontalDivider()
+                }
+            }
+
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f).padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text(localizedText("Sound FX"), style = MaterialTheme.typography.bodyLarge)
                         Text(locale.getString("settings_desc_sound_fx", "Turn sound effects for in-game interactions on or off."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(
@@ -392,6 +407,16 @@ fun SettingsScreen(
                         checked = settings.vibrationEnabled,
                         onCheckedChange = { onUpdateSettings(settings.copy(vibrationEnabled = it)) }
                     )
+                }
+            }
+
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        locale.getString("visual_comfort_description", "Visual comfort & accessibility"),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    HorizontalDivider()
                 }
             }
 
