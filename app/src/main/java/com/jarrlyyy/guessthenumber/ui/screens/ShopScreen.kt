@@ -18,11 +18,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.theme.NebulaPink
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +37,7 @@ fun ShopScreen(
     val context = LocalContext.current
     val configRepo = remember(state.settings.locale) { JsonConfigRepository(context, state.settings.locale) }
     val locale = configRepo.localeManager
+    val hapticFeedback = LocalHapticFeedback.current
     val shopItems = remember(state.settings.locale) { configRepo.loadShopItems() }
     var selectedCategory by remember { mutableStateOf("all") }
 
@@ -108,8 +112,25 @@ fun ShopScreen(
                 val equipped = state.equippedCosmeticId == item.id
                 val canAfford = state.nebula >= BigNumber(item.nebulaCost)
                 val itemInteractionSource = remember(item.id) { MutableInteractionSource() }
+                var previousPurchased by remember(item.id) { mutableStateOf(purchased) }
+                var purchaseHighlight by remember(item.id) { mutableStateOf(false) }
+                LaunchedEffect(purchased) {
+                    if (purchased && !previousPurchased) {
+                        purchaseHighlight = true
+                        if (state.settings.vibrationEnabled) {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
+                        delay(if (state.settings.reducedMotion) 350L else 650L)
+                        purchaseHighlight = false
+                    }
+                    previousPurchased = purchased
+                }
 
-                val targetCardColor = if (equipped) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                val targetCardColor = when {
+                    equipped -> MaterialTheme.colorScheme.primaryContainer
+                    purchaseHighlight || purchased -> MaterialTheme.colorScheme.tertiaryContainer
+                    else -> MaterialTheme.colorScheme.surfaceVariant
+                }
                 val cardColor = if (state.settings.reducedMotion) targetCardColor else animateColorAsState(targetValue = targetCardColor, label = "shopCardColor_${item.id}").value
 
                 Surface(
