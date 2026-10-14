@@ -872,6 +872,10 @@
   "visual_comfort_description": "Conforto visual e acessibilidade",
   "reduced_motion_label": "Reduzir movimento",
   "reduced_motion_description": "Suaviza ou desativa as transições expressivas do ecrã",
+  "sfx_volume_format": "Volume dos efeitos sonoros: %d%%",
+
+  "settings_desc_sfx_volume": "Ajuste o volume dos efeitos sonoros independentemente da música de fundo.",
+
   "master_volume_format": "Volume principal: %d%%",
   "save_data_management_title": "Gestão dos dados guardados",
   "reset_all_game_data_label": "Repor todos os dados do jogo",
