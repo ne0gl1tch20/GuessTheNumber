@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -341,7 +342,7 @@ fun PlayScreen(
                     exit = if (state.settings.reducedMotion) fadeOut() else scaleOut() + fadeOut()
                 ) {
                     Surface(
-                        modifier = Modifier.fillMaxWidth().animateContentSize(),
+                        modifier = Modifier.fillMaxWidth().animateContentSize().semantics(mergeDescendants = true) { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite },
                         shape = MaterialTheme.shapes.extraLarge,
                         color = MaterialTheme.colorScheme.tertiaryContainer,
                         tonalElevation = if (state.settings.reducedMotion) 0.dp else 6.dp
@@ -424,7 +425,7 @@ fun PlayScreen(
                         }
                     ) {
                         Surface(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite },
                             shape = MaterialTheme.shapes.extraLarge,
                             color = eventContainerColor,
                             tonalElevation = 5.dp
