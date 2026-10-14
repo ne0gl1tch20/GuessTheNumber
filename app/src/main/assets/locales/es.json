@@ -873,9 +873,7 @@
   "reduced_motion_label": "Reducir movimiento",
   "reduced_motion_description": "Suaviza o desactiva las transiciones expresivas de pantalla",
   "sfx_volume_format": "Volumen de efectos de sonido: %d%%",
-
   "settings_desc_sfx_volume": "Ajusta el volumen de los efectos de sonido por separado de la música de fondo.",
-
   "master_volume_format": "Volumen maestro: %d%%",
   "save_data_management_title": "Administración de datos guardados",
   "reset_all_game_data_label": "Restablecer todos los datos del juego",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "Reduce los destellos y los cambios visuales repentinos.",
   "settings_desc_reduced_motion": "Suaviza o desactiva las transiciones animadas de pantalla.",
   "settings_desc_master_volume": "Ajusta el volumen de la aplicación desde silencio hasta el máximo.",
-  "settings_desc_reset_all_data": "Esto borrará el progreso guardado del juego. Se requiere una confirmación adicional para continuar."
+  "settings_desc_reset_all_data": "Esto borrará el progreso guardado del juego. Se requiere una confirmación adicional para continuar.",
+  "more_feature_discovery_title": "Guía rápida",
+  "more_feature_discovery_step_1": "Esta función tiene sus propias herramientas y progreso. Echa un vistazo y elige qué quieres explorar.",
+  "more_feature_discovery_step_2": "Puedes volver a esta función desde el centro Más cuando quieras.",
+  "more_feature_discovery_skip": "Saltar y abrir"
 }
