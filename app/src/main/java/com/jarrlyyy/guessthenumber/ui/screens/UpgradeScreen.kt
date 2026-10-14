@@ -22,6 +22,7 @@ import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -174,6 +175,27 @@ fun UpgradeScreen(
                 val totalCost = computedUpgradeCosts[upgrade.id] ?: BigNumber.ZERO
                 val canAfford = state.money >= totalCost
                 val buyInteractionSource = remember(upgrade.id) { MutableInteractionSource() }
+                var previousLevel by remember(upgrade.id) { mutableStateOf(level) }
+                var purchaseHighlight by remember(upgrade.id) { mutableStateOf(false) }
+                LaunchedEffect(level) {
+                    val levelBeforeUpdate = previousLevel
+                    previousLevel = level
+                    if (level > levelBeforeUpdate) {
+                        purchaseHighlight = true
+                        delay(if (state.settings.reducedMotion) 450L else 700L)
+                        purchaseHighlight = false
+                    }
+                }
+                val targetCardColor = if (purchaseHighlight) {
+                    MaterialTheme.colorScheme.tertiaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant
+                }
+                val cardColor = if (state.settings.reducedMotion) {
+                    targetCardColor
+                } else {
+                    animateColorAsState(targetValue = targetCardColor, label = "upgradePurchaseColor_${upgrade.id}").value
+                }
 
                 // Material 3 Expressive Upgrade Card
                 Surface(
@@ -181,8 +203,8 @@ fun UpgradeScreen(
                         .then(if (state.settings.reducedMotion) Modifier else Modifier.animateItem(placementSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow, dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy)))
                         .animateContentSize(),
                     shape = MaterialTheme.shapes.large,
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    tonalElevation = 2.dp
+                    color = cardColor,
+                    tonalElevation = if (purchaseHighlight && !state.settings.reducedMotion) 4.dp else 2.dp
                 ) {
                     Row(
                         modifier = Modifier
