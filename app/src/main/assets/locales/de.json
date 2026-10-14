@@ -872,6 +872,14 @@
   "visual_comfort_description": "Visueller Komfort und Barrierefreiheit",
   "reduced_motion_label": "Bewegungen reduzieren",
   "reduced_motion_description": "Ausdrucksstarke Bildschirmübergänge abschwächen oder deaktivieren",
+  "more_feature_discovery_title": "Kurzer Überblick",
+
+  "more_feature_discovery_step_1": "Diese Funktion hat eigene Werkzeuge und Fortschritte. Schau kurz hinein und entscheide dann, was du erkunden möchtest.",
+
+  "more_feature_discovery_step_2": "Du kannst jederzeit über den More Hub zu dieser Funktion zurückkehren.",
+
+  "more_feature_discovery_skip": "Überspringen und öffnen",
+
   "master_volume_format": "Hauptlautstärke: %d%%",
   "save_data_management_title": "Speicherdaten verwalten",
   "reset_all_game_data_label": "Alle Spieldaten zurücksetzen",
