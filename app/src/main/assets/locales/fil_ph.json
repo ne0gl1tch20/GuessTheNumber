@@ -915,6 +915,10 @@
   "visual_comfort_description": "Visual comfort at accessibility",
   "reduced_motion_label": "Bawasan ang Galaw",
   "reduced_motion_description": "Palambutin o i-disable ang mga transition ng screen",
+  "sfx_volume_format": "Lakas ng sound effects: %d%%",
+
+  "settings_desc_sfx_volume": "Isaayos ang lakas ng sound effects nang hiwalay sa background music.",
+
   "master_volume_format": "Master Volume: %d%%",
   "save_data_management_title": "Pamamahala ng Save Data",
   "reset_all_game_data_label": "I-reset ang Lahat ng Game Data",
