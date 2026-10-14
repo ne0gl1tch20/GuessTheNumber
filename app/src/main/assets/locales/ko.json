@@ -916,9 +916,7 @@
   "reduced_motion_label": "모션 줄이기",
   "reduced_motion_description": "화면 전환 효과를 완화하거나 끕니다",
   "sfx_volume_format": "효과음 볼륨: %d%%",
-
   "settings_desc_sfx_volume": "배경 음악과 별도로 효과음 크기를 조절합니다.",
-
   "master_volume_format": "마스터 볼륨: %d%%",
   "save_data_management_title": "저장 데이터 관리",
   "reset_all_game_data_label": "모든 게임 데이터 초기화",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "번쩍임과 갑작스러운 시각적 변화를 줄입니다.",
   "settings_desc_reduced_motion": "화면 전환 애니메이션을 부드럽게 하거나 끕니다.",
   "settings_desc_master_volume": "앱 음량을 무음부터 최대로 설정합니다.",
-  "settings_desc_reset_all_data": "저장된 게임 진행 상황이 삭제됩니다. 계속하려면 추가 확인이 필요합니다."
+  "settings_desc_reset_all_data": "저장된 게임 진행 상황이 삭제됩니다. 계속하려면 추가 확인이 필요합니다.",
+  "more_feature_discovery_title": "간단한 안내",
+  "more_feature_discovery_step_1": "이 기능에는 고유한 도구와 진행 상황이 있습니다. 살펴본 뒤 탐색할 항목을 선택하세요.",
+  "more_feature_discovery_step_2": "언제든지 More Hub에서 이 기능으로 돌아올 수 있습니다.",
+  "more_feature_discovery_skip": "건너뛰고 열기"
 }
