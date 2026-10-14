@@ -872,6 +872,14 @@
   "visual_comfort_description": "Comfort visivo e accessibilità",
   "reduced_motion_label": "Riduci movimento",
   "reduced_motion_description": "Attenua o disattiva le transizioni animate dello schermo",
+  "more_feature_discovery_title": "Breve guida",
+
+  "more_feature_discovery_step_1": "Questa funzione ha strumenti e progressi propri. Dai un’occhiata e poi scegli cosa esplorare.",
+
+  "more_feature_discovery_step_2": "Puoi tornare a questa funzione dal More Hub quando vuoi.",
+
+  "more_feature_discovery_skip": "Salta e apri",
+
   "master_volume_format": "Volume principale: %d%%",
   "save_data_management_title": "Gestione dati di salvataggio",
   "reset_all_game_data_label": "Reimposta tutti i dati di gioco",
