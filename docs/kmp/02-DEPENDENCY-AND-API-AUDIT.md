@@ -1,52 +1,22 @@
-# Kotlin Multiplatform dependency and API audit
 
-## Current baseline observed
 
-The repository currently has a single Android application module included by `settings.gradle.kts`. The app applies the Android application, Kotlin serialization, and Compose compiler plugins. The app targets JVM bytecode 11 and uses Jetpack Compose.
+## Verified toolchain compatibility finding (2026-10-14)
 
-The version catalog currently includes these relevant libraries:
+The current repository configuration observed on `master` and the initial shared-module branch records:
 
-| Dependency | Initial classification | Required action |
-|---|---|---|
-| Kotlin standard library | Likely common | Confirm code uses only common APIs |
-| kotlinx.serialization JSON | Potentially multiplatform | Verify the selected artifact/version and serializers used |
-| kotlinx.coroutines core | Multiplatform-capable | Keep Android dispatcher/UI dependencies out of common code |
-| Jetpack Compose / Material 3 | Android UI today | Add Compose Multiplatform only after version compatibility is checked |
-| Navigation Compose | Android-oriented current usage | Audit desktop navigation support and API differences |
-| Preferences DataStore | Android-oriented current usage | Hide behind a storage interface before sharing |
-| AndroidX lifecycle/activity/core/appcompat | Android-only | Keep in Android source sets |
-| `org.luaj:luaj-jme:3.0.1` | JVM library, artifact-specific behavior to verify | Test exact runtime on Android and Windows; do not place in commonMain |
-| Android media, Glance, widgets, notifications | Android-only | Keep platform-specific or replace with desktop equivalents where useful |
-| C++ / NDK component, if added | Native per target | Separate Android ABI binaries from Windows binaries |
+- Kotlin Gradle plugin: `2.2.10`
+- Android Gradle Plugin: `9.4.1`
+- Gradle wrapper: `9.8.0`
 
-This is an initial classification based on the current version catalog, not proof that every dependency is compatible with every target.
+The official Kotlin Multiplatform compatibility table lists Kotlin/KGP `2.2.0–2.2.10` with Gradle `7.6.3–8.14` and AGP `7.3.1–8.10.0`. This means the repository's current Gradle/AGP versions are outside that documented compatibility range for KMP 2.2.10. Do not treat the new KMP module as validated until a supported version set is selected.
 
-## Audit checklist for each source file
+Official source: https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html
 
-Record the file, imports, dependency usage, proposed source set, and blocker.
+The same official guide lists KGP `2.4.20–2.4.21` with Gradle `7.6.3–9.7.0` and AGP `8.5.2–9.3.1`. This is a possible compatibility direction to evaluate, not an automatic upgrade recommendation: the project should choose and pin a mutually supported Gradle/KGP/AGP/Compose set together, then verify it with an explicitly requested build. In particular, Gradle `9.8.0` and AGP `9.4.1` are newer than the maxima in that KMP compatibility row.
 
-- **Common candidate:** plain Kotlin, deterministic business rules, no Android/JVM/Java APIs.
-- **JVM candidate:** depends on Java APIs but can run on Android and Windows JVMs; keep outside `commonMain`.
-- **Android-only:** uses Android framework, AndroidX lifecycle/storage, widgets, haptics, notifications, or app context.
-- **Desktop-only:** uses AWT/Swing, desktop filesystem conventions, Windows APIs, or desktop windowing.
-- **Native-specific:** uses JNI/NDK or platform-specific binaries.
+### Immediate migration gate
 
-## Commands for a local audit
-
-Run manually on a development machine when ready; this PR does not run builds:
-
-```bash
-./gradlew projects
-./gradlew :app:dependencies
-```
-
-Search source code for Android/JVM-bound imports such as `android.`, `androidx.`, `java.io.`, `java.nio.file.`, `java.net.`, `javax.crypto.`, and direct use of Android `Context`. These imports are not all inherently bad; they identify code that needs classification before being moved.
-
-## Exit criteria
-
-- [ ] Gradle, Kotlin, Android Gradle Plugin, and Compose versions recorded.
-- [ ] Each direct dependency has a target classification and version-compatibility check.
-- [ ] LuaJ artifact and APIs used by the current implementation are identified.
-- [ ] Save, encryption, resource loading, networking, and native-library dependencies are inventoried.
-- [ ] First shared-core extraction candidates are selected.
-- [ ] No existing dependency is removed or upgraded solely to make the audit look cleaner.
+- [ ] Choose a toolchain set within the official KMP compatibility matrix before expanding shared-module usage.
+- [ ] Confirm Compose Multiplatform version compatibility with the chosen Kotlin/KGP version.
+- [ ] Keep this compatibility issue visible in the first implementation PR; do not claim compilation success without a build.
+- [ ] Avoid unrelated dependency upgrades in the same change.
