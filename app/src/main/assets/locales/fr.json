@@ -1074,5 +1074,18 @@
   "update_available": "Une mise à jour est disponible.",
   "update_up_to_date": "Vous êtes à jour.",
   "update_unavailable": "Impossible de vérifier les mises à jour. Réessayez plus tard.",
-  "update_open": "Ouvrir la page de mise à jour"
+  "update_open": "Ouvrir la page de mise à jour",
+  "settings_desc_language": "Choisissez la langue du texte et des menus du jeu.",
+  "settings_desc_theme_mode": "Choisissez si l’application suit le thème de l’appareil ou utilise le mode sombre, clair ou AMOLED.",
+  "settings_desc_theme_preset": "Choisissez une palette prédéfinie ou personnalisez les couleurs.",
+  "settings_desc_theme_colors": "Personnalisez les couleurs primaire, secondaire et tertiaire de l’application. Les changements sont immédiats.",
+  "settings_desc_number_notation": "Choisissez l’affichage des grands nombres : standard, scientifique ou ingénieur.",
+  "settings_desc_notifications": "Activez les rappels et notifications facultatifs du jeu. Vous pouvez les désactiver à tout moment.",
+  "settings_desc_reminder_frequency": "Choisissez le nombre d’heures entre les rappels programmés.",
+  "settings_desc_sound_fx": "Activez ou désactivez les effets sonores des interactions en jeu.",
+  "settings_desc_vibration": "Activez ou désactivez les vibrations de l’application pendant les interactions.",
+  "settings_desc_reduce_flashes": "Réduisez les flashs et les changements visuels soudains.",
+  "settings_desc_reduced_motion": "Adoucissez ou désactivez les transitions animées entre les écrans.",
+  "settings_desc_master_volume": "Réglez le volume de l’application du silence au maximum.",
+  "settings_desc_reset_all_data": "Cette action efface la progression enregistrée. Une confirmation supplémentaire est requise avant de continuer."
 }

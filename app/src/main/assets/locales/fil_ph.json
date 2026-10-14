@@ -1074,5 +1074,18 @@
   "update_available": "May available na update.",
   "update_up_to_date": "Pinakabago na ang bersyon mo.",
   "update_unavailable": "Hindi masuri ang mga update. Subukan ulit mamaya.",
-  "update_open": "Buksan ang pahina ng update"
+  "update_open": "Buksan ang pahina ng update",
+  "settings_desc_language": "Piliin ang wikang gagamitin sa mga teksto at menu ng laro.",
+  "settings_desc_theme_mode": "Piliin kung susunod ang app sa tema ng device o gagamit ng Dark, Light, o AMOLED mode.",
+  "settings_desc_theme_preset": "Pumili ng nakahandang hanay ng kulay o magpasadya ng mga kulay.",
+  "settings_desc_theme_colors": "Ipasadya ang primary, secondary, at tertiary na kulay ng app. Agad na ilalapat ang mga pagbabago.",
+  "settings_desc_number_notation": "Piliin kung paano ipapakita ang malalaking numero: Standard, Scientific, o Engineering.",
+  "settings_desc_notifications": "I-on ang mga opsyonal na paalala at notification ng laro. Maaari mong i-off ang mga ito anumang oras.",
+  "settings_desc_reminder_frequency": "Piliin kung ilang oras ang pagitan ng mga naka-iskedyul na paalala.",
+  "settings_desc_sound_fx": "I-on o i-off ang sound effects para sa mga aksyon sa laro.",
+  "settings_desc_vibration": "I-on o i-off ang vibration ng app habang nakikipag-ugnayan.",
+  "settings_desc_reduce_flashes": "Bawasan ang mga flash at biglaang pagbabago sa itsura ng screen.",
+  "settings_desc_reduced_motion": "Pahinain o i-off ang mga animated na paglipat ng screen.",
+  "settings_desc_master_volume": "Itakda ang lakas ng tunog ng app mula tahimik hanggang pinakamalakas.",
+  "settings_desc_reset_all_data": "Mabubura nito ang naka-save na progreso ng laro. Kailangan ng isa pang kumpirmasyon bago magpatuloy."
 }

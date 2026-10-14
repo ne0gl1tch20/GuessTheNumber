@@ -1,5 +1,7 @@
 ## Unreleased (Post-v3.0.2 Development Updates)
 
+- ⚙️ **Clearer Settings descriptions**: Added localized plain-language descriptions for language, theme appearance and colors, number notation, reminders, sound effects, vibration, visual comfort, reduced motion, master volume, and the destructive data-reset action across all supported locale catalogs.
+
 - 🛡️ **LiveOps claim-state validation**: Reject reward claims when saved progression counters or permanent event boosts are negative, rather than allowing a corrupted state to be normalized during reward settlement.
 
 - ♿ **Accessible progression maps**: World Map and Prestige Skill Tree nodes now expose localized names, lock/unlock status, costs where applicable, and selected state to accessibility services instead of relying on color, borders, or emoji alone.

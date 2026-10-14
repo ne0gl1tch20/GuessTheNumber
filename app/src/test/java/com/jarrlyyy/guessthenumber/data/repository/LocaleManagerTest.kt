@@ -15,6 +15,33 @@ class LocaleManagerTest {
     private val context: Context = RuntimeEnvironment.getApplication()
 
     @Test
+    fun everySupportedLocaleResolvesSettingsDescriptions() = runBlocking {
+        val manager = LocaleManager(context)
+        val keys = listOf(
+            "settings_desc_language",
+            "settings_desc_theme_mode",
+            "settings_desc_theme_preset",
+            "settings_desc_theme_colors",
+            "settings_desc_number_notation",
+            "settings_desc_notifications",
+            "settings_desc_reminder_frequency",
+            "settings_desc_sound_fx",
+            "settings_desc_vibration",
+            "settings_desc_reduce_flashes",
+            "settings_desc_reduced_motion",
+            "settings_desc_master_volume",
+            "settings_desc_reset_all_data"
+        )
+
+        LocaleManager.supportedLocales.forEach { supported ->
+            manager.loadLocale(supported.fileName)
+            keys.forEach { key ->
+                assertTrue("${supported.tag} is missing settings description: $key", manager.getString(key).isNotBlank())
+            }
+        }
+    }
+
+    @Test
     fun supportedLocalesHaveAssetsAndFallbackKeys() = runBlocking {
         val manager = LocaleManager(context)
 

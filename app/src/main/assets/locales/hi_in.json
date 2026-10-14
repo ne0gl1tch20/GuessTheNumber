@@ -1074,5 +1074,18 @@
   "update_available": "अपडेट उपलब्ध है।",
   "update_up_to_date": "आपका संस्करण नवीनतम है।",
   "update_unavailable": "अपडेट नहीं देख सके। बाद में फिर कोशिश करें।",
-  "update_open": "अपडेट पेज खोलें"
+  "update_open": "अपडेट पेज खोलें",
+  "settings_desc_language": "गेम के टेक्स्ट और मेनू की भाषा चुनें।",
+  "settings_desc_theme_mode": "चुनें कि ऐप डिवाइस की थीम अपनाए या Dark, Light अथवा AMOLED मोड इस्तेमाल करे।",
+  "settings_desc_theme_preset": "तैयार रंग-समूह चुनें या अपने रंग सेट करें।",
+  "settings_desc_theme_colors": "ऐप के प्राथमिक, द्वितीयक और तृतीयक रंग बदलें। बदलाव तुरंत लागू होंगे।",
+  "settings_desc_number_notation": "बड़ी संख्याएँ दिखाने का तरीका चुनें: Standard, Scientific या Engineering।",
+  "settings_desc_notifications": "गेम के वैकल्पिक रिमाइंडर और सूचनाएँ चालू करें। आप इन्हें कभी भी बंद कर सकते हैं।",
+  "settings_desc_reminder_frequency": "शेड्यूल किए गए रिमाइंडर के बीच घंटों की संख्या चुनें।",
+  "settings_desc_sound_fx": "गेम में होने वाली गतिविधियों के ध्वनि प्रभाव चालू या बंद करें।",
+  "settings_desc_vibration": "ऐप में गतिविधियों के दौरान होने वाला कंपन चालू या बंद करें।",
+  "settings_desc_reduce_flashes": "तेज़ चमक और अचानक होने वाले दृश्य बदलाव कम करें।",
+  "settings_desc_reduced_motion": "स्क्रीन के एनिमेटेड बदलाव धीमे करें या बंद करें।",
+  "settings_desc_master_volume": "ऐप का वॉल्यूम म्यूट से अधिकतम तक सेट करें।",
+  "settings_desc_reset_all_data": "इससे सेव की गई गेम प्रगति मिट जाएगी। आगे बढ़ने से पहले अतिरिक्त पुष्टि आवश्यक है।"
 }

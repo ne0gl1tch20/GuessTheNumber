@@ -1074,5 +1074,18 @@
   "update_available": "Bir güncelleme var.",
   "update_up_to_date": "En güncel sürümü kullanıyorsunuz.",
   "update_unavailable": "Güncellemeler denetlenemedi. Daha sonra tekrar deneyin.",
-  "update_open": "Güncelleme sayfasını aç"
+  "update_open": "Güncelleme sayfasını aç",
+  "settings_desc_language": "Oyun metinleri ve menülerinde kullanılacak dili seçin.",
+  "settings_desc_theme_mode": "Uygulamanın cihaz temasını mı izleyeceğini yoksa Koyu, Açık veya AMOLED modunu mu kullanacağını seçin.",
+  "settings_desc_theme_preset": "Hazır bir renk paleti seçin veya renkleri kendiniz özelleştirin.",
+  "settings_desc_theme_colors": "Uygulamanın birincil, ikincil ve üçüncül renklerini özelleştirin. Değişiklikler hemen uygulanır.",
+  "settings_desc_number_notation": "Büyük sayıların nasıl gösterileceğini seçin: Standart, Bilimsel veya Mühendislik.",
+  "settings_desc_notifications": "İsteğe bağlı oyun hatırlatıcılarını ve bildirimlerini etkinleştirin. İstediğiniz zaman kapatabilirsiniz.",
+  "settings_desc_reminder_frequency": "Planlanmış hatırlatıcılar arasındaki saat sayısını seçin.",
+  "settings_desc_sound_fx": "Oyun içi etkileşim ses efektlerini açın veya kapatın.",
+  "settings_desc_vibration": "Etkileşimler sırasında uygulamanın titreşimini açın veya kapatın.",
+  "settings_desc_reduce_flashes": "Flaşları ve ani görsel değişiklikleri azaltın.",
+  "settings_desc_reduced_motion": "Animasyonlu ekran geçişlerini yumuşatın veya devre dışı bırakın.",
+  "settings_desc_master_volume": "Uygulama ses düzeyini sessizden en yükseğe ayarlayın.",
+  "settings_desc_reset_all_data": "Bu işlem kayıtlı oyun ilerlemesini siler. Devam etmeden önce ek onay gerekir."
 }

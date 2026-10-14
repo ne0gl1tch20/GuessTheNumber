@@ -1074,5 +1074,18 @@
   "update_available": "An update is available.",
   "update_up_to_date": "You're up to date.",
   "update_unavailable": "Couldn't check for updates. Try again later.",
-  "update_open": "Open update page"
+  "update_open": "Open update page",
+  "settings_desc_language": "Choose the language used for game text and menus.",
+  "settings_desc_theme_mode": "Choose whether the app follows your device theme or uses Dark, Light or AMOLED mode.",
+  "settings_desc_theme_preset": "Choose a ready-made color set or customize the colors yourself.",
+  "settings_desc_theme_colors": "Customize the app's primary, secondary and tertiary colors. Changes apply immediately.",
+  "settings_desc_number_notation": "Choose how large numbers are displayed: Standard, Scientific or Engineering.",
+  "settings_desc_notifications": "Enable optional game reminders and notifications. You can turn them off at any time.",
+  "settings_desc_reminder_frequency": "Choose how many hours pass between scheduled reminders.",
+  "settings_desc_sound_fx": "Turn sound effects for in-game interactions on or off.",
+  "settings_desc_vibration": "Turn app-triggered vibration during interactions on or off.",
+  "settings_desc_reduce_flashes": "Reduce flashes and sudden visual changes for greater visual comfort.",
+  "settings_desc_reduced_motion": "Soften or disable animated screen transitions.",
+  "settings_desc_master_volume": "Set the app's audio level from silent to maximum.",
+  "settings_desc_reset_all_data": "This clears saved game progress. An extra confirmation is required before continuing."
 }

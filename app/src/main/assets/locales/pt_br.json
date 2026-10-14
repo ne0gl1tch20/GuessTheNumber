@@ -1074,5 +1074,18 @@
   "update_available": "Há uma atualização disponível.",
   "update_up_to_date": "Você está usando a versão mais recente.",
   "update_unavailable": "Não foi possível verificar atualizações. Tente novamente mais tarde.",
-  "update_open": "Abrir página da atualização"
+  "update_open": "Abrir página da atualização",
+  "settings_desc_language": "Escolha o idioma usado nos textos e menus do jogo.",
+  "settings_desc_theme_mode": "Escolha se o app seguirá o tema do dispositivo ou usará o modo escuro, claro ou AMOLED.",
+  "settings_desc_theme_preset": "Escolha uma paleta pronta ou personalize as cores.",
+  "settings_desc_theme_colors": "Personalize as cores primária, secundária e terciária do app. As mudanças são aplicadas imediatamente.",
+  "settings_desc_number_notation": "Escolha como números grandes serão exibidos: padrão, científico ou engenharia.",
+  "settings_desc_notifications": "Ative lembretes e notificações opcionais do jogo. Você pode desativá-los quando quiser.",
+  "settings_desc_reminder_frequency": "Escolha quantas horas haverá entre os lembretes programados.",
+  "settings_desc_sound_fx": "Ative ou desative os efeitos sonoros das interações no jogo.",
+  "settings_desc_vibration": "Ative ou desative a vibração do app durante as interações.",
+  "settings_desc_reduce_flashes": "Reduza flashes e mudanças visuais repentinas.",
+  "settings_desc_reduced_motion": "Suavize ou desative as transições animadas entre telas.",
+  "settings_desc_master_volume": "Defina o volume do app do silencioso ao máximo.",
+  "settings_desc_reset_all_data": "Isso apaga o progresso salvo do jogo. É necessária uma confirmação extra antes de continuar."
 }

@@ -1074,5 +1074,18 @@
   "update_available": "Er is een update beschikbaar.",
   "update_up_to_date": "Je bent up-to-date.",
   "update_unavailable": "Updates controleren is mislukt. Probeer het later opnieuw.",
-  "update_open": "Updatepagina openen"
+  "update_open": "Updatepagina openen",
+  "settings_desc_language": "Kies de taal voor spelteksten en menu's.",
+  "settings_desc_theme_mode": "Kies of de app het apparaatthema volgt of de donkere, lichte of AMOLED-modus gebruikt.",
+  "settings_desc_theme_preset": "Kies een vooraf ingesteld kleurenpalet of pas de kleuren zelf aan.",
+  "settings_desc_theme_colors": "Pas de primaire, secundaire en tertiaire appkleuren aan. Wijzigingen worden direct toegepast.",
+  "settings_desc_number_notation": "Kies hoe grote getallen worden weergegeven: standaard, wetenschappelijk of technisch.",
+  "settings_desc_notifications": "Schakel optionele spelherinneringen en meldingen in. Je kunt ze altijd uitzetten.",
+  "settings_desc_reminder_frequency": "Kies hoeveel uur er tussen geplande herinneringen zit.",
+  "settings_desc_sound_fx": "Schakel geluidseffecten voor interacties in het spel in of uit.",
+  "settings_desc_vibration": "Schakel trillingen van de app tijdens interacties in of uit.",
+  "settings_desc_reduce_flashes": "Verminder flitsen en plotselinge visuele veranderingen.",
+  "settings_desc_reduced_motion": "Verzacht of schakel geanimeerde schermovergangen uit.",
+  "settings_desc_master_volume": "Stel het appvolume in van stil tot maximaal.",
+  "settings_desc_reset_all_data": "Hiermee wordt opgeslagen spelvoortgang gewist. Je moet extra bevestigen voordat je doorgaat."
 }

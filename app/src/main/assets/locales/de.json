@@ -1074,5 +1074,18 @@
   "update_available": "Ein Update ist verfügbar.",
   "update_up_to_date": "Du bist auf dem neuesten Stand.",
   "update_unavailable": "Updates konnten nicht geprüft werden. Versuche es später erneut.",
-  "update_open": "Update-Seite öffnen"
+  "update_open": "Update-Seite öffnen",
+  "settings_desc_language": "Wähle die Sprache für Spieltexte und Menüs.",
+  "settings_desc_theme_mode": "Lege fest, ob die App dem Gerätedesign folgt oder den dunklen, hellen oder AMOLED-Modus nutzt.",
+  "settings_desc_theme_preset": "Wähle ein fertiges Farbset oder verwende eigene Farben.",
+  "settings_desc_theme_colors": "Passe die primären, sekundären und tertiären App-Farben an. Änderungen gelten sofort.",
+  "settings_desc_number_notation": "Wähle die Darstellung großer Zahlen: Standard, wissenschaftlich oder technisch.",
+  "settings_desc_notifications": "Aktiviere optionale Spiel-Erinnerungen und Benachrichtigungen. Du kannst sie jederzeit ausschalten.",
+  "settings_desc_reminder_frequency": "Lege fest, wie viele Stunden zwischen geplanten Erinnerungen liegen.",
+  "settings_desc_sound_fx": "Schalte Soundeffekte für Aktionen im Spiel ein oder aus.",
+  "settings_desc_vibration": "Schalte Vibrationen bei Interaktionen in der App ein oder aus.",
+  "settings_desc_reduce_flashes": "Reduziere blinkende und plötzlich wechselnde visuelle Effekte.",
+  "settings_desc_reduced_motion": "Schwäche Bildschirmübergänge ab oder deaktiviere sie.",
+  "settings_desc_master_volume": "Stelle die App-Lautstärke von stumm bis maximal ein.",
+  "settings_desc_reset_all_data": "Damit wird dein gespeicherter Spielfortschritt gelöscht. Vor dem Fortfahren ist eine zusätzliche Bestätigung nötig."
 }
