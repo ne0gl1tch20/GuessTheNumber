@@ -255,11 +255,41 @@ class SaveManager(private val context: Context) {
                     state.prestige.value >= BigDecimal.ZERO &&
                     state.ultra.value >= BigDecimal.ZERO &&
                     state.nebula.value >= BigDecimal.ZERO &&
+                    state.currentRangeMin >= 1 &&
                     state.currentRangeMin <= state.currentRangeMax &&
+                    state.targetNumber in state.currentRangeMin..state.currentRangeMax &&
                     state.attempts >= 0 &&
                     state.correctGuesses >= 0 &&
                     state.streak >= 0 &&
                     state.bestStreak >= 0 &&
+                    state.statistics.totalGuesses >= 0 &&
+                    state.statistics.correctGuesses >= 0 &&
+                    state.statistics.failedGuesses >= 0 &&
+                    state.statistics.moneyEarned.value >= BigDecimal.ZERO &&
+                    state.statistics.moneySpent.value >= BigDecimal.ZERO &&
+                    state.statistics.prestigesCount >= 0 &&
+                    state.statistics.ultrasCount >= 0 &&
+                    state.statistics.nebulaEarned >= 0 &&
+                    state.statistics.playtimeSeconds >= 0 &&
+                    state.statistics.arcadePlayed >= 0 &&
+                    state.statistics.randomEventsTriggered >= 0 &&
+                    state.statistics.arcadeBestScores.values.all { it >= 0 } &&
+                    state.upgradeLevels.values.all { it >= 0 } &&
+                    state.prestigeUpgradeLevels.values.all { it >= 0 } &&
+                    state.ultraUpgradeLevels.values.all { it >= 0 } &&
+                    state.liveOpsClaims.values.all { it >= 0 } &&
+                    state.permanentEventBoosts >= 0 &&
+                    state.dailyQuestGuesses >= 0 &&
+                    state.dailyQuestCorrectGuesses >= 0 &&
+                    state.dailyQuestBestStreak >= 0 &&
+                    state.dailyQuestUpgradePurchases >= 0 &&
+                    state.lootCommonChests >= 0 &&
+                    state.lootRareChests >= 0 &&
+                    state.lootEpicChests >= 0 &&
+                    state.lootDropsFound >= 0 &&
+                    state.lootChestsOpened >= 0 &&
+                    state.endlessRiftTier >= 0 &&
+                    state.endlessRiftBestTier >= 0 &&
                     state.lastSaveTimestamp > 0
         } catch (e: Exception) {
             false
