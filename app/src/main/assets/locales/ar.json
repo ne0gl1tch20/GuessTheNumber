@@ -873,6 +873,14 @@
   "visual_comfort_description": "الراحة البصرية وإمكانية الوصول",
   "reduced_motion_label": "تقليل الحركة",
   "reduced_motion_description": "تخفيف انتقالات الشاشة أو تعطيلها",
+  "more_feature_discovery_title": "جولة سريعة",
+
+  "more_feature_discovery_step_1": "تحتوي هذه الميزة على أدوات وتقدم خاصين بها. ألقِ نظرة سريعة ثم اختر ما تريد استكشافه.",
+
+  "more_feature_discovery_step_2": "يمكنك العودة إلى هذه الميزة من More Hub في أي وقت.",
+
+  "more_feature_discovery_skip": "تخطَّ وافتح",
+
   "master_volume_format": "مستوى الصوت الرئيسي: %d%%",
   "save_data_management_title": "إدارة بيانات الحفظ",
   "reset_all_game_data_label": "إعادة ضبط جميع بيانات اللعبة",
