@@ -32,42 +32,38 @@ class LocaleManager(private val context: Context) {
                     try {
                         val overlay = readJson(localeFileName)
                         val keys = overlay.keys()
-                        while (keys.hasNext()) {
-                            val key = keys.next()
-                            merged.put(key, overlay.get(key))
-                        }
+                        while (keys.hasNext()) { val key = keys.next(); merged.put(key, overlay.get(key)) }
                     } catch (overlayError: Exception) { overlayError.printStackTrace() }
                 }
                 translations = merged
                 currentLocale = locale
             } catch (e: Exception) {
-                e.printStackTrace()
-                translations = JSONObject()
-                currentLocale = Locale.US
+                e.printStackTrace(); translations = JSONObject(); currentLocale = Locale.US
             }
         }
     }
 
     suspend fun loadLocaleForTag(localeTag: String?) = loadLocale(resolveFileName(localeTag))
-
     fun resolveFileName(localeTag: String?): String {
         val normalized = localeTag?.trim()?.replace('_', '-')?.lowercase(Locale.ROOT)
         return supportedLocales.firstOrNull { it.tag.lowercase(Locale.ROOT) == normalized }?.fileName
             ?: supportedLocales.firstOrNull { normalized != null && it.tag.substringBefore('-').lowercase(Locale.ROOT) == normalized.substringBefore('-') }?.fileName
             ?: ENGLISH_FILE
     }
-
     fun getCurrentLocaleTag(): String = currentLocale.toLanguageTag()
     fun isRtl(): Boolean = currentLocale.language in setOf("ar", "fa", "he", "ur")
 
     fun getString(key: String, default: String = key): String {
+        val translated = translations.optString(key, getStringByEnglish(key))
         val fallback = if (default == key) getStringByEnglish(key) else default
-        return translations.optString(key, fallback)
+        // A two-argument call is historically used both for fallbacks and simple formatting.
+        // When the catalog entry is a format string and the second argument is a value, format it.
+        return if (default != key && translated != default && translated.contains("%") && !default.contains("%")) {
+            formatString(translated, default)
+        } else translations.optString(key, fallback)
     }
 
-    /** Formatting-only overload. Keeping it separate from fallback overloads avoids Kotlin vararg ambiguity. */
-    fun getString(key: String, vararg formatArgs: Any): String =
-        formatString(translations.optString(key, getStringByEnglish(key)), *formatArgs)
+    fun getString(key: String, vararg formatArgs: Any): String = formatString(translations.optString(key, getStringByEnglish(key)), *formatArgs)
 
     fun getString(key: String, default: String, formatArg: Any, vararg formatArgs: Any): String {
         val fallback = if (default == key) getStringByEnglish(key) else default
@@ -76,10 +72,7 @@ class LocaleManager(private val context: Context) {
 
     fun getStringByEnglish(english: String): String {
         val keys = englishCatalog.keys()
-        while (keys.hasNext()) {
-            val key = keys.next()
-            if (englishCatalog.optString(key, "") == english) return translations.optString(key, english)
-        }
+        while (keys.hasNext()) { val key = keys.next(); if (englishCatalog.optString(key, "") == english) return translations.optString(key, english) }
         return english
     }
 
@@ -87,45 +80,24 @@ class LocaleManager(private val context: Context) {
     fun formatNumber(value: Double, maxFractionDigits: Int = 2): String = NumberFormat.getNumberInstance(currentLocale).apply { maximumFractionDigits = maxFractionDigits; minimumFractionDigits = 0 }.format(value)
     fun formatDecimal(value: BigDecimal, maxFractionDigits: Int = 2): String = NumberFormat.getNumberInstance(currentLocale).apply { maximumFractionDigits = maxFractionDigits; minimumFractionDigits = 0 }.format(value)
     fun formatPercent(value: Double, fractionDigits: Int = 1): String = NumberFormat.getPercentInstance(currentLocale).apply { maximumFractionDigits = fractionDigits; minimumFractionDigits = fractionDigits }.format(value)
-
     fun formatCurrency(amount: BigDecimal, currencyCode: String): String {
         val formatter = NumberFormat.getCurrencyInstance(currentLocale)
         val currency = runCatching { Currency.getInstance(currencyCode) }.getOrNull() ?: return formatDecimal(amount, 2)
-        formatter.currency = currency
-        formatter.maximumFractionDigits = 2
-        return formatter.format(amount)
+        formatter.currency = currency; formatter.maximumFractionDigits = 2; return formatter.format(amount)
     }
-
     fun formatDate(timestampMillis: Long): String = DateFormat.getDateInstance(DateFormat.MEDIUM, currentLocale).format(timestampMillis)
     fun formatTime(timestampMillis: Long): String = DateFormat.getTimeInstance(DateFormat.SHORT, currentLocale).format(timestampMillis)
     fun formatDateTime(timestampMillis: Long): String = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, currentLocale).format(timestampMillis)
     fun formatIsoDateTime(timestampMillis: Long): String = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", currentLocale).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(timestampMillis))
-
     fun formatDuration(totalSeconds: Long): String {
-        val duration = Duration.ofSeconds(totalSeconds.coerceAtLeast(0))
-        val total = duration.seconds
-        val hours = total / 3600
-        val minutes = (total % 3600) / 60
-        val seconds = total % 60
-        return if (hours > 0) getString("duration_hms_format", "%s:%s:%s", formatNumber(hours), formatNumber(minutes), formatNumber(seconds))
-        else if (minutes > 0) getString("duration_ms_format", "%s:%s", formatNumber(minutes), formatNumber(seconds))
-        else getString("duration_seconds_format", "%ss", formatNumber(seconds))
+        val duration = Duration.ofSeconds(totalSeconds.coerceAtLeast(0)); val total = duration.seconds; val hours = total / 3600; val minutes = (total % 3600) / 60; val seconds = total % 60
+        return if (hours > 0) getString("duration_hms_format", "%s:%s:%s", formatNumber(hours), formatNumber(minutes), formatNumber(seconds)) else if (minutes > 0) getString("duration_ms_format", "%s:%s", formatNumber(minutes), formatNumber(seconds)) else getString("duration_seconds_format", "%ss", formatNumber(seconds))
     }
-
-    fun formatClock(totalSeconds: Int): String {
-        val safeSeconds = totalSeconds.coerceAtLeast(0)
-        return "%d:%02d".format(Locale.ROOT, safeSeconds / 60, safeSeconds % 60)
-    }
-
-    private fun readJson(fileName: String): JSONObject {
-        val inputStream = context.assets.open("locales/$fileName")
-        return InputStreamReader(inputStream).use { JSONObject(it.readText()) }
-    }
-
+    fun formatClock(totalSeconds: Int): String { val safeSeconds = totalSeconds.coerceAtLeast(0); return "%d:%02d".format(Locale.ROOT, safeSeconds / 60, safeSeconds % 60) }
+    private fun readJson(fileName: String): JSONObject = InputStreamReader(context.assets.open("locales/$fileName")).use { JSONObject(it.readText()) }
     private fun formatString(raw: String, vararg args: Any): String = runCatching { String.format(currentLocale, raw, *args) }.getOrElse { raw }
 
     data class SupportedLocale(val tag: String, val fileName: String, val displayName: String, val rtl: Boolean = false)
-
     companion object {
         const val ENGLISH_FILE = "en_us.json"
         val supportedLocales = listOf(
