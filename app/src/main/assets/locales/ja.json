@@ -916,9 +916,7 @@
   "reduced_motion_label": "動きを減らす",
   "reduced_motion_description": "画面遷移の動きを弱めるか無効にします",
   "sfx_volume_format": "効果音の音量: %d%%",
-
   "settings_desc_sfx_volume": "BGMとは別に効果音の音量を調整します。",
-
   "master_volume_format": "マスター音量：%d%%",
   "save_data_management_title": "セーブデータ管理",
   "reset_all_game_data_label": "すべてのゲームデータをリセット",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "点滅や急な視覚変化を減らします。",
   "settings_desc_reduced_motion": "画面遷移のアニメーションを弱めるか無効にします。",
   "settings_desc_master_volume": "アプリの音量をミュートから最大まで調整します。",
-  "settings_desc_reset_all_data": "保存されたゲームの進行状況を消去します。続行するには追加の確認が必要です。"
+  "settings_desc_reset_all_data": "保存されたゲームの進行状況を消去します。続行するには追加の確認が必要です。",
+  "more_feature_discovery_title": "クイックツアー",
+  "more_feature_discovery_step_1": "この機能には専用のツールと進行状況があります。少し確認して、探索したいものを選びましょう。",
+  "more_feature_discovery_step_2": "いつでもMore Hubからこの機能に戻れます。",
+  "more_feature_discovery_skip": "スキップして開く"
 }
