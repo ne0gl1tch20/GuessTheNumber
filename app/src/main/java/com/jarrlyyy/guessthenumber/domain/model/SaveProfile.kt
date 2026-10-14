@@ -1,23 +1,13 @@
 package com.jarrlyyy.guessthenumber.domain.model
 
+import com.jarrlyyy.guessthenumber.shared.domain.SaveProfileRules
+
 object SaveProfile {
-    const val DEFAULT_ICON = "default"
+    const val DEFAULT_ICON = SaveProfileRules.DEFAULT_ICON
 
-    val iconIds: List<String> = listOf(
-        DEFAULT_ICON,
-        "star",
-        "bolt",
-        "crown",
-        "planet"
-    )
+    val iconIds: List<String> = SaveProfileRules.iconIds
 
-    fun isValidIcon(id: String): Boolean = id in iconIds
+    fun isValidIcon(id: String): Boolean = SaveProfileRules.isValidIcon(id)
 
-    fun iconSymbol(id: String): String = when (id) {
-        "star" -> "⭐"
-        "bolt" -> "⚡"
-        "crown" -> "👑"
-        "planet" -> "🪐"
-        else -> "🎮"
-    }
+    fun iconSymbol(id: String): String = SaveProfileRules.iconSymbol(id)
 }
