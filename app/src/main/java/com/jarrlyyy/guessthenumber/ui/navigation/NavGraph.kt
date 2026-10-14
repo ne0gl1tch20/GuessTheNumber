@@ -525,7 +525,9 @@ fun NavGraph(
                         )
                     }
                 }
-                FeatureTourOverlay(route = currentRoute, state = state, onUpdateSettings = onUpdateSettings)
+                if (!tutorialActive) {
+                    FeatureTourOverlay(route = currentRoute, state = state, onUpdateSettings = onUpdateSettings)
+                }
                 if (tutorialActive) {
                     Box(Modifier.fillMaxSize(), contentAlignment = if (tutorialStep == 0 || tutorialStep == 3) androidx.compose.ui.Alignment.TopCenter else androidx.compose.ui.Alignment.BottomCenter) {
                         GuidedTutorialOverlay(
