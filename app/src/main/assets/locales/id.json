@@ -872,6 +872,14 @@
   "visual_comfort_description": "Kenyamanan Visual & Aksesibilitas",
   "reduced_motion_label": "Kurangi Gerakan",
   "reduced_motion_description": "Lembutkan atau nonaktifkan transisi layar ekspresif",
+  "more_feature_discovery_title": "Tur singkat",
+
+  "more_feature_discovery_step_1": "Fitur ini memiliki alat dan progresnya sendiri. Lihat sebentar, lalu pilih apa yang ingin dijelajahi.",
+
+  "more_feature_discovery_step_2": "Kamu bisa kembali ke fitur ini dari Hub Lainnya kapan saja.",
+
+  "more_feature_discovery_skip": "Lewati dan buka",
+
   "master_volume_format": "Volume Utama: %d%%",
   "save_data_management_title": "Pengelolaan Data Simpanan",
   "reset_all_game_data_label": "Atur Ulang Semua Data Game",
