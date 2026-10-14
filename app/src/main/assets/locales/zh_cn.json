@@ -916,9 +916,7 @@
   "reduced_motion_label": "减少动态效果",
   "reduced_motion_description": "柔化或关闭富有表现力的屏幕过渡动画",
   "sfx_volume_format": "音效音量：%d%%",
-
   "settings_desc_sfx_volume": "单独调整音效音量，不影响背景音乐。",
-
   "master_volume_format": "主音量：%d%%",
   "save_data_management_title": "存档数据管理",
   "reset_all_game_data_label": "重置所有游戏数据",
@@ -1092,5 +1090,9 @@
   "settings_desc_reduce_flashes": "减少闪光和突然的视觉变化。",
   "settings_desc_reduced_motion": "减弱或关闭屏幕切换动画。",
   "settings_desc_master_volume": "将应用音量从静音调整到最大。",
-  "settings_desc_reset_all_data": "此操作会清除已保存的游戏进度。继续前需要再次确认。"
+  "settings_desc_reset_all_data": "此操作会清除已保存的游戏进度。继续前需要再次确认。",
+  "more_feature_discovery_title": "快速导览",
+  "more_feature_discovery_step_1": "此功能有自己的工具和进度。先简单了解一下，再选择想探索的内容。",
+  "more_feature_discovery_step_2": "你可以随时从 More Hub 返回此功能。",
+  "more_feature_discovery_skip": "跳过并打开"
 }
