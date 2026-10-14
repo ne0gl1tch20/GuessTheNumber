@@ -872,6 +872,14 @@
   "visual_comfort_description": "Comodidad visual y accesibilidad",
   "reduced_motion_label": "Reducir movimiento",
   "reduced_motion_description": "Suaviza o desactiva las transiciones expresivas de pantalla",
+  "more_feature_discovery_title": "Guía rápida",
+
+  "more_feature_discovery_step_1": "Esta función tiene sus propias herramientas y progreso. Echa un vistazo y elige qué quieres explorar.",
+
+  "more_feature_discovery_step_2": "Puedes volver a esta función desde el centro Más cuando quieras.",
+
+  "more_feature_discovery_skip": "Saltar y abrir",
+
   "master_volume_format": "Volumen maestro: %d%%",
   "save_data_management_title": "Administración de datos guardados",
   "reset_all_game_data_label": "Restablecer todos los datos del juego",
