@@ -50,6 +50,8 @@ private fun DesktopGameScreen() {
     var guess by remember { mutableStateOf("") }
     var feedback by remember { mutableStateOf("Guess a number to earn money.") }
     var saveStatus by remember { mutableStateOf("Loading local save…") }
+    var luaActivity by remember { mutableStateOf<DesktopLuaActivity?>(null) }
+    var luaResult by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(gameState) {
         saveStatus = if (saveStore.save(gameState)) {
@@ -112,6 +114,21 @@ private fun DesktopGameScreen() {
                         feedback = "Difficulty changed to Extreme."
                     }
                 }
+                Spacer(Modifier.height(12.dp))
+                Button(
+                    onClick = {
+                        runCatching {
+                            DesktopLuaActivity.load("scripts/minigames/number_rush.lua")
+                        }.onSuccess {
+                            luaActivity = it
+                            luaResult = null
+                        }.onFailure {
+                            feedback = "Lua activity couldn't start: ${it.message ?: "unknown error"}"
+                        }
+                    }
+                ) {
+                    Text("Play Number Rush (Lua)")
+                }
                 Spacer(Modifier.height(16.dp))
                 Text(
                     "Range: ${gameState.currentRangeMin}–${gameState.currentRangeMax}",
@@ -160,6 +177,32 @@ private fun DesktopGameScreen() {
                 Text(saveStatus, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(8.dp))
                 Text("More progression screens and localization are still being ported.")
+
+                luaActivity?.let { activity ->
+                    Spacer(Modifier.height(24.dp))
+                    Text(activity.title, style = MaterialTheme.typography.titleLarge)
+                    Text(activity.description, style = MaterialTheme.typography.bodyMedium)
+                    Spacer(Modifier.height(8.dp))
+                    Text(activity.prompt, style = MaterialTheme.typography.titleMedium)
+                    activity.options.forEachIndexed { index, option ->
+                        Button(onClick = {
+                            luaResult = if (index == activity.correctOption) {
+                                activity.successMessage
+                            } else {
+                                activity.failureMessage
+                            }
+                        }) {
+                            Text(option)
+                        }
+                    }
+                    luaResult?.let { Text(it, style = MaterialTheme.typography.bodyLarge) }
+                    Button(onClick = {
+                        luaActivity = null
+                        luaResult = null
+                    }) {
+                        Text("Close activity")
+                    }
+                }
             }
         }
     }
