@@ -23,6 +23,7 @@ On Windows PowerShell:
 - Shared reward calculations, streaks, guess statistics and difficulty penalties.
 - Offline local saves under `~/.guessthenumber/`, with an atomic save file and last-known-good backup.
 - Shared save JSON codec with unknown-field tolerance for migration compatibility.
+- Bundled Number Rush Lua activity, executed in the shared instruction-budgeted sandbox and validated before rendering.
 - No accounts, ads, analytics or network requirement.
 
 ## Still being ported
