@@ -21,7 +21,7 @@ TESTS = ROOT / "app/src/test/java/com/jarrlyyy/guessthenumber"
 SCRIPTS = ROOT / "app/src/main/assets/scripts"
 SFX_DIR = ROOT / "app/src/main/assets/sfx"
 
-PLACEHOLDER = re.compile(r"%(?:\\d+\\$)?[-#+ 0,(]*\\d*(?:\\.\\d+)?[a-zA-Z%]")
+PLACEHOLDER = re.compile(r"%(?:[0-9]+\\$)?[-#+ 0,(]*[0-9]*(?:[.][0-9]+)?[a-zA-Z%]")
 REQUIRED_SETTINGS_DESCRIPTIONS = (
     "settings_desc_language",
     "settings_desc_theme_mode",
