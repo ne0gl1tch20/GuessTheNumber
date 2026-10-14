@@ -20,7 +20,8 @@
   "live_ops": "Live Ops",
   "mutators": "Mga Mutator",
   "prestige": "Prestige",
-  "save_slots": "Mga Slot ng Save",
+  "save_slots": "Mga Slot ng Save",  "guess_rate_limited": "Sandali lang bago muling manghula.",
+
   "guess_prompt": "Ilagay ang iyong hula:",
   "submit_guess": "Isumite",
   "correct_guess": "✨ Tama! Nahulaan mo ang sekretong numero!",
