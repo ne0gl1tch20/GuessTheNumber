@@ -1,3 +1,7 @@
+## Unreleased (Tactile Game Feedback)
+
+- 📳 **Setting-aware haptics**: Guess submissions give a subtle confirmation for a correct answer and a light directional-feedback tick for high/low results. Successful upgrade purchases give a confirmation haptic when the level actually increases. All haptics respect the existing global Vibration setting; Blindfolded Oracle's hidden feedback stays silent. Guess rules, prices, rewards and save data are unchanged.
+
 ## Unreleased (Accessible Player Feedback)
 
 - ♿ **Screen-reader announcements**: Correct-guess celebrations, random-event cards and shared progression milestone banners now expose their combined message as a polite live region, so TalkBack can announce changing feedback without relying on color, icons or animation. Gameplay and rewards are unchanged.
