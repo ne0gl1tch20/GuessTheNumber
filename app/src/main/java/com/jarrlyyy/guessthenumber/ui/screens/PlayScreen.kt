@@ -29,6 +29,7 @@ import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
+import com.jarrlyyy.guessthenumber.ui.components.ExpressiveMilestoneBanner
 
 private enum class GuessFeedbackTone { Neutral, TooLow, TooHigh, Correct }
 
@@ -55,6 +56,15 @@ fun PlayScreen(
     var feedbackTone by remember { mutableStateOf(GuessFeedbackTone.Neutral) }
     var showCorrectCelebration by remember { mutableStateOf(false) }
     var observedCorrectGuesses by remember { mutableStateOf(state.correctGuesses) }
+    val completedEarlyGoals = buildSet {
+        if (state.correctGuesses >= 10) add("correct_10")
+        if (state.bestStreak >= 5) add("streak_5")
+        if (state.money >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(1_000_000)) add("millionaire")
+    }
+    var observedEarlyGoalIds by remember { mutableStateOf(completedEarlyGoals) }
+    val earlyGoalCelebrationQueue = remember { androidx.compose.runtime.mutableStateListOf<String>() }
+    var showEarlyGoalCelebration by remember { mutableStateOf(false) }
+    var earlyGoalCelebrationText by remember { mutableStateOf("") }
     val guessInteractionSource = remember { MutableInteractionSource() }
     val isGuessPressed by guessInteractionSource.collectIsPressedAsState()
     val guessCornerRadius by animateDpAsState(
@@ -65,6 +75,35 @@ fun PlayScreen(
         ),
         label = "guessButtonShape"
     )
+
+    LaunchedEffect(completedEarlyGoals) {
+        val newlyCompleted = completedEarlyGoals - observedEarlyGoalIds
+        observedEarlyGoalIds = completedEarlyGoals
+        val goalNameKeys = listOf(
+            "correct_10" to "achievement_correct_10_name",
+            "streak_5" to "achievement_streak_5_name",
+            "millionaire" to "achievement_millionaire_name"
+        )
+        goalNameKeys.filter { it.first in newlyCompleted }.forEach { (_, nameKey) ->
+            val goalName = locale.getString(nameKey, "Progress milestone")
+            val message = locale.getString("achievement_unlocked_banner", "Unlocked: %s", goalName)
+            if (message !in earlyGoalCelebrationQueue && message != earlyGoalCelebrationText) {
+                earlyGoalCelebrationQueue.add(message)
+            }
+        }
+    }
+
+    LaunchedEffect(earlyGoalCelebrationQueue.firstOrNull(), state.settings.reducedMotion) {
+        val nextCelebration = earlyGoalCelebrationQueue.firstOrNull() ?: return@LaunchedEffect
+        earlyGoalCelebrationText = nextCelebration
+        showEarlyGoalCelebration = true
+        delay(if (state.settings.reducedMotion) 700L else 2200L)
+        showEarlyGoalCelebration = false
+        delay(if (state.settings.reducedMotion) 100L else 220L)
+        if (earlyGoalCelebrationQueue.firstOrNull() == nextCelebration) {
+            earlyGoalCelebrationQueue.removeAt(0)
+        }
+    }
 
     LaunchedEffect(state.correctGuesses, state.settings.reducedMotion) {
         val foundNewNumber = state.correctGuesses > observedCorrectGuesses
@@ -736,6 +775,14 @@ fun PlayScreen(
                         }
                     }
                 }
+            }
+            item(key = "early_goal_celebration") {
+                ExpressiveMilestoneBanner(
+                    visible = showEarlyGoalCelebration,
+                    title = locale.getString("achievement_unlocked_title", "Milestone reached!"),
+                    description = earlyGoalCelebrationText,
+                    reducedMotion = state.settings.reducedMotion
+                )
             }
             item(key = "early_goal_board") {
                 EarlyGoalBoard(
