@@ -24,8 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.jarrlyyy.guessthenumber.shared.domain.DifficultyRules
+import com.jarrlyyy.guessthenumber.shared.domain.GameState
+import com.jarrlyyy.guessthenumber.shared.engine.GameEngine
 import com.jarrlyyy.guessthenumber.shared.rules.GuessFeedback
-import com.jarrlyyy.guessthenumber.shared.rules.GuessRules
 import kotlin.random.Random
 
 fun main() = application {
@@ -41,36 +43,36 @@ fun main() = application {
 
 @Composable
 private fun DesktopGameScreen() {
-    var targetNumber by remember { mutableStateOf(Random.nextLong(1L, 101L)) }
+    val engine = remember { GameEngine() }
+    var gameState by remember {
+        mutableStateOf(
+            GameState(
+                currentRangeMax = DifficultyRules.baseRangeMax(DifficultyRules.CLASSIC),
+                targetNumber = Random.nextLong(1L, 101L)
+            )
+        )
+    }
     var guess by remember { mutableStateOf("") }
-    var attempts by remember { mutableStateOf(0) }
-    var hasWon by remember { mutableStateOf(false) }
-    var feedback by remember { mutableStateOf("Guess a number from 1 to 100.") }
+    var feedback by remember { mutableStateOf("Guess a number to earn money.") }
 
     val submitGuess = {
-        val parsedGuess = guess.toIntOrNull()
+        val parsedGuess = guess.toLongOrNull()
         when {
-            hasWon -> Unit
-            parsedGuess == null || parsedGuess !in 1..100 -> {
-                feedback = "Enter a whole number from 1 to 100."
+            parsedGuess == null -> {
+                feedback = "Enter a whole number within the current range."
+            }
+            parsedGuess !in gameState.currentRangeMin..gameState.currentRangeMax -> {
+                feedback = "Choose a number from ${gameState.currentRangeMin} to ${gameState.currentRangeMax}."
             }
             else -> {
-                attempts += 1
-                when (
-                    GuessRules.resolveFeedback(
-                        targetNumber = targetNumber,
-                        guess = parsedGuess.toLong(),
-                        rangeMin = 1L,
-                        rangeMax = 100L
-                    )
-                ) {
-                    GuessFeedback.TOO_LOW -> feedback = "Too low. Try again."
-                    GuessFeedback.TOO_HIGH -> feedback = "Too high. Try again."
-                    GuessFeedback.CORRECT -> {
-                        hasWon = true
-                        feedback = "Correct! You won in $attempts guesses."
-                    }
+                val result = engine.processGuess(gameState, parsedGuess)
+                gameState = result.newState
+                feedback = when (result.feedback) {
+                    GuessFeedback.TOO_LOW -> "Too low. Try again."
+                    GuessFeedback.TOO_HIGH -> "Too high. Try again."
+                    GuessFeedback.CORRECT -> "Correct! Earned ${result.reward.format()} money."
                 }
+                if (result.feedback == GuessFeedback.CORRECT) guess = ""
             }
         }
     }
@@ -83,20 +85,40 @@ private fun DesktopGameScreen() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .widthIn(max = 560.dp),
+                    .widthIn(max = 640.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Text("Guess The Number", style = MaterialTheme.typography.headlineLarge)
+                Spacer(Modifier.height(8.dp))
+                Text("Shared Kotlin game engine · offline desktop build")
+                Spacer(Modifier.height(20.dp))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DifficultyButton("Classic", DifficultyRules.CLASSIC, gameState.difficultyId) {
+                        gameState = changeDifficulty(gameState, it, engine)
+                        feedback = "Difficulty changed to Classic."
+                    }
+                    DifficultyButton("Hard", DifficultyRules.HARD, gameState.difficultyId) {
+                        gameState = changeDifficulty(gameState, it, engine)
+                        feedback = "Difficulty changed to Hard."
+                    }
+                    DifficultyButton("Extreme", DifficultyRules.EXTREME, gameState.difficultyId) {
+                        gameState = changeDifficulty(gameState, it, engine)
+                        feedback = "Difficulty changed to Extreme."
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Range: ${gameState.currentRangeMin}–${gameState.currentRangeMax}",
+                    style = MaterialTheme.typography.titleMedium
+                )
                 Spacer(Modifier.height(12.dp))
-                Text("A first Windows desktop shell powered by the shared Kotlin rules.")
-                Spacer(Modifier.height(24.dp))
                 OutlinedTextField(
                     value = guess,
-                    onValueChange = { guess = it.filter(Char::isDigit).take(3) },
-                    label = { Text("Your guess (1–100)") },
+                    onValueChange = { guess = it.filter(Char::isDigit).take(12) },
+                    label = { Text("Your guess") },
                     singleLine = true,
-                    enabled = !hasWon,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(12.dp))
@@ -104,26 +126,65 @@ private fun DesktopGameScreen() {
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(onClick = submitGuess, enabled = !hasWon && guess.isNotBlank()) {
+                    Button(onClick = submitGuess, enabled = guess.isNotBlank()) {
                         Text("Guess")
                     }
                     Button(
                         onClick = {
-                            targetNumber = Random.nextLong(1L, 101L)
+                            gameState = gameState.copy(
+                                targetNumber = Random.nextLong(
+                                    gameState.currentRangeMin,
+                                    gameState.currentRangeMax + 1L
+                                )
+                            )
                             guess = ""
-                            attempts = 0
-                            hasWon = false
-                            feedback = "New number chosen. Guess from 1 to 100."
+                            feedback = "A new target was chosen. Your progression is kept."
                         }
                     ) {
-                        Text("New game")
+                        Text("New target")
                     }
                 }
                 Spacer(Modifier.height(16.dp))
                 Text(feedback, style = MaterialTheme.typography.bodyLarge)
+                Spacer(Modifier.height(20.dp))
+                Text("Money: ${gameState.money.format()}", style = MaterialTheme.typography.titleLarge)
+                Spacer(Modifier.height(6.dp))
+                Text("Streak: ${gameState.streak}   ·   Best: ${gameState.bestStreak}")
+                Text("Total guesses: ${gameState.statistics.totalGuesses}")
+                Text("Correct guesses: ${gameState.correctGuesses}")
                 Spacer(Modifier.height(8.dp))
-                Text("Guesses: $attempts", style = MaterialTheme.typography.bodyMedium)
+                Text("Desktop saves and the remaining progression screens are next in the port.")
             }
         }
     }
+}
+
+@Composable
+private fun DifficultyButton(
+    label: String,
+    difficultyId: String,
+    selectedDifficulty: String,
+    onSelect: (String) -> Unit
+) {
+    Button(
+        onClick = { onSelect(difficultyId) },
+        enabled = difficultyId != selectedDifficulty
+    ) {
+        Text(label)
+    }
+}
+
+private fun changeDifficulty(
+    state: GameState,
+    difficultyId: String,
+    engine: GameEngine
+): GameState {
+    val max = engine.getInitialRangeMax(difficultyId)
+    return state.copy(
+        difficultyId = difficultyId,
+        currentRangeMin = 1L,
+        currentRangeMax = max,
+        targetNumber = Random.nextLong(1L, max + 1L),
+        streak = 0
+    )
 }
