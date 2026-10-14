@@ -9,7 +9,7 @@ jobs:
     env:
       ORG_GRADLE_PROJECT_luaLiveOpsPublicKeyBase64: ${{ secrets.LUA_LIVEOPS_PUBLIC_KEY_BASE64 }}
     permissions:
-      contents: read
+      contents: write
 
     steps:
       - name: Checkout
@@ -44,7 +44,7 @@ jobs:
         run: python3 tools/build_preflight.py
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -72,6 +72,13 @@ jobs:
           GTN_DEBUG_KEYSTORE_PATH: ${{ runner.temp }}/gtn-signing/debug.keystore
         run: ./gradlew assembleDebug --no-daemon
 
+      - name: Create installable debug archive
+        run: |
+          mkdir -p "$RUNNER_TEMP/gtn-debug"
+          cp app/build/outputs/apk/debug/*.apk "$RUNNER_TEMP/gtn-debug/GuessTheNumber-debug.apk"
+          cd "$RUNNER_TEMP/gtn-debug"
+          zip -q "$GITHUB_WORKSPACE/GuessTheNumber-debug.zip" GuessTheNumber-debug.apk
+
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
@@ -79,6 +86,20 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
 
+      - name: Upload installable debug archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: GuessTheNumber-debug.zip
+          path: GuessTheNumber-debug.zip
+          if-no-files-found: error
+
+      - name: Publish debug-latest release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view debug-latest >/dev/null 2>&1 || gh release create debug-latest --title "GuessTheNumber Debug Latest" --notes "Automatically refreshed stable debug build."
+          gh release upload debug-latest GuessTheNumber-debug.zip --clobber
+
       - name: Remove signing material
         if: always()
-        run: rm -rf "$RUNNER_TEMP/gtn-signing"
+        run: rm -rf "$RUNNER_TEMP/gtn-signing" "$RUNNER_TEMP/gtn-debug"
