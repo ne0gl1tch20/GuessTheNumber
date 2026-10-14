@@ -872,6 +872,14 @@
   "visual_comfort_description": "Thoải mái thị giác và trợ năng",
   "reduced_motion_label": "Giảm chuyển động",
   "reduced_motion_description": "Làm dịu hoặc tắt chuyển cảnh biểu cảm",
+  "more_feature_discovery_title": "Hướng dẫn nhanh",
+
+  "more_feature_discovery_step_1": "Tính năng này có công cụ và tiến trình riêng. Hãy xem qua rồi chọn nội dung bạn muốn khám phá.",
+
+  "more_feature_discovery_step_2": "Bạn có thể quay lại tính năng này từ More Hub bất cứ lúc nào.",
+
+  "more_feature_discovery_skip": "Bỏ qua và mở",
+
   "master_volume_format": "Âm lượng chính: %d%%",
   "save_data_management_title": "Quản lý dữ liệu lưu",
   "reset_all_game_data_label": "Đặt lại toàn bộ dữ liệu trò chơi",
