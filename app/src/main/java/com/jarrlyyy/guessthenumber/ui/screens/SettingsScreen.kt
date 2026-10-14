@@ -185,7 +185,7 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text(localizedText("Beyond the Numbers"), style = MaterialTheme.typography.titleMedium)
+                                Text(locale.getString("play_correct_celebration_title", "Nice guess!"), style = MaterialTheme.typography.titleMedium)
                                 Text(
                                     locale.getString("play_correct_celebration_desc", "Secret number found. Your streak keeps growing."),
                                     style = MaterialTheme.typography.bodySmall,
@@ -207,7 +207,7 @@ fun SettingsScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            listOf(previewPrimary, previewSecondary, previewTertiary).forEachIndexed { index, color ->
+                            listOf(previewPrimary, previewSecondary, previewTertiary).forEach { color ->
                                 Surface(
                                     modifier = Modifier.weight(1f).height(8.dp),
                                     shape = MaterialTheme.shapes.extraLarge,
