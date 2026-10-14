@@ -1,3 +1,7 @@
+## Unreleased (Achievement Celebrations)
+
+- 🏆 **Achievement unlock queue**: When several achievements unlock together, each gets its own localized celebration banner in sequence instead of only announcing the first one. Reduced-motion timing remains supported.
+
 ## Unreleased (Player Experience)
 
 - 🛍️ **Clearer shop purchase state**: Purchased items now receive a distinct theme-aware card color, while equipped cosmetics keep their existing selected styling. The transition respects reduced motion.
