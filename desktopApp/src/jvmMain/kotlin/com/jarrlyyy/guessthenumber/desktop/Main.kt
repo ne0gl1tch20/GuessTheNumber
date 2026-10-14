@@ -47,11 +47,17 @@ private fun DesktopGameScreen() {
     val engine = remember { GameEngine() }
     val saveStore = remember { DesktopSaveStore() }
     var gameState by remember { mutableStateOf(saveStore.loadOrDefault()) }
-    LaunchedEffect(gameState) {
-        saveStore.save(gameState)
-    }
     var guess by remember { mutableStateOf("") }
     var feedback by remember { mutableStateOf("Guess a number to earn money.") }
+    var saveStatus by remember { mutableStateOf("Loading local save…") }
+
+    LaunchedEffect(gameState) {
+        saveStatus = if (saveStore.save(gameState)) {
+            "Saved locally with recovery backup"
+        } else {
+            "Couldn't save to disk. Check folder permissions or free space."
+        }
+    }
 
     val submitGuess = {
         val parsedGuess = guess.toLongOrNull()
@@ -151,7 +157,9 @@ private fun DesktopGameScreen() {
                 Text("Total guesses: ${gameState.statistics.totalGuesses}")
                 Text("Correct guesses: ${gameState.correctGuesses}")
                 Spacer(Modifier.height(8.dp))
-                Text("Desktop saves and the remaining progression screens are next in the port.")
+                Text(saveStatus, style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(8.dp))
+                Text("More progression screens and localization are still being ported.")
             }
         }
     }
