@@ -38,6 +38,7 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
     }
@@ -54,7 +55,6 @@ compose.desktop {
         nativeDistributions {
             targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi)
             packageName = "GuessTheNumber"
-            // Keep the displayed MSI version and the version used by the updater in sync.
             packageVersion = windowsPackageVersion.get()
 
             windows {
