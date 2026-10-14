@@ -1,6 +1,10 @@
-## Unreleased (Cross-Core Runtime Hardening)
+## Unreleased (Player Experience)
 
 - 🎯 **Accurate guess feedback**: Keyboard and button submissions now share one handler, and rate-limited guesses show a localized retry message instead of misleading high/low/correct feedback. Feedback uses the same clamped number the game engine evaluates.
+- 🎯 **Clearer guess feedback**: High, low, and correct guesses now use distinct icons and theme-aware feedback cards. Feedback transitions respect the reduced-motion setting, and Blindfolded Oracle hides feedback from both the Guess button and keyboard submission paths.
+
+## Unreleased (Cross-Core Runtime Hardening)
+
 - 💾 **Preserve recoverable saves**: Saving over a corrupted primary no longer overwrites a valid last-known-good backup.
 - 💾 **Reject impossible save state**: Save validation now rejects out-of-range targets and negative economy/progression counters so recovery can prefer a valid backup.
 - 🎵 **Bound music imports**: Imported tracks are capped at 100 MiB; empty, oversized, or failed imports are rejected and partial files are cleaned up.
