@@ -1,3 +1,7 @@
+## Unreleased (Random Event Announcements)
+
+- 🎲 **More exciting random-event announcements**: Lucky events now use event-specific icons and theme-aware color treatments, with a clearer title/description layout and an entrance animation that respects reduced motion. Repeated events of the same type are announced again. Event selection odds, rewards, effects, and save data are unchanged.
+
 ## Unreleased (Progression Celebrations)
 
 - 🌟 **Early-goal celebrations**: Completing the existing 10-correct-guesses, 5-best-streak, or one-million-Money goals now triggers a localized milestone banner on the Play screen. Multiple milestones queue in sequence, and reduced-motion timing is respected. Existing goals and rewards are unchanged.
