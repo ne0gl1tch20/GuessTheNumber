@@ -78,7 +78,7 @@ fun main() = application {
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text("Windows Debug updates", style = MaterialTheme.typography.titleMedium)
-                        Text("Installed version: $WindowsBuildVersion.current")
+                        Text("Installed version: ${WindowsBuildVersion.current}")
                         Text(status)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Button(
