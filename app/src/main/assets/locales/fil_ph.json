@@ -915,6 +915,14 @@
   "visual_comfort_description": "Visual comfort at accessibility",
   "reduced_motion_label": "Bawasan ang Galaw",
   "reduced_motion_description": "Palambutin o i-disable ang mga transition ng screen",
+  "more_feature_discovery_title": "Mabilis na tour",
+
+  "more_feature_discovery_step_1": "May sarili itong mga tool at progreso. Silipin muna, pagkatapos piliin kung ano ang gusto mong tuklasin.",
+
+  "more_feature_discovery_step_2": "Puwede kang bumalik sa feature na ito mula sa More Hub anumang oras.",
+
+  "more_feature_discovery_skip": "Laktawan at buksan",
+
   "master_volume_format": "Master Volume: %d%%",
   "save_data_management_title": "Pamamahala ng Save Data",
   "reset_all_game_data_label": "I-reset ang Lahat ng Game Data",
