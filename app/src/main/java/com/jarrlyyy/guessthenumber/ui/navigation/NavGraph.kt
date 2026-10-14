@@ -525,7 +525,13 @@ fun NavGraph(
                         )
                     }
                 }
-                if (!tutorialActive) {
+                if (
+                    !tutorialActive &&
+                    !needsSettingsMigration &&
+                    !showTimeTravelPopup &&
+                    !showChangelogPopup &&
+                    offlineGains == null
+                ) {
                     FeatureTourOverlay(route = currentRoute, state = state, onUpdateSettings = onUpdateSettings)
                 }
                 if (tutorialActive) {
