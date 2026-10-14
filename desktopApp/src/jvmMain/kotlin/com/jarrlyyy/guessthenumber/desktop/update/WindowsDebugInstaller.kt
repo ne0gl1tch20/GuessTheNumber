@@ -66,15 +66,15 @@ internal class WindowsDebugInstaller {
         val msiLiteral = powershellLiteral(msiPath.toAbsolutePath().toString())
         val directoryLiteral = powershellLiteral(temporaryDirectory.toAbsolutePath().toString())
         val script = """
-            $ErrorActionPreference = 'Stop'
-            $msiPath = '$msiLiteral'
-            $temporaryDirectory = '$directoryLiteral'
+            ${'$'}ErrorActionPreference = 'Stop'
+            ${'$'}msiPath = '$msiLiteral'
+            ${'$'}temporaryDirectory = '$directoryLiteral'
             try {
-                $installer = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/i', $msiPath) -Wait -PassThru
-                exit $installer.ExitCode
+                ${'$'}installer = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/i', ${'$'}msiPath) -Wait -PassThru
+                exit ${'$'}installer.ExitCode
             } finally {
                 Start-Sleep -Seconds 2
-                Remove-Item -LiteralPath $temporaryDirectory -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -LiteralPath ${'$'}temporaryDirectory -Recurse -Force -ErrorAction SilentlyContinue
             }
         """.trimIndent()
         Files.writeString(scriptPath, script)
