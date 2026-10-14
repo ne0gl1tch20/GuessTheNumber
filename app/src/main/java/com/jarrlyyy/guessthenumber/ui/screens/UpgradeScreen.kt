@@ -17,11 +17,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +35,7 @@ fun UpgradeScreen(
 ) {
     val context = LocalContext.current
     val locale = LocalAppLocaleManager.current
+    val hapticFeedback = LocalHapticFeedback.current
     val upgrades = remember {
         JsonConfigRepository(context).loadUpgrades()
     }
@@ -174,6 +178,22 @@ fun UpgradeScreen(
                 val totalCost = computedUpgradeCosts[upgrade.id] ?: BigNumber.ZERO
                 val canAfford = state.money >= totalCost
                 val buyInteractionSource = remember(upgrade.id) { MutableInteractionSource() }
+                var previousLevel by remember(upgrade.id) { mutableStateOf(level) }
+                var purchaseHighlight by remember(upgrade.id) { mutableStateOf(false) }
+                LaunchedEffect(level) {
+                    val oldLevel = previousLevel
+                    previousLevel = level
+                    if (level > oldLevel) {
+                        purchaseHighlight = true
+                        if (state.settings.vibrationEnabled) {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
+                        delay(if (state.settings.reducedMotion) 350L else 650L)
+                        purchaseHighlight = false
+                    }
+                }
+                val targetCardColor = if (purchaseHighlight) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                val cardColor = if (state.settings.reducedMotion) targetCardColor else animateColorAsState(targetValue = targetCardColor, label = "upgradePurchaseColor_${upgrade.id}").value
 
                 // Material 3 Expressive Upgrade Card
                 Surface(
@@ -181,8 +201,8 @@ fun UpgradeScreen(
                         .then(if (state.settings.reducedMotion) Modifier else Modifier.animateItem(placementSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow, dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy)))
                         .animateContentSize(),
                     shape = MaterialTheme.shapes.large,
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    tonalElevation = 2.dp
+                    color = cardColor,
+                    tonalElevation = if (purchaseHighlight && !state.settings.reducedMotion) 4.dp else 2.dp
                 ) {
                     Row(
                         modifier = Modifier
