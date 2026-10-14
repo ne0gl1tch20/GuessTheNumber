@@ -80,6 +80,26 @@ class SaveValidationTest {
     }
 
     @Test
+    fun saveValidationRejectsImpossibleTargetsAndNegativeEconomyCounters() {
+        val manager = SaveManager(RuntimeEnvironment.getApplication())
+        val json = kotlinx.serialization.json.Json { encodeDefaults = true }
+
+        val impossibleTarget = GameState(
+            currentRangeMin = 1,
+            currentRangeMax = 100,
+            targetNumber = 101
+        )
+        val negativeUpgrade = GameState(upgradeLevels = mapOf("reward_multiplier" to -1))
+        val negativeStatistics = GameState(
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(moneySpent = BigNumber(-1))
+        )
+
+        assertFalse(manager.validateSave(json.encodeToString(GameState.serializer(), impossibleTarget)))
+        assertFalse(manager.validateSave(json.encodeToString(GameState.serializer(), negativeUpgrade)))
+        assertFalse(manager.validateSave(json.encodeToString(GameState.serializer(), negativeStatistics)))
+    }
+
+    @Test
     fun testCurrencySanitization() {
         val corrupted = GameState(money = BigNumber(-5000), prestige = BigNumber(-10))
         val sanitized = AntiCheatService.sanitizeCurrency(corrupted)
