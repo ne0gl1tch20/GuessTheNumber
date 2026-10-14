@@ -872,6 +872,10 @@
   "visual_comfort_description": "Thoải mái thị giác và trợ năng",
   "reduced_motion_label": "Giảm chuyển động",
   "reduced_motion_description": "Làm dịu hoặc tắt chuyển cảnh biểu cảm",
+  "sfx_volume_format": "Âm lượng hiệu ứng âm thanh: %d%%",
+
+  "settings_desc_sfx_volume": "Điều chỉnh âm lượng hiệu ứng riêng biệt với nhạc nền.",
+
   "master_volume_format": "Âm lượng chính: %d%%",
   "save_data_management_title": "Quản lý dữ liệu lưu",
   "reset_all_game_data_label": "Đặt lại toàn bộ dữ liệu trò chơi",
