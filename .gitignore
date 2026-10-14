@@ -13,5 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+# Local project debug signing key (do not commit private signing material)
+/debug-signing/debug.keystore
 /gtn-liveops-keys
 /gtn-signing

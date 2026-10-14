@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
 
 @Composable
 fun parseMarkdownInline(text: String): AnnotatedString {
@@ -25,57 +26,75 @@ fun parseMarkdownInline(text: String): AnnotatedString {
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
 
     return remember(text, primaryColor, secondaryColor, onSurfaceColor) {
-        buildAnnotatedString {
-            val regex = Regex("(\\*\\*(.*?)\\*\\*|__(.*?)__|\\*(.*?)\\*|_(.*?)_|`(.*?)`|\\$(.*?)\\$)")
-            var lastIndex = 0
-            val matchResults = regex.findAll(text)
-            for (match in matchResults) {
-                val range = match.range
-                if (range.first > lastIndex) {
-                    append(text.substring(lastIndex, range.first))
-                }
-                val boldAsterisk = match.groups[2]?.value
-                val boldUnderscore = match.groups[3]?.value
-                val italicAsterisk = match.groups[4]?.value
-                val italicUnderscore = match.groups[5]?.value
-                val inlineCode = match.groups[6]?.value
-                val latexMath = match.groups[7]?.value
+        try {
+            buildAnnotatedString {
+            var index = 0
 
-                val boldText = boldAsterisk ?: boldUnderscore
-                val italicText = italicAsterisk ?: italicUnderscore
+            fun appendStyled(delimiter: String, style: SpanStyle, transform: (String) -> String = { it }): Boolean {
+                if (!text.startsWith(delimiter, index)) return false
+                val contentStart = index + delimiter.length
+                val closingIndex = text.indexOf(delimiter, contentStart)
+                if (closingIndex < 0) return false
 
-                if (boldText != null) {
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = onSurfaceColor)) {
-                        append(boldText)
-                    }
-                } else if (italicText != null) {
-                    withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = onSurfaceColor)) {
-                        append(italicText)
-                    }
-                } else if (inlineCode != null) {
-                    withStyle(SpanStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp, color = primaryColor)) {
-                        append(inlineCode)
-                    }
-                } else if (latexMath != null) {
-                    val formattedMath = latexMath
-                        .replace("\\times", "×")
-                        .replace("\\cdot", "·")
-                        .replace("\\to", "→")
-                        .replace("\\div", "÷")
-                        .replace("\\pm", "±")
-                        .replace("\\leq", "≤")
-                        .replace("\\geq", "≥")
-                    withStyle(SpanStyle(fontStyle = FontStyle.Italic, fontWeight = FontWeight.Medium, color = secondaryColor)) {
-                        append(formattedMath)
-                    }
-                } else {
-                    append(match.value)
+                withStyle(style) {
+                    append(transform(text.substring(contentStart, closingIndex)))
                 }
-                lastIndex = range.last + 1
+                index = closingIndex + delimiter.length
+                return true
             }
-            if (lastIndex < text.length) {
-                append(text.substring(lastIndex))
+
+            while (index < text.length) {
+                val parsed = when {
+                    appendStyled(
+                        "**",
+                        SpanStyle(fontWeight = FontWeight.Bold, color = onSurfaceColor)
+                    ) -> true
+
+                    appendStyled(
+                        "__",
+                        SpanStyle(fontWeight = FontWeight.Bold, color = onSurfaceColor)
+                    ) -> true
+
+                    appendStyled(
+                        "*",
+                        SpanStyle(fontStyle = FontStyle.Italic, color = onSurfaceColor)
+                    ) -> true
+
+                    appendStyled(
+                        "_",
+                        SpanStyle(fontStyle = FontStyle.Italic, color = onSurfaceColor)
+                    ) -> true
+
+                    appendStyled(
+                        "`",
+                        SpanStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp, color = primaryColor)
+                    ) -> true
+
+                    (appendStyled(
+                        "$",
+                        SpanStyle(fontStyle = FontStyle.Italic, fontWeight = FontWeight.Medium, color = secondaryColor)
+                    ) { math ->
+                        math
+                            .replace("\\times", "×")
+                            .replace("\\cdot", "·")
+                            .replace("\\to", "→")
+                            .replace("\\div", "÷")
+                            .replace("\\pm", "±")
+                            .replace("\\leq", "≤")
+                            .replace("\\geq", "≥")
+                    }) -> true
+
+                    else -> {
+                        append(text[index])
+                        index++
+                        true
+                    }
+                }
+                if (!parsed) index++
             }
+            }
+        } catch (_: RuntimeException) {
+            buildAnnotatedString { append(text) }
         }
     }
 }
@@ -88,15 +107,20 @@ fun MarkdownViewerScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    var markdownText by remember { mutableStateOf("") }
+    var markdownText by remember(assetFileName) { mutableStateOf("") }
+    var loadError by remember(assetFileName) { mutableStateOf(false) }
 
     LaunchedEffect(assetFileName) {
+        loadError = false
         markdownText = try {
             context.assets.open(assetFileName).bufferedReader().use { it.readText() }
         } catch (_: Exception) {
-            "Failed to load $assetFileName"
+            loadError = true
+            ""
         }
     }
+
+    val lines = remember(markdownText) { markdownText.lines() }
 
     Scaffold(
         topBar = {
@@ -104,7 +128,7 @@ fun MarkdownViewerScreen(
                 title = { Text(title) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = localizedText("Back"))
                     }
                 }
             )
@@ -116,7 +140,6 @@ fun MarkdownViewerScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            val lines = markdownText.lines()
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -177,7 +200,7 @@ fun MarkdownViewerScreen(
                         
                     }
                 }
+                }
             }
-        }
     }
 }

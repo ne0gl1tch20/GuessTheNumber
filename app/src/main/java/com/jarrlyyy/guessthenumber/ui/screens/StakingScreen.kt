@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,19 +24,21 @@ import kotlin.random.Random
 @Composable
 fun StakingScreen(
     state: GameState,
-    onStakeResult: (BigNumber, Boolean) -> Unit,
+    onStakeResult: (BigNumber, BigNumber, Boolean) -> Unit,
     onBack: () -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val locale = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale).localeManager }
     var stakeInput by remember { mutableStateOf("") }
     var resultMessage by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Combo Streaks & Lucky Stake") },
+                title = { Text(locale.getString("staking_title", "Combo Streaks & Lucky Stake")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 }
             )
@@ -59,11 +63,11 @@ fun StakingScreen(
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Current Streak: ${state.streak} (Best: ${state.bestStreak})", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                        Text(locale.getString("staking_streak_format", "Current Streak: %d (Best: %d)", state.streak, state.bestStreak), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("Money: ${state.money.format()}", color = MoneyGold, fontSize = 16.sp)
+                        Text(locale.getString("staking_money_format", "Money: %s", state.money.format()), color = MoneyGold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Stake a portion of your money on a 50/50 'Lucky Guess' coin flip. Win to double your stake (+streak multiplier bonus), lose to forfeit it!", fontSize = 13.sp)
+                        Text(locale.getString("staking_description", "Stake a portion of your money on a 50/50 'Lucky Guess' coin flip. Win to double your stake (+streak multiplier bonus), lose to forfeit it!"), fontSize = 13.sp)
                     }
                 }
             }
@@ -72,7 +76,7 @@ fun StakingScreen(
                 OutlinedTextField(
                     value = stakeInput,
                     onValueChange = { stakeInput = it },
-                    label = { Text("Stake Amount") },
+                    label = { Text(locale.getString("staking_amount_label", "Stake Amount")) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -90,10 +94,10 @@ fun StakingScreen(
                                 val multiplier = 2.0 + (state.streak * 0.1)
                                 if (won) {
                                     val payout = stakeAmount * BigNumber(multiplier)
-                                    onStakeResult(payout, true)
+                                    onStakeResult(stakeAmount, payout, true)
                                     resultMessage = "🎉 Lucky Guess Won! Earned ${payout.format()}!"
                                 } else {
-                                    onStakeResult(stakeAmount, false)
+                                    onStakeResult(stakeAmount, BigNumber.ZERO, false)
                                     resultMessage = "💥 Lucky Guess Lost! Forfeited ${stakeAmount.format()}."
                                 }
                                 stakeInput = ""
@@ -107,7 +111,7 @@ fun StakingScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = MoneyGold)
                 ) {
-                    Text("Stake & Flip (50/50)", color = MaterialTheme.colorScheme.onBackground)
+                    Text(locale.getString("staking_flip_button", "Stake & Flip (50/50)"), color = MaterialTheme.colorScheme.onBackground)
                 }
             }
 

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "flags": {
+    "live_ops": true,
+    "seasonal_rewards": true,
+    "world_map": true,
+    "challenge_builder": true,
+    "dev_console": true,
+    "lua_scripting": true
+  }
+}

@@ -1,0 +1,38 @@
+-- Bundled seasonal content only. Kotlin remains authoritative for validation,
+-- event timing, eligibility, claim limits, rewards, and persisted state.
+return {
+    schemaVersion = 1,
+    manifestVersion = 2,
+    events = {
+        {
+            id = "season_1_cyber_guess",
+            title = "Season 1: Cybernetic Guessing",
+            description = "Claim up to 20 rewards of 10 Nebula each. Every claim also raises this save slot's permanent money and Nebula bonus level, up to level 25.",
+            status = "ACTIVE",
+            startDate = "2024-01-01T00:00:00Z",
+            endDate = "2026-12-31T23:59:59Z",
+            currencyName = "Nebula",
+            maxClaims = 20,
+            rewardNebula = 10,
+            permanentBoostPerClaim = 1,
+            minCorrectGuesses = 0,
+            minPrestigeCount = 0,
+            minUltraCount = 0
+        },
+        {
+            id = "holiday_neon_rush",
+            title = "Neon Holiday Rush",
+            description = "Claim up to 5 rewards of 10 Nebula each. Every claim also raises this save slot's permanent money and Nebula bonus level, up to level 25.",
+            status = "UPCOMING",
+            startDate = "2026-11-01T00:00:00Z",
+            endDate = "2026-12-31T23:59:59Z",
+            currencyName = "Nebula",
+            maxClaims = 5,
+            rewardNebula = 10,
+            permanentBoostPerClaim = 1,
+            minCorrectGuesses = 100,
+            minPrestigeCount = 0,
+            minUltraCount = 0
+        }
+    }
+}

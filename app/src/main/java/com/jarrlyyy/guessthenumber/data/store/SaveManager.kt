@@ -10,7 +10,10 @@ import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameSettings
+import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,18 +21,34 @@ import java.math.BigDecimal
 
 val Context.saveDataStore by preferencesDataStore(name = "game_save_prefs")
 
+const val MAX_SAVE_SLOTS = 10
+
 data class SaveSlotMetadata(
     val slotIndex: Int,
+    val difficultyId: String = Difficulty.CLASSIC,
+    val profileName: String = "",
+    val profileIconId: String = SaveProfile.DEFAULT_ICON,
     val isEmpty: Boolean,
     val money: BigNumber = BigNumber.ZERO,
     val prestige: BigNumber = BigNumber.ZERO,
     val ultra: BigNumber = BigNumber.ZERO,
     val attempts: Long = 0L,
     val correctGuesses: Long = 0L,
-    val lastSaveTimestamp: Long = 0L
+    val lastSaveTimestamp: Long = 0L,
+    val hasBackup: Boolean = false
+)
+
+@kotlinx.serialization.Serializable
+data class EncryptedBackupBundle(
+    val formatVersion: Int = 2,
+    val appPreferencesJson: String,
+    val activeSlot: Int,
+    val slots: Map<Int, String> = emptyMap(),
+    val backups: Map<Int, String> = emptyMap()
 )
 
 class SaveManager(private val context: Context) {
+    private val globalPreferences = GlobalPreferencesManager(context)
     private val legacySaveKey = stringPreferencesKey("game_state_json")
     private val legacyBackupKey = stringPreferencesKey("game_state_backup_json")
     private val activeSlotKey = intPreferencesKey("active_save_slot")
@@ -41,12 +60,12 @@ class SaveManager(private val context: Context) {
 
     suspend fun getActiveSlot(): Int {
         val prefs = context.saveDataStore.data.first()
-        return prefs[activeSlotKey] ?: 1
+        return (prefs[activeSlotKey] ?: 1).coerceIn(1, MAX_SAVE_SLOTS)
     }
 
     suspend fun setActiveSlot(slot: Int) {
         context.saveDataStore.edit { prefs ->
-            prefs[activeSlotKey] = slot.coerceIn(1, 3)
+            prefs[activeSlotKey] = slot.coerceIn(1, MAX_SAVE_SLOTS)
         }
     }
 
@@ -82,41 +101,78 @@ class SaveManager(private val context: Context) {
         }
     }
 
-    suspend fun getSlotMetadata(slot: Int): SaveSlotMetadata {
-        val s = slot.coerceIn(1, 3)
+    suspend fun hasGlobalTutorialCompleted(): Boolean = globalPreferences.getSettings().tutorialCompleted
+
+    suspend fun migrateTutorialCompletionToGlobal(): Boolean {
+        if (globalPreferences.getSettings().tutorialCompleted) return true
         return try {
             val prefs = context.saveDataStore.data.first()
-            val jsonString = prefs[getSaveKey(s)]
-            if (!jsonString.isNullOrEmpty() && validateSave(jsonString)) {
-                val state = json.decodeFromString<GameState>(jsonString)
+            val completed = (1..MAX_SAVE_SLOTS).any { slot ->
+                prefs[getSaveKey(slot)]?.let { raw ->
+                    runCatching { json.decodeFromString<GameState>(raw).tutorialCompleted }.getOrDefault(false)
+                } == true
+            }
+            if (completed) globalPreferences.markTutorialCompleted()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun hasAnyValidSave(): Boolean {
+        val prefs = context.saveDataStore.data.first()
+        return (1..MAX_SAVE_SLOTS).any { index -> prefs[getSaveKey(index)]?.let { validateSave(it) } == true }
+    }
+
+    suspend fun getSlotMetadata(slot: Int): SaveSlotMetadata {
+        val s = slot.coerceIn(1, MAX_SAVE_SLOTS)
+        return try {
+            val prefs = context.saveDataStore.data.first()
+            val primary = prefs[getSaveKey(s)]
+            val backup = prefs[getBackupKey(s)]
+            val raw = primary?.takeIf { validateSave(it) }
+                ?: backup?.takeIf { validateSave(it) }
+            if (raw != null) {
+                val state = json.decodeFromString<GameState>(raw)
                 SaveSlotMetadata(
                     slotIndex = s,
                     isEmpty = false,
+                    difficultyId = if (Difficulty.isValid(state.difficultyId)) state.difficultyId else Difficulty.CLASSIC,
+                    profileName = state.profileName.take(24),
+                    profileIconId = if (SaveProfile.isValidIcon(state.profileIconId)) state.profileIconId else SaveProfile.DEFAULT_ICON,
                     money = state.money,
                     prestige = state.prestige,
                     ultra = state.ultra,
                     attempts = state.attempts,
                     correctGuesses = state.correctGuesses,
-                    lastSaveTimestamp = state.lastSaveTimestamp
+                    lastSaveTimestamp = state.lastSaveTimestamp,
+                    hasBackup = backup?.let { validateSave(it) } == true
                 )
             } else {
-                SaveSlotMetadata(slotIndex = s, isEmpty = true)
+                SaveSlotMetadata(slotIndex = s, isEmpty = primary.isNullOrEmpty() && backup.isNullOrEmpty())
             }
         } catch (e: Exception) {
-            SaveSlotMetadata(slotIndex = s, isEmpty = true)
+            SaveSlotMetadata(slotIndex = s, isEmpty = false, hasBackup = false)
         }
     }
 
     suspend fun saveGame(state: GameState, slot: Int = -1): Boolean {
-        val targetSlot = if (slot in 1..3) slot else getActiveSlot()
+        val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot()
         val sKey = getSaveKey(targetSlot)
         val bKey = getBackupKey(targetSlot)
         return try {
-            val jsonString = json.encodeToString(state)
+            val storedState = if (globalPreferences.isMigrationCompleted()) state.copy(settings = GameSettings()) else state
+            val jsonString = json.encodeToString(storedState)
             context.saveDataStore.edit { prefs ->
                 val currentState = prefs[sKey]
                 if (currentState != null) {
-                    prefs[bKey] = currentState
+                    // Never replace a recoverable backup with a corrupt primary save.
+                    if (validateSave(currentState)) {
+                        prefs[bKey] = currentState
+                    } else if (prefs[bKey]?.let(::validateSave) != true) {
+                        // Discard a backup only when it is already unusable too.
+                        prefs.remove(bKey)
+                    }
                 }
                 prefs[sKey] = jsonString
             }
@@ -128,43 +184,116 @@ class SaveManager(private val context: Context) {
         }
     }
 
+    suspend fun updateGameAtomically(slot: Int = -1, transform: (GameState) -> GameState): GameState? {
+        val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot()
+        val sKey = getSaveKey(targetSlot)
+        val bKey = getBackupKey(targetSlot)
+        var updatedState: GameState? = null
+        return try {
+            context.saveDataStore.edit { prefs ->
+                val currentJson = prefs[sKey]
+                if (currentJson.isNullOrEmpty() || !validateSave(currentJson)) return@edit
+                val current = sanitizeLoadedState(json.decodeFromString<GameState>(currentJson))
+                val updated = transform(current).copy(lastSaveTimestamp = System.currentTimeMillis())
+                val storedUpdated = if (globalPreferences.isMigrationCompleted()) updated.copy(settings = GameSettings()) else updated
+                val updatedJson = json.encodeToString(storedUpdated)
+                // Validate the transformed state before committing either key. A bad transform
+                // must not create an invalid primary that only gets repaired on the next load.
+                if (!validateSave(updatedJson)) return@edit
+                prefs[bKey] = currentJson
+                prefs[sKey] = updatedJson
+                updatedState = updated
+            }
+            updatedState
+        } catch (e: Exception) {
+            GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "ATOMIC_UPDATE_ERROR", "Failed atomic game update in slot $targetSlot: ${e.message}")
+            null
+        }
+    }
     suspend fun loadGame(slot: Int = -1): GameState {
-        val targetSlot = if (slot in 1..3) slot else getActiveSlot()
+        val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot()
         val sKey = getSaveKey(targetSlot)
         val bKey = getBackupKey(targetSlot)
         return try {
             val prefs = context.saveDataStore.data.first()
             val jsonString = prefs[sKey]
             if (jsonString != null && validateSave(jsonString)) {
-                sanitizeLoadedState(json.decodeFromString<GameState>(jsonString))
+                sanitizeLoadedState(json.decodeFromString<GameState>(jsonString)).let { state ->
+                    val settings = globalPreferences.getSettings()
+                    state.copy(settings = settings, tutorialCompleted = settings.tutorialCompleted)
+                }
             } else {
                 val backupString = prefs[bKey]
                 if (backupString != null && validateSave(backupString)) {
+                    // Restore the validated backup to the primary key so subsequent launches do
+                    // not repeatedly enter the recovery path. Keep the backup intact until a
+                    // later successful save replaces it.
+                    val recovered = sanitizeLoadedState(json.decodeFromString<GameState>(backupString))
+                    val recoveredJson = json.encodeToString(recovered)
+                    context.saveDataStore.edit { current ->
+                        val latestPrimary = current[sKey]
+                        if (latestPrimary == null || !validateSave(latestPrimary)) {
+                            current[sKey] = recoveredJson
+                        }
+                    }
                     GameLogger.log(LogLevel.WARN, LoggerCategory.SAVE, "RESTORE_BACKUP", "Restored slot $targetSlot from backup save.")
-                    sanitizeLoadedState(json.decodeFromString<GameState>(backupString))
+                    val settings = globalPreferences.getSettings()
+                    recovered.copy(settings = settings, tutorialCompleted = settings.tutorialCompleted)
                 } else {
                     GameLogger.log(LogLevel.INFO, LoggerCategory.SAVE, "NEW_GAME", "Initializing fresh game state for slot $targetSlot.")
-                    GameState()
+                    val settings = globalPreferences.getSettings()
+                    GameState(settings = settings, tutorialCompleted = settings.tutorialCompleted)
                 }
             }
         } catch (e: Exception) {
             GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "LOAD_ERROR", "Failed to load game for slot $targetSlot, returning fresh state: ${e.message}")
-            GameState()
+            GameState(settings = globalPreferences.getSettings())
         }
     }
 
     fun validateSave(jsonString: String): Boolean {
         return try {
             val state = json.decodeFromString<GameState>(jsonString)
-            state.money.value >= BigDecimal.ZERO &&
+            Difficulty.isValid(state.difficultyId) &&
+                    state.money.value >= BigDecimal.ZERO &&
                     state.prestige.value >= BigDecimal.ZERO &&
                     state.ultra.value >= BigDecimal.ZERO &&
                     state.nebula.value >= BigDecimal.ZERO &&
+                    state.currentRangeMin >= 1 &&
                     state.currentRangeMin <= state.currentRangeMax &&
+                    state.targetNumber in state.currentRangeMin..state.currentRangeMax &&
                     state.attempts >= 0 &&
                     state.correctGuesses >= 0 &&
                     state.streak >= 0 &&
                     state.bestStreak >= 0 &&
+                    state.statistics.totalGuesses >= 0 &&
+                    state.statistics.correctGuesses >= 0 &&
+                    state.statistics.failedGuesses >= 0 &&
+                    state.statistics.moneyEarned.value >= BigDecimal.ZERO &&
+                    state.statistics.moneySpent.value >= BigDecimal.ZERO &&
+                    state.statistics.prestigesCount >= 0 &&
+                    state.statistics.ultrasCount >= 0 &&
+                    state.statistics.nebulaEarned >= 0 &&
+                    state.statistics.playtimeSeconds >= 0 &&
+                    state.statistics.arcadePlayed >= 0 &&
+                    state.statistics.randomEventsTriggered >= 0 &&
+                    state.statistics.arcadeBestScores.values.all { it >= 0 } &&
+                    state.upgradeLevels.values.all { it >= 0 } &&
+                    state.prestigeUpgradeLevels.values.all { it >= 0 } &&
+                    state.ultraUpgradeLevels.values.all { it >= 0 } &&
+                    state.liveOpsClaims.values.all { it >= 0 } &&
+                    state.permanentEventBoosts >= 0 &&
+                    state.dailyQuestGuesses >= 0 &&
+                    state.dailyQuestCorrectGuesses >= 0 &&
+                    state.dailyQuestBestStreak >= 0 &&
+                    state.dailyQuestUpgradePurchases >= 0 &&
+                    state.lootCommonChests >= 0 &&
+                    state.lootRareChests >= 0 &&
+                    state.lootEpicChests >= 0 &&
+                    state.lootDropsFound >= 0 &&
+                    state.lootChestsOpened >= 0 &&
+                    state.endlessRiftTier >= 0 &&
+                    state.endlessRiftBestTier >= 0 &&
                     state.lastSaveTimestamp > 0
         } catch (e: Exception) {
             false
@@ -176,15 +305,24 @@ class SaveManager(private val context: Context) {
         val prestige = if (state.prestige.value < BigDecimal.ZERO) BigNumber.ZERO else state.prestige
         val ultra = if (state.ultra.value < BigDecimal.ZERO) BigNumber.ZERO else state.ultra
         val nebula = if (state.nebula.value < BigDecimal.ZERO) BigNumber.ZERO else state.nebula
-        val min = if (state.currentRangeMin > state.currentRangeMax) 1L else state.currentRangeMin
-        val max = if (state.currentRangeMax < min) 100L else state.currentRangeMax
+        val min = 1L
+        val betterRangeLevel = state.upgradeLevels["better_range"] ?: 0
+        val difficultyMax = Difficulty.rangeMax(state.difficultyId, betterRangeLevel)
+        val max = state.currentRangeMax.coerceAtLeast(difficultyMax).coerceAtLeast(min)
         val target = state.targetNumber.coerceIn(min, max)
         val attempts = maxOf(0L, state.attempts)
         val correct = maxOf(0L, state.correctGuesses)
         val streak = maxOf(0, state.streak)
         val bestStreak = maxOf(0, state.bestStreak)
 
+        val difficultyId = if (Difficulty.isValid(state.difficultyId)) state.difficultyId else Difficulty.CLASSIC
+        val profileName = state.profileName.trim().take(24)
+        val profileIconId = if (SaveProfile.isValidIcon(state.profileIconId)) state.profileIconId else SaveProfile.DEFAULT_ICON
+
         return state.copy(
+            difficultyId = difficultyId,
+            profileName = profileName,
+            profileIconId = profileIconId,
             money = money,
             prestige = prestige,
             ultra = ultra,
@@ -246,36 +384,201 @@ class SaveManager(private val context: Context) {
     }
 
     suspend fun exportSave(slot: Int = -1): String {
-        val targetSlot = if (slot in 1..3) slot else getActiveSlot()
         val prefs = context.saveDataStore.data.first()
-        val raw = prefs[getSaveKey(targetSlot)] ?: ""
-        return if (raw.isNotEmpty()) encrypt(raw) else ""
+        val appSettings = globalPreferences.getSettings()
+        val slots = buildMap {
+            for (index in 1..MAX_SAVE_SLOTS) prefs[getSaveKey(index)]?.let { if (validateSave(it)) put(index, it) }
+        }
+        val backups = buildMap {
+            for (index in 1..MAX_SAVE_SLOTS) prefs[getBackupKey(index)]?.let { if (validateSave(it)) put(index, it) }
+        }
+        val bundle = EncryptedBackupBundle(
+            appPreferencesJson = globalPreferences.encode(appSettings),
+            activeSlot = getActiveSlot(),
+            slots = slots,
+            backups = backups
+        )
+        return encrypt(json.encodeToString(bundle))
     }
 
     suspend fun importSave(inputString: String, slot: Int = -1): Boolean {
-        val targetSlot = if (slot in 1..3) slot else getActiveSlot()
-        val jsonString = if (validateSave(inputString)) {
-            inputString
-        } else {
-            val decrypted = decrypt(inputString)
-            if (decrypted.isNotEmpty() && validateSave(decrypted)) {
-                decrypted
-            } else {
-                return false
-            }
+        val decrypted = decrypt(inputString)
+        val bundle = decrypted.takeIf { it.isNotEmpty() }?.let { runCatching { json.decodeFromString<EncryptedBackupBundle>(it) }.getOrNull() }
+        if (bundle != null) {
+            return try {
+                val importedSettings = globalPreferences.decode(bundle.appPreferencesJson) ?: return false
+                context.saveDataStore.edit { prefs ->
+                    for (index in 1..MAX_SAVE_SLOTS) {
+                        prefs.remove(getSaveKey(index))
+                        prefs.remove(getBackupKey(index))
+                    }
+                    bundle.slots.forEach { (index, raw) -> if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) prefs[getSaveKey(index)] = json.encodeToString(json.decodeFromString<GameState>(raw).copy(settings = GameSettings())) }
+                    bundle.backups.forEach { (index, raw) -> if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) prefs[getBackupKey(index)] = json.encodeToString(json.decodeFromString<GameState>(raw).copy(settings = GameSettings())) }
+                    prefs[activeSlotKey] = bundle.activeSlot.coerceIn(1, MAX_SAVE_SLOTS)
+                }
+                globalPreferences.saveSettings(importedSettings)
+                globalPreferences.markMigrationCompleted()
+                true
+            } catch (_: Exception) { false }
         }
 
+        val jsonString = if (validateSave(inputString)) inputString else decrypted.takeIf { validateSave(it) } ?: return false
         return try {
             val state = json.decodeFromString<GameState>(jsonString)
-            saveGame(state, targetSlot)
+            saveGame(state, if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot())
+        } catch (_: Exception) { false }
+    }
+
+    suspend fun needsSettingsMigration(): Boolean {
+        if (globalPreferences.isMigrationCompleted()) return false
+        val prefs = context.saveDataStore.data.first()
+        val needsMigration = (1..MAX_SAVE_SLOTS).any { index ->
+            val raw = prefs[getSaveKey(index)]
+            !raw.isNullOrEmpty() && runCatching {
+                val state = json.decodeFromString<GameState>(raw)
+                state.settings != GameSettings()
+            }.getOrDefault(false)
+        }
+        if (!needsMigration) {
+            globalPreferences.saveSettings(globalPreferences.getSettings())
+            globalPreferences.markMigrationCompleted()
+        }
+        return needsMigration
+    }
+
+    suspend fun migrateSettingsToGlobal(): Boolean {
+        if (globalPreferences.isMigrationCompleted()) return true
+        return try {
+            val prefs = context.saveDataStore.data.first()
+            val source = (1..MAX_SAVE_SLOTS).asSequence().mapNotNull { index ->
+                prefs[getSaveKey(index)]?.let { raw -> runCatching { json.decodeFromString<GameState>(raw) }.getOrNull() }
+            }.firstOrNull()
+            val settings = source?.settings ?: GameSettings()
+            globalPreferences.saveSettings(settings)
+            context.saveDataStore.edit { p ->
+                for (index in 1..MAX_SAVE_SLOTS) {
+                    p[getSaveKey(index)]?.let { raw ->
+                        runCatching { json.decodeFromString<GameState>(raw) }.getOrNull()?.let { state ->
+                            p[getSaveKey(index)] = json.encodeToString(state.copy(settings = GameSettings()))
+                        }
+                    }
+                }
+            }
+            globalPreferences.markMigrationCompleted()
+            true
+        } catch (_: Exception) { false }
+    }
+
+    suspend fun saveAppPreferences(settings: GameSettings) = globalPreferences.saveSettings(settings)
+    suspend fun getAppPreferencesJson(): String = globalPreferences.encode(globalPreferences.getSettings())
+    suspend fun applyAppPreferencesJson(raw: String): Boolean {
+        val settings = globalPreferences.decode(raw) ?: return false
+        globalPreferences.saveSettings(settings)
+        globalPreferences.markMigrationCompleted()
+        return true
+    }
+
+    suspend fun getSaveJson(slot: Int): String? {
+        if (slot !in 1..MAX_SAVE_SLOTS) return null
+        return context.saveDataStore.data.first()[getSaveKey(slot)]
+    }
+
+    suspend fun applySaveJson(slot: Int, raw: String): Boolean {
+        if (slot !in 1..MAX_SAVE_SLOTS || !validateSave(raw)) return false
+        return context.saveDataStore.edit { it[getSaveKey(slot)] = raw }.let { true }
+    }
+
+    suspend fun createFreshSlot(slot: Int, difficultyId: String, profileName: String = "", profileIconId: String = SaveProfile.DEFAULT_ICON): Boolean {
+        if (slot !in 1..MAX_SAVE_SLOTS || !Difficulty.isValid(difficultyId)) return false
+
+        val targetSlot = slot
+        return try {
+            val freshState = GameState(
+                difficultyId = difficultyId,
+                profileName = profileName.trim().take(24),
+                profileIconId = if (SaveProfile.isValidIcon(profileIconId)) profileIconId else SaveProfile.DEFAULT_ICON,
+                currentRangeMax = Difficulty.rangeMax(difficultyId, 0),
+                targetNumber = (Difficulty.rangeMax(difficultyId, 0) / 2L).coerceAtLeast(1L),
+                lastSaveTimestamp = System.currentTimeMillis()
+            )
+            val freshJson = json.encodeToString(freshState)
+            var created = false
+
+            // Check and write within the same DataStore transaction. A stale pre-read could
+            // otherwise let two rapid create requests overwrite an already-created save.
+            context.saveDataStore.edit { p ->
+                val existing = p[getSaveKey(targetSlot)]
+                val existingBackup = p[getBackupKey(targetSlot)]
+                // A malformed primary or a backup-only slot may still contain recoverable
+                // progress. Never treat either as an empty slot during fresh-slot creation.
+                if (existing.isNullOrEmpty() && existingBackup.isNullOrEmpty()) {
+                    p[getSaveKey(targetSlot)] = freshJson
+                    p[activeSlotKey] = targetSlot
+                    created = true
+                }
+            }
+            if (!created) return false
+
+            GameLogger.log(
+                LogLevel.INFO,
+                LoggerCategory.SAVE,
+                "CREATE_FRESH_SLOT",
+                "Created fresh save in slot $targetSlot with difficulty $difficultyId."
+            )
             true
         } catch (e: Exception) {
+            GameLogger.log(
+                LogLevel.ERROR,
+                LoggerCategory.SAVE,
+                "CREATE_FRESH_SLOT_ERROR",
+                "Failed to create fresh save in slot $targetSlot: ${e.message}"
+            )
+            false
+        }
+    }
+
+    suspend fun duplicateSlot(sourceSlot: Int, targetSlot: Int): Boolean {
+        val source = sourceSlot.coerceIn(1, MAX_SAVE_SLOTS)
+        val target = targetSlot.coerceIn(1, MAX_SAVE_SLOTS)
+        if (source == target) return false
+        return try {
+            val prefs = context.saveDataStore.data.first()
+            val sourceJson = prefs[getSaveKey(source)] ?: return false
+            if (!validateSave(sourceJson)) return false
+            if (!prefs[getSaveKey(target)].isNullOrEmpty()) return false
+            context.saveDataStore.edit { p ->
+                p[getSaveKey(target)] = sourceJson
+                prefs[getBackupKey(source)]?.let { p[getBackupKey(target)] = it }
+            }
+            GameLogger.log(LogLevel.INFO, LoggerCategory.SAVE, "DUPLICATE_SLOT", "Duplicated slot $source to slot $target.")
+            true
+        } catch (e: Exception) {
+            GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "DUPLICATE_SLOT_ERROR", "Failed to duplicate slot $source to slot $target: ${e.message}")
+            false
+        }
+    }
+
+    suspend fun restoreBackup(slot: Int): Boolean {
+        val s = slot.coerceIn(1, MAX_SAVE_SLOTS)
+        return try {
+            val prefs = context.saveDataStore.data.first()
+            val current = prefs[getSaveKey(s)] ?: return false
+            val backup = prefs[getBackupKey(s)] ?: return false
+            if (!validateSave(current) || !validateSave(backup)) return false
+            context.saveDataStore.edit { p ->
+                p[getSaveKey(s)] = backup
+                p[getBackupKey(s)] = current
+            }
+            GameLogger.log(LogLevel.WARN, LoggerCategory.SAVE, "RESTORE_BACKUP", "Restored slot $s from its backup.")
+            true
+        } catch (e: Exception) {
+            GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "RESTORE_BACKUP_ERROR", "Failed to restore backup for slot $s: ${e.message}")
             false
         }
     }
 
     suspend fun resetSlot(slot: Int) {
-        val s = slot.coerceIn(1, 3)
+        val s = slot.coerceIn(1, MAX_SAVE_SLOTS)
         context.saveDataStore.edit { prefs ->
             prefs.remove(getSaveKey(s))
             prefs.remove(getBackupKey(s))

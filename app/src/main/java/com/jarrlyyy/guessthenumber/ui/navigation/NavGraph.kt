@@ -3,28 +3,43 @@ package com.jarrlyyy.guessthenumber.ui.navigation
 import androidx.compose.animation.*
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.jarrlyyy.guessthenumber.BuildConfig
+import androidx.compose.ui.platform.LocalContext
+import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.screens.*
+import com.jarrlyyy.guessthenumber.ui.components.ExpressiveScreen
+import com.jarrlyyy.guessthenumber.ui.components.expressiveSelection
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
+import androidx.compose.runtime.CompositionLocalProvider
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 
 
 @Composable
 fun NavGraph(
     state: GameState,
-    onMakeGuess: (Long) -> Unit,
+    onMakeGuess: (Long) -> Boolean,
+    incomePerSecond: BigNumber,
     onBuyUpgrade: (String, BigNumber) -> Unit,
     onBuyShopItem: (String, Long) -> Unit,
+    onEquipCosmetic: (String) -> Unit,
     onBuyPrestigeUpgrade: (String, BigNumber) -> Unit,
     onBuyPrestigeShopItem: (String, Long) -> Unit,
     onBuyUltraUpgrade: (String, BigNumber) -> Unit,
@@ -55,25 +70,107 @@ fun NavGraph(
     showTimeTravelPopup: Boolean,
     timeTravelSeconds: Long,
     onDismissTimeTravel: () -> Unit,
+    needsSettingsMigration: Boolean,
+    isMigratingSettings: Boolean,
+    onMigrateSettings: (Boolean) -> Unit,
     onEarnMinigameReward: (Long, BigNumber) -> Unit,
     onUpdateMultiplier: (String) -> Unit,
     onClaimLiveOpsEventReward: (String) -> Unit,
-    viewModel: GameViewModel
+    onActivateChallengeBuilder: (Set<String>) -> Unit,
+    viewModel: GameViewModel,
+    hasAnySave: Boolean,
+    initialDestination: String? = null,
+    onNotificationDestinationHandled: () -> Unit = {}
 ) {
-    if (!state.tutorialCompleted) {
-        TutorialScreen(onComplete = onCompleteTutorial)
+    val navController = rememberNavController()
+    val context = LocalContext.current
+    val featureFlags = remember { FeatureFlagRepository(context).load() }
+    val locale = viewModel.localeManager
+    if (!hasAnySave) {
+        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+            SaveSlotsScreen(viewModel = viewModel, onNavigateBack = {})
+        }
         return
     }
-
-    val locale = viewModel.localeManager
-    val navController = rememberNavController()
     val items = listOf(Screen.Play, Screen.Upgrade, Screen.Shop, Screen.More)
+    val startRoute = initialDestination?.takeIf {
+        it in setOf(
+            Screen.Play.route,
+            Screen.WorldMap.route,
+            Screen.Relics.route,
+            Screen.HomeBase.route,
+            Screen.Codex.route,
+            Screen.Endgame.route,
+            Screen.MusicPlayer.route,
+            "live_ops",
+            "achievements"
+        )
+    } ?: Screen.Play.route
+
+    // Notifications can arrive while MainActivity is already alive. Keep the
+    // start route for cold launches and navigate on subsequent notification taps.
+    LaunchedEffect(initialDestination) {
+        val destination = initialDestination?.takeIf {
+            it in setOf(
+                Screen.Play.route,
+                Screen.WorldMap.route,
+                Screen.Relics.route,
+                Screen.HomeBase.route,
+                Screen.Codex.route,
+                Screen.Endgame.route,
+                Screen.MusicPlayer.route,
+                "live_ops",
+                "achievements"
+            )
+        }
+        if (destination != null) {
+            if (navController.currentDestination?.route != destination) {
+                navController.navigate(destination) { launchSingleTop = true }
+            }
+            onNotificationDestinationHandled()
+        }
+    }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    var tutorialStep by rememberSaveable { mutableIntStateOf(0) }
+    val tutorialActive = !state.tutorialCompleted
+    LaunchedEffect(currentRoute, tutorialActive, tutorialStep) {
+        if (tutorialActive) {
+            when {
+                tutorialStep == 1 && currentRoute == Screen.Upgrade.route -> tutorialStep = 2
+                tutorialStep == 2 && currentRoute == Screen.More.route -> tutorialStep = 3
+                tutorialStep == 3 && currentRoute == Screen.Settings.route -> onCompleteTutorial()
+            }
+        }
+    }
+
+    if (needsSettingsMigration) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text(locale.getString("settings_migration_title", "Settings Update")) },
+            text = {
+                if (isMigratingSettings) {
+                    Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                        Text(locale.getString("settings_migration_loading", "Migrating your app settings..."))
+                        androidx.compose.material3.CircularProgressIndicator()
+                    }
+                } else {
+                    Text(locale.getString("settings_migration_text", "Your existing app settings will be moved from the save data into global App Preferences. Your game progress will stay unchanged."))
+                }
+            },
+            confirmButton = {
+                if (!isMigratingSettings) {
+                    Button(onClick = { onMigrateSettings(true) }) {
+                        Text(locale.getString("ok", "OK"))
+                    }
+                }
+            }
+        )
+    }
 
     if (hasPreviousCrash) {
-        CrashRecoveryScreen(onDismiss = onDismissCrash)
+        CrashRecoveryScreen(locale = locale, onDismiss = onDismissCrash, reducedMotion = state.settings.reducedMotion)
         return
     }
 
@@ -91,19 +188,19 @@ fun NavGraph(
     } else if (showChangelogPopup) {
         AlertDialog(
             onDismissRequest = onDismissChangelog,
-            title = { Text(locale.getString("changelog_popup_title", "🚀 What's New in v1.9!")) },
-            text = { Text(locale.getString("changelog_popup_text", "A new version of Guess The Number is installed! Check out the changelog for details on Internationalization, Localization, and updates.")) },
+            title = { Text(locale.getString("changelog_popup_title", "🚀 What's New in v%s!", BuildConfig.VERSION_NAME)) },
+            text = { Text(locale.getString("changelog_popup_text", "Guess The Number v%s is installed! Check out the changelog for the latest features, polish, and fixes.", BuildConfig.VERSION_NAME)) },
             confirmButton = {
                 Button(onClick = {
                     onDismissChangelog()
                     navController.navigate(Screen.ChangelogViewer.route)
                 }) {
-                    Text(locale.getString("view_changelog", "View Changelog"))
+                    Text(locale.getString("view_changelog"))
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismissChangelog) {
-                    Text(locale.getString("dismiss", "Dismiss"))
+                    Text(locale.getString("dismiss"))
                 }
             }
         )
@@ -120,167 +217,367 @@ fun NavGraph(
         )
     }
 
-    Scaffold(
-        bottomBar = {
-            if (items.any { it.route == currentRoute }) {
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    tonalElevation = 8.dp
-                ) {
-                    items.forEach { screen ->
-                        val labelText = when (screen.route) {
-                            Screen.Play.route -> locale.getString("nav_play", "Play")
-                            Screen.Upgrade.route -> locale.getString("nav_upgrade", "Upgrades")
-                            Screen.Shop.route -> locale.getString("nav_shop", "Shop")
-                            Screen.More.route -> locale.getString("nav_more", "More")
-                            else -> screen.title
-                        }
-                        NavigationBarItem(
-                            icon = { Icon(imageVector = screen.icon, contentDescription = labelText) },
-                            label = { Text(labelText) },
-                            selected = currentRoute == screen.route,
-                            onClick = {
-                                if (currentRoute != screen.route) {
-                                    navController.navigate(screen.route) {
-                                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
+    CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+        Scaffold(
+            bottomBar = {
+                if (items.any { it.route == currentRoute }) {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        tonalElevation = 8.dp
+                    ) {
+                        items.forEach { screen ->
+                            val labelText = when (screen.route) {
+                                Screen.Play.route -> locale.getString("nav_play", "Play")
+                                Screen.Upgrade.route -> locale.getString("nav_upgrade", "Upgrades")
+                                Screen.Shop.route -> locale.getString("nav_shop", "Shop")
+                                Screen.More.route -> locale.getString("nav_more", "More")
+                                else -> screen.title
+                            }
+                            NavigationBarItem(
+                                icon = { Icon(modifier = Modifier.expressiveSelection(currentRoute == screen.route), imageVector = screen.icon, contentDescription = labelText) },
+                                label = { Text(labelText) },
+                                selected = currentRoute == screen.route,
+                                onClick = {
+                                    if (currentRoute != screen.route) {
+                                        navController.navigate(screen.route) {
+                                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
                                     }
-                                }
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                                )
                             )
+                        }
+                    }
+                }
+            }
+        ) { padding ->
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                NavHost(
+                    navController = navController,
+                    startDestination = startRoute,
+                    modifier = Modifier.fillMaxSize(),
+                    enterTransition = {
+                        if (state.settings.reducedMotion) EnterTransition.None
+                        else fadeIn(animationSpec = tween(220)) +
+                            slideInHorizontally(
+                                initialOffsetX = { it / 12 },
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            ) +
+                            scaleIn(
+                                initialScale = 0.97f,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            )
+                    },
+                    exitTransition = {
+                        if (state.settings.reducedMotion) ExitTransition.None
+                        else fadeOut(animationSpec = tween(140)) +
+                            slideOutHorizontally(targetOffsetX = { -it / 16 }, animationSpec = tween(160)) +
+                            scaleOut(targetScale = 0.985f, animationSpec = tween(160))
+                    },
+                    popEnterTransition = {
+                        if (state.settings.reducedMotion) EnterTransition.None
+                        else fadeIn(animationSpec = tween(220)) +
+                            slideInHorizontally(
+                                initialOffsetX = { -it / 12 },
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            ) +
+                            scaleIn(
+                                initialScale = 0.97f,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            )
+                    },
+                    popExitTransition = {
+                        if (state.settings.reducedMotion) ExitTransition.None
+                        else fadeOut(animationSpec = tween(140)) +
+                            slideOutHorizontally(targetOffsetX = { it / 16 }, animationSpec = tween(160)) +
+                            scaleOut(targetScale = 0.985f, animationSpec = tween(160))
+                    }
+                ) {
+                    composable(Screen.Play.route) {
+                        ExpressiveScreen(enabled = !state.settings.reducedMotion) { PlayScreen(state = state, onMakeGuess = { guess ->
+                            val accepted = onMakeGuess(guess)
+                            if (accepted && tutorialActive && tutorialStep == 0) tutorialStep = 1
+                            accepted
+                        }, onClaimDailyQuest = viewModel::claimDailyQuest, onOpenLootChest = viewModel::openLootChest, onWorldAction = viewModel::worldProgressAction, onNavigateProgression = { route -> navController.navigate(route) }, incomePerSecond = incomePerSecond) }
+                    }
+                    composable(Screen.Upgrade.route) {
+                        ExpressiveScreen(enabled = !state.settings.reducedMotion) { UpgradeScreen(
+                            state = state,
+                            onBuyUpgrade = onBuyUpgrade,
+                            onUpdateMultiplier = onUpdateMultiplier
+                        ) }
+                    }
+                    composable(Screen.Shop.route) {
+                        ExpressiveScreen(enabled = !state.settings.reducedMotion) { ShopScreen(state = state, onBuyShopItem = onBuyShopItem, onEquipCosmetic = onEquipCosmetic) }
+                    }
+                    composable(Screen.More.route) {
+                        ExpressiveScreen(enabled = !state.settings.reducedMotion) { MoreScreen(
+                            state = state,
+                            onNavigate = { route ->
+                                // Keep the legacy More-menu route working for existing saves.
+                                navController.navigate(
+                                    if (route == "changelog") Screen.ChangelogViewer.route else route
+                                )
+                            },
+                            onUpdateSettings = onUpdateSettings
+                        ) }
+                    }
+                    composable(Screen.MusicPlayer.route) {
+                        MusicPlayerScreen(onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.Prestige.route) {
+                        PrestigeScreen(
+                            state = state,
+                            onPrestige = onPrestige,
+                            onBuyPrestigeUpgrade = onBuyPrestigeUpgrade,
+                            onUpdateMultiplier = onUpdateMultiplier,
+                            onBuyPrestigeShopItem = onBuyPrestigeShopItem,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable(Screen.Ultra.route) {
+                        UltraScreen(
+                            state = state,
+                            onUltra = onUltra,
+                            onBuyUltraUpgrade = onBuyUltraUpgrade,
+                            onBuyUltraShopItem = onBuyUltraShopItem,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable(Screen.LuaHub.route) {
+                        if (featureFlags["lua_scripting"] == true) {
+                            LuaActivityHubScreen(onBack = { navController.popBackStack() })
+                        } else {
+                            FeatureDisabledScreen("Activity Hub", onBack = { navController.popBackStack() })
+                        }
+                    }
+                    if (BuildConfig.DEBUG) {
+                        composable(Screen.LuaTestingHub.route) {
+                            if (featureFlags["dev_console"] == true) {
+                                LuaTestingHubScreen(onBack = { navController.popBackStack() })
+                            } else {
+                                FeatureDisabledScreen("Lua Testing Hub", onBack = { navController.popBackStack() })
+                            }
+                        }
+                    }
+                    composable(Screen.Arcade.route) {
+                        ArcadeScreen(
+                            onEarnReward = onEarnMinigameReward,
+                            onBack = { navController.popBackStack() },
+                            reducedMotion = state.settings.reducedMotion
+                        )
+                    }
+                    composable(Screen.Stats.route) {
+                        StatsScreen(state = state, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.Settings.route) {
+                        SettingsScreen(state = state, onResetData = onResetData, onUpdateSettings = onUpdateSettings, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.About.route) {
+                        AboutScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
+                    }
+                    if (BuildConfig.DEBUG) {
+                        composable(Screen.DevSettings.route) {
+                            if (BuildConfig.DEBUG && featureFlags["dev_console"] == true) {
+                                DevSettingsScreen(
+                                    state = state,
+                                    onExecuteCommand = onExecuteDevCommand,
+                                    onImportSave = onImportSave,
+                                    onUpdateSettings = onUpdateSettings,
+                                    onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
+                                    onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
+                                    onGetSaveJson = viewModel::getSaveJson,
+                                    onApplySaveJson = viewModel::applySaveJson,
+                                    onNavigate = { route -> navController.navigate(route) },
+                                    onBack = { navController.popBackStack() }
+                                )
+                            } else {
+                                FeatureDisabledScreen("Developer console", onBack = { navController.popBackStack() })
+                            }
+                        }
+                        composable("process_inspector") {
+                            ProcessInspectorScreen(
+                                state = state,
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                    }
+                    composable(Screen.SaveSlots.route) {
+                        SaveSlotsScreen(
+                            viewModel = viewModel,
+                            onNavigateBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("achievements") {
+                        AchievementsScreen(
+                            state = state,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("live_ops") {
+                        if (featureFlags["live_ops"] == true && featureFlags["seasonal_rewards"] == true) {
+                            LiveOpsScreen(
+                                state = state,
+                                onClaimReward = onClaimLiveOpsEventReward,
+                                onBack = { navController.popBackStack() }
+                            )
+                        } else {
+                            FeatureDisabledScreen("Seasonal events", onBack = { navController.popBackStack() })
+                        }
+                    }
+                    composable("talent") {
+                        TalentScreen(
+                            state = state,
+                            onBuyTalent = viewModel::buyTalent,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("mutators") {
+                        if (featureFlags["challenge_builder"] == true) {
+                            MutatorsScreen(
+                                state = state,
+                                onSelectMutator = { id, active -> viewModel.setMutatorActive(id, active) },
+                                onActivateChallengeBuilder = onActivateChallengeBuilder,
+                                onCompleteChallenge = { id, reward -> viewModel.claimChallenge(id, reward) },
+                                onBack = { navController.popBackStack() }
+                            )
+                        } else {
+                            FeatureDisabledScreen("Mutators and challenge builder", onBack = { navController.popBackStack() })
+                        }
+                    }
+                    composable(Screen.WorldMap.route) {
+                        if (featureFlags["world_map"] == true) {
+                            WorldMapScreen(state = state, onWorldAction = viewModel::worldProgressAction, onProgressionAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        } else {
+                            FeatureDisabledScreen("World Map", onBack = { navController.popBackStack() })
+                        }
+                    }
+                    composable(Screen.Relics.route) {
+                        val bossIds = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+                        val defeatedCount = state.defeatedBossIds.count { it in bossIds }
+                        if (defeatedCount > 0) {
+                            RelicsScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        } else {
+                            FeatureProgressionLockedScreen(
+                                title = locale.getString("relics_title", "Relic Collection"),
+                                requirement = locale.getString("more_unlock_first_boss", "Defeat your first world boss to unlock this feature."),
+                                progress = locale.getString("more_unlock_boss_progress", "World bosses defeated: %d / 4", defeatedCount),
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                    }
+                    composable(Screen.HomeBase.route) {
+                        HomeBaseScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.Codex.route) {
+                        val bossIds = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+                        val defeatedCount = state.defeatedBossIds.count { it in bossIds }
+                        if (defeatedCount > 0) {
+                            CodexScreen(state = state, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        } else {
+                            FeatureProgressionLockedScreen(
+                                title = locale.getString("codex_title", "Explorer's Codex"),
+                                requirement = locale.getString("more_unlock_first_boss", "Defeat your first world boss to unlock this feature."),
+                                progress = locale.getString("more_unlock_boss_progress", "World bosses defeated: %d / 4", defeatedCount),
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                    }
+                    composable(Screen.Endgame.route) {
+                        val bossIds = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+                        val defeatedCount = state.defeatedBossIds.count { it in bossIds }
+                        if (state.defeatedBossIds.containsAll(bossIds)) {
+                            EndgameScreen(state = state, onNavigate = { navController.navigate(it) }, onAction = viewModel::progressionAction, onBack = { navController.popBackStack() })
+                        } else {
+                            FeatureProgressionLockedScreen(
+                                title = locale.getString("endgame_title", "Endgame Challenges"),
+                                requirement = locale.getString("more_unlock_all_bosses", "Defeat all four world bosses to unlock this feature."),
+                                progress = locale.getString("more_unlock_boss_progress", "World bosses defeated: %d / 4", defeatedCount),
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                    }
+                    composable(Screen.Staking.route) {
+                        StakingScreen(state = state, onStakeResult = viewModel::settleStake, onBack = { navController.popBackStack() })
+                    }
+                    composable(Screen.ChangelogViewer.route) {
+                        MarkdownViewerScreen(
+                            assetFileName = "changelogs.md",
+                            title = locale.getString("changelog", "Changelog"),
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                }
+                if (tutorialActive) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = if (tutorialStep == 0 || tutorialStep == 3) androidx.compose.ui.Alignment.TopCenter else androidx.compose.ui.Alignment.BottomCenter) {
+                        GuidedTutorialOverlay(
+                            step = tutorialStep,
+                            title = locale.getString("guided_tutorial_title_" + tutorialStep, "Guided Tutorial"),
+                            instruction = locale.getString("guided_tutorial_instruction_" + tutorialStep, "Follow the highlighted action to continue."),
+                            stepLabel = locale.getString("guided_tutorial_step", "Step %d of 4 • Action required", tutorialStep + 1),
+                            reducedMotion = state.settings.reducedMotion
                         )
                     }
                 }
             }
         }
-    ) { padding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Play.route,
-            modifier = Modifier.padding(padding),
-            enterTransition = { fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { 100 }) },
-            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { -100 }) },
-            popEnterTransition = { fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideInHorizontally(initialOffsetX = { -100 }) },
-            popExitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow)) + slideOutHorizontally(targetOffsetX = { 100 }) }
-        ) {
-            composable(Screen.Play.route) {
-                PlayScreen(state = state, onMakeGuess = onMakeGuess)
-            }
-            composable(Screen.Upgrade.route) {
-                UpgradeScreen(
-                    state = state,
-                    onBuyUpgrade = onBuyUpgrade,
-                    onUpdateMultiplier = onUpdateMultiplier
-                )
-            }
-            composable(Screen.Shop.route) {
-                ShopScreen(state = state, onBuyShopItem = onBuyShopItem)
-            }
-            composable(Screen.More.route) {
-                MoreScreen(
-                    state = state,
-                    onNavigate = { route -> navController.navigate(route) },
-                    onUpdateBackgroundMusic = onUpdateBackgroundMusic,
-                    isPlayingMusic = isPlayingMusic,
-                    musicCurrentPosition = musicCurrentPosition,
-                    musicDuration = musicDuration,
-                    musicAlbumArt = musicAlbumArt,
-                    onPlayMusic = onPlayMusic,
-                    onPauseMusic = onPauseMusic,
-                    onStopMusic = onStopMusic,
-                    onSeekMusic = onSeekMusic
-                )
-            }
-            composable(Screen.Prestige.route) {
-                PrestigeScreen(
-                    state = state,
-                    onPrestige = onPrestige,
-                    onBuyPrestigeUpgrade = onBuyPrestigeUpgrade,
-                    onBuyPrestigeShopItem = onBuyPrestigeShopItem,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(Screen.Ultra.route) {
-                UltraScreen(
-                    state = state,
-                    onUltra = onUltra,
-                    onBuyUltraUpgrade = onBuyUltraUpgrade,
-                    onBuyUltraShopItem = onBuyUltraShopItem,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(Screen.Arcade.route) {
-                ArcadeScreen(onEarnReward = onEarnMinigameReward, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.Stats.route) {
-                StatsScreen(state = state, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.Settings.route) {
-                SettingsScreen(state = state, onExportSave = onExportSave, onImportSave = onImportSave, onResetData = onResetData, onUpdateSettings = onUpdateSettings, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.About.route) {
-                AboutScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
-            }
-            composable(Screen.DevSettings.route) {
-                DevSettingsScreen(
-                    state = state,
-                    onExecuteCommand = onExecuteDevCommand,
-                    onImportSave = onImportSave,
-                    onUpdateSettings = onUpdateSettings,
-                    onNavigate = { route -> navController.navigate(route) },
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(Screen.SaveSlots.route) {
-                SaveSlotsScreen(
-                    viewModel = viewModel,
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
-            composable("process_inspector") {
-                ProcessInspectorScreen(
-                    state = state,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable("achievements") {
-                AchievementsScreen(
-                    state = state,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable("live_ops") {
-                LiveOpsScreen(
-                    state = state,
-                    onClaimReward = onClaimLiveOpsEventReward,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable("talent") {
-                TalentScreen(
-                    state = state,
-                    onBuyTalent = onBuyPrestigeShopItem,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable("mutators") {
-                MutatorsScreen(
-                    state = state,
-                    onSelectMutator = { id -> onBuyShopItem(id, 0L) },
-                    onCompleteChallenge = { id, reward -> onEarnMinigameReward(reward, BigNumber.ZERO) },
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(Screen.ChangelogViewer.route) {
-                MarkdownViewerScreen(
-                    assetFileName = "changelogs.md",
-                    title = "Changelog",
-                    onBack = { navController.popBackStack() }
-                )
-            }
+    }
+}
+
+
+@Composable
+private fun FeatureDisabledScreen(feature: String, onBack: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = androidx.compose.ui.Alignment.Center
+    ) {
+        Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+            Text("$feature is disabled in game/feature_flags.json")
+            Button(onClick = onBack) { Text("Back") }
+        }
+    }
+}
+
+
+@Composable
+private fun FeatureProgressionLockedScreen(
+    title: String,
+    requirement: String,
+    progress: String,
+    onBack: () -> Unit
+) {
+    val locale = LocalAppLocaleManager.current
+    Column(
+        modifier = Modifier.fillMaxSize().padding(24.dp),
+        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "🔒",
+            modifier = Modifier.padding(bottom = 12.dp).size(42.dp),
+            style = MaterialTheme.typography.headlineMedium
+        )
+        Text(title, style = MaterialTheme.typography.headlineSmall)
+        Text(requirement, modifier = Modifier.padding(top = 8.dp), style = MaterialTheme.typography.bodyMedium)
+        Text(progress, modifier = Modifier.padding(top = 8.dp), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Button(onClick = onBack, modifier = Modifier.padding(top = 20.dp)) {
+            Text(locale.getString("back", "Back"))
         }
     }
 }

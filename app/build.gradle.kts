@@ -7,15 +7,36 @@ plugins {
 }
 
 android {
+    // Stable project debug signing. CI supplies the keystore through environment variables; local builds can use debug-signing/debug.keystore.
+    val ciDebugKeystore = System.getenv("GTN_DEBUG_KEYSTORE_PATH")?.let(::file)
+    val projectDebugKeystore = rootProject.file("debug-signing/debug.keystore")
+    val selectedDebugKeystore = ciDebugKeystore?.takeIf { it.isFile } ?: projectDebugKeystore
+    val hasProjectDebugKeystore = selectedDebugKeystore.isFile
+    val debugStorePassword = System.getenv("GTN_DEBUG_KEYSTORE_PASSWORD") ?: "android"
+    val debugKeyAlias = System.getenv("GTN_DEBUG_KEY_ALIAS") ?: "guessthenumber-debug"
+    val debugKeyPassword = System.getenv("GTN_DEBUG_KEY_PASSWORD") ?: "android"
+
     namespace = "com.jarrlyyy.guessthenumber"
     compileSdk = 37
 
     defaultConfig {
+        val liveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl").orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-LiveOps/main/manifest.json").get()
+        // The base64-encoded DER key may be line-wrapped in GitHub Actions secrets.
+        // Remove whitespace before embedding it so generated BuildConfig.java stays valid
+        // and Android's Base64 decoder receives only the encoded key bytes.
+        val liveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64")
+            .orElse("")
+            .get()
+            .filterNot(Char::isWhitespace)
+        buildConfigField("String", "LIVEOPS_MANIFEST_URL", "\"$liveOpsManifestUrl\"")
+        buildConfigField("String", "LIVEOPS_PUBLIC_KEY_BASE64", "\"$liveOpsPublicKey\"")
+        val buildCommitSha = System.getenv("GITHUB_SHA") ?: "unknown"
+        buildConfigField("String", "GIT_COMMIT_SHA", "\"$buildCommitSha\"")
         applicationId = "com.jarrlyyy.guessthenumber"
         minSdk = 26
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.9"
+        versionCode = 20
+        versionName = "3.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -23,8 +44,20 @@ android {
         }
     }
 
+    signingConfigs {
+        if (hasProjectDebugKeystore) {
+            create("projectDebug") {
+                storeFile = selectedDebugKeystore
+                storePassword = debugStorePassword
+                keyAlias = debugKeyAlias
+                keyPassword = debugKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
+            buildConfigField("String", "UPDATE_CHANNEL", "\"release\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -32,8 +65,12 @@ android {
             )
         }
         debug {
+            buildConfigField("String", "UPDATE_CHANNEL", "\"debug\"")
             applicationIdSuffix = ".debug"
             isDebuggable = true
+            if (hasProjectDebugKeystore) {
+                signingConfig = signingConfigs.getByName("projectDebug")
+            }
         }
     }
     compileOptions {
@@ -43,6 +80,11 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
     packaging {
         resources {
@@ -72,14 +114,16 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.luaj.jme)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation(libs.androidx.glance)
     implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.media)
 
     testImplementation(libs.junit)
-    testImplementation("org.robolectric:robolectric:4.11.1")
+    testImplementation("org.robolectric:robolectric:4.15")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

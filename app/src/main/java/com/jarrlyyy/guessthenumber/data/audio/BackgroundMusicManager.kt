@@ -1,39 +1,84 @@
 package com.jarrlyyy.guessthenumber.data.audio
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
+import java.util.WeakHashMap
+import kotlin.random.Random
 
-class BackgroundMusicManager(context: Context) {
+class BackgroundMusicManager private constructor(context: Context) {
+    data class Track(val id: String, val path: String, val title: String, val artist: String = "", val album: String = "", val duration: Int = 0)
+    enum class RepeatMode { OFF, ONE, ALL }
+
+    companion object {
+        private const val MAX_IMPORT_BYTES = 100L * 1024L * 1024L
+        private val instances = WeakHashMap<Context, BackgroundMusicManager>()
+
+        @Synchronized
+        operator fun invoke(context: Context): BackgroundMusicManager {
+            val appContext = context.applicationContext
+            return instances[appContext] ?: BackgroundMusicManager(appContext).also { instances[appContext] = it }
+        }
+
+        @Synchronized
+        private fun removeInstance(instance: BackgroundMusicManager) {
+            instances.entries.removeIf { it.value === instance }
+        }
+    }
+
     private val appContext = context.applicationContext
-    private var mediaPlayer: MediaPlayer? = null
+    private val preferences = appContext.getSharedPreferences("offline_music_library", Context.MODE_PRIVATE)
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var mediaPlayer: MediaPlayer? = null
     private var progressJob: Job? = null
-
+    private var queueIndex = 0
+    private var skipRepeatOnceAfterQueueRemoval = false
+    private val _library = MutableStateFlow(loadLibrary())
+    val library: StateFlow<List<Track>> = _library.asStateFlow()
+    private val _queue = MutableStateFlow<List<String>>(loadQueue())
+    val queue: StateFlow<List<String>> = _queue.asStateFlow()
+    private val _repeatMode = MutableStateFlow(loadRepeatMode())
+    val repeatMode: StateFlow<RepeatMode> = _repeatMode.asStateFlow()
+    private val _shuffle = MutableStateFlow(preferences.getBoolean("shuffle", false))
+    val shuffle: StateFlow<Boolean> = _shuffle.asStateFlow()
+    private val _playlists = MutableStateFlow(loadPlaylists())
+    val playlists: StateFlow<Map<String, List<String>>> = _playlists.asStateFlow()
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
-
     private val _currentPath = MutableStateFlow<String?>(null)
     val currentPath: StateFlow<String?> = _currentPath.asStateFlow()
-
+    private val _currentTrackId = MutableStateFlow<String?>(preferences.getString("current_track", null))
+    val currentTrackId: StateFlow<String?> = _currentTrackId.asStateFlow()
     private val _currentPosition = MutableStateFlow(0)
     val currentPosition: StateFlow<Int> = _currentPosition.asStateFlow()
-
     private val _duration = MutableStateFlow(0)
     val duration: StateFlow<Int> = _duration.asStateFlow()
-
     private val _albumArt = MutableStateFlow<Bitmap?>(null)
     val albumArt: StateFlow<Bitmap?> = _albumArt.asStateFlow()
 
     init {
+        val validTrackIds = _library.value.mapTo(hashSetOf()) { it.id }
+        if (_currentTrackId.value != null && _currentTrackId.value !in validTrackIds) {
+            _currentTrackId.value = null
+            preferences.edit().remove("current_track").apply()
+        }
+        // Persist the sanitized versions so missing imported files cannot leave stale queue
+        // and playlist IDs behind across every subsequent process restart.
+        persistQueue()
+        persistPlaylists()
         startProgressTracker()
     }
 
@@ -41,125 +86,344 @@ class BackgroundMusicManager(context: Context) {
         progressJob?.cancel()
         progressJob = scope.launch {
             while (isActive) {
-                delay(200)
-                mediaPlayer?.let { player ->
+                val player = mediaPlayer
+                val activelyPlaying = player != null && _isPlaying.value
+                // Keep UI progress responsive during playback without waking the main
+                // dispatcher five times a second when paused or idle.
+                delay(if (activelyPlaying) 500L else 2_000L)
+                if (player != null) {
                     try {
-                        if (player.isPlaying) {
-                            _currentPosition.value = player.currentPosition
-                            _duration.value = player.duration
-                        }
-                    } catch (_: Exception) {}
+                        _currentPosition.value = player.currentPosition
+                        _duration.value = player.duration
+                    } catch (_: Exception) {
+                        // MediaPlayer may be released between a snapshot and a read.
+                    }
                 }
             }
         }
     }
 
-    private fun extractMetadata(path: String?) {
-        if (path.isNullOrEmpty() || !File(path).exists()) {
-            _albumArt.value = null
+    private fun ensurePlaybackService() {
+        runCatching {
+            ContextCompat.startForegroundService(
+                appContext,
+                Intent(appContext, MusicPlaybackService::class.java)
+            )
+        }
+    }
+
+    private fun stopPlaybackService() {
+        runCatching { appContext.stopService(Intent(appContext, MusicPlaybackService::class.java)) }
+    }
+
+    fun importTrack(uri: Uri, displayName: String? = null): Track? {
+        var destination: File? = null
+        return try {
+            val musicDir = File(appContext.filesDir, "music").apply { mkdirs() }
+            val id = "track_${System.currentTimeMillis()}_${Random.nextInt(1000, 9999)}"
+            val target = File(musicDir, "$id.audio")
+            destination = target
+
+            // Imported files come from user-selected content providers. Bound the copy so
+            // a huge or unbounded stream cannot unexpectedly fill the app's private storage.
+            var totalBytes = 0L
+            val inputStream = appContext.contentResolver.openInputStream(uri)
+                ?: throw IllegalStateException("Unable to open the selected music file.")
+            inputStream.use { input ->
+                FileOutputStream(target).use { output ->
+                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                    while (true) {
+                        val read = input.read(buffer)
+                        if (read < 0) break
+                        totalBytes += read
+                        require(totalBytes <= MAX_IMPORT_BYTES) {
+                            "Music file exceeds the 100 MiB import limit."
+                        }
+                        output.write(buffer, 0, read)
+                    }
+                }
+            }
+
+            require(totalBytes > 0L) { "Music file is empty." }
+            val metadata = readMetadata(target)
+            val track = Track(
+                id = id,
+                path = target.absolutePath,
+                title = displayName?.takeIf { it.isNotBlank() }?.take(160)
+                    ?: metadata.title?.takeIf { it.isNotBlank() }
+                    ?: target.nameWithoutExtension,
+                artist = metadata.artist.orEmpty().take(160),
+                album = metadata.album.orEmpty().take(160),
+                duration = metadata.duration.coerceAtLeast(0)
+            )
+            val updatedLibrary = _library.value + track
+            persistLibrary(updatedLibrary)
+            _library.value = updatedLibrary
+            track
+        } catch (_: Exception) {
+            // A rejected/failed import must not leave a partial file consuming storage.
+            destination?.let { runCatching { it.delete() } }
+            null
+        }
+    }
+
+    fun removeTrack(trackId: String) {
+        val track = _library.value.firstOrNull { it.id == trackId } ?: return
+        val previousQueue = _queue.value
+        val previousQueueIndex = queueIndex
+        val wasPlaying = _currentTrackId.value == trackId
+        if (wasPlaying) {
+            stop()
+            _currentTrackId.value = null
+            _currentPath.value = null
             _duration.value = 0
-            _currentPosition.value = 0
+            _albumArt.value = null
+            preferences.edit().remove("current_track").apply()
+        }
+        runCatching { File(track.path).delete() }
+        _library.value = _library.value.filterNot { it.id == trackId }
+        persistLibrary(_library.value)
+        val removedBeforeCursor = previousQueue.take(previousQueueIndex.coerceAtLeast(0)).count { it == trackId }
+        _queue.value = previousQueue.filterNot { it == trackId }
+        queueIndex = (previousQueueIndex - removedBeforeCursor).coerceIn(0, (_queue.value.lastIndex).coerceAtLeast(0))
+        persistQueue()
+        _playlists.value = _playlists.value.mapValues { (_, ids) -> ids.filterNot { it == trackId } }
+        persistPlaylists()
+    }
+
+    fun createPlaylist(name: String): Boolean {
+        val clean = name.trim()
+        if (clean.isEmpty() || _playlists.value.containsKey(clean)) return false
+        _playlists.value = _playlists.value + (clean to emptyList()); persistPlaylists(); return true
+    }
+
+    fun deletePlaylist(name: String) { _playlists.value = _playlists.value - name; persistPlaylists() }
+
+    fun addToPlaylist(name: String, trackId: String): Boolean {
+        if (trackId !in _library.value.map { it.id } || name !in _playlists.value) return false
+        val ids = _playlists.value.getValue(name)
+        if (trackId in ids) return true
+        _playlists.value = _playlists.value + (name to ids + trackId); persistPlaylists(); return true
+    }
+
+    fun removeFromPlaylist(name: String, trackId: String) {
+        val ids = _playlists.value[name] ?: return
+        _playlists.value = _playlists.value + (name to ids.filterNot { it == trackId }); persistPlaylists()
+    }
+
+    fun playQueue(trackIds: List<String>, startIndex: Int = 0) {
+        _queue.value = trackIds.filter { id -> _library.value.any { it.id == id } }
+        persistQueue()
+        queueIndex = startIndex.coerceIn(0, (_queue.value.size - 1).coerceAtLeast(0))
+        if (_queue.value.isEmpty()) {
+            stop()
             return
         }
-        try {
-            val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(path)
-            val artBytes = retriever.embeddedPicture
-            if (artBytes != null) {
-                _albumArt.value = BitmapFactory.decodeByteArray(artBytes, 0, artBytes.size)
-            } else {
-                _albumArt.value = null
-            }
-            val durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            _duration.value = durationStr?.toIntOrNull() ?: 0
-            retriever.release()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            _albumArt.value = null
-        }
+        playQueueIndex()
     }
 
-    fun setSourceAndPlay(path: String?) {
-        _currentPath.value = path
-        extractMetadata(path)
-        if (!path.isNullOrEmpty() && File(path).exists()) {
-            try {
-                mediaPlayer?.release()
-                mediaPlayer = MediaPlayer().apply {
-                    setDataSource(appContext, Uri.fromFile(File(path)))
-                    isLooping = true
-                    prepare()
-                    start()
-                }
-                _duration.value = mediaPlayer?.duration ?: 0
-                _currentPosition.value = 0
-                _isPlaying.value = true
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _isPlaying.value = false
-            }
-        } else {
+    fun enqueue(trackId: String) { if (trackId in _library.value.map { it.id }) { _queue.value = _queue.value + trackId; persistQueue() } }
+
+    fun removeFromQueue(index: Int) {
+        val currentQueue = _queue.value
+        if (index !in currentQueue.indices) return
+        val removedCurrentItem = index == queueIndex
+        val removedPlayingTrack = removedCurrentItem && currentQueue.getOrNull(index) == _currentTrackId.value
+        if (removedPlayingTrack) skipRepeatOnceAfterQueueRemoval = true
+        _queue.value = currentQueue.toMutableList().also { it.removeAt(index) }
+        queueIndex = when {
+            _queue.value.isEmpty() -> 0
+            index < queueIndex -> queueIndex - 1
+            removedCurrentItem -> index - 1
+            else -> queueIndex
+        }.coerceAtMost((_queue.value.size - 1).coerceAtLeast(0))
+        persistQueue()
+        // Keep a removed playing track running until completion, but do not let Repeat One
+        // restart it after it has been removed from the queue.
+        if (removedPlayingTrack && _queue.value.isEmpty()) {
+            skipRepeatOnceAfterQueueRemoval = false
             stop()
         }
     }
 
-    fun play() {
-        val path = _currentPath.value
-        if (!path.isNullOrEmpty() && File(path).exists()) {
-            try {
-                if (mediaPlayer == null) {
-                    setSourceAndPlay(path)
-                } else if (mediaPlayer?.isPlaying == false) {
-                    mediaPlayer?.start()
-                    _isPlaying.value = true
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+    fun moveQueue(from: Int, to: Int) {
+        if (from !in _queue.value.indices || to !in _queue.value.indices || from == to) return
+        _queue.value = _queue.value.toMutableList().also { val item = it.removeAt(from); it.add(to, item) }
+        queueIndex = when { queueIndex == from -> to; from < queueIndex && to >= queueIndex -> queueIndex - 1; from > queueIndex && to <= queueIndex -> queueIndex + 1; else -> queueIndex }
+        persistQueue()
     }
 
-    fun pause() {
-        try {
-            if (mediaPlayer?.isPlaying == true) {
-                mediaPlayer?.pause()
-                _isPlaying.value = false
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    fun clearQueue() {
+        if (_currentTrackId.value?.let { it in _queue.value } == true) skipRepeatOnceAfterQueueRemoval = true
+        _queue.value = emptyList()
+        queueIndex = 0
+        persistQueue()
+    }
+    fun setShuffle(enabled: Boolean) { _shuffle.value = enabled; preferences.edit().putBoolean("shuffle", enabled).apply() }
+    fun setRepeatMode(mode: RepeatMode) { _repeatMode.value = mode; preferences.edit().putString("repeat", mode.name).apply() }
+    fun next() = advance()
+
+    fun previous() {
+        if (_currentPosition.value > 3000) { seekTo(0); return }
+        queueIndex = (queueIndex - 1).coerceAtLeast(0); playQueueIndex()
     }
 
-    fun stop() {
+    private fun advance() {
+        val skipRepeatForRemovedTrack = skipRepeatOnceAfterQueueRemoval
+        skipRepeatOnceAfterQueueRemoval = false
+        if (!skipRepeatForRemovedTrack && _repeatMode.value == RepeatMode.ONE && _currentTrackId.value != null) {
+            playTrack(_currentTrackId.value!!)
+            return
+        }
+        if (_queue.value.isEmpty()) {
+            stop()
+            return
+        }
+        queueIndex = if (_shuffle.value) Random.nextInt(_queue.value.size) else queueIndex + 1
+        if (queueIndex >= _queue.value.size) {
+            if (_repeatMode.value == RepeatMode.ALL) queueIndex = 0 else { stop(); return }
+        }
+        playQueueIndex()
+    }
+
+    private fun playQueueIndex() { _queue.value.getOrNull(queueIndex)?.let(::playTrack) }
+
+    fun setSourceAndPlay(path: String?) {
+        val track = _library.value.firstOrNull { it.path == path }
+        if (track != null) playTrack(track.id) else if (!path.isNullOrEmpty()) startPath(path, null)
+    }
+
+    fun playTrack(trackId: String) {
+        skipRepeatOnceAfterQueueRemoval = false
+        _library.value.firstOrNull { it.id == trackId }?.let { startPath(it.path, it) }
+    }
+
+    private fun startPath(path: String, track: Track?) {
+        if (!File(path).exists()) { track?.let { removeTrack(it.id) }; stop(); return }
         try {
-            mediaPlayer?.stop()
             mediaPlayer?.release()
+            mediaPlayer = MediaPlayer().apply { setDataSource(path); setOnCompletionListener { advance() }; prepare(); start() }
+            _currentPath.value = path
+            _currentTrackId.value = track?.id
+            preferences.edit().putString("current_track", track?.id).apply()
+            _duration.value = mediaPlayer?.duration ?: track?.duration ?: 0
+            _currentPosition.value = 0
+            extractAlbumArt(path)
+            _isPlaying.value = true
+            ensurePlaybackService()
+        } catch (_: Exception) {
+            // A failed prepare/start must not leave a released player or stale "playing"
+            // metadata visible to the screen and media session.
+            runCatching { mediaPlayer?.release() }
             mediaPlayer = null
             _isPlaying.value = false
             _currentPosition.value = 0
-        } catch (e: Exception) {
-            e.printStackTrace()
+            _duration.value = 0
+            _currentPath.value = null
+            _currentTrackId.value = null
+            _albumArt.value = null
+            preferences.edit().remove("current_track").apply()
+            stopPlaybackService()
         }
     }
 
-    fun seekTo(position: Int) {
+    fun play() {
         try {
-            mediaPlayer?.seekTo(position)
-            _currentPosition.value = position
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+            if (mediaPlayer == null) _currentTrackId.value?.let(::playTrack) ?: _currentPath.value?.let { startPath(it, null) }
+            else if (mediaPlayer?.isPlaying == false) { mediaPlayer?.start(); _isPlaying.value = true; ensurePlaybackService() }
+        } catch (_: Exception) {}
     }
+
+    fun pause() { runCatching { mediaPlayer?.pause(); _isPlaying.value = false } }
+    fun stop() { runCatching { mediaPlayer?.stop(); mediaPlayer?.release() }; mediaPlayer = null; _isPlaying.value = false; _currentPosition.value = 0; stopPlaybackService() }
+    fun seekTo(position: Int) { runCatching { mediaPlayer?.seekTo(position.coerceAtLeast(0)); _currentPosition.value = position.coerceAtLeast(0) } }
 
     fun release() {
+        // Playback is app-scoped. Screens must not release the shared owner during navigation.
+        // The service lifecycle and explicit stop() control the actual player lifecycle.
+    }
+
+    private fun extractAlbumArt(path: String) {
+        val retriever = MediaMetadataRetriever()
         try {
-            progressJob?.cancel()
-            scope.cancel()
-            mediaPlayer?.release()
-            mediaPlayer = null
-            _isPlaying.value = false
-        } catch (e: Exception) {
-            e.printStackTrace()
+            retriever.setDataSource(path)
+            retriever.embeddedPicture?.let { bytes ->
+                _albumArt.value = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            } ?: run { _albumArt.value = null }
+        } catch (_: Exception) {
+            _albumArt.value = null
+        } finally {
+            runCatching { retriever.release() }
         }
     }
+
+    private data class Metadata(val title: String?, val artist: String?, val album: String?, val duration: Int)
+
+    private fun readMetadata(file: File): Metadata {
+        val retriever = MediaMetadataRetriever()
+        return try {
+            retriever.setDataSource(file.absolutePath)
+            Metadata(
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST),
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM),
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toIntOrNull() ?: 0
+            )
+        } catch (_: Exception) {
+            Metadata(null, null, null, 0)
+        } finally {
+            runCatching { retriever.release() }
+        }
+    }
+
+    private fun persistLibrary(items: List<Track>) {
+        val array = JSONArray()
+        items.forEach { array.put(JSONObject().apply { put("id", it.id); put("path", it.path); put("title", it.title); put("artist", it.artist); put("album", it.album); put("duration", it.duration) }) }
+        preferences.edit().putString("library", array.toString()).apply()
+    }
+
+    private fun loadLibrary(): List<Track> = runCatching {
+        val array = JSONArray(preferences.getString("library", "[]"))
+        buildList {
+            for (i in 0 until array.length()) {
+                val o = array.getJSONObject(i)
+                if (File(o.getString("path")).exists()) add(Track(o.getString("id"), o.getString("path"), o.getString("title"), o.optString("artist"), o.optString("album"), o.optInt("duration")))
+            }
+        }
+    }.getOrDefault(emptyList())
+
+    private fun persistQueue() = preferences.edit().putString("queue", JSONArray(_queue.value).toString()).apply()
+    private fun loadQueue(): List<String> = runCatching {
+        val validTrackIds = _library.value.mapTo(hashSetOf()) { it.id }
+        val array = JSONArray(preferences.getString("queue", "[]"))
+        buildList {
+            for (i in 0 until array.length()) {
+                val id = array.optString(i)
+                if (id in validTrackIds) add(id)
+            }
+        }
+    }.getOrDefault(emptyList())
+    private fun loadRepeatMode() = runCatching { RepeatMode.valueOf(preferences.getString("repeat", RepeatMode.OFF.name)!!) }.getOrDefault(RepeatMode.OFF)
+
+    private fun persistPlaylists() {
+        val root = JSONObject()
+        _playlists.value.forEach { (name, ids) -> root.put(name, JSONArray(ids)) }
+        preferences.edit().putString("playlists", root.toString()).apply()
+    }
+
+    private fun loadPlaylists(): Map<String, List<String>> = runCatching {
+        val validTrackIds = _library.value.mapTo(hashSetOf()) { it.id }
+        val root = JSONObject(preferences.getString("playlists", "{}"))
+        buildMap {
+            root.keys().forEach { name ->
+                val array = root.getJSONArray(name)
+                put(name, buildList {
+                    for (i in 0 until array.length()) {
+                        val id = array.optString(i)
+                        if (id in validTrackIds) add(id)
+                    }
+                })
+            }
+        }
+    }.getOrDefault(emptyMap())
 }

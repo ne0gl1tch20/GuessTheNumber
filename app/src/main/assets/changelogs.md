@@ -1,4 +1,194 @@
+## Unreleased (Player Experience)
+
+- 🧭 **More Hub feature discovery**: First-time visits to eligible More Hub features now show a short two-step popup with Next, Done, and Skip-and-open. Completion is saved in global settings; Settings, About, and developer/testing routes are excluded. Dismissing the popup leaves it available to show again.
+- 🔊 **Independent SFX mixer foundation**: Added a separate sound-effects volume preference and a resilient asset lookup/player API. Missing `assets/sfx/` folders or clips return a not-found result without interrupting gameplay; no bundled sound assets are added in this phase.
+- 🛍️ **Purchase feedback**: Successful Nebula shop purchases briefly highlight the purchased item, and successful upgrades highlight the upgrade card. Feedback respects reduced-motion preferences and uses the existing vibration setting.
+- 🏆 **Queued achievement celebrations**: When several achievements unlock together, each announcement is shown in sequence instead of being overwritten. Achievement celebrations respect reduced motion and the existing vibration setting.
+- 🎯 **Accurate guess feedback**: Keyboard and button submissions now share one handler, and rate-limited guesses show a localized retry message instead of misleading high/low/correct feedback. Feedback uses the same clamped number the game engine evaluates.
+- 🎯 **Clearer guess feedback**: High, low, and correct guesses now use distinct icons and theme-aware feedback cards. Feedback transitions respect the reduced-motion setting, and Blindfolded Oracle hides feedback from both the Guess button and keyboard submission paths.
+
+## Unreleased (Cross-Core Runtime Hardening)
+
+- 💾 **Preserve recoverable saves**: Saving over a corrupted primary no longer overwrites a valid last-known-good backup.
+- 💾 **Reject impossible save state**: Save validation now rejects out-of-range targets and negative economy/progression counters so recovery can prefer a valid backup.
+- 🎵 **Bound music imports**: Imported tracks are capped at 100 MiB; empty, oversized, or failed imports are rejected and partial files are cleaned up.
+- 🎵 **Lower idle progress polling**: Music progress refresh now polls less often while paused or idle.
+- 🌐 **Locale resilience**: Locale catalog references are safely published across threads, and invalid currency codes fall back to a plain localized number instead of throwing.
+- 🧪 **Regression coverage**: Added tests for recoverable save backups, invalid saved state, and invalid currency formatting.
+
+## Unreleased (Post-v3.0.2 Development Updates)
+
+- 🎨 **Live theme preview**: Settings now previews the selected primary, secondary, and tertiary colors in a sample game card and action button, updating immediately as theme colors change.
+
+- ⚙️ **Clearer Settings sections**: Grouped notification controls, audio/feedback controls, and visual-comfort preferences under distinct localized headings and dividers, while preserving existing settings behavior.
+
+- ⚙️ **Clearer Settings descriptions**: Added localized plain-language descriptions for language, theme appearance and colors, number notation, reminders, sound effects, vibration, visual comfort, reduced motion, master volume, and the destructive data-reset action across all supported locale catalogs.
+
+- 🛡️ **LiveOps claim-state validation**: Reject reward claims when saved progression counters or permanent event boosts are negative, rather than allowing a corrupted state to be normalized during reward settlement.
+
+- ♿ **Accessible progression maps**: World Map and Prestige Skill Tree nodes now expose localized names, lock/unlock status, costs where applicable, and selected state to accessibility services instead of relying on color, borders, or emoji alone.
+
+- ♿ **Guidance and UI previews**: Added a TalkBack-labeled guidance button with hover/long-press tooltip support and preview fixtures for loading, empty, error, app-themed light/dark modes, and Filipino-localized states. Essential actions remain normal button clicks.
+
+- 🎯 **Early progression goals**: Added live progress and reward spotlights for the existing Novice Guesser, Streak Master, and Number Millionaire milestones on the Play screen.
+- 🧮 **Optional Math Strategy Lab**: Added a collapsible midpoint guide that can suggest a guess without submitting it automatically or revealing the hidden target.
+- 🔒 **Progression-locked More Hub entries**: Relic Collection and Explorer's Codex remain visible until the first world boss is defeated; Endgame Challenges unlock after all four world bosses are defeated. Locked entries explain the requirements and current progress, and navigation enforces the same gates.
+- 🔄 **Build-channel-aware update discovery**: The About screen can check GitHub Releases for release builds and recent successful Stable Debug APK workflow artifacts for debug builds. Results link to official GitHub pages; the app does not silently download or install APKs.
+- 🌐 **Localization updates**: Added the new More Hub lock/requirements text across the supported locale catalogs.
+- 🛠️ **Project organization**: Moved internal AI planning notes and roadmaps under `.openai/`; these internal documents are not part of the player-facing app.
+- ℹ️ **Version status**: These are development updates on top of versionCode 20 / versionName 3.0.2. No app version bump is included in this changelog-only update.
+
+## v3.0.2 (Winning-Streak Celebrations)
+
+- 🎉 **Streak milestone celebrations**: Correct-guess celebrations now switch to an achievement-style banner at winning streaks of 5, 10, 25, and 50, reusing the existing localized achievement names.
+- 🎮 **Version**: versionCode 20 / versionName 3.0.2.
+
+## v3.0.1 (Streamlined More Hub)
+
+- Removed the redundant Interactive Tutorial and Save Export / Import shortcuts from More. The action-driven tutorial remains available through its existing button action, and encrypted backup/restore remains on Save Slots.
+- Removed the standalone tutorial and cloud-backup navigation destinations and their unused screen implementations.
+- Existing saved More-menu orders automatically discard the retired shortcuts while preserving the user's remaining order.
+- Version: versionCode 19 / versionName 3.0.1.
+
+# Changelog
+
+## v3.0.0 (Beyond the Numbers: Ultimate Expansion)
+
+- 🌌 **Endless Rift**: After defeating all four world bosses, unlock a persistent, repeatable boss gauntlet. Each victory advances the tier, raises boss HP, and scales Money and Nebula rewards.
+- ⚔️ **Escalating boss encounters**: Rift rematches use the existing phase-based guessing combat and miss penalties, with tier-scaled HP and rewards.
+- 💾 **Save-compatible progression**: Added defaulted per-save Rift tier, best-tier and active-run fields so older saves load without migration.
+- 🌍 **Integrated endgame flow**: Start or leave the Rift from Endgame Challenges, continue the current boss on the World Map, and see its scaled HP and current tier.
+- 🌐 **Localization**: Added the Rift interface strings to all 23 supported locale catalogs.
+- 📱 **Version**: Bumped to versionCode 18 / versionName 3.0.0.
+
 # 🚀 Guess The Number Simulator - Changelog
+
+## v2.0.0 (Beyond the Numbers Major Expansion)
+- 🗺️ **Interactive World Map**: Added four selectable worlds, zoom and pan controls, connected routes, secret-area markers, unlock requirements, boss progress and world mastery upgrades.
+- ⚔️ **Guessing-Based Boss Combat**: Boss battles now start from the map; correct guesses deal damage, and missed guesses push progress back every 4 misses in phase 1, every 3 in phase 2 and every 2 in phase 3, and victory grants one-time Money, Nebula, relic and Codex rewards.
+- 🌳 **Zoomable Skill Tree**: Rebuilt the Prestige Talent Web as a connected, clickable tree with pinch-to-zoom, drag-to-pan, zoom controls, node selection and parent requirements.
+- 💠 **Real Talent Effects**: Automation talents increase auto-clicker speed; precision talents add critical reward chances; Nebula Resonance boosts correct-guess earnings; Cosmic Oracle grants Nebula on correct guesses.
+- 💎 **Relic Collection and Bonuses**: Bosses award persistent relics; equip up to two to gain Money bonuses, critical rewards and extra Nebula.
+- 🏡 **Evolving Home Base**: Added persistent sanctuary levels, building milestones and a Money bonus that scales with restoration progress.
+- 📖 **Explorer's Codex**: Added collectible world, boss and secret-area entries plus a one-time 100 Nebula completion reward.
+- 🏆 **Endgame Goals**: Added long-term goals for boss victories, secret areas, relic collection and sanctuary restoration.
+- 🧭 **Navigation Integration**: Added direct More-menu entry points for World Map, Relics, Home Base, Codex, Endgame, Cloud Backup, Lucky Stake and Tutorial; registered their navigation destinations.
+- 🎮 **Play Hub Integration**: Added a live Beyond the Numbers card to Play with unlocked-world and defeated-boss counts plus direct World Map, Relics, Home Base and Codex shortcuts. The new hub labels and progress summary are present in all 23 locale files.
+- 💾 **Save Compatibility**: Added new progression fields with defaults so older save data can load without a reset.
+- 🌐 **Locale Coverage**: Added all new progression keys to the 23 locale JSON files. Filipino strings are translated; several newly added strings in other locales currently retain English values and need native-language review.
+- 🚀 **Major Version**: Bumped versionName to 2.0.0 and versionCode to 17.
+
+## v1.16.0 (Expressive Motion & Gameplay Feedback)
+- 🌍 **World Progression**: Added four unlockable realms, each with explicit requirements based on correct guesses, upgrade levels, Prestige, Ultra, and previous boss victories.
+- ⚔️ **Multi-Hit Boss Battles**: Added four bosses with persistent HP progress, increasing hit counts, one-time victories, and escalating Money + Nebula rewards.
+- 🗝️ **World Gates**: Later realms require defeating the previous realm's boss plus account milestones; Nebula Rift requires Ultra progression.
+- 🌐 **Full Localization**: Added world names, unlock requirements, boss names, battle requirements, rewards, and boss-health text across all 23 locale files.
+- 🎁 **Treasure Drops**: Correct guesses can drop collectible Common, Rare, and Epic chests. Open stored chests for random Money or Nebula rewards, with rarer tiers offering bigger prizes.
+- 📦 **Loot Inventory**: Added persistent per-save chest counts, total drops found, opened-chest stats, and a latest-drop banner on the Play screen.
+- 🌐 **Full Locale Coverage**: Added all treasure-drop strings to all 23 locale JSON files.
+
+- 🎯 **Daily Bounty Board**: Added four rotating-by-day contracts for guesses, correct answers, streaks, and upgrade purchases, each with claimable rewards.
+- 💎 **Reward Loop**: Daily contracts award Money or Nebula, track progress inside each save slot, and reset their progress and claims when the local calendar day changes.
+- 🌐 **Bounty Localization**: Added English and Filipino text for the new board, quest progress, rewards, and claim states.
+
+- 🌀 **Expressive Save Loading**: Added a pulsing save icon, indeterminate progress ring, and animated loading dots tied to the real save-switch loading state.
+- 🎮 **Gameplay Feedback**: Added animated currency and guess feedback, a morphing guess button, tactile press responses, and a celebration banner for correct guesses.
+- ✨ **Progression Celebrations**: Added event-driven banners for achievement unlocks, Prestige resets, and Ultra resets.
+- 🧭 **Animated Screens & Navigation**: Expanded spring-based motion across save slots, upgrades, shop, achievements, arcade results, tutorial steps, crash recovery, and navigation transitions.
+- ♿ **Reduced Motion Support**: New motion effects respect the existing reduced-motion preference.
+- 📱 **Version**: Bumped to versionCode 16 / versionName 1.16.0.
+
+## v1.15.0 (Expressive More Menu & Persistent Reordering)
+
+- 🎨 **More Expressive Material 3 UI**: Expanded the More Hub's Material 3 Expressive treatment with richer surfaces, rounded shapes, drag elevation, animated selection feedback, and clearer visual hierarchy.
+- ↕️ **Real More Menu Reordering**: Reordered shortcuts now control the actual More menu instead of only changing the preview list.
+- 💾 **Persistent Default Order**: Added a stable default More shortcut order that is saved with game settings and automatically repairs missing or legacy entries.
+- 🧭 **Reorder UX Polish**: Long-press drag-and-drop now clearly communicates that the new order is saved and reused by the menu.
+- 🌐 **What's New Localization**: Moved the release popup copy fully into the locale catalog and changed its version text to a localized %s placeholder, so the popup no longer contains hardcoded release text in Kotlin.
+- 🧪 **Localization Regression Coverage**: Added coverage for localized What's New formatting and updated release-version assertions.
+- 📱 **Version**: Bumped to versionCode 15 / versionName 1.15.0.
+
+## v1.14.0 (Global Localization & Internationalization Expansion)
+
+- 🌍 **Global locale expansion**: Added 23 supported locale overlays covering English (US/UK), Filipino, Simplified/Traditional Chinese, Japanese, Korean, Spanish, French, German, Italian, Portuguese (Portugal/Brazil), Russian, Hindi, Indonesian, Thai, Vietnamese, Turkish, Polish, Ukrainian, Dutch, and Arabic.
+- 🧩 **Locale fallback architecture**: Locale JSON files can now provide translated overlays while safely falling back to the complete English catalog for keys that are not yet translated.
+- 🔢 **Locale-aware formatting**: Number, decimal, percent, currency, date, time, date-time, and duration formatting now follows the active locale.
+- ↔️ **RTL foundation**: Arabic is registered as an RTL locale and locale metadata is available to the UI for future layout-direction enforcement.
+- 📱 **Android per-app language support**: Declared the supported language configuration so Android 13+ can expose app-specific language preferences.
+- ⚙️ **Expanded language picker**: Settings now exposes the complete supported locale list instead of only English and Filipino.
+- 🔎 **Repository-wide JSON inspection**: Added automated validation for JSON assets and data-driven localization keys, including the game's JSON catalogs.
+- 🧪 **Localization tests**: Added locale loading, fallback, formatting, and RTL unit coverage.
+- 🛠️ **CI expansion**: Manual GitHub Actions now validates locale contracts, scans the localization surface, validates JSON assets, runs unit tests, runs lint, runs the full Gradle check, and uploads test/lint reports.
+- 🧹 **De-hardcoding foundation**: Added repository-wide high-confidence localization auditing so remaining user-facing literals can be migrated without touching machine-readable IDs or internal schema values.
+- 📱 **Version**: Bumped to versionCode 14 / versionName 1.14.0.
+
+## v1.13.0 (Material 3 Expressive UI Overhaul)
+
+- 🎨 **Unified Material 3 Expressive Design System**: Centralized expressive shapes, typography, theme roles, and reusable motion primitives across the app.
+- 🌀 **App-Wide Expressive Motion**: Added spring-based screen entrance/exit motion and animated navigation selection states for a consistent Android interaction language.
+- 🧭 **Expressive Navigation**: Bottom navigation icons now animate their selected state while preserving navigation and state restoration.
+- 🎮 **Primary Screen Polish**: Play, Upgrades, Shop, and More now use the shared expressive screen-motion foundation without changing game logic.
+- ♿ **Reduced Motion Support**: The existing reduced-motion setting now disables the new screen and navigation transitions instead of leaving the preference disconnected.
+- 📐 **Adaptive UI Foundation**: Shared Material 3 shapes, typography, and motion primitives provide a consistent base for phone, foldable, tablet, and split-screen layouts.
+- ⚡ **Performance-Oriented Motion**: Animation specs are centralized and reused rather than recreated independently across screens.
+- 🔍 **Guideline Alignment Pass**: Preserved Material components, semantic color roles, custom theme picker, localization, save system, tutorial, and offline architecture.
+- 📱 **Version**: Bumped to versionCode 13 / versionName 1.13.0.
+
+## v1.12.1 (Global Preferences, Complete Encrypted Backups, Save Creation & Theme Customization)
+
+- 💾 **Save Slots First Launch**: Devices with no valid saves now open the Save Slots screen first, with encrypted Import/Export available above the slot list.
+- 🔐 **Complete Encrypted Backup**: Export now packages global App Preferences plus all 10 save slots and slot backups into one encrypted string; importing restores the complete package.
+- 🌐 **Global App Preferences**: App settings are stored globally instead of inside individual game saves.
+- 🔄 **Settings Migration**: Existing per-save settings receive a one-time OK confirmation, followed by an in-dialog migration/loading state before global migration completes.
+- 🎮 **New Save Setup**: New saves can choose a name, icon, and permanent per-save difficulty during creation.
+- 🧭 **Interactive Tutorial**: New saves now enter an action-driven tutorial requiring highlighted controls to be pressed before advancing.
+- 🎨 **Theme Customization**: Theme presets now live in Settings as a polished dropdown, with Custom HSV/brightness controls, live preview, and hex entry for primary, secondary, and tertiary colors.
+- ↕️ **Animated More Reordering**: More shortcut reordering stays locked until Reorder is pressed and now gives the dragged item lift, scale, elevation, and smoother motion.
+- 🧭 **Guided In-App Tutorial**: Replaced the generic tutorial screen with an action-required coachmark flow that uses the real Play, Upgrades, More, and Settings screens. Tutorial completion remains global across save slots.
+- 🛠️ **Developer JSON Editors**: Split raw preference editing into global App Preferences and Save Slots, with a Save 1–10 selector.
+- 📱 **Version**: Bumped to versionCode 12 / versionName 1.12.1.
+
+
+## v1.12 (Shop Categories, Cosmetics, Mutator Combinations & Challenge Builder)
+
+**Ready to play? v1.12 gives you more ways to build your run your way.** Customize your shop, unlock cosmetics, stack mutators, and create your own challenges. Then head back to Play and see how far your build can go. 🎮✨
+
+- 🛍️ **Shop Categories**: Reworked the Nebula Shop into filterable All, Automation, Boosts, and Cosmetics categories.
+- ✨ **Cosmetics**: Added purchasable profile cosmetics with persistent ownership and equip selection.
+- 🌐 **Cosmetic Localization**: Added English and Filipino names and descriptions for the new cosmetic catalog and shop controls.
+- 🧩 **Mutator Combinations**: Mutators can now be activated together and their reward multipliers stack.
+- 🎯 **Mutator Gameplay Effects**: Hardcore expands the active range, Hyper Speed accelerates the auto-clicker, Blindfolded Oracle hides directional feedback, and Heavy Taxation applies its penalty.
+- 🛠️ **Challenge Builder**: Added custom challenge creation with selectable mutators, goal types, targets, calculated Nebula rewards, activation, and one-time claims.
+- 🌐 **Challenge Builder Localization**: Added English and Filipino builder controls and status text.
+- 🧪 **Mutator Tests**: Added unit coverage for stacked mutator rewards, Hardcore range expansion, and unknown-mutator sanitization.
+- 🧪 **Phase 15 Validation**: Added final state validation and migration-oriented tests before the v1.12 build.
+
+## v1.11 (Weekly Challenges, Random Events, Achievement Tiers & Combo / Frenzy)
+- 📅 **Weekly Challenges**: Reworked the challenge system into rotating weekly sets with varied goal types and week-scoped claim IDs.
+- 🎯 **Challenge Variety**: Added accuracy, streak, money, guess volume, Prestige, Ultra, Frenzy, and playtime objectives with different Nebula rewards.
+- ⚡ **Random Events**: Added seven varied occasional events with cash, Nebula, streak, range, refund, and jackpot effects. Events are checked periodically rather than firing constantly.
+- 🌐 **Random Event Localization**: Added English and Filipino event names and descriptions.
+- 🏆 **Achievement Tiers**: Expanded the system to 27 achievements across Bronze, Silver, Gold, and Diamond tiers, with escalating Nebula rewards.
+- 🌐 **Achievement Localization**: Added localized names and descriptions for the expanded catalog in English and Filipino.
+- 🔥 **Combo Frenzy**: Consecutive correct guesses now unlock Frenzy tiers every 5-streak steps.
+- 📈 **Frenzy Rewards**: Each Frenzy tier adds a 25% reward multiplier, capped at 5x, on top of the existing streak multiplier.
+- ✨ **Live Frenzy Indicator**: The Play screen shows the active Frenzy multiplier once the streak reaches 5.
+- 🌐 **Localized Frenzy UI**: Added English and Filipino Frenzy text.
+- 🧪 **Frenzy Tests**: Added engine coverage for tier scaling and reward increases.
+
+## v1.10 (Save Slot Expansion, Profiles, Difficulty & Backup Improvements)
+- 💾 **10 Save Slots**: Expanded save management from 3 slots to 10 with dynamic slot handling and metadata support.
+- 🎚️ **Per-Slot Difficulty**: Added Classic, Hard, and Extreme difficulty profiles at the save-slot level.
+- 👤 **Save Profiles**: Added customizable profile names and icons with sanitized save metadata.
+- 📋 **Slot Duplication & Backup Restore**: Added duplication into empty slots and backup restoration with protection against overwriting occupied slots.
+- 🛠️ **About Screen License Fix**: Fixed open-source license author and license fields displaying `%s` instead of their actual values.
+- 🧪 **Localization Validation**: Improved placeholder validation so literal percent signs in localized text are handled correctly.
+- 🎮 **Difficulty Mechanics**: Classic, Hard, and Extreme now have distinct range sizes, reward multipliers, and incorrect-guess money penalties.
+- 📈 **Difficulty-Aware Ranges**: Better Range upgrades now scale from each difficulty's own base range.
+- 🔄 **Reset Consistency**: Prestige resets preserve the selected difficulty's range.
+- 🧪 **Engine Tests**: Added coverage for difficulty penalties, rewards, and range behavior.
+- 🤖 **Smarter Guessing Bot**: Reworked the auto-clicker to use feedback-driven binary search instead of reading the hidden target directly.
+- 🧪 **Bot Tests**: Added coverage for feedback-based target finding and difficulty-sized ranges.
 
 ## v1.9 (Comprehensive Internationalization & Localization Overhaul)
 - 🌐 **Full Locale & Internationalization Support**: Localized 100% of user-visible strings across all screens (Play, Prestige, Ultra, Upgrades, Shop, Arcade, More, Mutators, Achievements, Cloud Backup, Crash Recovery, Settings, Dev Settings) into `locales/en_us.json`.

@@ -1,7 +1,12 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.jarrlyyy.guessthenumber.ui.theme.expressivePressScale
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -12,11 +17,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,6 +34,8 @@ fun UpgradeScreen(
     onUpdateMultiplier: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
+    val locale = LocalAppLocaleManager.current
+    val hapticFeedback = LocalHapticFeedback.current
     val upgrades = remember {
         JsonConfigRepository(context).loadUpgrades()
     }
@@ -77,7 +87,7 @@ fun UpgradeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Upgrades", style = MaterialTheme.typography.titleMedium) },
+                title = { Text(localizedText("Upgrades"), style = MaterialTheme.typography.titleMedium) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
@@ -105,9 +115,9 @@ fun UpgradeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            Text("Available Money", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(localizedText("Available Money"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                             AnimatedContent(targetState = state.money.format(), label = "UpgradeMoneyAnimation") { moneyStr ->
-                                Text("$moneyStr Money", color = MoneyGold, style = MaterialTheme.typography.titleLarge)
+                                Text(LocalAppLocaleManager.current.getString("available_money_format", "%s Money", moneyStr), color = MoneyGold, style = MaterialTheme.typography.titleLarge)
                             }
                         }
                         Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null, tint = MoneyGold, modifier = Modifier.size(32.dp))
@@ -125,7 +135,7 @@ fun UpgradeScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Buy Multiplier:", style = MaterialTheme.typography.titleMedium)
+                    Text(localizedText("Buy Multiplier:"), style = MaterialTheme.typography.titleMedium)
                     
                     Box(
                         modifier = Modifier.wrapContentSize(Alignment.TopEnd)
@@ -135,11 +145,11 @@ fun UpgradeScreen(
                             shape = MaterialTheme.shapes.medium,
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                         ) {
-                            Text("${state.buyMultiplier}x", style = MaterialTheme.typography.labelLarge)
+                            Text(LocalAppLocaleManager.current.getString("multiplier_format", "%sx", state.buyMultiplier), style = MaterialTheme.typography.labelLarge)
                             Spacer(modifier = Modifier.width(8.dp))
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = "Dropdown"
+                                contentDescription = localizedText("Dropdown")
                             )
                         }
 
@@ -149,7 +159,7 @@ fun UpgradeScreen(
                         ) {
                             multipliers.forEach { mult ->
                                 DropdownMenuItem(
-                                    text = { Text("$mult x", style = MaterialTheme.typography.bodyMedium) },
+                                    text = { Text(LocalAppLocaleManager.current.getString("multiplier_option_format", "%s x", mult), style = MaterialTheme.typography.bodyMedium) },
                                     onClick = {
                                         onUpdateMultiplier(mult)
                                         expanded = false
@@ -167,13 +177,32 @@ fun UpgradeScreen(
                 val level = state.upgradeLevels[upgrade.id] ?: 0
                 val totalCost = computedUpgradeCosts[upgrade.id] ?: BigNumber.ZERO
                 val canAfford = state.money >= totalCost
+                val buyInteractionSource = remember(upgrade.id) { MutableInteractionSource() }
+                var previousLevel by remember(upgrade.id) { mutableStateOf(level) }
+                var purchaseHighlight by remember(upgrade.id) { mutableStateOf(false) }
+                LaunchedEffect(level) {
+                    val oldLevel = previousLevel
+                    previousLevel = level
+                    if (level > oldLevel) {
+                        purchaseHighlight = true
+                        if (state.settings.vibrationEnabled) {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
+                        delay(if (state.settings.reducedMotion) 350L else 650L)
+                        purchaseHighlight = false
+                    }
+                }
+                val targetCardColor = if (purchaseHighlight) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                val cardColor = if (state.settings.reducedMotion) targetCardColor else animateColorAsState(targetValue = targetCardColor, label = "upgradePurchaseColor_${upgrade.id}").value
 
                 // Material 3 Expressive Upgrade Card
                 Surface(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .then(if (state.settings.reducedMotion) Modifier else Modifier.animateItem(placementSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow, dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy)))
+                        .animateContentSize(),
                     shape = MaterialTheme.shapes.large,
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    tonalElevation = 2.dp
+                    color = cardColor,
+                    tonalElevation = if (purchaseHighlight && !state.settings.reducedMotion) 4.dp else 2.dp
                 ) {
                     Row(
                         modifier = Modifier
@@ -192,23 +221,30 @@ fun UpgradeScreen(
                                 shape = MaterialTheme.shapes.extraSmall,
                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                             ) {
-                                Text(
-                                    text = "Level: $level / ${if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel}",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                                )
+                                AnimatedContent(targetState = level, label = "upgradeLevel_${upgrade.id}") { animatedLevel ->
+                                    Text(text = locale.getString("upgrade_level_format", "Level: %d / %s", animatedLevel, if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel.toString()),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                    )
+                                }
                             }
                             if (!isMaxed) {
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text("Cost (${state.buyMultiplier}x): ${totalCost.format()}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(LocalAppLocaleManager.current.getString("upgrade_cost_format", "Cost (%sx): %s Money", state.buyMultiplier, totalCost.format()), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Button(
+                            interactionSource = buyInteractionSource,
                             onClick = { onBuyUpgrade(upgrade.id, totalCost) },
                             enabled = canAfford && !isMaxed,
                             shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier.expressivePressScale(
+                                interactionSource = buyInteractionSource,
+                                enabled = canAfford && !isMaxed,
+                                reducedMotion = state.settings.reducedMotion
+                            ),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
                             Text(if (isMaxed) "MAX" else "Buy", style = MaterialTheme.typography.labelLarge)

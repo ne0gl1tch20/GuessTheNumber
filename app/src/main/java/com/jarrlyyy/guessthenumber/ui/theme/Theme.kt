@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 
 private val ExpressiveDarkColorScheme = darkColorScheme(
@@ -65,6 +67,14 @@ private val AmoledDarkColorScheme = darkColorScheme(
 )
 
 // Google Material 3 Expressive Shapes (Oversized rounded corners and pill shapes)
+val ExpressiveTypography = Typography().run {
+    copy(
+        displayLarge = displayLarge.copy(letterSpacing = (-0.5).sp),
+        headlineLarge = headlineLarge.copy(letterSpacing = (-0.25).sp),
+        titleLarge = titleLarge.copy(letterSpacing = 0.sp)
+    )
+}
+
 val ExpressiveShapes = Shapes(
     extraSmall = RoundedCornerShape(16.dp),
     small = RoundedCornerShape(24.dp),
@@ -76,6 +86,9 @@ val ExpressiveShapes = Shapes(
 @Composable
 fun GuessTheNumberTheme(
     themeMode: String = "System",
+    primaryHex: String = "#7C4DFF",
+    secondaryHex: String = "#00BCD4",
+    tertiaryHex: String = "#00C853",
     content: @Composable () -> Unit
 ) {
     val systemDark = isSystemInDarkTheme()
@@ -85,12 +98,34 @@ fun GuessTheNumberTheme(
         else -> systemDark
     }
 
+    val customPrimary = runCatching { Color(android.graphics.Color.parseColor(primaryHex)) }.getOrDefault(PrimaryNeonPurple)
+    val customSecondary = runCatching { Color(android.graphics.Color.parseColor(secondaryHex)) }.getOrDefault(SecondaryElectricCyan)
+    val customTertiary = runCatching { Color(android.graphics.Color.parseColor(tertiaryHex)) }.getOrDefault(TertiaryEmerald)
+    val customDark = darkColorScheme(
+        primary = customPrimary,
+        secondary = customSecondary,
+        tertiary = customTertiary,
+        background = ExpressiveBackgroundDark,
+        surface = ExpressiveSurfaceDark,
+        surfaceVariant = ExpressiveSurfaceVariantDark,
+        onBackground = Color(0xFFE6E1F9),
+        onSurface = Color(0xFFE6E1F9)
+    )
+    val customLight = lightColorScheme(
+        primary = customPrimary,
+        secondary = customSecondary,
+        tertiary = customTertiary,
+        background = ExpressiveBackgroundLight,
+        surface = ExpressiveSurfaceLight,
+        surfaceVariant = ExpressiveSurfaceVariantLight
+    )
+
     val colorScheme = when (themeMode) {
-        "AMOLED" -> AmoledDarkColorScheme
-        "Dark" -> ExpressiveDarkColorScheme
-        "Light" -> ExpressiveLightColorScheme
+        "AMOLED" -> customDark.copy(background = Color.Black, surface = Color.Black, surfaceVariant = Color(0xFF121212))
+        "Dark" -> customDark
+        "Light" -> customLight
         else -> {
-            if (systemDark) ExpressiveDarkColorScheme else ExpressiveLightColorScheme
+            if (systemDark) customDark else customLight
         }
     }
 
@@ -106,6 +141,7 @@ fun GuessTheNumberTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         shapes = ExpressiveShapes,
+        typography = ExpressiveTypography,
         content = content
     )
 }

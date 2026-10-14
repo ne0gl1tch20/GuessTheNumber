@@ -13,17 +13,30 @@ import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.data.notification.GameReminderWorker
+import com.jarrlyyy.guessthenumber.data.notification.NotificationHelper
+import com.jarrlyyy.guessthenumber.widget.WidgetRefresh
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
+import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
 import com.jarrlyyy.guessthenumber.domain.engine.AntiCheatService
 import com.jarrlyyy.guessthenumber.domain.engine.AntiTimeTravelService
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
+import com.jarrlyyy.guessthenumber.domain.engine.GuessingBot
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
+import com.jarrlyyy.guessthenumber.domain.model.Difficulty
+import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.LiveOpsClaimDefinition
+import com.jarrlyyy.guessthenumber.domain.model.LiveOpsClaimPolicy
+import com.jarrlyyy.guessthenumber.domain.model.RandomEventEngine
+import com.jarrlyyy.guessthenumber.scripting.LuaRandomEventSelector
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
+import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+import com.jarrlyyy.guessthenumber.data.repository.LiveOpsRepository
+import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,10 +47,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
+import java.time.LocalDate
+import java.time.Instant
+import kotlin.random.Random
 
 class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val saveManager = SaveManager(application)
+    private val slotOperationMutex = Mutex()
+    private val liveOpsClaimMutex = Mutex()
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
@@ -50,6 +71,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private val gameEngine = GameEngine()
+    private val guessingBot = GuessingBot()
+    private val randomEventEngine = RandomEventEngine()
+    private val luaRandomEventSelector by lazy { LuaRandomEventSelector(getApplication<Application>()) }
     private val commandExecutor = CommandExecutor()
     private val backgroundMusicManager = BackgroundMusicManager(application)
 
@@ -65,6 +89,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     val hasPreviousCrash: StateFlow<Boolean> = _hasPreviousCrash.asStateFlow()
 
     private val _offlineGains = MutableStateFlow<BigNumber?>(null)
+    private val _incomePerSecond = MutableStateFlow(BigNumber.ZERO)
+    val incomePerSecond: StateFlow<BigNumber> = _incomePerSecond.asStateFlow()
+    private var lastIncomeMeasurement = BigNumber.ZERO
     val offlineGains: StateFlow<BigNumber?> = _offlineGains.asStateFlow()
 
     private val _showChangelogPopup = MutableStateFlow(false)
@@ -81,25 +108,53 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val _hasLegacySave = MutableStateFlow(false)
     val hasLegacySave: StateFlow<Boolean> = _hasLegacySave.asStateFlow()
 
+    private val _hasAnySave = MutableStateFlow(false)
+    val hasAnySave: StateFlow<Boolean> = _hasAnySave.asStateFlow()
+
+    private val _needsSettingsMigration = MutableStateFlow(false)
+    val needsSettingsMigration: StateFlow<Boolean> = _needsSettingsMigration.asStateFlow()
+    private val _isMigratingSettings = MutableStateFlow(false)
+    val isMigratingSettings: StateFlow<Boolean> = _isMigratingSettings.asStateFlow()
+
     private var autoClickerJob: Job? = null
     private var saveJob: Job? = null
     private var timerJob: Job? = null
+    private var randomEventJob: Job? = null
 
     init {
         AppErrorHandler.init(application.filesDir)
         _hasPreviousCrash.value = AppErrorHandler.hasPreviousCrash()
         GameLogger.configureStorage(File(application.filesDir, "game_logs.txt"), _gameState.value.settings.saveLogsToStorage)
-        loadGame()
-        startAutoSave()
-        startPlaytimeTimer()
-        startAutoClicker()
+        GameLogger.configureVerbose(_gameState.value.settings.verboseLogging)
+        GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "APP_INITIALIZED", "GameViewModel initialized; debugBuild=${BuildConfig.DEBUG}.")
+
+        // Crash recovery is the first boot layer. Do not touch save data or start game
+        // background jobs until the user has acknowledged the previous crash.
+        if (!_hasPreviousCrash.value) {
+            loadGame()
+            startAutoSave()
+            startPlaytimeTimer()
+            startRandomEvents()
+            startAutoClicker()
+        }
     }
 
     fun loadGame(slot: Int = -1) {
+        GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "LOAD_REQUESTED", "Save load requested for slot=$slot (active slot will be used when unspecified).")
+        _isLoadingSave.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            val targetSlot = if (slot in 1..3) slot else saveManager.getActiveSlot()
+            try {
+                val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else saveManager.getActiveSlot()
             saveManager.setActiveSlot(targetSlot)
             _activeSlot.value = targetSlot
+
+            val anySaveCheck = saveManager.hasAnyValidSave()
+            withContext(Dispatchers.Main) { _hasAnySave.value = anySaveCheck }
+
+            saveManager.migrateTutorialCompletionToGlobal()
+
+            val settingsMigrationCheck = saveManager.needsSettingsMigration()
+            withContext(Dispatchers.Main) { _needsSettingsMigration.value = settingsMigrationCheck }
 
             val legacyCheck = saveManager.hasLegacySave()
             if (legacyCheck) {
@@ -109,6 +164,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             val loaded = saveManager.loadGame(targetSlot)
+            GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_READ", "Read save data for slot=$targetSlot; applying state validation.")
             val sanitized = AntiCheatService.sanitizeCurrency(loaded)
 
             // Auto-detect system locale on fresh boot if default en-US is set
@@ -136,7 +192,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             )
 
             val deltaSeconds = if (!timeTravelDetected) (System.currentTimeMillis() - effectiveSanitized.lastSaveTimestamp) / 1000L else 0L
-            var finalState = timeCheckedState
+            var finalState = refreshDailyQuestDay(timeCheckedState)
 
             if (!timeTravelDetected && deltaSeconds > 60 && timeCheckedState.autoClickerActive) {
                 val maxOfflineSeconds = 28800L
@@ -144,8 +200,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val earningsPerSec = BigNumber(500)
                 val totalOfflineEarnings = earningsPerSec * BigNumber(effectiveSeconds.toDouble())
                 
-                finalState = timeCheckedState.copy(
-                    money = timeCheckedState.money + totalOfflineEarnings
+                finalState = finalState.copy(
+                    money = finalState.money + totalOfflineEarnings,
+                    statistics = finalState.statistics.copy(
+                        moneyEarned = finalState.statistics.moneyEarned + totalOfflineEarnings
+                    )
                 )
                 withContext(Dispatchers.Main) {
                     _offlineGains.value = totalOfflineEarnings
@@ -153,8 +212,16 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 GameLogger.log(LogLevel.INFO, LoggerCategory.AUTOCLICKER, "OFFLINE_GAINS", "Earned $totalOfflineEarnings while offline for $effectiveSeconds seconds in slot $targetSlot.")
             }
 
+            guessingBot.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+            lastIncomeMeasurement = finalState.money
+            _incomePerSecond.value = BigNumber.ZERO
+
             withContext(Dispatchers.Main) {
                 _gameState.value = finalState
+                GameLogger.configureStorage(File(getApplication<Application>().filesDir, "game_logs.txt"), finalState.settings.saveLogsToStorage)
+                GameLogger.configureVerbose(finalState.settings.verboseLogging)
+                GameLogger.log(LogLevel.DEBUG, LoggerCategory.STATE, "STATE_READY", "Loaded slot=$targetSlot with guesses=${finalState.attempts}, upgrades=${finalState.upgradeLevels.size}, activeWorld=${finalState.activeWorldId}.")
+                if (effectiveSanitized.dailyQuestDate != finalState.dailyQuestDate) saveGameAsync()
                 _isLoadingSave.value = false
                 if (timeTravelDetected) {
                     _showTimeTravelPopup.value = true
@@ -162,6 +229,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 if (isNewVersion && !timeTravelDetected) {
                     _showChangelogPopup.value = true
+                }
+            }
+            } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "LOAD_INITIALIZATION_FAILED", "Save initialization failed: ${error.message}")
+                withContext(Dispatchers.Main) {
+                    _isLoadingSave.value = false
                 }
             }
         }
@@ -173,18 +248,131 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun createSlot(slot: Int, difficultyId: String, profileName: String = "", profileIconId: String = SaveProfile.DEFAULT_ICON, onResult: (Boolean) -> Unit = {}) {
+        if (slot !in 1..MAX_SAVE_SLOTS || !Difficulty.isValid(difficultyId)) {
+            onResult(false)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = slotOperationMutex.withLock {
+                val created = saveManager.createFreshSlot(slot, difficultyId, profileName, profileIconId)
+                if (!created) {
+                    false
+                } else {
+                    val globalSettings = saveManager.loadGame(slot).settings
+                    val freshState = GameState(
+                        difficultyId = difficultyId,
+                        profileName = profileName.trim().take(24),
+                        profileIconId = if (SaveProfile.isValidIcon(profileIconId)) profileIconId else SaveProfile.DEFAULT_ICON,
+                        currentRangeMax = Difficulty.rangeMax(difficultyId, 0),
+                        targetNumber = (Difficulty.rangeMax(difficultyId, 0) / 2L).coerceAtLeast(1L),
+                        lastSaveTimestamp = System.currentTimeMillis(),
+                        settings = globalSettings,
+                        tutorialCompleted = globalSettings.tutorialCompleted
+                    )
+                    _activeSlot.value = slot
+                    _hasAnySave.value = true
+                    _gameState.value = freshState
+                    guessingBot.reset(freshState.currentRangeMin, freshState.currentRangeMax)
+                    lastIncomeMeasurement = freshState.money
+                    _incomePerSecond.value = BigNumber.ZERO
+                    WidgetRefresh.request(getApplication<Application>())
+                    true
+                }
+            }
+            withContext(Dispatchers.Main) {
+                onResult(success)
+            }
+        }
+    }
+
+    fun updateSlotProfile(slot: Int, name: String, iconId: String) {
+        if (slot !in 1..MAX_SAVE_SLOTS || !SaveProfile.isValidIcon(iconId)) return
+        viewModelScope.launch(Dispatchers.IO) {
+            slotOperationMutex.withLock {
+                val metadata = saveManager.getSlotMetadata(slot)
+                if (metadata.isEmpty) return@withLock
+                val state = saveManager.loadGame(slot)
+                val updated = state.copy(
+                    profileName = name.trim().take(24),
+                    profileIconId = iconId
+                )
+                val saved = saveManager.saveGame(updated, slot)
+                if (saved && _activeSlot.value == slot) {
+                    _gameState.value = AntiCheatService.sanitizeCurrency(updated)
+                    WidgetRefresh.request(getApplication<Application>())
+                }
+            }
+        }
+    }
+
     fun switchSlot(slot: Int) {
-        if (slot in 1..3 && slot != _activeSlot.value) {
+        if (slot in 1..MAX_SAVE_SLOTS && slot != _activeSlot.value) {
             viewModelScope.launch(Dispatchers.IO) {
-                saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
-                loadGame(slot)
+                slotOperationMutex.withLock {
+                    withContext(Dispatchers.Main) {
+                        _isLoadingSave.value = true
+                    }
+                    try {
+                        val currentSlot = _activeSlot.value
+                        val currentState = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
+                        // Do not switch away from unsaved progress. DataStore failures must
+                        // leave the current slot selected and its in-memory state untouched.
+                        if (!saveManager.saveGame(currentState, currentSlot)) {
+                            GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "SLOT_SWITCH_SAVE_FAILED", "Save slot switch cancelled because the current slot could not be saved.")
+                            return@withLock
+                        }
+                        saveManager.setActiveSlot(slot)
+                        val loaded = saveManager.loadGame(slot)
+                        val sanitized = AntiCheatService.sanitizeCurrency(loaded)
+                        withContext(Dispatchers.Main) {
+                            _activeSlot.value = slot
+                            _gameState.value = sanitized
+                            guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                            lastIncomeMeasurement = sanitized.money
+                            _incomePerSecond.value = BigNumber.ZERO
+                        }
+                        WidgetRefresh.request(getApplication<Application>())
+                    } finally {
+                        withContext(Dispatchers.Main) {
+                            _isLoadingSave.value = false
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun migrateSettingsToGlobal(onResult: (Boolean) -> Unit = {}) {
+        if (_isMigratingSettings.value) return
+        _isMigratingSettings.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = slotOperationMutex.withLock { saveManager.migrateSettingsToGlobal() }
+            if (success) {
+                val active = saveManager.getActiveSlot()
+                val loaded = saveManager.loadGame(active)
+                val sanitized = AntiCheatService.sanitizeCurrency(loaded)
+                withContext(Dispatchers.Main) {
+                    _gameState.value = sanitized
+                    updateLocaleRepo(sanitized.settings.locale)
+                    _needsSettingsMigration.value = false
+                    _isMigratingSettings.value = false
+                    onResult(true)
+                }
+            } else {
+                withContext(Dispatchers.Main) {
+                    _isMigratingSettings.value = false
+                    onResult(false)
+                }
             }
         }
     }
 
     fun migrateLegacySave() {
         viewModelScope.launch(Dispatchers.IO) {
-            val success = saveManager.migrateLegacySaveToSlot1()
+            val success = slotOperationMutex.withLock {
+                saveManager.migrateLegacySaveToSlot1()
+            }
             if (success) {
                 withContext(Dispatchers.Main) {
                     _hasLegacySave.value = false
@@ -194,45 +382,160 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun resetSlot(slot: Int) {
+    fun duplicateSlot(sourceSlot: Int, targetSlot: Int, onResult: (Boolean) -> Unit) {
+        if (sourceSlot !in 1..MAX_SAVE_SLOTS || targetSlot !in 1..MAX_SAVE_SLOTS) {
+            onResult(false)
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
-            saveManager.resetSlot(slot)
-            if (_activeSlot.value == slot) {
-                loadGame(slot)
+            val success = slotOperationMutex.withLock {
+                saveManager.duplicateSlot(sourceSlot, targetSlot)
             }
+            if (success) WidgetRefresh.request(getApplication<Application>())
+            withContext(Dispatchers.Main) { onResult(success) }
         }
     }
 
-    fun makeGuess(guess: Long) {
-        if (!AntiCheatService.validateGuessRate()) return
-        val result = gameEngine.processGuess(_gameState.value, guess)
-        _gameState.value = result.newState
-        checkAchievements(result.newState)
+    fun restoreBackup(slot: Int, onResult: (Boolean) -> Unit) {
+        if (slot !in 1..MAX_SAVE_SLOTS) {
+            onResult(false)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = slotOperationMutex.withLock {
+                val restored = saveManager.restoreBackup(slot)
+                if (restored && _activeSlot.value == slot) {
+                    val loaded = saveManager.loadGame(slot)
+                    val sanitized = AntiCheatService.sanitizeCurrency(loaded)
+                    _gameState.value = sanitized
+                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                    lastIncomeMeasurement = sanitized.money
+                    _incomePerSecond.value = BigNumber.ZERO
+                }
+                restored
+            }
+            if (success) WidgetRefresh.request(getApplication<Application>())
+            withContext(Dispatchers.Main) { onResult(success) }
+        }
+    }
+
+    fun resetSlot(slot: Int) {
+        if (slot !in 1..MAX_SAVE_SLOTS) return
+        viewModelScope.launch(Dispatchers.IO) {
+            slotOperationMutex.withLock {
+                saveManager.resetSlot(slot)
+                if (_activeSlot.value == slot) {
+                    saveManager.setActiveSlot(slot)
+                    val globalSettings = saveManager.loadGame(slot).settings
+                    val fresh = GameState(settings = globalSettings, tutorialCompleted = globalSettings.tutorialCompleted, lastSaveTimestamp = System.currentTimeMillis())
+                    saveManager.saveGame(fresh, slot)
+                    _gameState.value = fresh
+                    guessingBot.reset(fresh.currentRangeMin, fresh.currentRangeMax)
+                    lastIncomeMeasurement = fresh.money
+                    _incomePerSecond.value = BigNumber.ZERO
+                }
+            }
+            WidgetRefresh.request(getApplication<Application>())
+        }
+    }
+
+    fun makeGuess(guess: Long): Boolean {
+        val correlationId = "guess-${System.nanoTime().toString(16)}"
+        if (!AntiCheatService.validateGuessRate()) {
+            GameLogger.log(LogLevel.WARN, LoggerCategory.GUESS, "GUESS_RATE_LIMITED", "Guess input was rate-limited.", correlationId)
+            return false
+        }
+        val currentState = refreshDailyQuestDay(_gameState.value)
+        GameLogger.log(LogLevel.DEBUG, LoggerCategory.GUESS, "GUESS_BEGIN", "Processing guess within range ${currentState.currentRangeMin}..${currentState.currentRangeMax}.", correlationId)
+        val result = gameEngine.processGuess(currentState, guess)
+        guessingBot.observeGuess(guess.coerceIn(currentState.currentRangeMin, currentState.currentRangeMax), result.feedback)
+        if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
+            guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
+        }
+        val isCorrect = result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
+        val talentAdjustedState = applyTalentBonuses(currentState, result.newState, isCorrect)
+        val progressedState = recordLootDrop(
+            recordDailyGuess(currentState, talentAdjustedState, isCorrect),
+            isCorrect
+        )
+        _gameState.value = progressedState
+        val activeBossWorld = progressedState.activeBossBattleWorldId
+        if (activeBossWorld != null) {
+            worldProgressAction(activeBossWorld, if (isCorrect) "boss_hit" else "boss_miss")
+        }
+        checkAchievements(_gameState.value)
+        val finalState = _gameState.value
+        if (finalState.achievements.size > currentState.achievements.size) {
+            NotificationHelper.showProgressionNotification(getApplication<Application>())
+        }
         saveGameAsync()
-        GameLogger.log(LogLevel.INFO, LoggerCategory.GUESS, "MAKE_GUESS", "Guess $guess resulted in ${result.feedback}, reward: ${result.reward}")
+        GameLogger.log(
+            LogLevel.INFO,
+            LoggerCategory.GUESS,
+            "MAKE_GUESS",
+            "Guess $guess resulted in ${result.feedback}; reward=${result.reward}; attempts=${finalState.attempts}; streak=${finalState.streak}.",
+            correlationId
+        )
+        return true
     }
 
     private fun checkAchievements(state: GameState) {
         val newAchievements = state.achievements.toMutableSet()
         var nebulaReward = 0L
 
-        if (state.correctGuesses >= 10 && !newAchievements.contains("correct_10")) {
-            newAchievements.add("correct_10")
-            nebulaReward += 10
-        }
-        if (state.bestStreak >= 5 && !newAchievements.contains("streak_5")) {
-            newAchievements.add("streak_5")
-            nebulaReward += 25
-        }
-        if (state.money >= BigNumber(1_000_000) && !newAchievements.contains("millionaire")) {
-            newAchievements.add("millionaire")
-            nebulaReward += 50
+        val milestones = listOf(
+            "correct_10" to (state.correctGuesses >= 10),
+            "correct_50" to (state.correctGuesses >= 50),
+            "correct_100" to (state.correctGuesses >= 100),
+            "correct_500" to (state.correctGuesses >= 500),
+            "streak_5" to (state.bestStreak >= 5),
+            "streak_10" to (state.bestStreak >= 10),
+            "streak_25" to (state.bestStreak >= 25),
+            "streak_50" to (state.bestStreak >= 50),
+            "millionaire" to (state.money >= BigNumber(1_000_000)),
+            "ten_millionaire" to (state.money >= BigNumber(10_000_000)),
+            "hundred_millionaire" to (state.money >= BigNumber(100_000_000)),
+            "billionaire" to (state.money >= BigNumber(1_000_000_000)),
+            "prestige_1" to (state.prestigeCount >= 1),
+            "prestige_5" to (state.prestigeCount >= 5),
+            "prestige_10" to (state.prestigeCount >= 10),
+            "prestige_25" to (state.prestigeCount >= 25),
+            "ultra_1" to (state.ultraCount >= 1),
+            "ultra_3" to (state.ultraCount >= 3),
+            "ultra_10" to (state.ultraCount >= 10),
+            "ultra_25" to (state.ultraCount >= 25),
+            "playtime_1h" to (state.statistics.playtimeSeconds >= 3_600),
+            "playtime_10h" to (state.statistics.playtimeSeconds >= 36_000),
+            "playtime_50h" to (state.statistics.playtimeSeconds >= 180_000),
+            "frenzy_5" to (state.bestStreak >= 5),
+            "frenzy_10" to (state.bestStreak >= 10),
+            "frenzy_25" to (state.bestStreak >= 25),
+            "frenzy_50" to (state.bestStreak >= 50)
+        )
+
+        val achievementRewards = mapOf(
+            "correct_10" to 10L, "correct_50" to 20L, "correct_100" to 40L, "correct_500" to 100L,
+            "streak_5" to 25L, "streak_10" to 50L, "streak_25" to 100L, "streak_50" to 250L,
+            "millionaire" to 50L, "ten_millionaire" to 100L, "hundred_millionaire" to 200L, "billionaire" to 500L,
+            "prestige_1" to 25L, "prestige_5" to 75L, "prestige_10" to 150L, "prestige_25" to 300L,
+            "ultra_1" to 100L, "ultra_3" to 250L, "ultra_10" to 500L, "ultra_25" to 1000L,
+            "playtime_1h" to 25L, "playtime_10h" to 100L, "playtime_50h" to 300L,
+            "frenzy_5" to 30L, "frenzy_10" to 75L, "frenzy_25" to 150L, "frenzy_50" to 350L
+        )
+
+        for ((id, unlocked) in milestones) {
+            if (unlocked && newAchievements.add(id)) {
+                nebulaReward += achievementRewards[id] ?: 0L
+            }
         }
 
         if (newAchievements.size > state.achievements.size) {
             _gameState.value = state.copy(
                 achievements = newAchievements,
-                nebula = state.nebula + BigNumber(nebulaReward)
+                nebula = state.nebula + BigNumber(nebulaReward),
+                statistics = state.statistics.copy(
+                    nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+                )
             )
         }
     }
@@ -243,7 +546,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun buyUpgrade(upgradeId: String, cost: BigNumber) {
-        val state = _gameState.value
+        val state = refreshDailyQuestDay(_gameState.value)
         if (state.money >= cost) {
             val currentLevel = state.upgradeLevels[upgradeId] ?: 0
             val upgradeDef = JsonConfigRepository(getApplication()).loadUpgrades().find { it.id == upgradeId }
@@ -276,7 +579,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             newLevels[upgradeId] = newLevel
             val newMoney = state.money - cost
             val newStats = state.statistics.copy(moneySpent = state.statistics.moneySpent + cost)
-            _gameState.value = state.copy(money = newMoney, upgradeLevels = newLevels, statistics = newStats)
+            _gameState.value = state.copy(money = newMoney, upgradeLevels = newLevels, statistics = newStats, dailyQuestUpgradePurchases = state.dailyQuestUpgradePurchases + 1)
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_UPGRADE", "Bought upgrade $upgradeId to level $newLevel")
         }
@@ -294,10 +597,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 prestige = newPrestige,
                 upgradeLevels = emptyMap(),
                 currentRangeMin = 1,
-                currentRangeMax = 100,
+                currentRangeMax = Difficulty.rangeMax(state.difficultyId, 0),
                 statistics = newStats,
                 prestigeCount = state.prestigeCount + 1
             )
+            guessingBot.reset(_gameState.value.currentRangeMin, _gameState.value.currentRangeMax)
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.PRESTIGE, "PRESTIGE_RESET", "Prestige reset performed (#${state.prestigeCount + 1}), awarded $reward Prestige.")
         }
@@ -320,6 +624,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 statistics = newStats,
                 ultraCount = state.ultraCount + 1
             )
+            guessingBot.reset(_gameState.value.currentRangeMin, _gameState.value.currentRangeMax)
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.ULTRA, "ULTRA_RESET", "Ultra reset performed (#${state.ultraCount + 1}), awarded $reward Ultra.")
         }
@@ -332,36 +637,179 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             val newPurchases = state.shopPurchases + itemId
             val newNebula = state.nebula - cost
             val autoActive = if (itemId == "auto_clicker_basic") true else state.autoClickerActive
-            _gameState.value = state.copy(nebula = newNebula, shopPurchases = newPurchases, autoClickerActive = autoActive)
+            val cosmetic = if (itemId.startsWith("cosmetic_")) itemId else state.equippedCosmeticId
+            _gameState.value = state.copy(
+                nebula = newNebula,
+                shopPurchases = newPurchases,
+                equippedCosmeticId = cosmetic,
+                autoClickerActive = autoActive
+            )
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.SHOP, "BUY_SHOP", "Purchased shop item $itemId")
         }
     }
 
+    fun equipCosmetic(itemId: String) {
+        val state = _gameState.value
+        if (!itemId.startsWith("cosmetic_") || itemId !in state.shopPurchases) return
+        _gameState.value = state.copy(equippedCosmeticId = itemId)
+        saveGameAsync()
+    }
+
+    fun setMutatorActive(mutatorId: String, active: Boolean) {
+        val state = _gameState.value
+        val valid = setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")
+        if (mutatorId !in valid) return
+        val next = state.activeMutators.toMutableSet().apply {
+            if (active) add(mutatorId) else remove(mutatorId)
+        }.toSet()
+        val rangeMax = gameEngine.getRangeMax(state.copy(activeMutators = next))
+        val target = if (rangeMax >= 1L) kotlin.random.Random.nextLong(1L, rangeMax + 1L) else 1L
+        val updated = state.copy(
+            activeMutators = next,
+            currentRangeMax = rangeMax,
+            targetNumber = target
+        )
+        _gameState.value = updated
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.SHOP, "MUTATOR_TOGGLE", "Mutator $mutatorId active=$active")
+    }
+
+    fun activateChallengeBuilder(mutators: Set<String>) {
+        val state = _gameState.value
+        val valid = setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")
+        val selected = mutators.intersect(valid)
+        val next = state.copy(activeMutators = selected)
+        val rangeMax = gameEngine.getRangeMax(next)
+        _gameState.value = next.copy(
+            currentRangeMax = rangeMax,
+            targetNumber = kotlin.random.Random.nextLong(1L, rangeMax + 1L)
+        )
+        saveGameAsync()
+    }
+
+    private fun bulkUpgradeCount(upgrade: com.jarrlyyy.guessthenumber.domain.model.UpgradeDef, currentLevel: Int, currency: BigNumber): Int {
+        if (currentLevel >= upgrade.maxLevel) return 0
+        val requestedCount = when (_gameState.value.buyMultiplier) {
+            "10" -> 10
+            "100" -> 100
+            "MAX" -> upgrade.maxLevel - currentLevel
+            else -> 1
+        }.coerceAtMost(upgrade.maxLevel - currentLevel)
+
+        // Return the largest affordable prefix for every bulk mode. This lets
+        // 10/100/MAX buy the levels the player can afford instead of failing
+        // the entire purchase when the full requested batch costs too much.
+        var count = 0
+        var totalCost = BigNumber.ZERO
+        val base = BigNumber(upgrade.baseCost)
+        val mult = BigNumber(upgrade.costMultiplier)
+        while (count < requestedCount) {
+            val nextCost = base * mult.pow(currentLevel + count)
+            if (currency < totalCost + nextCost) break
+            totalCost += nextCost
+            count++
+        }
+        return count
+    }
+
     fun buyPrestigeUpgrade(upgradeId: String, cost: BigNumber) {
         val state = _gameState.value
-        if (state.prestige >= cost) {
-            val currentLevel = state.prestigeUpgradeLevels[upgradeId] ?: 0
-            val newLevels = state.prestigeUpgradeLevels.toMutableMap()
-            newLevels[upgradeId] = currentLevel + 1
-            val newPrestige = state.prestige - cost
-            _gameState.value = state.copy(prestige = newPrestige, prestigeUpgradeLevels = newLevels)
-            saveGameAsync()
-            GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_PRESTIGE_UPGRADE", "Bought prestige upgrade $upgradeId to level ${currentLevel + 1}")
+        val upgrade = JsonConfigRepository(getApplication()).loadPrestigeUpgrades().find { it.id == upgradeId } ?: return
+        val currentLevel = state.prestigeUpgradeLevels[upgradeId] ?: 0
+        val count = bulkUpgradeCount(upgrade, currentLevel, state.prestige)
+        if (count <= 0) return
+
+        // Bulk purchases must charge every level bought, not just the single-level
+        // price passed by the UI. Otherwise 10/MAX purchases grant free levels.
+        val actualCost = (0 until count).fold(BigNumber.ZERO) { total, offset ->
+            total + BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(currentLevel + offset)
         }
+        if (state.prestige < actualCost) return
+        val newLevel = minOf(upgrade.maxLevel, currentLevel + count)
+        val newLevels = state.prestigeUpgradeLevels.toMutableMap()
+        newLevels[upgradeId] = newLevel
+        val newPrestige = state.prestige - actualCost
+        _gameState.value = state.copy(prestige = newPrestige, prestigeUpgradeLevels = newLevels)
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_PRESTIGE_UPGRADE", "Bought prestige upgrade $upgradeId to level $newLevel")
     }
 
     fun buyUltraUpgrade(upgradeId: String, cost: BigNumber) {
         val state = _gameState.value
-        if (state.ultra >= cost) {
-            val currentLevel = state.ultraUpgradeLevels[upgradeId] ?: 0
-            val newLevels = state.ultraUpgradeLevels.toMutableMap()
-            newLevels[upgradeId] = currentLevel + 1
-            val newUltra = state.ultra - cost
-            _gameState.value = state.copy(ultra = newUltra, ultraUpgradeLevels = newLevels)
-            saveGameAsync()
-            GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_ULTRA_UPGRADE", "Bought ultra upgrade $upgradeId to level ${currentLevel + 1}")
+        val upgrade = JsonConfigRepository(getApplication()).loadUltraUpgrades().find { it.id == upgradeId } ?: return
+        val currentLevel = state.ultraUpgradeLevels[upgradeId] ?: 0
+        val count = bulkUpgradeCount(upgrade, currentLevel, state.ultra)
+        if (count <= 0) return
+
+        // Keep Ultra bulk purchases economically consistent with Prestige.
+        val actualCost = (0 until count).fold(BigNumber.ZERO) { total, offset ->
+            total + BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(currentLevel + offset)
         }
+        if (state.ultra < actualCost) return
+        val newLevel = minOf(upgrade.maxLevel, currentLevel + count)
+        val newLevels = state.ultraUpgradeLevels.toMutableMap()
+        newLevels[upgradeId] = newLevel
+        val newUltra = state.ultra - actualCost
+        _gameState.value = state.copy(ultra = newUltra, ultraUpgradeLevels = newLevels)
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_ULTRA_UPGRADE", "Bought ultra upgrade $upgradeId to level $newLevel")
+    }
+
+    fun buyTalent(talentId: String, cost: Long) {
+        val state = _gameState.value
+        val parents = mapOf("talent_speed_2" to "talent_speed_1", "talent_crit_2" to "talent_crit_1", "talent_reward_1" to "talent_crit_2", "talent_master_1" to "talent_reward_1")
+        if (talentId in state.prestigeShopPurchases || state.prestige < BigNumber(cost)) return
+        val parent = parents[talentId]
+        if (parent != null && parent !in state.prestigeShopPurchases) return
+        _gameState.value = state.copy(prestige = state.prestige - BigNumber(cost), prestigeShopPurchases = state.prestigeShopPurchases + talentId)
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_TALENT", "Unlocked talent $talentId")
+    }
+
+    private fun applyTalentBonuses(before: GameState, after: GameState, correct: Boolean): GameState {
+        if (!correct) return after
+        val earned = after.money - before.money
+        val eligibleEarnings = if (earned > BigNumber.ZERO) earned else BigNumber.ZERO
+        var bonusMoney = BigNumber.ZERO
+        if ("talent_reward_1" in before.prestigeShopPurchases) bonusMoney += eligibleEarnings * BigNumber(0.5)
+        val eventBoostLevel = before.permanentEventBoosts.coerceIn(0, 25)
+        if (eventBoostLevel > 0) bonusMoney += eligibleEarnings * BigNumber(eventBoostLevel * 0.02)
+        val masteryLevel = (before.worldMasteryLevels[before.activeWorldId] ?: 0).coerceIn(0, 10)
+        if (masteryLevel > 0) bonusMoney += eligibleEarnings * BigNumber(masteryLevel * 0.02)
+        val criticalChance = when { "talent_crit_2" in before.prestigeShopPurchases -> 0.15; "talent_crit_1" in before.prestigeShopPurchases -> 0.05; else -> 0.0 }
+        if (criticalChance > 0.0 && Random.nextDouble() < criticalChance) bonusMoney += eligibleEarnings
+        if ("verdant_guardian" in before.equippedRelicIds) bonusMoney += eligibleEarnings * BigNumber(0.10)
+        if ("crystal_golem" in before.equippedRelicIds && Random.nextDouble() < 0.10) bonusMoney += eligibleEarnings * BigNumber(0.5)
+        if ("ember_dragon" in before.equippedRelicIds) bonusMoney += eligibleEarnings * BigNumber(0.25)
+        if ("nebula_titan" in before.equippedRelicIds) bonusMoney += eligibleEarnings * BigNumber(0.25)
+
+        // Relic set bonuses now scale across the full four-world relic collection.
+        val equippedBossRelics = before.equippedRelicIds.intersect(
+            setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        )
+        val relicSetBonus = when (equippedBossRelics.size) {
+            2 -> 0.10
+            3 -> 0.20
+            4 -> 0.35
+            else -> 0.0
+        }
+        if (relicSetBonus > 0.0) bonusMoney += eligibleEarnings * BigNumber(relicSetBonus)
+        if (before.homeBaseLevel > 0) bonusMoney += eligibleEarnings * BigNumber((before.homeBaseLevel * 0.02).coerceAtMost(0.40))
+        val secretForActiveWorld = mapOf(
+            "verdant_grove" to "whispering_hollow",
+            "crystal_caverns" to "shard_archive",
+            "ember_summit" to "ashen_vault",
+            "nebula_rift" to "lost_observatory"
+        )[before.activeWorldId]
+        if (secretForActiveWorld != null && secretForActiveWorld in before.discoveredSecretIds) bonusMoney += eligibleEarnings * BigNumber(0.05)
+        val bonusNebula = (if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L) +
+            (eventBoostLevel / 5).toLong() +
+            (if ("ember_dragon" in before.equippedRelicIds) 1L else 0L) +
+            (if (equippedBossRelics.size == 4) 1L else 0L) +
+            (if (before.discoveredSecretIds.size >= 4) 1L else 0L) +
+            (if (before.activeWorldId == "ember_summit" && "ashen_vault" in before.discoveredSecretIds) 1L else 0L)
+        return after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(bonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + bonusNebula))
     }
 
     fun buyPrestigeShopItem(itemId: String, cost: Long) {
@@ -399,60 +847,165 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun importSave(json: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val success = saveManager.importSave(json, _activeSlot.value)
+            val success = slotOperationMutex.withLock {
+                saveManager.importSave(json, _activeSlot.value)
+            }
             if (success) {
                 val loaded = saveManager.loadGame(_activeSlot.value)
                 val sanitized = AntiCheatService.sanitizeCurrency(loaded)
                 withContext(Dispatchers.Main) {
                     _gameState.value = sanitized
+                    _hasAnySave.value = true
+                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                    lastIncomeMeasurement = sanitized.money
+                    _incomePerSecond.value = BigNumber.ZERO
                     onResult(true)
                 }
             } else {
-                withContext(Dispatchers.Main) {
-                    onResult(false)
-                }
+                withContext(Dispatchers.Main) { onResult(false) }
             }
         }
     }
 
     fun resetData() {
         viewModelScope.launch(Dispatchers.IO) {
-            saveManager.resetData()
-            loadGame(1)
-            withContext(Dispatchers.Main) {
-                backgroundMusicManager.stop()
+            slotOperationMutex.withLock {
+                saveManager.resetData()
+                val fresh = GameState()
+                saveManager.setActiveSlot(1)
+                saveManager.saveGame(fresh, 1)
+                _activeSlot.value = 1
+                _gameState.value = fresh
+                guessingBot.reset(fresh.currentRangeMin, fresh.currentRangeMax)
+                lastIncomeMeasurement = fresh.money
+                _incomePerSecond.value = BigNumber.ZERO
             }
+            WidgetRefresh.request(getApplication<Application>())
+            withContext(Dispatchers.Main) { backgroundMusicManager.stop() }
         }
     }
 
+    private fun cancelDisabledNotifications(settings: GameSettings) {
+        val context = getApplication<Application>()
+        if (!settings.notificationsEnabled) {
+            NotificationHelper.Type.values().forEach { NotificationHelper.cancel(context, it) }
+            return
+        }
+        if (!settings.notificationRemindersEnabled) NotificationHelper.cancel(context, NotificationHelper.Type.REMINDER)
+        if (!settings.notificationProgressionEnabled) NotificationHelper.cancel(context, NotificationHelper.Type.PROGRESSION)
+        if (!settings.notificationEventsEnabled) NotificationHelper.cancel(context, NotificationHelper.Type.EVENT)
+    }
+
     fun updateSettings(newSettings: GameSettings) {
-        val oldEnabled = _gameState.value.settings.notificationsEnabled
-        if (newSettings.locale != _gameState.value.settings.locale) {
+        val oldSettings = _gameState.value.settings
+        if (newSettings.locale != oldSettings.locale) {
             updateLocaleRepo(newSettings.locale)
         }
         _gameState.update { it.copy(settings = newSettings) }
+        viewModelScope.launch(Dispatchers.IO) { saveManager.saveAppPreferences(newSettings) }
         GameLogger.configureStorage(File(getApplication<Application>().filesDir, "game_logs.txt"), newSettings.saveLogsToStorage)
+        GameLogger.configureVerbose(newSettings.verboseLogging)
+        GameLogger.log(LogLevel.INFO, LoggerCategory.STATE, "LOGGING_SETTINGS_CHANGED", "Verbose logging ${if (newSettings.verboseLogging) "enabled" else "disabled"}; file logging ${if (newSettings.saveLogsToStorage) "enabled" else "disabled"}.")
         saveGameAsync()
 
         val context = getApplication<Application>()
-        if (newSettings.notificationsEnabled && !oldEnabled) {
+        cancelDisabledNotifications(newSettings)
+        val workManager = WorkManager.getInstance(context)
+        if (!newSettings.notificationsEnabled || !newSettings.notificationRemindersEnabled) {
+            workManager.cancelUniqueWork(GameReminderWorker.WORK_NAME)
+        } else if (
+            !oldSettings.notificationsEnabled ||
+            !oldSettings.notificationRemindersEnabled ||
+            newSettings.notificationIntervalHours != oldSettings.notificationIntervalHours
+        ) {
+            val intervalHours = newSettings.notificationIntervalHours.coerceIn(12L, 48L)
             val workRequest = PeriodicWorkRequestBuilder<GameReminderWorker>(
-                24, TimeUnit.HOURS
+                intervalHours, TimeUnit.HOURS
             ).build()
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            workManager.enqueueUniquePeriodicWork(
                 GameReminderWorker.WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 workRequest
             )
-        } else if (!newSettings.notificationsEnabled && oldEnabled) {
-            WorkManager.getInstance(context).cancelUniqueWork(GameReminderWorker.WORK_NAME)
         }
 
         GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "UPDATE_SETTINGS", "Updated game settings.")
     }
 
+    fun getAppPreferencesJson(onResult: (String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val raw = saveManager.getAppPreferencesJson()
+            withContext(Dispatchers.Main) { onResult(raw) }
+        }
+    }
+
+    fun applyAppPreferencesJson(raw: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = slotOperationMutex.withLock { saveManager.applyAppPreferencesJson(raw) }
+            if (success) {
+                val loaded = saveManager.loadGame(_activeSlot.value)
+                val settings = loaded.settings
+                val context = getApplication<Application>()
+                cancelDisabledNotifications(settings)
+                val workManager = WorkManager.getInstance(context)
+                if (!settings.notificationsEnabled || !settings.notificationRemindersEnabled) {
+                    workManager.cancelUniqueWork(GameReminderWorker.WORK_NAME)
+                } else {
+                    val intervalHours = settings.notificationIntervalHours.coerceIn(12L, 48L)
+                    val workRequest = PeriodicWorkRequestBuilder<GameReminderWorker>(
+                        intervalHours, TimeUnit.HOURS
+                    ).build()
+                    workManager.enqueueUniquePeriodicWork(
+                        GameReminderWorker.WORK_NAME,
+                        ExistingPeriodicWorkPolicy.UPDATE,
+                        workRequest
+                    )
+                }
+                WidgetRefresh.request(context)
+                withContext(Dispatchers.Main) {
+                    _gameState.value = AntiCheatService.sanitizeCurrency(loaded)
+                    updateLocaleRepo(_gameState.value.settings.locale)
+                    onResult(true)
+                }
+            } else withContext(Dispatchers.Main) { onResult(false) }
+        }
+    }
+
+    fun getSaveJson(slot: Int, onResult: (String?) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val raw = saveManager.getSaveJson(slot)
+            withContext(Dispatchers.Main) { onResult(raw) }
+        }
+    }
+
+    fun applySaveJson(slot: Int, raw: String, onResult: (Boolean) -> Unit) {
+        if (slot !in 1..MAX_SAVE_SLOTS) {
+            onResult(false)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = slotOperationMutex.withLock {
+                val applied = saveManager.applySaveJson(slot, raw)
+                if (applied && _activeSlot.value == slot) {
+                    val loaded = AntiCheatService.sanitizeCurrency(saveManager.loadGame(slot))
+                    withContext(Dispatchers.Main) {
+                        _gameState.value = loaded
+                        guessingBot.reset(loaded.currentRangeMin, loaded.currentRangeMax)
+                        lastIncomeMeasurement = loaded.money
+                        _incomePerSecond.value = BigNumber.ZERO
+                    }
+                }
+                applied
+            }
+            if (success) WidgetRefresh.request(getApplication<Application>())
+            withContext(Dispatchers.Main) { onResult(success) }
+        }
+    }
+
     fun updateBackgroundMusicPath(path: String?) {
-        _gameState.update { it.copy(settings = it.settings.copy(backgroundMusicPath = path)) }
+        val updatedSettings = _gameState.value.settings.copy(backgroundMusicPath = path)
+        _gameState.update { it.copy(settings = updatedSettings) }
+        viewModelScope.launch(Dispatchers.IO) { saveManager.saveAppPreferences(updatedSettings) }
         saveGameAsync()
         backgroundMusicManager.setSourceAndPlay(path)
         GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "BG_MUSIC", "Updated background music path: $path")
@@ -487,20 +1040,457 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun dismissCrash() {
         AppErrorHandler.clearCrashMarker()
         _hasPreviousCrash.value = false
+
+        // Only begin save loading and background game work after crash recovery is dismissed.
+        loadGame()
+        startAutoSave()
+        startPlaytimeTimer()
+        startRandomEvents()
+        startAutoClicker()
     }
+
+    fun claimChallenge(challengeId: String, rewardNebula: Long) {
+        val (updated, claimed) = gameEngine.claimChallenge(_gameState.value, challengeId, rewardNebula)
+        if (claimed) {
+            _gameState.value = updated
+            saveGameAsync()
+        }
+    }
+
+    private fun recordLootDrop(state: GameState, correct: Boolean): GameState {
+        if (!correct) return state
+        val roll = Random.nextInt(1000)
+        val tier = when {
+            roll < 10 -> "epic"
+            roll < 60 -> "rare"
+            roll < 240 -> "common"
+            else -> null
+        } ?: return state
+        return when (tier) {
+            "epic" -> state.copy(lootEpicChests = state.lootEpicChests + 1, lootDropsFound = state.lootDropsFound + 1, lastLootDropTier = tier, lootEventId = state.lootEventId + 1)
+            "rare" -> state.copy(lootRareChests = state.lootRareChests + 1, lootDropsFound = state.lootDropsFound + 1, lastLootDropTier = tier, lootEventId = state.lootEventId + 1)
+            else -> state.copy(lootCommonChests = state.lootCommonChests + 1, lootDropsFound = state.lootDropsFound + 1, lastLootDropTier = tier, lootEventId = state.lootEventId + 1)
+        }
+    }
+
+    private fun progressionRewardBonus(state: GameState, baseMoney: BigNumber): Pair<BigNumber, Long> {
+        val relicCount = state.equippedRelicIds.intersect(
+            setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        ).size
+        val setRate = when (relicCount) {
+            2 -> 0.10
+            3 -> 0.20
+            4 -> 0.35
+            else -> 0.0
+        }
+        val masteryRate = ((state.worldMasteryLevels[state.activeWorldId] ?: 0).coerceIn(0, 10) * 0.02)
+        // Keep Home Base and permanent event bonuses consistent across guess and boss/Rift rewards.
+        val sanctuaryRate = (state.homeBaseLevel.coerceAtLeast(0) * 0.02).coerceAtMost(0.40)
+        val eventRate = (state.permanentEventBoosts.coerceIn(0, 25) * 0.02)
+        val secretId = mapOf(
+            "verdant_grove" to "whispering_hollow",
+            "crystal_caverns" to "shard_archive",
+            "ember_summit" to "ashen_vault",
+            "nebula_rift" to "lost_observatory"
+        )[state.activeWorldId]
+        val secretRate = if (secretId != null && secretId in state.discoveredSecretIds) 0.05 else 0.0
+        val bonusMoney = baseMoney * BigNumber(setRate + masteryRate + sanctuaryRate + secretRate + eventRate)
+        val bonusNebula = (if (relicCount == 4) 10L else 0L) +
+            (if ((state.worldMasteryLevels[state.activeWorldId] ?: 0) >= 5) 5L else 0L) +
+            (if (secretId != null && secretId in state.discoveredSecretIds) 5L else 0L)
+        return bonusMoney to bonusNebula
+    }
+
+    fun worldProgressAction(worldId: String, action: String) {
+        val state = _gameState.value
+        val totalUpgradeLevels = state.upgradeLevels.values.sum()
+        val worldDefinitions = WorldConfigRepository(getApplication<Application>()).loadWorlds()
+        val world = worldDefinitions.firstOrNull { it.id == worldId } ?: return
+        val bossId = world.bossId
+        if (action == "unlock") {
+            if (worldId in state.unlockedWorldIds) return
+            val canUnlock = world.unlockBossId?.let { requiredBossId ->
+                requiredBossId in state.defeatedBossIds &&
+                    state.correctGuesses >= world.unlockCorrectGuesses &&
+                    totalUpgradeLevels >= world.unlockUpgradeCount &&
+                    state.prestigeCount >= world.unlockPrestigeCount &&
+                    state.ultraCount >= world.unlockUltraCount
+            } ?: true
+            if (canUnlock) {
+                _gameState.value = state.copy(unlockedWorldIds = state.unlockedWorldIds + worldId, activeWorldId = worldId)
+                saveGameAsync()
+                NotificationHelper.showProgressionNotification(getApplication<Application>())
+                GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_UNLOCKED", "Unlocked world $worldId")
+            }
+            return
+        }
+        if (action == "boss") {
+            if (worldId !in state.unlockedWorldIds || (bossId in state.defeatedBossIds && !state.endlessRiftActive)) return
+            if (state.activeBossBattleWorldId == worldId) { _gameState.value = state.copy(activeBossBattleWorldId = null); saveGameAsync(); return }
+            val canFight = state.endlessRiftActive || (
+                state.correctGuesses >= world.fightCorrectGuesses &&
+                    totalUpgradeLevels >= world.fightUpgradeCount &&
+                    state.prestigeCount >= world.fightPrestigeCount &&
+                    state.ultraCount >= world.fightUltraCount
+            )
+            if (canFight) { _gameState.value = state.copy(activeWorldId = worldId, activeBossBattleWorldId = worldId); saveGameAsync(); GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "BOSS_BATTLE_STARTED", "Started boss battle $bossId") }
+            return
+        }
+        if (state.activeBossBattleWorldId != worldId || worldId !in state.unlockedWorldIds || (bossId in state.defeatedBossIds && !state.endlessRiftActive)) return
+        val baseBossHp = world.hp
+        val bossHp = baseBossHp + if (state.endlessRiftActive) ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
+        val damage = state.bossBattleProgress[bossId] ?: 0
+        if (action == "boss_miss") {
+            val misses = (state.bossBattleMistakes[bossId] ?: 0) + 1
+            val phase = ((damage * 3) / bossHp + 1).coerceIn(1, 3)
+            val missInterval = when (phase) { 1 -> 4; 2 -> 3; else -> 2 }
+            val regressedDamage = if (misses % missInterval == 0) (damage - 1).coerceAtLeast(0) else damage
+            _gameState.value = state.copy(bossBattleMistakes = state.bossBattleMistakes + (bossId to misses), bossBattleProgress = state.bossBattleProgress + (bossId to regressedDamage))
+            saveGameAsync()
+            return
+        }
+        if (action != "boss_hit") return
+        val nextDamage = (state.bossBattleProgress[bossId] ?: 0) + 1
+        if (nextDamage < bossHp) {
+            val oldPhase = ((damage * 3) / bossHp + 1).coerceIn(1, 3)
+            val newPhase = ((nextDamage * 3) / bossHp + 1).coerceIn(1, 3)
+            val mistakes = if (newPhase != oldPhase) 0 else (state.bossBattleMistakes[bossId] ?: 0)
+            _gameState.value = state.copy(bossBattleProgress = state.bossBattleProgress + (bossId to nextDamage), bossBattleMistakes = state.bossBattleMistakes + (bossId to mistakes))
+            saveGameAsync()
+            GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_HIT", "Hit boss $bossId: $nextDamage/$bossHp")
+            return
+        }
+        val baseMoneyReward = BigNumber(world.baseMoneyReward)
+        val baseNebulaReward = world.baseNebulaReward
+        if (state.endlessRiftActive) {
+            val tierMultiplier = state.endlessRiftTier.coerceAtLeast(1)
+            val (baseBonusMoney, baseBonusNebula) = progressionRewardBonus(state, baseMoneyReward)
+            val moneyReward = (baseMoneyReward + baseBonusMoney) * BigNumber(tierMultiplier)
+            val nebulaReward = (baseNebulaReward + baseBonusNebula) * tierMultiplier.toLong()
+            val nextWorldDefinition = worldDefinitions[
+                (worldDefinitions.indexOf(world).coerceAtLeast(0) + 1) % worldDefinitions.size
+            ]
+            val nextWorld = nextWorldDefinition.id
+            val nextBoss = nextWorldDefinition.bossId
+            val nextTier = state.endlessRiftTier + 1
+            _gameState.value = state.copy(
+                money = state.money + moneyReward,
+                nebula = state.nebula + BigNumber(nebulaReward),
+                worldBossVictories = state.worldBossVictories + 1,
+                bossBattleProgress = state.bossBattleProgress + (bossId to bossHp) + (nextBoss to 0),
+                bossBattleMistakes = state.bossBattleMistakes + (nextBoss to 0),
+                activeWorldId = nextWorld,
+                activeBossBattleWorldId = nextWorld,
+                endlessRiftTier = nextTier,
+                endlessRiftBestTier = maxOf(state.endlessRiftBestTier, state.endlessRiftTier),
+                statistics = state.statistics.copy(moneyEarned = state.statistics.moneyEarned + moneyReward, nebulaEarned = state.statistics.nebulaEarned + nebulaReward)
+            )
+            saveGameAsync()
+            if (state.endlessRiftTier % 5 == 0) {
+                NotificationHelper.showProgressionNotification(getApplication<Application>())
+            }
+            GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "ENDLESS_RIFT_CLEARED", "Cleared Rift tier ${state.endlessRiftTier}")
+            return
+        }
+        val (bonusMoney, bonusNebula) = progressionRewardBonus(state, baseMoneyReward)
+        val finalMoneyReward = baseMoneyReward + bonusMoney
+        val finalNebulaReward = baseNebulaReward + bonusNebula
+        _gameState.value = state.copy(
+            money = state.money + finalMoneyReward,
+            nebula = state.nebula + BigNumber(finalNebulaReward),
+            defeatedBossIds = state.defeatedBossIds + bossId,
+            worldBossVictories = state.worldBossVictories + 1,
+            bossBattleProgress = state.bossBattleProgress + (bossId to bossHp),
+            activeBossBattleWorldId = null,
+            relicInventory = state.relicInventory + bossId,
+            codexEntries = state.codexEntries + setOf("world:$worldId", "boss:$bossId"),
+            worldMasteryLevels = state.worldMasteryLevels + (worldId to ((state.worldMasteryLevels[worldId] ?: 0) + 1)),
+            statistics = state.statistics.copy(
+                moneyEarned = state.statistics.moneyEarned + finalMoneyReward,
+                nebulaEarned = state.statistics.nebulaEarned + finalNebulaReward
+            )
+        )
+        saveGameAsync()
+        NotificationHelper.showProgressionNotification(getApplication<Application>())
+        GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "WORLD_BOSS_DEFEATED", "Defeated boss $bossId")
+    }
+
+    /** Handles persistent v2 progression actions. Defaults in GameState preserve older saves. */
+    fun progressionAction(action: String, id: String) {
+        val state = _gameState.value
+        val updated = when (action) {
+            "rift_start" -> {
+                val requiredBosses = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+                if (state.endlessRiftActive || !state.defeatedBossIds.containsAll(requiredBosses)) return
+                val tier = maxOf(1, state.endlessRiftBestTier + 1)
+                state.copy(
+                    endlessRiftActive = true,
+                    endlessRiftTier = tier,
+                    activeWorldId = "verdant_grove",
+                    activeBossBattleWorldId = "verdant_grove",
+                    bossBattleProgress = state.bossBattleProgress + ("verdant_guardian" to 0),
+                    bossBattleMistakes = state.bossBattleMistakes + ("verdant_guardian" to 0)
+                )
+            }
+            "rift_stop" -> {
+                if (!state.endlessRiftActive) return
+                state.copy(endlessRiftActive = false, activeBossBattleWorldId = null)
+            }
+            "select_world" -> {
+                if (id !in state.unlockedWorldIds) return
+                if (state.endlessRiftActive && id != state.activeWorldId) return
+                state.copy(activeWorldId = id, activeBossBattleWorldId = if (state.activeBossBattleWorldId == id) id else null)
+            }
+            "secret" -> {
+                val secretWorld = mapOf("whispering_hollow" to "verdant_grove", "shard_archive" to "crystal_caverns", "ashen_vault" to "ember_summit", "lost_observatory" to "nebula_rift")[id] ?: return
+                val threshold = mapOf("whispering_hollow" to 50L, "shard_archive" to 150L, "ashen_vault" to 300L, "lost_observatory" to 600L)[id] ?: return
+                if (id in state.discoveredSecretIds || secretWorld !in state.unlockedWorldIds || state.correctGuesses < threshold) return
+                val moneyReward = mapOf(
+                    "whispering_hollow" to BigNumber(10_000),
+                    "shard_archive" to BigNumber(50_000),
+                    "ashen_vault" to BigNumber(250_000),
+                    "lost_observatory" to BigNumber(1_000_000)
+                )[id] ?: BigNumber.ZERO
+                val nebulaReward = mapOf("whispering_hollow" to 5L, "shard_archive" to 15L, "ashen_vault" to 50L, "lost_observatory" to 150L)[id] ?: 0L
+                state.copy(
+                    money = state.money + moneyReward,
+                    nebula = state.nebula + BigNumber(nebulaReward),
+                    discoveredSecretIds = state.discoveredSecretIds + id,
+                    codexEntries = state.codexEntries + "secret:$id",
+                    statistics = state.statistics.copy(
+                        moneyEarned = state.statistics.moneyEarned + moneyReward,
+                        nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+                    )
+                )
+            }
+            "equip_relic" -> {
+                if (id !in state.relicInventory) return
+                val equipped = if (id in state.equippedRelicIds) state.equippedRelicIds - id else (state.equippedRelicIds + id).toList().takeLast(4).toSet()
+                state.copy(equippedRelicIds = equipped)
+            }
+            "home_upgrade" -> {
+                val cost = BigNumber(50_000L * (state.homeBaseLevel + 1L))
+                if (state.money < cost || state.homeBaseLevel >= 20) return
+                val nextLevel = state.homeBaseLevel + 1
+                val milestoneNebula = if (nextLevel % 5 == 0) (nextLevel / 5L) * 25L else 0L
+                val milestoneEntries = if (nextLevel in setOf(5, 10, 15, 20)) state.codexEntries + "sanctuary:$nextLevel" else state.codexEntries
+                state.copy(
+                    money = state.money - cost,
+                    nebula = state.nebula + BigNumber(milestoneNebula),
+                    homeBaseLevel = nextLevel,
+                    codexEntries = milestoneEntries,
+                    statistics = state.statistics.copy(
+                        moneySpent = state.statistics.moneySpent + cost,
+                        nebulaEarned = state.statistics.nebulaEarned + milestoneNebula
+                    )
+                )
+            }
+            "claim_codex" -> {
+                val requiredEntries = setOf(
+                    "world:verdant_grove", "world:crystal_caverns", "world:ember_summit", "world:nebula_rift",
+                    "boss:verdant_guardian", "boss:crystal_golem", "boss:ember_dragon", "boss:nebula_titan",
+                    "secret:whispering_hollow", "secret:shard_archive", "secret:ashen_vault", "secret:lost_observatory"
+                )
+                if (state.codexRewardClaimed || !state.codexEntries.containsAll(requiredEntries)) return
+                state.copy(nebula = state.nebula + BigNumber(100), codexRewardClaimed = true, statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 100))
+            }
+            "claim_endgame_reward" -> {
+                val allBosses = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+                val reward = when (id) {
+                    "all_bosses" -> if (state.defeatedBossIds.containsAll(allBosses)) 250L to BigNumber(2_000_000) else return
+                    "all_secrets" -> if (state.discoveredSecretIds.containsAll(setOf("whispering_hollow", "shard_archive", "ashen_vault", "lost_observatory"))) 200L to BigNumber(1_000_000) else return
+                    "all_relics" -> if (state.relicInventory.containsAll(allBosses)) 300L to BigNumber(1_000_000) else return
+                    "sanctuary_10" -> if (state.homeBaseLevel >= 10) 500L to BigNumber(5_000_000) else return
+                    "rift_tier_10" -> if (state.endlessRiftBestTier >= 10) 1_000L to BigNumber(10_000_000) else return
+                    "mastery_all_5" -> if (listOf("verdant_grove", "crystal_caverns", "ember_summit", "nebula_rift").all { (state.worldMasteryLevels[it] ?: 0) >= 5 }) 400L to BigNumber(5_000_000) else return
+                    else -> return
+                }
+                if (id in state.endgameRewardsClaimed) return
+                val nebulaReward = reward.first
+                val moneyReward = reward.second
+                state.copy(
+                    money = state.money + moneyReward,
+                    nebula = state.nebula + BigNumber(nebulaReward),
+                    endgameRewardsClaimed = state.endgameRewardsClaimed + id,
+                    statistics = state.statistics.copy(
+                        moneyEarned = state.statistics.moneyEarned + moneyReward,
+                        nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+                    )
+                )
+            }
+            "mastery" -> {
+                val bossForMastery = mapOf("verdant_grove" to "verdant_guardian", "crystal_caverns" to "crystal_golem", "ember_summit" to "ember_dragon", "nebula_rift" to "nebula_titan")[id] ?: return
+                if (id !in state.unlockedWorldIds || bossForMastery !in state.defeatedBossIds) return
+                val current = state.worldMasteryLevels[id] ?: 1
+                val secretForWorld = mapOf(
+                    "verdant_grove" to "whispering_hollow",
+                    "crystal_caverns" to "shard_archive",
+                    "ember_summit" to "ashen_vault",
+                    "nebula_rift" to "lost_observatory"
+                )[id]
+                val baseCost = BigNumber(10L * (current + 1L))
+                val secretDiscount = if (secretForWorld != null && secretForWorld in state.discoveredSecretIds) 0.20 else 0.0
+                val sanctuaryDiscount = (state.homeBaseLevel * 0.01).coerceAtMost(0.20)
+                val fullRelicSetDiscount = if (
+                    state.equippedRelicIds.containsAll(setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan"))
+                ) 0.10 else 0.0
+                val totalDiscount = (secretDiscount + sanctuaryDiscount + fullRelicSetDiscount).coerceAtMost(0.40)
+                val cost = baseCost * BigNumber(1.0 - totalDiscount)
+                if (current >= 10 || state.nebula < cost) return
+                val nextLevel = current + 1
+                val milestoneNebula = when (nextLevel) {
+                    5 -> 25L
+                    10 -> 100L
+                    else -> 0L
+                }
+                val milestoneEntries = if (nextLevel == 5 || nextLevel == 10) {
+                    state.codexEntries + "mastery:$id:$nextLevel"
+                } else state.codexEntries
+                state.copy(
+                    nebula = state.nebula - cost + BigNumber(milestoneNebula),
+                    worldMasteryLevels = state.worldMasteryLevels + (id to nextLevel),
+                    codexEntries = milestoneEntries,
+                    statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + milestoneNebula)
+                )
+            }
+            else -> return
+        }
+        if (updated != state) {
+            _gameState.value = updated
+            saveGameAsync()
+            val isHomeBaseMilestone = action == "home_upgrade" && updated.homeBaseLevel in setOf(1, 5, 10, 15, 20)
+            if (action == "secret" || action == "claim_codex" || isHomeBaseMilestone ||
+                (action == "rift_start" && updated.endlessRiftTier > state.endlessRiftBestTier)
+            ) {
+                NotificationHelper.showProgressionNotification(getApplication<Application>())
+            }
+            GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "PROGRESSION_ACTION", "$action:$id")
+        }
+    }
+
+    fun settleStake(stakeAmount: BigNumber, payout: BigNumber, won: Boolean) {
+        val state = _gameState.value
+        if (stakeAmount <= BigNumber.ZERO || state.money < stakeAmount) return
+        val updatedMoney = if (won) state.money - stakeAmount + payout else state.money - stakeAmount
+        _gameState.value = state.copy(money = updatedMoney, statistics = state.statistics.copy(moneyEarned = if (won) state.statistics.moneyEarned + payout else state.statistics.moneyEarned, moneySpent = state.statistics.moneySpent + stakeAmount))
+        saveGameAsync()
+    }
+
+    fun openLootChest(tier: String) {
+        val state = _gameState.value
+        val available = when (tier) {
+            "common" -> state.lootCommonChests
+            "rare" -> state.lootRareChests
+            "epic" -> state.lootEpicChests
+            else -> 0
+        }
+        if (available <= 0) return
+        val moneyReward = when (tier) {
+            "common" -> BigNumber(5_000)
+            "rare" -> BigNumber(25_000)
+            "epic" -> BigNumber(100_000)
+            else -> BigNumber.ZERO
+        }
+        val nebulaReward = when (tier) {
+            "common" -> 5L
+            "rare" -> 25L
+            "epic" -> 100L
+            else -> 0L
+        }
+        val giveNebula = Random.nextBoolean()
+        val updated = when (tier) {
+            "common" -> state.copy(lootCommonChests = state.lootCommonChests - 1)
+            "rare" -> state.copy(lootRareChests = state.lootRareChests - 1)
+            "epic" -> state.copy(lootEpicChests = state.lootEpicChests - 1)
+            else -> state
+        }
+        _gameState.value = if (giveNebula) {
+            updated.copy(nebula = updated.nebula + BigNumber(nebulaReward), statistics = updated.statistics.copy(nebulaEarned = updated.statistics.nebulaEarned + nebulaReward), lootChestsOpened = updated.lootChestsOpened + 1)
+        } else {
+            updated.copy(money = updated.money + moneyReward, statistics = updated.statistics.copy(moneyEarned = updated.statistics.moneyEarned + moneyReward), lootChestsOpened = updated.lootChestsOpened + 1)
+        }
+        GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "LOOT_CHEST_OPENED", "Opened $tier loot chest.")
+        saveGameAsync()
+    }
+
+    fun claimDailyQuest(questId: String) {
+        val state = refreshDailyQuestDay(_gameState.value)
+        val requirement = when (questId) {
+            "daily_guesses_10" -> state.dailyQuestGuesses >= 10
+            "daily_correct_5" -> state.dailyQuestCorrectGuesses >= 5
+            "daily_streak_5" -> state.dailyQuestBestStreak >= 5
+            "daily_upgrades_3" -> state.dailyQuestUpgradePurchases >= 3
+            else -> false
+        }
+        if (!requirement || questId in state.claimedDailyQuests) {
+            _gameState.value = state
+            return
+        }
+        val rewardState = when (questId) {
+            "daily_guesses_10" -> state.copy(
+                money = state.money + BigNumber(10_000),
+                statistics = state.statistics.copy(moneyEarned = state.statistics.moneyEarned + BigNumber(10_000))
+            )
+            "daily_correct_5" -> state.copy(
+                nebula = state.nebula + BigNumber(25),
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 25)
+            )
+            "daily_streak_5" -> state.copy(
+                nebula = state.nebula + BigNumber(50),
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 50)
+            )
+            "daily_upgrades_3" -> state.copy(
+                nebula = state.nebula + BigNumber(35),
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 35)
+            )
+            else -> state
+        }
+        _gameState.value = rewardState.copy(claimedDailyQuests = rewardState.claimedDailyQuests + questId)
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "DAILY_QUEST_CLAIM", "Claimed daily quest $questId")
+    }
+
+    private fun refreshDailyQuestDay(state: GameState): GameState {
+        val today = LocalDate.now().toString()
+        if (state.dailyQuestDate == today) return state
+        return state.copy(
+            dailyQuestDate = today,
+            dailyQuestGuesses = 0,
+            dailyQuestCorrectGuesses = 0,
+            dailyQuestBestStreak = 0,
+            dailyQuestUpgradePurchases = 0,
+            claimedDailyQuests = emptySet()
+        )
+    }
+
+    private fun recordDailyGuess(previous: GameState, next: GameState, correct: Boolean): GameState =
+        next.copy(
+            dailyQuestDate = previous.dailyQuestDate,
+            dailyQuestGuesses = previous.dailyQuestGuesses + 1,
+            dailyQuestCorrectGuesses = previous.dailyQuestCorrectGuesses + if (correct) 1 else 0,
+            dailyQuestBestStreak = maxOf(previous.dailyQuestBestStreak, next.streak),
+            dailyQuestUpgradePurchases = previous.dailyQuestUpgradePurchases,
+            claimedDailyQuests = previous.claimedDailyQuests
+        )
+
 
     fun earnMinigameReward(nebulaReward: Long, moneyReward: BigNumber) {
         val state = _gameState.value
         _gameState.value = state.copy(
             nebula = state.nebula + BigNumber(nebulaReward),
-            money = state.money + moneyReward
+            money = state.money + moneyReward,
+            statistics = state.statistics.copy(
+                moneyEarned = state.statistics.moneyEarned + moneyReward,
+                nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+            )
         )
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.ARCADE, "MINIGAME_REWARD", "Earned $nebulaReward Nebula and $moneyReward Money from minigame.")
     }
 
     fun completeTutorial() {
-        _gameState.update { it.copy(tutorialCompleted = true) }
+        _gameState.update { it.copy(tutorialCompleted = true, settings = it.settings.copy(tutorialCompleted = true)) }
+        viewModelScope.launch(Dispatchers.IO) { saveManager.saveAppPreferences(_gameState.value.settings) }
         saveGameAsync()
         GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "TUTORIAL_COMPLETE", "Tutorial completed by user.")
     }
@@ -518,13 +1508,65 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun claimLiveOpsEventReward(eventId: String) {
-        // Handled or logged
-        GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "LIVEOPS_CLAIM", "Claimed event reward: $eventId")
+        viewModelScope.launch {
+            liveOpsClaimMutex.withLock {
+                val context = getApplication<Application>()
+                val (featureFlags, manifest) = withContext(Dispatchers.IO) {
+                    FeatureFlagRepository(context).load() to LiveOpsRepository(context).loadLiveOpsEvents()
+                }
+                if (featureFlags["live_ops"] != true || featureFlags["seasonal_rewards"] != true) {
+                    GameLogger.log(LogLevel.WARN, LoggerCategory.UI, "LIVEOPS_DISABLED", "Blocked event claim because LiveOps feature flags are disabled.")
+                    return@withLock
+                }
+                val event = manifest.events.firstOrNull { it.id == eventId } ?: return@withLock
+                val now = Instant.now()
+                val withinDates = runCatching {
+                    !now.isBefore(Instant.parse(event.startDate)) && now.isBefore(Instant.parse(event.endDate))
+                }.getOrDefault(false)
+                if (event.status != "ACTIVE" || !withinDates) return@withLock
+
+                val state = _gameState.value
+                val updatedState = LiveOpsClaimPolicy.apply(
+                    state = state,
+                    event = LiveOpsClaimDefinition(
+                        id = event.id,
+                        maxClaims = event.maxClaims,
+                        rewardNebula = event.rewardNebula,
+                        permanentBoostPerClaim = event.permanentBoostPerClaim,
+                        minCorrectGuesses = event.minCorrectGuesses,
+                        minPrestigeCount = event.minPrestigeCount,
+                        minUltraCount = event.minUltraCount
+                    )
+                )
+                if (updatedState == null) {
+                    if (state.correctGuesses < event.minCorrectGuesses ||
+                        state.prestigeCount < event.minPrestigeCount ||
+                        state.ultraCount < event.minUltraCount
+                    ) {
+                        GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "LIVEOPS_INELIGIBLE", "Blocked event claim because progression requirements are not met: $eventId")
+                    }
+                    return@withLock
+                }
+                _gameState.value = updatedState
+                saveGameAsync()
+                GameLogger.log(LogLevel.INFO, LoggerCategory.UI, "LIVEOPS_CLAIM", "Claimed Live Ops reward: $eventId")
+            }
+        }
     }
 
     private fun saveGameAsync() {
         viewModelScope.launch(Dispatchers.IO) {
-            saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
+            slotOperationMutex.withLock {
+                val slot = _activeSlot.value
+                val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
+                GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_ASYNC_BEGIN", "Persisting game state for slot=$slot.")
+                if (saveManager.saveGame(state, slot)) {
+                    GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_ASYNC_OK", "Game state persisted for slot=$slot.")
+                    WidgetRefresh.request(getApplication<Application>())
+                } else {
+                    GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "SAVE_ASYNC_FAILED", "Could not persist the latest game state for slot $slot.")
+                }
+            }
         }
     }
 
@@ -532,7 +1574,15 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         saveJob = viewModelScope.launch(Dispatchers.IO) {
             while (true) {
                 delay(30000)
-                saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
+                slotOperationMutex.withLock {
+                    val slot = _activeSlot.value
+                    val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
+                    if (saveManager.saveGame(state, slot)) {
+                        WidgetRefresh.request(getApplication<Application>())
+                    } else {
+                        GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "AUTOSAVE_FAILED", "Could not persist the latest game state for slot $slot.")
+                    }
+                }
             }
         }
     }
@@ -541,8 +1591,41 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         timerJob = viewModelScope.launch(Dispatchers.Default) {
             while (true) {
                 delay(1000)
+                val currentMoney = _gameState.value.money
+                _incomePerSecond.value = if (_gameState.value.autoClickerActive) {
+                    currentMoney - lastIncomeMeasurement
+                } else {
+                    BigNumber.ZERO
+                }
+                lastIncomeMeasurement = currentMoney
                 _gameState.update {
                     it.copy(statistics = it.statistics.copy(playtimeSeconds = it.statistics.playtimeSeconds + 1))
+                }
+            }
+        }
+    }
+
+    private fun startRandomEvents() {
+        randomEventJob = viewModelScope.launch(Dispatchers.Default) {
+            while (true) {
+                delay(60_000L)
+                val event = withContext(Dispatchers.Main) {
+                    val currentState = _gameState.value
+                    luaRandomEventSelector.roll()?.let { eventType ->
+                        randomEventEngine.apply(currentState, eventType).also { _gameState.value = it.state }
+                    }
+                } ?: continue
+                saveGameAsync()
+                GameLogger.log(
+                    LogLevel.INFO,
+                    LoggerCategory.GAME,
+                    "RANDOM_EVENT",
+                    "Random event triggered: " + event.type.name
+                )
+                NotificationHelper.showEventNotification(getApplication<Application>())
+                delay(8_000L)
+                if (_gameState.value.lastRandomEventId == event.type.name.lowercase()) {
+                    _gameState.update { it.copy(lastRandomEventId = null) }
                 }
             }
         }
@@ -552,18 +1635,38 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         autoClickerJob = viewModelScope.launch(Dispatchers.Default) {
             while (true) {
                 val state = _gameState.value
-                val delayMillis = if (state.autoClickerActive && state.autoClickerSpeed > 0.0) {
-                    (1000.0 / state.autoClickerSpeed).toLong()
+                val talentSpeed = (if ("talent_speed_1" in state.prestigeShopPurchases) 1.25 else 1.0) * (if ("talent_speed_2" in state.prestigeShopPurchases) 1.5 else 1.0)
+                val effectiveSpeed = state.autoClickerSpeed * talentSpeed * if ("mut_speed" in state.activeMutators) 3.0 else 1.0
+                val delayMillis = if (state.autoClickerActive && effectiveSpeed > 0.0) {
+                    (1000.0 / effectiveSpeed).toLong()
                 } else {
                     1000L
                 }
                 delay(delayMillis)
-                val currentState = _gameState.value
-                if (currentState.autoClickerActive) {
-                    val guess = currentState.targetNumber
-                    val result = gameEngine.processGuess(currentState, guess)
-                    withContext(Dispatchers.Main) {
-                        _gameState.value = result.newState
+                withContext(Dispatchers.Main) {
+                    val currentState = refreshDailyQuestDay(_gameState.value)
+                    if (currentState.autoClickerActive) {
+                        val guess = guessingBot.nextGuess(
+                            currentState.currentRangeMin,
+                            currentState.currentRangeMax
+                        )
+                        val result = gameEngine.processGuess(currentState, guess)
+                        guessingBot.observeGuess(guess, result.feedback)
+                        val isCorrect = result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
+                        if (isCorrect) {
+                            guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
+                        }
+                        val talentAdjustedState = applyTalentBonuses(currentState, result.newState, isCorrect)
+                        val progressedState = recordLootDrop(
+                            recordDailyGuess(currentState, talentAdjustedState, isCorrect),
+                            isCorrect
+                        )
+                        _gameState.value = progressedState
+                        val activeBossWorld = progressedState.activeBossBattleWorldId
+                        if (activeBossWorld != null) {
+                            worldProgressAction(activeBossWorld, if (isCorrect) "boss_hit" else "boss_miss")
+                        }
+                        saveGameAsync()
                     }
                 }
             }
@@ -575,9 +1678,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         autoClickerJob?.cancel()
         saveJob?.cancel()
         timerJob?.cancel()
+        randomEventJob?.cancel()
         backgroundMusicManager.release()
-        viewModelScope.launch(Dispatchers.IO) {
-            saveManager.saveGame(_gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()), _activeSlot.value)
+        runBlocking(Dispatchers.IO) {
+            saveManager.saveGame(
+                _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis()),
+                _activeSlot.value
+            )
         }
     }
 }

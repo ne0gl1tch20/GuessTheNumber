@@ -1,4 +1,5 @@
 {
+  "schemaVersion": 1,
   "upgrades": [
     {
       "id": "ultra_money_boost",
@@ -7,7 +8,7 @@
       "maxLevel": 20,
       "baseCost": "5",
       "costMultiplier": 2.5,
-      "effectPerLevel": 2.0
+      "effectPerLevel": 2
     },
     {
       "id": "ultra_gain_boost",
@@ -15,7 +16,7 @@
       "description": "Increases Ultra currency gain from resets (up to 2,000 cap).",
       "maxLevel": 10,
       "baseCost": "25",
-      "costMultiplier": 3.0,
+      "costMultiplier": 3,
       "effectPerLevel": 0.5
     },
     {
@@ -25,7 +26,7 @@
       "maxLevel": 15,
       "baseCost": "10",
       "costMultiplier": 2.2,
-      "effectPerLevel": 1.0
+      "effectPerLevel": 1
     }
   ]
 }

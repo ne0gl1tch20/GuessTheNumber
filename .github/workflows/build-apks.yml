@@ -1,18 +1,33 @@
 name: Build Android APKs (Debug & Release)
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
-    name: Build Debug and Release APKs
+    name: Validate, Test, and Build Debug/Release APKs
     runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_luaLiveOpsPublicKeyBase64: ${{ secrets.LUA_LIVEOPS_PUBLIC_KEY_BASE64 }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Show Build Revision
+        run: |
+          echo "GitHub SHA: $GITHUB_SHA"
+          echo "GitHub ref: $GITHUB_REF"
+          git rev-parse HEAD
+          git log -1 --oneline
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -20,26 +35,88 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Validate Localizations
+        run: python3 tools/validate_locales.py
+
+      - name: Validate Localization Release Gate
+        run: python3 tools/validate_localization_release_gate.py
+
+      - name: Validate Version Metadata
+        run: python3 tools/validate_versions.py
+
+      - name: Validate All JSON Assets
+        run: python3 tools/validate_json_assets.py
+
+      - name: Audit Repository Localization Surface
+        run: python3 tools/audit_localization_surface.py
+
+      - name: Audit Hardcoded UI Strings
+        run: python3 tools/validate_hardcoded_strings.py
+
+      - name: Fast Kotlin Preflight Check
+        run: python3 tools/preflight_compile_check.py
+
+      - name: Build Preflight
+        run: python3 tools/build_preflight.py
+
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest
+
+      - name: Run Lint
+        run: ./gradlew lintDebug
+
+      - name: Run Full Gradle Check
+        run: ./gradlew check
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
       - name: Build Release APK (Unsigned)
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Write Debug Artifact Metadata
+        run: >-
+          python3 tools/write_build_artifact_metadata.py
+          --channel debug
+          --apk app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Write Release Artifact Metadata
+        run: >-
+          python3 tools/write_build_artifact_metadata.py
+          --channel release
+          --apk app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Upload Test and Lint Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GuessTheNumber-test-reports
+          path: |
+            app/build/reports/tests/**
+            app/build/test-results/**
+            app/build/reports/lint-results-*.html
+          if-no-files-found: warn
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: GuessTheNumber-debug
-          path: app/build/outputs/apk/debug/*.apk
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/debug/*.build-metadata.json
+            app/build/outputs/apk/debug/*.sha256
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
           name: GuessTheNumber-release
-          path: app/build/outputs/apk/release/*.apk
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/release/*.build-metadata.json
+            app/build/outputs/apk/release/*.sha256

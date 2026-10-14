@@ -1,5 +1,11 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.animateContentSize
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -21,15 +27,22 @@ import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.data.crash.AppErrorHandler
 
 @Composable
-fun CrashRecoveryScreen(onDismiss: () -> Unit) {
+fun CrashRecoveryScreen(locale: LocaleManager, onDismiss: () -> Unit, reducedMotion: Boolean = false) {
     val context = LocalContext.current
     val crashLog = remember { AppErrorHandler.getCrashLog() }
     val scrollState = rememberScrollState()
 
+    var showRecoveryContent by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { showRecoveryContent = true }
+
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().animateContentSize(),
         color = MaterialTheme.colorScheme.errorContainer
     ) {
+        AnimatedVisibility(
+            visible = showRecoveryContent,
+            enter = if (reducedMotion) fadeIn() else scaleIn(initialScale = 0.97f) + fadeIn()
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -38,16 +51,16 @@ fun CrashRecoveryScreen(onDismiss: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("⚠️ Unexpected Crash Detected", fontSize = 24.sp, color = MaterialTheme.colorScheme.onErrorContainer)
+            Text(locale.getString("crash_detected_title", "⚠️ Unexpected Crash Detected"), fontSize = 24.sp, color = MaterialTheme.colorScheme.onErrorContainer)
             Spacer(modifier = Modifier.height(16.dp))
-            Text("The game encountered an unexpected error during the previous session and has safely recovered your last valid progress.", fontSize = 16.sp)
+            Text(locale.getString("crash_detected_message", "The game encountered an unexpected error during the previous session and has safely recovered your last valid progress."), fontSize = 16.sp)
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = crashLog,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Crash Diagnostic Logs") },
+                label = { Text(locale.getString("crash_diagnostic_logs", "Crash Diagnostic Logs")) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -62,15 +75,15 @@ fun CrashRecoveryScreen(onDismiss: () -> Unit) {
                 Button(
                     onClick = {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText("Crash Log", crashLog)
+                        val clip = ClipData.newPlainText(locale.getString("crash_log_label", "Crash Log"), crashLog)
                         clipboard.setPrimaryClip(clip)
-                        Toast.makeText(context, "Crash logs copied to clipboard!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, locale.getString("crash_logs_copied_to_clipboard_toast", "Crash logs copied to clipboard!"), Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(imageVector = Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Copy Logs", fontSize = 12.sp)
+                    Text(locale.getString("copy_logs", "Copy Logs"), fontSize = 12.sp)
                 }
                 Button(
                     onClick = {
@@ -79,14 +92,14 @@ fun CrashRecoveryScreen(onDismiss: () -> Unit) {
                             putExtra(Intent.EXTRA_TEXT, crashLog)
                             type = "text/plain"
                         }
-                        val shareIntent = Intent.createChooser(sendIntent, "Share Crash Logs")
+                        val shareIntent = Intent.createChooser(sendIntent, locale.getString("share_crash_logs_title", "Share Crash Logs"))
                         context.startActivity(shareIntent)
                     },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Share Logs", fontSize = 12.sp)
+                    Text(locale.getString("share_logs", "Share Logs"), fontSize = 12.sp)
                 }
             }
 
@@ -96,8 +109,9 @@ fun CrashRecoveryScreen(onDismiss: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Continue Playing")
+                Text(locale.getString("continue_playing", "Continue Playing"))
             }
+        }
         }
     }
 }

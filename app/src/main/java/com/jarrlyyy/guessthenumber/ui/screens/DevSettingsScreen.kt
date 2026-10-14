@@ -1,5 +1,8 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -29,8 +32,13 @@ import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
+import com.jarrlyyy.guessthenumber.domain.command.CommandAutocomplete
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.scripting.LuaEngine
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -41,69 +49,55 @@ fun DevSettingsScreen(
     onExecuteCommand: (String) -> String,
     onImportSave: (String, (Boolean) -> Unit) -> Unit,
     onUpdateSettings: (GameSettings) -> Unit,
+    onGetAppPreferencesJson: ((String) -> Unit) -> Unit,
+    onApplyAppPreferencesJson: (String, (Boolean) -> Unit) -> Unit,
+    onGetSaveJson: (Int, (String?) -> Unit) -> Unit,
+    onApplySaveJson: (Int, String, (Boolean) -> Unit) -> Unit,
     onNavigate: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val locale = LocalAppLocaleManager.current
     var commandInput by remember { mutableStateOf("") }
     var saveJsonEditorInput by remember { mutableStateOf("") }
+    var appPreferencesJsonEditorInput by remember { mutableStateOf("") }
+    var selectedSaveSlot by remember { mutableIntStateOf(1) }
+    var saveSlotExpanded by remember { mutableStateOf(false) }
     var logSearchQuery by remember { mutableStateOf("") }
+    var selectedLogLevel by remember { mutableStateOf("ALL") }
     var isPaused by remember { mutableStateOf(false) }
+    var luaCommandInput by remember { mutableStateOf("/lua status") }
+    var luaCommandOutput by remember { mutableStateOf("") }
+    var luaCommandBusy by remember { mutableStateOf(false) }
+    val luaEngine = remember(context) { LuaEngine.get(context) }
+    val coroutineScope = rememberCoroutineScope()
 
-    val configRepo = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale) }
-    val locale = configRepo.localeManager
-    
     val logs by GameLogger.logFlow.collectAsState(initial = emptyList())
     val jsonSerializer = remember { Json { ignoreUnknownKeys = true; prettyPrint = true } }
 
-    val allCommands = listOf(
-        "/help",
-        "/give money ",
-        "/give prestige ",
-        "/give ultra ",
-        "/give nebula ",
-        "/give all ",
-        "/set money ",
-        "/set prestige ",
-        "/set ultra ",
-        "/set nebula ",
-        "/reset progression",
-        "/reset prestige",
-        "/reset ultra",
-        "/reset all",
-        "/timeskip ",
-        "/max_upgrades",
-        "/unlock_all",
-        "/win",
-        "/speed ",
-        "/stats",
-        "/matrix",
-        "/konami",
-        "/moneyprinter",
-        "/easteregg",
-        "/crash_test"
-    )
-
-    val suggestions = if (commandInput.isNotBlank()) {
-        allCommands.filter { it.startsWith(commandInput, ignoreCase = true) && it != commandInput }
-    } else {
-        emptyList()
+    LaunchedEffect(state.settings.verboseLogging, state.settings.saveLogsToStorage) {
+        GameLogger.configureVerbose(state.settings.verboseLogging)
+        GameLogger.configureStorage(File(context.filesDir, "game_logs.txt"), state.settings.saveLogsToStorage)
     }
 
-    val filteredLogs = logs.filter {
-        logSearchQuery.isBlank() ||
-        it.message.contains(logSearchQuery, ignoreCase = true) ||
-        it.category.name.contains(logSearchQuery, ignoreCase = true) ||
-        it.level.name.contains(logSearchQuery, ignoreCase = true)
+    val suggestions = remember(commandInput) { CommandAutocomplete.suggest(commandInput) }
+
+    val filteredLogs = logs.filter { log ->
+        (selectedLogLevel == "ALL" || log.level.name == selectedLogLevel) &&
+            (logSearchQuery.isBlank() ||
+                log.message.contains(logSearchQuery, ignoreCase = true) ||
+                log.event.contains(logSearchQuery, ignoreCase = true) ||
+                log.category.name.contains(logSearchQuery, ignoreCase = true) ||
+                log.level.name.contains(logSearchQuery, ignoreCase = true))
     }.reversed()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Developer Settings & Console") },
+                title = { Text(localizedText("Developer Settings & Console")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 }
             )
@@ -125,7 +119,19 @@ fun DevSettingsScreen(
                 ) {
                     Icon(imageVector = Icons.Default.Info, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Open Variable & Process Inspector", fontSize = 16.sp)
+                    Text(localizedText("Open Variable & Process Inspector"), fontSize = 16.sp)
+                }
+            }
+
+            // Keep Lua testing tools separate from the player-facing Activity Hub.
+            item {
+                Button(
+                    onClick = { onNavigate("lua_testing_hub") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(imageVector = Icons.Default.Code, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(localizedText("Lua Testing Hub"), fontSize = 16.sp)
                 }
             }
 
@@ -138,13 +144,34 @@ fun DevSettingsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Save non-crash logs to storage", style = MaterialTheme.typography.titleMedium, fontSize = 16.sp)
-                            Text("Saves game logs to Android/data files directory", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(localizedText("Save non-crash logs to storage"), style = MaterialTheme.typography.titleMedium, fontSize = 16.sp)
+                            Text(localizedText("Saves game logs to Android/data files directory"), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Switch(
                             checked = state.settings.saveLogsToStorage,
                             onCheckedChange = { enabled ->
                                 onUpdateSettings(state.settings.copy(saveLogsToStorage = enabled))
+                            }
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(localizedText("Verbose diagnostic logging"), style = MaterialTheme.typography.titleMedium, fontSize = 16.sp)
+                            Text(
+                                localizedText("Adds detailed TRACE and DEBUG events. Debug builds only; uses more storage and Logcat output."),
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = state.settings.verboseLogging,
+                            onCheckedChange = { enabled ->
+                                onUpdateSettings(state.settings.copy(verboseLogging = enabled))
                             }
                         )
                     }
@@ -181,14 +208,71 @@ fun DevSettingsScreen(
                                 val shareIntent = Intent.createChooser(sendIntent, "Share Zipped Logs")
                                 context.startActivity(shareIntent)
                             } catch (e: Exception) {
-                                Toast.makeText(context, "Failed to zip and share logs: ${e.message}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, locale.getString("dev_logs_zip_failed_format", "Failed to zip and share logs: %s", e.message ?: ""), Toast.LENGTH_SHORT).show()
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Zip & Share Logs from Storage", fontSize = 14.sp)
+                        Text(localizedText("Zip & Share Logs from Storage"), fontSize = 14.sp)
+                    }
+                }
+            }
+
+            // Debug-only Lua commands share the engine used by the player-facing GO flow.
+            item {
+                HorizontalDivider()
+                Text(localizedText("Lua Console"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(
+                    localizedText("Run registered local or verified LiveOps script IDs. Raw Lua evaluation is disabled."),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp
+                )
+            }
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = luaCommandInput,
+                        onValueChange = { luaCommandInput = it },
+                        label = { Text(localizedText("Lua command (e.g. /lua status)")) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            onClick = {
+                                if (!luaCommandBusy && luaCommandInput.isNotBlank()) {
+                                    coroutineScope.launch {
+                                        luaCommandBusy = true
+                                        luaCommandOutput = withContext(Dispatchers.Default) {
+                                            luaEngine.executeConsoleCommand(luaCommandInput)
+                                        }
+                                        luaCommandBusy = false
+                                    }
+                                }
+                            },
+                            enabled = !luaCommandBusy && luaCommandInput.isNotBlank(),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            if (luaCommandBusy) CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                            else Icon(Icons.Default.PlayArrow, contentDescription = null)
+                            Spacer(Modifier.width(6.dp))
+                            Text(localizedText("Execute Lua command"))
+                        }
+                        OutlinedButton(onClick = { luaCommandOutput = "" }) {
+                            Text(localizedText("Clear"))
+                        }
+                    }
+                    if (luaCommandOutput.isNotBlank()) {
+                        Card(Modifier.fillMaxWidth()) {
+                            Text(
+                                luaCommandOutput,
+                                modifier = Modifier.padding(12.dp),
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 12.sp
+                            )
+                        }
                     }
                 }
             }
@@ -197,7 +281,7 @@ fun DevSettingsScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Developer Commands", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(localizedText("Developer Commands"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
             }
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -208,7 +292,7 @@ fun DevSettingsScreen(
                         OutlinedTextField(
                             value = commandInput,
                             onValueChange = { commandInput = it },
-                            label = { Text("Command (e.g. /help)") },
+                            label = { Text(localizedText("Command (e.g. /help)")) },
                             modifier = Modifier.weight(1f),
                             singleLine = true
                         )
@@ -219,26 +303,69 @@ fun DevSettingsScreen(
                                 commandInput = ""
                             }
                         }) {
-                            Text("Run")
+                            Text(localizedText("Run"))
                         }
                     }
 
-                    // Autocomplete Suggestions Row
+                    // Suggestions are sourced from the command registry, not a UI-owned list.
                     if (suggestions.isNotEmpty()) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            suggestions.forEach { suggestion ->
-                                AssistChip(
-                                    onClick = { commandInput = suggestion },
-                                    label = { Text(suggestion) }
-                                )
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                suggestions.forEach { suggestion ->
+                                    TextButton(
+                                        onClick = { commandInput = suggestion.insertText },
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Column(modifier = Modifier.fillMaxWidth()) {
+                                            Text(
+                                                suggestion.title,
+                                                style = MaterialTheme.typography.labelLarge,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                            Text(
+                                                suggestion.description,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
+                }
+            }
+
+            // Section 1.5: Global App Preferences JSON
+            item {
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(localizedText("App Preferences (Global JSON)"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+            }
+            item {
+                OutlinedTextField(
+                    value = appPreferencesJsonEditorInput,
+                    onValueChange = { appPreferencesJsonEditorInput = it },
+                    label = { Text(localizedText("Raw App Preferences JSON")) },
+                    modifier = Modifier.fillMaxWidth().height(150.dp)
+                )
+            }
+            item {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        onGetAppPreferencesJson {
+                            appPreferencesJsonEditorInput = it
+                            Toast.makeText(context, locale.getString("dev_loaded_app_preferences_toast", "Loaded global app preferences"), Toast.LENGTH_SHORT).show()
+                        }
+                    }, modifier = Modifier.weight(1f)) { Text(localizedText("Load App Preferences")) }
+                    Button(onClick = {
+                        onApplyAppPreferencesJson(appPreferencesJsonEditorInput) { success ->
+                            Toast.makeText(context, if (success) "App preferences applied!" else "Invalid app preferences JSON!", Toast.LENGTH_SHORT).show()
+                        }
+                    }, modifier = Modifier.weight(1f)) { Text(localizedText("Apply App Preferences")) }
                 }
             }
 
@@ -246,13 +373,37 @@ fun DevSettingsScreen(
             item {
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Save Editor (JSON Editing)", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(localizedText("Save Editor (JSON Editing)"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+            }
+            item {
+                ExposedDropdownMenuBox(
+                    expanded = saveSlotExpanded,
+                    onExpandedChange = { saveSlotExpanded = it },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = "Save Slot $selectedSaveSlot",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(localizedText("Save Slots")) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(saveSlotExpanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(expanded = saveSlotExpanded, onDismissRequest = { saveSlotExpanded = false }) {
+                        (1..10).forEach { slot ->
+                            DropdownMenuItem(
+                                text = { Text(locale.getString("save_slot_label", "Save Slot %d", slot)) },
+                                onClick = { selectedSaveSlot = slot; saveSlotExpanded = false }
+                            )
+                        }
+                    }
+                }
             }
             item {
                 OutlinedTextField(
                     value = saveJsonEditorInput,
                     onValueChange = { saveJsonEditorInput = it },
-                    label = { Text("Raw GameState JSON") },
+                    label = { Text(localizedText("Raw GameState JSON")) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
@@ -265,27 +416,27 @@ fun DevSettingsScreen(
                 ) {
                     Button(
                         onClick = {
-                            saveJsonEditorInput = jsonSerializer.encodeToString(state)
-                            Toast.makeText(context, "Loaded current state into editor", Toast.LENGTH_SHORT).show()
+                            onGetSaveJson(selectedSaveSlot) { raw -> saveJsonEditorInput = raw ?: ""; }
+                            Toast.makeText(context, locale.getString("dev_loaded_save_to_editor_toast", "Loaded current state into editor"), Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.weight(1f)
                     ) {
                         Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Load Current Save", fontSize = 12.sp)
+                        Text(localizedText("Load Current Save"), fontSize = 12.sp)
                     }
                     Button(
                         onClick = {
                             if (saveJsonEditorInput.isNotBlank()) {
-                                onImportSave(saveJsonEditorInput) { success ->
+                                onApplySaveJson(selectedSaveSlot, saveJsonEditorInput) { success ->
                                     if (success) {
-                                        Toast.makeText(context, "Save applied successfully!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, locale.getString("dev_save_applied_toast", "Save applied successfully!"), Toast.LENGTH_SHORT).show()
                                     } else {
-                                        Toast.makeText(context, "Failed to apply invalid save JSON!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, locale.getString("invalid_save_json_toast", "Failed to apply invalid save JSON!"), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             } else {
-                                Toast.makeText(context, "Failed to apply invalid save json", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, locale.getString("invalid_save_json_toast", "Failed to apply invalid save JSON!"), Toast.LENGTH_SHORT).show()
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
@@ -293,7 +444,7 @@ fun DevSettingsScreen(
                     ) {
                         Icon(imageVector = Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Apply Save JSON", fontSize = 12.sp)
+                        Text(localizedText("Apply Save JSON"), fontSize = 12.sp)
                     }
                 }
             }
@@ -308,7 +459,7 @@ fun DevSettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Live Console Logs", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                        Text(localizedText("Live Console Logs"), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
                             IconButton(
                                 onClick = {
@@ -334,7 +485,7 @@ fun DevSettingsScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
-                                    contentDescription = "Clear",
+                                    contentDescription = locale.getString("clear", "Clear"),
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -342,14 +493,14 @@ fun DevSettingsScreen(
                                 onClick = {
                                     val exported = GameLogger.exportLogs()
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    clipboard.setPrimaryClip(ClipData.newPlainText("Game Logs", exported))
-                                    Toast.makeText(context, "Logs copied to clipboard", Toast.LENGTH_SHORT).show()
+                                    clipboard.setPrimaryClip(ClipData.newPlainText(locale.getString("dev_game_logs_title", "Game Logs"), exported))
+                                    Toast.makeText(context, locale.getString("dev_logs_copied_to_clipboard", "Logs copied to clipboard"), Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.ContentCopy,
-                                    contentDescription = "Copy",
+                                    contentDescription = locale.getString("copy", "Copy"),
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -359,9 +510,27 @@ fun DevSettingsScreen(
                     OutlinedTextField(
                         value = logSearchQuery,
                         onValueChange = { logSearchQuery = it },
-                        label = { Text("Filter logs (category, level, message)...") },
+                        label = { Text(localizedText("Filter logs (category, level, message)...")) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf("ALL", "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL").forEach { level ->
+                            FilterChip(
+                                selected = selectedLogLevel == level,
+                                onClick = { selectedLogLevel = level },
+                                label = { Text(level) }
+                            )
+                        }
+                    }
+                    Text(
+                        text = "${filteredLogs.size} matching log entries",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -411,8 +580,7 @@ fun DevSettingsScreen(
                                 .padding(12.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = "No logs recorded yet...",
+                            Text(text = localizedText("No logs recorded yet..."),
                                 color = Color(0xFF888888),
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 12.sp
@@ -433,8 +601,7 @@ fun DevSettingsScreen(
                                     LogLevel.INFO -> Color(0xFF50FA7B)
                                     else -> Color(0xFF8BE9FD)
                                 }
-                                Text(
-                                    text = "[$timeStr][${log.category}][${log.level}] ${log.message}",
+                                Text(text = "[$timeStr][${log.category}][${log.level}][${log.event}] ${log.message}${log.correlationId?.let { " (CID: $it)" } ?: ""}",
                                     color = color,
                                     fontFamily = FontFamily.Monospace,
                                     fontSize = 11.sp,

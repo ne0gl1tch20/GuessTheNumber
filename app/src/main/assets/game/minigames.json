@@ -1,16 +1,17 @@
 {
+  "schemaVersion": 1,
   "minigames": [
     {
       "id": "quick_guess",
       "name": "Quick Guess",
       "description": "Guess numbers as fast as possible within 10 seconds to score points and earn Nebula!",
-      "rewardMultiplier": 2.0
+      "rewardMultiplier": 2
     },
     {
       "id": "reaction_test",
       "name": "Reaction Test",
       "description": "Test your reflexes! Tap instantly when the signal turns green.",
-      "rewardMultiplier": 3.0
+      "rewardMultiplier": 3
     },
     {
       "id": "lucky_number",
@@ -22,7 +23,7 @@
       "id": "memory_match",
       "name": "Memory Digit Sequence",
       "description": "Memorize a sequence of glowing digits and repeat it back correctly.",
-      "rewardMultiplier": 4.0
+      "rewardMultiplier": 4
     },
     {
       "id": "number_rush",

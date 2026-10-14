@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -7,6 +9,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -18,6 +21,8 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(state: GameState, onBack: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val locale = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale).localeManager }
     val stats = state.statistics
     val totalGuesses = stats.totalGuesses
     val correctGuesses = stats.correctGuesses
@@ -37,10 +42,10 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Advanced Statistics", style = MaterialTheme.typography.titleMedium) },
+                title = { Text(localizedText("Advanced Statistics"), style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -71,11 +76,11 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Guessing Precision", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(localizedText("Guessing Precision"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                             Icon(imageVector = Icons.Default.Analytics, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         }
                         Text(
-                            text = String.format("%.1f%%", accuracy),
+                            text = locale.formatPercent(accuracy.toDouble() / 100.0),
                             style = MaterialTheme.typography.displayMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -92,9 +97,9 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Correct: $correctGuesses", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                            Text("Failed: $failedGuesses", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                            Text("Total: $totalGuesses", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(locale.getString("stats_correct_guesses", "Correct: %s", locale.formatNumber(correctGuesses)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(locale.getString("stats_failed_guesses", "Failed: %s", locale.formatNumber(failedGuesses)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(locale.getString("stats_total_guesses", "Total: %s", locale.formatNumber(totalGuesses)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
                         }
                     }
                 }
@@ -102,8 +107,7 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
 
             // Core Metrics Section Header
             item {
-                Text(
-                    text = "Performance & Economy",
+                Text(text = localizedText("Performance & Economy"),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -116,14 +120,14 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                 ) {
                     StatMetricCard(
                         modifier = Modifier.weight(1f),
-                        title = "Money Earned",
+                        title = locale.getString("inspector_money_earned", "Money Earned"),
                         value = stats.moneyEarned.format(),
                         icon = Icons.Default.TrendingUp,
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                     StatMetricCard(
                         modifier = Modifier.weight(1f),
-                        title = "Money Spent",
+                        title = locale.getString("inspector_money_spent", "Money Spent"),
                         value = stats.moneySpent.format(),
                         icon = Icons.Default.ShoppingCart,
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -138,14 +142,14 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
                 ) {
                     StatMetricCard(
                         modifier = Modifier.weight(1f),
-                        title = "Current Streak",
+                        title = locale.getString("inspector_current_streak", "Current Streak"),
                         value = "${state.streak}",
                         icon = Icons.Default.LocalFireDepartment,
                         containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                     StatMetricCard(
                         modifier = Modifier.weight(1f),
-                        title = "Best Streak",
+                        title = locale.getString("inspector_best_streak", "Best Streak"),
                         value = "${state.bestStreak}",
                         icon = Icons.Default.EmojiEvents,
                         containerColor = MaterialTheme.colorScheme.secondaryContainer
@@ -156,8 +160,7 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
             // Resets & Progression Header
             item {
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Resets & Meta Progression",
+                Text(text = localizedText("Resets & Meta Progression"),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -166,19 +169,19 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     StatDetailRow(
-                        title = "Prestige Resets",
+                        title = locale.getString("stats_prestige_resets", "Prestige Resets"),
                         value = "${stats.prestigesCount}",
                         icon = Icons.Default.Star,
                         description = "Times reset for Prestige tokens"
                     )
                     StatDetailRow(
-                        title = "Ultra Resets",
+                        title = locale.getString("stats_ultra_resets", "Ultra Resets"),
                         value = "${stats.ultrasCount}",
                         icon = Icons.Default.AutoAwesome,
                         description = "Times reset for Ultra tokens"
                     )
                     StatDetailRow(
-                        title = "Nebula Earned",
+                        title = locale.getString("inspector_nebula_earned", "Nebula Earned"),
                         value = "${stats.nebulaEarned}",
                         icon = Icons.Default.BrightnessHigh,
                         description = "Total Nebula crystals gathered"
@@ -190,7 +193,7 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
             item {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Session & Arcade",
+                    text = locale.getString("stats_session_arcade", "Session & Arcade"),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -199,19 +202,19 @@ fun StatsScreen(state: GameState, onBack: () -> Unit) {
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     StatDetailRow(
-                        title = "Total Playtime",
+                        title = locale.getString("stats_total_playtime", "Total Playtime"),
                         value = playtimeFormatted,
                         icon = Icons.Default.Schedule,
                         description = "Active game session duration"
                     )
                     StatDetailRow(
-                        title = "Arcade Minigames Played",
+                        title = locale.getString("inspector_arcade_played", "Arcade Minigames Played"),
                         value = "${stats.arcadePlayed}",
                         icon = Icons.Default.SportsEsports,
                         description = "Total arcade rounds completed"
                     )
                     StatDetailRow(
-                        title = "Current Number Range",
+                        title = locale.getString("stats_current_number_range", "Current Number Range"),
                         value = "${state.currentRangeMin} - ${state.currentRangeMax}",
                         icon = Icons.Default.SwapHoriz,
                         description = "Active guessing bounds"

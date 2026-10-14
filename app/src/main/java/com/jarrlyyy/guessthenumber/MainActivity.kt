@@ -1,36 +1,65 @@
 package com.jarrlyyy.guessthenumber
 
 import android.os.Bundle
+import android.content.Intent
+import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.jarrlyyy.guessthenumber.ui.components.ExpressiveSaveLoadingScreen
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.LaunchedEffect
 import com.jarrlyyy.guessthenumber.ui.navigation.NavGraph
+import com.jarrlyyy.guessthenumber.ui.screens.CrashRecoveryScreen
 import com.jarrlyyy.guessthenumber.ui.theme.GuessTheNumberTheme
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 
 class MainActivity : ComponentActivity() {
     private val viewModel: GameViewModel by viewModels()
+    private var notificationDestination by mutableStateOf<String?>(null)
+    private var pendingWidgetSaveSlot by mutableStateOf<Int?>(null)
+
+    companion object {
+        const val EXTRA_NOTIFICATION_DESTINATION = "notification_destination"
+        const val EXTRA_WIDGET_SAVE_SLOT = "widget_save_slot"
+        private const val STATE_NOTIFICATION_DESTINATION = "state_notification_destination"
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        notificationDestination = intent.getStringExtra(EXTRA_NOTIFICATION_DESTINATION)
+        pendingWidgetSaveSlot = intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
+            .takeIf { it in 1..MAX_SAVE_SLOTS }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(STATE_NOTIFICATION_DESTINATION, notificationDestination)
+        super.onSaveInstanceState(outState)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        notificationDestination = savedInstanceState?.getString(STATE_NOTIFICATION_DESTINATION)
+            ?: intent.getStringExtra(EXTRA_NOTIFICATION_DESTINATION)
+        pendingWidgetSaveSlot = intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
+            .takeIf { it in 1..MAX_SAVE_SLOTS }
         setContent {
             val state by viewModel.gameState.collectAsState()
             val isLoadingSave by viewModel.isLoadingSave.collectAsState()
             val hasPreviousCrash by viewModel.hasPreviousCrash.collectAsState()
+            LaunchedEffect(isLoadingSave, hasPreviousCrash, pendingWidgetSaveSlot) {
+                val requestedSlot = pendingWidgetSaveSlot
+                if (requestedSlot != null && !isLoadingSave && !hasPreviousCrash) {
+                    pendingWidgetSaveSlot = null
+                    viewModel.switchSlot(requestedSlot)
+                }
+            }
             val offlineGains by viewModel.offlineGains.collectAsState()
+            val incomePerSecond by viewModel.incomePerSecond.collectAsState()
             val showChangelogPopup by viewModel.showChangelogPopup.collectAsState()
             val showTimeTravelPopup by viewModel.showTimeTravelPopup.collectAsState()
             val timeTravelSeconds by viewModel.timeTravelSeconds.collectAsState()
@@ -38,71 +67,85 @@ class MainActivity : ComponentActivity() {
             val musicCurrentPosition by viewModel.musicCurrentPosition.collectAsState()
             val musicDuration by viewModel.musicDuration.collectAsState()
             val musicAlbumArt by viewModel.musicAlbumArt.collectAsState()
+            val hasAnySave by viewModel.hasAnySave.collectAsState()
+            val needsSettingsMigration by viewModel.needsSettingsMigration.collectAsState()
+            val isMigratingSettings by viewModel.isMigratingSettings.collectAsState()
 
-            GuessTheNumberTheme(themeMode = state.settings.themeMode) {
+            GuessTheNumberTheme(
+                themeMode = state.settings.themeMode,
+                primaryHex = state.settings.customPrimaryColor,
+                secondaryHex = state.settings.customSecondaryColor,
+                tertiaryHex = state.settings.customTertiaryColor
+            ) {
                 val locale = viewModel.localeManager
-                if (isLoadingSave) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                CircularProgressIndicator()
-                                Text(
-                                    text = locale.getString("loading_save_data", "Loading save data..."),
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                            }
-                        }
+                when {
+                    hasPreviousCrash -> {
+                        // Crash recovery must be the first visible boot layer.
+                        // Keep it independent from NavGraph and CompositionLocals.
+                        CrashRecoveryScreen(
+                            locale = locale,
+                            onDismiss = { viewModel.dismissCrash() }
+                        )
                     }
-                } else {
-                    NavGraph(
-                        state = state,
-                        onMakeGuess = { viewModel.makeGuess(it) },
-                        onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
-                        onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
-                        onBuyPrestigeUpgrade = { id, cost -> viewModel.buyPrestigeUpgrade(id, cost) },
-                        onBuyPrestigeShopItem = { id, cost -> viewModel.buyPrestigeShopItem(id, cost) },
-                        onBuyUltraUpgrade = { id, cost -> viewModel.buyUltraUpgrade(id, cost) },
-                        onBuyUltraShopItem = { id, cost -> viewModel.buyUltraShopItem(id, cost) },
-                        onPrestige = { viewModel.prestigeReset() },
-                        onUltra = { viewModel.ultraReset() },
-                        onExecuteDevCommand = { viewModel.executeDevCommand(it) },
-                        onExportSave = { viewModel.exportSave(it) },
-                        onImportSave = { json, cb -> viewModel.importSave(json, cb) },
-                        onResetData = { viewModel.resetData() },
-                        onUpdateSettings = { viewModel.updateSettings(it) },
-                        onUpdateBackgroundMusic = { viewModel.updateBackgroundMusicPath(it) },
-                        isPlayingMusic = isPlayingMusic,
-                        musicCurrentPosition = musicCurrentPosition,
-                        musicDuration = musicDuration,
-                        musicAlbumArt = musicAlbumArt,
-                        onPlayMusic = { viewModel.playBackgroundMusic() },
-                        onPauseMusic = { viewModel.pauseBackgroundMusic() },
-                        onStopMusic = { viewModel.stopBackgroundMusic() },
-                        onSeekMusic = { viewModel.seekBackgroundMusic(it) },
-                        onCompleteTutorial = { viewModel.completeTutorial() },
-                        hasPreviousCrash = hasPreviousCrash,
-                        onDismissCrash = { viewModel.dismissCrash() },
-                        offlineGains = offlineGains,
-                        onDismissOfflineGains = { viewModel.dismissOfflineGains() },
-                        showChangelogPopup = showChangelogPopup,
-                        onDismissChangelog = { viewModel.dismissChangelogPopup() },
-                        showTimeTravelPopup = showTimeTravelPopup,
-                        timeTravelSeconds = timeTravelSeconds,
-                        onDismissTimeTravel = { viewModel.dismissTimeTravelPopup() },
-                        onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) },
-                        onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) },
-                        onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
-                        viewModel = viewModel
-                    )
+
+                    isLoadingSave -> {
+                        ExpressiveSaveLoadingScreen(
+                            title = locale.getString("loading_save_data", "Loading save data..."),
+                            reducedMotion = state.settings.reducedMotion
+                        )
+                    }
+
+                    else -> {
+                        NavGraph(
+                            state = state,
+                            onMakeGuess = { viewModel.makeGuess(it) },
+                            incomePerSecond = incomePerSecond,
+                            onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
+                            onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
+                            onEquipCosmetic = { id -> viewModel.equipCosmetic(id) },
+                            onBuyPrestigeUpgrade = { id, cost -> viewModel.buyPrestigeUpgrade(id, cost) },
+                            onBuyPrestigeShopItem = { id, cost -> viewModel.buyPrestigeShopItem(id, cost) },
+                            onBuyUltraUpgrade = { id, cost -> viewModel.buyUltraUpgrade(id, cost) },
+                            onBuyUltraShopItem = { id, cost -> viewModel.buyUltraShopItem(id, cost) },
+                            onPrestige = { viewModel.prestigeReset() },
+                            onUltra = { viewModel.ultraReset() },
+                            onExecuteDevCommand = { viewModel.executeDevCommand(it) },
+                            onExportSave = { viewModel.exportSave(it) },
+                            onImportSave = { json, cb -> viewModel.importSave(json, cb) },
+                            onResetData = { viewModel.resetData() },
+                            onUpdateSettings = { viewModel.updateSettings(it) },
+                            onUpdateBackgroundMusic = { viewModel.updateBackgroundMusicPath(it) },
+                            isPlayingMusic = isPlayingMusic,
+                            musicCurrentPosition = musicCurrentPosition,
+                            musicDuration = musicDuration,
+                            musicAlbumArt = musicAlbumArt,
+                            onPlayMusic = { viewModel.playBackgroundMusic() },
+                            onPauseMusic = { viewModel.pauseBackgroundMusic() },
+                            onStopMusic = { viewModel.stopBackgroundMusic() },
+                            onSeekMusic = { viewModel.seekBackgroundMusic(it) },
+                            onCompleteTutorial = { viewModel.completeTutorial() },
+                            hasPreviousCrash = hasPreviousCrash,
+                            onDismissCrash = { viewModel.dismissCrash() },
+                            offlineGains = offlineGains,
+                            onDismissOfflineGains = { viewModel.dismissOfflineGains() },
+                            showChangelogPopup = showChangelogPopup,
+                            onDismissChangelog = { viewModel.dismissChangelogPopup() },
+                            showTimeTravelPopup = showTimeTravelPopup,
+                            timeTravelSeconds = timeTravelSeconds,
+                            onDismissTimeTravel = { viewModel.dismissTimeTravelPopup() },
+                            needsSettingsMigration = needsSettingsMigration,
+                            isMigratingSettings = isMigratingSettings,
+                            onMigrateSettings = { viewModel.migrateSettingsToGlobal() },
+                            hasAnySave = hasAnySave,
+                            onEarnMinigameReward = { nebula, money -> viewModel.earnMinigameReward(nebula, money) },
+                            onUpdateMultiplier = { viewModel.updateBuyMultiplier(it) },
+                            onClaimLiveOpsEventReward = { viewModel.claimLiveOpsEventReward(it) },
+                            onActivateChallengeBuilder = { ids -> viewModel.activateChallengeBuilder(ids) },
+                            viewModel = viewModel,
+                            initialDestination = notificationDestination,
+                            onNotificationDestinationHandled = { notificationDestination = null }
+                        )
+                    }
                 }
             }
         }

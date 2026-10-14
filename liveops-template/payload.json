@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "hostApiVersion": 1,
+  "minAppVersionCode": 19,
+  "maxAppVersionCode": 9999,
+  "bundleVersion": 1,
+  "scripts": [
+    {
+      "id": "liveops_demo",
+      "fileName": "liveops_demo.lua",
+      "title": "LiveOps Demo",
+      "description": "A signed example activity delivered from the LiveOps repository.",
+      "sha256": "",
+      "featured": true,
+      "hostApiVersion": 1,
+      "capabilities": ["log"]
+    }
+  ]
+}

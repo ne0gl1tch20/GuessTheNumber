@@ -1,6 +1,21 @@
-# Guess The Number (Incremental & Arcade Edition v1.7)
+# Guess The Number (Incremental & Arcade Edition)
 
-An advanced, feature-rich incremental and arcade Android game built with **Jetpack Compose** and **Kotlin**. Beyond a simple number-guessing mechanic, this app incorporates deep incremental layers (upgrades, prestige, ultra prestige, achievements, minigames, challenges, and arcade modes), extensive logging, audio management, and developer tools.
+An advanced, feature-rich incremental and arcade Android game built with **Jetpack Compose** and **Kotlin**. Start with a simple number guess, then turn it into a full progression loop: build upgrades, chase streaks, trigger Frenzy, discover events, collect cosmetics, stack mutators, and create challenges that make your next run feel different.
+
+**Why try it?** 🎮 You can play casually, optimize an automation build, hunt achievement tiers, or make a ridiculous custom mutator challenge. There is always another upgrade, reset, challenge, or combination waiting in the next run.
+
+## 🧩 Lua Scripting Layer (Implementation in Progress)
+
+The first embedded LuaJ runtime and shared Kotlin engine facade are now implemented on the `feat/lua-runtime-engine` branch. The Lua Activity Hub has a working **GO** flow for the bundled offline Number Rush activity, and Dev Settings has typed `/lua` commands. Kotlin remains authoritative for save data, progression, and rewards.
+
+- [Lua implementation roadmap](docs/LUA_SCRIPTING_PLAN.md)
+- [Draft Lua host API contract](docs/LUA_API_DESIGN.md)
+- [GitHub LiveOps bundle delivery plan](docs/LIVEOPS_SCRIPT_BUNDLES_PLAN.md)
+- [Signed LiveOps bundle format](docs/LIVEOPS_BUNDLE_FORMAT.md)
+- [Copy-ready LiveOps repository template](liveops-template/README.md)
+- [Reserved reusable scripts directory](app/src/main/assets/scripts/README.md)
+
+The runtime uses an instruction-budgeted Lua sandbox with no exposed Android, Java bridge, filesystem, OS, network, package loader, or coroutine library. The signed LiveOps client is implemented but remains fail-closed until the `GuessTheNumber-LiveOps` content repository and trusted RSA public-key configuration are set up. No remote script is accepted without a valid signed manifest and matching script hashes.
 
 ---
 
@@ -10,8 +25,20 @@ An advanced, feature-rich incremental and arcade Android game built with **Jetpa
 - **Number Guessing / Incremental Engine**: Earn currency by guessing numbers, accelerated by fluid quick-buy multipliers (`1x`, `10x`, `100x`, `MAX`) and autonomous background guessing bots.
 - **Upgrades & Progression**: Buy standard upgrades (`upgrades.json`), prestige upgrades (`prestige_upgrades.json`), ultra upgrades (`ultra_upgrades.json`), and interconnected Prestige Talent Web skill nodes (`talents.json`) via JSON configuration files.
 - **Prestige & Ultra Systems**: Reset or ascend through multiple layers of prestige with scaling requirements and custom shops.
+- **Weekly Challenges**: Rotating weekly challenge sets now mix accuracy, streak, money, guess volume, Prestige, Ultra, Frenzy, and playtime goals with week-scoped claim IDs and varied Nebula rewards.
+- **Random Events**: Occasional varied offline-friendly events such as Cash Burst, Nebula Rain, Jackpot, Streak Surge, Range Shuffle, Tax Refund, and rare Cosmic Gifts.
+- **Achievement Tier System**: Expanded the achievement catalog to 27 milestones across Bronze, Silver, Gold, and Diamond tiers with localized names/descriptions and escalating Nebula rewards.
+- **Combo / Frenzy System**: Consecutive correct guesses build streaks, with Frenzy tiers adding escalating reward multipliers up to 5x.
 - **Achievements & Challenges**: Track milestones, complete daily seeded challenges with Nebula rewards, and play high-stakes 50/50 staking mode (`StakingScreen`).
 - **Arcade Minigames**: Integrated side activities and minigames (`minigames.json`) to keep gameplay engaging.
+
+### 🎯 **What You Can Do Right Now**
+- 🔥 **Build a streak and hit Frenzy**: Keep landing correct guesses to push your reward multiplier higher.
+- 🧩 **Make your own challenge**: Combine mutators, choose a goal, set a target, and chase the Nebula reward.
+- ✨ **Collect cosmetics**: Browse the shop by category and equip cosmetics as your collection grows.
+- 🏆 **Climb achievement tiers**: Work through Bronze, Silver, Gold, and Diamond milestones.
+- 🎲 **React to random events**: Keep playing and see what the next event throws at your run.
+- 💾 **Keep multiple runs**: Use the expanded save-slot system for separate profiles and difficulty choices.
 
 ### 2. **Architecture & Tech Stack**
 - **UI Toolkit**: 100% Jetpack Compose with Google's **Material 3 Expressive** design system, organic spring-physics micro-animations, and pure black AMOLED mode.
@@ -60,4 +87,4 @@ com.jarrlyyy.guessthenumber/
 
 1. **Prerequisites**: Android Studio Jellyfish / Koala or later with Kotlin support and Android SDK 34.
 2. **Open Project**: Open the root folder `GuessTheNumber` in Android Studio.
-3. **Build & Run**: Sync Gradle and run the `app` module on an emulator or physical Android device (minSdk 26, targetSdk 34).
+3. **Build & Run**: Sync Gradle and run the `app` module on an emulator or physical Android device (minSdk 26, targetSdk 35).

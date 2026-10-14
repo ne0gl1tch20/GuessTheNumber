@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.domain.command
 
+import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
@@ -7,23 +8,21 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 
 object DeveloperConfig {
-    const val ENABLED = true
+    val ENABLED = BuildConfig.DEBUG
 }
 
 class CommandExecutor {
 
     fun execute(commandLine: String, currentState: GameState, onStateUpdate: (GameState) -> Unit): String {
         if (!DeveloperConfig.ENABLED) return "Developer mode is disabled."
-        val parts = commandLine.trim().split("\\s+".toRegex())
-        if (parts.isEmpty() || parts[0].isEmpty()) return "Invalid command."
-
-        val cmd = parts[0].lowercase()
-        val args = parts.drop(1)
+        val parsed = CommandParser.parse(commandLine) ?: return "Invalid command. Commands must start with '/'."
+        val cmd = parsed.name
+        val args = parsed.arguments
 
         GameLogger.log(LogLevel.INFO, LoggerCategory.COMMAND, "EXEC_COMMAND", "Executing: $commandLine")
 
         return when (cmd) {
-            "/help" -> "Available commands:\n/give [money|prestige|ultra|nebula|all] <amount>\n/set [money|prestige|ultra|nebula] <amount>\n/reset [progression|prestige|ultra|all]\n/timeskip <seconds>\n/test antitimetravel\n/max_upgrades\n/unlock_all\n/win\n/speed <multiplier>\n/stats\n/matrix\n/konami\n/moneyprinter\n/easteregg\n/crash_test"
+            "/help" -> "Available commands:\n/give <currency> <amount>\n/set <currency> <amount>\n/reset <progression|prestige|ultra|all>\n/timeskip <seconds>\n/max_upgrades\n/unlock_all or /unlock all\n/win or /completeguess\n/speed <clicksPerSecond>\n/autoclicker <on|off>\n/setlevel <upgradeId> <level>\n/newnumber\n/state or /inspect\n/version\n/logs <clear|pause|resume>\n/stats\n/test antitimetravel\n/matrix\n/konami\n/moneyprinter\n/easteregg\n/crash_test"
             
             "/give" -> {
                 if (args.size < 2) return "Usage: /give <currency> <amount>"
@@ -122,7 +121,7 @@ class CommandExecutor {
                 "All standard, prestige, and ultra upgrades maxed to peak levels!"
             }
 
-            "/unlock_all" -> {
+            "/unlock_all", "/unlock" -> {
                 val newState = currentState.copy(
                     achievements = setOf("correct_10", "streak_5", "millionaire"),
                     completedChallenges = setOf("daily_guess_50"),
@@ -135,7 +134,7 @@ class CommandExecutor {
                 "All achievements, challenges, shop items (including Nebula, Prestige, and Ultra shops), and tutorial unlocked!"
             }
 
-            "/win" -> {
+            "/win", "/completeguess" -> {
                 val reward = BigNumber(10000)
                 val newStreak = currentState.streak + 1
                 val newBestStreak = maxOf(currentState.bestStreak, newStreak)
@@ -181,6 +180,54 @@ class CommandExecutor {
                 )
                 onStateUpdate(newState)
                 "Auto-clicker speed set to $speed clicks/sec."
+            }
+
+
+            "/autoclicker" -> {
+                val requested = args.getOrNull(0)?.lowercase()
+                    ?: return "Usage: /autoclicker <on|off>"
+                val enabled = when (requested) {
+                    "on", "true", "1" -> true
+                    "off", "false", "0" -> false
+                    else -> return "Use /autoclicker on or /autoclicker off."
+                }
+                onStateUpdate(currentState.copy(autoClickerActive = enabled))
+                "Auto-clicker ${if (enabled) "enabled" else "disabled"}."
+            }
+
+            "/setlevel" -> {
+                if (args.size < 2) return "Usage: /setlevel <upgradeId> <level>"
+                val id = args[0].lowercase()
+                if (!id.matches(Regex("[a-z0-9_]{1,64}"))) return "Invalid upgrade ID."
+                val level = args[1].toIntOrNull()?.coerceIn(0, 1000)
+                    ?: return "Level must be an integer from 0 to 1000."
+                onStateUpdate(currentState.copy(upgradeLevels = currentState.upgradeLevels + (id to level)))
+                "Set upgrade '$id' to level $level."
+            }
+
+            "/newnumber" -> {
+                if (currentState.currentRangeMin >= currentState.currentRangeMax) return "Current guess range is invalid."
+                val target = java.util.concurrent.ThreadLocalRandom.current().nextLong(
+                    currentState.currentRangeMin,
+                    currentState.currentRangeMax + 1
+                )
+                onStateUpdate(currentState.copy(targetNumber = target, attempts = 0))
+                "Generated a new target in the current range."
+            }
+
+            "/state", "/inspect" -> {
+                "State: range=${currentState.currentRangeMin}..${currentState.currentRangeMax}, attempts=${currentState.attempts}, correct=${currentState.correctGuesses}, streak=${currentState.streak}, autoClicker=${currentState.autoClickerActive}, upgrades=${currentState.upgradeLevels.size}, activeBoss=${currentState.activeBossBattleWorldId ?: "none"}."
+            }
+
+            "/version" -> "GuessTheNumber ${BuildConfig.VERSION_NAME} (versionCode ${BuildConfig.VERSION_CODE}; debug=${BuildConfig.DEBUG})."
+
+            "/logs" -> {
+                when (args.getOrNull(0)?.lowercase()) {
+                    "clear" -> { GameLogger.clear(); "Developer logs cleared." }
+                    "pause" -> { GameLogger.pause(); "Developer log stream paused." }
+                    "resume" -> { GameLogger.resume(); "Developer log stream resumed." }
+                    else -> "Usage: /logs <clear|pause|resume>"
+                }
             }
 
             "/stats" -> {
