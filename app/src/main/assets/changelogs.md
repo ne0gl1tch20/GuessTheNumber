@@ -1,3 +1,7 @@
+## Unreleased (Progression Celebrations)
+
+- 🌟 **Early-goal celebrations**: Completing the existing 10-correct-guesses, 5-best-streak, or one-million-Money goals now triggers a localized milestone banner on the Play screen. Multiple milestones queue in sequence, and reduced-motion timing is respected. Existing goals and rewards are unchanged.
+
 ## Unreleased (Achievement Celebrations)
 
 - 🏆 **Achievement unlock queue**: When several achievements unlock together, each gets its own localized celebration banner in sequence instead of only announcing the first one. Reduced-motion timing remains supported.
