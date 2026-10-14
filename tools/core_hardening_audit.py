@@ -34,6 +34,7 @@ REQUIRED_SETTINGS_DESCRIPTIONS = (
     "settings_desc_vibration",
     "settings_desc_reduced_motion",
     "settings_desc_master_volume",
+    "settings_desc_sfx_volume",
 )
 
 errors: list[str] = []

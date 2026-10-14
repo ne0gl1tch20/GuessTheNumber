@@ -872,6 +872,10 @@
   "visual_comfort_description": "Visueel comfort en toegankelijkheid",
   "reduced_motion_label": "Beweging verminderen",
   "reduced_motion_description": "Verzacht of schakelt expressieve schermovergangen uit",
+  "sfx_volume_format": "Volume geluidseffecten: %d%%",
+
+  "settings_desc_sfx_volume": "Pas het volume van geluidseffecten onafhankelijk van de achtergrondmuziek aan.",
+
   "master_volume_format": "Hoofdvolume: %d%%",
   "save_data_management_title": "Opgeslagen gegevens beheren",
   "reset_all_game_data_label": "Alle gamegegevens resetten",

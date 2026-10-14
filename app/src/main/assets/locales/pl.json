@@ -872,6 +872,10 @@
   "visual_comfort_description": "Komfort wizualny i dostępność",
   "reduced_motion_label": "Ogranicz ruch",
   "reduced_motion_description": "Złagodź lub wyłącz animowane przejścia ekranu",
+  "sfx_volume_format": "Głośność efektów dźwiękowych: %d%%",
+
+  "settings_desc_sfx_volume": "Ustaw głośność efektów dźwiękowych niezależnie od muzyki w tle.",
+
   "master_volume_format": "Głośność główna: %d%%",
   "save_data_management_title": "Zarządzanie zapisanymi danymi",
   "reset_all_game_data_label": "Zresetuj wszystkie dane gry",
