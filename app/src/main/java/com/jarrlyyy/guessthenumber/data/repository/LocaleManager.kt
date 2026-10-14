@@ -16,9 +16,9 @@ import java.util.Currency
 import java.util.Locale
 
 class LocaleManager(private val context: Context) {
-    private var translations: JSONObject = JSONObject()
-    private var englishCatalog: JSONObject = JSONObject()
-    private var currentLocale: Locale = Locale.US
+    @Volatile private var translations: JSONObject = JSONObject()
+    @Volatile private var englishCatalog: JSONObject = JSONObject()
+    @Volatile private var currentLocale: Locale = Locale.US
 
     suspend fun loadLocale(localeFileName: String = ENGLISH_FILE) {
         withContext(Dispatchers.IO) {
@@ -118,11 +118,18 @@ class LocaleManager(private val context: Context) {
             minimumFractionDigits = fractionDigits
         }.format(value)
 
-    fun formatCurrency(amount: BigDecimal, currencyCode: String): String =
-        NumberFormat.getCurrencyInstance(currentLocale).apply {
-            currency = Currency.getInstance(currencyCode)
-            maximumFractionDigits = 2
-        }.format(amount)
+    fun formatCurrency(amount: BigDecimal, currencyCode: String): String {
+        val formatter = NumberFormat.getCurrencyInstance(currentLocale)
+        val currency = runCatching { Currency.getInstance(currencyCode) }.getOrNull()
+        if (currency == null) {
+            // Bad external/config data must not crash a screen. Keep the numeric amount
+            // visible without guessing which currency the caller intended.
+            return formatDecimal(amount, 2)
+        }
+        formatter.currency = currency
+        formatter.maximumFractionDigits = 2
+        return formatter.format(amount)
+    }
 
     fun formatDate(timestampMillis: Long): String =
         DateFormat.getDateInstance(DateFormat.MEDIUM, currentLocale).format(timestampMillis)
