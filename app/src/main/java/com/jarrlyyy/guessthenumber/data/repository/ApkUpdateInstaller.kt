@@ -27,17 +27,25 @@ class ApkUpdateInstaller(private val context: Context) {
     fun install(downloadUrl: String): Result<Unit> {
         val root = File(context.cacheDir, "updates").apply { mkdirs() }
         val archive = File(root, "update.zip")
+        val directApk = File(root, "update.apk")
         val extracted = File(root, "extracted-${System.currentTimeMillis()}")
         return runCatching {
-            download(downloadUrl, archive)
-            extractSafely(archive, extracted)
-            val apks = extracted.walkTopDown().filter { it.isFile && it.extension.equals("apk", true) }.toList()
-            require(apks.isNotEmpty()) { "No APK found in update archive." }
-            require(apks.size <= 32) { "Too many APK candidates." }
-            apks.forEach(::validateApk)
-            installApks(apks)
+            if (URL(downloadUrl).path.lowercase().endsWith(".apk")) {
+                download(downloadUrl, directApk)
+                validateApk(directApk)
+                installApks(listOf(directApk))
+            } else {
+                download(downloadUrl, archive)
+                extractSafely(archive, extracted)
+                val apks = extracted.walkTopDown().filter { it.isFile && it.extension.equals("apk", true) }.toList()
+                require(apks.isNotEmpty()) { "No APK found in update archive." }
+                require(apks.size <= 32) { "Too many APK candidates." }
+                apks.forEach(::validateApk)
+                installApks(apks)
+            }
         }.also {
             archive.delete()
+            directApk.delete()
             extracted.deleteRecursively()
         }
     }
