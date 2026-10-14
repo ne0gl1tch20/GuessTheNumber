@@ -84,7 +84,7 @@ fun FeatureTourOverlay(
 
     AlertDialog(
         onDismissRequest = ::finish,
-        title = { Text(locale.getString("tour_title_format", "%s • Quick tour", featureTitle)) },
+        title = { Text("$featureTitle · ${locale.getString("more_feature_discovery_title", "Quick tour")}") },
         text = { Text(featureDescription) },
         confirmButton = {
             Button(onClick = ::finish) {
