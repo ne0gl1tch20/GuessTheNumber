@@ -848,6 +848,10 @@
   "visual_comfort_description": "Visual comfort & accessibility",
   "reduced_motion_label": "Reduced Motion",
   "reduced_motion_description": "Soften or disable expressive screen transitions",
+  "sfx_volume_format": "Sound Effects Volume: %d%%",
+
+  "settings_desc_sfx_volume": "Adjust sound-effect loudness independently of background music.",
+
   "master_volume_format": "Master Volume: %d%%",
   "save_data_management_title": "Save Data Management",
   "reset_all_game_data_label": "Reset All Game Data",
