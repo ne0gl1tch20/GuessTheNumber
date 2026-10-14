@@ -68,10 +68,18 @@ jobs:
         shell: pwsh
         run: .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache
 
+      - name: Show packaged files
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "desktopApp/build/compose/binaries" -Recurse -File | Select-Object FullName, Length
+          if (-not (Test-Path "desktopApp/build/compose/binaries/main/msi")) {
+            throw "Windows MSI output directory was not created."
+          }
+
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
           name: GuessTheNumber-Windows-Desktop
-          path: desktopApp/build/compose/binaries/main/**
-          if-no-files-found: warn
+          path: desktopApp/build/compose/binaries/main/msi/*.msi
+          if-no-files-found: error
           retention-days: 14

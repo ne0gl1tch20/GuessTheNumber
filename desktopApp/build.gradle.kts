@@ -26,5 +26,11 @@ kotlin {
 compose.desktop {
     application {
         mainClass = "com.jarrlyyy.guessthenumber.desktop.MainKt"
+
+        nativeDistributions {
+            targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi)
+            packageName = "GuessTheNumber"
+            packageVersion = "1.0.0"
+        }
     }
 }
