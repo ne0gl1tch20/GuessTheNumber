@@ -915,6 +915,14 @@
   "visual_comfort_description": "视觉舒适与无障碍",
   "reduced_motion_label": "减少动态效果",
   "reduced_motion_description": "柔化或关闭富有表现力的屏幕过渡动画",
+  "more_feature_discovery_title": "快速导览",
+
+  "more_feature_discovery_step_1": "此功能有自己的工具和进度。先简单了解一下，再选择想探索的内容。",
+
+  "more_feature_discovery_step_2": "你可以随时从 More Hub 返回此功能。",
+
+  "more_feature_discovery_skip": "跳过并打开",
+
   "master_volume_format": "主音量：%d%%",
   "save_data_management_title": "存档数据管理",
   "reset_all_game_data_label": "重置所有游戏数据",
