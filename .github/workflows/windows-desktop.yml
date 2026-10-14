@@ -60,14 +60,18 @@ jobs:
         shell: pwsh
         run: .\gradlew.bat :shared:jvmTest :desktopApp:compileKotlinJvm
 
-      - name: Build Windows MSI installer
+      - name: Inspect desktop packaging tasks
         shell: pwsh
-        run: .\gradlew.bat :desktopApp:packageMsi
+        run: .\gradlew.bat :desktopApp:tasks --all
+
+      - name: Build Windows installer
+        shell: pwsh
+        run: .\gradlew.bat :desktopApp:package
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheNumber-Windows-MSI
-          path: desktopApp/build/compose/binaries/main/msi/*.msi
-          if-no-files-found: error
+          name: GuessTheNumber-Windows-Package
+          path: desktopApp/build/compose/binaries/main/**
+          if-no-files-found: warn
           retention-days: 14
