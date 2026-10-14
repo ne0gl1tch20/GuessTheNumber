@@ -21,6 +21,7 @@
   "mutators": "Mutators",
   "prestige": "Prestige",
   "save_slots": "Save Slots",
+  "guess_rate_limited": "Please wait a moment before guessing again.",
   "guess_prompt": "Enter your guess:",
   "submit_guess": "Submit",
   "correct_guess": "Correct! You guessed the number!",
