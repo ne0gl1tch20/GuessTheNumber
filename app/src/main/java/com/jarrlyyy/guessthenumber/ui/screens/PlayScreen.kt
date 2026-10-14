@@ -30,6 +30,8 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
 
+private enum class GuessFeedbackTone { Neutral, TooLow, TooHigh, Correct }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayScreen(
@@ -50,6 +52,7 @@ fun PlayScreen(
     val configRepository = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale) }
     val locale = configRepository.localeManager
     var lastFeedback by remember { mutableStateOf(locale.getString("guess_prompt", "Guess a number between ${state.currentRangeMin} and ${state.currentRangeMax}")) }
+    var feedbackTone by remember { mutableStateOf(GuessFeedbackTone.Neutral) }
     var showCorrectCelebration by remember { mutableStateOf(false) }
     var observedCorrectGuesses by remember { mutableStateOf(state.correctGuesses) }
     val guessInteractionSource = remember { MutableInteractionSource() }
@@ -471,16 +474,57 @@ fun PlayScreen(
                         AnimatedContent(
                             targetState = lastFeedback,
                             transitionSpec = {
-                                (fadeIn(animationSpec = tween(180)) + slideInVertically { it / 5 }) togetherWith
-                                    (fadeOut(animationSpec = tween(120)) + slideOutVertically { -it / 5 })
+                                if (state.settings.reducedMotion) {
+                                    fadeIn(animationSpec = tween(100)) togetherWith fadeOut(animationSpec = tween(100))
+                                } else {
+                                    (fadeIn(animationSpec = tween(180)) + slideInVertically { it / 5 }) togetherWith
+                                        (fadeOut(animationSpec = tween(120)) + slideOutVertically { -it / 5 })
+                                }
                             },
                             label = "FeedbackAnimation"
                         ) { feedback ->
-                            Text(
-                                text = feedback,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            val feedbackContainerColor = when (feedbackTone) {
+                                GuessFeedbackTone.Neutral -> MaterialTheme.colorScheme.surfaceVariant
+                                GuessFeedbackTone.TooLow -> MaterialTheme.colorScheme.secondaryContainer
+                                GuessFeedbackTone.TooHigh -> MaterialTheme.colorScheme.primaryContainer
+                                GuessFeedbackTone.Correct -> MaterialTheme.colorScheme.tertiaryContainer
+                            }
+                            val feedbackContentColor = when (feedbackTone) {
+                                GuessFeedbackTone.Neutral -> MaterialTheme.colorScheme.onSurfaceVariant
+                                GuessFeedbackTone.TooLow -> MaterialTheme.colorScheme.onSecondaryContainer
+                                GuessFeedbackTone.TooHigh -> MaterialTheme.colorScheme.onPrimaryContainer
+                                GuessFeedbackTone.Correct -> MaterialTheme.colorScheme.onTertiaryContainer
+                            }
+                            Surface(
+                                modifier = Modifier.fillMaxWidth().animateContentSize(),
+                                shape = MaterialTheme.shapes.large,
+                                color = feedbackContainerColor,
+                                tonalElevation = if (state.settings.reducedMotion) 0.dp else 2.dp
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(14.dp),
+                                    verticalAlignment = Alignment.Top,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = when (feedbackTone) {
+                                            GuessFeedbackTone.Neutral -> Icons.Default.TipsAndUpdates
+                                            GuessFeedbackTone.TooLow -> Icons.Default.ArrowUpward
+                                            GuessFeedbackTone.TooHigh -> Icons.Default.ArrowDownward
+                                            GuessFeedbackTone.Correct -> Icons.Default.CheckCircle
+                                        },
+                                        contentDescription = null,
+                                        tint = feedbackContentColor,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Text(
+                                        text = feedback,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = feedbackContentColor,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -495,6 +539,12 @@ fun PlayScreen(
                                 val g = guessInput.toLongOrNull()
                                 if (g != null) {
                                     onMakeGuess(g)
+                                    feedbackTone = when {
+                                        "mut_blind" in state.activeMutators -> GuessFeedbackTone.Neutral
+                                        g < state.targetNumber -> GuessFeedbackTone.TooLow
+                                        g > state.targetNumber -> GuessFeedbackTone.TooHigh
+                                        else -> GuessFeedbackTone.Correct
+                                    }
                                     lastFeedback = if ("mut_blind" in state.activeMutators) {
                                         locale.getString("blind_feedback", "Feedback hidden by Blindfolded Oracle.")
                                     } else if (g < state.targetNumber) {
@@ -554,7 +604,7 @@ fun PlayScreen(
                                         }
                                         "$highMsg\n\n$formattedTip"
                                     } else {
-                                        "✨ Correct! You guessed the secret number!"
+                                        locale.getString("play_correct_guess", "✨ Correct! You guessed the secret number!")
                                     }
                                     guessInput = ""
                                 }
@@ -571,7 +621,15 @@ fun PlayScreen(
                                 val g = guessInput.toLongOrNull()
                                 if (g != null) {
                                     onMakeGuess(g)
-                                    lastFeedback = if (g < state.targetNumber) {
+                                    feedbackTone = when {
+                                        "mut_blind" in state.activeMutators -> GuessFeedbackTone.Neutral
+                                        g < state.targetNumber -> GuessFeedbackTone.TooLow
+                                        g > state.targetNumber -> GuessFeedbackTone.TooHigh
+                                        else -> GuessFeedbackTone.Correct
+                                    }
+                                    lastFeedback = if ("mut_blind" in state.activeMutators) {
+                                        locale.getString("blind_feedback", "Feedback hidden by Blindfolded Oracle.")
+                                    } else if (g < state.targetNumber) {
                                         val lowMsg = feedbackRoot.tooLowMessages.randomOrNull() ?: "📈 Too Low!"
                                         val randomTipTemplate = feedbackRoot.guessTipsAndClues.randomOrNull() ?: "💡 Binary search midpoint: %d"
                                         val midpoint = (state.currentRangeMin + state.currentRangeMax) / 2
