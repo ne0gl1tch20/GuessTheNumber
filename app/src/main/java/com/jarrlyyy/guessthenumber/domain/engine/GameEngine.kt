@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.domain.engine
 
+import com.jarrlyyy.guessthenumber.shared.rules.GuessRules
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -7,9 +8,7 @@ import kotlin.math.log10
 import kotlin.math.sqrt
 import kotlin.random.Random
 
-enum class GuessFeedback {
-    TOO_LOW, TOO_HIGH, CORRECT
-}
+typealias GuessFeedback = com.jarrlyyy.guessthenumber.shared.rules.GuessFeedback
 
 data class GuessResult(
     val feedback: GuessFeedback,
@@ -69,12 +68,12 @@ class GameEngine(private val rng: Random = Random.Default) {
 
     fun processGuess(state: GameState, guess: Long): GuessResult {
         // Validate target range bounds
-        val clampedGuess = guess.coerceIn(state.currentRangeMin, state.currentRangeMax)
-        val feedback = when {
-            clampedGuess < state.targetNumber -> GuessFeedback.TOO_LOW
-            clampedGuess > state.targetNumber -> GuessFeedback.TOO_HIGH
-            else -> GuessFeedback.CORRECT
-        }
+        val feedback = GuessRules.resolveFeedback(
+            targetNumber = state.targetNumber,
+            guess = guess,
+            rangeMin = state.currentRangeMin,
+            rangeMax = state.currentRangeMax
+        )
 
         if (feedback == GuessFeedback.CORRECT) {
             val critChance = 0.05 + ((state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0) * 0.01)
