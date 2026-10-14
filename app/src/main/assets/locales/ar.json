@@ -874,9 +874,7 @@
   "reduced_motion_label": "تقليل الحركة",
   "reduced_motion_description": "تخفيف انتقالات الشاشة أو تعطيلها",
   "sfx_volume_format": "مستوى صوت المؤثرات: %d%%",
-
   "settings_desc_sfx_volume": "اضبط مستوى المؤثرات الصوتية بشكل مستقل عن موسيقى الخلفية.",
-
   "master_volume_format": "مستوى الصوت الرئيسي: %d%%",
   "save_data_management_title": "إدارة بيانات الحفظ",
   "reset_all_game_data_label": "إعادة ضبط جميع بيانات اللعبة",
@@ -1093,5 +1091,9 @@
   "settings_desc_reduce_flashes": "قلّل الومضات والتغييرات البصرية المفاجئة لراحة أكبر.",
   "settings_desc_reduced_motion": "خفّف أو أوقف انتقالات الشاشة المتحركة.",
   "settings_desc_master_volume": "اضبط مستوى صوت التطبيق من الصامت إلى الحد الأقصى.",
-  "settings_desc_reset_all_data": "يمسح هذا الإجراء تقدم اللعبة المحفوظ. ستحتاج إلى تأكيد إضافي قبل المتابعة."
+  "settings_desc_reset_all_data": "يمسح هذا الإجراء تقدم اللعبة المحفوظ. ستحتاج إلى تأكيد إضافي قبل المتابعة.",
+  "more_feature_discovery_title": "جولة سريعة",
+  "more_feature_discovery_step_1": "تحتوي هذه الميزة على أدوات وتقدم خاصين بها. ألقِ نظرة سريعة ثم اختر ما تريد استكشافه.",
+  "more_feature_discovery_step_2": "يمكنك العودة إلى هذه الميزة من More Hub في أي وقت.",
+  "more_feature_discovery_skip": "تخطَّ وافتح"
 }
