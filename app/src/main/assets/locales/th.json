@@ -872,6 +872,10 @@
   "visual_comfort_description": "ความสบายตาและการช่วยการเข้าถึง",
   "reduced_motion_label": "ลดการเคลื่อนไหว",
   "reduced_motion_description": "ลดหรือปิดการเปลี่ยนหน้าจอแบบเคลื่อนไหว",
+  "sfx_volume_format": "ระดับเสียงเอฟเฟกต์: %d%%",
+
+  "settings_desc_sfx_volume": "ปรับระดับเสียงเอฟเฟกต์แยกจากเพลงพื้นหลัง",
+
   "master_volume_format": "ระดับเสียงหลัก: %d%%",
   "save_data_management_title": "จัดการข้อมูลบันทึก",
   "reset_all_game_data_label": "รีเซ็ตข้อมูลเกมทั้งหมด",
