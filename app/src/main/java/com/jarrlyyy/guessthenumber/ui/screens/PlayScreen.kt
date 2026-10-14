@@ -341,7 +341,7 @@ fun PlayScreen(
                     exit = if (state.settings.reducedMotion) fadeOut() else scaleOut() + fadeOut()
                 ) {
                     Surface(
-                        modifier = Modifier.fillMaxWidth().animateContentSize(),
+                        modifier = Modifier.fillMaxWidth().animateContentSize().semantics(mergeDescendants = true) { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite },
                         shape = MaterialTheme.shapes.extraLarge,
                         color = MaterialTheme.colorScheme.tertiaryContainer,
                         tonalElevation = if (state.settings.reducedMotion) 0.dp else 6.dp
@@ -424,7 +424,7 @@ fun PlayScreen(
                         }
                     ) {
                         Surface(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite },
                             shape = MaterialTheme.shapes.extraLarge,
                             color = eventContainerColor,
                             tonalElevation = 5.dp
