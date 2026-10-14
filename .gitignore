@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+/gtn-liveops-keys
+/gtn-signing
