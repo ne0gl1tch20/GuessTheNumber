@@ -872,6 +872,14 @@
   "visual_comfort_description": "दृश्य आराम और सुगम्यता",
   "reduced_motion_label": "गति कम करें",
   "reduced_motion_description": "स्क्रीन ट्रांज़िशन को हल्का करें या बंद करें",
+  "more_feature_discovery_title": "त्वरित परिचय",
+
+  "more_feature_discovery_step_1": "इस सुविधा के अपने टूल और प्रगति हैं। एक नज़र डालें, फिर चुनें कि आप क्या देखना चाहते हैं।",
+
+  "more_feature_discovery_step_2": "आप जब चाहें More Hub से इस सुविधा पर लौट सकते हैं।",
+
+  "more_feature_discovery_skip": "छोड़ें और खोलें",
+
   "master_volume_format": "मुख्य वॉल्यूम: %d%%",
   "save_data_management_title": "सेव डेटा प्रबंधन",
   "reset_all_game_data_label": "सभी गेम डेटा रीसेट करें",
