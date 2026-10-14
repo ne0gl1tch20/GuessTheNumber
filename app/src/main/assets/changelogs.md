@@ -1,5 +1,6 @@
 ## Unreleased (Player Experience)
 
+- 🧭 **More Hub feature discovery**: First-time visits to eligible More Hub features now show a short two-step popup with Next, Done, and Skip-and-open. Completion is saved in global settings; Settings, About, and developer/testing routes are excluded. Dismissing the popup leaves it available to show again.
 - 🎯 **Accurate guess feedback**: Keyboard and button submissions now share one handler, and rate-limited guesses show a localized retry message instead of misleading high/low/correct feedback. Feedback uses the same clamped number the game engine evaluates.
 - 🎯 **Clearer guess feedback**: High, low, and correct guesses now use distinct icons and theme-aware feedback cards. Feedback transitions respect the reduced-motion setting, and Blindfolded Oracle hides feedback from both the Guess button and keyboard submission paths.
 
