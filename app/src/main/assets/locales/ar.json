@@ -21,6 +21,7 @@
   "mutators": "Mutators",
   "prestige": "Prestige",
   "save_slots": "خانات الحفظ",
+  "guess_rate_limited": "يرجى الانتظار قليلًا قبل التخمين مرة أخرى.",
   "guess_prompt": "Enter your guess:",
   "submit_guess": "إرسال",
   "correct_guess": "Correct! You guessed the number!",

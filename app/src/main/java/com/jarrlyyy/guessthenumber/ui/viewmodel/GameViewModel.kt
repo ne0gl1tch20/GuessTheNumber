@@ -439,11 +439,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun makeGuess(guess: Long) {
+    fun makeGuess(guess: Long): Boolean {
         val correlationId = "guess-${System.nanoTime().toString(16)}"
         if (!AntiCheatService.validateGuessRate()) {
             GameLogger.log(LogLevel.WARN, LoggerCategory.GUESS, "GUESS_RATE_LIMITED", "Guess input was rate-limited.", correlationId)
-            return
+            return false
         }
         val currentState = refreshDailyQuestDay(_gameState.value)
         GameLogger.log(LogLevel.DEBUG, LoggerCategory.GUESS, "GUESS_BEGIN", "Processing guess within range ${currentState.currentRangeMin}..${currentState.currentRangeMax}.", correlationId)
@@ -476,6 +476,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             "Guess $guess resulted in ${result.feedback}; reward=${result.reward}; attempts=${finalState.attempts}; streak=${finalState.streak}.",
             correlationId
         )
+        return true
     }
 
     private fun checkAchievements(state: GameState) {

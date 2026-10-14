@@ -37,6 +37,7 @@
   "live_ops": "Live Ops",
   "mutators": "Mutators",
   "prestige": "Prestige",
+  "guess_rate_limited": "Зачекайте трохи перед наступною спробою.",
   "guess_prompt": "Enter your guess:",
   "correct_guess": "Correct! You guessed the number!",
   "too_low": "Too low! Try a higher number.",
