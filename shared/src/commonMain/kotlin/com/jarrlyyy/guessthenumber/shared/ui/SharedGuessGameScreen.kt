@@ -35,7 +35,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.shared.domain.GuessGameReducer
-import com.jarrlyyy.guessthenumber.shared.domain.GuessGameState
 import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
 import kotlin.random.Random
 
