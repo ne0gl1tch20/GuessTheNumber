@@ -50,7 +50,7 @@ fun FeatureTourOverlay(
         "codex" -> locale.getString("codex_title", "Explorer's Codex")
         "endgame" -> locale.getString("endgame_title", "Endgame Challenges")
         "arcade" -> locale.getString("arcade_title", "Arcade Minigames")
-        "stats" -> locale.getString("stats_title", "Statistics")
+        "stats" -> locale.getString("stats", "Statistics")
         "live_ops" -> locale.getString("live_ops_screen_title", "Seasonal Events")
         "mutators" -> locale.getString("mutators_title", "Mutators & Weekly Challenges")
         else -> feature.replace('_', ' ').replaceFirstChar { it.uppercase() }
