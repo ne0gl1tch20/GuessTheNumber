@@ -37,7 +37,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: windows-desktop-${{ github.workflow }}-${{ github.ref }}
@@ -230,17 +230,20 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Publish versioned Windows Debug release
+      - name: Upload Windows Debug channel archive
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: softprops/action-gh-release@v2
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: windows-debug-${{ github.run_number }}-${{ github.run_attempt }}
-          name: GuessTheNumber Windows Debug ${{ github.run_number }}.${{ github.run_attempt }}
-          body: |
-            Automated Windows Debug channel build from commit ${{ github.sha }}.
-            This is a development build, not a production release.
-          prerelease: true
-          make_latest: false
-          files: |
-            ${{ env.GTN_DEBUG_ZIP }}
-            ${{ env.GTN_DEBUG_MANIFEST }}
+          name: GuessTheNumber-Windows-Debug-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ${{ env.GTN_DEBUG_ZIP }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Windows Debug manifest
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: GuessTheNumber-Windows-Debug-Manifest-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ${{ env.GTN_DEBUG_MANIFEST }}
+          if-no-files-found: error
+          retention-days: 14
