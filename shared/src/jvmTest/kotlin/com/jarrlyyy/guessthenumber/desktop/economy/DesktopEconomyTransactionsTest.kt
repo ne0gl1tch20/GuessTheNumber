@@ -169,6 +169,21 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
+    fun autoClickerCanOnlyToggleAfterPurchase() {
+        val locked = GameState()
+        assertFalse(DesktopEconomyTransactions.setAutoClickerActive(locked, true).accepted)
+
+        val owned = locked.copy(shopPurchases = setOf("auto_clicker_basic"))
+        val resumed = DesktopEconomyTransactions.setAutoClickerActive(owned, true)
+        assertTrue(resumed.accepted)
+        assertTrue(resumed.state.autoClickerActive)
+
+        val paused = DesktopEconomyTransactions.setAutoClickerActive(resumed.state, false)
+        assertTrue(paused.accepted)
+        assertFalse(paused.state.autoClickerActive)
+    }
+
+    @Test
     fun shopEffectWithoutDesktopImplementationIsRejected() {
         val initial = GameState(nebula = BigNumber(100))
         val item = com.jarrlyyy.guessthenumber.domain.model.ShopItemDef(
