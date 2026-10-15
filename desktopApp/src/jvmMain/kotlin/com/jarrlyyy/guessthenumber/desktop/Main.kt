@@ -19,8 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsBuildVersion
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugInstaller
@@ -34,10 +36,14 @@ import kotlinx.coroutines.withContext
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-        title = "Guess The Number"
+        title = "Guess The Number",
+        state = remember { WindowState(size = DpSize(1100.dp, 760.dp)) },
+        resizable = true
     ) {
         MaterialTheme {
             val scope = rememberCoroutineScope()
+            val shell = remember { DesktopShellController() }
+            val shellState = shell.state
             val updateClient = remember { WindowsDebugUpdateClient() }
             val installer = remember { WindowsDebugInstaller() }
             var availableUpdate by remember { mutableStateOf<WindowsDebugUpdate?>(null) }
@@ -71,60 +77,101 @@ fun main() = application {
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text("Windows Debug updates", style = MaterialTheme.typography.titleMedium)
-                        Text("Installed version: ${WindowsBuildVersion.current}")
-                        Text(status)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(
-                                onClick = { scope.launch { refreshUpdates() } },
-                                enabled = !isBusy
-                            ) {
-                                Text("Check again")
-                            }
-                            val update = availableUpdate
-                            if (update != null) {
-                                Button(
-                                    onClick = {
-                                        scope.launch {
-                                            isBusy = true
-                                            status = "Downloading and verifying version ${update.version}…"
-                                            try {
-                                                withContext(Dispatchers.IO) {
-                                                    installer.downloadVerifyAndLaunch(update)
-                                                }
-                                                status = "Windows Installer is opening. GuessTheNumber will close for the update."
-                                                exitApplication()
-                                            } catch (error: Exception) {
-                                                status = "Update failed: ${error.message ?: "installer error"}"
-                                                isBusy = false
-                                            }
-                                        }
-                                    },
-                                    enabled = !isBusy
-                                ) {
-                                    Text("Install update")
-                                }
-                            }
-                            if (isBusy) {
-                                Spacer(modifier = Modifier.padding(2.dp))
-                                CircularProgressIndicator()
-                            }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DesktopDestination.entries.forEach { destination ->
+                        Button(
+                            onClick = { shell.navigate(destination) },
+                            enabled = shellState.destination != destination
+                        ) {
+                            Text(destination.label)
                         }
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text("Windows Desktop", style = MaterialTheme.typography.labelLarge)
+                }
+
+                if (shellState.message != null) {
+                    Card(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            "Debug builds are separate from production releases. Windows may ask for permission to install the MSI.",
-                            style = MaterialTheme.typography.bodySmall
+                            shellState.message.orEmpty(),
+                            modifier = Modifier.fillMaxWidth().padding(12.dp),
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                 }
-                Column(
-                    modifier = Modifier.weight(1f).fillMaxWidth()
-                ) {
-                    SharedGuessGameScreen()
+
+                when (shellState.destination) {
+                    DesktopDestination.PLAY -> {
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text("Windows Debug updates", style = MaterialTheme.typography.titleMedium)
+                                Text("Installed version: ${WindowsBuildVersion.current}")
+                                Text(status)
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Button(
+                                        onClick = { scope.launch { refreshUpdates() } },
+                                        enabled = !isBusy
+                                    ) {
+                                        Text("Check again")
+                                    }
+                                    val update = availableUpdate
+                                    if (update != null) {
+                                        Button(
+                                            onClick = {
+                                                scope.launch {
+                                                    isBusy = true
+                                                    status = "Downloading and verifying version ${update.version}…"
+                                                    try {
+                                                        withContext(Dispatchers.IO) {
+                                                            installer.downloadVerifyAndLaunch(update)
+                                                        }
+                                                        status = "Windows Installer is opening. GuessTheNumber will close for the update."
+                                                        exitApplication()
+                                                    } catch (error: Exception) {
+                                                        status = "Update failed: ${error.message ?: "installer error"}"
+                                                        isBusy = false
+                                                    }
+                                                }
+                                            },
+                                            enabled = !isBusy
+                                        ) {
+                                            Text("Install update")
+                                        }
+                                    }
+                                    if (isBusy) {
+                                        CircularProgressIndicator()
+                                    }
+                                }
+                                Text(
+                                    "Debug builds are separate from production releases. Windows may ask for permission to install the MSI.",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                        Column(
+                            modifier = Modifier.weight(1f).fillMaxWidth()
+                        ) {
+                            SharedGuessGameScreen()
+                        }
+                    }
+
+                    DesktopDestination.ABOUT -> {
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(24.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Text("About Guess The Number", style = MaterialTheme.typography.headlineSmall)
+                                Text("Windows desktop edition")
+                                Text("Designed for offline play. No ads, analytics or accounts.")
+                                Text("This Windows build is under active development. Some Android features are not available on Windows yet.")
+                                Text("Installed version: ${WindowsBuildVersion.current}")
+                            }
+                        }
+                    }
                 }
             }
         }
