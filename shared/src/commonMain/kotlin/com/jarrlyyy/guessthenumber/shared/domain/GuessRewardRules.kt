@@ -11,4 +11,7 @@ object GuessRewardRules {
 
     fun upgradeMultiplier(rewardMultiplierLevel: Int): Double =
         1.0 + (rewardMultiplierLevel * 0.25)
+
+    fun talentMultiplier(hasTalentReward: Boolean): Double =
+        if (hasTalentReward) 1.5 else 1.0
 }
