@@ -22,4 +22,10 @@ class GuessRewardRulesTest {
         assertEquals(1.25, GuessRewardRules.upgradeMultiplier(1), 1e-9)
         assertEquals(2.0, GuessRewardRules.upgradeMultiplier(4), 1e-9)
     }
+
+    @Test
+    fun preservesTalentRewardMultiplier() {
+        assertEquals(1.0, GuessRewardRules.talentMultiplier(false), 1e-9)
+        assertEquals(1.5, GuessRewardRules.talentMultiplier(true), 1e-9)
+    }
 }
