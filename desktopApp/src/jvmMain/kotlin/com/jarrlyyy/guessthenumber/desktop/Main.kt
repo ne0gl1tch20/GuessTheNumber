@@ -38,6 +38,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
@@ -130,6 +131,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Guess The Number",
+        icon = painterResource("GTN_APP_LOGO.png"),
         state = remember { WindowState(size = DpSize(DesktopWindowMetrics.INITIAL_WIDTH, DesktopWindowMetrics.INITIAL_HEIGHT)) },
         resizable = true
     ) {
@@ -140,7 +142,7 @@ fun main() = application {
                 with(density) { DesktopWindowMetrics.MIN_HEIGHT.roundToPx() }
             )
         }
-        DesktopTheme {
+        DesktopTheme(window = window) {
             val scope = rememberCoroutineScope()
             val shellFocusRequester = remember { FocusRequester() }
             val shell = remember { DesktopShellController() }
