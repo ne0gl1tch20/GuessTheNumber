@@ -4,11 +4,13 @@ import com.jarrlyyy.guessthenumber.domain.engine.AntiCheatService
 import com.jarrlyyy.guessthenumber.domain.engine.AntiTimeTravelService
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
+import com.jarrlyyy.guessthenumber.data.store.GlobalPreferencesManager
 import com.jarrlyyy.guessthenumber.data.store.saveDataStore
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import org.junit.Assert.*
 import org.robolectric.RuntimeEnvironment
 import kotlinx.coroutines.flow.first
@@ -21,6 +23,89 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class SaveValidationTest {
 
+
+    @Test
+    fun globalSettingsJsonRoundTripsAcrossSaveManagerInstances() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        context.appPreferencesDataStore.edit { it.clear() }
+        context.saveDataStore.edit { it.clear() }
+        val settings = GameSettings(
+            musicEnabled = false,
+            soundEnabled = false,
+            vibrationEnabled = false,
+            notificationsEnabled = false,
+            notificationIntervalHours = 12L,
+            themeMode = "Dark",
+            numberNotation = "Scientific",
+            locale = "fil-PH",
+            reducedMotion = true,
+            volume = 0.65f,
+            sfxVolume = 0.35f,
+            backgroundMusicPath = "content://media/external/audio/track/42",
+            musicLibraryPaths = listOf("content://media/external/audio/track/42"),
+            musicQueuePaths = listOf("content://media/external/audio/track/42"),
+            musicPlaylistPaths = mapOf("study" to listOf("content://media/external/audio/track/42")),
+            musicRepeatMode = "all",
+            musicShuffle = true,
+            themePreset = "Ocean",
+            customPrimaryColor = "#123456",
+            moreScreenOrder = listOf("world_map", "settings", "about"),
+            tutorialSeenFeatures = setOf("world_map", "save_slots")
+        )
+        val manager = SaveManager(context)
+
+        manager.saveAppPreferences(settings)
+        val exportedJson = manager.getAppPreferencesJson()
+
+        assertTrue(SaveManager(context).applyAppPreferencesJson(exportedJson))
+        assertEquals(settings, GlobalPreferencesManager(context).getSettings())
+    }
+
+    @Test
+    fun saveSlotMetadataRoundTripsPrimaryAndBackupSummary() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        context.appPreferencesDataStore.edit { it.clear() }
+        context.saveDataStore.edit { it.clear() }
+        val manager = SaveManager(context)
+        val previous = GameState(
+            difficultyId = "hard",
+            profileName = "Metadata profile",
+            money = BigNumber("12345678901234567890"),
+            prestige = BigNumber(77),
+            ultra = BigNumber(8),
+            attempts = 91,
+            correctGuesses = 54
+        )
+        val current = previous.copy(
+            money = BigNumber("98765432109876543210"),
+            prestige = BigNumber(99),
+            ultra = BigNumber(12),
+            attempts = 120,
+            correctGuesses = 80
+        )
+
+        assertTrue(manager.saveGame(previous, 3))
+        assertTrue(manager.saveGame(current, 3))
+
+        val metadata = SaveManager(context).getSlotMetadata(3)
+        assertEquals(3, metadata.slotIndex)
+        assertFalse(metadata.isEmpty)
+        assertEquals("hard", metadata.difficultyId)
+        assertEquals("Metadata profile", metadata.profileName)
+        assertEquals(previous.profileIconId, metadata.profileIconId)
+        assertEquals(current.money, metadata.money)
+        assertEquals(current.prestige, metadata.prestige)
+        assertEquals(current.ultra, metadata.ultra)
+        assertEquals(120L, metadata.attempts)
+        assertEquals(80L, metadata.correctGuesses)
+        assertTrue(metadata.lastSaveTimestamp > 0L)
+        assertTrue(metadata.hasBackup)
+
+        val emptyMetadata = SaveManager(context).getSlotMetadata(4)
+        assertEquals(4, emptyMetadata.slotIndex)
+        assertTrue(emptyMetadata.isEmpty)
+        assertFalse(emptyMetadata.hasBackup)
+    }
 
     @Test
     fun testFreshSlotDoesNotCloneAnotherSlot() = runBlocking {
