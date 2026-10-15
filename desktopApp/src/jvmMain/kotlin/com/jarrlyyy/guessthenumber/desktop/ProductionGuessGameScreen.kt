@@ -20,9 +20,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.jarrlyyy.guessthenumber.desktop.DesktopGuessingBot
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import com.jarrlyyy.guessthenumber.desktop.economy.EconomyTransaction
@@ -34,6 +36,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -42,6 +45,7 @@ import kotlin.random.Random
 @Composable
 fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
     val engine = remember { GameEngine() }
+    val autoClicker = remember { DesktopGuessingBot() }
     val saveStore = remember { DesktopSaveStore(defaultDesktopSaveDirectory()) }
     val catalogResult = remember { runCatching { DesktopEconomyCatalog.load() } }
     val catalog = catalogResult.getOrNull()
@@ -50,10 +54,12 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
     var guessText by remember { mutableStateOf("") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
     var isSaving by remember { mutableStateOf(false) }
+    val latestSaving by rememberUpdatedState(isSaving)
 
     LaunchedEffect(Unit) {
         val loaded = withContext(Dispatchers.IO) { saveStore.load(1) }
         if (loaded != null) {
+            autoClicker.reset(loaded.currentRangeMin, loaded.currentRangeMax)
             state = loaded
             feedback = "Saved game loaded."
         } else {
@@ -64,6 +70,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             )
             val created = withContext(Dispatchers.IO) { saveStore.save(1, fresh) }
             if (created) {
+                autoClicker.reset(fresh.currentRangeMin, fresh.currentRangeMax)
                 state = fresh
                 feedback = "New game created."
             } else {
@@ -95,6 +102,43 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
     }
 
     val currentState = state
+
+    LaunchedEffect(currentState) {
+        val snapshot = currentState ?: return@LaunchedEffect
+        if (!snapshot.autoClickerActive || "auto_clicker_basic" !in snapshot.shopPurchases) {
+            return@LaunchedEffect
+        }
+        delay(1_000L)
+        while (latestSaving) delay(100L)
+        if (state != snapshot) return@LaunchedEffect
+
+        val guess = autoClicker.nextGuess(snapshot.currentRangeMin, snapshot.currentRangeMax)
+        isSaving = true
+        val result = engine.processGuess(snapshot, guess)
+        val finalState = DesktopEconomyTransactions.applyGuessBonuses(
+            before = snapshot,
+            after = result.newState,
+            correct = result.feedback == GuessFeedback.CORRECT
+        )
+        val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
+        if (saved) {
+            autoClicker.observeGuess(guess, result.feedback)
+            if (result.feedback == GuessFeedback.CORRECT) {
+                autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+            }
+            state = finalState
+            feedback = when (result.feedback) {
+                GuessFeedback.TOO_LOW -> "Auto Clicker: too low."
+                GuessFeedback.TOO_HIGH -> "Auto Clicker: too high."
+                GuessFeedback.CORRECT -> "Auto Clicker solved the round and earned ${finalState.money - snapshot.money} Money."
+            }
+        } else {
+            feedback = "Auto Clicker paused because the save failed. Your previous saved state is still intact."
+            state = snapshot.copy(autoClickerActive = false)
+        }
+        isSaving = false
+    }
+
     Card(modifier = modifier.fillMaxSize()) {
         if (currentState == null) {
             Column(
@@ -142,6 +186,10 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     } else if (!isSaving) {
                         isSaving = true
                         val result = engine.processGuess(currentState, guess)
+                        autoClicker.observeGuess(guess, result.feedback)
+                        if (result.feedback == GuessFeedback.CORRECT) {
+                            autoClicker.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
+                        }
                         val finalState = DesktopEconomyTransactions.applyGuessBonuses(
                             before = currentState,
                             after = result.newState,
@@ -169,6 +217,12 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
             }
             Text(feedback, style = MaterialTheme.typography.bodyLarge)
+            if ("auto_clicker_basic" in currentState.shopPurchases) {
+                Button(
+                    onClick = { commitTransaction { DesktopEconomyTransactions.setAutoClickerActive(it, !it.autoClickerActive) } },
+                    enabled = !isSaving
+                ) { Text(if (currentState.autoClickerActive) "Pause auto-clicker" else "Resume auto-clicker") }
+            }
 
             SectionTitle("Money upgrades")
             if (catalog == null) {
@@ -241,9 +295,9 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     EconomyActionCard(
                         title = item.name,
                         description = item.description,
-                        detail = if (!item.isCosmetic) "Windows effect not implemented yet · Cost: ${item.nebulaCost} Nebula" else "Cost: ${item.nebulaCost} Nebula",
-                        action = if (purchased) "Owned" else if (item.isCosmetic) "Buy" else "Unavailable",
-                        enabled = !isSaving && item.isCosmetic && !purchased && currentState.nebula >= BigNumber(item.nebulaCost)
+                        detail = if (!item.isCosmetic && item.id != "auto_clicker_basic") "Windows effect not implemented yet · Cost: ${item.nebulaCost} Nebula" else "Cost: ${item.nebulaCost} Nebula",
+                        action = if (purchased) "Owned" else if (item.isCosmetic || item.id == "auto_clicker_basic") "Buy" else "Unavailable",
+                        enabled = !isSaving && (item.isCosmetic || item.id == "auto_clicker_basic") && !purchased && currentState.nebula >= BigNumber(item.nebulaCost)
                     ) {
                         commitTransaction { DesktopEconomyTransactions.buyShopItem(it, item) }
                     }
