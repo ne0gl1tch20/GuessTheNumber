@@ -6,10 +6,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @Serializable
-private data class UpgradeRoot(val upgrades: List<UpgradeDef> = emptyList())
+private data class UpgradeRoot(val schemaVersion: Int = 1, val upgrades: List<UpgradeDef> = emptyList())
 
 @Serializable
-private data class ShopRoot(val shopItems: List<ShopItemDef> = emptyList())
+private data class ShopRoot(val schemaVersion: Int = 1, val shopItems: List<ShopItemDef> = emptyList())
 
 @Serializable
 data class DesktopCurrencyShopItem(
@@ -20,13 +20,13 @@ data class DesktopCurrencyShopItem(
 )
 
 @Serializable
-private data class CurrencyShopRoot(val shopItems: List<DesktopCurrencyShopItem> = emptyList())
+private data class CurrencyShopRoot(val schemaVersion: Int = 1, val shopItems: List<DesktopCurrencyShopItem> = emptyList())
 
 @Serializable
 data class DesktopTalentDef(val id: String, val name: String, val description: String, val cost: Long, val requiredParentId: String? = null)
 
 @Serializable
-private data class TalentRoot(val talents: List<DesktopTalentDef> = emptyList())
+private data class TalentRoot(val schemaVersion: Int = 1, val talents: List<DesktopTalentDef> = emptyList())
 
 /** Reads the same checked-in game JSON used by Android. No copied desktop economy values. */
 class DesktopEconomyRepository(
