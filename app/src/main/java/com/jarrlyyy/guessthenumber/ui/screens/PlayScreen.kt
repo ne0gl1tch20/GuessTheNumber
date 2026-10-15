@@ -28,6 +28,7 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessInputField
+import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackCard
 
 private enum class GuessFeedbackTone { Neutral, TooLow, TooHigh, Correct }
 
@@ -573,31 +574,11 @@ fun PlayScreen(
                             },
                             label = "FeedbackAnimation"
                         ) { feedback ->
-                            val feedbackContainerColor = when (sharedPresentation.status) {
-                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY,
-                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.INVALID_INPUT -> MaterialTheme.colorScheme.surfaceVariant
-                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_LOW -> MaterialTheme.colorScheme.secondaryContainer
-                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_HIGH -> MaterialTheme.colorScheme.primaryContainer
-                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT -> MaterialTheme.colorScheme.tertiaryContainer
-                            }
-                            val feedbackContentColor = when (sharedPresentation.status) {
-                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY,
-                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.INVALID_INPUT -> MaterialTheme.colorScheme.onSurfaceVariant
-                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_LOW -> MaterialTheme.colorScheme.onSecondaryContainer
-                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_HIGH -> MaterialTheme.colorScheme.onPrimaryContainer
-                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT -> MaterialTheme.colorScheme.onTertiaryContainer
-                            }
-                            Surface(
-                                modifier = Modifier.fillMaxWidth().animateContentSize(),
-                                shape = MaterialTheme.shapes.large,
-                                color = feedbackContainerColor,
-                                tonalElevation = if (state.settings.reducedMotion) 0.dp else 2.dp
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(14.dp),
-                                    verticalAlignment = Alignment.Top,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                                ) {
+                            SharedGuessFeedbackCard(
+                                status = sharedPresentation.status,
+                                message = feedback,
+                                reducedMotion = state.settings.reducedMotion,
+                                leadingContent = {
                                     Icon(
                                         imageVector = when (sharedPresentation.status) {
                                             com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY,
@@ -607,17 +588,10 @@ fun PlayScreen(
                                             com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT -> Icons.Default.CheckCircle
                                         },
                                         contentDescription = null,
-                                        tint = feedbackContentColor,
                                         modifier = Modifier.size(24.dp)
                                     )
-                                    Text(
-                                        text = feedback,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = feedbackContentColor,
-                                        modifier = Modifier.weight(1f)
-                                    )
                                 }
-                            }
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
