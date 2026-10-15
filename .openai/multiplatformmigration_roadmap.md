@@ -156,3 +156,11 @@ Do not call the migration complete until all are true:
 Update this file whenever a PR merges, fails, is replaced or changes the next action. Keep the current checkpoint accurate. This is temporary planning; after migration, consolidate durable architecture decisions into normal project docs and remove/archive this file in a separate cleanup PR.
 
 This roadmap is a proposed order based on current repository context, not a claim that every remaining file has already been audited.
+
+
+### Phase 3 follow-up - Save-write failure test design
+
+- [x] #154 covers global settings JSON and save-slot primary/backup metadata round trips; Android and Windows CI passed before merge.
+- [x] Drafted `docs/SAVE_WRITE_FAILURE_TEST_DESIGN.md` to define a narrow DataStore write-failure seam and explicit assertions for primary/backup preservation.
+- [ ] Implement the test seam and storage-level failure tests in a code PR; do not change production transaction semantics in that PR unless tests and behavior are fully specified.
+- [ ] Add ViewModel failed-persistence consistency tests after the storage contract is verified.
