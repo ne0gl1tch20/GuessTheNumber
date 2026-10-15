@@ -1,5 +1,9 @@
 package com.jarrlyyy.guessthenumber.desktop
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+
 /**
  * Windows-owned navigation contract. Destinations are added here as each
  * parity stage implements a real screen; Android navigation stays platform-owned.
@@ -18,7 +22,7 @@ data class DesktopShellState(
 class DesktopShellController(
     initialState: DesktopShellState = DesktopShellState()
 ) {
-    var state: DesktopShellState = initialState
+    var state: DesktopShellState by mutableStateOf(initialState)
         private set
 
     fun navigate(destination: DesktopDestination) {
