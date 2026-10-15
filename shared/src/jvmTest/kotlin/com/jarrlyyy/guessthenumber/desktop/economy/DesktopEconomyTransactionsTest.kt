@@ -140,6 +140,34 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
+    fun rewardTalentAddsMoneyAndStatisticsAfterCorrectGuess() {
+        val before = GameState(
+            money = BigNumber(100),
+            prestigeShopPurchases = setOf("talent_reward_1"),
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(
+                moneyEarned = BigNumber(100)
+            )
+        )
+        val after = before.copy(
+            money = BigNumber(200),
+            statistics = before.statistics.copy(moneyEarned = BigNumber(200))
+        )
+
+        val result = DesktopEconomyTransactions.applyGuessBonuses(before, after, correct = true)
+
+        assertEquals(BigNumber(250), result.money)
+        assertEquals(BigNumber(250), result.statistics.moneyEarned)
+    }
+
+    @Test
+    fun incorrectGuessDoesNotApplyPostGuessBonuses() {
+        val before = GameState(prestigeShopPurchases = setOf("talent_reward_1"))
+        val after = before.copy(money = BigNumber(10))
+
+        assertEquals(after, DesktopEconomyTransactions.applyGuessBonuses(before, after, correct = false))
+    }
+
+    @Test
     fun talentRequiresParentAndCannotBePurchasedTwice() {
         val locked = GameState(prestige = BigNumber(100))
         val rejected = DesktopEconomyTransactions.buyTalent(locked, "talent_reward_1", 10)
