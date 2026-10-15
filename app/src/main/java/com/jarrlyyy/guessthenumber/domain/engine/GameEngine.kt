@@ -82,6 +82,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             val generatedNextTarget = rng.nextLong(newMin, newMax + 1)
             val decision = GuessTransitionRules.resolve(
                 stateTransition = transition.stateTransition,
+                currentState = transition.nextState,
                 criticalChance = critChance,
                 criticalRoll = criticalRoll,
                 nextTarget = generatedNextTarget,
@@ -122,11 +123,7 @@ class GameEngine(private val rng: Random = Random.Default) {
                 correctGuesses = state.statistics.correctGuesses + 1,
                 moneyEarned = state.statistics.moneyEarned + totalReward
             )
-            val nextCoreState = transition.nextState.copy(
-                targetNumber = nextTarget,
-                rangeMin = newMin,
-                rangeMax = newMax
-            )
+            val nextCoreState = decision.nextState
             val updatedState = state.copy(
                 money = newMoney,
                 currentRangeMin = nextCoreState.rangeMin,
@@ -140,7 +137,16 @@ class GameEngine(private val rng: Random = Random.Default) {
             )
             return GuessResult(feedback, totalReward, isCrit, newStreak, updatedState)
         } else {
-            val newAttempts = transition.attempts
+            val decision = GuessTransitionRules.resolve(
+                stateTransition = transition.stateTransition,
+                currentState = transition.nextState,
+                criticalChance = 0.0,
+                criticalRoll = null,
+                nextTarget = null,
+                nextRangeMin = state.currentRangeMin,
+                nextRangeMax = state.currentRangeMax
+            )
+            val newAttempts = decision.nextState.attempts
             val economyDecision = GuessEconomyDecisionRules.resolve(
                 rangeMax = state.currentRangeMax,
                 streak = state.streak,
@@ -158,7 +164,7 @@ class GameEngine(private val rng: Random = Random.Default) {
                 totalGuesses = state.statistics.totalGuesses + 1,
                 failedGuesses = state.statistics.failedGuesses + 1
             )
-            val nextCoreState = transition.nextState
+            val nextCoreState = decision.nextState
             val updatedState = state.copy(
                 money = newMoney,
                 targetNumber = nextCoreState.targetNumber,
