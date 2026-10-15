@@ -54,6 +54,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
     var guessText by remember { mutableStateOf("") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
     var isSaving by remember { mutableStateOf(false) }
+    var autoClickerFailurePaused by remember { mutableStateOf(false) }
     val latestSaving by rememberUpdatedState(isSaving)
 
     LaunchedEffect(Unit) {
@@ -93,6 +94,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             val saved = withContext(Dispatchers.IO) { saveStore.save(1, transaction.state) }
             if (saved) {
                 state = transaction.state
+                autoClickerFailurePaused = false
                 feedback = transaction.message
             } else {
                 feedback = "Could not save that change. Your previous saved state is still intact."
@@ -105,7 +107,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
 
     LaunchedEffect(currentState) {
         val snapshot = currentState ?: return@LaunchedEffect
-        if (!snapshot.autoClickerActive || "auto_clicker_basic" !in snapshot.shopPurchases) {
+        if (!snapshot.autoClickerActive || autoClickerFailurePaused || "auto_clicker_basic" !in snapshot.shopPurchases) {
             return@LaunchedEffect
         }
         delay(1_000L)
@@ -134,7 +136,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             }
         } else {
             feedback = "Auto Clicker paused because the save failed. Your previous saved state is still intact."
-            state = snapshot.copy(autoClickerActive = false)
+            autoClickerFailurePaused = true
         }
         isSaving = false
     }
@@ -186,10 +188,6 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     } else if (!isSaving) {
                         isSaving = true
                         val result = engine.processGuess(currentState, guess)
-                        autoClicker.observeGuess(guess, result.feedback)
-                        if (result.feedback == GuessFeedback.CORRECT) {
-                            autoClicker.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
-                        }
                         val finalState = DesktopEconomyTransactions.applyGuessBonuses(
                             before = currentState,
                             after = result.newState,
@@ -198,6 +196,11 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                         scope.launch {
                             val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
                             if (saved) {
+                                autoClicker.observeGuess(guess, result.feedback)
+                                if (result.feedback == GuessFeedback.CORRECT) {
+                                    autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+                                }
+                                autoClickerFailurePaused = false
                                 state = finalState
                                 feedback = when (result.feedback) {
                                     GuessFeedback.TOO_LOW -> "Too low. Try again!"
