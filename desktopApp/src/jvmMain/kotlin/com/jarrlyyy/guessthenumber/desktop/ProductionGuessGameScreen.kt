@@ -94,7 +94,9 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             val saved = withContext(Dispatchers.IO) { saveStore.save(1, transaction.state) }
             if (saved) {
                 state = transaction.state
-                autoClickerFailurePaused = false
+                if (before.autoClickerActive != transaction.state.autoClickerActive) {
+                    autoClickerFailurePaused = false
+                }
                 feedback = transaction.message
             } else {
                 feedback = "Could not save that change. Your previous saved state is still intact."
