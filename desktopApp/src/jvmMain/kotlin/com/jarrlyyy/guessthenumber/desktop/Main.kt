@@ -19,6 +19,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.foundation.focusable
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
@@ -56,6 +59,7 @@ fun main() = application {
         }
         MaterialTheme {
             val scope = rememberCoroutineScope()
+            val shellFocusRequester = remember { FocusRequester() }
             val shell = remember { DesktopShellController() }
             val shellState = shell.state
             val updateClient = remember { WindowsDebugUpdateClient() }
@@ -86,9 +90,15 @@ fun main() = application {
             LaunchedEffect(Unit) {
                 refreshUpdates()
             }
+            LaunchedEffect(shellFocusRequester) {
+                shellFocusRequester.requestFocus()
+            }
 
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp).onPreviewKeyEvent { event ->
+                modifier = Modifier.fillMaxSize().padding(16.dp)
+                    .focusRequester(shellFocusRequester)
+                    .focusable()
+                    .onPreviewKeyEvent { event ->
                     if (event.type != KeyEventType.KeyDown) {
                         return@onPreviewKeyEvent false
                     }
