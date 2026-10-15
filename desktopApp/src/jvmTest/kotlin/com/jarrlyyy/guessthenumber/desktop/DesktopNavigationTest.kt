@@ -3,6 +3,8 @@ package com.jarrlyyy.guessthenumber.desktop
 import androidx.compose.ui.input.key.Key
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DesktopNavigationTest {
@@ -35,6 +37,7 @@ class DesktopNavigationTest {
         controller.showMessage("  ")
         assertNull(controller.state.message)
     }
+
     @Test
     fun ctrlNumberShortcutsMapToDestinations() {
         assertEquals(DesktopDestination.PLAY, DesktopDestination.fromShortcut(Key.One, ctrlPressed = true))
@@ -42,9 +45,29 @@ class DesktopNavigationTest {
     }
 
     @Test
+    fun escapeClearsMessageBeforeReturningToPlay() {
+        val controller = DesktopShellController()
+        controller.navigate(DesktopDestination.ABOUT)
+        controller.showMessage("A recoverable message")
+
+        assertTrue(controller.handleKey(Key.Escape, ctrlPressed = false))
+        assertEquals(DesktopDestination.ABOUT, controller.state.destination)
+        assertNull(controller.state.message)
+
+        assertTrue(controller.handleKey(Key.Escape, ctrlPressed = false))
+        assertEquals(DesktopDestination.PLAY, controller.state.destination)
+    }
+
+    @Test
+    fun enterIsNotConsumedByShell() {
+        val controller = DesktopShellController()
+        assertFalse(controller.handleKey(Key.Enter, ctrlPressed = false))
+        assertEquals(DesktopDestination.PLAY, controller.state.destination)
+    }
+
+    @Test
     fun shortcutsRequireControlAndIgnoreUnknownKeys() {
         assertNull(DesktopDestination.fromShortcut(Key.One, ctrlPressed = false))
         assertNull(DesktopDestination.fromShortcut(Key.Three, ctrlPressed = true))
     }
-
 }

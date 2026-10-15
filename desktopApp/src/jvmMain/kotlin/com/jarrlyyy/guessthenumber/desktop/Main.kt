@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.desktop
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,15 +13,21 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.border
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.focusable
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
@@ -28,6 +35,10 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -43,18 +54,73 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@Composable
+private fun DesktopNavigationBar(
+    currentDestination: DesktopDestination,
+    onNavigate: (DesktopDestination) -> Unit
+) {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        if (shouldUseCompactNavigation(maxWidth)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                DesktopNavigationButtons(currentDestination, onNavigate)
+                Text("Windows Desktop", style = MaterialTheme.typography.labelLarge)
+            }
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                DesktopNavigationButtons(currentDestination, onNavigate)
+                Spacer(modifier = Modifier.weight(1f))
+                Text("Windows Desktop", style = MaterialTheme.typography.labelLarge)
+            }
+        }
+    }
+}
+
+@Composable
+private fun DesktopNavigationButtons(
+    currentDestination: DesktopDestination,
+    onNavigate: (DesktopDestination) -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        DesktopDestination.entries.forEach { destination ->
+            var isFocused by remember(destination) { mutableStateOf(false) }
+            val focusModifier = Modifier
+                .onFocusChanged { isFocused = it.isFocused }
+                .then(
+                    if (isFocused) {
+                        Modifier.border(
+                            BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                            RoundedCornerShape(12.dp)
+                        )
+                    } else {
+                        Modifier
+                    }
+                )
+            Button(
+                modifier = focusModifier,
+                onClick = { onNavigate(destination) },
+                enabled = currentDestination != destination
+            ) {
+                Text(destination.label)
+            }
+        }
+    }
+}
+
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Guess The Number",
-        state = remember { WindowState(size = DpSize(1100.dp, 760.dp)) },
+        state = remember { WindowState(size = DpSize(DesktopWindowMetrics.INITIAL_WIDTH, DesktopWindowMetrics.INITIAL_HEIGHT)) },
         resizable = true
     ) {
         val density = LocalDensity.current
         LaunchedEffect(density) {
             window.minimumSize = Dimension(
-                with(density) { 800.dp.roundToPx() },
-                with(density) { 600.dp.roundToPx() }
+                with(density) { DesktopWindowMetrics.MIN_WIDTH.roundToPx() },
+                with(density) { DesktopWindowMetrics.MIN_HEIGHT.roundToPx() }
             )
         }
         DesktopTheme {
@@ -102,27 +168,17 @@ fun main() = application {
                     if (event.type != KeyEventType.KeyDown) {
                         return@onPreviewKeyEvent false
                     }
-                    val destination = DesktopDestination.fromShortcut(
+                    shell.handleKey(
                         key = event.key,
                         ctrlPressed = event.isCtrlPressed
-                    ) ?: return@onPreviewKeyEvent false
-                    shell.navigate(destination)
-                    true
+                    )
                 },
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    DesktopDestination.entries.forEach { destination ->
-                        Button(
-                            onClick = { shell.navigate(destination) },
-                            enabled = shellState.destination != destination
-                        ) {
-                            Text(destination.label)
-                        }
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text("Windows Desktop", style = MaterialTheme.typography.labelLarge)
-                }
+                DesktopNavigationBar(
+                    currentDestination = shellState.destination,
+                    onNavigate = shell::navigate
+                )
 
                 if (shellState.message != null) {
                     Card(modifier = Modifier.fillMaxWidth()) {
@@ -143,7 +199,19 @@ fun main() = application {
                             ) {
                                 Text("Windows Debug updates", style = MaterialTheme.typography.titleMedium)
                                 Text("Installed version: ${WindowsBuildVersion.current}")
-                                Text(status)
+                                Text(
+                                    status,
+                                    color = if (
+                                        classifyDesktopUpdateStatus(
+                                            status = status,
+                                            isBusy = isBusy,
+                                            hasUpdate = availableUpdate != null
+                                        ) == DesktopUpdateStatusKind.ERROR
+                                    ) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.semantics {
+                                        liveRegion = LiveRegionMode.Polite
+                                    }
+                                )
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Button(
                                         onClick = { scope.launch { refreshUpdates() } },
@@ -176,7 +244,7 @@ fun main() = application {
                                         }
                                     }
                                     if (isBusy) {
-                                        CircularProgressIndicator()
+                                        CircularProgressIndicator(modifier = Modifier.semantics { contentDescription = status })
                                     }
                                 }
                                 Text(

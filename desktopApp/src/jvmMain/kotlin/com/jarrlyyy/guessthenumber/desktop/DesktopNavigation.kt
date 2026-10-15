@@ -44,4 +44,21 @@ class DesktopShellController(
     fun clearMessage() {
         state = state.copy(message = null)
     }
+
+    /** Handles only shell shortcuts and Escape; normal Enter activation stays with focused controls. */
+    fun handleKey(key: Key, ctrlPressed: Boolean): Boolean {
+        val action = resolveDesktopShellKeyAction(
+            key = key,
+            ctrlPressed = ctrlPressed,
+            destination = state.destination,
+            hasMessage = state.message != null
+        )
+        when (action) {
+            DesktopShellKeyAction.NAVIGATE_PLAY -> navigate(DesktopDestination.PLAY)
+            DesktopShellKeyAction.NAVIGATE_ABOUT -> navigate(DesktopDestination.ABOUT)
+            DesktopShellKeyAction.CLEAR_MESSAGE -> clearMessage()
+            DesktopShellKeyAction.NONE -> return false
+        }
+        return true
+    }
 }
