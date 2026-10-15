@@ -6,6 +6,7 @@ import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.ShopItemDef
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
+import kotlin.random.Random
 
 data class EconomyTransaction(
     val state: GameState,
@@ -113,6 +114,69 @@ object DesktopEconomyTransactions {
                 equippedCosmeticId = if (item.id.startsWith("cosmetic_")) item.id else state.equippedCosmeticId
             ),
             "Purchased ${item.name}."
+        )
+    }
+
+    /** Mirrors the Android post-guess talent/event/mastery/relic bonus layer. */
+    fun applyGuessBonuses(
+        before: GameState,
+        after: GameState,
+        correct: Boolean,
+        rng: Random = Random.Default
+    ): GameState {
+        if (!correct) return after
+        val earned = after.money - before.money
+        val eligibleEarnings = if (earned > BigNumber.ZERO) earned else BigNumber.ZERO
+        var bonusMoney = BigNumber.ZERO
+        if ("talent_reward_1" in before.prestigeShopPurchases) bonusMoney += eligibleEarnings * BigNumber(0.5)
+        val eventBoostLevel = before.permanentEventBoosts.coerceIn(0, 25)
+        if (eventBoostLevel > 0) bonusMoney += eligibleEarnings * BigNumber(eventBoostLevel * 0.02)
+        val masteryLevel = (before.worldMasteryLevels[before.activeWorldId] ?: 0).coerceIn(0, 10)
+        if (masteryLevel > 0) bonusMoney += eligibleEarnings * BigNumber(masteryLevel * 0.02)
+        val criticalChance = when {
+            "talent_crit_2" in before.prestigeShopPurchases -> 0.15
+            "talent_crit_1" in before.prestigeShopPurchases -> 0.05
+            else -> 0.0
+        }
+        if (criticalChance > 0.0 && rng.nextDouble() < criticalChance) bonusMoney += eligibleEarnings
+        if ("verdant_guardian" in before.equippedRelicIds) bonusMoney += eligibleEarnings * BigNumber(0.10)
+        if ("crystal_golem" in before.equippedRelicIds && rng.nextDouble() < 0.10) bonusMoney += eligibleEarnings * BigNumber(0.5)
+        if ("ember_dragon" in before.equippedRelicIds) bonusMoney += eligibleEarnings * BigNumber(0.25)
+        if ("nebula_titan" in before.equippedRelicIds) bonusMoney += eligibleEarnings * BigNumber(0.25)
+
+        val equippedBossRelics = before.equippedRelicIds.intersect(
+            setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        )
+        val relicSetBonus = when (equippedBossRelics.size) {
+            2 -> 0.10
+            3 -> 0.20
+            4 -> 0.35
+            else -> 0.0
+        }
+        if (relicSetBonus > 0.0) bonusMoney += eligibleEarnings * BigNumber(relicSetBonus)
+        if (before.homeBaseLevel > 0) bonusMoney += eligibleEarnings * BigNumber((before.homeBaseLevel * 0.02).coerceAtMost(0.40))
+        val secretForActiveWorld = mapOf(
+            "verdant_grove" to "whispering_hollow",
+            "crystal_caverns" to "shard_archive",
+            "ember_summit" to "ashen_vault",
+            "nebula_rift" to "lost_observatory"
+        )[before.activeWorldId]
+        if (secretForActiveWorld != null && secretForActiveWorld in before.discoveredSecretIds) {
+            bonusMoney += eligibleEarnings * BigNumber(0.05)
+        }
+        val bonusNebula = (if ("talent_master_1" in before.prestigeShopPurchases) 1L else 0L) +
+            (eventBoostLevel / 5).toLong() +
+            (if ("ember_dragon" in before.equippedRelicIds) 1L else 0L) +
+            (if (equippedBossRelics.size == 4) 1L else 0L) +
+            (if (before.discoveredSecretIds.size >= 4) 1L else 0L) +
+            (if (before.activeWorldId == "ember_summit" && "ashen_vault" in before.discoveredSecretIds) 1L else 0L)
+        return after.copy(
+            money = after.money + bonusMoney,
+            nebula = after.nebula + BigNumber(bonusNebula),
+            statistics = after.statistics.copy(
+                moneyEarned = after.statistics.moneyEarned + bonusMoney,
+                nebulaEarned = after.statistics.nebulaEarned + bonusNebula
+            )
         )
     }
 
