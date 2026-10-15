@@ -85,6 +85,74 @@ jobs:
             throw "Windows MSI output directory was not created."
           }
 
+      - name: Verify in-place MSI upgrade from legacy package
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        run: |
+          $gradlePath = "desktopApp/build.gradle.kts"
+          $resourcePath = "desktopApp/src/jvmMain/resources/windows-build.properties"
+          $msiDir = "desktopApp/build/compose/binaries/main/msi"
+          $originalGradle = Get-Content -Path $gradlePath -Raw
+          $baselineGradle = [regex]::Replace(
+            $originalGradle,
+            '(?m)^[ \t]*// Preserve the UpgradeCode embedded in the existing Windows MSI\.\r?\n[ \t]*upgradeUuid = "6178B622-7859-39F2-8ED0-E0466C715DD1"\r?\n',
+            ''
+          )
+          if ($baselineGradle -eq $originalGradle) {
+            throw "Could not prepare the legacy MSI baseline configuration."
+          }
+
+          $baselineMsi = Join-Path $env:RUNNER_TEMP "GuessTheNumber-legacy-1.0.0.msi"
+          try {
+            Set-Content -Path $gradlePath -Value $baselineGradle -NoNewline
+            Set-Content -Path $resourcePath -Value "version=1.0.0" -Encoding ascii
+            $env:GTN_WINDOWS_PACKAGE_VERSION = "1.0.0"
+            Remove-Item -Path (Join-Path $msiDir "*.msi") -Force -ErrorAction SilentlyContinue
+            .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache --rerun-tasks --no-daemon
+            $legacyPackage = Get-ChildItem -Path $msiDir -Filter "GuessTheNumber-1.0.0.msi" -File | Select-Object -First 1
+            if (-not $legacyPackage) { throw "Legacy baseline MSI was not produced." }
+            Copy-Item $legacyPackage.FullName $baselineMsi
+            $legacyInstall = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$baselineMsi`" /qn /norestart" -Wait -PassThru
+            if ($legacyInstall.ExitCode -notin @(0, 3010)) {
+              throw "Legacy MSI installation failed with exit code $($legacyInstall.ExitCode)."
+            }
+          } finally {
+            Set-Content -Path $gradlePath -Value $originalGradle -NoNewline
+            $env:GTN_WINDOWS_PACKAGE_VERSION = "1.0.${{ github.run_number }}"
+            Set-Content -Path $resourcePath -Value "version=$env:GTN_WINDOWS_PACKAGE_VERSION" -Encoding ascii
+          }
+
+          Remove-Item -Path (Join-Path $msiDir "*.msi") -Force -ErrorAction SilentlyContinue
+          .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache --rerun-tasks --no-daemon
+          $updatedPackage = Get-ChildItem -Path $msiDir -Filter "GuessTheNumber-$($env:GTN_WINDOWS_PACKAGE_VERSION).msi" -File | Select-Object -First 1
+          if (-not $updatedPackage) { throw "Updated MSI was not produced." }
+          $updatedInstall = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$($updatedPackage.FullName)`" /qn /norestart" -Wait -PassThru
+          if ($updatedInstall.ExitCode -notin @(0, 3010)) {
+            throw "Updated MSI installation failed with exit code $($updatedInstall.ExitCode)."
+          }
+
+          $uninstallRoots = @(
+            "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
+            "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*",
+            "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"
+          )
+          $installedEntries = @(
+            $uninstallRoots |
+              ForEach-Object { Get-ItemProperty -Path $_ -ErrorAction SilentlyContinue } |
+              Where-Object { $_.DisplayName -like "*GuessTheNumber*" }
+          )
+          if ($installedEntries.Count -ne 1) {
+            throw "Expected exactly one GuessTheNumber installation after update, found $($installedEntries.Count)."
+          }
+          if ($installedEntries[0].DisplayVersion -ne $env:GTN_WINDOWS_PACKAGE_VERSION) {
+            throw "Installed MSI version does not match the updated package version."
+          }
+          $installedProductCode = $installedEntries[0].PSChildName
+          $remove = Start-Process -FilePath "msiexec.exe" -ArgumentList "/x `"$installedProductCode`" /qn /norestart" -Wait -PassThru
+          if ($remove.ExitCode -notin @(0, 1605, 3010)) {
+            throw "CI cleanup of the test installation failed with exit code $($remove.ExitCode)."
+          }
+
       - name: Prepare debug channel package
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         shell: pwsh
