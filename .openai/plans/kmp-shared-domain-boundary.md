@@ -23,3 +23,11 @@ This lets Android and Windows use the same `GameState`, `GameStatistics`, `GameS
 - [ ] Add shared deterministic parity tests for gameplay and currency examples.
 - [ ] Keep desktop storage separate from Android DataStore while preserving the serialized model contract.
 - [ ] Only move additional production logic when its dependencies fit this boundary; do not migrate UI/platform services into the shared model.
+
+
+## App icon source of truth
+
+- [ ] Use the repository-root `GTN_APP_LOGO.png` as the canonical source image for **both Android mobile and Windows Desktop** app icons.
+- [ ] Generate Android launcher resources at the required density buckets from that source, including adaptive/round launcher resources where supported; do not leave the existing Android launcher artwork as a separate source of truth.
+- [ ] Keep the Windows installer/app icon derived from the same source artwork.
+- [ ] Verify the icon in debug and release Android builds and in the packaged Windows app/MSI. Keep this asset task separate from gameplay behavior and do not claim it is complete until the packaged icons are inspected.
