@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
 
@@ -24,7 +25,7 @@ import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
 fun SharedGuessFeedbackCard(
     status: GuessGameStatus,
     message: String,
-    leadingContent: @Composable () -> Unit,
+    leadingContent: @Composable (Color) -> Unit,
     reducedMotion: Boolean = false,
     modifier: Modifier = Modifier
 ) {
@@ -54,7 +55,7 @@ fun SharedGuessFeedbackCard(
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            leadingContent()
+            leadingContent(contentColor)
             Text(
                 text = message,
                 style = MaterialTheme.typography.titleMedium,
