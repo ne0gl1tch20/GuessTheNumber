@@ -42,6 +42,8 @@ compose.desktop {
             packageVersion = windowsPackageVersion.get()
 
             windows {
+                // Preserve the UpgradeCode embedded in the existing Windows MSI.
+                upgradeUuid = "6178B622-7859-39F2-8ED0-E0466C715DD1"
                 menu = true
                 menuGroup = "GuessTheNumber"
                 shortcut = true
