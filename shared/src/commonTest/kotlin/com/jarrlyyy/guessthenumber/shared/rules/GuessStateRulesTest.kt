@@ -42,6 +42,26 @@ class GuessStateRulesTest {
     }
 
     @Test
+    fun highGuessIncrementsAttemptsAndResetsStreakWithoutChangingCorrectCount() {
+        val result = GuessStateRules.applyGuess(
+            targetNumber = 42,
+            guess = 43,
+            rangeMin = 1,
+            rangeMax = 100,
+            attempts = 2,
+            correctGuesses = 1,
+            streak = 3,
+            bestStreak = 4
+        )
+
+        assertEquals(GuessFeedback.TOO_HIGH, result.feedback)
+        assertEquals(3L, result.attempts)
+        assertEquals(1L, result.correctGuesses)
+        assertEquals(0, result.streak)
+        assertEquals(4, result.bestStreak)
+    }
+
+    @Test
     fun wrongGuessIncrementsAttemptsAndResetsStreakWithoutChangingCorrectCount() {
         val result = GuessStateRules.applyGuess(
             targetNumber = 42,
