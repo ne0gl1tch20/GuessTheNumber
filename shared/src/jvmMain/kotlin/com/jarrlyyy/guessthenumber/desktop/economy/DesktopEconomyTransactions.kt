@@ -103,6 +103,7 @@ object DesktopEconomyTransactions {
     }
 
     fun buyShopItem(state: GameState, item: ShopItemDef): EconomyTransaction {
+        if (!item.isCosmetic) return rejected(state, "This shop effect is not wired for Windows yet.")
         if (item.id in state.shopPurchases) return rejected(state, "Already purchased.")
         val cost = BigNumber(item.nebulaCost)
         if (state.nebula < cost) return rejected(state, "Not enough Nebula.")
