@@ -165,3 +165,12 @@ Current app version: 3.0.2 (versionCode 20).
 - Added all ten reusable-player labels to the 22 non-canonical locale catalogs with translated text and preserved format placeholders.
 - Extended `tools/validate_locales.py` to require the ten player labels plus the five shared media-control labels in every locale overlay. This prevents the music player from silently falling back to English for missing catalog entries.
 - Validation run #113 passed for the translation update. The new required-key gate is included in the next full workflow run.
+## Save integrity and shared challenge decisions (2026-10-15)
+
+- Shared deterministic challenge-claim decisions are now used to decide whether a claim is eligible, invalid, or a duplicate. Android remains responsible for applying Nebula to the existing large-number model, updating lifetime statistics, and persisting the resulting `GameState`.
+- The merged reload regression test verifies that claiming a weekly challenge, saving it, and loading it through a fresh `SaveManager` cannot grant the same reward a second time. The persisted claim ID, Nebula balance, and lifetime Nebula-earned statistic are checked together.
+- Atomic save updates validate the current primary save and the transformed result before writing the new primary and retaining the previous valid primary as recovery backup in one DataStore edit. Existing recovery/import/save-slot compatibility remains a release requirement.
+- **Known gap:** `GameViewModel` can publish an updated in-memory state before its asynchronous save has succeeded. A storage failure can therefore temporarily leave memory ahead of disk. A future implementation must coordinate state publication and persistence without overwriting newer in-memory changes with stale disk state.
+- A separate regression test is being prepared for rejecting an atomic update when the primary is corrupt while preserving the recovery backup. That test does not simulate a DataStore I/O exception and does not resolve the ViewModel ordering gap.
+
+These notes describe the audited implementation and test scope. They are not a claim that every persistence-failure path has been fault-injected or that device-level recovery has been fully validated.
