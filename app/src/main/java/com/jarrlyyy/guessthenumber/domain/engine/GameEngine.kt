@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.domain.engine
 
 import com.jarrlyyy.guessthenumber.shared.domain.FrenzyRules
+import com.jarrlyyy.guessthenumber.shared.domain.CriticalChanceRules
 import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
@@ -68,7 +69,7 @@ class GameEngine(private val rng: Random = Random.Default) {
         val feedback = transition.feedback
 
         if (feedback == GuessFeedback.CORRECT) {
-            val critChance = 0.05 + ((state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0) * 0.01)
+            val critChance = CriticalChanceRules.chance(state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0)
             val isCrit = rng.nextDouble() < critChance
             val baseReward = BigNumber(100) * BigNumber(state.currentRangeMax)
             val streakMultiplier = BigNumber(1.0 + (state.streak * 0.1))
