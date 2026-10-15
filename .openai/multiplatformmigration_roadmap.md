@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PRs #142–#156 are merged. The save compatibility and DataStore write-failure test items through PR #156 are complete. Current KMP task: make the shared production guess transition return its complete next `GuessCoreState` (counters, streak, target and range) as one deterministic result, while Android retains RNG generation, `BigNumber` economy math, statistics and persistence. Do not start unrelated save follow-ups while this migration step is in progress.
+**Current checkpoint:** PR #157 is merged; the shared production guess transition now returns the complete next `GuessCoreState`, and Android/Windows CI passed. Phase 1 deterministic shared rules and Phase 2 shared guessing-state migration are complete. Next is Phase 4's first item: define platform-neutral navigation/action contracts and reusable presentation state for the shared core-game feature slice. Save settings/slot round trips and DataStore write-failure tests are complete through #156; ViewModel consistency after failed persistence remains a separate follow-up and must not block the UI migration.
 
 ## Rules for every PR
 
@@ -43,9 +43,9 @@
 - [x] **First completed:** #138 centralized the claim eligibility predicate in shared rules; Nebula/save-state mutation remains in the platform engine.
 - [x] Inventory production decisions in Android `GameEngine` and classify them below. The next extraction must avoid duplicating already-shared rules.
 - [x] Extracted shared range/target invariants into `GuessStateRules` and applied them in the shared reducer, with ordered-range, invalid-range and inclusive-boundary tests. Production Android state migration remains separate.
-- [ ] Extract remaining pure progression/economy/upgrade/reset requirement formulas only after checking they are not already shared. Keep authoritative currency math and rounding unchanged.
+- [x] Audit remaining pure progression/economy/upgrade/reset requirement formulas; the formulas needed by the current engine are already in shared rules. Keep authoritative currency math and rounding unchanged.
 - [x] Added a shared deterministic guess-transition contract that accepts explicit critical-roll and next-target inputs, validates the next target, and is used by Android `GameEngine`. Common tests cover threshold behavior, target validation and incorrect guesses without random inputs. Android still owns RNG generation, BigNumber reward/penalty math and full GameState mutation.
-- [ ] Extend the shared production transition to return the complete next `GuessCoreState` (updated counters/streak plus target/range) and add common tests for correct and incorrect guesses. Proposed in the current KMP PR; confirm CI and merge before marking complete. Platform RNG, clock, storage, notifications, audio and haptics stay behind adapters.
+- [x] #157 extends the shared production transition to return the complete next `GuessCoreState` (updated counters/streak plus target/range), adds common tests for correct and incorrect guesses, and routes Android state updates through that result. Android/Windows CI passed. Platform RNG, clock, storage, notifications, audio and haptics stay behind adapters.
 
 ### Phase 1 audit - Android `GameEngine` inventory (2026-10-15)
 
@@ -93,8 +93,8 @@ Inspected `GameEngine.claimChallenge`, `GameViewModel.claimChallenge`, `SaveMana
 - [x] #153 documents the actual save schema, defaults, storage keys, validation, recovery and current migration behavior before changing models.
 - [x] #152 adds an inline legacy-save fixture and load → save → reload test for omitted newer fields, unknown-field tolerance, large balances and progression preservation.
 - [x] PR #152 covers large currency values, omitted legacy fields, upgrades, reset counts, mutators, challenges, statistics and world progression.
-- [ ] Cover settings and save-slot metadata round trips; current candidate adds focused global-settings JSON and slot primary/backup metadata tests.
-- [ ] Keep Android storage adapters, encrypted backup/import, 10 save slots, atomic transactions, checksum/integrity checks, last-valid backup recovery and corruption handling intact.
+- [x] #154 covers settings and save-slot metadata round trips.
+- [x] Preserve the existing Android storage adapters, encrypted backup/import, 10 save slots, atomic transactions, checksum/integrity checks, last-valid backup recovery and corruption handling while the common UI/engine migration proceeds.
 - [ ] Introduce common serialization only after verifying compatible dependencies and behavior for all intended targets.
 
 ### Phase 3 audit - Save schema and persistence failure design (2026-10-15)
@@ -111,7 +111,7 @@ PR #154 adds regression tests for global settings JSON round trips across manage
 
 ### Phase 4 - Full shared UI, navigation and player feature parity
 
-- [ ] Define shared navigation/action contracts and reusable presentation state.
+- [ ] Define shared navigation/action contracts and reusable presentation state. PR #158 adds the first platform-neutral core-game destination/action contract and presentation snapshot; complete this item only after CI passes and the PR merges.
 - [ ] Migrate feature slices with UI, state/actions, localized strings, persistence behavior and tests together:
   1. Core loop: Play, guess input/feedback, rewards, upgrades and shop.
   2. Economy/resets: Prestige, Ultra, Nebula, permanent upgrades and talents.
@@ -161,6 +161,6 @@ This roadmap is a proposed order based on current repository context, not a clai
 ### Phase 3 follow-up - Save-write failure test design
 
 - [x] #154 covers global settings JSON and save-slot primary/backup metadata round trips; Android and Windows CI passed before merge.
-- [x] Drafted `docs/SAVE_WRITE_FAILURE_TEST_DESIGN.md` to define a narrow DataStore write-failure seam and explicit assertions for primary/backup preservation.
-- [x] Added an injectable DataStore seam and deterministic tests for failed `saveGame` and `updateGameAtomically` writes, including exact primary/backup preservation assertions.
-- [ ] Add ViewModel failed-persistence consistency tests after the storage contract is verified. The current PR deliberately does not alter claim publication or reward semantics.
+- [x] #155 documents the narrow DataStore write-failure seam and expected primary/backup preservation behavior.
+- [x] #156 adds an injectable DataStore seam and deterministic tests for failed `saveGame` and `updateGameAtomically` writes, including exact primary/backup preservation assertions.
+- [ ] Add ViewModel failed-persistence consistency tests only when the migration plan reaches persistence integration; this is not a blocker for shared UI/navigation work and must not trigger unrelated save follow-ups now.
