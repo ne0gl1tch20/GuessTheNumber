@@ -2,14 +2,12 @@ package com.jarrlyyy.guessthenumber.domain.engine
 
 import com.jarrlyyy.guessthenumber.shared.domain.FrenzyRules
 import com.jarrlyyy.guessthenumber.shared.domain.CriticalChanceRules
-import com.jarrlyyy.guessthenumber.shared.domain.GuessRewardRules
-import com.jarrlyyy.guessthenumber.shared.domain.GuessPenaltyRules
+import com.jarrlyyy.guessthenumber.shared.domain.GuessEconomyDecisionRules
 import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRewardRules
-import com.jarrlyyy.guessthenumber.shared.domain.DifficultyRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessCoreState
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessTransitionRules
@@ -92,18 +90,28 @@ class GameEngine(private val rng: Random = Random.Default) {
             val isCrit = decision.isCritical
             val nextTarget = decision.nextTarget
                 ?: error("Correct guess transition must provide a next target")
-            val baseReward = BigNumber(GuessRewardRules.BASE_REWARD_PER_RANGE_UNIT) * BigNumber(state.currentRangeMax)
-            val streakMultiplier = BigNumber(GuessRewardRules.streakMultiplier(state.streak))
-            val frenzyMult = frenzyMultiplier(state.streak)
-            val critMultiplier = BigNumber(GuessRewardRules.criticalMultiplier(isCrit))
             val rewardMultiplierLevel = state.upgradeLevels["reward_multiplier"] ?: 0
-            val upgradeMult = BigNumber(GuessRewardRules.upgradeMultiplier(rewardMultiplierLevel))
             val hasTalentReward = state.shopPurchases.contains("talent_reward_1") || state.upgradeLevels.containsKey("talent_reward_1")
-            val talentMult = BigNumber(GuessRewardRules.talentMultiplier(hasTalentReward))
-            val mutatorMult = mutatorRewardMultiplier(state)
-            val difficultyMultiplier = BigNumber(Difficulty.rewardMultiplier(state.difficultyId))
+            val economyDecision = GuessEconomyDecisionRules.resolve(
+                rangeMax = state.currentRangeMax,
+                streak = state.streak,
+                isCritical = isCrit,
+                rewardMultiplierLevel = rewardMultiplierLevel,
+                hasTalentReward = hasTalentReward,
+                activeMutators = state.activeMutators,
+                difficultyId = state.difficultyId
+            )
+            // Keep BigNumber multiplication order on Android to preserve currency behavior.
+            val baseReward = BigNumber(economyDecision.baseRewardPerRangeUnit) * BigNumber(economyDecision.rangeUnits)
+            val streakMultiplier = BigNumber(economyDecision.streakMultiplier)
+            val frenzyMult = if (state.streak < FrenzyRules.THRESHOLD) BigNumber.ONE else BigNumber(economyDecision.frenzyMultiplier)
+            val critMultiplier = BigNumber(economyDecision.criticalMultiplier)
+            val upgradeMult = BigNumber(economyDecision.upgradeMultiplier)
+            val talentMult = BigNumber(economyDecision.talentMultiplier)
+            val mutatorMult = BigNumber(economyDecision.mutatorMultiplier)
+            val difficultyMultiplier = BigNumber(economyDecision.difficultyMultiplier)
             val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier
-            val totalReward = maxOf(BigNumber(GuessRewardRules.MINIMUM_GUESS_REWARD), calculatedReward)
+            val totalReward = maxOf(BigNumber(economyDecision.minimumGuessReward), calculatedReward)
             val newMoney = state.money + totalReward
             val newStreak = transition.streak
             val bestStreak = transition.bestStreak
@@ -132,8 +140,17 @@ class GameEngine(private val rng: Random = Random.Default) {
             return GuessResult(feedback, totalReward, isCrit, newStreak, updatedState)
         } else {
             val newAttempts = transition.attempts
-            val difficultyPenalty = state.money * BigNumber(Difficulty.wrongGuessPenalty(state.difficultyId))
-            val taxPenaltyRate = GuessPenaltyRules.taxPenaltyRate(state.activeMutators)
+            val economyDecision = GuessEconomyDecisionRules.resolve(
+                rangeMax = state.currentRangeMax,
+                streak = state.streak,
+                isCritical = false,
+                rewardMultiplierLevel = state.upgradeLevels["reward_multiplier"] ?: 0,
+                hasTalentReward = state.shopPurchases.contains("talent_reward_1") || state.upgradeLevels.containsKey("talent_reward_1"),
+                activeMutators = state.activeMutators,
+                difficultyId = state.difficultyId
+            )
+            val difficultyPenalty = state.money * BigNumber(economyDecision.difficultyPenaltyRate)
+            val taxPenaltyRate = economyDecision.taxPenaltyRate
             val taxPenalty = if (taxPenaltyRate > 0.0) state.money * BigNumber(taxPenaltyRate) else BigNumber.ZERO
             val newMoney = maxOf(BigNumber.ZERO, state.money - difficultyPenalty - taxPenalty)
             val newStats = state.statistics.copy(
