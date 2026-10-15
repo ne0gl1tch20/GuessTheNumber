@@ -70,7 +70,7 @@ internal class WindowsDebugInstaller {
             ${'$'}msiPath = '$msiLiteral'
             ${'$'}temporaryDirectory = '$directoryLiteral'
             try {
-                ${'$'}installer = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/i', ${'$'}msiPath) -Wait -PassThru
+                ${'$'}installer = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/i', ('"{0}"' -f ${'$'}msiPath)) -Wait -PassThru
                 exit ${'$'}installer.ExitCode
             } finally {
                 Start-Sleep -Seconds 2
