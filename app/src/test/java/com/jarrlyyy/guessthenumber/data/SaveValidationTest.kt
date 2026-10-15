@@ -11,6 +11,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import org.junit.Assert.*
 import org.robolectric.RuntimeEnvironment
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import org.junit.Test
@@ -99,6 +100,31 @@ class SaveValidationTest {
         assertEquals(BigNumber(75), duplicateClaim?.nebula)
         assertEquals(75L, duplicateClaim?.statistics?.nebulaEarned)
         assertTrue(duplicateClaim?.completedChallenges?.contains("weekly_correct") == true)
+    }
+
+    @Test
+    fun atomicGameUpdateRejectsCorruptPrimaryWithoutChangingRecoveryBackup() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = SaveManager(context)
+        val primaryKey = stringPreferencesKey("game_state_slot_1_json")
+        val backupKey = stringPreferencesKey("game_state_slot_1_backup_json")
+        val json = kotlinx.serialization.json.Json { encodeDefaults = true }
+        val recoveryState = GameState(money = BigNumber(250))
+        val recoveryJson = json.encodeToString(GameState.serializer(), recoveryState)
+
+        context.saveDataStore.edit { prefs ->
+            prefs[primaryKey] = "{corrupt"
+            prefs[backupKey] = recoveryJson
+        }
+
+        val updated = manager.updateGameAtomically(1) {
+            it.copy(money = it.money + BigNumber(100))
+        }
+
+        assertNull(updated)
+        val afterUpdate = context.saveDataStore.data.first()
+        assertEquals("{corrupt", afterUpdate[primaryKey])
+        assertEquals(recoveryJson, afterUpdate[backupKey])
     }
 
     @Test
