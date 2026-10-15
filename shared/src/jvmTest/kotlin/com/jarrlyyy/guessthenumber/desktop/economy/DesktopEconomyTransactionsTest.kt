@@ -187,9 +187,9 @@ class DesktopEconomyTransactionsTest {
     fun shopEffectWithoutDesktopImplementationIsRejected() {
         val initial = GameState(nebula = BigNumber(100))
         val item = com.jarrlyyy.guessthenumber.domain.model.ShopItemDef(
-            id = "auto_clicker_basic",
-            name = "Auto Clicker",
-            description = "Background automation.",
+            id = "nebula_boost",
+            name = "Nebula Crystal",
+            description = "Nebula gain boost.",
             nebulaCost = 25,
             category = "automation",
             isCosmetic = false
