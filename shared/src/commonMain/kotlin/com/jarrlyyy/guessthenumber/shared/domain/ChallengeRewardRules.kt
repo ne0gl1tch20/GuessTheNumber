@@ -71,7 +71,7 @@ object ChallengeRewardRules {
             val mutators = mutableListOf<String>()
             while (remaining.isNotEmpty()) {
                 val matched = MutatorRules.ids.sortedByDescending { it.length }
-                    .firstOrNull { remaining == it || remaining.startsWith("$it_") } ?: return false
+                    .firstOrNull { remaining == it || remaining.startsWith("${it}_") } ?: return false
                 mutators.add(matched)
                 remaining = remaining.removePrefix(matched).removePrefix("_")
             }
