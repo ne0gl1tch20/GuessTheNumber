@@ -3,6 +3,8 @@ package com.jarrlyyy.guessthenumber.desktop
 import androidx.compose.ui.input.key.Key
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DesktopNavigationTest {
@@ -35,6 +37,7 @@ class DesktopNavigationTest {
         controller.showMessage("  ")
         assertNull(controller.state.message)
     }
+
     @Test
     fun ctrlNumberShortcutsMapToDestinations() {
         assertEquals(DesktopDestination.PLAY, DesktopDestination.fromShortcut(Key.One, ctrlPressed = true))
@@ -67,5 +70,4 @@ class DesktopNavigationTest {
         assertNull(DesktopDestination.fromShortcut(Key.One, ctrlPressed = false))
         assertNull(DesktopDestination.fromShortcut(Key.Three, ctrlPressed = true))
     }
-
 }
