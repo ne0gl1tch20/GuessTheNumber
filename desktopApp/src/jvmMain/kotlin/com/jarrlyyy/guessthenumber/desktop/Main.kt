@@ -57,7 +57,7 @@ fun main() = application {
                 with(density) { 600.dp.roundToPx() }
             )
         }
-        MaterialTheme {
+        DesktopTheme {
             val scope = rememberCoroutineScope()
             val shellFocusRequester = remember { FocusRequester() }
             val shell = remember { DesktopShellController() }
