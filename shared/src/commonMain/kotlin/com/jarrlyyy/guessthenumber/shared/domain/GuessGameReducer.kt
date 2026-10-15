@@ -29,8 +29,12 @@ enum class GuessGameStatus {
 
 object GuessGameReducer {
     fun newGame(targetNumber: Long, rangeMin: Long = 1L, rangeMax: Long = 100L): GuessGameState {
-        require(rangeMax >= rangeMin) { "rangeMax must be >= rangeMin" }
-        require(targetNumber in rangeMin..rangeMax) { "targetNumber must be within the range" }
+        require(GuessStateRules.isValidRange(rangeMin, rangeMax)) {
+            "rangeMax must be >= rangeMin"
+        }
+        require(GuessStateRules.isTargetWithinRange(targetNumber, rangeMin, rangeMax)) {
+            "targetNumber must be within the range"
+        }
         return GuessGameState(
             targetNumber = targetNumber,
             rangeMin = rangeMin,

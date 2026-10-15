@@ -16,6 +16,14 @@ data class GuessStateTransition(
 )
 
 object GuessStateRules {
+    /** True when a guessing range is ordered and therefore safe to use. */
+    fun isValidRange(rangeMin: Long, rangeMax: Long): Boolean =
+        rangeMax >= rangeMin
+
+    /** True when the hidden target is inside an already validated range. */
+    fun isTargetWithinRange(targetNumber: Long, rangeMin: Long, rangeMax: Long): Boolean =
+        isValidRange(rangeMin, rangeMax) && targetNumber in rangeMin..rangeMax
+
     fun applyGuess(
         targetNumber: Long,
         guess: Long,

@@ -5,6 +5,26 @@ import kotlin.test.assertEquals
 
 class GuessStateRulesTest {
     @Test
+    fun validRangeIncludesSingleValueAndNormalRanges() {
+        assertEquals(true, GuessStateRules.isValidRange(1, 100))
+        assertEquals(true, GuessStateRules.isValidRange(7, 7))
+    }
+
+    @Test
+    fun reversedRangeIsInvalid() {
+        assertEquals(false, GuessStateRules.isValidRange(100, 1))
+    }
+
+    @Test
+    fun targetMustBeWithinAnOrderedRangeIncludingBoundaries() {
+        assertEquals(true, GuessStateRules.isTargetWithinRange(1, 1, 100))
+        assertEquals(true, GuessStateRules.isTargetWithinRange(100, 1, 100))
+        assertEquals(false, GuessStateRules.isTargetWithinRange(0, 1, 100))
+        assertEquals(false, GuessStateRules.isTargetWithinRange(101, 1, 100))
+        assertEquals(false, GuessStateRules.isTargetWithinRange(5, 10, 1))
+    }
+
+    @Test
     fun correctGuessIncrementsAttemptsCorrectCountAndStreak() {
         val result = GuessStateRules.applyGuess(
             targetNumber = 42,

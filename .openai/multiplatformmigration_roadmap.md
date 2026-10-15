@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PR #138 merged after both Android and Windows CI passed. PR #139 adds this roadmap; its docs-only Android workflow was queued at last check.
+**Current checkpoint:** PR #140 merged with the Android `GameEngine` inventory. This implementation step centralizes shared range invariants for the KMP guessing pilot; it does not yet move production Android economy/state mutation.
 
 ## Rules for every PR
 
@@ -42,9 +42,9 @@
 
 - [x] **First completed:** #138 centralized the claim eligibility predicate in shared rules; Nebula/save-state mutation remains in the platform engine.
 - [x] Inventory production decisions in Android `GameEngine` and classify them below. The next extraction must avoid duplicating already-shared rules.
-- [ ] Extract the next low-risk, pure state validation/invariant into `shared/src/commonMain`; add valid, invalid, boundary and duplicate-action tests in `commonTest`.
+- [x] Extracted shared range/target invariants into `GuessStateRules` and applied them in the shared reducer, with ordered-range, invalid-range and inclusive-boundary tests. Production Android state migration remains separate.
 - [ ] Extract remaining pure progression/economy/upgrade/reset requirement formulas only after checking they are not already shared. Keep authoritative currency math and rounding unchanged.
-- [ ] Define the shared production transition contract and inject deterministic randomness for tests. Platform RNG, clock, storage, notifications, audio and haptics stay behind adapters.
+- [ ] Define the shared production transition contract and inject deterministic randomness for tests. `GameEngine` already accepts a seeded `Random`, but its random draws are not yet independently injectable. Platform RNG, clock, storage, notifications, audio and haptics stay behind adapters.
 
 ### Phase 1 audit - Android `GameEngine` inventory (2026-10-15)
 
