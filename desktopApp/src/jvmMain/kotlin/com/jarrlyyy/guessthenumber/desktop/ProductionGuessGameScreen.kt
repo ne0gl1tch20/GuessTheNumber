@@ -142,14 +142,19 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     } else if (!isSaving) {
                         isSaving = true
                         val result = engine.processGuess(currentState, guess)
+                        val finalState = DesktopEconomyTransactions.applyGuessBonuses(
+                            before = currentState,
+                            after = result.newState,
+                            correct = result.feedback == GuessFeedback.CORRECT
+                        )
                         scope.launch {
-                            val saved = withContext(Dispatchers.IO) { saveStore.save(1, result.newState) }
+                            val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
                             if (saved) {
-                                state = result.newState
+                                state = finalState
                                 feedback = when (result.feedback) {
                                     GuessFeedback.TOO_LOW -> "Too low. Try again!"
                                     GuessFeedback.TOO_HIGH -> "Too high. Try again!"
-                                    GuessFeedback.CORRECT -> "Correct! You earned ${result.reward} Money."
+                                    GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - currentState.money} Money."
                                 }
                                 guessText = ""
                             } else {
