@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.domain.engine
 
 import com.jarrlyyy.guessthenumber.shared.domain.FrenzyRules
 import com.jarrlyyy.guessthenumber.shared.domain.CriticalChanceRules
+import com.jarrlyyy.guessthenumber.shared.domain.GuessRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
@@ -72,13 +73,13 @@ class GameEngine(private val rng: Random = Random.Default) {
             val critChance = CriticalChanceRules.chance(state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0)
             val isCrit = rng.nextDouble() < critChance
             val baseReward = BigNumber(100) * BigNumber(state.currentRangeMax)
-            val streakMultiplier = BigNumber(1.0 + (state.streak * 0.1))
+            val streakMultiplier = BigNumber(GuessRewardRules.streakMultiplier(state.streak))
             val frenzyMult = frenzyMultiplier(state.streak)
-            val critMultiplier = if (isCrit) BigNumber(5) else BigNumber.ONE
+            val critMultiplier = BigNumber(GuessRewardRules.criticalMultiplier(isCrit))
 
             // Multipliers from upgrades
             val rewardMultiplierLevel = state.upgradeLevels["reward_multiplier"] ?: 0
-            val upgradeMult = BigNumber(1.0 + (rewardMultiplierLevel * 0.25))
+            val upgradeMult = BigNumber(GuessRewardRules.upgradeMultiplier(rewardMultiplierLevel))
 
             // Talents & Mutators multiplier integration
             val talentMult = if (state.shopPurchases.contains("talent_reward_1") || state.upgradeLevels.containsKey("talent_reward_1")) BigNumber(1.5) else BigNumber.ONE
