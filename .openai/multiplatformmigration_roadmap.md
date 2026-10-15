@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PRs #142–#146 are merged. PR #145 shared the guess-economy multiplier/penalty-rate decision; PR #146 added Android coverage for combined Hard-difficulty and tax penalties. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Current candidate: share the deterministic challenge-claim decision while keeping reward application and persistence on the platform.
+**Current checkpoint:** PRs #142–#147 are merged. PR #145 shared the guess-economy multiplier/penalty-rate decision; PR #146 added Android coverage for combined Hard-difficulty and tax penalties; PR #147 shared the deterministic challenge-claim decision while keeping reward application and persistence on Android. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Current candidate: document and test challenge-claim atomicity before changing transaction behavior.
 
 ## Rules for every PR
 
@@ -72,9 +72,21 @@ Inspected `app/src/main/java/com/jarrlyyy/guessthenumber/domain/engine/GameEngin
 - [x] #145 - Extract reward multipliers and difficulty/tax penalty rates into a common deterministic decision result; keep `BigNumber` arithmetic and currency mutation on Android.
 - [x] #146 - Add combined wrong-guess penalty parity coverage; Android and Windows CI passed before merge.
 - [x] #146 - Add Android parity coverage for the combined Hard-difficulty and tax-mutator penalty; preserve current `BigNumber` deductions and guess statistics.
-- [ ] Share a deterministic challenge-claim decision result and test rejected/duplicate claims; keep Nebula arithmetic, statistics mutation and persistence on Android.
+- [x] #147 - Share a deterministic challenge-claim decision result and test accepted, invalid and duplicate claims; keep Nebula arithmetic, statistics mutation and persistence on Android.
 - [ ] Audit atomicity across state mutation and persistence before changing transaction behavior. Failed validation or persistence must not award currency twice or leave partial state.
 - [ ] Do not replace the existing large-number representation until a separately tested cross-platform numeric migration is justified.
+
+
+
+### Phase 2 audit - Challenge claim and persistence atomicity (2026-10-15)
+
+Inspected `GameEngine.claimChallenge`, `GameViewModel.claimChallenge`, `SaveManager.saveGame`, `SaveManager.updateGameAtomically` and the existing `SaveValidationTest` coverage after #147 merged.
+
+- `GameEngine.claimChallenge` is a pure state transformation: invalid/duplicate claims return the original state; accepted claims add the challenge ID, Nebula and the Nebula-earned statistic together in the returned `GameState`.
+- The current ViewModel claim path publishes the updated state to `_gameState` before scheduling `saveGameAsync()`. The caller does not receive a durable-save result, so a persistence failure can leave the in-memory state ahead of the saved state until a later save/reload. The shared decision prevents ordinary duplicate claims against the current state, but it does not by itself make the state publication and persistence one transaction.
+- `SaveManager.updateGameAtomically` uses a single DataStore edit to validate the current primary, transform a decoded state, validate the serialized result and update primary plus backup together. Existing tests cover successful updates and rejecting an invalid transformed state without replacing the primary.
+- The atomic update helper returns `null` when the primary save is absent or invalid. A future claim integration must deliberately handle fresh slots and backup-recovery behavior, must not overwrite newer in-memory gameplay state with a stale persisted snapshot, and must surface/handle persistence failure before claiming success.
+- No transaction behavior was changed in this audit. Next implementation should add focused failure/duplicate/restart tests and define how the ViewModel serializes gameplay updates with saves before wiring challenge claims through durable storage.
 
 ### Phase 3 - Save and persistence compatibility
 
