@@ -54,7 +54,6 @@ import com.jarrlyyy.guessthenumber.desktop.update.WindowsBuildVersion
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugInstaller
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdate
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdateClient
-import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessGameScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -283,7 +282,7 @@ fun main() = application {
                             Column(
                                 modifier = Modifier.weight(1f).fillMaxWidth()
                             ) {
-                                SharedGuessGameScreen()
+                                ProductionGuessGameScreen()
                             }
                         }
 
