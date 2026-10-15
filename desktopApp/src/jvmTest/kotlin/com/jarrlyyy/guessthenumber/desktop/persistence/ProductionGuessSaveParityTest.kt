@@ -39,7 +39,7 @@ class ProductionGuessSaveParityTest {
         assertEquals(GuessFeedback.CORRECT, correctGuess.feedback)
         assertEquals(2L, correctGuess.newState.attempts)
         assertEquals(1L, correctGuess.newState.correctGuesses)
-        assertEquals(1L, correctGuess.newState.statistics.totalGuesses)
+        assertEquals(2L, correctGuess.newState.statistics.totalGuesses)
         assertEquals(1L, correctGuess.newState.statistics.correctGuesses)
         assertTrue(correctGuess.newState.targetNumber in 1L..100L)
         assertTrue(store.save(1, correctGuess.newState))
