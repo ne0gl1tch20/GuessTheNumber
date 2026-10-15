@@ -1,12 +1,10 @@
 # Guess The Number (Incremental & Arcade Edition)
 
-An advanced, feature-rich incremental and arcade game built with **Kotlin** and **Jetpack Compose**. Android remains the primary, feature-complete platform while the project incrementally extracts deterministic game rules into Kotlin Multiplatform (`shared/`) and validates the Windows desktop target. The migration is in progress; shared-rule coverage does not mean full gameplay or UI parity across platforms. Start with a simple number guess, then turn it into a full progression loop: build upgrades, chase streaks, trigger Frenzy, discover events, collect cosmetics, stack mutators, and create challenges that make your next run feel different.
+An advanced, feature-rich incremental and arcade game built with Kotlin and Jetpack Compose. Android is the primary feature-rich platform. The Kotlin Multiplatform foundation shares deterministic game rules and selected guessing UI contracts with the Windows desktop target; this does not mean the full game has feature parity on Windows. See the plans below.
 
-**Why try it?** 🎮 You can play casually, optimize an automation build, hunt achievement tiers, or make a ridiculous custom mutator challenge. There is always another upgrade, reset, challenge, or combination waiting in the next run.
+## Lua Scripting Layer (Implementation in Progress)
 
-## 🧩 Lua Scripting Layer (Implementation in Progress)
-
-The embedded LuaJ runtime and shared Kotlin engine facade support the bundled offline Number Rush activity, and Dev Settings includes typed `/lua` commands. This scripting layer is still evolving. Kotlin remains authoritative for save data, progression, eligibility, and rewards.
+The embedded LuaJ runtime and shared Kotlin engine facade support the bundled offline Number Rush activity, and Dev Settings includes typed /lua commands. Kotlin remains authoritative for save data, progression, eligibility and rewards.
 
 - [Lua implementation roadmap](docs/LUA_SCRIPTING_PLAN.md)
 - [Draft Lua host API contract](docs/LUA_API_DESIGN.md)
@@ -15,61 +13,38 @@ The embedded LuaJ runtime and shared Kotlin engine facade support the bundled of
 - [Copy-ready LiveOps repository template](liveops-template/README.md)
 - [Reserved reusable scripts directory](app/src/main/assets/scripts/README.md)
 
-The runtime uses an instruction-budgeted Lua sandbox with no exposed Android, Java bridge, filesystem, OS, network, package loader, or coroutine library. The signed LiveOps client is implemented but remains fail-closed until the `GuessTheNumber-LiveOps` content repository and trusted RSA public-key configuration are set up. No remote script is accepted without a valid signed manifest and matching script hashes.
+The runtime uses an instruction-budgeted Lua sandbox without Android/Java bridge, filesystem, OS, network, package loader or coroutine access. The signed LiveOps client remains fail-closed until its content repository and trusted public-key configuration are set up.
 
----
+## Key features
 
-## 🚀 Key Features
+- Number guessing, incremental engine, quick-buy multipliers and background guessing bots.
+- Standard, Prestige and Ultra upgrades, talents and scaling progression.
+- Weekly challenges, offline random events, achievements, Frenzy and mutators.
+- Arcade/minigames, world progression, bosses, relics, Home Base, Codex and Endless Rift.
+- Multiple save slots, backup/restore and recovery.
+- Android audio, notifications, widgets and developer diagnostics.
 
-### 1. **Core Gameplay & Incremental Mechanics**
-- **Number Guessing / Incremental Engine**: Earn currency by guessing numbers, accelerated by fluid quick-buy multipliers (`1x`, `10x`, `100x`, `MAX`) and autonomous background guessing bots.
-- **Upgrades & Progression**: Buy standard upgrades (`upgrades.json`), prestige upgrades (`prestige_upgrades.json`), ultra upgrades (`ultra_upgrades.json`), and interconnected Prestige Talent Web skill nodes (`talents.json`) via JSON configuration files.
-- **Prestige & Ultra Systems**: Reset or ascend through multiple layers of prestige with scaling requirements and custom shops.
-- **Weekly Challenges**: Rotating weekly challenge sets now mix accuracy, streak, money, guess volume, Prestige, Ultra, Frenzy, and playtime goals with week-scoped claim IDs and varied Nebula rewards.
-- **Random Events**: Occasional varied offline-friendly events such as Cash Burst, Nebula Rain, Jackpot, Streak Surge, Range Shuffle, Tax Refund, and rare Cosmic Gifts.
-- **Achievement Tier System**: Expanded the achievement catalog to 27 milestones across Bronze, Silver, Gold, and Diamond tiers with localized names/descriptions and escalating Nebula rewards.
-- **Combo / Frenzy System**: Consecutive correct guesses build streaks, with Frenzy tiers adding escalating reward multipliers up to 5x.
-- **Achievements & Challenges**: Track milestones, complete daily seeded challenges with Nebula rewards, and play high-stakes 50/50 staking mode (`StakingScreen`).
-- **Arcade Minigames**: Integrated side activities and minigames (`minigames.json`) to keep gameplay engaging.
+## Architecture
 
-### 🎯 **What You Can Do Right Now**
-- 🔥 **Build a streak and hit Frenzy**: Keep landing correct guesses to push your reward multiplier higher.
-- 🧩 **Make your own challenge**: Combine mutators, choose a goal, set a target, and chase the Nebula reward.
-- ✨ **Collect cosmetics**: Browse the shop by category and equip cosmetics as your collection grows.
-- 🏆 **Climb achievement tiers**: Work through Bronze, Silver, Gold, and Diamond milestones.
-- 🎲 **React to random events**: Keep playing and see what the next event throws at your run.
-- 💾 **Keep multiple runs**: Use the expanded save-slot system for separate profiles and difficulty choices.
+- Android UI: Jetpack Compose and Material 3 Expressive.
+- Shared KMP foundation: deterministic rules and selected guessing UI components in shared/.
+- Android retains its production navigation, authoritative GameState mutation, BigNumber currency math, persistence, RNG integration and Android-only services.
+- Windows retains desktop window/input behavior, updates and MSI packaging.
+- The app remains offline-first with no ads, analytics or accounts.
 
-### 2. **Architecture & Tech Stack**
-- **Android UI**: Jetpack Compose with Google's **Material 3 Expressive** design system, animations, and pure-black AMOLED mode. Shared KMP rules are being migrated incrementally; Android-specific screens and services remain platform-owned.
-- **Navigation**: Jetpack Navigation Compose (`NavGraph.kt`, `Screen.kt`) with smooth horizontal swiping between tabs.
-- **State and persistence**: Reactive Android state through `GameViewModel.kt`, Coroutines, and Flows, backed by `SaveManager.kt`, DataStore, save-slot validation, and recovery backups. Save export/import and recovery behavior must remain compatible during migration.
-- **Data & Configuration**: JSON-driven configuration repository (`JsonConfigRepository.kt`) for items, upgrades, achievements, and challenges.
-- **Custom Numeric Model**: Supports extremely large numbers using a robust custom `BigNumber` data model with multiple number notations (Scientific, Engineering, Short Scale, Alpha Suffixes).
+## KMP foundation and Windows parity
 
-### 3. **Utilities & Advanced Systems**
-- **Anti-Cheat & Time-Travel Protection**: Protects game progression against unauthorized manipulation and time cheating.
-- **Background Audio & Notifications**: Ambient background music manager and WorkManager-based notifications/reminders (`GameReminderWorker.kt`, `NotificationHelper.kt`).
-- **Crash Recovery & Logging**: Comprehensive in-app crash handler (`AppErrorHandler.kt`) and a custom game logger (`GameLogger.kt`) with dedicated inspection screens.
-- **Android Home Screen Widgets**: Glance-based app widgets (`GuessWidget`) supporting real-time currency display and quick-guess action triggers.
-- **Developer Tools**: Feature-packed developer console with dev commands (`/timeskip`, `/max_upgrades`, etc.), raw JSON save editor, and process inspector.
+The KMP foundation shares deterministic rules for guess transitions, reward multipliers, penalties, progression requirements and challenge-claim decisions, with common tests. Selected controlled guessing UI is also shared. Windows has a desktop target, but end-to-end parity for all player-facing features is not yet established.
 
----
-
-## 🧭 Kotlin Multiplatform migration status
-
-The migration is deliberately incremental. Deterministic rules for guess transitions, reward multipliers, penalties, progression requirements, and challenge-claim decisions are shared and covered by common tests. Android still owns `BigNumber` arithmetic, RNG generation, currency/statistics mutation, full `GameState` updates, persistence, clocks, notifications, audio, haptics, and Android UI. These boundaries stay in place until differential tests establish parity.
-
-- `shared/`: common Kotlin rules and tests.
-- `app/`: Android application, platform adapters, UI, and authoritative save/game-state integration.
-- Windows Desktop CI: validates the shared/Kotlin code path and builds the desktop target. This is migration validation, not a claim of complete feature parity.
-- [Migration execution roadmap](.openai/multiplatformmigration_roadmap.md)
+- [KMP foundation status and exit criteria](docs/KMP_FOUNDATION_STATUS.md)
+- [Windows feature parity plan](docs/WINDOWS_FEATURE_PARITY_PLAN.md)
+- [Android runtime QA checklist](.openai/kmp_runtime_parity_checklist.md)
 - [Documentation index](docs/README.md)
-- [Integration audit and remaining release gates](docs/INTEGRATION_AUDIT_STATUS.md)
+- [Save schema and migration notes](docs/SAVE_SCHEMA_AND_MIGRATION.md)
 
-## 🧪 Validation and CI
+## Validation and CI
 
-Pull requests use the normal Android validation/tests workflow and Windows Desktop CI. Routine validation is tests/checks only; it is not intended to build Android APKs. The stable debug APK workflow is separate. Do not treat a source review as a passing test result: use the latest run for the exact commit and inspect failed job logs before merging.
+PRs use Android validation/tests and Windows Desktop CI. Routine validation is checks/tests only and is not intended to build Android APKs. The stable debug APK workflow is separate. Use the latest run for the exact commit and inspect failures before claiming a check passed.
 
 Local Android unit tests:
 
@@ -77,37 +52,9 @@ Local Android unit tests:
 ./gradlew :app:testDebugUnitTest
 ```
 
-For shared common tests, use the Gradle task configured by the project for `shared`; confirm the task name from Gradle rather than guessing it. Device/emulator coverage is a separate validation layer.
+For shared common tests, confirm the task name from Gradle rather than guessing it. Device/emulator coverage is separate.
 
-## 📂 Project Structure
+## Getting started
 
-```text
-com.jarrlyyy.guessthenumber/
-│
-├── data/
-│   ├── audio/              # Background music manager
-│   ├── crash/              # Error handler and crash recovery
-│   ├── logger/             # Game logging and log entries
-│   ├── notification/       # Notifications, receivers, and workers
-│   ├── repository/         # JSON config repository
-│   └── store/              # Save data manager
-│
-├── domain/
-│   ├── command/            # Command executor system
-│   ├── engine/             # Game engine and anti-cheat service
-│   └── model/              # BigNumber and GameState models
-│
-└── ui/
-    ├── navigation/         # Navigation graph and screen definitions
-    ├── screens/            # Play, Shop, Prestige, Ultra, Arcade, Stats, Settings, etc.
-    ├── theme/              # Material 3 colors and theme setup
-    └── viewmodel/          # GameViewModel (core game logic & state)
-```
-
----
-
-## 🛠️ Getting Started
-
-1. **Prerequisites**: A recent Android Studio version with Kotlin support and the Android SDK versions configured by the project.
-2. **Open Project**: Open the root folder `GuessTheNumber` in Android Studio.
-3. **Build & Run**: Sync Gradle and run the `app` module on an emulator or physical Android device. The Android app currently uses minSdk 26 and targetSdk 35.
+1. Open the repository in a recent Android Studio version with Kotlin support and the configured Android SDK.
+2. Sync Gradle and run the app module on an emulator or physical Android device. Android currently uses minSdk 26 and targetSdk 35.
