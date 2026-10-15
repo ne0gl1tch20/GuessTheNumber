@@ -8,8 +8,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -29,6 +27,7 @@ import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
+import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessInputField
 
 private enum class GuessFeedbackTone { Neutral, TooLow, TooHigh, Correct }
 
@@ -623,13 +622,17 @@ fun PlayScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        OutlinedTextField(
+                        SharedGuessInputField(
                             value = guessInput,
                             onValueChange = { guessInput = it },
-                            label = { Text("${locale.getString("play_enter_guess", "Enter your guess")} (${sharedPresentation.rangeMin}–${sharedPresentation.rangeMax})") },
+                            onSubmit = { submitGuess() },
+                            minNumber = sharedPresentation.rangeMin,
+                            maxNumber = sharedPresentation.rangeMax,
+                            label = locale.getString("play_enter_guess", "Enter your guess"),
                             shape = MaterialTheme.shapes.medium,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            keyboardActions = KeyboardActions(onDone = { submitGuess() }),
+                            keyboardType = KeyboardType.Number,
+                            imeAction = androidx.compose.ui.text.input.ImeAction.Default,
+                            submitOnEnter = false,
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
