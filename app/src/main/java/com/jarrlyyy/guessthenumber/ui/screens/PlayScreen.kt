@@ -53,6 +53,15 @@ fun PlayScreen(
     val locale = configRepository.localeManager
     var lastFeedback by remember { mutableStateOf(locale.getString("guess_prompt", "Guess a number between ${state.currentRangeMin} and ${state.currentRangeMax}")) }
     var feedbackTone by remember { mutableStateOf(GuessFeedbackTone.Neutral) }
+    val sharedPresentation = ProductionGuessPresentationAdapter.from(
+        state = state,
+        status = when (feedbackTone) {
+            GuessFeedbackTone.Neutral -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY
+            GuessFeedbackTone.TooLow -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_LOW
+            GuessFeedbackTone.TooHigh -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_HIGH
+            GuessFeedbackTone.Correct -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT
+        }
+    )
     var showCorrectCelebration by remember { mutableStateOf(false) }
     var observedCorrectGuesses by remember { mutableStateOf(state.correctGuesses) }
     val guessInteractionSource = remember { MutableInteractionSource() }
@@ -614,7 +623,7 @@ fun PlayScreen(
                         OutlinedTextField(
                             value = guessInput,
                             onValueChange = { guessInput = it },
-                            label = { Text(locale.getString("play_enter_guess", "Enter your guess")) },
+                            label = { Text("${locale.getString("play_enter_guess", "Enter your guess")} (${sharedPresentation.rangeMin}–${sharedPresentation.rangeMax})") },
                             shape = MaterialTheme.shapes.medium,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             keyboardActions = KeyboardActions(onDone = { submitGuess() }),
