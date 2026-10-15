@@ -4,9 +4,11 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+val windowsPackageVersion = providers.environmentVariable("GTN_WINDOWS_PACKAGE_VERSION")
+    .orElse("1.0.0")
+
 kotlin {
     jvmToolchain(17)
-
     jvm()
 
     sourceSets {
@@ -18,6 +20,13 @@ kotlin {
                 implementation(compose.material3)
                 implementation(compose.ui)
                 implementation(compose.desktop.currentOs)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.coroutines.core)
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.junit)
             }
         }
     }
@@ -30,11 +39,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi)
             packageName = "GuessTheNumber"
-            // CI supplies a monotonically increasing MSI version for update testing.
-            // Local development keeps the existing fallback version.
-            packageVersion = providers.environmentVariable("GTN_WINDOWS_PACKAGE_VERSION")
-                .orElse("1.0.0")
-                .get()
+            packageVersion = windowsPackageVersion.get()
 
             windows {
                 menu = true
