@@ -118,6 +118,16 @@ object DesktopEconomyTransactions {
         )
     }
 
+    fun setAutoClickerActive(state: GameState, active: Boolean): EconomyTransaction {
+        if ("auto_clicker_basic" !in state.shopPurchases) {
+            return rejected(state, "Purchase the Auto Clicker first.")
+        }
+        return accepted(
+            state.copy(autoClickerActive = active),
+            if (active) "Auto Clicker resumed." else "Auto Clicker paused."
+        )
+    }
+
     /** Mirrors the Android post-guess talent/event/mastery/relic bonus layer. */
     fun applyGuessBonuses(
         before: GameState,
