@@ -54,6 +54,90 @@ class SaveValidationTest {
     }
 
     @Test
+    fun legacySaveWithOmittedFieldsRoundTripsWithoutLosingProgression() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = SaveManager(context)
+        val primaryKey = stringPreferencesKey("game_state_slot_1_json")
+        val json = kotlinx.serialization.json.Json { encodeDefaults = true }
+        val legacyState = GameState(
+            difficultyId = "hard",
+            money = BigNumber("123456789012345678901234567890"),
+            prestige = BigNumber("98765432109876543210"),
+            ultra = BigNumber("123456789012345"),
+            nebula = BigNumber(425),
+            attempts = 321,
+            correctGuesses = 210,
+            upgradeLevels = mapOf("reward_multiplier" to 7, "better_range" to 3),
+            prestigeCount = 12,
+            ultraCount = 4,
+            activeMutators = setOf("double_or_nothing"),
+            completedChallenges = setOf("weekly_correct"),
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(
+                totalGuesses = 400,
+                correctGuesses = 210,
+                nebulaEarned = 900
+            ),
+            unlockedWorldIds = setOf("verdant_grove", "crystal_cavern"),
+            activeWorldId = "crystal_cavern",
+            homeBaseLevel = 5
+        )
+        val legacyFields = json.encodeToString(GameState.serializer(), legacyState)
+        val legacyObject = json.parseToJsonElement(legacyFields).let {
+            it as kotlinx.serialization.json.JsonObject
+        }.toMutableMap()
+
+        // Model a save written before these fields existed, plus an unknown future field.
+        legacyObject.remove("endlessRiftTier")
+        legacyObject.remove("endlessRiftBestTier")
+        legacyObject.remove("endlessRiftActive")
+        legacyObject.remove("activeBossBattleWorldId")
+        legacyObject["futureFieldFromNewerVersion"] =
+            kotlinx.serialization.json.JsonPrimitive("ignored by this version")
+        val legacyJson = kotlinx.serialization.json.JsonObject(legacyObject).toString()
+
+        assertTrue(manager.validateSave(legacyJson))
+        context.saveDataStore.edit { prefs -> prefs[primaryKey] = legacyJson }
+
+        val loaded = manager.loadGame(1)
+        assertEquals(BigNumber("123456789012345678901234567890"), loaded.money)
+        assertEquals(BigNumber("98765432109876543210"), loaded.prestige)
+        assertEquals(BigNumber("123456789012345"), loaded.ultra)
+        assertEquals(BigNumber(425), loaded.nebula)
+        assertEquals(321L, loaded.attempts)
+        assertEquals(210L, loaded.correctGuesses)
+        assertEquals(mapOf("reward_multiplier" to 7, "better_range" to 3), loaded.upgradeLevels)
+        assertEquals(12L, loaded.prestigeCount)
+        assertEquals(4L, loaded.ultraCount)
+        assertEquals(setOf("double_or_nothing"), loaded.activeMutators)
+        assertEquals(setOf("weekly_correct"), loaded.completedChallenges)
+        assertEquals(900L, loaded.statistics.nebulaEarned)
+        assertEquals(setOf("verdant_grove", "crystal_cavern"), loaded.unlockedWorldIds)
+        assertEquals("crystal_cavern", loaded.activeWorldId)
+        assertEquals(5, loaded.homeBaseLevel)
+        assertEquals(0, loaded.endlessRiftTier)
+        assertEquals(0, loaded.endlessRiftBestTier)
+        assertFalse(loaded.endlessRiftActive)
+        assertNull(loaded.activeBossBattleWorldId)
+
+        assertTrue(manager.saveGame(loaded, 1))
+        val restartedManager = SaveManager(context)
+        val reloaded = restartedManager.loadGame(1)
+        assertEquals(loaded.money, reloaded.money)
+        assertEquals(loaded.prestige, reloaded.prestige)
+        assertEquals(loaded.ultra, reloaded.ultra)
+        assertEquals(loaded.nebula, reloaded.nebula)
+        assertEquals(loaded.upgradeLevels, reloaded.upgradeLevels)
+        assertEquals(loaded.prestigeCount, reloaded.prestigeCount)
+        assertEquals(loaded.ultraCount, reloaded.ultraCount)
+        assertEquals(loaded.activeMutators, reloaded.activeMutators)
+        assertEquals(loaded.completedChallenges, reloaded.completedChallenges)
+        assertEquals(loaded.statistics.nebulaEarned, reloaded.statistics.nebulaEarned)
+        assertEquals(loaded.unlockedWorldIds, reloaded.unlockedWorldIds)
+        assertEquals(loaded.activeWorldId, reloaded.activeWorldId)
+        assertEquals(loaded.homeBaseLevel, reloaded.homeBaseLevel)
+    }
+
+    @Test
     fun atomicGameUpdateUsesLatestSavedState() = runBlocking {
         val context = RuntimeEnvironment.getApplication()
         val manager = SaveManager(context)
