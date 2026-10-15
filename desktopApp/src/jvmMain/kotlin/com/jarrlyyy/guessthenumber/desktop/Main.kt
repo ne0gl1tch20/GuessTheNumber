@@ -38,6 +38,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "Guess The Number",
         state = remember { WindowState(size = DpSize(1100.dp, 760.dp)) },
+        minimumSize = DpSize(800.dp, 600.dp),
         resizable = true
     ) {
         MaterialTheme {
