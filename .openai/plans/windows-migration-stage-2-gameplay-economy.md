@@ -8,7 +8,7 @@
 
 Stage 2 already exists in the Windows feature-parity plan. This file tracks its implementation breakdown and does not replace the parity plan.
 
-PRs #193–#196 have moved the production `GameState`, `BigNumber`, `GameEngine` and `Difficulty` boundary into shared JVM/Android code, connected the Windows Play screen to the production guess engine, and added desktop-native persistence with backup recovery and failure-path tests. The Windows screen currently exposes only the basic guessing loop and a few counters. PR #198 (Stage 2-B initial slice) now adds desktop economy transactions, catalog loading, purchase/reset UI and deterministic tests. Full parity of effects tied to Android-only services and actual Windows runtime verification remain outstanding. See [`docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md`](../../docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md) for evidence and the current gate.
+PRs #193–#196 have moved the production `GameState`, `BigNumber`, `GameEngine` and `Difficulty` boundary into shared JVM/Android code, connected the Windows Play screen to the production guess engine, and added desktop-native persistence with backup recovery and failure-path tests. The Windows screen currently exposes only the basic guessing loop and a few counters. PR #199 (Stage 2-B initial slice) adds desktop economy transactions, catalog loading, purchase/reset UI, a feedback-driven Auto Clicker and deterministic tests. Full parity of effects tied to Android-only services and actual Windows runtime verification remain outstanding. See [`docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md`](../../docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md) for evidence and the current gate.
 
 ## Goal
 
@@ -30,7 +30,7 @@ Make Windows use the same deterministic gameplay rules, reward/economy decisions
 
 - [ ] Share or adapt the production reward decision path: critical hits, streak/Frenzy, difficulty, mutators and upgrade/talent bonuses.
 - [ ] Decide and document a multiplatform representation for `BigNumber` before porting currency math. Do not replace decimal arithmetic with `Double` or change multiplication/rounding order merely to simplify the port.
-- [x] Integrate Money upgrades, Nebula shop purchase records, Prestige/Ultra resets and upgrades, talent unlock prerequisites, and reset eligibility/preservation rules in the desktop transaction layer. Runtime verification and effect parity for services/background systems remain open.
+- [x] Integrate Money upgrades, Nebula shop purchase records, Prestige/Ultra resets and upgrades, talent unlock prerequisites, and reset eligibility/preservation rules in the desktop transaction layer. The feedback-driven Auto Clicker now runs from persisted state and is covered by bot tests; runtime verification and parity for remaining services/background systems remain open.
 - [x] Reject duplicate shop/talent purchases and invalid resets; persist transaction results before publishing the new desktop UI state.
 - [x] Add deterministic tests for upgrade cost/affordability, Prestige/Ultra thresholds and reset preservation, duplicate shop purchases, talent prerequisites and desktop catalog loading. [ ] Expand exact reward fixtures and verify all catalog effects against Android.
 
@@ -86,7 +86,7 @@ Start with S2-A's source audit and architecture boundary. The main risk to resol
 
 ## Stage 2-B economy implementation slice
 
-- PR #198 adds the Android economy JSON catalogs as Windows JVM resources, immutable desktop economy transactions and Windows UI for Money/Prestige/Ultra currencies, all catalog upgrades, Prestige/Ultra resets, Nebula shop purchase records and talent unlocks.
+- PR #199 adds the Android economy JSON catalogs as Windows JVM resources, immutable desktop economy transactions and Windows UI for Money/Prestige/Ultra currencies, all catalog upgrades, Prestige/Ultra resets, supported Nebula shop purchases and talent unlocks. It also adds a feedback-driven Auto Clicker using the same interval-narrowing behavior as Android.
 - Every economy action saves before the visible state is updated; a failed save leaves the previous UI state intact.
 - Automated tests cover purchase cost and affordability, max-level rejection, Prestige/Ultra thresholds and reset preservation, duplicate shop purchases, talent prerequisites and catalog parsing.
-- Still open: verify actual runtime behavior on Windows, confirm all item effects (especially auto-clicker/background behavior and shop boosts) against Android, expand expected-reward fixtures, and complete the broader Stage 2 economy/feature matrix.
+- Still open: verify actual runtime behavior on Windows, wire or explicitly exclude unsupported shop boost effects, add daily-quest/loot/achievement/world-progression parity where it belongs to the Stage 2 core loop, expand expected-reward fixtures, and complete the broader Stage 2 economy/feature matrix.
