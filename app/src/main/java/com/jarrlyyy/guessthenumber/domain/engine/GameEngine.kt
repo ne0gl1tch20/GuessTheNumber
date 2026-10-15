@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.domain.engine
 import com.jarrlyyy.guessthenumber.shared.domain.FrenzyRules
 import com.jarrlyyy.guessthenumber.shared.domain.CriticalChanceRules
 import com.jarrlyyy.guessthenumber.shared.domain.GuessRewardRules
+import com.jarrlyyy.guessthenumber.shared.domain.GuessPenaltyRules
 import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
@@ -120,7 +121,8 @@ class GameEngine(private val rng: Random = Random.Default) {
         } else {
             val newAttempts = transition.attempts
             val difficultyPenalty = state.money * BigNumber(Difficulty.wrongGuessPenalty(state.difficultyId))
-            val taxPenalty = if ("mut_tax" in state.activeMutators) state.money * BigNumber(0.05) else BigNumber.ZERO
+            val taxPenaltyRate = GuessPenaltyRules.taxPenaltyRate(state.activeMutators)
+            val taxPenalty = if (taxPenaltyRate > 0.0) state.money * BigNumber(taxPenaltyRate) else BigNumber.ZERO
             val newMoney = maxOf(BigNumber.ZERO, state.money - difficultyPenalty - taxPenalty)
 
             val newStats = state.statistics.copy(
