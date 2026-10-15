@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PRs #142–#149 are merged. PR #145 shared the guess-economy multiplier/penalty-rate decision; PR #146 added Android coverage for combined Hard-difficulty and tax penalties; PR #147 shared the deterministic challenge-claim decision; PR #148 documented the state-publication/persistence gap; PR #149 tests persisted duplicate-claim prevention across reload. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Current candidate: verify atomic update rejection preserves recovery data before designing persistence-failure injection.
+**Current checkpoint:** PRs #142–#151 are merged. PR #149 tests persisted duplicate-claim prevention across reload; PR #150 tests rejection of an atomic update when the primary save is corrupt without modifying the recovery backup; PR #151 refreshes project documentation. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Current candidate: add a legacy-save load → save → reload compatibility regression before changing save models or injecting persistence failures.
 
 ## Rules for every PR
 
@@ -91,7 +91,7 @@ Inspected `GameEngine.claimChallenge`, `GameViewModel.claimChallenge`, `SaveMana
 ### Phase 3 - Save and persistence compatibility
 
 - [ ] Document the actual save schema and migration rules before changing models.
-- [ ] Add representative legacy-save fixtures and round-trip tests: load → map → update → save → reload.
+- [ ] Add representative legacy-save fixtures and round-trip tests: load → map → update → save → reload. Current PR candidate adds an inline legacy JSON fixture for omitted newer fields, unknown-field tolerance, large balances and progression preservation across load → save → reload.
 - [ ] Cover large currency values, omitted legacy fields, upgrades, reset counts, mutators, challenges, statistics, world progression, settings and save-slot metadata.
 - [ ] Keep Android storage adapters, encrypted backup/import, 10 save slots, atomic transactions, checksum/integrity checks, last-valid backup recovery and corruption handling intact.
 - [ ] Introduce common serialization only after verifying compatible dependencies and behavior for all intended targets.
