@@ -125,7 +125,8 @@ class DesktopEconomyTransactionsTest {
             id = "cosmetic_blue",
             name = "Blue",
             description = "A cosmetic.",
-            nebulaCost = 3
+            nebulaCost = 3,
+            isCosmetic = true
         )
         val bought = DesktopEconomyTransactions.buyShopItem(initial, item)
 
@@ -165,6 +166,24 @@ class DesktopEconomyTransactionsTest {
         val after = before.copy(money = BigNumber(10))
 
         assertEquals(after, DesktopEconomyTransactions.applyGuessBonuses(before, after, correct = false))
+    }
+
+    @Test
+    fun shopEffectWithoutDesktopImplementationIsRejected() {
+        val initial = GameState(nebula = BigNumber(100))
+        val item = com.jarrlyyy.guessthenumber.domain.model.ShopItemDef(
+            id = "auto_clicker_basic",
+            name = "Auto Clicker",
+            description = "Background automation.",
+            nebulaCost = 25,
+            category = "automation",
+            isCosmetic = false
+        )
+
+        val result = DesktopEconomyTransactions.buyShopItem(initial, item)
+
+        assertFalse(result.accepted)
+        assertEquals(initial, result.state)
     }
 
     @Test
