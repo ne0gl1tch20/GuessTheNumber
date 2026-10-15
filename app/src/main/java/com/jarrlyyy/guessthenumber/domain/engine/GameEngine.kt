@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.domain.engine
 
+import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
@@ -24,10 +25,6 @@ class GameEngine(private val rng: Random = Random.Default) {
         const val FRENZY_THRESHOLD = 5
         const val FRENZY_BONUS_PER_TIER = 0.25
         const val FRENZY_MAX_MULTIPLIER = 5.0
-        private const val HARDCORE_MULTIPLIER = 2.0
-        private const val SPEED_MULTIPLIER = 3.0
-        private const val BLIND_MULTIPLIER = 5.0
-        private const val TAX_MULTIPLIER = 10.0
     }
 
     fun frenzyMultiplier(streak: Int): BigNumber {
@@ -50,18 +47,11 @@ class GameEngine(private val rng: Random = Random.Default) {
         return if ("mut_hardcore" in active) base * 2L else base
     }
 
-    fun mutatorRewardMultiplier(state: GameState): BigNumber {
-        val active = validateMutators(state.activeMutators)
-        var multiplier = 1.0
-        if ("mut_hardcore" in active) multiplier *= HARDCORE_MULTIPLIER
-        if ("mut_speed" in active) multiplier *= SPEED_MULTIPLIER
-        if ("mut_blind" in active) multiplier *= BLIND_MULTIPLIER
-        if ("mut_tax" in active) multiplier *= TAX_MULTIPLIER
-        return BigNumber(multiplier)
-    }
+    fun mutatorRewardMultiplier(state: GameState): BigNumber =
+        BigNumber(MutatorRules.rewardMultiplier(state.activeMutators))
 
     fun validateMutators(mutators: Set<String>): Set<String> =
-        mutators.intersect(setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax"))
+        MutatorRules.validate(mutators)
 
     fun applyMutatorSet(state: GameState, mutators: Set<String>): GameState =
         state.copy(activeMutators = validateMutators(mutators))
@@ -243,7 +233,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             val kind = parts[0]
             val target = parts[1].toLongOrNull() ?: return false
             val mutators = parts.drop(2)
-            val validMutators = setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")
+            val validMutators = MutatorRules.ids
             if (target < 1L || mutators.any { it !in validMutators }) return false
             if (rewardNebula != 50L + mutators.size * 50L) return false
             val progress = when (kind) {
