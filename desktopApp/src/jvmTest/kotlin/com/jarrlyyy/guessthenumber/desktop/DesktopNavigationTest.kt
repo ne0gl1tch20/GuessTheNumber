@@ -59,6 +59,19 @@ class DesktopNavigationTest {
     }
 
     @Test
+    fun escapeReturnsToPlayAndKeepsNavigationUsable() {
+        val controller = DesktopShellController()
+        controller.navigate(DesktopDestination.ABOUT)
+
+        assertTrue(controller.handleKey(Key.Escape, ctrlPressed = false))
+        assertEquals(DesktopDestination.PLAY, controller.state.destination)
+        assertNull(controller.state.message)
+
+        assertTrue(controller.handleKey(Key.Two, ctrlPressed = true))
+        assertEquals(DesktopDestination.ABOUT, controller.state.destination)
+    }
+
+    @Test
     fun enterIsNotConsumedByShell() {
         val controller = DesktopShellController()
         assertFalse(controller.handleKey(Key.Enter, ctrlPressed = false))
