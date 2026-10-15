@@ -33,6 +33,15 @@ class SharedGameContractsTest {
     }
 
     @Test
+    fun feedbackIconTokensStayAlignedWithSharedStatus() {
+        assertEquals(SharedGuessFeedbackIcon.TIP, GuessGameStatus.READY.toSharedFeedbackIcon())
+        assertEquals(SharedGuessFeedbackIcon.TIP, GuessGameStatus.INVALID_INPUT.toSharedFeedbackIcon())
+        assertEquals(SharedGuessFeedbackIcon.TOO_LOW, GuessGameStatus.TOO_LOW.toSharedFeedbackIcon())
+        assertEquals(SharedGuessFeedbackIcon.TOO_HIGH, GuessGameStatus.TOO_HIGH.toSharedFeedbackIcon())
+        assertEquals(SharedGuessFeedbackIcon.CORRECT, GuessGameStatus.CORRECT.toSharedFeedbackIcon())
+    }
+
+    @Test
     fun presentationSnapshotReflectsSharedGameState() {
         val state = GuessGameReducer.submitGuess(
             GuessGameReducer.newGame(targetNumber = 42, rangeMin = 1, rangeMax = 99),
