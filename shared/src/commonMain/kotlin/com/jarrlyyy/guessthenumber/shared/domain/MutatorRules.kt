@@ -3,8 +3,8 @@ package com.jarrlyyy.guessthenumber.shared.domain
 /**
  * Platform-independent mutator identifiers and reward balancing.
  *
- * Keep validation and multiplier ordering shared so Android and Windows
- * cannot accept different mutator sets or calculate different multipliers.
+ * Keep validation and balance effects shared so Android and Windows
+ * cannot accept different mutator sets or calculate different values.
  */
 object MutatorRules {
     const val HARDCORE = "mut_hardcore"
@@ -25,4 +25,7 @@ object MutatorRules {
         if (TAX in active) multiplier *= 10.0
         return multiplier
     }
+
+    fun rangeMultiplier(mutators: Set<String>): Long =
+        if (HARDCORE in validate(mutators)) 2L else 1L
 }
