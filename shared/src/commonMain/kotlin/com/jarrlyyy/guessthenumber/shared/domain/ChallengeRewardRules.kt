@@ -57,18 +57,32 @@ object ChallengeRewardRules {
         }
 
         if (challengeId.startsWith("builder_")) {
-            val parts = challengeId.removePrefix("builder_").split('_')
-            if (parts.size < 2) return false
-            val kind = parts[0]
-            val target = parts[1].toLongOrNull() ?: return false
-            val mutators = parts.drop(2)
-            if (target < 1L || mutators.any { it !in MutatorRules.ids }) return false
+            val payload = challengeId.removePrefix("builder_")
+            val firstSeparator = payload.indexOf('_')
+            if (firstSeparator <= 0) return false
+            val secondSeparator = payload.indexOf('_', firstSeparator + 1)
+            val kind = payload.substring(0, firstSeparator)
+            val targetText = if (secondSeparator < 0) payload.substring(firstSeparator + 1)
+                else payload.substring(firstSeparator + 1, secondSeparator)
+            val target = targetText.toLongOrNull() ?: return false
+            if (target < 1L) return false
+
+            var remaining = if (secondSeparator < 0) "" else payload.substring(secondSeparator + 1)
+            val mutators = mutableListOf<String>()
+            while (remaining.isNotEmpty()) {
+                val matched = MutatorRules.ids.sortedByDescending { it.length }
+                    .firstOrNull { remaining == it || remaining.startsWith("$it_") } ?: return false
+                mutators.add(matched)
+                remaining = remaining.removePrefix(matched).removePrefix("_")
+            }
+            if (mutators.distinct().size != mutators.size) return false
             if (rewardNebula != 50L + mutators.size * 50L) return false
             val current = when (kind) {
                 "correct" -> progress.correctGuesses
                 "streak" -> progress.bestStreak
                 "guesses" -> progress.totalGuesses
-                else -> progress.money
+                "money" -> progress.money
+                else -> return false
             }
             return current >= target
         }
