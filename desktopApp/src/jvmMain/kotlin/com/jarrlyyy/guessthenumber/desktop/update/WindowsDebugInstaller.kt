@@ -70,7 +70,85 @@ internal class WindowsDebugInstaller {
             ${'$'}msiPath = '$msiLiteral'
             ${'$'}temporaryDirectory = '$directoryLiteral'
             try {
-                ${'$'}installer = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/i', ${'$'}msiPath) -Wait -PassThru
+                ${'
+                exit ${'$'}installer.ExitCode
+            } finally {
+                Start-Sleep -Seconds 2
+                Remove-Item -LiteralPath ${'$'}temporaryDirectory -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        """.trimIndent()
+        Files.writeString(scriptPath, script)
+        try {
+            ProcessBuilder(
+                "powershell.exe",
+                "-NoProfile",
+                "-NonInteractive",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                scriptPath.toAbsolutePath().toString()
+            ).start()
+        } catch (error: Exception) {
+            deleteTree(temporaryDirectory)
+            throw IllegalStateException("Could not start the Windows MSI installer.", error)
+        }
+    }
+
+    private fun powershellLiteral(value: String): String = value.replace("'", "''")
+
+    private fun deleteTree(root: Path) {
+        if (!Files.exists(root)) return
+        Files.walk(root).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { path ->
+                runCatching { Files.deleteIfExists(path) }
+            }
+        }
+    }
+
+    private companion object {
+        const val MAX_ARCHIVE_BYTES = 300L * 1024 * 1024
+    }
+}
+}installer = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/i', ('"{0}"' -f ${'
+                exit ${'$'}installer.ExitCode
+            } finally {
+                Start-Sleep -Seconds 2
+                Remove-Item -LiteralPath ${'$'}temporaryDirectory -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        """.trimIndent()
+        Files.writeString(scriptPath, script)
+        try {
+            ProcessBuilder(
+                "powershell.exe",
+                "-NoProfile",
+                "-NonInteractive",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                scriptPath.toAbsolutePath().toString()
+            ).start()
+        } catch (error: Exception) {
+            deleteTree(temporaryDirectory)
+            throw IllegalStateException("Could not start the Windows MSI installer.", error)
+        }
+    }
+
+    private fun powershellLiteral(value: String): String = value.replace("'", "''")
+
+    private fun deleteTree(root: Path) {
+        if (!Files.exists(root)) return
+        Files.walk(root).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { path ->
+                runCatching { Files.deleteIfExists(path) }
+            }
+        }
+    }
+
+    private companion object {
+        const val MAX_ARCHIVE_BYTES = 300L * 1024 * 1024
+    }
+}
+}msiPath)) -Wait -PassThru
                 exit ${'$'}installer.ExitCode
             } finally {
                 Start-Sleep -Seconds 2
