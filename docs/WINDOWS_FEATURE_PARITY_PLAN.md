@@ -142,24 +142,49 @@ This replaces the Windows-related phases buried in the temporary KMP migration r
 - [ ] Publish final feature matrix with each row marked Verified on Windows, Intentionally platform-specific, Not implemented or Blocked, with evidence.
 - [ ] Fix release-blocking regressions before declaring Windows parity complete.
 
-## Initial feature parity matrix
+## Stage 1 source audit (2026-10-15)
 
-A shared component or green CI is not proof that a complete feature works end-to-end on Windows.
+This is a repository-source audit, not a runtime test. Paths below link to the code inspected on `master`.
 
-| Feature area | Current assessment | Evidence needed |
+### Confirmed source findings
+
+- **Windows entry point and shell:** [`desktopApp/.../desktop/Main.kt`](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt) opens one Compose Desktop `Window`, checks/installs Windows Debug updates, and embeds `SharedGuessGameScreen()`. The shown host does not wire Android's production `GameViewModel`, full `GameState`, production navigation, or save system into Windows.
+- **Shared guessing screen:** [`SharedGuessGameScreen.kt`](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/ui/SharedGuessGameScreen.kt) owns temporary in-memory demo state and generates a local target. [`SharedGuessGameContent.kt`](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/ui/SharedGuessGameContent.kt) explicitly leaves game state, target generation, persistence and navigation to the host. This is a pilot UI, not end-to-end Windows gameplay parity.
+- **Android feature/navigation reference:** [`Screen.kt`](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/Screen.kt) defines Play, Upgrades, Shop, More, Music Player, Arcade, Activity Hub, Statistics, Settings, About, Dev Settings, Prestige, Ultra, Achievements, Talent Web, Mutators, Process Inspector, Changelog, Save Slots, World Map, Relics, Home Base, Codex, Endgame and Lucky Stake. [`NavGraph.kt`](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt) wires these destinations to Android-owned state/actions and Android-specific services.
+- **Windows packaging:** [`desktopApp/build.gradle.kts`](../desktopApp/build.gradle.kts) targets Compose Desktop MSI and preserves the existing MSI UpgradeCode. [.github/workflows/windows-desktop.yml](../.github/workflows/windows-desktop.yml) runs localization/JSON/preflight checks, shared and desktop JVM tests, desktop compilation and MSI packaging; its PR path includes a legacy-to-current MSI upgrade check. These checks do not prove interactive runtime parity.
+- **Windows updater:** [`WindowsDebugUpdateClient.kt`](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/update/WindowsDebugUpdateClient.kt) reads the public GitHub Releases API and validates the Windows Debug manifest/channel/checksum format. Keep this behavior isolated from production release discovery.
+- **Project inclusion:** [`settings.gradle.kts`](../settings.gradle.kts) includes `:app`, `:shared` and `:desktopApp`.
+
+### Initial feature parity matrix
+
+A shared component or green CI is not proof that a complete feature works end-to-end on Windows. “Source gap” means the inspected Windows entry point does not currently wire the feature; “runtime unverified” means no interactive Windows session was run as part of this audit.
+
+| Feature area | Current source-backed assessment | Evidence / next proof |
 |---|---|---|
-| Shared deterministic rules | Shared foundation exists | Common tests and feature parity cases |
-| Guessing UI | Shared pilot exists | Runtime input, feedback, reward and persistence regression |
-| Upgrades and shop | Full Windows integration not established | Buy/cost/state tests |
-| Prestige, Ultra and talents | Full Windows integration not established | Requirement, reset and reward tests |
-| Achievements and challenges | Full Windows integration not established | Unlock/claim/persistence tests |
-| World map, bosses, relics, Home Base, Codex, Rift | Full Windows integration not established | Progression and save round-trip tests |
-| Arcade, minigames, Lua activities | Full Windows integration not established | Offline play and sandbox/reward validation |
-| Save slots and backup/recovery | Full Windows integration not established | Restart, recovery and compatibility tests |
-| Localization | Feature-level audit needed | Verify visible surfaces in supported locales |
-| Keyboard/mouse/window behavior | Desktop QA required | Focus, shortcuts, resize and high-DPI results |
-| Debug/release update channels | Existing boundary must be retained | Artifact/channel isolation tests |
-| MSI install and upgrades | Packaging QA required | Install/upgrade/rollback evidence |
+| Desktop launch and window close | **Implemented in source; runtime unverified.** One Compose Desktop window with close-to-exit behavior. | [desktop Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt); run on Windows and verify launch/close. |
+| Responsive guessing UI | **Shared pilot present; runtime unverified.** Shared content changes layout at a width threshold, but the desktop host uses standalone demo state. | [SharedGuessGameContent.kt](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/ui/SharedGuessGameContent.kt), [SharedGuessGameScreen.kt](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/ui/SharedGuessGameScreen.kt); test resize, narrow window and high DPI. |
+| Production game state, rewards and save persistence | **Source gap in Windows host.** The desktop entry point does not connect the shared pilot to Android's authoritative state/save architecture. | [desktop Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt); add a Windows-owned state/persistence adapter and round-trip tests before claiming core-loop parity. |
+| Android production destinations | **Source gap in Windows host.** Android defines 25 named destinations; Windows currently displays the guessing pilot and updater card rather than equivalent production navigation. | [Screen.kt](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/Screen.kt), [NavGraph.kt](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt), [desktop Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt); map destinations to Windows feature slices. |
+| Upgrades, shop, Prestige, Ultra, talents and economy | **Not wired in inspected Windows entry point.** | Android destination and game-state/action wiring in [NavGraph.kt](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt); implement/test end-to-end in Stage 2. |
+| Achievements, challenges, statistics, map, bosses, relics, Home Base, Codex, Rift and activities | **Not wired in inspected Windows entry point.** | Android destination list and [NavGraph.kt](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt); inventory individual screens/actions during Stage 1 and implement in Stage 3. |
+| Settings, locale, accessibility, save slots and recovery | **Not wired in inspected Windows entry point.** | [NavGraph.kt](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt); define Windows-native equivalents in Stage 4. |
+| Localization | **CI validators exist; desktop runtime coverage unverified.** Main window strings inspected are hardcoded English. | [desktop Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt), [Windows Desktop CI](../.github/workflows/windows-desktop.yml); identify reusable locale resources and verify actual Windows rendering. |
+| Keyboard/mouse/focus, Enter/Escape, minimum size, high DPI and resize | **Runtime unverified.** Source audit does not establish usable focus order, shortcuts or behavior across display settings. | Run a Windows interactive QA pass and record each outcome; add host-specific behavior where missing. |
+| Windows Debug update channel | **Source implemented; end-to-end runtime unverified.** Public prerelease discovery validates manifest channel and checksum shape; installer path exists in desktop host. | [WindowsDebugUpdateClient.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/update/WindowsDebugUpdateClient.kt), [desktop Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt); verify real update and failure paths without crossing into production releases. |
+| MSI packaging and upgrade identity | **Build configuration and CI checks present; full lifecycle not established.** UpgradeCode is explicitly preserved. | [desktopApp/build.gradle.kts](../desktopApp/build.gradle.kts), [Windows Desktop CI](../.github/workflows/windows-desktop.yml); retain UpgradeCode and complete install/upgrade/recovery regression in Stage 5. |
+| Shared deterministic rules | **Shared foundation and common tests exist; Windows end-to-end use is not established by the desktop entry point.** | [KMP Foundation Status](KMP_FOUNDATION_STATUS.md), [shared rules](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/rules/GuessRules.kt); connect the authoritative game flow and test integration. |
+
+### Stage 1 audit conclusion and first implementation slice
+
+The primary blocker is not a missing cosmetic tweak: Windows currently hosts the standalone guessing pilot, not the production game architecture. Therefore, the first implementation slice should establish a **Windows desktop application shell contract** before porting individual features:
+
+1. Introduce a Windows-owned application state/controller boundary that can own the real game state and persistence without importing Android APIs.
+2. Establish explicit desktop navigation and a destination registry, initially covering the shell plus the core gameplay destination.
+3. Define window behavior centrally: sensible minimum size, resize-aware content, keyboard/mouse focus expectations and a visible loading/error state.
+4. Add focused desktop tests for navigation/state transitions and document which checks still require an actual Windows session.
+5. Keep updater behavior intact and separate; do not change MSI identity or start Stage 2 feature work until the Stage 1 exit gate is met.
+
+This is a proposed implementation boundary derived from the inspected source, not a claim that these tasks are already implemented. No Windows interactive runtime session was run during this audit.
 
 ## Definition of done
 
