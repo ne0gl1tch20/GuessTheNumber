@@ -4,46 +4,94 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090b17">
-  <meta name="description" content="Download Guess The Number builds from the project's official GitHub Releases page.">
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png">
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png">
+  <meta name="description" content="Download Guess The Number for Android and Windows. Live release information and downloads from GitHub.">
   <meta property="og:title" content="Downloads — Guess The Number">
-  <meta property="og:description" content="Find published builds, release notes, and verified project download links.">
+  <meta property="og:description" content="Find the right Guess The Number download for your device.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png">
   <title>Downloads — Guess The Number</title>
   <style>
-    :root{color-scheme:dark;--bg:#090b17;--panel:#12172b;--ink:#f6f5ff;--muted:#a8aecb;--line:#ffffff19;--mint:#8bffd4;--blue:#8da4ff;--gold:#ffd98c}
+    :root{color-scheme:dark;--bg:#090b17;--ink:#f6f5ff;--muted:#a8aecb;--line:#ffffff19;--mint:#8bffd4;--blue:#8da4ff;--gold:#ffd98c}
     *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 5%,#4a3e9b36,transparent 42%),radial-gradient(ellipse at 90% 30%,#1a9c9a20,transparent 38%),var(--bg);color:var(--ink);font:16px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    a{color:inherit}a:focus-visible{outline:3px solid var(--mint);outline-offset:4px}.wrap{width:min(960px,calc(100% - 32px));margin:auto}
-    header{border-bottom:1px solid #ffffff12;background:#090b17c9;backdrop-filter:blur(18px)}nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:900;letter-spacing:-.04em}.mark{display:grid;place-items:center;width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--mint),var(--blue));color:#101426;font-weight:950}.back{color:var(--muted);text-decoration:none;font-size:.92rem}.back:hover{color:var(--mint)}
-    main{padding:clamp(48px,9vw,100px) 0 76px}.eyebrow{color:var(--mint);font-size:.78rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.hero h1{font-size:clamp(3rem,9vw,5.6rem);letter-spacing:-.08em;line-height:.98;margin:16px 0}.gradient{background:linear-gradient(100deg,var(--mint),#b2c0ff 60%,#ff8ed8);-webkit-background-clip:text;background-clip:text;color:transparent}.intro{max-width:650px;color:var(--muted);font-size:1.08rem;margin:0 0 32px}
-    .download-card{padding:clamp(24px,5vw,42px);border:1px solid #8bffd435;border-radius:30px;background:radial-gradient(ellipse at 100% 0%,#8da4ff16,transparent 48%),linear-gradient(145deg,#151a30,#0d1120);box-shadow:0 30px 90px #0003}.release-icon{display:grid;place-items:center;width:58px;height:58px;border-radius:18px;background:#8bffd415;border:1px solid #8bffd42e;font-size:1.8rem;margin-bottom:20px}.download-card h2{font-size:clamp(1.6rem,4vw,2.25rem);letter-spacing:-.05em;line-height:1.1;margin:0 0 10px}.download-card p{color:var(--muted);margin:0 0 23px}.actions{display:flex;gap:12px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid #ffffff24;border-radius:999px;padding:13px 19px;font-weight:850;text-decoration:none;transition:transform .2s,border-color .2s}.button:hover{transform:translateY(-2px);border-color:#8bffd46b}.primary{background:var(--mint);color:#101426;border-color:transparent}.secondary{background:#ffffff08}.meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:22px;color:var(--muted);font-size:.84rem}.dot{width:7px;height:7px;border-radius:50%;background:var(--mint)}
-    .details{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}.detail{padding:22px;border:1px solid var(--line);border-radius:22px;background:#ffffff05}.detail h3{margin:0 0 7px;font-size:1.05rem}.detail p{color:var(--muted);font-size:.92rem;margin:0 0 14px}.text-link{color:var(--mint);font-weight:800;text-underline-offset:4px}.notice{margin-top:22px;padding:17px 19px;border:1px solid #ffd98c35;border-radius:17px;background:#ffd98c0a;color:#d8d4c6;font-size:.88rem}.notice strong{color:var(--gold)}footer{padding:25px 0 36px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}.foot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}footer a{text-decoration:none}footer a:hover{color:var(--mint)}
-    @media(max-width:620px){nav{min-height:66px}.brand{font-size:.88rem}.details{grid-template-columns:1fr}.actions{flex-direction:column}.button{width:100%}}
+    a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--mint);outline-offset:4px}.wrap{width:min(1050px,calc(100% - 32px));margin:auto}
+    header{border-bottom:1px solid #ffffff12;background:#090b17c9;backdrop-filter:blur(18px)}nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:900;letter-spacing:-.04em}.brand img{width:42px;height:42px;object-fit:contain;border-radius:11px}.back{color:var(--muted);text-decoration:none;font-size:.92rem}.back:hover{color:var(--mint)}
+    main{padding:clamp(42px,8vw,82px) 0 76px}.eyebrow{color:var(--mint);font-size:.78rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.hero h1{font-size:clamp(2.8rem,8vw,5.1rem);letter-spacing:-.08em;line-height:.98;margin:15px 0}.gradient{background:linear-gradient(100deg,var(--mint),#b2c0ff 60%,#ff8ed8);-webkit-background-clip:text;background-clip:text;color:transparent}.intro{max-width:690px;color:var(--muted);font-size:1.08rem;margin:0 0 34px}
+    .platforms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.platform{min-width:0;padding:clamp(22px,4vw,32px);border:1px solid #ffffff20;border-radius:27px;background:radial-gradient(ellipse at 100% 0%,#8da4ff16,transparent 48%),linear-gradient(145deg,#151a30,#0d1120);box-shadow:0 24px 70px #0002}.platform-head{display:flex;align-items:center;gap:14px;margin-bottom:20px}.platform-icon{width:54px;height:54px;display:grid;place-items:center;border:1px solid #8bffd42e;border-radius:17px;background:#8bffd415;font-size:1.8rem}.platform h2{font-size:1.65rem;letter-spacing:-.05em;line-height:1.1;margin:0}.platform-sub{color:var(--muted);font-size:.88rem;margin-top:5px}.release-list{display:grid;gap:12px}.release{border:1px solid var(--line);border-radius:17px;padding:16px;background:#ffffff04}.release-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.release h3{font-size:1rem;line-height:1.3;margin:0 0 4px;overflow-wrap:anywhere}.release-meta{font-size:.8rem;color:var(--muted)}.tag{display:inline-flex;align-items:center;white-space:nowrap;border-radius:999px;padding:3px 9px;font-size:.7rem;font-weight:850;background:#8bffd415;color:var(--mint)}.tag.preview{background:#ffd98c17;color:var(--gold)}.notes{color:var(--muted);font-size:.88rem;margin:12px 0;overflow-wrap:anywhere}.assets{display:flex;gap:9px;flex-wrap:wrap}.download{display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;font-weight:850;font-size:.86rem;border-radius:999px;padding:10px 13px;background:var(--mint);color:#101426}.download.secondary{background:#ffffff09;border:1px solid #ffffff24;color:var(--ink)}.download:hover{filter:brightness(1.08)}.empty{border:1px dashed #ffffff2b;border-radius:17px;padding:18px;color:var(--muted);font-size:.9rem}.state{color:var(--muted);font-size:.9rem;padding:12px 0}.status{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:.85rem;margin:22px 0 0}.dot{width:8px;height:8px;border-radius:50%;background:var(--mint);flex:none}.help{margin-top:22px;padding:20px 22px;border:1px solid #ffd98c35;border-radius:19px;background:#ffd98c0a;color:#d8d4c6;font-size:.9rem}.help strong{color:var(--gold)}.help a{color:var(--mint);text-underline-offset:3px}footer{padding:25px 0 36px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}.foot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}.foot a{text-decoration:none}.foot a:hover{color:var(--mint)}
+    @media(max-width:720px){.platforms{grid-template-columns:1fr}.brand{font-size:.86rem}.brand img{width:36px;height:36px}.platform{padding:22px}.release-top{align-items:flex-start}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
 <body>
-<header><nav class="wrap" aria-label="Main navigation"><a class="brand" href="index.html"><span class="mark">G!</span><span>GUESS THE NUMBER</span></a><a class="back" href="index.html">← Back to home</a></nav></header>
+<header><nav class="wrap" aria-label="Main navigation"><a class="brand" href="index.html"><img src="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png" alt="" width="42" height="42"><span>GUESS THE NUMBER</span></a><a class="back" href="index.html">← Back to home</a></nav></header>
 <main class="wrap">
-  <div class="hero">
-    <div class="eyebrow">Official project downloads</div>
-    <h1>Your next run<br><span class="gradient">starts here.</span></h1>
-    <p class="intro">Get Guess The Number builds from the project's GitHub Releases page. Open a release to read its notes, check the included files, and choose the download that matches your device.</p>
-  </div>
-  <section class="download-card" aria-labelledby="stable-heading">
-    <div class="release-icon" aria-hidden="true">↓</div>
-    <h2 id="stable-heading">Published releases</h2>
-    <p>Browse published versions and download their attached files directly from GitHub. Release notes and available assets are listed on each release page.</p>
-    <div class="actions">
-      <a class="button primary" href="https://github.com/ne0gl1tch20/GuessTheNumber/releases/latest">Get the latest release ↗</a>
-      <a class="button secondary" href="https://github.com/ne0gl1tch20/GuessTheNumber/releases">View all releases ↗</a>
-    </div>
-    <div class="meta"><span class="dot" aria-hidden="true"></span><span>Downloads are hosted by GitHub, the project's release source.</span></div>
+  <section class="hero">
+    <div class="eyebrow">Find your version</div>
+    <h1>Choose your device.<br><span class="gradient">Start playing.</span></h1>
+    <p class="intro">Download Guess The Number for Android or Windows. This page checks the project's GitHub Releases feed and lists the builds and files that are actually published, with direct download links.</p>
   </section>
-  <div class="details">
-    <article class="detail"><h3>Looking for a debug build?</h3><p>Debug builds are development builds and may be unfinished or change between runs. Use them for testing rather than as a stable release.</p><a class="text-link" href="https://github.com/ne0gl1tch20/GuessTheNumber/actions/workflows/stable-debug-apk.yml">Open debug build artifacts ↗</a></article>
-    <article class="detail"><h3>Not sure which file to choose?</h3><p>Read the release notes and check the asset name before downloading. Only install a file you can verify came from this project.</p><a class="text-link" href="https://github.com/ne0gl1tch20/GuessTheNumber">Inspect the source repository ↗</a></article>
-  </div>
-  <aside class="notice"><strong>About this project:</strong> Guess The Number is still under development. The downloads page links to actual GitHub-hosted releases and build artifacts; it does not pretend the game is published on Google Play.</aside>
+  <section class="platforms" aria-label="Downloads by platform">
+    <article class="platform" aria-labelledby="android-title">
+      <div class="platform-head"><div class="platform-icon" aria-hidden="true">▣</div><div><h2 id="android-title">Android</h2><div class="platform-sub">Android APK releases</div></div></div>
+      <div id="android-list" class="release-list" aria-live="polite"><div class="state">Checking published Android releases…</div></div>
+    </article>
+    <article class="platform" aria-labelledby="windows-title">
+      <div class="platform-head"><div class="platform-icon" aria-hidden="true">▦</div><div><h2 id="windows-title">Windows</h2><div class="platform-sub">Desktop builds for Windows</div></div></div>
+      <div id="windows-list" class="release-list" aria-live="polite"><div class="state">Checking published Windows releases…</div></div>
+    </article>
+  </section>
+  <div class="status"><span class="dot" aria-hidden="true"></span><span id="api-status" role="status">Connecting to GitHub Releases…</span></div>
+  <aside class="help"><strong>Still under development.</strong> Debug builds may contain unfinished features. Each download links to an asset published by this project's GitHub repository. Review release notes before installing. <a href="https://github.com/ne0gl1tch20/GuessTheNumber">View source code ↗</a></aside>
 </main>
-<footer><div class="wrap foot"><span>© <span id="year"></span> Guess The Number</span><span><a href="index.html">Home</a> · <a href="https://github.com/ne0gl1tch20/GuessTheNumber">Source code</a> · <a href="https://github.com/ne0gl1tch20/GuessTheNumber/releases">GitHub Releases</a></span></div></footer>
-<script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+<footer><div class="wrap foot"><span>© <span id="year"></span> Guess The Number</span><span><a href="index.html">Home</a> · <a href="https://github.com/ne0gl1tch20/GuessTheNumber/releases">All GitHub releases ↗</a></span></div></footer>
+<script>
+(() => {
+  const owner = 'ne0gl1tch20';
+  const repo = 'GuessTheNumber';
+  const api = 'https://api.github.com/repos/' + owner + '/' + repo + '/releases?per_page=100';
+  const androidRoot = document.getElementById('android-list');
+  const windowsRoot = document.getElementById('windows-list');
+  const status = document.getElementById('api-status');
+  document.getElementById('year').textContent = new Date().getFullYear();
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const fmtDate = value => { const d = new Date(value); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}); };
+  const isAndroid = asset => /\.apk$/i.test(asset.name) || /android/i.test(asset.name);
+  const isWindows = asset => /\.msi$/i.test(asset.name) || /\.exe$/i.test(asset.name) || /\.zip$/i.test(asset.name) && /windows|desktop|guessthenumber/i.test(asset.name);
+  function card(release, assets, platform) {
+    const label = release.prerelease ? 'Preview build' : 'Release';
+    const links = assets.map(asset => '<a class="download ' + (asset.name.toLowerCase().endsWith('.json') ? 'secondary' : '') + '" href="' + escapeHtml(asset.browser_download_url) + '" target="_blank" rel="noopener noreferrer" download>' + (asset.name.toLowerCase().endsWith('.json') ? 'Manifest' : '↓ Download') + (assets.length > 1 ? ' · ' + escapeHtml(asset.name) : '') + '</a>').join('');
+    const body = release.body ? escapeHtml(release.body.replace(/\r/g,'').slice(0,420)) : 'Open the release page for notes and details.';
+    return '<article class="release"><div class="release-top"><div><h3>' + escapeHtml(release.name || release.tag_name) + '</h3><div class="release-meta">' + escapeHtml(release.tag_name) + (release.published_at ? ' · ' + escapeHtml(fmtDate(release.published_at)) : '') + '</div></div><span class="tag ' + (release.prerelease ? 'preview' : '') + '">' + label + '</span></div><p class="notes">' + body + '</p><div class="assets">' + links + '<a class="download secondary" href="' + escapeHtml(release.html_url) + '" target="_blank" rel="noopener noreferrer">Release details ↗</a></div></article>';
+  }
+  function renderPlatform(root, releases, matcher, platform) {
+    const found = [];
+    for (const release of releases) {
+      const assets = (release.assets || []).filter(matcher);
+      if (assets.length) found.push({release,assets});
+      if (found.length >= 3) break;
+    }
+    if (!found.length) {
+      const extra = platform === 'Android' ? 'Android APKs will appear here when an APK is attached to a GitHub release.' : 'Windows installers or desktop archives will appear here when published.';
+      root.innerHTML = '<div class="empty">' + extra + ' <a class="text-link" href="https://github.com/' + owner + '/' + repo + '/releases">Browse all releases ↗</a></div>';
+      return;
+    }
+    root.innerHTML = found.map(item => card(item.release,item.assets,platform)).join('');
+  }
+  fetch(api, {headers:{'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}})
+    .then(response => { if (!response.ok) throw new Error('GitHub returned HTTP ' + response.status); return response.json(); })
+    .then(releases => {
+      if (!Array.isArray(releases)) throw new Error('Unexpected release response');
+      renderPlatform(androidRoot,releases,isAndroid,'Android');
+      renderPlatform(windowsRoot,releases,isWindows,'Windows');
+      const published = releases.length;
+      status.textContent = 'Updated from GitHub Releases · ' + published + ' release' + (published === 1 ? '' : 's') + ' checked.';
+    })
+    .catch(() => {
+      const error = '<div class="empty">Could not load releases right now. Try again in a moment or open GitHub directly.</div>';
+      androidRoot.innerHTML = error + '<p><a class="text-link" href="https://github.com/' + owner + '/' + repo + '/releases">Android release page ↗</a></p>';
+      windowsRoot.innerHTML = error + '<p><a class="text-link" href="https://github.com/' + owner + '/' + repo + '/releases">Windows release page ↗</a></p>';
+      status.textContent = 'GitHub Releases could not be reached. Direct repository links are still available.';
+    });
+})();
+</script>
 </body>
 </html>
