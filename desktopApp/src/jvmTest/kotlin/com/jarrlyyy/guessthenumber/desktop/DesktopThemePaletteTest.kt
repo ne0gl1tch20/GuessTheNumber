@@ -25,6 +25,50 @@ class DesktopThemePaletteTest {
         assertTrue(DesktopThemePalette.light.primary != DesktopThemePalette.dark.primary)
     }
 
+    @Test
+    fun navigationButtonColorsHaveReadableContrastInBothThemes() {
+        listOf(DesktopThemePalette.light, DesktopThemePalette.dark).forEach { scheme ->
+            assertTrue(
+                contrastRatio(
+                    desktopNavigationContentColor(selected = true, colorScheme = scheme),
+                    desktopNavigationContainerColor(selected = true, colorScheme = scheme)
+                ) >= 4.5
+            )
+            assertTrue(
+                contrastRatio(
+                    desktopNavigationContentColor(selected = false, colorScheme = scheme),
+                    desktopNavigationContainerColor(selected = false, colorScheme = scheme)
+                ) >= 4.5
+            )
+        }
+    }
+
+    @Test
+    fun parsesWindowsLightAndDarkAppPreferences() {
+        assertTrue(
+            parseWindowsThemePreference(
+                "    AppsUseLightTheme    REG_DWORD    0x0",
+                "AppsUseLightTheme"
+            ) == true
+        )
+        assertTrue(
+            parseWindowsThemePreference(
+                "    AppsUseLightTheme    REG_DWORD    0x1",
+                "AppsUseLightTheme"
+            ) == false
+        )
+    }
+
+    @Test
+    fun unknownWindowsThemePreferenceFallsBackCleanly() {
+        assertTrue(
+            parseWindowsThemePreference("AppsUseLightTheme REG_SZ 0x0") == null
+        )
+        assertTrue(
+            parseWindowsThemePreference("SystemUsesLightTheme REG_DWORD 0x0") == null
+        )
+    }
+
     private fun contrastRatio(foreground: Color, background: Color): Double {
         val foregroundLuminance = foreground.luminance().toDouble()
         val backgroundLuminance = background.luminance().toDouble()

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +30,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.focusable
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
@@ -38,6 +40,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -99,9 +102,22 @@ private fun DesktopNavigationButtons(
                     }
                 )
             Button(
-                modifier = focusModifier,
-                onClick = { onNavigate(destination) },
-                enabled = currentDestination != destination
+                modifier = focusModifier.semantics {
+                    selected = currentDestination == destination
+                },
+                onClick = {
+                    if (currentDestination != destination) onNavigate(destination)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = desktopNavigationContainerColor(
+                        selected = currentDestination == destination,
+                        colorScheme = MaterialTheme.colorScheme
+                    ),
+                    contentColor = desktopNavigationContentColor(
+                        selected = currentDestination == destination,
+                        colorScheme = MaterialTheme.colorScheme
+                    )
+                )
             ) {
                 Text(destination.label)
             }
@@ -162,17 +178,21 @@ fun main() = application {
 
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp)
-                    .focusRequester(shellFocusRequester)
-                    .focusable()
                     .onPreviewKeyEvent { event ->
-                    if (event.type != KeyEventType.KeyDown) {
-                        return@onPreviewKeyEvent false
+                        if (event.type != KeyEventType.KeyDown) {
+                            return@onPreviewKeyEvent false
+                        }
+                        val handled = shell.handleKey(
+                            key = event.key,
+                            ctrlPressed = event.isCtrlPressed
+                        )
+                        if (handled && event.key == Key.Escape) {
+                            shellFocusRequester.requestFocus()
+                        }
+                        handled
                     }
-                    shell.handleKey(
-                        key = event.key,
-                        ctrlPressed = event.isCtrlPressed
-                    )
-                },
+                    .focusRequester(shellFocusRequester)
+                    .focusable(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 DesktopNavigationBar(
