@@ -1,17 +1,28 @@
 package com.jarrlyyy.guessthenumber.desktop
 
+import androidx.compose.foundation.DarkDefaultContextMenuRepresentation
+import androidx.compose.foundation.LightDefaultContextMenuRepresentation
+import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.graphics.Color
+import com.sun.jna.Memory
+import com.sun.jna.Native
+import com.sun.jna.Pointer
+import com.sun.jna.platform.WindowUtils
+import com.sun.jna.win32.StdCallLibrary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import java.awt.Window as AwtWindow
 import java.util.concurrent.TimeUnit
 
 internal object DesktopThemePalette {
@@ -57,7 +68,7 @@ internal fun parseWindowsThemePreference(
     valueName: String = "AppsUseLightTheme"
 ): Boolean? {
     val pattern = Regex(
-        """(?im)^\s*${Regex.escape(valueName)}\s+REG_DWORD\s+0x([0-9a-f]+)\s*$"""
+        """(?im)^\\s*${Regex.escape(valueName)}\\s+REG_DWORD\\s+0x([0-9a-f]+)\\s*$"""
     )
     val value = pattern.find(output)?.groupValues?.getOrNull(1)?.toIntOrNull(16) ?: return null
     return value == 0
@@ -82,9 +93,38 @@ private fun readWindowsDarkThemePreference(): Boolean? {
     }
 }
 
-/** Follows the Windows app-theme preference while the desktop window is open. */
+private interface DwmApi : StdCallLibrary {
+    fun DwmSetWindowAttribute(hwnd: Pointer, attribute: Int, value: Pointer, valueSize: Int): Int
+}
+
+/**
+ * Requests the Windows dark title-bar treatment without changing the user's system theme.
+ * Windows 11 and recent Windows 10 builds use attribute 20; attribute 19 is the legacy fallback.
+ */
+private object DesktopWindowChrome {
+    private val dwmApi by lazy {
+        Native.load("dwmapi", DwmApi::class.java) as DwmApi
+    }
+
+    fun apply(window: AwtWindow, isDark: Boolean) {
+        if (!System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) return
+
+        runCatching {
+            val hwnd = WindowUtils.getHWND(window) ?: return
+            Memory(4).use { value ->
+                value.setInt(0, if (isDark) 1 else 0)
+                val result = dwmApi.DwmSetWindowAttribute(hwnd, 20, value, 4)
+                if (result != 0) {
+                    dwmApi.DwmSetWindowAttribute(hwnd, 19, value, 4)
+                }
+            }
+        }
+    }
+}
+
+/** Follows Windows' app-theme preference and applies it to Compose and native window chrome. */
 @Composable
-fun DesktopTheme(content: @Composable () -> Unit) {
+fun DesktopTheme(window: AwtWindow, content: @Composable () -> Unit) {
     val fallbackIsDark = isSystemInDarkTheme()
     val isDark by produceState(initialValue = fallbackIsDark) {
         if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) {
@@ -97,8 +137,23 @@ fun DesktopTheme(content: @Composable () -> Unit) {
             }
         }
     }
-    MaterialTheme(
-        colorScheme = if (isDark) DesktopThemePalette.dark else DesktopThemePalette.light,
-        content = content
-    )
+
+    val contextMenuRepresentation = if (isDark) {
+        DarkDefaultContextMenuRepresentation
+    } else {
+        LightDefaultContextMenuRepresentation
+    }
+
+    SideEffect {
+        DesktopWindowChrome.apply(window, isDark)
+    }
+
+    CompositionLocalProvider(
+        LocalContextMenuRepresentation provides contextMenuRepresentation
+    ) {
+        MaterialTheme(
+            colorScheme = if (isDark) DesktopThemePalette.dark else DesktopThemePalette.light,
+            content = content
+        )
+    }
 }
