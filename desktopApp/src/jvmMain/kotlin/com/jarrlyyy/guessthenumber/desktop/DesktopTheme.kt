@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import com.sun.jna.Memory
 import com.sun.jna.Native
 import com.sun.jna.Pointer
-import com.sun.jna.platform.WindowUtils
 import com.sun.jna.win32.StdCallLibrary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -110,7 +109,7 @@ private object DesktopWindowChrome {
         if (!System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) return
 
         runCatching {
-            val hwnd = WindowUtils.getHWND(window) ?: return
+            val hwnd = Native.getComponentPointer(window) ?: return
             Memory(4).use { value ->
                 value.setInt(0, if (isDark) 1 else 0)
                 val result = dwmApi.DwmSetWindowAttribute(hwnd, 20, value, 4)
