@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PR #138 is open; Android and Windows CI were running at last check.
+**Current checkpoint:** PR #138 merged after both Android and Windows CI passed. PR #139 adds this roadmap; its docs-only Android workflow was queued at last check.
 
 ## Rules for every PR
 
@@ -34,13 +34,13 @@
 - [x] #135 - Shared talent reward multiplier.
 - [x] #136 - Shared base guess reward constants.
 - [x] #137 - Windows CI now runs Android locale/JSON/version/Kotlin preflight checks and watches relevant shared/desktop/app/tool paths.
-- [ ] **#138 ACTIVE** - Shared challenge-claim eligibility. Wait for both Android and Windows CI; inspect and fix any failures before merging.
+- [x] #138 - Shared challenge-claim eligibility. Android and Windows CI passed; merged as `b08c9fd`.
 
 ## Ordered PR plan from here
 
 ### Phase 1 - Finish deterministic shared domain rules
 
-- [ ] **First:** Complete #138 after required CI passes.
+- [x] **First completed:** #138 centralized the claim eligibility predicate in shared rules; Nebula/save-state mutation remains in the platform engine.
 - [ ] Inventory remaining production decisions in Android `GameEngine` and classify each as **already shared**, **platform adapter**, or **not migrated**. Avoid duplicate abstractions.
 - [ ] Extract remaining low-risk, pure state validation/invariants into `shared/src/commonMain`; test valid, invalid, boundary and duplicate-action cases in `commonTest`.
 - [ ] Extract remaining pure progression/economy/upgrade/reset requirement formulas only after checking they are not already shared. Keep authoritative currency math and rounding unchanged.
