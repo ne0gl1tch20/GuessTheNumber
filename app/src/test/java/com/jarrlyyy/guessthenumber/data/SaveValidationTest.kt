@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.data
 
 import com.jarrlyyy.guessthenumber.domain.engine.AntiCheatService
 import com.jarrlyyy.guessthenumber.domain.engine.AntiTimeTravelService
+import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import com.jarrlyyy.guessthenumber.data.store.saveDataStore
 import androidx.datastore.preferences.core.edit
@@ -61,6 +62,43 @@ class SaveValidationTest {
 
         assertEquals(BigNumber(150), updated?.money)
         assertEquals(BigNumber(150), manager.loadGame(1).money)
+    }
+
+    @Test
+    fun atomicChallengeClaimCannotRewardTwiceAfterReload() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = SaveManager(context)
+        val engine = GameEngine()
+        val eligibleState = GameState(
+            correctGuesses = 80,
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(
+                totalGuesses = 300,
+                correctGuesses = 80
+            )
+        )
+        assertTrue(manager.saveGame(eligibleState, 1))
+
+        val firstClaim = manager.updateGameAtomically(1) { saved ->
+            engine.claimChallenge(saved, "weekly_correct", 75L).first
+        }
+        assertNotNull(firstClaim)
+        assertEquals(BigNumber(75), firstClaim?.nebula)
+        assertEquals(75L, firstClaim?.statistics?.nebulaEarned)
+        assertTrue(firstClaim?.completedChallenges?.contains("weekly_correct") == true)
+
+        // A new manager instance models a process restart reading the durable save.
+        val restartedManager = SaveManager(context)
+        val reloaded = restartedManager.loadGame(1)
+        assertEquals(BigNumber(75), reloaded.nebula)
+        assertEquals(75L, reloaded.statistics.nebulaEarned)
+
+        val duplicateClaim = restartedManager.updateGameAtomically(1) { saved ->
+            engine.claimChallenge(saved, "weekly_correct", 75L).first
+        }
+        assertNotNull(duplicateClaim)
+        assertEquals(BigNumber(75), duplicateClaim?.nebula)
+        assertEquals(75L, duplicateClaim?.statistics?.nebulaEarned)
+        assertTrue(duplicateClaim?.completedChallenges?.contains("weekly_correct") == true)
     }
 
     @Test
