@@ -16,6 +16,13 @@ class ChallengeRewardRulesTest {
     )
 
     @Test
+    fun claimEligibilityRejectsCompletedChallengesAndInvalidRewards() {
+        assertTrue(ChallengeRewardRules.canClaim(emptySet(), "weekly_correct", 75, progress))
+        assertFalse(ChallengeRewardRules.canClaim(setOf("weekly_correct"), "weekly_correct", 75, progress))
+        assertFalse(ChallengeRewardRules.canClaim(emptySet(), "weekly_correct", 74, progress))
+    }
+
+    @Test
     fun acceptsWeeklyChallengeOnlyWhenRewardAndProgressMatch() {
         assertTrue(ChallengeRewardRules.isValidReward("weekly_correct", 75, progress))
         assertFalse(ChallengeRewardRules.isValidReward("weekly_correct", 74, progress))
