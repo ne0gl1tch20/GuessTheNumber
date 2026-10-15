@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PRs #157 and #158 are merged, with Android and Windows CI passing. Phase 1 deterministic shared rules and Phase 2 shared guessing-state migration are complete. Phase 4's navigation/action contracts and reusable presentation snapshot are in place; the next step is a controlled shared guessing UI that accepts host-owned state and emits typed actions, without replacing the full production Play screen or moving Android services into commonMain. Save settings/slot round trips and DataStore write-failure tests are complete through #156; ViewModel consistency after failed persistence remains a separate follow-up and must not block the UI migration.
+**Current checkpoint:** PRs #157, #158 and #159 are merged; Android and Windows CI passed for #159. Phase 1 deterministic shared rules and Phase 2 shared guessing-state migration are complete. Phase 4 now has platform-neutral navigation/action contracts, a reusable presentation snapshot and a controlled shared guessing component. Next: integrate the shared core-loop slice into Android production in a narrowly scoped, behavior-preserving way. Preserve the rich Play screen, localization, guess-rate limiting, custom feedback/tips, animations, rewards and all Android-owned economy/save/platform services; do not replace the whole screen with the simplified pilot. Start by defining and testing an explicit adapter between production `GameState` and the shared presentation state, then migrate only a bounded UI element if parity is demonstrated. Save settings/slot round trips and DataStore write-failure tests are complete through #156; ViewModel consistency after failed persistence remains a separate follow-up and must not block the UI migration.
 
 ## Rules for every PR
 
@@ -112,7 +112,8 @@ PR #154 adds regression tests for global settings JSON round trips across manage
 ### Phase 4 - Full shared UI, navigation and player feature parity
 
 - [x] #158 defines platform-neutral core-game destinations/actions and a reusable presentation snapshot; Android and Windows CI passed and the PR merged.
-- [ ] Add a controlled shared guessing UI that consumes host-owned state and emits typed actions; keep target generation, production economy/save state and platform services in their existing hosts. PR #159 proposes this first composable integration step; complete after CI passes and merge.
+- [x] #159 adds a controlled shared guessing UI that consumes host-owned state and emits typed actions; Android and Windows CI passed before merge. Target generation, production economy/save state and platform services remain in their existing hosts.
+- [ ] Next: add a tested adapter from Android production `GameState` to the shared guessing presentation model. Preserve the rich production Play screen and its localized feedback, rate limiting, strategy tips, animations, rewards and progression UI. Do not replace the screen with the simplified pilot; only integrate a bounded shared UI slice after state/behavior parity is demonstrated.
 - [ ] Migrate feature slices with UI, state/actions, localized strings, persistence behavior and tests together:
   1. Core loop: Play, guess input/feedback, rewards, upgrades and shop.
   2. Economy/resets: Prestige, Ultra, Nebula, permanent upgrades and talents.
