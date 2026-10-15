@@ -42,6 +42,27 @@ class DesktopNavigationTest {
     }
 
     @Test
+    fun escapeClearsMessageBeforeReturningToPlay() {
+        val controller = DesktopShellController()
+        controller.navigate(DesktopDestination.ABOUT)
+        controller.showMessage("A recoverable message")
+
+        assertTrue(controller.handleKey(Key.Escape, ctrlPressed = false))
+        assertEquals(DesktopDestination.ABOUT, controller.state.destination)
+        assertNull(controller.state.message)
+
+        assertTrue(controller.handleKey(Key.Escape, ctrlPressed = false))
+        assertEquals(DesktopDestination.PLAY, controller.state.destination)
+    }
+
+    @Test
+    fun enterIsNotConsumedByShell() {
+        val controller = DesktopShellController()
+        assertFalse(controller.handleKey(Key.Enter, ctrlPressed = false))
+        assertEquals(DesktopDestination.PLAY, controller.state.destination)
+    }
+
+    @Test
     fun shortcutsRequireControlAndIgnoreUnknownKeys() {
         assertNull(DesktopDestination.fromShortcut(Key.One, ctrlPressed = false))
         assertNull(DesktopDestination.fromShortcut(Key.Three, ctrlPressed = true))
