@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PR #140 merged with the Android `GameEngine` inventory. This implementation step centralizes shared range invariants for the KMP guessing pilot; it does not yet move production Android economy/state mutation.
+**Current checkpoint:** PR #141 merged after Android Debug/Release and Windows Desktop CI passed. The next implementation PR introduces a deterministic shared guess-transition contract and routes the Android engine's injected random values through it; full economy/state migration remains future work.
 
 ## Rules for every PR
 
@@ -44,7 +44,8 @@
 - [x] Inventory production decisions in Android `GameEngine` and classify them below. The next extraction must avoid duplicating already-shared rules.
 - [x] Extracted shared range/target invariants into `GuessStateRules` and applied them in the shared reducer, with ordered-range, invalid-range and inclusive-boundary tests. Production Android state migration remains separate.
 - [ ] Extract remaining pure progression/economy/upgrade/reset requirement formulas only after checking they are not already shared. Keep authoritative currency math and rounding unchanged.
-- [ ] Define the shared production transition contract and inject deterministic randomness for tests. `GameEngine` already accepts a seeded `Random`, but its random draws are not yet independently injectable. Platform RNG, clock, storage, notifications, audio and haptics stay behind adapters.
+- [x] Added a shared deterministic guess-transition contract that accepts explicit critical-roll and next-target inputs, validates the next target, and is used by Android `GameEngine`. Common tests cover threshold behavior, target validation and incorrect guesses without random inputs. Android still owns RNG generation, BigNumber reward/penalty math and full GameState mutation.
+- [ ] Extend the shared production state/transition model and add differential tests against Android behavior before moving any economy or persistence mutation. Platform RNG, clock, storage, notifications, audio and haptics stay behind adapters.
 
 ### Phase 1 audit - Android `GameEngine` inventory (2026-10-15)
 
@@ -57,7 +58,7 @@ Inspected `app/src/main/java/com/jarrlyyy/guessthenumber/domain/engine/GameEngin
 | Wrong-guess penalty and mutator tax rates | Already shared | `GuessPenaltyRules`; Android applies the resulting amount to its `BigNumber` balance. |
 | Prestige/Ultra requirements and reward ratios | Already shared | `ProgressionRequirementRules` and `ProgressionRewardRules`; BigNumber conversion and flooring stay in Android. |
 | Challenge claim eligibility and challenge reward validation | Already shared | `ChallengeRewardRules`; Android still commits completed IDs, Nebula and statistics. |
-| Random critical roll and next-target selection | Platform adapter / transition dependency | Uses Android engine's injected `kotlin.random.Random`; next step is to define deterministic inputs for shared transition tests, not to move platform RNG or alter probabilities. |
+| Random critical roll and next-target selection | Shared deterministic contract + platform adapter | Android generates the values using its existing `kotlin.random.Random` and passes them to `GuessTransitionRules`; common tests can inject exact values. The RNG and probabilities remain unchanged. |
 | Currency, statistics and full `GameState` updates | Not migrated as shared production transition | Android `GameEngine` currently commits these updates. Needs an explicit shared state/transition contract plus differential tests before moving mutations. |
 | Save/persistence, clocks, notifications, audio and haptics | Platform adapter | Keep out of common domain rules; migrate only through explicit adapter contracts if needed. |
 
