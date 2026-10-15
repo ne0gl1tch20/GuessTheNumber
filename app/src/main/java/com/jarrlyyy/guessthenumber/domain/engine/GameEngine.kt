@@ -22,6 +22,12 @@ data class GuessResult(
 
 class GameEngine(private val rng: Random = Random.Default) {
 
+    companion object {
+        const val FRENZY_THRESHOLD = FrenzyRules.THRESHOLD
+        const val FRENZY_BONUS_PER_TIER = FrenzyRules.BONUS_PER_TIER
+        const val FRENZY_MAX_MULTIPLIER = FrenzyRules.MAX_MULTIPLIER
+    }
+
     fun frenzyMultiplier(streak: Int): BigNumber =
         BigNumber(FrenzyRules.multiplier(streak))
 
