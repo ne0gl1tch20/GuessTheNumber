@@ -63,7 +63,7 @@ fun SharedGuessEntryPanel(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),
-            keyboardActions = KeyboardActions(onDone = onSubmitGuess),
+            keyboardActions = KeyboardActions(onDone = { onSubmitGuess() }),
             modifier = Modifier.onKeyEvent { event ->
                 if (event.key == Key.Enter && event.type == KeyEventType.KeyUp) {
                     onSubmitGuess()
