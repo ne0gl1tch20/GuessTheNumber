@@ -5,12 +5,11 @@ import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
+import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRewardRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
-import kotlin.math.log10
-import kotlin.math.sqrt
 import kotlin.random.Random
 
 typealias GuessFeedback = com.jarrlyyy.guessthenumber.shared.rules.GuessFeedback
@@ -147,18 +146,13 @@ class GameEngine(private val rng: Random = Random.Default) {
     fun calculatePrestigeReward(money: BigNumber, prestigeCount: Long): BigNumber {
         val req = calculatePrestigeRequirement(prestigeCount).value.toDouble()
         val m = money.value.toDouble()
-        if (m < req) return BigNumber.ZERO
-        val p = sqrt(m / req)
-        return BigNumber(p).floor()
+        return BigNumber(ProgressionRewardRules.prestigeRewardRatio(m, req)).floor()
     }
 
     fun calculateUltraReward(money: BigNumber, ultraCount: Long): BigNumber {
         val req = calculateUltraRequirement(ultraCount).value.toDouble()
         val m = money.value.toDouble()
-        if (m < req) return BigNumber.ZERO
-        val u = log10(m / req) * 100.0
-        val capped = minOf(u, 2000.0)
-        return BigNumber(capped).floor()
+        return BigNumber(ProgressionRewardRules.ultraRewardRatio(m, req)).floor()
     }
 
     fun claimChallenge(state: GameState, challengeId: String, rewardNebula: Long): Pair<GameState, Boolean> {
