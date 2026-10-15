@@ -65,6 +65,10 @@ Make Windows use the same deterministic gameplay rules, reward/economy decisions
 
 Keep each PR cohesive and allow multiple related commits per PR. Do not make tiny one-feature migration PRs when the work belongs to the same boundary.
 
+## Cross-platform app icon requirement
+
+`GTN_APP_LOGO.png` at the repository root is the single source of truth for the Windows desktop/installer icon and the Android mobile launcher icon. Android's existing `mipmap-*` and adaptive-icon resources must be regenerated from this source in a dedicated branding/build-assets change, then checked on a real or emulated Android launcher. Keep generated platform assets reproducible and avoid manually maintained logo copies. This is tracked with migration parity but is not part of Stage 2 gameplay logic.
+
 ## Guardrails
 
 - Android remains the behavior reference unless a platform-specific difference is explicitly approved.
