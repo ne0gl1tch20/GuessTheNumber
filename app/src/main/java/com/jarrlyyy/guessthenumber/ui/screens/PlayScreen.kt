@@ -578,7 +578,7 @@ fun PlayScreen(
                                 status = sharedPresentation.status,
                                 message = feedback,
                                 reducedMotion = state.settings.reducedMotion,
-                                leadingContent = {
+                                leadingContent = { feedbackContentColor ->
                                     Icon(
                                         imageVector = when (sharedPresentation.status) {
                                             com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY,
@@ -588,6 +588,7 @@ fun PlayScreen(
                                             com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT -> Icons.Default.CheckCircle
                                         },
                                         contentDescription = null,
+                                        tint = feedbackContentColor,
                                         modifier = Modifier.size(24.dp)
                                     )
                                 }
