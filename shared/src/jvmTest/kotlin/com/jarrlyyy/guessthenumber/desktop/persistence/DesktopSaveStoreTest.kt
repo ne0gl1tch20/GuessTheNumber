@@ -1,7 +1,7 @@
 package com.jarrlyyy.guessthenumber.desktop.persistence
 
 import com.jarrlyyy.guessthenumber.domain.model.GameState
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.runBlocking
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.test.Test
@@ -12,7 +12,7 @@ import kotlin.test.assertTrue
 
 class DesktopSaveStoreTest {
     @Test
-    fun saveAndReloadRoundTripPreservesState() {
+    fun saveAndReloadRoundTripPreservesState() = runBlocking {
         val directory = Files.createTempDirectory("gtn-save-roundtrip")
         val store = DesktopSaveStore(directory)
         val expected = GameState(
@@ -33,7 +33,7 @@ class DesktopSaveStoreTest {
     }
 
     @Test
-    fun corruptPrimaryRecoversFromBackup() {
+    fun corruptPrimaryRecoversFromBackup() = runBlocking {
         val directory = Files.createTempDirectory("gtn-save-recovery")
         val store = DesktopSaveStore(directory)
         val first = GameState(targetNumber = 20, lastSaveTimestamp = 100L)
@@ -50,7 +50,7 @@ class DesktopSaveStoreTest {
     }
 
     @Test
-    fun corruptPrimaryWithoutBackupDoesNotBecomeVisibleState() {
+    fun corruptPrimaryWithoutBackupDoesNotBecomeVisibleState() = runBlocking {
         val directory = Files.createTempDirectory("gtn-save-corrupt")
         Files.createDirectories(directory)
         Files.writeString(directory.resolve("slot-1.json"), "not-json")
@@ -60,7 +60,7 @@ class DesktopSaveStoreTest {
     }
 
     @Test
-    fun legacyJsonDefaultsRemainCompatible() {
+    fun legacyJsonDefaultsRemainCompatible() = runBlocking {
         val directory = Files.createTempDirectory("gtn-save-legacy")
         Files.createDirectories(directory)
         Files.writeString(
@@ -78,7 +78,7 @@ class DesktopSaveStoreTest {
     }
 
     @Test
-    fun failedPrimaryWriteLeavesPreviousStateOnDisk() {
+    fun failedPrimaryWriteLeavesPreviousStateOnDisk() = runBlocking {
         val directory = Files.createTempDirectory("gtn-save-failure")
         val normal = DesktopSaveStore(directory)
         val first = GameState(targetNumber = 11, lastSaveTimestamp = 100L)
