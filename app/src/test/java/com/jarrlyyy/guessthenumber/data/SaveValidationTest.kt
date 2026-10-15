@@ -7,12 +7,15 @@ import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import com.jarrlyyy.guessthenumber.data.store.GlobalPreferencesManager
 import com.jarrlyyy.guessthenumber.data.store.appPreferencesDataStore
 import com.jarrlyyy.guessthenumber.data.store.saveDataStore
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import org.junit.Assert.*
+import java.io.IOException
 import org.robolectric.RuntimeEnvironment
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -23,6 +26,65 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class SaveValidationTest {
+
+    @Test
+    fun saveGameWriteFailureReturnsFalseAndPreservesPrimaryAndBackup() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        context.saveDataStore.edit { it.clear() }
+        val normalManager = SaveManager(context)
+        val previous = GameState(money = BigNumber(100))
+        val current = GameState(money = BigNumber(200))
+        assertTrue(normalManager.saveGame(previous, 1))
+        assertTrue(normalManager.saveGame(current, 1))
+
+        val primaryKey = stringPreferencesKey("game_state_slot_1_json")
+        val backupKey = stringPreferencesKey("game_state_slot_1_backup_json")
+        val before = context.saveDataStore.data.first()
+        val primaryBefore = before[primaryKey]
+        val backupBefore = before[backupKey]
+        assertNotNull(primaryBefore)
+        assertNotNull(backupBefore)
+
+        val failingStore = ToggleFailingDataStore(context.saveDataStore).apply { failWrites = true }
+        val failingManager = SaveManager(context, failingStore)
+        assertFalse(failingManager.saveGame(GameState(money = BigNumber(300)), 1))
+
+        val after = context.saveDataStore.data.first()
+        assertEquals(primaryBefore, after[primaryKey])
+        assertEquals(backupBefore, after[backupKey])
+
+        assertEquals(BigNumber(200), SaveManager(context).loadGame(1).money)
+    }
+
+    @Test
+    fun atomicUpdateWriteFailureReturnsNullAndPreservesPrimaryAndBackup() = runBlocking {
+        val context = RuntimeEnvironment.getApplication()
+        context.saveDataStore.edit { it.clear() }
+        val normalManager = SaveManager(context)
+        assertTrue(normalManager.saveGame(GameState(money = BigNumber(100)), 1))
+        assertTrue(normalManager.saveGame(GameState(money = BigNumber(200)), 1))
+
+        val primaryKey = stringPreferencesKey("game_state_slot_1_json")
+        val backupKey = stringPreferencesKey("game_state_slot_1_backup_json")
+        val before = context.saveDataStore.data.first()
+        val primaryBefore = before[primaryKey]
+        val backupBefore = before[backupKey]
+        assertNotNull(primaryBefore)
+        assertNotNull(backupBefore)
+
+        val failingStore = ToggleFailingDataStore(context.saveDataStore).apply { failWrites = true }
+        val failingManager = SaveManager(context, failingStore)
+        val updated = failingManager.updateGameAtomically(1) {
+            it.copy(money = it.money + BigNumber(100))
+        }
+
+        assertNull(updated)
+        val after = context.saveDataStore.data.first()
+        assertEquals(primaryBefore, after[primaryKey])
+        assertEquals(backupBefore, after[backupKey])
+        assertEquals(BigNumber(200), SaveManager(context).loadGame(1).money)
+    }
+
 
 
     @Test
