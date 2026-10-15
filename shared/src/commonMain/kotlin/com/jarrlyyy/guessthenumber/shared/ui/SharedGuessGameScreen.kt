@@ -21,8 +21,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,16 +34,15 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.jarrlyyy.guessthenumber.shared.rules.GuessFeedback
-import com.jarrlyyy.guessthenumber.shared.rules.GuessRules
+import com.jarrlyyy.guessthenumber.shared.domain.GuessGameReducer
+import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
 import kotlin.random.Random
 
 /**
- * First shared Compose gameplay surface.
+ * Shared Compose pilot backed by a platform-independent state reducer.
  *
- * This is deliberately a small UI pilot, not a replacement for the Android
- * production PlayScreen. Keep game rules in shared domain code and add
- * platform-specific navigation/state adapters before migrating more screens.
+ * This remains a small migration slice, not a replacement for Android's
+ * production PlayScreen or its economy/save state.
  */
 @Composable
 fun SharedGuessGameScreen(
@@ -56,34 +53,30 @@ fun SharedGuessGameScreen(
 ) {
     require(maxNumber >= minNumber) { "maxNumber must be >= minNumber" }
 
-    var target by remember(minNumber, maxNumber) {
-        mutableLongStateOf(Random.nextLong(minNumber, maxNumber + 1L))
+    var game by remember(minNumber, maxNumber) {
+        mutableStateOf(
+            GuessGameReducer.newGame(
+                targetNumber = Random.nextLong(minNumber, maxNumber + 1L),
+                rangeMin = minNumber,
+                rangeMax = maxNumber
+            )
+        )
     }
     var guessText by remember { mutableStateOf("") }
-    var attempts by remember { mutableIntStateOf(0) }
-    var solved by remember { mutableStateOf(false) }
-    var feedback by remember(minNumber, maxNumber) {
-        mutableStateOf("Guess a number from $minNumber to $maxNumber.")
-    }
 
     fun submitGuess() {
+        if (game.solved) return
         val guess = guessText.toLongOrNull()
-        if (solved) return
-        if (guess == null || guess !in minNumber..maxNumber) {
-            feedback = "Enter a whole number from $minNumber to $maxNumber."
-            return
-        }
+        game = GuessGameReducer.submitGuess(game, guess)
+        if (game.solved) onSolved(game.attempts.toInt())
+    }
 
-        attempts += 1
-        when (GuessRules.resolveFeedback(target, guess, minNumber, maxNumber)) {
-            GuessFeedback.TOO_LOW -> feedback = "Too low. Try again."
-            GuessFeedback.TOO_HIGH -> feedback = "Too high. Try again."
-            GuessFeedback.CORRECT -> {
-                solved = true
-                feedback = "Correct! You won in $attempts guesses."
-                onSolved(attempts)
-            }
-        }
+    val feedback = when (game.status) {
+        GuessGameStatus.READY -> "Guess a number from $minNumber to $maxNumber."
+        GuessGameStatus.INVALID_INPUT -> "Enter a whole number from $minNumber to $maxNumber."
+        GuessGameStatus.TOO_LOW -> "Too low. Try again."
+        GuessGameStatus.TOO_HIGH -> "Too high. Try again."
+        GuessGameStatus.CORRECT -> "Correct! You won in ${game.attempts} guesses."
     }
 
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -113,7 +106,7 @@ fun SharedGuessGameScreen(
                         onValueChange = { guessText = it.filter(Char::isDigit).take(maxNumber.toString().length) },
                         label = { Text("Your guess ($minNumber–$maxNumber)") },
                         singleLine = true,
-                        enabled = !solved,
+                        enabled = !game.solved,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done
@@ -132,22 +125,23 @@ fun SharedGuessGameScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
                     ) {
-                        Button(onClick = { submitGuess() }, enabled = !solved && guessText.isNotBlank()) {
+                        Button(onClick = { submitGuess() }, enabled = !game.solved && guessText.isNotBlank()) {
                             Text("Guess")
                         }
                         Button(onClick = {
-                            target = Random.nextLong(minNumber, maxNumber + 1L)
+                            game = GuessGameReducer.newGame(
+                                targetNumber = Random.nextLong(minNumber, maxNumber + 1L),
+                                rangeMin = minNumber,
+                                rangeMax = maxNumber
+                            )
                             guessText = ""
-                            attempts = 0
-                            solved = false
-                            feedback = "New number chosen. Guess from $minNumber to $maxNumber."
                         }) {
                             Text("New game")
                         }
                     }
                     Spacer(Modifier.height(2.dp))
                     Text(feedback, style = MaterialTheme.typography.bodyLarge)
-                    Text("Guesses: $attempts", style = MaterialTheme.typography.bodyMedium)
+                    Text("Guesses: ${game.attempts}", style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
