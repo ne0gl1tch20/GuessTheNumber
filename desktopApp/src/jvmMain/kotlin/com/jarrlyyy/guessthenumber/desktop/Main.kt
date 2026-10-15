@@ -19,11 +19,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
+import java.awt.Dimension
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsBuildVersion
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugInstaller
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdate
@@ -38,9 +40,15 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "Guess The Number",
         state = remember { WindowState(size = DpSize(1100.dp, 760.dp)) },
-        minimumSize = DpSize(800.dp, 600.dp),
         resizable = true
     ) {
+        val density = LocalDensity.current
+        LaunchedEffect(density) {
+            window.minimumSize = Dimension(
+                with(density) { 800.dp.roundToPx() },
+                with(density) { 600.dp.roundToPx() }
+            )
+        }
         MaterialTheme {
             val scope = rememberCoroutineScope()
             val shell = remember { DesktopShellController() }
