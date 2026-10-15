@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PR #157 is merged; the shared production guess transition now returns the complete next `GuessCoreState`, and Android/Windows CI passed. Phase 1 deterministic shared rules and Phase 2 shared guessing-state migration are complete. Next is Phase 4's first item: define platform-neutral navigation/action contracts and reusable presentation state for the shared core-game feature slice. Save settings/slot round trips and DataStore write-failure tests are complete through #156; ViewModel consistency after failed persistence remains a separate follow-up and must not block the UI migration.
+**Current checkpoint:** PRs #157 and #158 are merged, with Android and Windows CI passing. Phase 1 deterministic shared rules and Phase 2 shared guessing-state migration are complete. Phase 4's navigation/action contracts and reusable presentation snapshot are in place; the next step is a controlled shared guessing UI that accepts host-owned state and emits typed actions, without replacing the full production Play screen or moving Android services into commonMain. Save settings/slot round trips and DataStore write-failure tests are complete through #156; ViewModel consistency after failed persistence remains a separate follow-up and must not block the UI migration.
 
 ## Rules for every PR
 
@@ -111,7 +111,8 @@ PR #154 adds regression tests for global settings JSON round trips across manage
 
 ### Phase 4 - Full shared UI, navigation and player feature parity
 
-- [ ] Define shared navigation/action contracts and reusable presentation state. PR #158 adds the first platform-neutral core-game destination/action contract and presentation snapshot; complete this item only after CI passes and the PR merges.
+- [x] #158 defines platform-neutral core-game destinations/actions and a reusable presentation snapshot; Android and Windows CI passed and the PR merged.
+- [ ] Add a controlled shared guessing UI that consumes host-owned state and emits typed actions; keep target generation, production economy/save state and platform services in their existing hosts. PR #159 proposes this first composable integration step; complete after CI passes and merge.
 - [ ] Migrate feature slices with UI, state/actions, localized strings, persistence behavior and tests together:
   1. Core loop: Play, guess input/feedback, rewards, upgrades and shop.
   2. Economy/resets: Prestige, Ultra, Nebula, permanent upgrades and talents.
