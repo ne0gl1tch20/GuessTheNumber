@@ -26,6 +26,8 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             resources.srcDir(generatedDesktopResources)
+            // Consume the canonical game configuration instead of maintaining desktop copies.
+            resources.srcDir(rootProject.file("app/src/main/assets/game"))
             dependencies {
                 implementation(project(":shared"))
                 implementation(compose.runtime)
