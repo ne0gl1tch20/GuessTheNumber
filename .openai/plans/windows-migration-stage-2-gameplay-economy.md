@@ -8,7 +8,7 @@
 
 Stage 2 already exists in the Windows feature-parity plan. This file tracks its implementation breakdown and does not replace the parity plan.
 
-PRs #193–#196 have moved the production `GameState`, `BigNumber`, `GameEngine` and `Difficulty` boundary into shared JVM/Android code, connected the Windows Play screen to the production guess engine, and added desktop-native persistence with backup recovery and failure-path tests. The Windows screen currently exposes only the basic guessing loop and a few counters. Full economy/progression UI and actual Windows runtime verification remain outstanding. See [`docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md`](../../docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md) for evidence and the current gate.
+PRs #193–#196 have moved the production `GameState`, `BigNumber`, `GameEngine` and `Difficulty` boundary into shared JVM/Android code, connected the Windows Play screen to the production guess engine, and added desktop-native persistence with backup recovery and failure-path tests. The Windows screen currently exposes only the basic guessing loop and a few counters. PR #198 (Stage 2-B initial slice) now adds desktop economy transactions, catalog loading, purchase/reset UI and deterministic tests. Full parity of effects tied to Android-only services and actual Windows runtime verification remain outstanding. See [`docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md`](../../docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md) for evidence and the current gate.
 
 ## Goal
 
@@ -30,11 +30,11 @@ Make Windows use the same deterministic gameplay rules, reward/economy decisions
 
 - [ ] Share or adapt the production reward decision path: critical hits, streak/Frenzy, difficulty, mutators and upgrade/talent bonuses.
 - [ ] Decide and document a multiplatform representation for `BigNumber` before porting currency math. Do not replace decimal arithmetic with `Double` or change multiplication/rounding order merely to simplify the port.
-- [ ] Integrate Money, upgrades, shop purchases, Prestige, Ultra, Nebula, talent reset/preservation rules and eligibility checks.
-- [ ] Prevent duplicate rewards and keep reset operations atomic from the player's perspective.
-- [ ] Add parity tests for representative state/reward examples from Android.
+- [x] Integrate Money upgrades, Nebula shop purchase records, Prestige/Ultra resets and upgrades, talent unlock prerequisites, and reset eligibility/preservation rules in the desktop transaction layer. Runtime verification and effect parity for services/background systems remain open.
+- [x] Reject duplicate shop/talent purchases and invalid resets; persist transaction results before publishing the new desktop UI state.
+- [x] Add deterministic tests for upgrade cost/affordability, Prestige/Ultra thresholds and reset preservation, duplicate shop purchases, talent prerequisites and desktop catalog loading. [ ] Expand exact reward fixtures and verify all catalog effects against Android.
 
-**Exit gate:** The same input and starting state produce matching feedback, reward, counters and progression decisions on Android and Windows.
+**Exit gate:** PARTIAL. Core guess rewards use the shared production engine. The first economy transaction/UI slice is implemented and tested in PR #198, but full effect parity, Android service-owned progression and actual Windows runtime checks are still required.
 
 ### S2-C — Persistence and recovery
 
@@ -55,7 +55,7 @@ Make Windows use the same deterministic gameplay rules, reward/economy decisions
 - [ ] Update `docs/WINDOWS_FEATURE_PARITY_PLAN.md` with evidence-backed status and leave untested rows unverified.
 - [x] Keep Stage 3 progression/activities, Stage 4 utilities/tooling, and Stage 5 release hardening out of this stage.
 
-**Exit gate:** NOT MET. The automated guessing/save integration coverage is being expanded, but S2-B economy/reward/reset flows are not yet implemented on Windows and actual Windows runtime verification is outstanding.
+**Exit gate:** NOT MET. PR #198 adds economy purchases and reset flows with automated coverage, but full effect parity and actual Windows runtime verification remain outstanding.
 
 ## Recommended PR sequence
 
@@ -82,3 +82,11 @@ Keep each PR cohesive and allow multiple related commits per PR. Do not make tin
 ## First implementation action
 
 Start with S2-A's source audit and architecture boundary. The main risk to resolve before moving production code is the Android-only `GameState`/Java `BigDecimal` `BigNumber` dependency. Keep the current shared rule APIs as the starting point, but do not promote the demo `GuessGameState` into the production save model by renaming it or copying fields without an explicit mapping and compatibility tests.
+
+
+## Stage 2-B economy implementation slice
+
+- PR #198 adds the Android economy JSON catalogs as Windows JVM resources, immutable desktop economy transactions and Windows UI for Money/Prestige/Ultra currencies, all catalog upgrades, Prestige/Ultra resets, Nebula shop purchase records and talent unlocks.
+- Every economy action saves before the visible state is updated; a failed save leaves the previous UI state intact.
+- Automated tests cover purchase cost and affordability, max-level rejection, Prestige/Ultra thresholds and reset preservation, duplicate shop purchases, talent prerequisites and catalog parsing.
+- Still open: verify actual runtime behavior on Windows, confirm all item effects (especially auto-clicker/background behavior and shop boosts) against Android, expand expected-reward fixtures, and complete the broader Stage 2 economy/feature matrix.
