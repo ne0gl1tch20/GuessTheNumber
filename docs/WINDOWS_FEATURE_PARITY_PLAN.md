@@ -1,6 +1,6 @@
 # Windows Feature Parity Plan
 
-**Status:** Planned; Windows has a desktop target and shared guessing-screen pilot, not the full Android feature set.
+**Status:** In progress; Windows has a desktop shell and shared guessing-screen pilot, not the full Android feature set.
 **Reviewed:** 2026-10-15
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
@@ -56,8 +56,8 @@ This replaces the Windows-related phases buried in the temporary KMP migration r
 
 ### W0. Inventory and desktop shell
 
-- [ ] Inventory Android destinations, visible features, settings, save operations and debug-only routes against Windows.
-- [ ] Update the parity table below before implementation.
+- [x] Inventory Android destinations, visible features, settings, save operations and debug-only routes against Windows (see source-backed inventory below).
+- [x] Update the parity table below before implementation.
 - [ ] Confirm desktop navigation, window lifecycle, theme, locale loading and error/loading/empty states.
 - [ ] Verify keyboard/mouse navigation, focus order, Enter/Escape, resizing, minimum window size, high-DPI scaling and narrow layouts.
 
@@ -150,7 +150,7 @@ This is a repository-source audit, not a runtime test. Paths below link to the c
 
 - **Windows entry point and shell:** [\`desktopApp/.../desktop/Main.kt\`](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt) opens a resizable Compose Desktop \`Window\` with an initial 1100×760 dp size, a Windows-owned Play/About navigation shell, the shared guessing pilot and Windows Debug update controls. [\`DesktopNavigation.kt\`](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigation.kt) defines the testable shell state/controller. The host still does not wire Android's production \`GameViewModel\`, full \`GameState\`, production navigation or save system into Windows.
 - **Shared guessing screen:** [`SharedGuessGameScreen.kt`](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/ui/SharedGuessGameScreen.kt) owns temporary in-memory demo state and generates a local target. [`SharedGuessGameContent.kt`](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/ui/SharedGuessGameContent.kt) explicitly leaves game state, target generation, persistence and navigation to the host. This is a pilot UI, not end-to-end Windows gameplay parity.
-- **Android feature/navigation reference:** [`Screen.kt`](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/Screen.kt) defines Play, Upgrades, Shop, More, Music Player, Arcade, Activity Hub, Statistics, Settings, About, Dev Settings, Prestige, Ultra, Achievements, Talent Web, Mutators, Process Inspector, Changelog, Save Slots, World Map, Relics, Home Base, Codex, Endgame and Lucky Stake. [`NavGraph.kt`](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt) wires these destinations to Android-owned state/actions and Android-specific services.
+- **Android feature/navigation reference:** [`Screen.kt`](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/Screen.kt) declares 26 destinations, including debug-only Lua Testing Hub and Process Inspector. [`NavGraph.kt`](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt) also defines `live_ops` as a separate route and wires destinations to Android-owned state/actions and Android-specific services. The source-backed inventory and planned Windows stage are recorded below.
 - **Windows packaging:** [`desktopApp/build.gradle.kts`](../desktopApp/build.gradle.kts) targets Compose Desktop MSI and preserves the existing MSI UpgradeCode. [.github/workflows/windows-desktop.yml](../.github/workflows/windows-desktop.yml) runs localization/JSON/preflight checks, shared and desktop JVM tests, desktop compilation and MSI packaging; its PR path includes a legacy-to-current MSI upgrade check. These checks do not prove interactive runtime parity.
 - **Windows updater:** [`WindowsDebugUpdateClient.kt`](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/update/WindowsDebugUpdateClient.kt) reads the public GitHub Releases API and validates the Windows Debug manifest/channel/checksum format. Keep this behavior isolated from production release discovery.
 - **Project inclusion:** [`settings.gradle.kts`](../settings.gradle.kts) includes `:app`, `:shared` and `:desktopApp`.
@@ -174,6 +174,51 @@ A shared component or green CI is not proof that a complete feature works end-to
 | MSI packaging and upgrade identity | **Build configuration and CI checks present; full lifecycle not established.** UpgradeCode is explicitly preserved. | [desktopApp/build.gradle.kts](../desktopApp/build.gradle.kts), [Windows Desktop CI](../.github/workflows/windows-desktop.yml); retain UpgradeCode and complete install/upgrade/recovery regression in Stage 5. |
 | Shared deterministic rules | **Shared foundation and common tests exist; Windows end-to-end use is not established by the desktop entry point.** | [KMP Foundation Status](KMP_FOUNDATION_STATUS.md), [shared rules](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/rules/GuessRules.kt); connect the authoritative game flow and test integration. |
 
+### Source-backed Android destination and data-operation inventory
+
+This inventory was checked against `Screen.kt`, `NavGraph.kt`, `MainActivity.kt`, `GameViewModel.kt`, `SaveManager.kt`, `LocaleManager.kt` and `SAVE_SCHEMA_AND_MIGRATION.md` on 2026-10-15. The stage labels below are sequencing targets, not a claim that the Windows implementation exists. On Windows, only the initial Play/About shell is present; Play still embeds the demo pilot and About is informational, so neither counts as production feature parity.
+
+| Android destination or route | Planned stage | Windows status / notes |
+|---|---|---|
+| Play | Stage 2 | Shell destination exists; production game state, rules integration, rewards and persistence are not wired. |
+| Upgrades | Stage 2 | Not implemented as a Windows production feature. |
+| Shop | Stage 2 | Not implemented as a Windows production feature. |
+| More | Stage 1 then Stages 2–4 | No production hub/menu yet; it must expose features as their Windows slices land. |
+| Prestige | Stage 2 | Not implemented as a Windows production feature. |
+| Ultra | Stage 2 | Not implemented as a Windows production feature. |
+| Talent Web | Stage 2 | Economy/progression dependencies must be shared consistently; not implemented on Windows. |
+| Mutators | Stage 2 | Includes challenge-builder gating and state/reward integration; not implemented on Windows. |
+| Statistics | Stage 3 | Not implemented on Windows. |
+| Achievements | Stage 3 | Not implemented on Windows. |
+| World Map | Stage 3 | Not implemented on Windows; Android route is feature-flag gated. |
+| Relics | Stage 3 | Not implemented on Windows; Android locks it until a world boss is defeated. |
+| Home Base | Stage 3 | Not implemented on Windows. |
+| Codex | Stage 3 | Not implemented on Windows; Android locks it until a world boss is defeated. |
+| Endgame | Stage 3 | Not implemented on Windows; Android requires all four world bosses defeated. |
+| Arcade | Stage 3 | Not implemented on Windows; rewards must go through validated game-state actions. |
+| Activity Hub (`lua_hub`) | Stage 3 | Not implemented on Windows; Android gates it with the Lua scripting feature flag. |
+| Lucky Stake | Stage 3 | Not implemented on Windows; settlement must preserve authoritative economy rules. |
+| Live Ops (`live_ops` route) | Stage 3 | Separate NavGraph route, not a `Screen.kt` object; Android gates it with Live Ops and seasonal-reward flags. Not implemented on Windows. |
+| Settings | Stage 4 | Not implemented on Windows; desktop-native equivalents are required rather than copying Android APIs. |
+| Save Slots | Stage 4 | Not implemented on Windows. Android's source defines 10 slots, active-slot selection, slot metadata, backup/recovery and legacy-save migration. |
+| Music Player | Stage 4 | Not implemented on Windows; confirm desktop audio support and document any approved platform difference. |
+| About | Stage 1 shell / Stage 4 completion | Basic Windows informational screen exists; full Android About behavior/content is not yet matched. |
+| Changelog | Stage 4 | Not implemented as a Windows player-facing feature. |
+| Lua Testing Hub | Stage 4, debug-only | Android route exists only in debug builds and is feature-flag gated. Must never leak into production. |
+| Dev Settings | Stage 4, debug-only | Android route exists only in debug builds and is feature-flag gated. Must never leak into production. |
+| Process Inspector | Stage 4, debug-only | Android route exists only in debug builds. Must never leak into production. |
+
+#### Cross-cutting Android behavior that Windows must account for
+
+- **State and save data:** Android's `GameViewModel` owns authoritative `GameState` mutation and coordinates `SaveManager`. Save payloads serialize `GameState` as JSON with kotlinx.serialization; nested data includes settings, statistics and large-number values. The current schema has no dedicated integer schema-version field, and `lastSavedVersion` is app-version metadata, not a schema version. Windows must not blindly import Android `DataStore` APIs or invent a conflicting format. Define a desktop-native storage adapter and explicit compatibility/round-trip tests before Stage 2 gameplay is considered complete.
+- **Save operations:** Account for up to 10 slots, active-slot selection, slot metadata, primary/backup recovery, validated legacy migration, save export/import, reset, and app preferences. Existing behavior and save compatibility must be preserved; test failure and recovery paths rather than treating a successful write as enough.
+- **Settings:** The saved settings model includes locale, theme customization, number formatting, reduced motion/flashes, audio/haptics/notifications, user-selected music paths/queues/playlists, More-screen ordering/colors and feature-tour state. Some Android controls/services are platform-specific; each needs an explicit Windows equivalent or a documented intentional difference.
+- **Localization:** Android `LocaleManager` loads a selected locale JSON overlay on top of the English catalog and falls back to English. The inspected catalog lists 23 locales and locale-aware number/date/time formatting. The Windows shell currently uses hardcoded English strings, so locale resource discovery/loading, fallback behavior and all visible/accessibility strings remain open Stage 1 work.
+- **Startup and transient states:** Android has first-save/empty-save-slot handling, crash recovery, settings migration, offline gains, time-travel detection and changelog dialogs, plus notification deep-link routing. Windows needs a documented equivalent, or an explicit platform-specific decision, for every applicable state; the Play/About shell alone does not cover them.
+- **Input and windowing:** Keyboard/mouse focus order, Enter/Escape behavior, minimum size, high-DPI scaling, narrow layouts, window close/reopen behavior and theme handling still require Windows runtime verification. CI is not a substitute for this pass.
+
+The inventory is source-backed and completes the **documentation/inventory** part of Stage 1. It does not pass the Stage 1 exit gate: Windows runtime QA, desktop locale/theme/loading/error-state checks and the remaining shell behavior are still unverified.
+
 ### Stage 1 implementation progress
 
 - [x] Add a Windows-owned destination/state contract for the initial Play and About shell.
@@ -182,7 +227,7 @@ A shared component or green CI is not proof that a complete feature works end-to
 - [ ] Run the desktop unit tests and compilation on Windows CI.
 - [ ] Verify actual window launch/close, keyboard and mouse focus, minimum sizing, high-DPI and narrow layouts on Windows.
 - [ ] Audit theme/locale loading and loading/error/empty states beyond the updater status.
-- [ ] Finish mapping Android destinations and save/settings operations to Windows status.
+- [x] Map Android destinations and save/settings operations to planned Windows stages (see inventory below).
 
 The shell is a first implementation slice, not the Stage 1 exit gate. Windows runtime checks remain unverified, and the production game state/save system is intentionally deferred to Stage 2.
 
