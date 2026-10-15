@@ -8,7 +8,7 @@
 
 Stage 2 already exists in the Windows feature-parity plan. This file tracks its implementation breakdown and does not replace the parity plan.
 
-PRs #193–#196 have moved the production `GameState`, `BigNumber`, `GameEngine` and `Difficulty` boundary into shared JVM/Android code, connected the Windows Play screen to the production guess engine, and added desktop-native persistence with backup recovery and failure-path tests. The Windows screen currently exposes only the basic guessing loop and a few counters. Full economy/progression UI and actual Windows runtime verification remain outstanding. See [`docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md`](../../docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md) for evidence and the current gate.
+PRs #193–#196 have moved the production `GameState`, `BigNumber`, `GameEngine` and `Difficulty` boundary into shared JVM/Android code, connected the Windows Play screen to the production guess engine, and added desktop-native persistence with backup recovery and failure-path tests. The Windows screen now exposes a first economy slice using canonical Android game JSON: Money/Prestige/Ultra upgrades, Nebula/Prestige/Ultra shop purchases, talent purchases and Prestige/Ultra resets. It does not yet cover every Android progression action or match the Android screen design. Actual Windows runtime verification remains outstanding. See [`docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md`](../../docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md) for evidence and the current gate.
 
 ## Goal
 
@@ -28,13 +28,15 @@ Make Windows use the same deterministic gameplay rules, reward/economy decisions
 
 ### S2-B — Rewards, upgrades, shop and resets
 
-- [ ] Share or adapt the production reward decision path: critical hits, streak/Frenzy, difficulty, mutators and upgrade/talent bonuses.
+- [ ] Verify end-to-end desktop reward behavior against Android fixtures for critical hits, streak/Frenzy, difficulty, mutators and upgrade/talent bonuses. The Windows screen calls the shared production `GameEngine`; the new purchase UI alone does not establish reward parity.
 - [ ] Decide and document a multiplatform representation for `BigNumber` before porting currency math. Do not replace decimal arithmetic with `Double` or change multiplication/rounding order merely to simplify the port.
-- [ ] Integrate Money, upgrades, shop purchases, Prestige, Ultra, Nebula, talent reset/preservation rules and eligibility checks.
+- [x] Integrate the first Windows slice for Money upgrades, Nebula/Prestige/Ultra shop purchases, talent purchases and Prestige/Ultra reset eligibility using the existing production `GameEngine` and canonical Android JSON definitions.
+- [ ] Complete the remaining Android economy/progression actions and verify all reset preservation rules against Android behavior.
 - [ ] Prevent duplicate rewards and keep reset operations atomic from the player's perspective.
-- [ ] Add parity tests for representative state/reward examples from Android.
+- [x] Add deterministic tests for desktop upgrade costs/purchases, shop ownership, talent prerequisites and Prestige/Ultra reset gates.
+- [ ] Add Android-backed fixtures for exact reward values, upgrade effects and reset preservation.
 
-**Exit gate:** The same input and starting state produce matching feedback, reward, counters and progression decisions on Android and Windows.
+**Exit gate:** NOT MET. The first desktop purchase/reset flows are implemented, but exact reward-value fixtures and the remaining progression-action coverage are still needed.
 
 ### S2-C — Persistence and recovery
 
@@ -55,7 +57,7 @@ Make Windows use the same deterministic gameplay rules, reward/economy decisions
 - [ ] Update `docs/WINDOWS_FEATURE_PARITY_PLAN.md` with evidence-backed status and leave untested rows unverified.
 - [x] Keep Stage 3 progression/activities, Stage 4 utilities/tooling, and Stage 5 release hardening out of this stage.
 
-**Exit gate:** NOT MET. The automated guessing/save integration coverage is being expanded, but S2-B economy/reward/reset flows are not yet implemented on Windows and actual Windows runtime verification is outstanding.
+**Exit gate:** NOT MET. Automated guessing/save integration is in place. A first S2-B economy slice has been added in the Windows economy PR, but complete Android-backed reward parity and actual Windows runtime verification remain outstanding.
 
 ## Recommended PR sequence
 
