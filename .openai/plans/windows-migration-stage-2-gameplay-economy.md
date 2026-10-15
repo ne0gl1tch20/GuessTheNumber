@@ -1,14 +1,14 @@
 # Windows Migration Stage 2 — Core Gameplay and Economy
 
-**Status:** Planning PR; no production code changed yet.  
+**Status:** Implementation in progress; Stage 2-D parity audit is open and the Stage 2 exit gate has not passed.  
 **Source of truth:** `docs/WINDOWS_FEATURE_PARITY_PLAN.md`, Stage 2 (W1–W2).  
 **Opened:** 2026-10-15
 
-## Finding
+## Current implementation finding
 
-Stage 2 already exists in the Windows feature-parity plan. This file adds the implementation breakdown under `.openai/plans/`; it does not replace the parity plan or mark any migration work complete.
+Stage 2 already exists in the Windows feature-parity plan. This file tracks its implementation breakdown and does not replace the parity plan.
 
-The Windows Play destination still hosts the standalone shared guessing pilot. The production Android `GameEngine` uses shared deterministic rules, but its authoritative `GameState`, `BigNumber`, reward calculation, and persistence remain in the Android app module. The pilot reducer is not production gameplay parity.
+PRs #193–#196 have moved the production `GameState`, `BigNumber`, `GameEngine` and `Difficulty` boundary into shared JVM/Android code, connected the Windows Play screen to the production guess engine, and added desktop-native persistence with backup recovery and failure-path tests. The Windows screen currently exposes only the basic guessing loop and a few counters. Full economy/progression UI and actual Windows runtime verification remain outstanding. See [`docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md`](../../docs/WINDOWS_STAGE_2D_PARITY_VERIFICATION.md) for evidence and the current gate.
 
 ## Goal
 
@@ -18,10 +18,10 @@ Make Windows use the same deterministic gameplay rules, reward/economy decisions
 
 ### S2-A — Production gameplay boundary and core loop
 
-- [ ] Audit the current Android `GameEngine`, `GameViewModel`, `GameState`, `BigNumber`, shared rules, desktop shell, and existing tests before moving code.
+- [x] Audit the production `GameEngine`, `GameState`, `BigNumber`, shared rules, desktop shell and existing tests before moving the production boundary.
 - [ ] Define a platform-neutral command/result boundary for submit guess, start next round, and invalid/duplicate/post-solve submissions.
-- [ ] Keep target generation injectable/deterministic in tests; do not duplicate the guessing rules in desktop UI code.
-- [ ] Replace the standalone Windows pilot state with a production-connected controller for input, range, attempts, feedback, correct guesses, streaks and Frenzy.
+- [x] Keep target generation injectable/deterministic in tests; do not duplicate the guessing rules in desktop UI code.
+- [x] Replace the standalone Windows pilot state with a production-engine-backed guessing screen for input, range, attempts and feedback. Full economy UI remains in S2-B.
 - [ ] Preserve Android behavior and player-facing strings; update the changelog in the same PR for any player-visible change.
 
 **Exit gate:** Windows runs the real guessing loop through the shared production boundary, with deterministic common tests and no second source of truth for guess counters.
@@ -38,23 +38,24 @@ Make Windows use the same deterministic gameplay rules, reward/economy decisions
 
 ### S2-C — Persistence and recovery
 
-- [ ] Define a desktop-native storage adapter; do not import Android DataStore APIs into desktop code.
-- [ ] Preserve the existing serialized save contract and safe defaults for legacy fields.
-- [ ] Cover primary/backup recovery, corrupt saves, slot selection where supported, and save/reload round trips.
-- [ ] Serialize state mutations and writes so failed writes cannot silently leave the visible state ahead of disk.
-- [ ] Add compatibility fixtures and failure-path tests before changing save schema or encryption/obfuscation behavior.
+- [x] Define a desktop-native storage adapter; do not import Android DataStore APIs into desktop code.
+- [x] Preserve the shared serialized save contract and safe defaults for legacy fields.
+- [x] Cover primary/backup recovery, corrupt saves, and save/reload round trips. The screen currently uses slot 1; player-facing slot selection remains unimplemented.
+- [x] Keep writes off the UI thread and publish accepted guess state only after its save succeeds.
+- [x] Add legacy-default compatibility fixtures and injected write-failure tests.
 
 **Exit gate:** Windows can save, close/reopen and reload a run without losing or duplicating currency, counters or progression; legacy Android saves are either supported explicitly or the limitation is documented and agreed before implementation.
 
 ### S2-D — Parity gate and documentation
 
-- [ ] Run relevant shared/JVM tests and the existing Windows Desktop CI checks; do not manually dispatch workflows unless explicitly authorized.
-- [ ] Compare deterministic gameplay/economy scenarios across Android and Windows.
+- [x] Add an engine-plus-desktop-save integration test for deterministic incorrect/correct guesses, counters and reloads; confirm CI on this PR before treating it as passing.
+- [ ] Confirm current-candidate Android validation and Windows Desktop CI.
+- [ ] Add representative economy/reward/reset parity scenarios after S2-B is implemented.
 - [ ] Perform actual Windows runtime checks for guesses, rewards, upgrades, resets and persistence. CI alone is not runtime evidence.
 - [ ] Update `docs/WINDOWS_FEATURE_PARITY_PLAN.md` with evidence-backed status and leave untested rows unverified.
-- [ ] Keep Stage 3 progression/activities, Stage 4 utilities/tooling, and Stage 5 release hardening out of this stage.
+- [x] Keep Stage 3 progression/activities, Stage 4 utilities/tooling, and Stage 5 release hardening out of this stage.
 
-**Exit gate:** Stage 2's W1 and W2 checklists are complete with code/test/runtime evidence, and the full core loop and economy preserve Android semantics.
+**Exit gate:** NOT MET. The automated guessing/save integration coverage is being expanded, but S2-B economy/reward/reset flows are not yet implemented on Windows and actual Windows runtime verification is outstanding.
 
 ## Recommended PR sequence
 
