@@ -49,3 +49,20 @@ data class SharedGuessPresentationState(
         )
     }
 }
+
+/** Semantic feedback icon token shared across platforms; hosts map tokens to native assets. */
+enum class SharedGuessFeedbackIcon {
+    TIP,
+    TOO_LOW,
+    TOO_HIGH,
+    CORRECT
+}
+
+/** Keep feedback meaning consistent while letting each host choose its own icon asset. */
+fun GuessGameStatus.toSharedFeedbackIcon(): SharedGuessFeedbackIcon = when (this) {
+    GuessGameStatus.READY,
+    GuessGameStatus.INVALID_INPUT -> SharedGuessFeedbackIcon.TIP
+    GuessGameStatus.TOO_LOW -> SharedGuessFeedbackIcon.TOO_LOW
+    GuessGameStatus.TOO_HIGH -> SharedGuessFeedbackIcon.TOO_HIGH
+    GuessGameStatus.CORRECT -> SharedGuessFeedbackIcon.CORRECT
+}
