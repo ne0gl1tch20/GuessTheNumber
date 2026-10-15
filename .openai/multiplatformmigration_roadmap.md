@@ -41,10 +41,27 @@
 ### Phase 1 - Finish deterministic shared domain rules
 
 - [x] **First completed:** #138 centralized the claim eligibility predicate in shared rules; Nebula/save-state mutation remains in the platform engine.
-- [ ] Inventory remaining production decisions in Android `GameEngine` and classify each as **already shared**, **platform adapter**, or **not migrated**. Avoid duplicate abstractions.
-- [ ] Extract remaining low-risk, pure state validation/invariants into `shared/src/commonMain`; test valid, invalid, boundary and duplicate-action cases in `commonTest`.
+- [x] Inventory production decisions in Android `GameEngine` and classify them below. The next extraction must avoid duplicating already-shared rules.
+- [ ] Extract the next low-risk, pure state validation/invariant into `shared/src/commonMain`; add valid, invalid, boundary and duplicate-action tests in `commonTest`.
 - [ ] Extract remaining pure progression/economy/upgrade/reset requirement formulas only after checking they are not already shared. Keep authoritative currency math and rounding unchanged.
 - [ ] Define the shared production transition contract and inject deterministic randomness for tests. Platform RNG, clock, storage, notifications, audio and haptics stay behind adapters.
+
+### Phase 1 audit - Android `GameEngine` inventory (2026-10-15)
+
+Inspected `app/src/main/java/com/jarrlyyy/guessthenumber/domain/engine/GameEngine.kt` against the shared rules currently in `shared/src/commonMain`.
+
+| Production decision | Classification | Current owner / next action |
+|---|---|---|
+| Guess feedback, attempt/correct counters, streak and best-streak update | Already shared | `GuessStateRules`; Android engine delegates to it. Keep reward and platform state mutation separate for now. |
+| Guess reward constants and multipliers (streak, Frenzy, critical chance, upgrades, talents, mutators, difficulty) | Already shared | `GuessRewardRules`, `FrenzyRules`, `CriticalChanceRules`, `MutatorRules`, `DifficultyRules`; Android still composes them with `BigNumber`. |
+| Wrong-guess penalty and mutator tax rates | Already shared | `GuessPenaltyRules`; Android applies the resulting amount to its `BigNumber` balance. |
+| Prestige/Ultra requirements and reward ratios | Already shared | `ProgressionRequirementRules` and `ProgressionRewardRules`; BigNumber conversion and flooring stay in Android. |
+| Challenge claim eligibility and challenge reward validation | Already shared | `ChallengeRewardRules`; Android still commits completed IDs, Nebula and statistics. |
+| Random critical roll and next-target selection | Platform adapter / transition dependency | Uses Android engine's injected `kotlin.random.Random`; next step is to define deterministic inputs for shared transition tests, not to move platform RNG or alter probabilities. |
+| Currency, statistics and full `GameState` updates | Not migrated as shared production transition | Android `GameEngine` currently commits these updates. Needs an explicit shared state/transition contract plus differential tests before moving mutations. |
+| Save/persistence, clocks, notifications, audio and haptics | Platform adapter | Keep out of common domain rules; migrate only through explicit adapter contracts if needed. |
+
+**Audit conclusion:** the easy deterministic formulas are already extracted. Do not invent another wrapper around them. The next implementation PR should introduce a small deterministic input/result contract around the production guess transition, with injected critical-roll/next-target values in tests, while leaving Android's existing random generation and `BigNumber` state mutation authoritative until differential tests prove parity.
 
 ### Phase 2 - Shared production state and engine
 
