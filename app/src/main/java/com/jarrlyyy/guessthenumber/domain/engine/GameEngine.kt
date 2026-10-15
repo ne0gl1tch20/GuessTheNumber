@@ -10,6 +10,7 @@ import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.DifficultyRules
+import com.jarrlyyy.guessthenumber.shared.rules.GuessCoreState
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessTransitionRules
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
@@ -58,15 +59,19 @@ class GameEngine(private val rng: Random = Random.Default) {
         state.copy(activeMutators = validateMutators(mutators))
 
     fun processGuess(state: GameState, guess: Long): GuessResult {
+        // Map the existing Android save model into the shared guessing-state slice.
+        // Keep currency, statistics, upgrades and persistence in the Android engine.
         val transition = GuessStateRules.applyGuess(
-            targetNumber = state.targetNumber,
-            guess = guess,
-            rangeMin = state.currentRangeMin,
-            rangeMax = state.currentRangeMax,
-            attempts = state.attempts,
-            correctGuesses = state.correctGuesses,
-            streak = state.streak,
-            bestStreak = state.bestStreak
+            state = GuessCoreState(
+                targetNumber = state.targetNumber,
+                rangeMin = state.currentRangeMin,
+                rangeMax = state.currentRangeMax,
+                attempts = state.attempts,
+                correctGuesses = state.correctGuesses,
+                streak = state.streak,
+                bestStreak = state.bestStreak
+            ),
+            guess = guess
         )
         val feedback = transition.feedback
 
@@ -77,7 +82,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             val newMax = getRangeMax(state)
             val generatedNextTarget = rng.nextLong(newMin, newMax + 1)
             val decision = GuessTransitionRules.resolve(
-                stateTransition = transition,
+                stateTransition = transition.stateTransition,
                 criticalChance = critChance,
                 criticalRoll = criticalRoll,
                 nextTarget = generatedNextTarget,
@@ -108,15 +113,20 @@ class GameEngine(private val rng: Random = Random.Default) {
                 correctGuesses = state.statistics.correctGuesses + 1,
                 moneyEarned = state.statistics.moneyEarned + totalReward
             )
+            val nextCoreState = transition.nextState.copy(
+                targetNumber = nextTarget,
+                rangeMin = newMin,
+                rangeMax = newMax
+            )
             val updatedState = state.copy(
                 money = newMoney,
-                currentRangeMin = newMin,
-                currentRangeMax = newMax,
-                targetNumber = nextTarget,
-                attempts = transition.attempts,
-                correctGuesses = transition.correctGuesses,
-                streak = newStreak,
-                bestStreak = bestStreak,
+                currentRangeMin = nextCoreState.rangeMin,
+                currentRangeMax = nextCoreState.rangeMax,
+                targetNumber = nextCoreState.targetNumber,
+                attempts = nextCoreState.attempts,
+                correctGuesses = nextCoreState.correctGuesses,
+                streak = nextCoreState.streak,
+                bestStreak = nextCoreState.bestStreak,
                 statistics = newStats
             )
             return GuessResult(feedback, totalReward, isCrit, newStreak, updatedState)
@@ -130,12 +140,16 @@ class GameEngine(private val rng: Random = Random.Default) {
                 totalGuesses = state.statistics.totalGuesses + 1,
                 failedGuesses = state.statistics.failedGuesses + 1
             )
+            val nextCoreState = transition.nextState
             val updatedState = state.copy(
                 money = newMoney,
+                targetNumber = nextCoreState.targetNumber,
+                currentRangeMin = nextCoreState.rangeMin,
+                currentRangeMax = nextCoreState.rangeMax,
                 attempts = newAttempts,
-                correctGuesses = transition.correctGuesses,
-                streak = transition.streak,
-                bestStreak = transition.bestStreak,
+                correctGuesses = nextCoreState.correctGuesses,
+                streak = nextCoreState.streak,
+                bestStreak = nextCoreState.bestStreak,
                 statistics = newStats
             )
             return GuessResult(feedback, BigNumber.ZERO, false, 0, updatedState)

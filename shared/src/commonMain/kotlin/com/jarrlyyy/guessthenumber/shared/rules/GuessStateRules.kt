@@ -60,4 +60,32 @@ object GuessStateRules {
             )
         }
     }
+
+    /**
+     * Resolve a guess from the shared production-state slice and return its next state.
+     * This overload is the preferred entry point for platform engines migrating away
+     * from parallel scalar fields.
+     */
+    fun applyGuess(state: GuessCoreState, guess: Long): GuessCoreTransition {
+        val counters = applyGuess(
+            targetNumber = state.targetNumber,
+            guess = guess,
+            rangeMin = state.rangeMin,
+            rangeMax = state.rangeMax,
+            attempts = state.attempts,
+            correctGuesses = state.correctGuesses,
+            streak = state.streak,
+            bestStreak = state.bestStreak
+        )
+        return GuessCoreTransition(
+            feedback = counters.feedback,
+            nextState = state.copy(
+                attempts = counters.attempts,
+                correctGuesses = counters.correctGuesses,
+                streak = counters.streak,
+                bestStreak = counters.bestStreak
+            ),
+            stateTransition = counters
+        )
+    }
 }

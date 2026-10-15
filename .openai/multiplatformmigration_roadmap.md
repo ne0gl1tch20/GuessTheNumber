@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PR #141 merged after Android Debug/Release and Windows Desktop CI passed. The next implementation PR introduces a deterministic shared guess-transition contract and routes the Android engine's injected random values through it; full economy/state migration remains future work.
+**Current checkpoint:** PRs #142 and #143 merged after Android and Windows CI passed. This implementation adds a shared guessing-state slice, maps Android `GameState` through it for guess submission, and adds common plus Android parity tests. Currency calculations, statistics, save serialization and platform RNG ownership remain unchanged.
 
 ## Rules for every PR
 
@@ -62,13 +62,14 @@ Inspected `app/src/main/java/com/jarrlyyy/guessthenumber/domain/engine/GameEngin
 | Currency, statistics and full `GameState` updates | Not migrated as shared production transition | Android `GameEngine` currently commits these updates. Needs an explicit shared state/transition contract plus differential tests before moving mutations. |
 | Save/persistence, clocks, notifications, audio and haptics | Platform adapter | Keep out of common domain rules; migrate only through explicit adapter contracts if needed. |
 
-**Audit conclusion:** the easy deterministic formulas are already extracted. Do not invent another wrapper around them. The next implementation PR should introduce a small deterministic input/result contract around the production guess transition, with injected critical-roll/next-target values in tests, while leaving Android's existing random generation and `BigNumber` state mutation authoritative until differential tests prove parity.
+**Audit conclusion:** the easy deterministic formulas and guess-transition decision contract are shared. The production engine now maps its guessing fields through `GuessCoreState`, with parity tests covering correct and incorrect guesses. Keep Android `BigNumber` calculations and persistence authoritative; the next step is to extract the reward/penalty decision into a shared deterministic result before moving any currency mutation.
 
 ### Phase 2 - Shared production state and engine
 
-- [ ] Add a shared production state model and explicit mapping to/from existing Android state.
-- [ ] Add differential tests comparing old engine behavior with shared behavior for identical states and injected random values.
-- [ ] Migrate one production transition per PR: guess submission; reward/penalty application; upgrade purchases; Prestige; Ultra; challenge claims; achievements/rewards; remaining progression actions.
+- [x] Add a shared production guessing-state slice and explicit mapping to/from the existing Android `GameState`; do not change save serialization.
+- [x] Add differential tests comparing the legacy scalar rule, shared state model and Android `GameEngine` for correct and incorrect guesses with deterministic random inputs.
+- [x] Migrate guess submission to the shared state model while keeping currency/statistics mutation on Android.
+- [ ] Migrate one additional production transition per PR: reward/penalty application; upgrade purchases; Prestige; Ultra; challenge claims; achievements/rewards; remaining progression actions.
 - [ ] Make transitions atomic and duplicate-resistant. Failed validation or persistence must not award currency twice or leave partial state.
 - [ ] Do not replace the existing large-number representation until a separately tested cross-platform numeric migration is justified.
 
