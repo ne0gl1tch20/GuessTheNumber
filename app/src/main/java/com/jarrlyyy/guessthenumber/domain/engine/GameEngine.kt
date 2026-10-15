@@ -29,7 +29,8 @@ class GameEngine(private val rng: Random = Random.Default) {
     }
 
     fun frenzyMultiplier(streak: Int): BigNumber =
-        BigNumber(FrenzyRules.multiplier(streak))
+        if (streak < FrenzyRules.THRESHOLD) BigNumber.ONE
+        else BigNumber(FrenzyRules.multiplier(streak))
 
     fun getInitialRangeMax(difficultyId: String): Long =
         Difficulty.baseRangeMax(difficultyId)
