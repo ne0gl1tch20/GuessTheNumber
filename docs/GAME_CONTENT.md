@@ -46,6 +46,12 @@ Each event includes:
 
 The UI displays the configured reward and requirements. The ViewModel validates the current schedule, feature flags, eligibility and claim count again before applying a reward. LiveOps is bundled content and does not fetch remote event data.
 
+## Save validation and recovery
+
+Save-state changes must preserve existing save serialization, populated and empty save slots, large-number values, export/import compatibility, and recovery from a damaged primary save. Atomic updates validate the existing primary state and the proposed serialized result before committing primary and backup together. A rejected update must not destroy recoverable data. Duplicate challenge claims are guarded by persisted claim IDs and are covered by a save/reload regression test.
+
+The persistence boundary is still under review: a ViewModel state update can currently be published before its asynchronous save completes. Do not describe gameplay-state publication and disk persistence as one atomic transaction until a tested implementation proves that behavior. A test that rejects corrupt input is not a substitute for simulating actual storage I/O failure.
+
 ## Validation and tests
 
 `ContentValidation`, `WorldConfigRepository` and `LiveOpsContentValidator` reject invalid schemas, duplicate/blank IDs, invalid rewards/costs, bad multipliers, missing talent-parent/world-boss references, malformed schedules and invalid eligibility requirements. Loaders then log a warning and use their documented fallback rather than trusting malformed content.
