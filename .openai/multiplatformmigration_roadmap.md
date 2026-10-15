@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PRs #142–#153 are merged. PR #149 tests persisted duplicate-claim prevention across reload; PR #150 tests rejection of an atomic update when the primary save is corrupt without modifying the recovery backup; PR #151 refreshes project documentation; PR #152 adds legacy-save load → save → reload coverage; PR #153 documents the observed save schema and migration behavior. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Current candidate: test global settings and save-slot metadata round trips before designing genuine persistence-failure injection.
+**Current checkpoint:** PRs #142–#156 are merged. The save compatibility and DataStore write-failure test items through PR #156 are complete. Current KMP task: make the shared production guess transition return its complete next `GuessCoreState` (counters, streak, target and range) as one deterministic result, while Android retains RNG generation, `BigNumber` economy math, statistics and persistence. Do not start unrelated save follow-ups while this migration step is in progress.
 
 ## Rules for every PR
 
@@ -45,7 +45,7 @@
 - [x] Extracted shared range/target invariants into `GuessStateRules` and applied them in the shared reducer, with ordered-range, invalid-range and inclusive-boundary tests. Production Android state migration remains separate.
 - [ ] Extract remaining pure progression/economy/upgrade/reset requirement formulas only after checking they are not already shared. Keep authoritative currency math and rounding unchanged.
 - [x] Added a shared deterministic guess-transition contract that accepts explicit critical-roll and next-target inputs, validates the next target, and is used by Android `GameEngine`. Common tests cover threshold behavior, target validation and incorrect guesses without random inputs. Android still owns RNG generation, BigNumber reward/penalty math and full GameState mutation.
-- [ ] Extend the shared production state/transition model and add differential tests against Android behavior before moving any economy or persistence mutation. Platform RNG, clock, storage, notifications, audio and haptics stay behind adapters.
+- [x] Extend the shared production transition to return the complete next `GuessCoreState` (updated counters/streak plus target/range) and add common tests for correct and incorrect guesses. Android delegates target/range state updates to this result; differential parity coverage remains in `GuessCoreStateParityTest`. Platform RNG, clock, storage, notifications, audio and haptics stay behind adapters.
 
 ### Phase 1 audit - Android `GameEngine` inventory (2026-10-15)
 
@@ -62,7 +62,7 @@ Inspected `app/src/main/java/com/jarrlyyy/guessthenumber/domain/engine/GameEngin
 | Currency, statistics and full `GameState` updates | Not migrated as shared production transition | Android `GameEngine` currently commits these updates. Needs an explicit shared state/transition contract plus differential tests before moving mutations. |
 | Save/persistence, clocks, notifications, audio and haptics | Platform adapter | Keep out of common domain rules; migrate only through explicit adapter contracts if needed. |
 
-**Audit conclusion:** deterministic formulas, the guess-transition contract and the guess-economy decision are shared. The production engine maps guessing fields through `GuessCoreState`; Android still owns currency arithmetic, statistics and full `GameState` mutation. Keep those boundaries intact until parity coverage demonstrates the exact legacy behavior.
+**Audit conclusion:** deterministic formulas, the guess-economy decision and the complete next `GuessCoreState` for a submitted guess are shared. Android still owns `BigNumber` currency arithmetic, game statistics and full `GameState` mutation. Keep those boundaries intact until separate parity coverage demonstrates exact legacy behavior.
 
 ### Phase 2 - Shared production state and engine
 
