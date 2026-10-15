@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Fast, conservative Kotlin source preflight before Gradle compilation.
 
-This checker deliberately only reports syntax-like source problems that can be
-reliably detected without Kotlin's compiler/type resolver. It must not try to
-reimplement Kotlin import resolution.
+Checks Android, shared KMP, and desktop Kotlin sources, including test source
+sets, without attempting to reimplement Kotlin import resolution.
 """
 from __future__ import annotations
 
@@ -11,7 +10,11 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "app" / "src" / "main"
+SRC_ROOTS = [
+    ROOT / "app" / "src",
+    ROOT / "shared" / "src",
+    ROOT / "desktopApp" / "src",
+]
 
 
 def check_structure(path: Path, text: str, errors: list[str]) -> None:
@@ -62,7 +65,6 @@ def check_structure(path: Path, text: str, errors: list[str]) -> None:
 
         if in_string:
             if ch == '"' and not escaped:
-                # Kotlin raw strings use triple quotes; handle their closing separately.
                 if text[i:i + 3] == '"""':
                     in_string = False
                     i += 3
@@ -133,11 +135,14 @@ def check_duplicate_imports(path: Path, text: str, errors: list[str]) -> None:
 
 
 def main() -> int:
-    if not SRC.exists():
-        print(f"Kotlin preflight: source directory not found: {SRC}")
+    missing = [path for path in SRC_ROOTS if not path.is_dir()]
+    if missing:
+        print("Kotlin preflight: missing source root(s):")
+        for path in missing:
+            print(f"  - {path.relative_to(ROOT)}")
         return 1
 
-    kotlin_files = sorted(SRC.rglob("*.kt"))
+    kotlin_files = sorted({path for root in SRC_ROOTS for path in root.rglob("*.kt")})
     errors: list[str] = []
 
     for path in kotlin_files:
@@ -150,7 +155,7 @@ def main() -> int:
         check_structure(path, text, errors)
         check_duplicate_imports(path, text, errors)
 
-    print(f"Kotlin preflight: scanned {len(kotlin_files)} file(s).")
+    print(f"Kotlin preflight: scanned {len(kotlin_files)} file(s) across Android, shared KMP, and desktop source sets.")
     if errors:
         print(f"Kotlin preflight: FAILED with {len(errors)} finding(s).")
         for error in errors:
