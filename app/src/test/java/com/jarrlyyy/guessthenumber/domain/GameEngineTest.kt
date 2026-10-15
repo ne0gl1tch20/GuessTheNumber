@@ -193,4 +193,23 @@ class GameEngineTest {
         assertEquals(eligible, updated)
     }
 
+
+    @Test
+    fun hardDifficultyAndTaxMutatorPenaltiesAreAppliedTogetherWithoutChangingMoneyArithmetic() {
+        val state = GameState(
+            difficultyId = Difficulty.HARD,
+            money = BigNumber(100),
+            targetNumber = 50L,
+            currentRangeMax = 100L,
+            activeMutators = setOf("mut_tax")
+        )
+
+        val result = GameEngine(Random(123)).processGuess(state, 20L)
+
+        // Hard applies 2% and mut_tax applies 5%; both rates are based on the
+        // original balance, then the existing BigNumber deductions are applied.
+        assertEquals(0, result.newState.money.compareTo(BigNumber(93)))
+        assertEquals(1L, result.newState.statistics.failedGuesses)
+        assertEquals(1L, result.newState.statistics.totalGuesses)
+    }
 }
