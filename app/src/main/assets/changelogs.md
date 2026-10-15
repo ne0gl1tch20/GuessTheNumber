@@ -1,3 +1,9 @@
+## Unreleased (Windows Stage 2 Economy Parity)
+
+- 💰 **Desktop economy actions**: Windows now exposes the shared production economy through upgrade purchases, Prestige and Ultra resets, Prestige/Ultra upgrades, Nebula shop purchases and talent unlocks. Transactions validate affordability and prerequisites, preserve permanent progress across resets and save before updating the visible state.
+- 🧪 **Economy parity coverage**: Added tests for exact upgrade costs, insufficient funds, maximum levels, Prestige/Ultra reset requirements and preserved state, duplicate shop purchases, talent prerequisites and bundled catalog loading.
+- 📦 **Shared catalog data**: Bundled the existing Android upgrade and shop definitions with the Windows desktop app so the desktop catalog starts from the same game data.
+
 ## v3.0.3 (First-Run Tours & Update Reliability)
 
 - 🧭 **Feature tours after navigation**: Eligible feature screens now render first, then show their own first-visit tour. Opening a feature from More no longer interrupts navigation with a generic popup first. Tour completion is saved per feature.
