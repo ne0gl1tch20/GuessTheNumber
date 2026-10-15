@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PRs #142 and #143 merged after Android and Windows CI passed. This implementation adds a shared guessing-state slice, maps Android `GameState` through it for guess submission, and adds common plus Android parity tests. Currency calculations, statistics, save serialization and platform RNG ownership remain unchanged.
+**Current checkpoint:** PRs #142, #143 and #144 are merged. The shared guessing-state slice now maps Android `GameState` through the common reducer for guess submission, with common and Android parity tests. Currency calculations, statistics, save serialization and platform RNG ownership remain unchanged. The next candidate extracts a deterministic shared economy decision while keeping all `BigNumber` arithmetic and state mutation on Android.
 
 ## Rules for every PR
 
@@ -69,7 +69,7 @@ Inspected `app/src/main/java/com/jarrlyyy/guessthenumber/domain/engine/GameEngin
 - [x] Add a shared production guessing-state slice and explicit mapping to/from the existing Android `GameState`; do not change save serialization.
 - [x] Add differential tests comparing the legacy scalar rule, shared state model and Android `GameEngine` for correct and incorrect guesses with deterministic random inputs.
 - [x] Migrate guess submission to the shared state model while keeping currency/statistics mutation on Android.
-- [ ] Migrate one additional production transition per PR: reward/penalty application; upgrade purchases; Prestige; Ultra; challenge claims; achievements/rewards; remaining progression actions.
+- [ ] Migrate one additional production transition per PR: reward/penalty application; upgrade purchases; Prestige; Ultra; challenge claims; achievements/rewards; remaining progression actions. Current candidate: extract reward multipliers and difficulty/tax penalty rates into a common deterministic decision result, without moving `BigNumber` arithmetic or currency mutation.
 - [ ] Make transitions atomic and duplicate-resistant. Failed validation or persistence must not award currency twice or leave partial state.
 - [ ] Do not replace the existing large-number representation until a separately tested cross-platform numeric migration is justified.
 
