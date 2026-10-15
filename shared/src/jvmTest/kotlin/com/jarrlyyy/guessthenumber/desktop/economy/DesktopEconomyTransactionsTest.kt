@@ -156,8 +156,10 @@ class DesktopEconomyTransactionsTest {
 
         val result = DesktopEconomyTransactions.applyGuessBonuses(before, after, correct = true)
 
-        assertEquals(BigNumber(250), result.money)
-        assertEquals(BigNumber(250), result.statistics.moneyEarned)
+        // BigNumber uses BigDecimal internally, whose equality is scale-sensitive.
+        // Compare numeric value here because percentage bonuses can produce 250.0.
+        assertEquals(0, result.money.compareTo(BigNumber(250)))
+        assertEquals(0, result.statistics.moneyEarned.compareTo(BigNumber(250)))
     }
 
     @Test
