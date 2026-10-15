@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.domain.engine
 
 import com.jarrlyyy.guessthenumber.shared.domain.FrenzyRules
 import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
+import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
@@ -135,17 +136,11 @@ class GameEngine(private val rng: Random = Random.Default) {
         }
     }
 
-    fun calculatePrestigeRequirement(prestigeCount: Long): BigNumber {
-        val base = 50_000_000.0
-        val multiplier = Math.pow(2.5, prestigeCount.toDouble())
-        return BigNumber(base * multiplier)
-    }
+    fun calculatePrestigeRequirement(prestigeCount: Long): BigNumber =
+        BigNumber(ProgressionRequirementRules.prestigeRequirement(prestigeCount))
 
-    fun calculateUltraRequirement(ultraCount: Long): BigNumber {
-        val base = 10_000_000_000.0
-        val multiplier = Math.pow(5.0, ultraCount.toDouble())
-        return BigNumber(base * multiplier)
-    }
+    fun calculateUltraRequirement(ultraCount: Long): BigNumber =
+        BigNumber(ProgressionRequirementRules.ultraRequirement(ultraCount))
 
     fun calculatePrestigeReward(money: BigNumber, prestigeCount: Long): BigNumber {
         val req = calculatePrestigeRequirement(prestigeCount).value.toDouble()
