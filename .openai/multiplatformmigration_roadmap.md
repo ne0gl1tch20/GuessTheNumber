@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PRs #142, #143 and #144 are merged. The shared guessing-state slice now maps Android `GameState` through the common reducer for guess submission, with common and Android parity tests. Currency calculations, statistics, save serialization and platform RNG ownership remain unchanged. The next candidate extracts a deterministic shared economy decision while keeping all `BigNumber` arithmetic and state mutation on Android.
+**Current checkpoint:** PRs #142–#145 are merged. PR #145 introduced `GuessEconomyDecisionRules`, a shared deterministic result for guess reward multipliers and difficulty/tax penalty rates. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Next: add focused Android parity coverage for combined reward/penalty behavior before moving any currency or full-state mutation into common code.
 
 ## Rules for every PR
 
@@ -62,14 +62,15 @@ Inspected `app/src/main/java/com/jarrlyyy/guessthenumber/domain/engine/GameEngin
 | Currency, statistics and full `GameState` updates | Not migrated as shared production transition | Android `GameEngine` currently commits these updates. Needs an explicit shared state/transition contract plus differential tests before moving mutations. |
 | Save/persistence, clocks, notifications, audio and haptics | Platform adapter | Keep out of common domain rules; migrate only through explicit adapter contracts if needed. |
 
-**Audit conclusion:** the easy deterministic formulas and guess-transition decision contract are shared. The production engine now maps its guessing fields through `GuessCoreState`, with parity tests covering correct and incorrect guesses. Keep Android `BigNumber` calculations and persistence authoritative; the next step is to extract the reward/penalty decision into a shared deterministic result before moving any currency mutation.
+**Audit conclusion:** deterministic formulas, the guess-transition contract and the guess-economy decision are shared. The production engine maps guessing fields through `GuessCoreState`; Android still owns currency arithmetic, statistics and full `GameState` mutation. Keep those boundaries intact until parity coverage demonstrates the exact legacy behavior.
 
 ### Phase 2 - Shared production state and engine
 
 - [x] Add a shared production guessing-state slice and explicit mapping to/from the existing Android `GameState`; do not change save serialization.
 - [x] Add differential tests comparing the legacy scalar rule, shared state model and Android `GameEngine` for correct and incorrect guesses with deterministic random inputs.
 - [x] Migrate guess submission to the shared state model while keeping currency/statistics mutation on Android.
-- [ ] Migrate one additional production transition per PR: reward/penalty application; upgrade purchases; Prestige; Ultra; challenge claims; achievements/rewards; remaining progression actions. Current candidate: extract reward multipliers and difficulty/tax penalty rates into a common deterministic decision result, without moving `BigNumber` arithmetic or currency mutation.
+- [x] #145 - Extract reward multipliers and difficulty/tax penalty rates into a common deterministic decision result; keep `BigNumber` arithmetic and currency mutation on Android.
+- [ ] Add focused Android parity tests for combined reward/penalty behavior, then choose the next state transition only after reviewing the existing platform arithmetic and persistence boundaries.
 - [ ] Make transitions atomic and duplicate-resistant. Failed validation or persistence must not award currency twice or leave partial state.
 - [ ] Do not replace the existing large-number representation until a separately tested cross-platform numeric migration is justified.
 
