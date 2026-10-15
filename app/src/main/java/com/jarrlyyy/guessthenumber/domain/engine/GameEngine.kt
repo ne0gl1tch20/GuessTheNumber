@@ -104,7 +104,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             // Keep BigNumber multiplication order on Android to preserve currency behavior.
             val baseReward = BigNumber(economyDecision.baseRewardPerRangeUnit) * BigNumber(economyDecision.rangeUnits)
             val streakMultiplier = BigNumber(economyDecision.streakMultiplier)
-            val frenzyMult = BigNumber(economyDecision.frenzyMultiplier)
+            val frenzyMult = if (state.streak < FrenzyRules.THRESHOLD) BigNumber.ONE else BigNumber(economyDecision.frenzyMultiplier)
             val critMultiplier = BigNumber(economyDecision.criticalMultiplier)
             val upgradeMult = BigNumber(economyDecision.upgradeMultiplier)
             val talentMult = BigNumber(economyDecision.talentMultiplier)
