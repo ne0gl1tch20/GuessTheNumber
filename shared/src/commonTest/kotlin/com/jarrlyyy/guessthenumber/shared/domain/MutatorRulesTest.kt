@@ -39,4 +39,12 @@ class MutatorRulesTest {
     fun unsupportedMutatorsDoNotAffectRewards() {
         assertEquals(1.0, MutatorRules.rewardMultiplier(setOf("unknown")))
     }
+
+    @Test
+    fun rangeMultiplierPreservesHardcoreRangeDoubling() {
+        assertEquals(1L, MutatorRules.rangeMultiplier(emptySet()))
+        assertEquals(2L, MutatorRules.rangeMultiplier(setOf(MutatorRules.HARDCORE)))
+        assertEquals(1L, MutatorRules.rangeMultiplier(setOf(MutatorRules.SPEED, MutatorRules.TAX)))
+        assertEquals(2L, MutatorRules.rangeMultiplier(setOf(MutatorRules.HARDCORE, "unknown")))
+    }
 }
