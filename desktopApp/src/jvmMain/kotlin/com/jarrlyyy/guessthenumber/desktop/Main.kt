@@ -13,6 +13,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -176,121 +177,126 @@ fun main() = application {
                 shellFocusRequester.requestFocus()
             }
 
-            Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp)
-                    .onPreviewKeyEvent { event ->
-                        if (event.type != KeyEventType.KeyDown) {
-                            return@onPreviewKeyEvent false
-                        }
-                        val handled = shell.handleKey(
-                            key = event.key,
-                            ctrlPressed = event.isCtrlPressed
-                        )
-                        if (handled && event.key == Key.Escape) {
-                            shellFocusRequester.requestFocus()
-                        }
-                        handled
-                    }
-                    .focusRequester(shellFocusRequester)
-                    .focusable(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
             ) {
-                DesktopNavigationBar(
-                    currentDestination = shellState.destination,
-                    onNavigate = shell::navigate
-                )
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                        .onPreviewKeyEvent { event ->
+                            if (event.type != KeyEventType.KeyDown) {
+                                return@onPreviewKeyEvent false
+                            }
+                            val handled = shell.handleKey(
+                                key = event.key,
+                                ctrlPressed = event.isCtrlPressed
+                            )
+                            if (handled && event.key == Key.Escape) {
+                                shellFocusRequester.requestFocus()
+                            }
+                            handled
+                        }
+                        .focusRequester(shellFocusRequester)
+                        .focusable(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    DesktopNavigationBar(
+                        currentDestination = shellState.destination,
+                        onNavigate = shell::navigate
+                    )
 
-                if (shellState.message != null) {
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            shellState.message.orEmpty(),
-                            modifier = Modifier.fillMaxWidth().padding(12.dp),
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-
-                when (shellState.destination) {
-                    DesktopDestination.PLAY -> {
+                    if (shellState.message != null) {
                         Card(modifier = Modifier.fillMaxWidth()) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text("Windows Debug updates", style = MaterialTheme.typography.titleMedium)
-                                Text("Installed version: ${WindowsBuildVersion.current}")
-                                Text(
-                                    status,
-                                    color = if (
-                                        classifyDesktopUpdateStatus(
-                                            status = status,
-                                            isBusy = isBusy,
-                                            hasUpdate = availableUpdate != null
-                                        ) == DesktopUpdateStatusKind.ERROR
-                                    ) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.semantics {
-                                        liveRegion = LiveRegionMode.Polite
-                                    }
-                                )
-                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    Button(
-                                        onClick = { scope.launch { refreshUpdates() } },
-                                        enabled = !isBusy
-                                    ) {
-                                        Text("Check again")
-                                    }
-                                    val update = availableUpdate
-                                    if (update != null) {
+                            Text(
+                                shellState.message.orEmpty(),
+                                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+
+                    when (shellState.destination) {
+                        DesktopDestination.PLAY -> {
+                            Card(modifier = Modifier.fillMaxWidth()) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text("Windows Debug updates", style = MaterialTheme.typography.titleMedium)
+                                    Text("Installed version: ${WindowsBuildVersion.current}")
+                                    Text(
+                                        status,
+                                        color = if (
+                                            classifyDesktopUpdateStatus(
+                                                status = status,
+                                                isBusy = isBusy,
+                                                hasUpdate = availableUpdate != null
+                                            ) == DesktopUpdateStatusKind.ERROR
+                                        ) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.semantics {
+                                            liveRegion = LiveRegionMode.Polite
+                                        }
+                                    )
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                         Button(
-                                            onClick = {
-                                                scope.launch {
-                                                    isBusy = true
-                                                    status = "Downloading and verifying version ${update.version}…"
-                                                    try {
-                                                        withContext(Dispatchers.IO) {
-                                                            installer.downloadVerifyAndLaunch(update)
-                                                        }
-                                                        status = "Windows Installer is opening. GuessTheNumber will close for the update."
-                                                        exitApplication()
-                                                    } catch (error: Exception) {
-                                                        status = "Update failed: ${error.message ?: "installer error"}"
-                                                        isBusy = false
-                                                    }
-                                                }
-                                            },
+                                            onClick = { scope.launch { refreshUpdates() } },
                                             enabled = !isBusy
                                         ) {
-                                            Text("Install update")
+                                            Text("Check again")
+                                        }
+                                        val update = availableUpdate
+                                        if (update != null) {
+                                            Button(
+                                                onClick = {
+                                                    scope.launch {
+                                                        isBusy = true
+                                                        status = "Downloading and verifying version ${update.version}…"
+                                                        try {
+                                                            withContext(Dispatchers.IO) {
+                                                                installer.downloadVerifyAndLaunch(update)
+                                                            }
+                                                            status = "Windows Installer is opening. GuessTheNumber will close for the update."
+                                                            exitApplication()
+                                                        } catch (error: Exception) {
+                                                            status = "Update failed: ${error.message ?: "installer error"}"
+                                                            isBusy = false
+                                                        }
+                                                    }
+                                                },
+                                                enabled = !isBusy
+                                            ) {
+                                                Text("Install update")
+                                            }
+                                        }
+                                        if (isBusy) {
+                                            CircularProgressIndicator(modifier = Modifier.semantics { contentDescription = status })
                                         }
                                     }
-                                    if (isBusy) {
-                                        CircularProgressIndicator(modifier = Modifier.semantics { contentDescription = status })
-                                    }
+                                    Text(
+                                        "Debug builds are separate from production releases. Windows may ask for permission to install the MSI.",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
                                 }
-                                Text(
-                                    "Debug builds are separate from production releases. Windows may ask for permission to install the MSI.",
-                                    style = MaterialTheme.typography.bodySmall
-                                )
+                            }
+                            Column(
+                                modifier = Modifier.weight(1f).fillMaxWidth()
+                            ) {
+                                SharedGuessGameScreen()
                             }
                         }
-                        Column(
-                            modifier = Modifier.weight(1f).fillMaxWidth()
-                        ) {
-                            SharedGuessGameScreen()
-                        }
-                    }
 
-                    DesktopDestination.ABOUT -> {
-                        Card(modifier = Modifier.fillMaxWidth()) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth().padding(24.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Text("About Guess The Number", style = MaterialTheme.typography.headlineSmall)
-                                Text("Windows desktop edition")
-                                Text("Designed for offline play. No ads, analytics or accounts.")
-                                Text("This Windows build is under active development. Some Android features are not available on Windows yet.")
-                                Text("Installed version: ${WindowsBuildVersion.current}")
+                        DesktopDestination.ABOUT -> {
+                            Card(modifier = Modifier.fillMaxWidth()) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().padding(24.dp),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Text("About Guess The Number", style = MaterialTheme.typography.headlineSmall)
+                                    Text("Windows desktop edition")
+                                    Text("Designed for offline play. No ads, analytics or accounts.")
+                                    Text("This Windows build is under active development. Some Android features are not available on Windows yet.")
+                                    Text("Installed version: ${WindowsBuildVersion.current}")
+                                }
                             }
                         }
                     }
