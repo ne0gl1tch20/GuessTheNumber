@@ -68,7 +68,7 @@ internal fun parseWindowsThemePreference(
     valueName: String = "AppsUseLightTheme"
 ): Boolean? {
     val pattern = Regex(
-        """(?im)^\\s*${Regex.escape(valueName)}\\s+REG_DWORD\\s+0x([0-9a-f]+)\\s*$"""
+        """(?im)^\s*${Regex.escape(valueName)}\s+REG_DWORD\s+0x([0-9a-f]+)\s*$"""
     )
     val value = pattern.find(output)?.groupValues?.getOrNull(1)?.toIntOrNull(16) ?: return null
     return value == 0
