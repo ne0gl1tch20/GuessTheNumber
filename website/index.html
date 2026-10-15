@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090b17">
-  <meta name="description" content="Explore Guess The Number, an offline-first arcade game, and follow its ongoing Kotlin Multiplatform migration and development progress.">
+  <meta name="description" content="Discover Guess The Number, an offline-first arcade game, and download official project builds.">
   <meta property="og:title" content="Guess The Number — One guess becomes a universe">
   <meta property="og:description" content="Build streaks, stack upgrades, chase cosmic progression, and play your way.">
   <meta property="og:type" content="website">
@@ -32,8 +32,8 @@
 <header class="topbar">
   <nav class="nav wrap" aria-label="Main navigation">
     <a class="brand" href="#home" aria-label="Guess The Number home"><span class="brand-mark">G!</span><span>GUESS THE NUMBER</span></a>
-    <div class="navlinks" id="navlinks"><a href="#features">The game</a><a href="#how-it-plays">The loop</a><a href="#development">Dev status</a><a href="#offline">Privacy</a></div>
-    <a class="pill-link" href="https://github.com/ne0gl1tch20/GuessTheNumber/releases" target="_blank" rel="noreferrer">Explore releases <span aria-hidden="true">↗</span></a>
+    <div class="navlinks" id="navlinks"><a href="#features">The game</a><a href="#how-it-plays">The loop</a><a href="downloads.html">Downloads</a><a href="#offline">Privacy</a></div>
+    <a class="pill-link" href="downloads.html">Downloads <span aria-hidden="true">↗</span></a>
     <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navlinks">☰</button>
   </nav>
 </header>
@@ -45,7 +45,7 @@
       <div class="eyebrow"><span class="live-dot"></span> A tiny guess. A whole universe.</div>
       <h1>Think fast.<br><span class="gradient-text">Level up.</span><br>Go cosmic.</h1>
       <p class="hero-copy">It starts with one number. Then come the streaks, upgrades, wild events, and that one-more-run feeling. Your next big run is waiting.</p>
-      <div class="hero-actions"><a class="button primary" href="https://github.com/ne0gl1tch20/GuessTheNumber/releases" target="_blank" rel="noreferrer">↗ Find a release</a><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber" target="_blank" rel="noreferrer">⌘ Explore the source</a></div>
+      <div class="hero-actions"><a class="button primary" href="downloads.html">↓ Download the game</a><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber" target="_blank" rel="noreferrer">⌘ Explore the source</a></div>
       <div class="micro-proof"><span>✦ Offline-first gameplay</span><span>✦ Upgrades & prestige</span><span>✦ Made for curious minds</span></div>
     </div>
     <div class="hero-art" aria-label="Animated illustration of the game interface">
@@ -84,44 +84,6 @@
       </div>
     </div>
   </section>
-  <section id="development" class="wrap">
-    <div class="section-head reveal">
-      <div class="kicker">Behind the build</div>
-      <h2>Building the next<br><span class="gradient-text">version, step by step.</span></h2>
-      <p>The game is actively being moved toward Kotlin Multiplatform. This is a progress snapshot, not a claim that the migration is finished.</p>
-    </div>
-    <div class="migration-panel reveal">
-      <div class="migration-top">
-        <span class="status-pill"><span class="live-dot"></span> Phase 4 · Controlled UI migration</span>
-        <small>Updated October 15, 2026</small>
-      </div>
-      <h3>Shared UI is reaching the production game.</h3>
-      <p class="migration-intro">The migration is connecting shared Kotlin game state and presentation components to the existing Android experience in small, testable steps. Android-specific services and production game rules remain with the Android host while this work continues.</p>
-      <div class="migration-grid">
-        <article class="migration-item">
-          <span class="item-state">✓ Integrated</span>
-          <h4>Shared game contracts</h4>
-          <p>Platform-neutral navigation/action contracts and controlled guessing content are in place, with an adapter from Android game state to shared presentation state.</p>
-        </article>
-        <article class="migration-item">
-          <span class="item-state">✓ Integrated</span>
-          <h4>Production Play UI</h4>
-          <p>The production screen now uses the shared numeric input and status-driven feedback card while keeping localized messages and Android-owned icon assets.</p>
-        </article>
-        <article class="migration-item pending">
-          <span class="item-state">↻ In progress</span>
-          <h4>Parity and regression checks</h4>
-          <p>Runtime verification of input behavior, localization, feedback, rate limits, rewards and save compatibility remains before calling this migration complete.</p>
-        </article>
-      </div>
-      <div class="migration-links">
-        <a class="button primary" href="https://github.com/ne0gl1tch20/GuessTheNumber/blob/master/.openai/multiplatformmigration_roadmap.md" target="_blank" rel="noreferrer">Read migration roadmap ↗</a>
-        <a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber/pull/169" target="_blank" rel="noreferrer">See latest shared UI change ↗</a>
-        <a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber/actions" target="_blank" rel="noreferrer">Check CI runs ↗</a>
-      </div>
-      <p class="migration-note">Latest shared feedback-card change passed Android validation/tests and Windows Desktop CI. Passing CI confirms the automated checks, not complete manual gameplay parity.</p>
-    </div>
-  </section>
   <section id="offline" class="wrap">
     <div class="privacy">
       <div class="privacy-copy reveal"><div class="kicker">Your game. Your device.</div><h2>Play first.<br><span class="gradient-text">Stay in control.</span></h2><p>Guess The Number is designed around offline-first play. The core game doesn't need an account or an online match to be a game you can enjoy.</p><p>Check the repository and the permissions of the specific release you choose if you want to inspect how a build behaves.</p></div>
@@ -131,10 +93,10 @@
     </div>
   </section>
   <section class="wrap">
-    <div class="cta reveal"><div class="eyebrow"><span class="live-dot"></span> Your next run starts here</div><h2>Ready to go<br><span class="gradient-text">one level further?</span></h2><p>Explore the project, read the release notes, and find the build that fits your device. The next streak is yours to chase.</p><div class="cta-actions"><a class="button primary" href="https://github.com/ne0gl1tch20/GuessTheNumber/releases" target="_blank" rel="noreferrer">Browse releases ↗</a><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber" target="_blank" rel="noreferrer">View source code</a></div></div>
+    <div class="cta reveal"><div class="eyebrow"><span class="live-dot"></span> Your next run starts here</div><h2>Ready to go<br><span class="gradient-text">one level further?</span></h2><p>Explore the project, read the release notes, and find the build that fits your device. The next streak is yours to chase.</p><div class="cta-actions"><a class="button primary" href="downloads.html">Get the game ↗</a><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber" target="_blank" rel="noreferrer">View source code</a></div></div>
   </section>
 </main>
-<footer class="footer"><div class="footer-inner wrap"><a class="brand" href="#home"><span class="brand-mark">G!</span><span>GUESS THE NUMBER</span></a><span>Made for the joy of one more run. © <span id="year"></span></span><div class="footer-links"><a href="https://github.com/ne0gl1tch20/GuessTheNumber">GitHub</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber/releases">Releases</a><a href="#offline">Install help</a></div></div></footer>
+<footer class="footer"><div class="footer-inner wrap"><a class="brand" href="#home"><span class="brand-mark">G!</span><span>GUESS THE NUMBER</span></a><span>Made for the joy of one more run. © <span id="year"></span></span><div class="footer-links"><a href="https://github.com/ne0gl1tch20/GuessTheNumber">GitHub</a><a href="downloads.html">Downloads</a><a href="#offline">Install help</a></div></div></footer>
 <script>
   // Feature flag: set to false to hide the development notice.
   const SHOW_DEVELOPMENT_BANNER = true;
