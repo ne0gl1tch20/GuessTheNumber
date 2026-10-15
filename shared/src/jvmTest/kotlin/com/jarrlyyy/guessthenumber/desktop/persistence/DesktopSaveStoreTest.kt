@@ -90,7 +90,7 @@ class DesktopSaveStoreTest {
                 if (target.fileName.toString() == "slot-1.json") {
                     throw IllegalStateException("injected primary write failure")
                 }
-                super.moveReplace(source, target)
+                DefaultDesktopSaveFileOps.moveReplace(source, target)
             }
         }
         val failingStore = DesktopSaveStore(directory, failingOps)
