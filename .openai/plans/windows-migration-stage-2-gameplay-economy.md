@@ -67,8 +67,11 @@ Keep each PR cohesive and allow multiple related commits per PR. Do not make tin
 
 ## Guardrails
 
+- **Maintain Android while adding Windows.** Every shared-code, gameplay, economy, save, localization, icon or Gradle change must account for Android compatibility in the same PR; Windows parity must never come at the cost of Android regressions.
 - Android remains the behavior reference unless a platform-specific difference is explicitly approved.
 - Preserve offline-first behavior; do not add ads, analytics, accounts or network dependencies.
+- Run/check the relevant Android and Windows validation for changes that affect shared code or build wiring. Keep the Android changelog current for actual player-facing changes.
+- Use root GTN_APP_LOGO.png as the source artwork for both Android mobile launcher icons and Windows app/installer icons; verify packaged output on both platforms before claiming completion.
 - Preserve existing saves and MSI/update-channel identity.
 - Keep platform services in host adapters; shared production rules stay deterministic and UI-neutral.
 - Keep debug tools debug-only.

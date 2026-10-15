@@ -2,7 +2,7 @@
 
 This directory stores internal AI-assisted development context, planning documents and generated task artifacts for GuessTheNumber.
 
-- [Project memory](MEMORY.md): current architecture, decisions, known issues and continuation context.
+- [Project memory](MEMORY.md): current architecture, decisions, known issues and continuation context, including the standing rule to maintain Android while adding Windows support.
 - [Project goals and working rules](promptgoal.md): instructions for future development work.
 - [Global localization implementation plan](GLOBAL_LOCALIZATION_IMPLEMENTATION_PLAN.md).
 - [Current implementation plan](implementation_plan.artifact.md).
