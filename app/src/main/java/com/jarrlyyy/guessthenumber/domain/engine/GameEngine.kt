@@ -90,8 +90,6 @@ class GameEngine(private val rng: Random = Random.Default) {
                 nextRangeMax = newMax
             )
             val isCrit = decision.isCritical
-            val nextTarget = decision.nextTarget
-                ?: error("Correct guess transition must provide a next target")
             val rewardMultiplierLevel = state.upgradeLevels["reward_multiplier"] ?: 0
             val hasTalentReward = state.shopPurchases.contains("talent_reward_1") || state.upgradeLevels.containsKey("talent_reward_1")
             val economyDecision = GuessEconomyDecisionRules.resolve(
