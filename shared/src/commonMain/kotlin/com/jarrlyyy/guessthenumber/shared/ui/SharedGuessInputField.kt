@@ -7,6 +7,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -33,21 +34,25 @@ fun SharedGuessInputField(
     label: String = "Your guess",
     enabled: Boolean = true,
     singleLine: Boolean = true,
-    keyboardType: KeyboardType = KeyboardType.Number
+    keyboardType: KeyboardType = KeyboardType.Number,
+    imeAction: ImeAction = ImeAction.Default,
+    shape: Shape = MaterialTheme.shapes.small,
+    submitOnEnter: Boolean = false
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text("$label ($minNumber–$maxNumber)") },
+        shape = shape,
         singleLine = singleLine,
         enabled = enabled,
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
-            imeAction = ImeAction.Done
+            imeAction = imeAction
         ),
         keyboardActions = KeyboardActions(onDone = { onSubmit() }),
         modifier = modifier.onKeyEvent { event ->
-            if (event.key == Key.Enter && event.type == KeyEventType.KeyUp) {
+            if (submitOnEnter && event.key == Key.Enter && event.type == KeyEventType.KeyUp) {
                 onSubmit()
                 true
             } else {
