@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -21,21 +23,28 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
+import com.jarrlyyy.guessthenumber.desktop.economy.EconomyTransaction
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveStore
 import com.jarrlyyy.guessthenumber.desktop.persistence.defaultDesktopSaveDirectory
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
+import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
-/** Windows presentation backed by the production engine and desktop save adapter. */
+/** Windows presentation backed by the production engine, economy rules and desktop save adapter. */
 @Composable
 fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
     val engine = remember { GameEngine() }
     val saveStore = remember { DesktopSaveStore(defaultDesktopSaveDirectory()) }
+    val catalogResult = remember { runCatching { DesktopEconomyCatalog.load() } }
+    val catalog = catalogResult.getOrNull()
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<GameState?>(null) }
     var guessText by remember { mutableStateOf("") }
@@ -63,6 +72,28 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    fun commitTransaction(transform: (GameState) -> EconomyTransaction) {
+        val before = state ?: return
+        if (isSaving) return
+        isSaving = true
+        scope.launch {
+            val transaction = transform(before)
+            if (!transaction.accepted) {
+                feedback = transaction.message
+                isSaving = false
+                return@launch
+            }
+            val saved = withContext(Dispatchers.IO) { saveStore.save(1, transaction.state) }
+            if (saved) {
+                state = transaction.state
+                feedback = transaction.message
+            } else {
+                feedback = "Could not save that change. Your previous saved state is still intact."
+            }
+            isSaving = false
+        }
+    }
+
     val currentState = state
     Card(modifier = modifier.fillMaxSize()) {
         if (currentState == null) {
@@ -77,24 +108,21 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
         }
 
         Column(
-            modifier = Modifier.fillMaxWidth().padding(24.dp),
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text("Guess The Number", style = MaterialTheme.typography.headlineMedium)
             Text("Find the hidden number between ${currentState.currentRangeMin} and ${currentState.currentRangeMax}.")
             Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Money", style = MaterialTheme.typography.labelMedium)
-                    Text(currentState.money.toString(), style = MaterialTheme.typography.titleLarge)
-                }
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Attempts", style = MaterialTheme.typography.labelMedium)
-                    Text(currentState.attempts.toString(), style = MaterialTheme.typography.titleLarge)
-                }
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Streak", style = MaterialTheme.typography.labelMedium)
-                    Text(currentState.streak.toString(), style = MaterialTheme.typography.titleLarge)
-                }
+                CurrencySummary("Money", currentState.money.toString())
+                CurrencySummary("Prestige", currentState.prestige.toString())
+                CurrencySummary("Ultra", currentState.ultra.toString())
+                CurrencySummary("Nebula", currentState.nebula.toString())
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                CurrencySummary("Attempts", currentState.attempts.toString())
+                CurrencySummary("Correct", currentState.correctGuesses.toString())
+                CurrencySummary("Streak", currentState.streak.toString())
             }
             OutlinedTextField(
                 value = guessText,
@@ -111,13 +139,11 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                         feedback = "Enter a whole number first."
                     } else if (guess !in currentState.currentRangeMin..currentState.currentRangeMax) {
                         feedback = "Choose a number within the displayed range."
-                    } else {
+                    } else if (!isSaving) {
+                        isSaving = true
                         val result = engine.processGuess(currentState, guess)
                         scope.launch {
-                            isSaving = true
-                            val saved = withContext(Dispatchers.IO) {
-                                saveStore.save(1, result.newState)
-                            }
+                            val saved = withContext(Dispatchers.IO) { saveStore.save(1, result.newState) }
                             if (saved) {
                                 state = result.newState
                                 feedback = when (result.feedback) {
@@ -138,11 +164,151 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
             }
             Text(feedback, style = MaterialTheme.typography.bodyLarge)
+
+            SectionTitle("Money upgrades")
+            if (catalog == null) {
+                Text("Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}")
+            } else {
+                catalog.upgrades.forEach { upgrade ->
+                    val level = currentState.upgradeLevels[upgrade.id] ?: 0
+                    val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+                    EconomyActionCard(
+                        title = upgrade.name,
+                        description = upgrade.description,
+                        detail = "Level $level / ${upgrade.maxLevel} · Cost: $cost Money",
+                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy",
+                        enabled = !isSaving && level < upgrade.maxLevel && currentState.money >= cost
+                    ) {
+                        commitTransaction { DesktopEconomyTransactions.buyUpgrade(it, upgrade) }
+                    }
+                }
+
+                SectionTitle("Prestige")
+                val prestigeRequirement = engine.calculatePrestigeRequirement(currentState.prestigeCount)
+                val prestigeReward = engine.calculatePrestigeReward(currentState.money, currentState.prestigeCount)
+                Text("Requirement: $prestigeRequirement Money · Estimated reward: $prestigeReward Prestige")
+                Button(
+                    onClick = { commitTransaction { DesktopEconomyTransactions.prestigeReset(it, engine) } },
+                    enabled = !isSaving && currentState.money >= prestigeRequirement && prestigeReward > BigNumber.ZERO
+                ) { Text("Prestige reset") }
+
+                catalog.prestigeUpgrades.forEach { upgrade ->
+                    val level = currentState.prestigeUpgradeLevels[upgrade.id] ?: 0
+                    val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+                    EconomyActionCard(
+                        title = upgrade.name,
+                        description = upgrade.description,
+                        detail = "Level $level / ${upgrade.maxLevel} · Cost: $cost Prestige",
+                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy",
+                        enabled = !isSaving && level < upgrade.maxLevel && currentState.prestige >= cost
+                    ) {
+                        commitTransaction { DesktopEconomyTransactions.buyPrestigeUpgrade(it, upgrade) }
+                    }
+                }
+
+                SectionTitle("Ultra")
+                val ultraRequirement = engine.calculateUltraRequirement(currentState.ultraCount)
+                val ultraReward = engine.calculateUltraReward(currentState.money, currentState.ultraCount)
+                Text("Requirement: $ultraRequirement Money and 1,000 Prestige · Estimated reward: $ultraReward Ultra")
+                Button(
+                    onClick = { commitTransaction { DesktopEconomyTransactions.ultraReset(it, engine) } },
+                    enabled = !isSaving && currentState.money >= ultraRequirement &&
+                        currentState.prestige >= BigNumber(1_000) && ultraReward > BigNumber.ZERO
+                ) { Text("Ultra reset") }
+
+                catalog.ultraUpgrades.forEach { upgrade ->
+                    val level = currentState.ultraUpgradeLevels[upgrade.id] ?: 0
+                    val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+                    EconomyActionCard(
+                        title = upgrade.name,
+                        description = upgrade.description,
+                        detail = "Level $level / ${upgrade.maxLevel} · Cost: $cost Ultra",
+                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy",
+                        enabled = !isSaving && level < upgrade.maxLevel && currentState.ultra >= cost
+                    ) {
+                        commitTransaction { DesktopEconomyTransactions.buyUltraUpgrade(it, upgrade) }
+                    }
+                }
+
+                SectionTitle("Nebula shop")
+                catalog.shopItems.forEach { item ->
+                    val purchased = item.id in currentState.shopPurchases
+                    EconomyActionCard(
+                        title = item.name,
+                        description = item.description,
+                        detail = "Cost: ${item.nebulaCost} Nebula",
+                        action = if (purchased) "Owned" else "Buy",
+                        enabled = !isSaving && !purchased && currentState.nebula >= BigNumber(item.nebulaCost)
+                    ) {
+                        commitTransaction { DesktopEconomyTransactions.buyShopItem(it, item) }
+                    }
+                }
+
+                SectionTitle("Talents")
+                val talents = listOf(
+                    Triple("talent_speed_1", "Quick Hands", 10L),
+                    Triple("talent_crit_1", "Critical Focus", 25L),
+                    Triple("talent_crit_2", "Critical Mastery", 50L),
+                    Triple("talent_reward_1", "Reward Resonance", 100L),
+                    Triple("talent_speed_2", "Rapid Hands", 75L),
+                    Triple("talent_master_1", "Mastery", 250L)
+                )
+                talents.forEach { (id, name, cost) ->
+                    val owned = id in currentState.prestigeShopPurchases
+                    EconomyActionCard(
+                        title = name,
+                        description = id.replace('_', ' '),
+                        detail = if (owned) "Unlocked" else "Cost: $cost Prestige",
+                        action = if (owned) "Owned" else "Unlock",
+                        enabled = !isSaving && !owned && currentState.prestige >= BigNumber(cost)
+                    ) {
+                        commitTransaction { DesktopEconomyTransactions.buyTalent(it, id, cost) }
+                    }
+                }
+            }
+
             Text(
-                "Your Windows run is saved locally after each accepted guess. A backup is kept for recovery if the primary save is damaged.",
+                "Your Windows run is saved locally after each accepted guess or economy transaction. A backup is kept for recovery if the primary save is damaged.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+}
+
+@Composable
+private fun CurrencySummary(label: String, value: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(label, style = MaterialTheme.typography.labelMedium)
+        Text(value, style = MaterialTheme.typography.titleLarge)
+    }
+}
+
+@Composable
+private fun SectionTitle(title: String) {
+    Text(title, style = MaterialTheme.typography.headlineSmall)
+}
+
+@Composable
+private fun EconomyActionCard(
+    title: String,
+    description: String,
+    detail: String,
+    action: String,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                Text(description, style = MaterialTheme.typography.bodyMedium)
+                Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Button(onClick = onClick, enabled = enabled) { Text(action) }
         }
     }
 }
