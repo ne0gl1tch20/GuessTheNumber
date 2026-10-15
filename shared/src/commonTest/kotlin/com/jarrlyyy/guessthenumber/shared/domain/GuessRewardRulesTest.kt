@@ -5,6 +5,12 @@ import kotlin.test.assertEquals
 
 class GuessRewardRulesTest {
     @Test
+    fun preservesBaseAndMinimumGuessRewardConstants() {
+        assertEquals(100L, GuessRewardRules.BASE_REWARD_PER_RANGE_UNIT)
+        assertEquals(10L, GuessRewardRules.MINIMUM_GUESS_REWARD)
+    }
+
+    @Test
     fun preservesStreakMultiplierScaling() {
         assertEquals(1.0, GuessRewardRules.streakMultiplier(0), 1e-9)
         assertEquals(1.5, GuessRewardRules.streakMultiplier(5), 1e-9)

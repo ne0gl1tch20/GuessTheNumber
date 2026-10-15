@@ -72,7 +72,7 @@ class GameEngine(private val rng: Random = Random.Default) {
         if (feedback == GuessFeedback.CORRECT) {
             val critChance = CriticalChanceRules.chance(state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0)
             val isCrit = rng.nextDouble() < critChance
-            val baseReward = BigNumber(100) * BigNumber(state.currentRangeMax)
+            val baseReward = BigNumber(GuessRewardRules.BASE_REWARD_PER_RANGE_UNIT) * BigNumber(state.currentRangeMax)
             val streakMultiplier = BigNumber(GuessRewardRules.streakMultiplier(state.streak))
             val frenzyMult = frenzyMultiplier(state.streak)
             val critMultiplier = BigNumber(GuessRewardRules.criticalMultiplier(isCrit))
@@ -83,7 +83,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             val mutatorMult = mutatorRewardMultiplier(state)
             val difficultyMultiplier = BigNumber(Difficulty.rewardMultiplier(state.difficultyId))
             val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier
-            val totalReward = maxOf(BigNumber(10), calculatedReward)
+            val totalReward = maxOf(BigNumber(GuessRewardRules.MINIMUM_GUESS_REWARD), calculatedReward)
             val newMoney = state.money + totalReward
             val newStreak = transition.streak
             val bestStreak = transition.bestStreak
