@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.domain.engine
 
+import com.jarrlyyy.guessthenumber.shared.domain.FrenzyRules
 import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
@@ -22,20 +23,14 @@ data class GuessResult(
 class GameEngine(private val rng: Random = Random.Default) {
 
     companion object {
-        const val FRENZY_THRESHOLD = 5
-        const val FRENZY_BONUS_PER_TIER = 0.25
-        const val FRENZY_MAX_MULTIPLIER = 5.0
+        const val FRENZY_THRESHOLD = FrenzyRules.THRESHOLD
+        const val FRENZY_BONUS_PER_TIER = FrenzyRules.BONUS_PER_TIER
+        const val FRENZY_MAX_MULTIPLIER = FrenzyRules.MAX_MULTIPLIER
     }
 
-    fun frenzyMultiplier(streak: Int): BigNumber {
-        if (streak < FRENZY_THRESHOLD) return BigNumber.ONE
-        val tiers = streak / FRENZY_THRESHOLD
-        val multiplier = minOf(
-            FRENZY_MAX_MULTIPLIER,
-            1.0 + (tiers * FRENZY_BONUS_PER_TIER)
-        )
-        return BigNumber(multiplier)
-    }
+    fun frenzyMultiplier(streak: Int): BigNumber =
+        if (streak < FrenzyRules.THRESHOLD) BigNumber.ONE
+        else BigNumber(FrenzyRules.multiplier(streak))
 
     fun getInitialRangeMax(difficultyId: String): Long =
         Difficulty.baseRangeMax(difficultyId)
