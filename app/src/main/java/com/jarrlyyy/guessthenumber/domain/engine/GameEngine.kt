@@ -2,8 +2,7 @@ package com.jarrlyyy.guessthenumber.domain.engine
 
 import com.jarrlyyy.guessthenumber.shared.domain.FrenzyRules
 import com.jarrlyyy.guessthenumber.shared.domain.CriticalChanceRules
-import com.jarrlyyy.guessthenumber.shared.domain.GuessRewardRules
-import com.jarrlyyy.guessthenumber.shared.domain.GuessPenaltyRules
+import com.jarrlyyy.guessthenumber.shared.domain.GuessEconomyRules
 import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
