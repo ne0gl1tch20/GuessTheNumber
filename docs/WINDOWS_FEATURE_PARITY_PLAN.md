@@ -10,6 +10,38 @@ Bring Windows to the agreed player-facing feature set in deliberate, testable sl
 
 This replaces the Windows-related phases buried in the temporary KMP migration roadmap.
 
+## Locked five-stage execution order
+
+**Execution order is locked: complete stages 1 through 5 sequentially.** The W0–W8 sections below are detailed work packages mapped into these five stages, not competing roadmaps. Do not skip ahead to later-stage feature work unless an earlier-stage blocker is documented and the dependency is genuinely independent.
+
+1. **Stage 1 — Desktop readiness and parity inventory** *(W0)*  
+   Audit Android features against Windows, update the parity matrix with source evidence, and establish reliable Windows navigation, lifecycle, input/focus, resizing, scaling, theme and localization loading.  
+   **Gate:** desktop shell and inventory are ready to host full features.
+
+2. **Stage 2 — Complete core gameplay and economy** *(W1–W2)*  
+   Finish guessing/input/feedback, rewards, attempts, streaks, mutators, upgrades/shop, persistence, Prestige, Ultra, Nebula and talent/economy/reset behavior.  
+   **Gate:** core play and economy work end-to-end with consistent state, rewards and save/reload behavior.
+
+3. **Stage 3 — Full progression and activities** *(W3–W4)*  
+   Add achievements, challenges, statistics, world map, bosses, relics, mastery, Home Base, Codex, Endless Rift, arcade/minigames, events and supported Lua activities.  
+   **Gate:** supported progression and activities work offline and preserve Kotlin-owned validation and reward/state boundaries.
+
+4. **Stage 4 — Player utilities and developer tooling** *(W5–W6)*  
+   Complete settings, accessibility, locale/theme, save slots, backup/import/export/recovery, tutorials, player-facing errors, supported music controls and debug-only developer tools.  
+   **Gate:** players can configure and recover their game; developer tools stay out of production.
+
+5. **Stage 5 — Release hardening and final parity verification** *(W7–W8)*  
+   Verify debug/release update-channel separation, MSI clean install and upgrade/recovery behavior, save compatibility, Windows CI, focused shared tests, runtime regression and every row of the final parity matrix.  
+   **Gate:** every agreed feature is marked verified with evidence, intentionally platform-specific, not included by agreement, or blocked. Do not declare parity complete while required rows remain unverified or release blockers remain.
+
+### Sequencing rules
+
+- Finish and record each stage's exit gate before treating the next stage as active.
+- Each implementation slice should be a focused PR with relevant tests and parity-matrix updates; merge only when its required checks and review are acceptable.
+- Do not create more migration-only UI extraction work. Reopen KMP foundation work only for a demonstrated defect or a specific cross-platform feature requirement.
+- Do not claim runtime verification from a successful build alone. Keep unrun checks marked unverified.
+- Preserve offline play and existing save/MSI/update-channel compatibility; do not add ads, analytics or accounts.
+
 ## Scope rules
 
 - Android is the behavior reference unless a platform-specific difference is approved.
