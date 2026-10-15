@@ -7,7 +7,8 @@ This directory stores internal AI-assisted development context, planning documen
 - [Global localization implementation plan](GLOBAL_LOCALIZATION_IMPLEMENTATION_PLAN.md).
 - [Current implementation plan](implementation_plan.artifact.md).
 - [Current task checklist](task.artifact.md).
+- [Windows migration Stage 2 plan](plans/windows-migration-stage-2-gameplay-economy.md): core gameplay, economy, persistence and parity gates.
 - [Historical generated artifacts](artifacts/): task plans, walkthroughs and related notes.
 - [Roadmaps and technical plans](docs/): roadmaps and planning/design documents moved from the public-facing docs directory.
 
-Keep user-facing documentation such as the root README, release changelog and gameplay/content documentation in their existing locations. Never store secrets, API keys, passwords, tokens or credentials here.
+Keep user-facing documentation such as the root README, release changelog and gameplay/content documentation in their existing locations. Never store secrets, API keys, passwords, tokens or credentials.
