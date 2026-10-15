@@ -53,7 +53,8 @@ fun MoreScreen(
     val locale = LocalAppLocaleManager.current
     val context = LocalContext.current
     val featureFlags = remember { FeatureFlagRepository(context).load() }
-    val defaultOrder = com.jarrlyyy.guessthenumber.domain.model.DEFAULT_MORE_SCREEN_ORDER
+    val defaultOrder = com.jarrlyyy.guessthenumber.domain.model.DEFAULT_MORE_SCREEN_ORDER +
+        (if (BuildConfig.DEBUG) listOf("dev_settings", "lua_testing_hub") else emptyList())
     val normalizedOrder = remember(state.settings.moreScreenOrder) {
         (state.settings.moreScreenOrder + defaultOrder).distinct()
             .filter { it in defaultOrder }
