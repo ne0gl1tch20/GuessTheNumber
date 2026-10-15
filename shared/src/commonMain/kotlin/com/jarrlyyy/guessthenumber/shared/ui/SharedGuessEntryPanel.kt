@@ -51,6 +51,7 @@ fun SharedGuessEntryPanel(
             maxNumber = maxNumber,
             label = guessLabel,
             enabled = !solved,
+            submitOnEnter = true,
             modifier = Modifier.fillMaxWidth()
         )
         Row(
