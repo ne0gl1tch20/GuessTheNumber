@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PRs #142–#152 are merged. PR #149 tests persisted duplicate-claim prevention across reload; PR #150 tests rejection of an atomic update when the primary save is corrupt without modifying the recovery backup; PR #151 refreshes project documentation; PR #152 adds legacy-save load → save → reload coverage. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Current candidate: document the observed save schema and migration behavior before designing genuine persistence-failure injection.
+**Current checkpoint:** PRs #142–#153 are merged. PR #149 tests persisted duplicate-claim prevention across reload; PR #150 tests rejection of an atomic update when the primary save is corrupt without modifying the recovery backup; PR #151 refreshes project documentation; PR #152 adds legacy-save load → save → reload coverage; PR #153 documents the observed save schema and migration behavior. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Current candidate: test global settings and save-slot metadata round trips before designing genuine persistence-failure injection.
 
 ## Rules for every PR
 
@@ -92,7 +92,8 @@ Inspected `GameEngine.claimChallenge`, `GameViewModel.claimChallenge`, `SaveMana
 
 - [x] #153 documents the actual save schema, defaults, storage keys, validation, recovery and current migration behavior before changing models.
 - [x] #152 adds an inline legacy-save fixture and load → save → reload test for omitted newer fields, unknown-field tolerance, large balances and progression preservation.
-- [ ] Cover large currency values, omitted legacy fields, upgrades, reset counts, mutators, challenges, statistics, world progression, settings and save-slot metadata.
+- [x] PR #152 covers large currency values, omitted legacy fields, upgrades, reset counts, mutators, challenges, statistics and world progression.
+- [ ] Cover settings and save-slot metadata round trips; current candidate adds focused global-settings JSON and slot primary/backup metadata tests.
 - [ ] Keep Android storage adapters, encrypted backup/import, 10 save slots, atomic transactions, checksum/integrity checks, last-valid backup recovery and corruption handling intact.
 - [ ] Introduce common serialization only after verifying compatible dependencies and behavior for all intended targets.
 
@@ -103,6 +104,10 @@ Inspected `GameEngine.claimChallenge`, `GameViewModel.claimChallenge`, `SaveMana
 - `validateSave` checks key balances/counters/range invariants, not every field or cross-field relationship. `sanitizeLoadedState` repairs core fields only. Any hardening must be additive and fixture-tested.
 - Backup/export currently uses XOR plus Base64 obfuscation and a plain-Base64 fallback; do not describe it as modern cryptographic protection or change its format in a compatibility-only task.
 - Remaining gaps: settings and slot-metadata round trips, genuine DataStore I/O failure injection, and ViewModel consistency when a save fails after an in-memory reward claim. The next step is to design a narrow test seam and test failure outcomes before changing production transaction behavior.
+
+### Phase 3 follow-up - Settings and slot metadata compatibility
+
+PR #154 adds regression tests for global settings JSON round trips across manager instances and for slot metadata after a second save creates a recovery backup. The tests assert current slot values, large balances, profile/difficulty fields, attempts/correct guesses, save timestamp and empty-slot behavior. The next unresolved persistence task remains genuine DataStore I/O failure injection and consistent ViewModel state on failed writes.
 
 ### Phase 4 - Full shared UI, navigation and player feature parity
 
