@@ -9,6 +9,7 @@ import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRewardRules
+import com.jarrlyyy.guessthenumber.shared.domain.DifficultyRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
@@ -57,7 +58,6 @@ class GameEngine(private val rng: Random = Random.Default) {
         state.copy(activeMutators = validateMutators(mutators))
 
     fun processGuess(state: GameState, guess: Long): GuessResult {
-        // Validate target range bounds
         val transition = GuessStateRules.applyGuess(
             targetNumber = state.targetNumber,
             guess = guess,
@@ -77,15 +77,10 @@ class GameEngine(private val rng: Random = Random.Default) {
             val streakMultiplier = BigNumber(GuessRewardRules.streakMultiplier(state.streak))
             val frenzyMult = frenzyMultiplier(state.streak)
             val critMultiplier = BigNumber(GuessRewardRules.criticalMultiplier(isCrit))
-
-            // Multipliers from upgrades
             val rewardMultiplierLevel = state.upgradeLevels["reward_multiplier"] ?: 0
             val upgradeMult = BigNumber(GuessRewardRules.upgradeMultiplier(rewardMultiplierLevel))
-
-            // Talents & Mutators multiplier integration
             val talentMult = if (state.shopPurchases.contains("talent_reward_1") || state.upgradeLevels.containsKey("talent_reward_1")) BigNumber(1.5) else BigNumber.ONE
             val mutatorMult = mutatorRewardMultiplier(state)
-
             val difficultyMultiplier = BigNumber(Difficulty.rewardMultiplier(state.difficultyId))
             val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier
             val totalReward = maxOf(BigNumber(10), calculatedReward)
@@ -93,18 +88,14 @@ class GameEngine(private val rng: Random = Random.Default) {
             val newStreak = transition.streak
             val bestStreak = transition.bestStreak
 
-            // Generate new target number
             val newMin = 1L
-            val betterRangeLevel = state.upgradeLevels["better_range"] ?: 0
             val newMax = getRangeMax(state)
             val newTarget = rng.nextLong(newMin, newMax + 1)
-
             val newStats = state.statistics.copy(
                 totalGuesses = state.statistics.totalGuesses + 1,
                 correctGuesses = state.statistics.correctGuesses + 1,
                 moneyEarned = state.statistics.moneyEarned + totalReward
             )
-
             val updatedState = state.copy(
                 money = newMoney,
                 currentRangeMin = newMin,
@@ -116,7 +107,6 @@ class GameEngine(private val rng: Random = Random.Default) {
                 bestStreak = bestStreak,
                 statistics = newStats
             )
-
             return GuessResult(feedback, totalReward, isCrit, newStreak, updatedState)
         } else {
             val newAttempts = transition.attempts
@@ -124,7 +114,6 @@ class GameEngine(private val rng: Random = Random.Default) {
             val taxPenaltyRate = GuessPenaltyRules.taxPenaltyRate(state.activeMutators)
             val taxPenalty = if (taxPenaltyRate > 0.0) state.money * BigNumber(taxPenaltyRate) else BigNumber.ZERO
             val newMoney = maxOf(BigNumber.ZERO, state.money - difficultyPenalty - taxPenalty)
-
             val newStats = state.statistics.copy(
                 totalGuesses = state.statistics.totalGuesses + 1,
                 failedGuesses = state.statistics.failedGuesses + 1
@@ -167,9 +156,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             state.copy(
                 completedChallenges = state.completedChallenges + challengeId,
                 nebula = state.nebula + BigNumber(rewardNebula),
-                statistics = state.statistics.copy(
-                    nebulaEarned = state.statistics.nebulaEarned + rewardNebula
-                )
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + rewardNebula)
             ),
             true
         )
