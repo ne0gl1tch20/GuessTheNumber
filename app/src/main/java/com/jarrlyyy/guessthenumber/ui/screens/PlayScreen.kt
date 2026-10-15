@@ -29,6 +29,7 @@ import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessInputField
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackCard
+import com.jarrlyyy.guessthenumber.shared.ui.toSharedFeedbackIcon
 
 
 @OptIn(ExperimentalMaterial3Api::class)
