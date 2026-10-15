@@ -105,7 +105,9 @@ private fun DesktopNavigationButtons(
                 modifier = focusModifier.semantics {
                     selected = currentDestination == destination
                 },
-                onClick = { onNavigate(destination) },
+                onClick = {
+                    if (currentDestination != destination) onNavigate(destination)
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = desktopNavigationContainerColor(
                         selected = currentDestination == destination,
