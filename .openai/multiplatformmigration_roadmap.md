@@ -162,5 +162,5 @@ This roadmap is a proposed order based on current repository context, not a clai
 
 - [x] #154 covers global settings JSON and save-slot primary/backup metadata round trips; Android and Windows CI passed before merge.
 - [x] Drafted `docs/SAVE_WRITE_FAILURE_TEST_DESIGN.md` to define a narrow DataStore write-failure seam and explicit assertions for primary/backup preservation.
-- [ ] Implement the test seam and storage-level failure tests in a code PR; do not change production transaction semantics in that PR unless tests and behavior are fully specified.
-- [ ] Add ViewModel failed-persistence consistency tests after the storage contract is verified.
+- [x] Added an injectable DataStore seam and deterministic tests for failed `saveGame` and `updateGameAtomically` writes, including exact primary/backup preservation assertions.
+- [ ] Add ViewModel failed-persistence consistency tests after the storage contract is verified. The current PR deliberately does not alter claim publication or reward semantics.
