@@ -149,7 +149,13 @@ class GameEngine(private val rng: Random = Random.Default) {
     }
 
     fun claimChallenge(state: GameState, challengeId: String, rewardNebula: Long): Pair<GameState, Boolean> {
-        if (challengeId in state.completedChallenges || !isValidChallengeReward(state, challengeId, rewardNebula)) {
+        if (!ChallengeRewardRules.canClaim(
+                completedChallenges = state.completedChallenges,
+                challengeId = challengeId,
+                rewardNebula = rewardNebula,
+                progress = challengeProgress(state)
+            )
+        ) {
             return Pair(state, false)
         }
         return Pair(
@@ -162,19 +168,15 @@ class GameEngine(private val rng: Random = Random.Default) {
         )
     }
 
-    private fun isValidChallengeReward(state: GameState, challengeId: String, rewardNebula: Long): Boolean =
-        ChallengeRewardRules.isValidReward(
-            challengeId = challengeId,
-            rewardNebula = rewardNebula,
-            progress = ChallengeProgress(
-                correctGuesses = state.correctGuesses,
-                bestStreak = state.bestStreak.toLong(),
-                money = state.money.value.toLong(),
-                totalGuesses = state.statistics.totalGuesses,
-                prestigeCount = state.prestigeCount,
-                ultraCount = state.ultraCount,
-                playtimeSeconds = state.statistics.playtimeSeconds
-            )
+    private fun challengeProgress(state: GameState): ChallengeProgress =
+        ChallengeProgress(
+            correctGuesses = state.correctGuesses,
+            bestStreak = state.bestStreak.toLong(),
+            money = state.money.value.toLong(),
+            totalGuesses = state.statistics.totalGuesses,
+            prestigeCount = state.prestigeCount,
+            ultraCount = state.ultraCount,
+            playtimeSeconds = state.statistics.playtimeSeconds
         )
 
     @Deprecated("Legacy overload")
