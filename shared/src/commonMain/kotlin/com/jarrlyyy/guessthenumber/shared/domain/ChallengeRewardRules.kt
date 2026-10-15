@@ -97,3 +97,36 @@ object ChallengeRewardRules {
         return false
     }
 }
+
+/**
+ * Shared deterministic decision for a single challenge claim.
+ *
+ * The platform applies the accepted reward to its currency and statistics models.
+ * Rejected or already-completed claims carry no reward to apply.
+ */
+data class ChallengeClaimDecision(
+    val accepted: Boolean,
+    val challengeId: String,
+    val rewardNebula: Long
+)
+
+object ChallengeClaimRules {
+    fun resolve(
+        completedChallenges: Set<String>,
+        challengeId: String,
+        rewardNebula: Long,
+        progress: ChallengeProgress
+    ): ChallengeClaimDecision {
+        val accepted = ChallengeRewardRules.canClaim(
+            completedChallenges = completedChallenges,
+            challengeId = challengeId,
+            rewardNebula = rewardNebula,
+            progress = progress
+        )
+        return ChallengeClaimDecision(
+            accepted = accepted,
+            challengeId = challengeId,
+            rewardNebula = if (accepted) rewardNebula else 0L
+        )
+    }
+}

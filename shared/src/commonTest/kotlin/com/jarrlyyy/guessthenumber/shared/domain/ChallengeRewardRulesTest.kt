@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.shared.domain
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -20,6 +21,23 @@ class ChallengeRewardRulesTest {
         assertTrue(ChallengeRewardRules.canClaim(emptySet(), "weekly_correct", 75, progress))
         assertFalse(ChallengeRewardRules.canClaim(setOf("weekly_correct"), "weekly_correct", 75, progress))
         assertFalse(ChallengeRewardRules.canClaim(emptySet(), "weekly_correct", 74, progress))
+    }
+
+    @Test
+    fun claimDecisionCarriesRewardOnlyForEligibleUnclaimedChallenges() {
+        val first = ChallengeClaimRules.resolve(emptySet(), "weekly_correct", 75, progress)
+        assertTrue(first.accepted)
+        assertEquals("weekly_correct", first.challengeId)
+        assertEquals(75L, first.rewardNebula)
+
+        val duplicate = ChallengeClaimRules.resolve(setOf("weekly_correct"), "weekly_correct", 75, progress)
+        assertFalse(duplicate.accepted)
+        assertEquals("weekly_correct", duplicate.challengeId)
+        assertEquals(0L, duplicate.rewardNebula)
+
+        val invalid = ChallengeClaimRules.resolve(emptySet(), "weekly_correct", 74, progress)
+        assertFalse(invalid.accepted)
+        assertEquals(0L, invalid.rewardNebula)
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.jarrlyyy.guessthenumber.shared.domain.GuessEconomyDecisionRules
 import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
+import com.jarrlyyy.guessthenumber.shared.domain.ChallengeClaimRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRewardRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessCoreState
@@ -192,20 +193,23 @@ class GameEngine(private val rng: Random = Random.Default) {
     }
 
     fun claimChallenge(state: GameState, challengeId: String, rewardNebula: Long): Pair<GameState, Boolean> {
-        if (!ChallengeRewardRules.canClaim(
-                completedChallenges = state.completedChallenges,
-                challengeId = challengeId,
-                rewardNebula = rewardNebula,
-                progress = challengeProgress(state)
-            )
-        ) {
-            return Pair(state, false)
-        }
+        val decision = ChallengeClaimRules.resolve(
+            completedChallenges = state.completedChallenges,
+            challengeId = challengeId,
+            rewardNebula = rewardNebula,
+            progress = challengeProgress(state)
+        )
+        if (!decision.accepted) return Pair(state, false)
+
+        // Keep currency arithmetic and statistics mutation on Android; shared code
+        // only decides whether this claim is valid and which reward may be applied.
         return Pair(
             state.copy(
-                completedChallenges = state.completedChallenges + challengeId,
-                nebula = state.nebula + BigNumber(rewardNebula),
-                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + rewardNebula)
+                completedChallenges = state.completedChallenges + decision.challengeId,
+                nebula = state.nebula + BigNumber(decision.rewardNebula),
+                statistics = state.statistics.copy(
+                    nebulaEarned = state.statistics.nebulaEarned + decision.rewardNebula
+                )
             ),
             true
         )
