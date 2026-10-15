@@ -22,7 +22,7 @@ internal interface DesktopSaveFileOps {
     fun moveReplace(source: Path, target: Path)
 }
 
-private object DefaultDesktopSaveFileOps : DesktopSaveFileOps {
+internal object DefaultDesktopSaveFileOps : DesktopSaveFileOps {
     override fun createDirectories(path: Path) {
         Files.createDirectories(path)
     }
