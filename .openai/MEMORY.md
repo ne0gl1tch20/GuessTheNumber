@@ -363,3 +363,11 @@ This section supersedes older notes where they conflict with the user's latest e
 - This is separate from ordinary music/SFX volume controls and routing. Coordinate with planned PR #92's music/SFX mixers so the work does not duplicate mixer UI or basic playback controls.
 - First establish measurable latency/CPU/memory/audio-quality goals and inspect Android's existing audio APIs and current playback architecture. Prefer the simplest reliable platform/Kotlin/JVM solution when it meets requirements; use native code only for a demonstrated benefit. Check dependency licenses, maintenance, ABI support, packaging size, and fallback behavior.
 - Keep audio processing bounded and lifecycle-aware: handle audio focus, route/device changes, interruptions, cancellation, resource cleanup, and failures without blocking the UI or breaking offline gameplay. Do not begin implementation while the project is paused.
+
+## Cross-platform maintenance rule (2026-10-15)
+
+- **Windows migration must not regress or neglect Android.** Android is the production behavior reference while Windows support is added. For every shared-domain, gameplay, economy, save-model, localization, asset, or build-system change, assess Android impact as part of the same PR and keep Android compiling and behaving as before.
+- Prefer shared production logic where the platform boundary supports it, while keeping Android-only lifecycle, storage, resources, notifications and UI in the Android host. Do not solve Windows parity by replacing Android behavior or weakening Android validation.
+- Keep CI/verification coverage for both Android and Windows when a change touches shared code or Gradle configuration. Verify save-format and BigNumber compatibility, and update app/src/main/assets/changelogs.md in the same PR for actual player-facing changes.
+- GTN_APP_LOGO.png at repository root is the canonical artwork for both Android mobile launcher icons and Windows app/installer icons. Android launcher density/adaptive/round resources must be generated from it and checked in packaged builds; do not treat the icon task as complete until verified.
+- This is a standing project rule, not a one-time migration checklist. Include it in future plans and reviews.
