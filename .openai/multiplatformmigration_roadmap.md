@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PRs #142–#151 are merged. PR #149 tests persisted duplicate-claim prevention across reload; PR #150 tests rejection of an atomic update when the primary save is corrupt without modifying the recovery backup; PR #151 refreshes project documentation. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Current candidate: add a legacy-save load → save → reload compatibility regression before changing save models or injecting persistence failures.
+**Current checkpoint:** PRs #142–#152 are merged. PR #149 tests persisted duplicate-claim prevention across reload; PR #150 tests rejection of an atomic update when the primary save is corrupt without modifying the recovery backup; PR #151 refreshes project documentation; PR #152 adds legacy-save load → save → reload coverage. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Current candidate: document the observed save schema and migration behavior before designing genuine persistence-failure injection.
 
 ## Rules for every PR
 
@@ -90,11 +90,19 @@ Inspected `GameEngine.claimChallenge`, `GameViewModel.claimChallenge`, `SaveMana
 
 ### Phase 3 - Save and persistence compatibility
 
-- [ ] Document the actual save schema and migration rules before changing models.
-- [ ] Add representative legacy-save fixtures and round-trip tests: load → map → update → save → reload. Current PR candidate adds an inline legacy JSON fixture for omitted newer fields, unknown-field tolerance, large balances and progression preservation across load → save → reload.
+- [x] #153 documents the actual save schema, defaults, storage keys, validation, recovery and current migration behavior before changing models.
+- [x] #152 adds an inline legacy-save fixture and load → save → reload test for omitted newer fields, unknown-field tolerance, large balances and progression preservation.
 - [ ] Cover large currency values, omitted legacy fields, upgrades, reset counts, mutators, challenges, statistics, world progression, settings and save-slot metadata.
 - [ ] Keep Android storage adapters, encrypted backup/import, 10 save slots, atomic transactions, checksum/integrity checks, last-valid backup recovery and corruption handling intact.
 - [ ] Introduce common serialization only after verifying compatible dependencies and behavior for all intended targets.
+
+### Phase 3 audit - Save schema and persistence failure design (2026-10-15)
+
+- `GameState` is serialized as JSON with `ignoreUnknownKeys = true` and `encodeDefaults = true`. Missing fields rely on constructor defaults; there is no dedicated integer save-schema version or explicit migration registry in the inspected path. `lastSavedVersion` is app-version metadata, not a schema version.
+- The save model and storage layout are documented in `docs/SAVE_SCHEMA_AND_MIGRATION.md`. The current inline compatibility fixture is useful regression coverage but is not a historical save captured from an actual released build.
+- `validateSave` checks key balances/counters/range invariants, not every field or cross-field relationship. `sanitizeLoadedState` repairs core fields only. Any hardening must be additive and fixture-tested.
+- Backup/export currently uses XOR plus Base64 obfuscation and a plain-Base64 fallback; do not describe it as modern cryptographic protection or change its format in a compatibility-only task.
+- Remaining gaps: settings and slot-metadata round trips, genuine DataStore I/O failure injection, and ViewModel consistency when a save fails after an in-memory reward claim. The next step is to design a narrow test seam and test failure outcomes before changing production transaction behavior.
 
 ### Phase 4 - Full shared UI, navigation and player feature parity
 
