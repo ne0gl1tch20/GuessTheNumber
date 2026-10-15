@@ -9,6 +9,7 @@ package com.jarrlyyy.guessthenumber.shared.rules
  */
 data class GuessTransitionDecision(
     val stateTransition: GuessStateTransition,
+    val nextState: GuessCoreState,
     val isCritical: Boolean,
     val nextTarget: Long?
 )
@@ -22,6 +23,7 @@ object GuessTransitionRules {
      */
     fun resolve(
         stateTransition: GuessStateTransition,
+        currentState: GuessCoreState,
         criticalChance: Double,
         criticalRoll: Double?,
         nextTarget: Long?,
@@ -31,6 +33,7 @@ object GuessTransitionRules {
         if (stateTransition.feedback != GuessFeedback.CORRECT) {
             return GuessTransitionDecision(
                 stateTransition = stateTransition,
+                nextState = currentState,
                 isCritical = false,
                 nextTarget = null
             )
@@ -47,6 +50,11 @@ object GuessTransitionRules {
 
         return GuessTransitionDecision(
             stateTransition = stateTransition,
+            nextState = currentState.copy(
+                targetNumber = nextTarget,
+                rangeMin = nextRangeMin,
+                rangeMax = nextRangeMax
+            ),
             isCritical = criticalRoll < criticalChance,
             nextTarget = nextTarget
         )
