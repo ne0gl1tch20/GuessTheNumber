@@ -24,6 +24,19 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+private class ToggleFailingDataStore(
+    private val delegate: DataStore<Preferences>
+) : DataStore<Preferences> {
+    var failWrites: Boolean = false
+
+    override val data = delegate.data
+
+    override suspend fun updateData(transform: suspend (t: Preferences) -> Preferences): Preferences {
+        if (failWrites) throw IOException("Injected DataStore write failure")
+        return delegate.updateData(transform)
+    }
+}
+
 @RunWith(RobolectricTestRunner::class)
 class SaveValidationTest {
 
