@@ -22,4 +22,9 @@ data class GuessCoreTransition(
     val feedback: GuessFeedback,
     val nextState: GuessCoreState,
     val stateTransition: GuessStateTransition
-)
+) {
+    val attempts: Long get() = nextState.attempts
+    val correctGuesses: Long get() = nextState.correctGuesses
+    val streak: Int get() = nextState.streak
+    val bestStreak: Int get() = nextState.bestStreak
+}
