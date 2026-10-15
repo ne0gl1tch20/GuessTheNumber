@@ -574,12 +574,11 @@ fun PlayScreen(
                                 reducedMotion = state.settings.reducedMotion,
                                 leadingContent = { feedbackContentColor ->
                                     Icon(
-                                        imageVector = when (sharedPresentation.status) {
-                                            com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY,
-                                            com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.INVALID_INPUT -> Icons.Default.TipsAndUpdates
-                                            com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_LOW -> Icons.Default.ArrowUpward
-                                            com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_HIGH -> Icons.Default.ArrowDownward
-                                            com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT -> Icons.Default.CheckCircle
+                                        imageVector = when (sharedPresentation.status.toSharedFeedbackIcon()) {
+                                            com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackIcon.TIP -> Icons.Default.TipsAndUpdates
+                                            com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackIcon.TOO_LOW -> Icons.Default.ArrowUpward
+                                            com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackIcon.TOO_HIGH -> Icons.Default.ArrowDownward
+                                            com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackIcon.CORRECT -> Icons.Default.CheckCircle
                                         },
                                         contentDescription = null,
                                         tint = feedbackContentColor,
