@@ -9,25 +9,25 @@ import androidx.compose.ui.graphics.Color
 
 internal object DesktopThemePalette {
     val dark = darkColorScheme(
-    primary = Color(0xFFCE93D8),
-    secondary = Color(0xFF80DEEA),
-    tertiary = Color(0xFF69F0AE),
-    background = Color(0xFF0D0B1E),
-    surface = Color(0xFF191632),
-    surfaceVariant = Color(0xFF25214D),
-    onBackground = Color(0xFFE6E1F9),
-    onSurface = Color(0xFFE6E1F9)
+        primary = Color(0xFFCE93D8),
+        secondary = Color(0xFF80DEEA),
+        tertiary = Color(0xFF69F0AE),
+        background = Color(0xFF0D0B1E),
+        surface = Color(0xFF191632),
+        surfaceVariant = Color(0xFF25214D),
+        onBackground = Color(0xFFE6E1F9),
+        onSurface = Color(0xFFE6E1F9)
     )
 
     val light = lightColorScheme(
-    primary = Color(0xFF7B1FA2),
-    secondary = Color(0xFF006874),
-    tertiary = Color(0xFF007A3D),
-    background = Color(0xFFFAF8FF),
-    surface = Color(0xFFF1EEFF),
-    surfaceVariant = Color(0xFFE5DEFF),
-    onBackground = Color(0xFF1D1B20),
-    onSurface = Color(0xFF1D1B20)
+        primary = Color(0xFF7B1FA2),
+        secondary = Color(0xFF006874),
+        tertiary = Color(0xFF007A3D),
+        background = Color(0xFFFAF8FF),
+        surface = Color(0xFFF1EEFF),
+        surfaceVariant = Color(0xFFE5DEFF),
+        onBackground = Color(0xFF1D1B20),
+        onSurface = Color(0xFF1D1B20)
     )
 }
 
