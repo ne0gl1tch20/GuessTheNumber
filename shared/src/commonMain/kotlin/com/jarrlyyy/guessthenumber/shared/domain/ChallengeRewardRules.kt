@@ -15,6 +15,13 @@ data class ChallengeProgress(
 )
 
 object ChallengeRewardRules {
+    fun canClaim(
+        completedChallenges: Set<String>,
+        challengeId: String,
+        rewardNebula: Long,
+        progress: ChallengeProgress
+    ): Boolean = challengeId !in completedChallenges && isValidReward(challengeId, rewardNebula, progress)
+
     fun isValidReward(challengeId: String, rewardNebula: Long, progress: ChallengeProgress): Boolean {
         if (rewardNebula <= 0L) return false
 
