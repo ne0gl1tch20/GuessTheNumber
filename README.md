@@ -1,12 +1,12 @@
 # Guess The Number (Incremental & Arcade Edition)
 
-An advanced, feature-rich incremental and arcade Android game built with **Jetpack Compose** and **Kotlin**. Start with a simple number guess, then turn it into a full progression loop: build upgrades, chase streaks, trigger Frenzy, discover events, collect cosmetics, stack mutators, and create challenges that make your next run feel different.
+An advanced, feature-rich incremental and arcade game built with **Kotlin** and **Jetpack Compose**. Android remains the primary, feature-complete platform while the project incrementally extracts deterministic game rules into Kotlin Multiplatform (`shared/`) and validates the Windows desktop target. The migration is in progress; shared-rule coverage does not mean full gameplay or UI parity across platforms. Start with a simple number guess, then turn it into a full progression loop: build upgrades, chase streaks, trigger Frenzy, discover events, collect cosmetics, stack mutators, and create challenges that make your next run feel different.
 
 **Why try it?** 🎮 You can play casually, optimize an automation build, hunt achievement tiers, or make a ridiculous custom mutator challenge. There is always another upgrade, reset, challenge, or combination waiting in the next run.
 
 ## 🧩 Lua Scripting Layer (Implementation in Progress)
 
-The first embedded LuaJ runtime and shared Kotlin engine facade are now implemented on the `feat/lua-runtime-engine` branch. The Lua Activity Hub has a working **GO** flow for the bundled offline Number Rush activity, and Dev Settings has typed `/lua` commands. Kotlin remains authoritative for save data, progression, and rewards.
+The embedded LuaJ runtime and shared Kotlin engine facade support the bundled offline Number Rush activity, and Dev Settings includes typed `/lua` commands. This scripting layer is still evolving. Kotlin remains authoritative for save data, progression, eligibility, and rewards.
 
 - [Lua implementation roadmap](docs/LUA_SCRIPTING_PLAN.md)
 - [Draft Lua host API contract](docs/LUA_API_DESIGN.md)
@@ -41,9 +41,9 @@ The runtime uses an instruction-budgeted Lua sandbox with no exposed Android, Ja
 - 💾 **Keep multiple runs**: Use the expanded save-slot system for separate profiles and difficulty choices.
 
 ### 2. **Architecture & Tech Stack**
-- **UI Toolkit**: 100% Jetpack Compose with Google's **Material 3 Expressive** design system, organic spring-physics micro-animations, and pure black AMOLED mode.
+- **Android UI**: Jetpack Compose with Google's **Material 3 Expressive** design system, animations, and pure-black AMOLED mode. Shared KMP rules are being migrated incrementally; Android-specific screens and services remain platform-owned.
 - **Navigation**: Jetpack Navigation Compose (`NavGraph.kt`, `Screen.kt`) with smooth horizontal swiping between tabs.
-- **State Management**: Reactive state handling using `GameViewModel.kt`, Coroutines, and Flows, backed by a persistent `SaveManager.kt` supporting encrypted save export/import and cloud backup.
+- **State and persistence**: Reactive Android state through `GameViewModel.kt`, Coroutines, and Flows, backed by `SaveManager.kt`, DataStore, save-slot validation, and recovery backups. Save export/import and recovery behavior must remain compatible during migration.
 - **Data & Configuration**: JSON-driven configuration repository (`JsonConfigRepository.kt`) for items, upgrades, achievements, and challenges.
 - **Custom Numeric Model**: Supports extremely large numbers using a robust custom `BigNumber` data model with multiple number notations (Scientific, Engineering, Short Scale, Alpha Suffixes).
 
@@ -55,6 +55,29 @@ The runtime uses an instruction-budgeted Lua sandbox with no exposed Android, Ja
 - **Developer Tools**: Feature-packed developer console with dev commands (`/timeskip`, `/max_upgrades`, etc.), raw JSON save editor, and process inspector.
 
 ---
+
+## 🧭 Kotlin Multiplatform migration status
+
+The migration is deliberately incremental. Deterministic rules for guess transitions, reward multipliers, penalties, progression requirements, and challenge-claim decisions are shared and covered by common tests. Android still owns `BigNumber` arithmetic, RNG generation, currency/statistics mutation, full `GameState` updates, persistence, clocks, notifications, audio, haptics, and Android UI. These boundaries stay in place until differential tests establish parity.
+
+- `shared/`: common Kotlin rules and tests.
+- `app/`: Android application, platform adapters, UI, and authoritative save/game-state integration.
+- Windows Desktop CI: validates the shared/Kotlin code path and builds the desktop target. This is migration validation, not a claim of complete feature parity.
+- [Migration execution roadmap](.openai/multiplatformmigration_roadmap.md)
+- [Documentation index](docs/README.md)
+- [Integration audit and remaining release gates](docs/INTEGRATION_AUDIT_STATUS.md)
+
+## 🧪 Validation and CI
+
+Pull requests use the normal Android validation/tests workflow and Windows Desktop CI. Routine validation is tests/checks only; it is not intended to build Android APKs. The stable debug APK workflow is separate. Do not treat a source review as a passing test result: use the latest run for the exact commit and inspect failed job logs before merging.
+
+Local Android unit tests:
+
+```bash
+./gradlew :app:testDebugUnitTest
+```
+
+For shared common tests, use the Gradle task configured by the project for `shared`; confirm the task name from Gradle rather than guessing it. Device/emulator coverage is a separate validation layer.
 
 ## 📂 Project Structure
 
@@ -85,6 +108,6 @@ com.jarrlyyy.guessthenumber/
 
 ## 🛠️ Getting Started
 
-1. **Prerequisites**: Android Studio Jellyfish / Koala or later with Kotlin support and Android SDK 34.
+1. **Prerequisites**: A recent Android Studio version with Kotlin support and the Android SDK versions configured by the project.
 2. **Open Project**: Open the root folder `GuessTheNumber` in Android Studio.
-3. **Build & Run**: Sync Gradle and run the `app` module on an emulator or physical Android device (minSdk 26, targetSdk 35).
+3. **Build & Run**: Sync Gradle and run the `app` module on an emulator or physical Android device. The Android app currently uses minSdk 26 and targetSdk 35.
