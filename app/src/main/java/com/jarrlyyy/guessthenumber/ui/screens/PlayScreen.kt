@@ -574,17 +574,19 @@ fun PlayScreen(
                             },
                             label = "FeedbackAnimation"
                         ) { feedback ->
-                            val feedbackContainerColor = when (feedbackTone) {
-                                GuessFeedbackTone.Neutral -> MaterialTheme.colorScheme.surfaceVariant
-                                GuessFeedbackTone.TooLow -> MaterialTheme.colorScheme.secondaryContainer
-                                GuessFeedbackTone.TooHigh -> MaterialTheme.colorScheme.primaryContainer
-                                GuessFeedbackTone.Correct -> MaterialTheme.colorScheme.tertiaryContainer
+                            val feedbackContainerColor = when (sharedPresentation.status) {
+                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY,
+                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.INVALID_INPUT -> MaterialTheme.colorScheme.surfaceVariant
+                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_LOW -> MaterialTheme.colorScheme.secondaryContainer
+                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_HIGH -> MaterialTheme.colorScheme.primaryContainer
+                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT -> MaterialTheme.colorScheme.tertiaryContainer
                             }
-                            val feedbackContentColor = when (feedbackTone) {
-                                GuessFeedbackTone.Neutral -> MaterialTheme.colorScheme.onSurfaceVariant
-                                GuessFeedbackTone.TooLow -> MaterialTheme.colorScheme.onSecondaryContainer
-                                GuessFeedbackTone.TooHigh -> MaterialTheme.colorScheme.onPrimaryContainer
-                                GuessFeedbackTone.Correct -> MaterialTheme.colorScheme.onTertiaryContainer
+                            val feedbackContentColor = when (sharedPresentation.status) {
+                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY,
+                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.INVALID_INPUT -> MaterialTheme.colorScheme.onSurfaceVariant
+                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_LOW -> MaterialTheme.colorScheme.onSecondaryContainer
+                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_HIGH -> MaterialTheme.colorScheme.onPrimaryContainer
+                                com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT -> MaterialTheme.colorScheme.onTertiaryContainer
                             }
                             Surface(
                                 modifier = Modifier.fillMaxWidth().animateContentSize(),
@@ -598,11 +600,12 @@ fun PlayScreen(
                                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
                                     Icon(
-                                        imageVector = when (feedbackTone) {
-                                            GuessFeedbackTone.Neutral -> Icons.Default.TipsAndUpdates
-                                            GuessFeedbackTone.TooLow -> Icons.Default.ArrowUpward
-                                            GuessFeedbackTone.TooHigh -> Icons.Default.ArrowDownward
-                                            GuessFeedbackTone.Correct -> Icons.Default.CheckCircle
+                                        imageVector = when (sharedPresentation.status) {
+                                            com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY,
+                                            com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.INVALID_INPUT -> Icons.Default.TipsAndUpdates
+                                            com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_LOW -> Icons.Default.ArrowUpward
+                                            com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_HIGH -> Icons.Default.ArrowDownward
+                                            com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT -> Icons.Default.CheckCircle
                                         },
                                         contentDescription = null,
                                         tint = feedbackContentColor,
