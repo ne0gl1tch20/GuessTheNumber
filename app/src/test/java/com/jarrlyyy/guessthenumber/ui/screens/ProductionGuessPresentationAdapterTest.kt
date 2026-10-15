@@ -15,15 +15,17 @@ class ProductionGuessPresentationAdapterTest {
             attempts = 12L
         )
 
-        val presentation = ProductionGuessPresentationAdapter.from(
-            state = state,
-            status = GuessGameStatus.TOO_LOW
-        )
+        GuessGameStatus.values().forEach { status ->
+            val presentation = ProductionGuessPresentationAdapter.from(
+                state = state,
+                status = status
+            )
 
-        assertEquals(10L, presentation.rangeMin)
-        assertEquals(90L, presentation.rangeMax)
-        assertEquals(12L, presentation.guessCount)
-        assertEquals(GuessGameStatus.TOO_LOW, presentation.status)
-        assertFalse(presentation.solved)
+            assertEquals(10L, presentation.rangeMin)
+            assertEquals(90L, presentation.rangeMax)
+            assertEquals(12L, presentation.guessCount)
+            assertEquals(status, presentation.status)
+            assertFalse(presentation.solved)
+        }
     }
 }
