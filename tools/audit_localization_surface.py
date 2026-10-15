@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""Deep repository-wide localization surface audit.
-
-Reports user-facing literals that can remain hidden in older Compose/XML screens.
-It is intentionally informational until the de-hardcoding pass is complete.
-"""
+"""Audit hardcoded user-facing text across Android, shared KMP, and desktop."""
 from __future__ import annotations
+
+import json
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-KOTLIN_ROOT = ROOT / "app" / "src" / "main" / "java"
+KOTLIN_ROOTS = [
+    ROOT / "app" / "src" / "main" / "java",
+    ROOT / "shared" / "src",
+    ROOT / "desktopApp" / "src",
+]
 XML_ROOT = ROOT / "app" / "src" / "main" / "res"
 
 PATTERNS = [
@@ -23,19 +25,15 @@ PATTERNS = [
 ]
 
 IGNORE_PREFIXES = ("http://", "https://", "file://", "TAG", "UTF-8", "/help", "/reset", "BUY_")
-SKIP_PATH_PARTS = ("/data/", "/domain/", "/test/", "/androidTest/")
+SKIP_PATH_PARTS = ("/data/", "/domain/", "/test/", "/androidTest/", "/commonTest/", "/jvmTest/")
+
 
 def probable_user_text(value: str) -> bool:
     value = value.strip()
     if len(value) < 2 or value.startswith(IGNORE_PREFIXES):
         return False
-    # Regex scans can stop at the nested quote in a Kotlin template such as
-    # "${locale.getString("key", "Fallback")}: $value". A fragment beginning
-    # with an unterminated interpolation is expression syntax, not visible copy.
     if value.startswith("${") and "}" not in value:
         return False
-    # Strip Kotlin-only interpolations before deciding whether static user copy remains.
-    # Purely dynamic values and animation/test trace labels are not translatable text.
     static_text = re.sub(r"\$\{[^}]+\}|\$[A-Za-z_]\w*", "", value)
     if not any(ch.isalpha() for ch in static_text):
         return False
@@ -46,9 +44,11 @@ def probable_user_text(value: str) -> bool:
         return False
     return any(ch.isalpha() for ch in value)
 
+
 def scan_kotlin():
     findings = []
-    for path in KOTLIN_ROOT.rglob("*.kt"):
+    files = sorted({path for root in KOTLIN_ROOTS if root.exists() for path in root.rglob("*.kt")})
+    for path in files:
         rel = str(path.relative_to(ROOT)).replace("\\", "/")
         if any(part in rel for part in SKIP_PATH_PARTS):
             continue
@@ -60,8 +60,11 @@ def scan_kotlin():
                         findings.append((rel, line_no, kind, value))
     return findings
 
+
 def scan_xml():
     findings = []
+    if not XML_ROOT.exists():
+        return findings
     for path in XML_ROOT.rglob("*.xml"):
         rel = str(path.relative_to(ROOT)).replace("\\", "/")
         for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -71,11 +74,11 @@ def scan_xml():
                     findings.append((rel, line_no, f"XML {attr}", match.group(1).strip()))
     return findings
 
+
 def scan_catalog_calls():
-    """Find English phrases that bypass or miss the canonical locale catalog."""
+    """Check literal locale lookup keys against the canonical Android locale catalog."""
     locale_path = ROOT / "app" / "src" / "main" / "assets" / "locales" / "en_us.json"
     try:
-        import json
         with locale_path.open("r", encoding="utf-8") as handle:
             catalog = json.load(handle)
     except Exception as exc:
@@ -84,8 +87,9 @@ def scan_catalog_calls():
     values = {value for value in catalog.values() if isinstance(value, str)}
     keys = set(catalog)
     findings = []
-    for path in KOTLIN_ROOT.rglob("*.kt"):
-        rel = str(path.relative_to(ROOT)).replace("\\\\", "/")
+    files = sorted({path for root in KOTLIN_ROOTS if root.exists() for path in root.rglob("*.kt")})
+    for path in files:
+        rel = str(path.relative_to(ROOT)).replace("\\", "/")
         if any(part in rel for part in SKIP_PATH_PARTS):
             continue
         for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -98,12 +102,8 @@ def scan_catalog_calls():
 
             for match in re.finditer(r'\b[A-Za-z_]\w*\.getString\s*\(\s*"([^"]+)"', line):
                 key = match.group(1).strip()
-                # IDs composed from data-driven asset IDs are validated by the
-                # asset-specific localization contract, not as literal keys here.
                 if "$" in key:
                     continue
-                # Dynamic catalog families such as achievement_tier_bronze
-                # are looked up by prefix plus asset value, not as literal keys.
                 if key.endswith("_") and any(existing.startswith(key) for existing in keys):
                     continue
                 if not re.fullmatch(r"[a-z0-9_]+", key):
@@ -112,12 +112,17 @@ def scan_catalog_calls():
                     findings.append((rel, line_no, "Missing locale key", key))
     return findings
 
+
 def main() -> int:
     findings = scan_kotlin() + scan_xml() + scan_catalog_calls()
-    print(f"Localization surface audit: {len(findings)} candidate(s), including missing catalog values and format-key issues.")
+    print(
+        f"Localization surface audit: scanned Android/shared/desktop Kotlin sources; "
+        f"{len(findings)} candidate(s), including missing catalog values and format-key issues."
+    )
     for rel, line_no, kind, value in findings:
         print(f"  - {rel}:{line_no}: [{kind}] {value}")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
