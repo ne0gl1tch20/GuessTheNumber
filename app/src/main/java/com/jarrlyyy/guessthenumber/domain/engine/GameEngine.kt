@@ -2,6 +2,8 @@ package com.jarrlyyy.guessthenumber.domain.engine
 
 import com.jarrlyyy.guessthenumber.shared.domain.FrenzyRules
 import com.jarrlyyy.guessthenumber.shared.domain.MutatorRules
+import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
+import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
@@ -175,68 +177,20 @@ class GameEngine(private val rng: Random = Random.Default) {
         )
     }
 
-    private fun isValidChallengeReward(state: GameState, challengeId: String, rewardNebula: Long): Boolean {
-        if (rewardNebula <= 0L) return false
-
-        if (challengeId.startsWith("weekly_")) {
-            val kind = challengeId.substringAfterLast('_')
-            val expectedReward = when (kind) {
-                "correct" -> 75L
-                "streak" -> 90L
-                "money" -> 100L
-                "guesses" -> 80L
-                "prestige" -> 125L
-                "ultra" -> 175L
-                "frenzy" -> 110L
-                "playtime" -> 95L
-                else -> return false
-            }
-            if (rewardNebula != expectedReward) return false
-            val progress = when (kind) {
-                "correct" -> state.correctGuesses
-                "streak" -> state.bestStreak.toLong()
-                "money" -> state.money.value.toLong()
-                "guesses" -> state.statistics.totalGuesses
-                "prestige" -> state.prestigeCount
-                "ultra" -> state.ultraCount
-                "frenzy" -> state.bestStreak.toLong()
-                "playtime" -> state.statistics.playtimeSeconds
-                else -> return false
-            }
-            val target = when (kind) {
-                "correct" -> 75L
-                "streak" -> 15L
-                "money" -> 10_000_000L
-                "guesses" -> 250L
-                "prestige" -> 2L
-                "ultra" -> 1L
-                "frenzy" -> 25L
-                "playtime" -> 3_600L
-                else -> return false
-            }
-            return progress >= target
-        }
-
-        if (challengeId.startsWith("builder_")) {
-            val parts = challengeId.removePrefix("builder_").split('_')
-            if (parts.size < 2) return false
-            val kind = parts[0]
-            val target = parts[1].toLongOrNull() ?: return false
-            val mutators = parts.drop(2)
-            val validMutators = MutatorRules.ids
-            if (target < 1L || mutators.any { it !in validMutators }) return false
-            if (rewardNebula != 50L + mutators.size * 50L) return false
-            val progress = when (kind) {
-                "correct" -> state.correctGuesses
-                "streak" -> state.bestStreak.toLong()
-                "guesses" -> state.statistics.totalGuesses
-                else -> state.money.value.toLong()
-            }
-            return progress >= target
-        }
-
-        return false
-    }
+    private fun isValidChallengeReward(state: GameState, challengeId: String, rewardNebula: Long): Boolean =
+        ChallengeRewardRules.isValidReward(
+            challengeId = challengeId,
+            rewardNebula = rewardNebula,
+            progress = ChallengeProgress(
+                correctGuesses = state.correctGuesses,
+                bestStreak = state.bestStreak.toLong(),
+                money = state.money.value.toLong(),
+                totalGuesses = state.statistics.totalGuesses,
+                prestigeCount = state.prestigeCount,
+                ultraCount = state.ultraCount,
+                playtimeSeconds = state.statistics.playtimeSeconds
+            )
+        )
 
     @Deprecated("Legacy overload")
     fun calculatePrestigeReward(money: BigNumber): BigNumber = calculatePrestigeReward(money, 0L)
