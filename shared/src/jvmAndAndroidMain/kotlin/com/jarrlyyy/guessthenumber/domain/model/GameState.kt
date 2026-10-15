@@ -1,13 +1,13 @@
 package com.jarrlyyy.guessthenumber.domain.model
 
-import com.jarrlyyy.guessthenumber.BuildConfig
+import com.jarrlyyy.guessthenumber.shared.domain.SaveProfileRules
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class GameState(
-    val difficultyId: String = Difficulty.CLASSIC,
+    val difficultyId: String = "classic",
     val profileName: String = "",
-    val profileIconId: String = SaveProfile.DEFAULT_ICON,
+    val profileIconId: String = SaveProfileRules.DEFAULT_ICON,
     val money: BigNumber = BigNumber.ZERO,
     val prestige: BigNumber = BigNumber.ZERO,
     val ultra: BigNumber = BigNumber.ZERO,
@@ -32,7 +32,7 @@ data class GameState(
     val statistics: GameStatistics = GameStatistics(),
     val settings: GameSettings = GameSettings(),
     val lastSaveTimestamp: Long = System.currentTimeMillis(),
-    val lastSavedVersion: String = BuildConfig.VERSION_NAME,
+    val lastSavedVersion: String = "unknown",
     val timeTravelPenaltyUntil: Long = 0L,
     val autoClickerActive: Boolean = false,
     val autoClickerSpeed: Double = 1.0,
@@ -97,7 +97,6 @@ val DEFAULT_MORE_SCREEN_ORDER = buildList {
         "world_map", "achievements", "live_ops", "lua_hub", "mutators", "talent", "relics",
         "home_base", "codex", "endgame", "arcade", "stats", "changelog", "settings", "about"
     ))
-    if (BuildConfig.DEBUG) addAll(listOf("dev_settings", "lua_testing_hub"))
     addAll(listOf("staking", "ultra", "prestige", "save_slots", "music"))
 }
 

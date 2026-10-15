@@ -7,6 +7,7 @@ This directory stores internal AI-assisted development context, planning documen
 - [Global localization implementation plan](GLOBAL_LOCALIZATION_IMPLEMENTATION_PLAN.md).
 - [Current implementation plan](implementation_plan.artifact.md).
 - [Current task checklist](task.artifact.md).
+- [KMP shared domain boundary](plans/kmp-shared-domain-boundary.md): shared JVM/Android save model, exact-decimal architecture and the canonical cross-platform app-icon requirement.
 - [Windows migration Stage 2 plan](plans/windows-migration-stage-2-gameplay-economy.md): core gameplay, economy, persistence and parity gates.
 - [Historical generated artifacts](artifacts/): task plans, walkthroughs and related notes.
 - [Roadmaps and technical plans](docs/): roadmaps and planning/design documents moved from the public-facing docs directory.

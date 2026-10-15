@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -25,6 +26,21 @@ kotlin {
     }
 
     sourceSets {
+        val commonMain by getting
+        val jvmAndAndroidMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                implementation(libs.kotlinx.serialization.json)
+            }
+        }
+
+        val androidMain by getting {
+            dependsOn(jvmAndAndroidMain)
+        }
+        val jvmMain by getting {
+            dependsOn(jvmAndAndroidMain)
+        }
+
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)

@@ -59,7 +59,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val saveManager = SaveManager(application)
     private val slotOperationMutex = Mutex()
     private val liveOpsClaimMutex = Mutex()
-    private val _gameState = MutableStateFlow(GameState())
+    private val _gameState = MutableStateFlow(GameState(lastSavedVersion = BuildConfig.VERSION_NAME))
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
     private var configRepository = JsonConfigRepository(application, _gameState.value.settings.locale)
@@ -262,6 +262,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     val globalSettings = saveManager.loadGame(slot).settings
                     val freshState = GameState(
                         difficultyId = difficultyId,
+                        lastSavedVersion = BuildConfig.VERSION_NAME,
                         profileName = profileName.trim().take(24),
                         profileIconId = if (SaveProfile.isValidIcon(profileIconId)) profileIconId else SaveProfile.DEFAULT_ICON,
                         currentRangeMax = Difficulty.rangeMax(difficultyId, 0),
@@ -315,7 +316,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     }
                     try {
                         val currentSlot = _activeSlot.value
-                        val currentState = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
+                        val currentState = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis(), lastSavedVersion = BuildConfig.VERSION_NAME)
                         // Do not switch away from unsaved progress. DataStore failures must
                         // leave the current slot selected and its in-memory state untouched.
                         if (!saveManager.saveGame(currentState, currentSlot)) {
@@ -871,7 +872,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             slotOperationMutex.withLock {
                 saveManager.resetData()
-                val fresh = GameState()
+                val fresh = GameState(lastSavedVersion = BuildConfig.VERSION_NAME)
                 saveManager.setActiveSlot(1)
                 saveManager.saveGame(fresh, 1)
                 _activeSlot.value = 1

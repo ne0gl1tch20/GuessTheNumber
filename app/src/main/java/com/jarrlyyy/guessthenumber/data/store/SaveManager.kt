@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.data.store
 
+import com.jarrlyyy.guessthenumber.BuildConfig
+
 import android.content.Context
 import android.util.Base64
 import androidx.datastore.core.DataStore
@@ -508,7 +510,8 @@ class SaveManager private constructor(
                 profileIconId = if (SaveProfile.isValidIcon(profileIconId)) profileIconId else SaveProfile.DEFAULT_ICON,
                 currentRangeMax = Difficulty.rangeMax(difficultyId, 0),
                 targetNumber = (Difficulty.rangeMax(difficultyId, 0) / 2L).coerceAtLeast(1L),
-                lastSaveTimestamp = System.currentTimeMillis()
+                lastSaveTimestamp = System.currentTimeMillis(),
+                lastSavedVersion = BuildConfig.VERSION_NAME
             )
             val freshJson = json.encodeToString(freshState)
             var created = false
