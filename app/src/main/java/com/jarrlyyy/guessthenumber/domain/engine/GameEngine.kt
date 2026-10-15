@@ -11,6 +11,7 @@ import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.DifficultyRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
+import com.jarrlyyy.guessthenumber.shared.rules.GuessTransitionRules
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -71,7 +72,21 @@ class GameEngine(private val rng: Random = Random.Default) {
 
         if (feedback == GuessFeedback.CORRECT) {
             val critChance = CriticalChanceRules.chance(state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0)
-            val isCrit = rng.nextDouble() < critChance
+            val criticalRoll = rng.nextDouble()
+            val newMin = 1L
+            val newMax = getRangeMax(state)
+            val generatedNextTarget = rng.nextLong(newMin, newMax + 1)
+            val decision = GuessTransitionRules.resolve(
+                stateTransition = transition,
+                criticalChance = critChance,
+                criticalRoll = criticalRoll,
+                nextTarget = generatedNextTarget,
+                nextRangeMin = newMin,
+                nextRangeMax = newMax
+            )
+            val isCrit = decision.isCritical
+            val nextTarget = decision.nextTarget
+                ?: error("Correct guess transition must provide a next target")
             val baseReward = BigNumber(GuessRewardRules.BASE_REWARD_PER_RANGE_UNIT) * BigNumber(state.currentRangeMax)
             val streakMultiplier = BigNumber(GuessRewardRules.streakMultiplier(state.streak))
             val frenzyMult = frenzyMultiplier(state.streak)
@@ -88,9 +103,6 @@ class GameEngine(private val rng: Random = Random.Default) {
             val newStreak = transition.streak
             val bestStreak = transition.bestStreak
 
-            val newMin = 1L
-            val newMax = getRangeMax(state)
-            val newTarget = rng.nextLong(newMin, newMax + 1)
             val newStats = state.statistics.copy(
                 totalGuesses = state.statistics.totalGuesses + 1,
                 correctGuesses = state.statistics.correctGuesses + 1,
@@ -100,7 +112,7 @@ class GameEngine(private val rng: Random = Random.Default) {
                 money = newMoney,
                 currentRangeMin = newMin,
                 currentRangeMax = newMax,
-                targetNumber = newTarget,
+                targetNumber = nextTarget,
                 attempts = transition.attempts,
                 correctGuesses = transition.correctGuesses,
                 streak = newStreak,
