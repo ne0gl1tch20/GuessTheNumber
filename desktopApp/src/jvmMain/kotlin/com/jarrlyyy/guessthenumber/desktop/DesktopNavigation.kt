@@ -3,14 +3,22 @@ package com.jarrlyyy.guessthenumber.desktop
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.input.key.Key
 
 /**
  * Windows-owned navigation contract. Destinations are added here as each
  * parity stage implements a real screen; Android navigation stays platform-owned.
  */
-enum class DesktopDestination(val label: String) {
-    PLAY("Play"),
-    ABOUT("About")
+enum class DesktopDestination(val label: String, val shortcutKey: Key) {
+    PLAY("Play", Key.One),
+    ABOUT("About", Key.Two);
+
+    companion object {
+        fun fromShortcut(key: Key, ctrlPressed: Boolean): DesktopDestination? {
+            if (!ctrlPressed) return null
+            return entries.firstOrNull { it.shortcutKey == key }
+        }
+    }
 }
 
 data class DesktopShellState(
