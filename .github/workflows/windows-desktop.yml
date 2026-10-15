@@ -67,7 +67,7 @@ jobs:
 
       - name: Run shared tests and compile desktop app
         shell: pwsh
-        run: .\\gradlew.bat :shared:jvmTest :desktopApp:compileKotlinJvm
+        run: .\\gradlew.bat :shared:jvmTest :desktopApp:jvmTest :desktopApp:compileKotlinJvm
 
       - name: Inspect desktop packaging tasks
         shell: pwsh
