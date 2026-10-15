@@ -5,6 +5,13 @@
 **Last reviewed:** 2026-10-15  
 **Current checkpoint:** PRs #157, #158, #159, #161, #163, #165, #167 and #169 are merged; Android and Windows CI passed for #159, #161, #163, #165, #167 and #169. Phase 1 deterministic shared rules and Phase 2 shared guessing-state migration are complete. Phase 4 now has platform-neutral navigation/action contracts, a controlled shared guessing component, a tested adapter from production Android `GameState` to the shared presentation model, a reusable controlled numeric guess-input primitive and a shared status-driven feedback card in `commonMain`. PR #167 adopts the shared input in production Play; static comparison confirms its label, range text, numeric keyboard, medium shape, single-line behavior and IME callback match the previous field configuration. PR #169 moves the feedback card layout and status-to-color mapping into shared UI while keeping localized feedback text and Android icon assets in the host. Next: complete runtime core-loop parity/regression verification, then continue feature-by-feature UI migration. Save settings/slot round trips and DataStore write-failure tests are complete through #156; ViewModel consistency after failed persistence remains a separate follow-up and must not block the UI migration.
 
+## Current next step - production feedback status alignment (2026-10-15)
+
+- [ ] Use the shared `GuessGameStatus` as the production Play screen's feedback state instead of maintaining a duplicate Android-only `GuessFeedbackTone` enum and translating it on every composition. This is a behavior-preserving bridge to the shared status-driven feedback card; Android retains localized wording, random tips, rate limiting and guess evaluation.
+- [ ] Verify Android and Windows CI for the status-alignment PR before merging.
+- [ ] Run/inspect a manual runtime parity matrix on Android for numeric input filtering and IME submission, invalid input, range boundaries, too-low/too-high/correct feedback, rate limiting, reward changes and save compatibility. Record actual evidence; CI alone does not establish runtime parity.
+- [ ] Only after this matrix is completed, choose the next production UI slice based on the remaining Android-owned rendering in `PlayScreen.kt`. Keep platform services and game mutation in the host until separately covered by shared contracts and tests.
+
 ## Rules for every PR
 
 1. Use focused, ordered, reversible PRs. Never push directly to `master`.

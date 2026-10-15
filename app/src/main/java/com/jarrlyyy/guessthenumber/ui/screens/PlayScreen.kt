@@ -30,7 +30,6 @@ import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessInputField
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackCard
 
-private enum class GuessFeedbackTone { Neutral, TooLow, TooHigh, Correct }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,15 +51,10 @@ fun PlayScreen(
     val configRepository = remember(state.settings.locale) { com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository(context, state.settings.locale) }
     val locale = configRepository.localeManager
     var lastFeedback by remember { mutableStateOf(locale.getString("guess_prompt", "Guess a number between ${state.currentRangeMin} and ${state.currentRangeMax}")) }
-    var feedbackTone by remember { mutableStateOf(GuessFeedbackTone.Neutral) }
+    var feedbackTone by remember { mutableStateOf(com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY) }
     val sharedPresentation = ProductionGuessPresentationAdapter.from(
         state = state,
-        status = when (feedbackTone) {
-            GuessFeedbackTone.Neutral -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY
-            GuessFeedbackTone.TooLow -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_LOW
-            GuessFeedbackTone.TooHigh -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_HIGH
-            GuessFeedbackTone.Correct -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT
-        }
+        status = feedbackTone
     )
     var showCorrectCelebration by remember { mutableStateOf(false) }
     var observedCorrectGuesses by remember { mutableStateOf(state.correctGuesses) }
@@ -92,7 +86,7 @@ fun PlayScreen(
     fun submitGuess() {
         val g = guessInput.toLongOrNull() ?: return
         if (!onMakeGuess(g)) {
-            feedbackTone = GuessFeedbackTone.Neutral
+            feedbackTone = com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY
             lastFeedback = locale.getString(
                 "guess_rate_limited",
                 "Please wait a moment before guessing again."
@@ -101,10 +95,10 @@ fun PlayScreen(
         }
         val evaluatedGuess = g.coerceIn(state.currentRangeMin, state.currentRangeMax)
         feedbackTone = when {
-            "mut_blind" in state.activeMutators -> GuessFeedbackTone.Neutral
-            evaluatedGuess < state.targetNumber -> GuessFeedbackTone.TooLow
-            evaluatedGuess > state.targetNumber -> GuessFeedbackTone.TooHigh
-            else -> GuessFeedbackTone.Correct
+            "mut_blind" in state.activeMutators -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.READY
+            evaluatedGuess < state.targetNumber -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_LOW
+            evaluatedGuess > state.targetNumber -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.TOO_HIGH
+            else -> com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus.CORRECT
         }
         lastFeedback = if ("mut_blind" in state.activeMutators) {
                                                 locale.getString("blind_feedback", "Feedback hidden by Blindfolded Oracle.")
