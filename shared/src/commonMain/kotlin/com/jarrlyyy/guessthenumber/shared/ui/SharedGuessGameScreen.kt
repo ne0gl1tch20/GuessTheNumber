@@ -56,9 +56,10 @@ fun SharedGuessGameScreen(
         if (game.solved) onSolved(game.attempts.toInt())
     }
 
-    val feedback = when (game.status) {
-        GuessGameStatus.READY -> "Guess a number from $minNumber to $maxNumber."
-        GuessGameStatus.INVALID_INPUT -> "Enter a whole number from $minNumber to $maxNumber."
+    val presentation = SharedGuessPresentationState.from(game)
+    val feedback = when (presentation.status) {
+        GuessGameStatus.READY -> "Guess a number from ${presentation.rangeMin} to ${presentation.rangeMax}."
+        GuessGameStatus.INVALID_INPUT -> "Enter a whole number from ${presentation.rangeMin} to ${presentation.rangeMax}."
         GuessGameStatus.TOO_LOW -> "Too low. Try again."
         GuessGameStatus.TOO_HIGH -> "Too high. Try again."
         GuessGameStatus.CORRECT -> "Correct! You won in ${game.attempts} guesses."
@@ -98,10 +99,10 @@ fun SharedGuessGameScreen(
                             guessText = ""
                         },
                         feedback = feedback,
-                        guessCount = game.attempts,
-                        minNumber = minNumber,
-                        maxNumber = maxNumber,
-                        solved = game.solved
+                        guessCount = presentation.guessCount,
+                        minNumber = presentation.rangeMin,
+                        maxNumber = presentation.rangeMax,
+                        solved = presentation.solved
                     )
                 }
             }
