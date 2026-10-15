@@ -29,7 +29,7 @@ class SharedGameContractsTest {
             SharedGameDestination.SHOP,
             (SharedGameAction.Navigate(SharedGameDestination.SHOP) as SharedGameAction.Navigate).destination
         )
-        assertTrue(SharedGameAction.StartNewGame is SharedGameAction)
+        assertEquals(SharedGameAction.StartNewGame, SharedGameAction.StartNewGame)
     }
 
     @Test
