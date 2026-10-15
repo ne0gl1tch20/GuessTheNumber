@@ -241,9 +241,9 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     EconomyActionCard(
                         title = item.name,
                         description = item.description,
-                        detail = "Cost: ${item.nebulaCost} Nebula",
-                        action = if (purchased) "Owned" else "Buy",
-                        enabled = !isSaving && !purchased && currentState.nebula >= BigNumber(item.nebulaCost)
+                        detail = if (!item.isCosmetic) "Windows effect not implemented yet · Cost: ${item.nebulaCost} Nebula" else "Cost: ${item.nebulaCost} Nebula",
+                        action = if (purchased) "Owned" else if (item.isCosmetic) "Buy" else "Unavailable",
+                        enabled = !isSaving && item.isCosmetic && !purchased && currentState.nebula >= BigNumber(item.nebulaCost)
                     ) {
                         commitTransaction { DesktopEconomyTransactions.buyShopItem(it, item) }
                     }
