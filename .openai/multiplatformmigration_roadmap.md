@@ -3,7 +3,7 @@
 **Purpose:** Track the ordered PR plan for the entire Android-to-Kotlin-Multiplatform migration before it reaches the finish line. This is an execution checklist, not a claim that unfinished work is complete.
 
 **Last reviewed:** 2026-10-15  
-**Current checkpoint:** PRs #142–#145 are merged. PR #145 introduced `GuessEconomyDecisionRules`, a shared deterministic result for guess reward multipliers and difficulty/tax penalty rates. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Next: add focused Android parity coverage for combined reward/penalty behavior before moving any currency or full-state mutation into common code.
+**Current checkpoint:** PRs #142–#146 are merged. PR #145 shared the guess-economy multiplier/penalty-rate decision; PR #146 added Android coverage for combined Hard-difficulty and tax penalties. Android still owns `BigNumber` arithmetic, currency/statistics mutation, RNG and save state. Current candidate: share the deterministic challenge-claim decision while keeping reward application and persistence on the platform.
 
 ## Rules for every PR
 
@@ -70,8 +70,10 @@ Inspected `app/src/main/java/com/jarrlyyy/guessthenumber/domain/engine/GameEngin
 - [x] Add differential tests comparing the legacy scalar rule, shared state model and Android `GameEngine` for correct and incorrect guesses with deterministic random inputs.
 - [x] Migrate guess submission to the shared state model while keeping currency/statistics mutation on Android.
 - [x] #145 - Extract reward multipliers and difficulty/tax penalty rates into a common deterministic decision result; keep `BigNumber` arithmetic and currency mutation on Android.
-- [ ] Add focused Android parity tests for combined reward/penalty behavior, then choose the next state transition only after reviewing the existing platform arithmetic and persistence boundaries.
-- [ ] Make transitions atomic and duplicate-resistant. Failed validation or persistence must not award currency twice or leave partial state.
+- [x] #146 - Add combined wrong-guess penalty parity coverage; Android and Windows CI passed before merge.
+- [x] #146 - Add Android parity coverage for the combined Hard-difficulty and tax-mutator penalty; preserve current `BigNumber` deductions and guess statistics.
+- [ ] Share a deterministic challenge-claim decision result and test rejected/duplicate claims; keep Nebula arithmetic, statistics mutation and persistence on Android.
+- [ ] Audit atomicity across state mutation and persistence before changing transaction behavior. Failed validation or persistence must not award currency twice or leave partial state.
 - [ ] Do not replace the existing large-number representation until a separately tested cross-platform numeric migration is justified.
 
 ### Phase 3 - Save and persistence compatibility
