@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "relics": [
+    {
+      "id": "verdant_guardian",
+      "name": "Heartwood Sigil",
+      "description": "A living charm from the Verdant Guardian.",
+      "setId": "world_boss_relics",
+      "setName": "World Boss Relics",
+      "rarity": "Rare",
+      "unlockBossId": "verdant_guardian",
+      "unlockBossName": "Verdant Guardian",
+      "twoPieceBonus": "+10% Money from correct guesses.",
+      "threePieceBonus": "+20% Money from correct guesses.",
+      "fourPieceBonus": "+35% Money from correct guesses and +1 Nebula per correct guess."
+    },
+    {
+      "id": "crystal_golem",
+      "name": "Prism Core",
+      "description": "A crystal lens that remembers every guess.",
+      "setId": "world_boss_relics",
+      "setName": "World Boss Relics",
+      "rarity": "Rare",
+      "unlockBossId": "crystal_golem",
+      "unlockBossName": "Crystal Golem",
+      "twoPieceBonus": "+10% Money from correct guesses.",
+      "threePieceBonus": "+20% Money from correct guesses.",
+      "fourPieceBonus": "+35% Money from correct guesses and +1 Nebula per correct guess."
+    },
+    {
+      "id": "ember_dragon",
+      "name": "Ember Scale",
+      "description": "A warm scale from the Ember Dragon.",
+      "setId": "world_boss_relics",
+      "setName": "World Boss Relics",
+      "rarity": "Epic",
+      "unlockBossId": "ember_dragon",
+      "unlockBossName": "Ember Dragon",
+      "twoPieceBonus": "+10% Money from correct guesses.",
+      "threePieceBonus": "+20% Money from correct guesses.",
+      "fourPieceBonus": "+35% Money from correct guesses and +1 Nebula per correct guess."
+    },
+    {
+      "id": "nebula_titan",
+      "name": "Starbound Fragment",
+      "description": "A fragment of the Nebula Titan's armor.",
+      "setId": "world_boss_relics",
+      "setName": "World Boss Relics",
+      "rarity": "Legendary",
+      "unlockBossId": "nebula_titan",
+      "unlockBossName": "Nebula Titan",
+      "twoPieceBonus": "+10% Money from correct guesses.",
+      "threePieceBonus": "+20% Money from correct guesses.",
+      "fourPieceBonus": "+35% Money from correct guesses and +1 Nebula per correct guess."
+    }
+  ]
+}

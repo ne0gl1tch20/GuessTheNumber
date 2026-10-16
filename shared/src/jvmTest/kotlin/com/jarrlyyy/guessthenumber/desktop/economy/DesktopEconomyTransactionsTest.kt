@@ -608,4 +608,221 @@ class DesktopEconomyTransactionsTest {
         assertEquals(owned.nebula, switched.state.nebula)
     }
 
+    @Test
+    fun homeBaseUpgradeChargesScaledCostAndPersistsLevel() {
+        val initial = GameState(money = BigNumber(100_000))
+        val result = DesktopEconomyTransactions.upgradeHomeBase(initial)
+
+        assertTrue(result.accepted)
+        assertEquals(BigNumber(50_000), result.state.money)
+        assertEquals(1, result.state.homeBaseLevel)
+        assertEquals(BigNumber(50_000), result.state.statistics.moneySpent)
+    }
+
+    @Test
+    fun homeBaseUpgradeRejectsUnaffordableAndMaximumLevelWithoutChangingState() {
+        val poor = GameState(money = BigNumber(49_999))
+        val unaffordable = DesktopEconomyTransactions.upgradeHomeBase(poor)
+        assertFalse(unaffordable.accepted)
+        assertEquals(poor, unaffordable.state)
+
+        val maxed = GameState(money = BigNumber(5_000_000), homeBaseLevel = 20)
+        val completed = DesktopEconomyTransactions.upgradeHomeBase(maxed)
+        assertFalse(completed.accepted)
+        assertEquals(maxed, completed.state)
+    }
+
+
+    @Test
+    fun bossBattleRequiresAndroidProgressionAndCanBeLeft() {
+        val locked = GameState(unlockedWorldIds = emptySet())
+        val lockedAttempt = DesktopEconomyTransactions.toggleBossBattle(locked, "verdant_grove")
+        assertFalse(lockedAttempt.accepted)
+        assertEquals(locked, lockedAttempt.state)
+
+        val underProgressed = GameState(unlockedWorldIds = setOf("verdant_grove"))
+        val rejected = DesktopEconomyTransactions.toggleBossBattle(underProgressed, "verdant_grove")
+        assertFalse(rejected.accepted)
+        assertEquals(underProgressed, rejected.state)
+
+        val ready = underProgressed.copy(
+            correctGuesses = 10,
+            upgradeLevels = mapOf("click_power" to 3)
+        )
+        val started = DesktopEconomyTransactions.toggleBossBattle(ready, "verdant_grove")
+        assertTrue(started.accepted)
+        assertEquals("verdant_grove", started.state.activeWorldId)
+        assertEquals("verdant_grove", started.state.activeBossBattleWorldId)
+
+        val left = DesktopEconomyTransactions.toggleBossBattle(started.state, "verdant_grove")
+        assertTrue(left.accepted)
+        assertEquals(null, left.state.activeBossBattleWorldId)
+        assertEquals(started.state.activeWorldId, left.state.activeWorldId)
+    }
+
+    @Test
+    fun bossBattleRejectsDefeatedBossOutsideEndlessRift() {
+        val defeated = GameState(
+            unlockedWorldIds = setOf("verdant_grove"),
+            defeatedBossIds = setOf("verdant_guardian"),
+            correctGuesses = 10,
+            upgradeLevels = mapOf("click_power" to 3)
+        )
+        val result = DesktopEconomyTransactions.toggleBossBattle(defeated, "verdant_grove")
+        assertFalse(result.accepted)
+        assertEquals(defeated, result.state)
+    }
+
+    @Test
+    fun bossGuessDamageAndVictoryRewardsUseSavedProgressionState() {
+        var state = GameState(
+            activeBossBattleWorldId = "verdant_grove",
+            correctGuesses = 10,
+            upgradeLevels = mapOf("click_power" to 3)
+        )
+        state = DesktopEconomyTransactions.recordBossGuess(state, true)
+        assertEquals(1, state.bossBattleProgress["verdant_guardian"])
+        assertTrue(state.defeatedBossIds.isEmpty())
+
+        state = DesktopEconomyTransactions.recordBossGuess(state, true)
+        assertEquals(2, state.bossBattleProgress["verdant_guardian"])
+        state = DesktopEconomyTransactions.recordBossGuess(state, true)
+
+        assertTrue("verdant_guardian" in state.defeatedBossIds)
+        assertEquals(null, state.activeBossBattleWorldId)
+        assertEquals(3, state.bossBattleProgress["verdant_guardian"])
+        assertTrue("verdant_guardian" in state.relicInventory)
+        assertTrue("world:verdant_grove" in state.codexEntries)
+        assertEquals(1, state.worldMasteryLevels["verdant_grove"])
+        assertTrue(state.money >= BigNumber(25_000))
+        assertTrue(state.nebula >= BigNumber(10))
+    }
+
+    @Test
+    fun bossMissesRegressDamageAtAndroidPhaseOneInterval() {
+        var state = GameState(
+            unlockedWorldIds = setOf("verdant_grove", "crystal_caverns"),
+            activeBossBattleWorldId = "crystal_caverns",
+            bossBattleProgress = mapOf("crystal_golem" to 1)
+        )
+        repeat(3) { state = DesktopEconomyTransactions.recordBossGuess(state, false) }
+        assertEquals(1, state.bossBattleProgress["crystal_golem"])
+        state = DesktopEconomyTransactions.recordBossGuess(state, false)
+        assertEquals(0, state.bossBattleProgress["crystal_golem"])
+        assertEquals(4, state.bossBattleMistakes["crystal_golem"])
+    }
+
+    @Test
+    fun activeBossBattleStatusMatchesSavedCombatProgress() {
+        val state = GameState(
+            activeBossBattleWorldId = "verdant_grove",
+            bossBattleProgress = mapOf("verdant_guardian" to 2),
+            bossBattleMistakes = mapOf("verdant_guardian" to 3)
+        )
+        val status = DesktopEconomyTransactions.activeBossBattleStatus(state)
+        assertEquals("verdant_grove", status?.worldId)
+        assertEquals("verdant_guardian", status?.bossId)
+        assertEquals("Verdant Guardian", status?.bossName)
+        assertEquals(3, status?.hp)
+        assertEquals(2, status?.damage)
+        assertEquals(3, status?.mistakes)
+        assertEquals(null, DesktopEconomyTransactions.activeBossBattleStatus(state.copy(activeBossBattleWorldId = null)))
+    }
+
+    @Test
+    fun relicClaimRequiresBossVictoryAndCannotDuplicateOwnership() {
+        val locked = GameState()
+        val denied = DesktopEconomyTransactions.claimRelic(locked, "verdant_guardian", "verdant_guardian")
+        assertFalse(denied.accepted)
+        assertEquals(locked, denied.state)
+
+        val defeated = locked.copy(defeatedBossIds = setOf("verdant_guardian"))
+        val claimed = DesktopEconomyTransactions.claimRelic(defeated, "verdant_guardian", "verdant_guardian")
+        assertTrue(claimed.accepted)
+        assertTrue("verdant_guardian" in claimed.state.relicInventory)
+
+        val duplicate = DesktopEconomyTransactions.claimRelic(claimed.state, "verdant_guardian", "verdant_guardian")
+        assertFalse(duplicate.accepted)
+        assertEquals(claimed.state, duplicate.state)
+    }
+
+    @Test
+    fun relicEquipAndUnequipEnforceOwnershipAndFourRelicLimit() {
+        val notOwned = DesktopEconomyTransactions.equipRelic(GameState(), "verdant_guardian")
+        assertFalse(notOwned.accepted)
+
+        val full = GameState(
+            relicInventory = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan", "fifth_relic"),
+            equippedRelicIds = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        )
+        val overflow = DesktopEconomyTransactions.equipRelic(full, "fifth_relic")
+        assertFalse(overflow.accepted)
+        assertEquals(full, overflow.state)
+
+        val removed = DesktopEconomyTransactions.unequipRelic(full, "nebula_titan")
+        assertTrue(removed.accepted)
+        assertFalse("nebula_titan" in removed.state.equippedRelicIds)
+        val equipped = DesktopEconomyTransactions.equipRelic(removed.state, "fifth_relic")
+        assertTrue(equipped.accepted)
+        assertEquals(4, equipped.state.equippedRelicIds.size)
+    }
+
+    @Test
+    fun codexCompletionRewardRequiresAllTwelveEntriesAndCanOnlyBeClaimedOnce() {
+        val incomplete = GameState(codexEntries = setOf("world:verdant_grove"))
+        val denied = DesktopEconomyTransactions.claimCodexCompletionReward(incomplete)
+        assertFalse(denied.accepted)
+        assertEquals(incomplete, denied.state)
+
+        val allEntries = setOf(
+            "world:verdant_grove", "boss:verdant_guardian",
+            "world:crystal_caverns", "boss:crystal_golem",
+            "world:ember_summit", "boss:ember_dragon",
+            "world:nebula_rift", "boss:nebula_titan",
+            "secret:whispering_hollow", "secret:shard_archive",
+            "secret:ashen_vault", "secret:lost_observatory"
+        )
+        val ready = GameState(codexEntries = allEntries, nebula = BigNumber(5))
+        val claimed = DesktopEconomyTransactions.claimCodexCompletionReward(ready)
+        assertTrue(claimed.accepted)
+        assertEquals(BigNumber(105), claimed.state.nebula)
+        assertTrue(claimed.state.codexRewardClaimed)
+        assertEquals(100L, claimed.state.statistics.nebulaEarned)
+
+        val duplicate = DesktopEconomyTransactions.claimCodexCompletionReward(claimed.state)
+        assertFalse(duplicate.accepted)
+        assertEquals(claimed.state, duplicate.state)
+    }
+
+    @Test
+    fun luckyStakeSettlementMatchesAndroidMoneyAndStatisticsRules() {
+        val initial = GameState(money = BigNumber(100))
+        val won = DesktopEconomyTransactions.settleStake(initial, BigNumber(10), BigNumber(25), true)
+        assertTrue(won.accepted)
+        assertEquals(BigNumber(115), won.state.money)
+        assertEquals(BigNumber(25), won.state.statistics.moneyEarned)
+        assertEquals(BigNumber(10), won.state.statistics.moneySpent)
+
+        val lost = DesktopEconomyTransactions.settleStake(initial, BigNumber(10), BigNumber.ZERO, false)
+        assertTrue(lost.accepted)
+        assertEquals(BigNumber(90), lost.state.money)
+        assertEquals(BigNumber.ZERO, lost.state.statistics.moneyEarned)
+        assertEquals(BigNumber(10), lost.state.statistics.moneySpent)
+    }
+
+    @Test
+    fun luckyStakeRejectsInvalidAndUnaffordableAmountsWithoutChangingState() {
+        val initial = GameState(money = BigNumber(10))
+        val zero = DesktopEconomyTransactions.settleStake(initial, BigNumber.ZERO, BigNumber.ZERO, false)
+        assertFalse(zero.accepted)
+        assertEquals(initial, zero.state)
+
+        val tooExpensive = DesktopEconomyTransactions.settleStake(initial, BigNumber(11), BigNumber.ZERO, false)
+        assertFalse(tooExpensive.accepted)
+        assertEquals(initial, tooExpensive.state)
+
+        val negativePayout = DesktopEconomyTransactions.settleStake(initial, BigNumber(1), BigNumber(-1), true)
+        assertFalse(negativePayout.accepted)
+        assertEquals(initial, negativePayout.state)
+    }
 }

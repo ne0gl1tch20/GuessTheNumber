@@ -1,3 +1,14 @@
+## Unreleased (Windows Progression Parity)
+
+- 🔄 **Windows Debug updates**: The About menu now checks the latest successful Windows Desktop CI run on `master`, downloads its short-lived Actions artifact, verifies the bundled manifest and SHA-256 checksum, and launches the MSI installer. The channel remains separate from production releases; interactive update/install testing is still pending.
+- 🌳 **Windows Talent Web**: Replaced the flat talent catalog with a connected six-node tree, selectable node details, zoom controls, drag/pinch navigation, parent-lock feedback and transaction-backed unlocks. Runtime screenshot parity remains unverified.
+- 🗺️ **World and boss progression**: Added Windows boss battle start/leave actions and connected guesses to shared boss damage, miss regression and victory-reward transactions. The interactive map canvas and Windows runtime parity checks remain unfinished.
+- 💎 **Relic transactions**: Relic claiming now checks boss unlock requirements and duplicate ownership; equip/unequip actions validate ownership and the four-slot limit through shared transactions.
+- 📖 **Explorer's Codex**: Added the 12 canonical world, boss and secret entries, saved discovery progress, and a one-time 100 Nebula completion reward.
+- 🏁 **Endgame tracker**: Added six saved progression goals covering bosses, secrets, relics, Home Base level, Endless Rift tier and world mastery.
+- 🎲 **Lucky Stake**: Added a Windows coin-flip screen with positive/affordable stake validation and a streak-based payout multiplier. Localization and runtime parity remain unverified.
+- 🧪 **Candidate status**: These are in-progress Windows ports, not a parity-complete release. On PR #215 head `c2138c0ff8ce2aba8813dd3104a560b489c82575`, Android Validation passed and Windows Desktop CI failed; see the parity audit before treating this work as validated.
+
 ## Unreleased (Windows Android visual parity)
 
 - 🎨 **Android theme parity pass**: aligned Windows Material 3 light/dark colors, expressive corner shapes and typography letter spacing with the Android theme tokens. Windows-only system chrome stays native. AMOLED/custom color settings and screenshot comparison remain to be verified.
@@ -24,6 +35,11 @@
 - 🧮 **Reward parity fixtures**: Added deterministic coverage for stacked talent, event, mastery, relic-set, Home Base and secret bonuses, including Money/Nebula statistics.
 - 🛍️ **Shop effects**: Windows now supports Nebula Crystal's 2× future Nebula rewards and Golden Guess Pass's critical-sized bonus on every tenth lifetime guess when that guess is correct. Unknown shop effects remain unavailable.
 - 🏆 **Progression hooks**: Achievement milestones award their configured Nebula rewards once and update lifetime earned statistics. World unlocks check boss, correct-guess, upgrade, Prestige and Ultra requirements, with explicit unlock/select controls on Play.
+
+## Unreleased (Windows Relic Gameplay Parity)
+
+- 💎 **Relic gameplay parity**: Windows now presents the four canonical Android boss relics, uses the same relic IDs as saved gameplay state, allows all four relics to be equipped and surfaces the real 2-piece, 3-piece and 4-piece bonuses. The existing post-guess reward calculation applies the equipped relic effects, including the four-piece +1 Nebula reward.
+- 🧪 **Relic set coverage**: Added tests for the catalog's canonical boss relic IDs, four-slot equipment limit and actual 2/3/4-piece gameplay reward effects.
 
 ## v3.0.3 (First-Run Tours & Update Reliability)
 
@@ -239,8 +255,8 @@
 - 📊 **Variable & Process Inspector Expansion**: Updated the Process & Variable Inspector screen to display real-time target guess numbers, range bounds, and complete runtime state variables.
 - 💬 **Data-Driven Randomized Guess Feedback**: Implemented data-driven JSON configuration (`guess_feedback_messages.json`) featuring 30 varied too-low and 30 varied too-high feedback messages.
 - ✨ **Hidden Background Money Generation (`/s`)**: Polished passive income calculation and live rate indicator on the Play screen.
-- ✨ **3 Distinct Save Slots System**: Implemented a comprehensive 3 save slot system (`Slot 1`, `Slot 2`, `Slot 3`) allowing players to manage separate game saves with independent progression, money, prestige, ultra currency, attempts, and timestamps.
-- 🔄 **Legacy Save Migration & Safety Prompt**: Added automatic detection for legacy single-saves from prior versions. When opening the Save Slots screen, players are prompted to securely transfer their legacy progress into Slot 1. If declined or dismissed without confirmation, the app closes immediately (`System.exit(0)`) to preserve data integrity.
+- ✨ **3 Distinct Save Slots System**: Implemented a comprehensive 3 save slot system (`Slot 1`, `Slot 2`, `Slot 3`) allowing users to manage separate game saves with independent progression, money, prestige, ultra currency, attempts, and timestamps.
+- 🔄 **Legacy Save Migration & Safety Prompt**: Added automatic detection for legacy single-saves from prior versions. When opening the Save Slots screen, users are prompted to securely transfer their legacy progress into Slot 1. If declined or dismissed without confirmation, the app closes immediately (`System.exit(0)`) to preserve data integrity.
 - 🛠️ **Save Slot Management UI**: Created a dedicated `SaveSlotsScreen` accessible from the More Hub, featuring slot summary cards, active slot highlighting, new game creation, individual slot resetting, and direct resume actions.
 
 ## v1.7 (Security & Integrity Hardening Pass)
@@ -282,7 +298,7 @@
 - 🛠️ Fixed Dev Settings Save Editor error message ("Failed to apply invalid save json") when submitting invalid save JSON strings.
 - 🎨 Converted dev settings action buttons (Run, Load Current Save, Apply Save JSON) into space-saving icon buttons.
 - 📤 Added dedicated share crash logs icon button alongside copy support in the crash recovery screen.
-- 📜 Enclosed the Dev Console live logs terminal viewer in a fully independent, scrollable console box with color-coded syntax.
+- 📜 Enclosed the Dev Settings live logs terminal viewer in a fully independent, scrollable console box with color-coded syntax.
 
 ## v1.2
 - 🛠️ **Essential Developer Commands**: Added robust new dev commands (`/timeskip`, `/max_upgrades`, `/unlock_all`, `/win`, `/speed`, `/stats`) along with autocomplete chips for rapid testing and debugging.

@@ -196,7 +196,7 @@ fun main() = application {
                         updateClient.findLatestUpdate(WindowsBuildVersion.current)
                     }
                     status = if (availableUpdate == null) {
-                        "You're using the latest published Windows Debug build."
+                        "You're using the latest available Windows Debug CI artifact."
                     } else {
                         "Version ${availableUpdate!!.version} is ready to install."
                     }
@@ -303,7 +303,16 @@ fun main() = application {
                         DesktopDestination.ULTRA,
                         DesktopDestination.TALENT,
                         DesktopDestination.STATS,
-                        DesktopDestination.SETTINGS -> {
+                        DesktopDestination.SETTINGS,
+                        DesktopDestination.ACHIEVEMENTS,
+                        DesktopDestination.WORLD_MAP,
+                        DesktopDestination.MUTATORS,
+                        DesktopDestination.SAVE_SLOTS,
+                        DesktopDestination.RELICS,
+                        DesktopDestination.HOME_BASE,
+                        DesktopDestination.CODEX,
+                        DesktopDestination.ENDGAME,
+                        DesktopDestination.LUCKY_STAKE -> {
                             Column(modifier = Modifier.fillMaxSize()) {
                                 ProductionGuessGameScreen(
                                     section = when (destination) {
@@ -315,6 +324,15 @@ fun main() = application {
                                         DesktopDestination.TALENT -> DesktopGameSection.TALENT
                                         DesktopDestination.STATS -> DesktopGameSection.STATS
                                         DesktopDestination.SETTINGS -> DesktopGameSection.SETTINGS
+                                        DesktopDestination.ACHIEVEMENTS -> DesktopGameSection.ACHIEVEMENTS
+                                        DesktopDestination.WORLD_MAP -> DesktopGameSection.WORLD_MAP
+                                        DesktopDestination.MUTATORS -> DesktopGameSection.MUTATORS
+                                        DesktopDestination.SAVE_SLOTS -> DesktopGameSection.SAVE_SLOTS
+                                        DesktopDestination.RELICS -> DesktopGameSection.RELICS
+                                        DesktopDestination.HOME_BASE -> DesktopGameSection.HOME_BASE
+                                        DesktopDestination.CODEX -> DesktopGameSection.CODEX
+                                        DesktopDestination.ENDGAME -> DesktopGameSection.ENDGAME
+                                        DesktopDestination.LUCKY_STAKE -> DesktopGameSection.LUCKY_STAKE
                                         else -> DesktopGameSection.PLAY
                                     },
                                     onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
@@ -328,6 +346,7 @@ fun main() = application {
                                         navigationPosition = selected
                                         DesktopNavigationPosition.save(selected)
                                     },
+                                    onOpenParityDestination = { shell.navigate(it) },
                                     onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
                                     onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
                                         themeMode = mode
@@ -339,6 +358,19 @@ fun main() = application {
                                 )
                             }
                         }
+
+                        DesktopDestination.CHANGELOG -> DesktopChangelogScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
+
+                        DesktopDestination.SAVE_SLOTS,
+                        DesktopDestination.RELICS,
+                        DesktopDestination.DEVELOPER_SETTINGS,
+                        DesktopDestination.DEVELOPER_CONSOLE,
+                        DesktopDestination.PROCESS_INSPECTOR,
+                        DesktopDestination.MUSIC_PLAYER,
+                        DesktopDestination.ARCADE,
+                        DesktopDestination.ACTIVITY_HUB,
+                        DesktopDestination.LUA_TESTING_HUB,
+                        DesktopDestination.LIVE_OPS -> DesktopParityScreen(destination = destination, onBack = { shell.navigate(DesktopDestination.MORE) }, onNavigate = { shell.navigate(it) })
 
                         DesktopDestination.ABOUT -> {
                             Card(modifier = Modifier.fillMaxWidth()) {

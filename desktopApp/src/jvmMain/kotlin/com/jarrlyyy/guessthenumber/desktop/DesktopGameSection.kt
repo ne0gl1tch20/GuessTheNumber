@@ -10,5 +10,14 @@ enum class DesktopGameSection {
     ULTRA,
     TALENT,
     STATS,
-    SETTINGS
+    SETTINGS,
+    ACHIEVEMENTS,
+    WORLD_MAP,
+    MUTATORS,
+    SAVE_SLOTS,
+    RELICS,
+    HOME_BASE,
+    CODEX,
+    ENDGAME,
+    LUCKY_STAKE
 }

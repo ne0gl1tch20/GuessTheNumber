@@ -1,0 +1,57 @@
+package com.jarrlyyy.guessthenumber.desktop
+
+import com.jarrlyyy.guessthenumber.domain.model.GameState
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class DesktopRelicsCatalogTest {
+    @Test
+    fun bundledCatalogHasUniqueRelicsAndConsistentSets() {
+        val catalog = DesktopRelicsCatalog.load()
+        assertEquals(4, catalog.size)
+        assertEquals(catalog.size, catalog.map { it.id }.distinct().size)
+        assertTrue(catalog.all { it.setId == "world_boss_relics" })
+        assertTrue(catalog.all { it.unlockBossId == it.id })
+        assertTrue(catalog.all { it.fourPieceBonus.contains("+1 Nebula") })
+        assertTrue(catalog.groupBy { it.setId }.values.all { set ->
+            set.map { it.setName }.distinct().size == 1 &&
+                set.map { it.twoPieceBonus }.distinct().size == 1 &&
+                set.map { it.threePieceBonus }.distinct().size == 1 &&
+                set.map { it.fourPieceBonus }.distinct().size == 1
+        })
+    }
+
+    @Test
+    fun invalidCatalogsAreRejected() {
+        assertNull(runCatching { DesktopRelicsCatalog.parse("""{"schemaVersion":1,"relics":[]}""") }.getOrNull())
+        val duplicate = """{"schemaVersion":1,"relics":[
+          {"id":"x","name":"X","description":"D","setId":"s","setName":"Set","rarity":"Common","unlockBossId":"b","unlockBossName":"Boss","twoPieceBonus":"A","threePieceBonus":"B","fourPieceBonus":"C"},
+          {"id":"x","name":"Y","description":"D","setId":"s","setName":"Set","rarity":"Common","unlockBossId":"b","unlockBossName":"Boss","twoPieceBonus":"A","threePieceBonus":"B","fourPieceBonus":"C"}
+        ]}"""
+        assertNull(runCatching { DesktopRelicsCatalog.parse(duplicate) }.getOrNull())
+    }
+
+    @Test
+    fun equipmentRequiresOwnershipAndHonorsFourSlotLimit() {
+        val owned = GameState(relicInventory = setOf("a", "b", "c", "d", "e"))
+        assertNull(DesktopRelicRules.equip(owned, "missing"))
+        val first = DesktopRelicRules.equip(owned, "a")!!
+        val second = DesktopRelicRules.equip(first, "b")!!
+        val third = DesktopRelicRules.equip(second, "c")!!
+        val fourth = DesktopRelicRules.equip(third, "d")!!
+        assertEquals(setOf("a", "b", "c", "d"), fourth.equippedRelicIds)
+        assertNull(DesktopRelicRules.equip(fourth, "e"))
+    }
+
+    @Test
+    fun worldBossSetBonusesActivateAtTwoThreeAndFourPieces() {
+        val catalog = DesktopRelicsCatalog.load()
+        val relicIds = catalog.map { it.id }
+        assertTrue(DesktopRelicRules.activeSetBonuses(catalog, relicIds.take(1).toSet()).isEmpty())
+        assertTrue(DesktopRelicRules.activeSetBonuses(catalog, relicIds.take(2).toSet()).single().contains("2-piece"))
+        assertTrue(DesktopRelicRules.activeSetBonuses(catalog, relicIds.take(3).toSet()).single().contains("3-piece"))
+        assertTrue(DesktopRelicRules.activeSetBonuses(catalog, relicIds.toSet()).single().contains("4-piece"))
+    }
+}

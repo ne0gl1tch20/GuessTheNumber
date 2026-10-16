@@ -28,11 +28,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -54,6 +56,7 @@ import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRepository
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import com.jarrlyyy.guessthenumber.desktop.economy.EconomyTransaction
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveStore
+import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveSlotSummary
 import com.jarrlyyy.guessthenumber.desktop.persistence.defaultDesktopSaveDirectory
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
@@ -86,6 +89,7 @@ fun ProductionGuessGameScreen(
     onBackFromSettings: () -> Unit = {},
     navigationPosition: DesktopNavigationPosition = DesktopNavigationPosition.LEFT,
     onNavigationPositionChange: (DesktopNavigationPosition) -> Unit = {},
+    onOpenParityDestination: (DesktopDestination) -> Unit = {},
     onThemeSettingsLoaded: (
         themeMode: String,
         primaryHex: String,
@@ -104,7 +108,10 @@ fun ProductionGuessGameScreen(
     val talentCatalog = talentCatalogResult.getOrNull()
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<GameState?>(null) }
+    var activeSaveSlot by remember { mutableStateOf(1) }
+    var saveSlotSummaries by remember { mutableStateOf<List<DesktopSaveSlotSummary>>(emptyList()) }
     var guessText by remember { mutableStateOf("") }
+    var lastGuessTimestampNanos by remember { mutableStateOf(0L) }
     var selectedShopCategory by remember { mutableStateOf("all") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
     var feedbackStatus by remember { mutableStateOf(GuessGameStatus.READY) }
@@ -115,7 +122,9 @@ fun ProductionGuessGameScreen(
     val latestSaving by rememberUpdatedState(isSaving)
 
     LaunchedEffect(Unit) {
-        val loaded = withContext(Dispatchers.IO) { saveStore.load(1) }
+        val selectedSlot = withContext(Dispatchers.IO) { saveStore.activeSlot() }
+        activeSaveSlot = selectedSlot
+        val loaded = withContext(Dispatchers.IO) { saveStore.load(selectedSlot) }
         if (loaded != null) {
             autoClicker.reset(loaded.currentRangeMin, loaded.currentRangeMax)
             state = loaded
@@ -126,7 +135,7 @@ fun ProductionGuessGameScreen(
                 currentRangeMin = 1L,
                 currentRangeMax = 100L
             )
-            val created = withContext(Dispatchers.IO) { saveStore.save(1, fresh) }
+            val created = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, fresh) }
             if (created) {
                 autoClicker.reset(fresh.currentRangeMin, fresh.currentRangeMax)
                 state = fresh
@@ -145,7 +154,7 @@ fun ProductionGuessGameScreen(
             val transaction = transform(before)
             if (!transaction.accepted) {
                 if (transaction.state != before) {
-                    val refreshedSave = withContext(Dispatchers.IO) { saveStore.save(1, transaction.state) }
+                    val refreshedSave = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, transaction.state) }
                     if (refreshedSave) {
                         state = transaction.state
                         feedback = transaction.message
@@ -159,7 +168,7 @@ fun ProductionGuessGameScreen(
                 return@launch
             }
             val progressedState = DesktopEconomyTransactions.evaluateAchievements(transaction.state)
-            val saved = withContext(Dispatchers.IO) { saveStore.save(1, progressedState) }
+            val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, progressedState) }
             if (saved) {
                 state = progressedState
                 if (
@@ -189,7 +198,7 @@ fun ProductionGuessGameScreen(
         settingsSaveJob?.cancel()
         settingsSaveJob = scope.launch {
             delay(200)
-            val saved = withContext(Dispatchers.IO) { saveStore.save(1, updated) }
+            val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, updated) }
             if (!saved) {
                 feedback = "Settings could not be saved. Your last valid save remains available."
             }
@@ -207,7 +216,7 @@ fun ProductionGuessGameScreen(
         autoClicker.reset(resetState.currentRangeMin, resetState.currentRangeMax)
         isSaving = true
         scope.launch {
-            val saved = withContext(Dispatchers.IO) { saveStore.reset(1, resetState) }
+            val saved = withContext(Dispatchers.IO) { saveStore.reset(activeSaveSlot, resetState) }
             feedback = if (saved) "Game data reset." else "Could not complete the data reset. Check the local save files."
             isSaving = false
         }
@@ -244,16 +253,16 @@ fun ProductionGuessGameScreen(
             after = result.newState,
             correct = correct
         )
-        val finalState = DesktopEconomyTransactions.evaluateAchievements(
-            DesktopEconomyTransactions.recordGuessProgress(
+        val guessProgressState = DesktopEconomyTransactions.recordGuessProgress(
                 before = snapshot,
                 after = bonusAdjustedState,
                 correct = correct,
                 today = LocalDate.now().toString(),
                 lootRoll = if (correct) Random.nextInt(1000) else null
             )
-        )
-        val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
+        val bossAdjustedState = DesktopEconomyTransactions.recordBossGuess(guessProgressState, correct)
+        val finalState = DesktopEconomyTransactions.evaluateAchievements(bossAdjustedState)
+        val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
         if (saved) {
             autoClicker.observeGuess(guess, result.feedback)
             if (result.feedback == GuessFeedback.CORRECT) {
@@ -304,7 +313,265 @@ fun ProductionGuessGameScreen(
                 CurrencySummary("Correct", currentState.correctGuesses.toString())
                 CurrencySummary("Streak", currentState.streak.toString())
             }
+
+            if (section == DesktopGameSection.SAVE_SLOTS) {
+                LaunchedEffect(activeSaveSlot, currentState?.lastSaveTimestamp, section) {
+                    saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                }
+                DesktopSaveSlotsContent(
+                    activeSlot = activeSaveSlot,
+                    slots = saveSlotSummaries,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onRefresh = { scope.launch { saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() } } },
+                    onSwitchSlot = { targetSlot ->
+                        val snapshot = state
+                        if (snapshot != null && !isSaving && targetSlot != activeSaveSlot) {
+                            scope.launch {
+                                isSaving = true
+                                val saved = withContext(Dispatchers.IO) {
+                                    saveStore.save(activeSaveSlot, snapshot.copy(lastSaveTimestamp = System.currentTimeMillis())) &&
+                                        saveStore.setActiveSlot(targetSlot)
+                                }
+                                if (saved) {
+                                    val loaded = withContext(Dispatchers.IO) { saveStore.load(targetSlot) }
+                                    if (loaded != null) {
+                                        activeSaveSlot = targetSlot
+                                        state = loaded
+                                        autoClicker.reset(loaded.currentRangeMin, loaded.currentRangeMax)
+                                        feedback = "Switched to save slot $targetSlot."
+                                    } else feedback = "That slot has no valid save. Create a new slot or recover its backup first."
+                                } else feedback = "Could not save the current slot. Switching was cancelled."
+                                isSaving = false
+                                saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                            }
+                        }
+                    },
+                    onCreateSlot = { targetSlot ->
+                        val current = state
+                        if (current != null) scope.launch {
+                            val fresh = GameState(
+                                targetNumber = Random.nextLong(1L, 101L),
+                                currentRangeMin = 1L,
+                                currentRangeMax = 100L,
+                                settings = current.settings,
+                                tutorialCompleted = current.tutorialCompleted,
+                                profileName = "Slot $targetSlot",
+                                lastSaveTimestamp = System.currentTimeMillis()
+                            )
+                            val created = withContext(Dispatchers.IO) {
+                                saveStore.createFreshSlot(targetSlot, fresh) && saveStore.setActiveSlot(targetSlot)
+                            }
+                            if (created) {
+                                activeSaveSlot = targetSlot
+                                state = fresh
+                                autoClicker.reset(fresh.currentRangeMin, fresh.currentRangeMax)
+                                feedback = "Created and switched to slot $targetSlot."
+                            } else feedback = "Could not create that slot. It may already contain data."
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    },
+                    onDuplicateSlot = { source, target ->
+                        scope.launch {
+                            val duplicated = withContext(Dispatchers.IO) { saveStore.duplicateSlot(source, target) }
+                            feedback = if (duplicated) "Duplicated slot $source to slot $target." else "Could not duplicate that slot. The target may not be empty."
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    },
+                    onRestoreBackup = { target ->
+                        scope.launch {
+                            val restored = withContext(Dispatchers.IO) { saveStore.restoreBackup(target) }
+                            if (restored && target == activeSaveSlot) {
+                                val recovered = withContext(Dispatchers.IO) { saveStore.load(target) }
+                                if (recovered != null) state = recovered
+                            }
+                            feedback = if (restored) "Restored the previous backup for slot $target." else "Could not restore a valid backup for that slot."
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    }
+                )
+            }
+
+            if (section == DesktopGameSection.MUTATORS) {
+                DesktopMutatorsContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onMutatorChange = { mutatorId, active ->
+                        commitTransaction { before -> DesktopEconomyTransactions.setMutatorActive(before, mutatorId, active, engine) }
+                    },
+                    onActivateBuilder = { selectedMutators ->
+                        commitTransaction { before ->
+                            val changes = (before.activeMutators - selectedMutators).map { it to false } +
+                                (selectedMutators - before.activeMutators).map { it to true }
+                            var transaction = EconomyTransaction(before, true, "Challenge mutators applied.")
+                            for ((id, active) in changes) {
+                                transaction = DesktopEconomyTransactions.setMutatorActive(transaction.state, id, active, engine)
+                                if (!transaction.accepted) break
+                            }
+                            transaction
+                        }
+                    },
+                    onClaimChallenge = { challengeId, reward ->
+                        commitTransaction { before ->
+                            if (challengeId in before.completedChallenges) EconomyTransaction(before, false, "Challenge already claimed.")
+                            else EconomyTransaction(
+                                before.copy(
+                                    completedChallenges = before.completedChallenges + challengeId,
+                                    nebula = before.nebula + BigNumber(reward),
+                                    statistics = before.statistics.copy(nebulaEarned = before.statistics.nebulaEarned + reward)
+                                ), true, "Challenge reward claimed: +$reward Nebula."
+                            )
+                        }
+                    }
+                )
+            }
+
+            if (section == DesktopGameSection.WORLD_MAP) {
+                DesktopWorldMapContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onWorldAction = { worldId, action ->
+                        commitTransaction { before ->
+                            when (action) {
+                                "unlock" -> DesktopEconomyTransactions.unlockWorld(before, worldId)
+                                "select" -> DesktopEconomyTransactions.selectWorld(before, worldId)
+                                "boss" -> DesktopEconomyTransactions.toggleBossBattle(before, worldId)
+                                else -> EconomyTransaction(before, false, "That world action is not supported yet.")
+                            }
+                        }
+                    }
+                )
+            }
+
+
+            if (section == DesktopGameSection.HOME_BASE) {
+                DesktopHomeBaseContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onUpgrade = {
+                        commitTransaction { before -> DesktopEconomyTransactions.upgradeHomeBase(before) }
+                    }
+                )
+            }
+
+            if (section == DesktopGameSection.RELICS) {
+                DesktopRelicsContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onRelicAction = { relicId, action ->
+                        val before = state
+                        if (before == null || isSaving) {
+                            feedback = "Wait for the current save to finish."
+                        } else {
+                            val relic = runCatching { DesktopRelicsCatalog.load().firstOrNull { it.id == relicId } }.getOrNull()
+                            if (relic == null) {
+                                feedback = "That relic is not in the catalog."
+                            } else {
+                                val transaction = when (action) {
+                                    "claim" -> DesktopEconomyTransactions.claimRelic(before, relicId, relic.unlockBossId)
+                                    "equip" -> DesktopEconomyTransactions.equipRelic(before, relicId)
+                                    "unequip" -> DesktopEconomyTransactions.unequipRelic(before, relicId)
+                                    else -> EconomyTransaction(before, false, "That relic action is not available.")
+                                }
+                                val updated = transaction.state
+                                if (!transaction.accepted) {
+                                    feedback = transaction.message
+                                } else {
+                                    isSaving = true
+                                    scope.launch {
+                                        val persisted = withContext(Dispatchers.IO) {
+                                            saveStore.save(activeSaveSlot, updated.copy(lastSaveTimestamp = System.currentTimeMillis()))
+                                        }
+                                        if (persisted) {
+                                            state = updated
+                                            feedback = when (action) {
+                                                "claim" -> "Relic claimed: " + relic.name + "."
+                                                "equip" -> "Equipped " + relic.name + "."
+                                                else -> "Unequipped " + relic.name + "."
+                                            }
+                                        } else {
+                                            feedback = "Could not save the relic change. Your previous saved state is still intact."
+                                        }
+                                        isSaving = false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                )
+            }
+
+            if (section == DesktopGameSection.LUCKY_STAKE) {
+                DesktopLuckyStakeContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onStakeResult = { stake, payout, won ->
+                        commitTransaction { DesktopEconomyTransactions.settleStake(it, stake, payout, won) }
+                    }
+                )
+            }
+
+            if (section == DesktopGameSection.ENDGAME) {
+                DesktopEndgameContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onOpenWorldMap = { onOpenParityDestination(DesktopDestination.WORLD_MAP) }
+                )
+            }
+
+            if (section == DesktopGameSection.CODEX) {
+                DesktopCodexContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onClaimCompletionReward = {
+                        commitTransaction { DesktopEconomyTransactions.claimCodexCompletionReward(it) }
+                    }
+                )
+            }
+
+            if (section == DesktopGameSection.ACHIEVEMENTS) {
+                DesktopAchievementsContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) }
+                )
+            }
+
             if (section == DesktopGameSection.PLAY) {
+            DesktopEconomyTransactions.activeBossBattleStatus(currentState)?.let { boss ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("⚔", style = MaterialTheme.typography.titleLarge)
+                            Spacer(Modifier.width(8.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Boss Battle Active", style = MaterialTheme.typography.titleMedium)
+                                Text(boss.bossName, style = MaterialTheme.typography.bodyMedium)
+                            }
+                            Text("${boss.hp - boss.damage} / ${boss.hp} HP", style = MaterialTheme.typography.labelMedium)
+                        }
+                        LinearProgressIndicator(
+                            progress = { boss.damage.toFloat() / boss.hp.toFloat() },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Text(
+                            "Correct guesses deal damage. Wrong guesses can restore HP as the boss changes phase.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        OutlinedButton(
+                            onClick = {
+                                commitTransaction { DesktopEconomyTransactions.toggleBossBattle(it, boss.worldId) }
+                            },
+                            enabled = !isSaving,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("Leave battle") }
+                    }
+                }
+            }
             Text(
                 "Daily progress: guesses ${currentState.dailyQuestGuesses}/10 · correct ${currentState.dailyQuestCorrectGuesses}/5 · best streak ${currentState.dailyQuestBestStreak}/5 · upgrades ${currentState.dailyQuestUpgradePurchases}/3",
                 style = MaterialTheme.typography.bodySmall,
@@ -323,7 +590,11 @@ fun ProductionGuessGameScreen(
                     } else if (guess !in currentState.currentRangeMin..currentState.currentRangeMax) {
                         feedbackStatus = GuessGameStatus.INVALID_INPUT
                         feedback = "Choose a number within the displayed range."
+                    } else if (!isSaving && lastGuessTimestampNanos != 0L && System.nanoTime() - lastGuessTimestampNanos < 50_000_000L) {
+                        feedbackStatus = GuessGameStatus.READY
+                        feedback = "Please wait a moment before guessing again."
                     } else if (!isSaving) {
+                        lastGuessTimestampNanos = System.nanoTime()
                         isSaving = true
                         val result = engine.processGuess(currentState, guess)
                         val correct = result.feedback == GuessFeedback.CORRECT
@@ -332,17 +603,17 @@ fun ProductionGuessGameScreen(
                             after = result.newState,
                             correct = correct
                         )
-                        val finalState = DesktopEconomyTransactions.evaluateAchievements(
-                            DesktopEconomyTransactions.recordGuessProgress(
+                        val guessProgressState = DesktopEconomyTransactions.recordGuessProgress(
                                 before = currentState,
                                 after = bonusAdjustedState,
                                 correct = correct,
                                 today = LocalDate.now().toString(),
                                 lootRoll = if (correct) Random.nextInt(1000) else null
                             )
-                        )
+                        val bossAdjustedState = DesktopEconomyTransactions.recordBossGuess(guessProgressState, correct)
+                        val finalState = DesktopEconomyTransactions.evaluateAchievements(bossAdjustedState)
                         scope.launch {
-                            val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
+                            val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
                             if (saved) {
                                 autoClicker.observeGuess(guess, result.feedback)
                                 if (result.feedback == GuessFeedback.CORRECT) {
@@ -724,34 +995,22 @@ fun ProductionGuessGameScreen(
             }
 
             if (section == DesktopGameSection.TALENT) {
-            SectionTitle("Talents")
                 if (talentCatalog == null) {
                     val talentCatalogError = talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"
                     Text("Talent catalog could not be loaded: $talentCatalogError")
                 } else {
-                    talentCatalog.forEach { talent ->
-                        val owned = talent.id in currentState.prestigeShopPurchases
-                        val parentOwned = talent.requiredParentId == null ||
-                            talent.requiredParentId in currentState.prestigeShopPurchases
-                        EconomyActionCard(
-                            title = talent.name,
-                            description = talent.description,
-                            detail = when {
-                                owned -> "Unlocked"
-                                !parentOwned -> "Cost: ${talent.cost} Prestige · Requires ${talent.requiredParentId}"
-                                else -> "Cost: ${talent.cost} Prestige"
-                            },
-                            action = if (owned) "Owned" else if (!parentOwned) "Locked" else "Unlock",
-                            enabled = !isSaving && !owned && parentOwned &&
-                                currentState.prestige >= BigNumber(talent.cost)
-                        ) {
+                    DesktopTalentWebContent(
+                        state = currentState,
+                        talents = talentCatalog,
+                        isSaving = isSaving,
+                        onBuyTalent = { talent ->
                             commitTransaction {
                                 DesktopEconomyTransactions.buyTalent(
                                     it, talent.id, talent.cost, talent.requiredParentId
                                 )
                             }
                         }
-                    }
+                    )
                 }
             }
 
@@ -850,6 +1109,15 @@ fun ProductionGuessGameScreen(
                         Button(onClick = onOpenStats) { Text("Statistics") }
                         Button(onClick = onOpenSettings) { Text("Settings & Save Management") }
                         Button(onClick = onOpenAbout) { Text("About and updates") }
+                        Text("More Windows destinations", style = MaterialTheme.typography.titleMedium)
+                        Text("These routes are being brought into parity with Android in stages. A connected route does not mean every Android interaction is complete yet.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        val parityDestinations = listOf(DesktopDestination.WORLD_MAP, DesktopDestination.MUTATORS, DesktopDestination.SAVE_SLOTS, DesktopDestination.RELICS, DesktopDestination.HOME_BASE, DesktopDestination.CODEX, DesktopDestination.ENDGAME, DesktopDestination.LUCKY_STAKE, DesktopDestination.MUSIC_PLAYER, DesktopDestination.ARCADE, DesktopDestination.ACTIVITY_HUB, DesktopDestination.LUA_TESTING_HUB, DesktopDestination.CHANGELOG, DesktopDestination.LIVE_OPS, DesktopDestination.DEVELOPER_SETTINGS, DesktopDestination.DEVELOPER_CONSOLE, DesktopDestination.PROCESS_INSPECTOR)
+                        parityDestinations.chunked(2).forEach { destinations ->
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                destinations.forEach { destination -> Button(onClick = { onOpenParityDestination(destination) }, modifier = Modifier.weight(1f)) { Text(destination.label) } }
+                                if (destinations.size == 1) Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
                     }
                 }
             }

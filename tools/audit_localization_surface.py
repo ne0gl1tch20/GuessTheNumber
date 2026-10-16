@@ -114,6 +114,12 @@ def scan_catalog_calls():
 
 
 def main() -> int:
+    # Windows PowerShell runners may default to cp1252; findings can contain
+    # valid Unicode punctuation that encoding cannot represent. Force UTF-8
+    # for diagnostic output so the audit reports findings instead of crashing.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")
+
     findings = scan_kotlin() + scan_xml() + scan_catalog_calls()
     print(
         f"Localization surface audit: scanned Android/shared/desktop Kotlin sources; "

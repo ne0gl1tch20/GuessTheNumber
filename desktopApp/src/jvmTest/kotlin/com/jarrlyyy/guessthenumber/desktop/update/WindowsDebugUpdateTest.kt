@@ -15,56 +15,37 @@ import java.util.zip.ZipOutputStream
 
 class WindowsDebugUpdateTest {
     @Test
-    fun discoversNewerMatchingWindowsDebugRelease() {
-        val manifestUrl = "https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/windows-debug-6-1/windows-debug-manifest.json"
-        val archiveUrl = "https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/windows-debug-6-1/GuessTheNumber-Windows-Desktop.zip"
-        val responses = mapOf(
-            RELEASES_URL to """
-                [
-                  {
-                    "tag_name":"windows-debug-6-1",
-                    "prerelease":true,
-                    "assets":[
-                      {"name":"windows-debug-manifest.json","browser_download_url":"$manifestUrl"},
-                      {"name":"GuessTheNumber-Windows-Desktop.zip","browser_download_url":"$archiveUrl"}
-                    ]
-                  }
-                ]
-            """.trimIndent(),
-            manifestUrl to """
-                {
-                  "channel":"windows-debug",
-                  "version":"1.0.6",
-                  "assetName":"GuessTheNumber-Windows-Desktop.zip",
-                  "sha256":"${"a".repeat(64)}",
-                  "tag":"windows-debug-6-1"
-                }
-            """.trimIndent()
-        )
-        val client = WindowsDebugUpdateClient { url -> StubConnection(url, responses.getValue(url.toString())) }
-
+    fun discoversNewerSuccessfulMasterDesktopArtifact() {
+        val client = clientForRun(runNumber = 6)
         val update = client.findLatestUpdate("1.0.5")
 
         assertNotNull(update)
         assertEquals("1.0.6", update?.version)
-        assertEquals(archiveUrl, update?.downloadUrl)
+        assertEquals("windows-debug-6-1", update?.tagName)
+        assertEquals("https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/88/zip", update?.downloadUrl)
+        assertEquals(6L, update?.runNumber)
+        assertEquals(1L, update?.runAttempt)
     }
 
     @Test
-    fun doesNotOfferInstalledOrOlderVersion() {
-        val client = clientWithManifest(version = "1.0.6", tag = "windows-debug-6-1")
-
-        assertNull(client.findLatestUpdate("1.0.6"))
-        assertNull(client.findLatestUpdate("1.0.7"))
+    fun doesNotOfferInstalledOrNewerVersion() {
+        assertNull(clientForRun(6).findLatestUpdate("1.0.6"))
+        assertNull(clientForRun(6).findLatestUpdate("1.0.7"))
     }
 
     @Test
-    fun rejectsManifestWithWrongTagOrInvalidChecksum() {
-        val wrongTag = clientWithManifest(version = "1.0.6", tag = "windows-debug-5-1")
-        val badChecksum = clientWithManifest(version = "1.0.6", tag = "windows-debug-6-1", checksum = "bad")
+    fun ignoresNonMasterRunsAndExpiredArtifacts() {
+        val runsUrl = WORKFLOW_RUNS_URL
+        val artifactsUrl = "$ACTIONS_API/runs/123/artifacts?per_page=100"
+        val responses = mapOf(
+            runsUrl to "{\"workflow_runs\":[{\"id\":123,\"run_number\":7,\"run_attempt\":1,\"event\":\"pull_request\",\"head_branch\":\"master\",\"conclusion\":\"success\"},{\"id\":123,\"run_number\":6,\"run_attempt\":1,\"event\":\"push\",\"head_branch\":\"master\",\"conclusion\":\"success\"}]}",
+            artifactsUrl to "{\"artifacts\":[{\"name\":\"GuessTheNumber-Windows-Debug\",\"expired\":true,\"archive_download_url\":\"https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/88/zip\"}]}"
+        )
+        val client = WindowsDebugUpdateClient { url ->
+            StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
+        }
 
-        assertNull(wrongTag.findLatestUpdate("1.0.5"))
-        assertNull(badChecksum.findLatestUpdate("1.0.5"))
+        assertNull(client.findLatestUpdate("1.0.5"))
     }
 
     @Test
@@ -85,12 +66,15 @@ class WindowsDebugUpdateTest {
     @Test(expected = IllegalStateException::class)
     fun rejectsZipPathTraversal() {
         val archive = createZip("../GuessTheNumber-Windows-Desktop.msi" to byteArrayOf(1))
+        val directory = Files.createTempDirectory("gtn-test-")
         try {
             WindowsDebugArchiveValidator.extractExpectedMsi(
                 archive,
-                Files.createTempDirectory("gtn-test-").resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
+                directory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
             )
         } finally {
+            Files.deleteIfExists(directory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME))
+            Files.deleteIfExists(directory)
             Files.deleteIfExists(archive)
         }
     }
@@ -98,12 +82,15 @@ class WindowsDebugUpdateTest {
     @Test(expected = IllegalStateException::class)
     fun rejectsUnexpectedFilesInArchive() {
         val archive = createZip("unexpected.txt" to byteArrayOf(1))
+        val directory = Files.createTempDirectory("gtn-test-")
         try {
             WindowsDebugArchiveValidator.extractExpectedMsi(
                 archive,
-                Files.createTempDirectory("gtn-test-").resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
+                directory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
             )
         } finally {
+            Files.deleteIfExists(directory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME))
+            Files.deleteIfExists(directory)
             Files.deleteIfExists(archive)
         }
     }
@@ -133,30 +120,17 @@ class WindowsDebugUpdateTest {
         }
     }
 
-    private fun clientWithManifest(version: String, tag: String, checksum: String = "a".repeat(64)): WindowsDebugUpdateClient {
-        val manifestUrl = "https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/windows-debug-6-1/windows-debug-manifest.json"
-        val archiveUrl = "https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/windows-debug-6-1/GuessTheNumber-Windows-Desktop.zip"
-        val releases = """
-            [{
-              "tag_name":"windows-debug-6-1",
-              "prerelease":true,
-              "assets":[
-                {"name":"windows-debug-manifest.json","browser_download_url":"$manifestUrl"},
-                {"name":"GuessTheNumber-Windows-Desktop.zip","browser_download_url":"$archiveUrl"}
-              ]
-            }]
-        """.trimIndent()
-        val manifest = """
-            {
-              "channel":"windows-debug",
-              "version":"$version",
-              "assetName":"GuessTheNumber-Windows-Desktop.zip",
-              "sha256":"$checksum",
-              "tag":"$tag"
-            }
-        """.trimIndent()
-        val responses = mapOf(RELEASES_URL to releases, manifestUrl to manifest)
-        return WindowsDebugUpdateClient { url -> StubConnection(url, responses.getValue(url.toString())) }
+    private fun clientForRun(runNumber: Long): WindowsDebugUpdateClient {
+        val runsUrl = WORKFLOW_RUNS_URL
+        val artifactsUrl = "$ACTIONS_API/runs/123/artifacts?per_page=100"
+        val downloadUrl = "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/88/zip"
+        val responses = mapOf(
+            runsUrl to "{\"workflow_runs\":[{\"id\":123,\"run_number\":$runNumber,\"run_attempt\":1,\"event\":\"push\",\"head_branch\":\"master\",\"conclusion\":\"success\"}]}",
+            artifactsUrl to "{\"artifacts\":[{\"name\":\"GuessTheNumber-Windows-Debug\",\"expired\":false,\"archive_download_url\":\"$downloadUrl\"}]}"
+        )
+        return WindowsDebugUpdateClient { url ->
+            StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
+        }
     }
 
     private fun createZip(vararg entries: Pair<String, ByteArray>): java.nio.file.Path {
@@ -180,6 +154,9 @@ class WindowsDebugUpdateTest {
     }
 
     private companion object {
-        const val RELEASES_URL = "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/releases?per_page=100"
+        const val ACTIONS_API =
+            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions"
+        const val WORKFLOW_RUNS_URL =
+            "$ACTIONS_API/workflows/windows-desktop.yml/runs?branch=master&status=completed&per_page=20"
     }
 }

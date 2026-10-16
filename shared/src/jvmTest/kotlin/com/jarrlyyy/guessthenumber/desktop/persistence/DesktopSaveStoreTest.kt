@@ -72,6 +72,27 @@ class DesktopSaveStoreTest {
         assertEquals(null, store.load(1))
     }
 
+
+    @Test
+    fun slotsSupportCreateSwitchDuplicateAndBackupRestore() = runBlocking {
+        val directory = Files.createTempDirectory("gtn-save-slots")
+        val store = DesktopSaveStore(directory)
+        val first = GameState(targetNumber = 12, lastSaveTimestamp = 100L)
+        val second = GameState(targetNumber = 88, lastSaveTimestamp = 200L)
+        assertTrue(store.createFreshSlot(1, first))
+        assertFalse(store.createFreshSlot(1, second))
+        assertEquals(10, store.slotSummaries().size)
+        assertTrue(store.setActiveSlot(1))
+        assertEquals(1, store.activeSlot())
+        assertTrue(store.save(1, second))
+        assertTrue(store.restoreBackup(1))
+        assertEquals(first, store.load(1))
+        assertTrue(store.slotSummaries().any { it.slot == 1 && !it.isEmpty && it.hasBackup })
+        assertTrue(store.duplicateSlot(1, 2))
+        assertEquals(first.targetNumber, store.load(2)?.targetNumber)
+        assertFalse(store.duplicateSlot(1, 2))
+    }
+
     @Test
     fun legacyJsonDefaultsRemainCompatible() = runBlocking {
         val directory = Files.createTempDirectory("gtn-save-legacy")

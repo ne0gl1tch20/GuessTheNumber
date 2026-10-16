@@ -215,6 +215,184 @@ object DesktopEconomyTransactions {
         return accepted(state.copy(activeWorldId = worldId, activeBossBattleWorldId = if (state.activeBossBattleWorldId == worldId) worldId else null), "Selected ${WORLD_REQUIREMENTS.first { it.id == worldId }.name}.")
     }
 
+    /** Applies Android's guess-driven boss damage, miss regression and victory rewards. */
+    private val CODEX_REQUIRED_ENTRIES = setOf(
+        "world:verdant_grove", "boss:verdant_guardian",
+        "world:crystal_caverns", "boss:crystal_golem",
+        "world:ember_summit", "boss:ember_dragon",
+        "world:nebula_rift", "boss:nebula_titan",
+        "secret:whispering_hollow", "secret:shard_archive",
+        "secret:ashen_vault", "secret:lost_observatory"
+    )
+
+    fun settleStake(
+        state: GameState,
+        stakeAmount: BigNumber,
+        payout: BigNumber,
+        won: Boolean
+    ): EconomyTransaction {
+        if (stakeAmount <= BigNumber.ZERO) return rejected(state, "Enter a positive stake.")
+        if (payout < BigNumber.ZERO) return rejected(state, "Payout cannot be negative.")
+        if (state.money < stakeAmount) return rejected(state, "Insufficient funds for this stake.")
+        val updatedMoney = if (won) state.money - stakeAmount + payout else state.money - stakeAmount
+        return accepted(
+            state.copy(
+                money = updatedMoney,
+                statistics = state.statistics.copy(
+                    moneyEarned = if (won) state.statistics.moneyEarned + payout else state.statistics.moneyEarned,
+                    moneySpent = state.statistics.moneySpent + stakeAmount
+                )
+            ),
+            if (won) "Lucky Guess won!" else "Lucky Guess lost."
+        )
+    }
+
+    fun claimCodexCompletionReward(state: GameState): EconomyTransaction {
+        if (state.codexRewardClaimed) return rejected(state, "Codex completion reward is already claimed.")
+        if (!state.codexEntries.containsAll(CODEX_REQUIRED_ENTRIES)) {
+            return rejected(state, "Discover all 12 Codex entries first.")
+        }
+        val reward = BigNumber(100)
+        return accepted(
+            state.copy(
+                nebula = state.nebula + reward,
+                codexRewardClaimed = true,
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 100L)
+            ),
+            "Codex complete! You earned 100 Nebula."
+        )
+    }
+
+    fun claimRelic(state: GameState, relicId: String, unlockBossId: String): EconomyTransaction {
+        if (relicId.isBlank() || unlockBossId.isBlank()) return rejected(state, "Invalid relic.")
+        if (relicId in state.relicInventory) return rejected(state, "Relic is already claimed.")
+        if (unlockBossId !in state.defeatedBossIds) return rejected(state, "Defeat the required boss first.")
+        return accepted(state.copy(relicInventory = state.relicInventory + relicId), "Relic claimed.")
+    }
+
+    fun equipRelic(state: GameState, relicId: String): EconomyTransaction {
+        if (relicId !in state.relicInventory) return rejected(state, "Claim the relic first.")
+        if (relicId in state.equippedRelicIds) return rejected(state, "Relic is already equipped.")
+        if (state.equippedRelicIds.size >= 4) return rejected(state, "You can equip up to four relics.")
+        return accepted(state.copy(equippedRelicIds = state.equippedRelicIds + relicId), "Relic equipped.")
+    }
+
+    fun unequipRelic(state: GameState, relicId: String): EconomyTransaction {
+        if (relicId !in state.equippedRelicIds) return rejected(state, "Relic is not equipped.")
+        return accepted(state.copy(equippedRelicIds = state.equippedRelicIds - relicId), "Relic unequipped.")
+    }
+
+    fun recordBossGuess(state: GameState, correct: Boolean): GameState {
+        val worldId = state.activeBossBattleWorldId ?: return state
+        val world = WORLD_REQUIREMENTS.firstOrNull { it.id == worldId } ?: return state
+        if (worldId !in state.unlockedWorldIds || (world.bossId in state.defeatedBossIds && !state.endlessRiftActive)) return state
+
+        val bossHp = world.bossHp + if (state.endlessRiftActive) ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
+        val damage = (state.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, bossHp)
+        val mistakes = state.bossBattleMistakes[world.bossId] ?: 0
+        if (!correct) {
+            val nextMistakes = mistakes + 1
+            val phase = ((damage * 3) / bossHp + 1).coerceIn(1, 3)
+            val interval = when (phase) { 1 -> 4; 2 -> 3; else -> 2 }
+            val nextDamage = if (nextMistakes % interval == 0) (damage - 1).coerceAtLeast(0) else damage
+            return state.copy(
+                bossBattleMistakes = state.bossBattleMistakes + (world.bossId to nextMistakes),
+                bossBattleProgress = state.bossBattleProgress + (world.bossId to nextDamage)
+            )
+        }
+
+        val nextDamage = damage + 1
+        val oldPhase = ((damage * 3) / bossHp + 1).coerceIn(1, 3)
+        val newPhase = ((nextDamage * 3) / bossHp + 1).coerceIn(1, 3)
+        if (nextDamage < bossHp) {
+            return state.copy(
+                bossBattleProgress = state.bossBattleProgress + (world.bossId to nextDamage),
+                bossBattleMistakes = state.bossBattleMistakes + (world.bossId to if (newPhase != oldPhase) 0 else mistakes)
+            )
+        }
+
+        val baseMoney = BigNumber(world.baseMoneyReward)
+        val (bonusMoney, bonusNebula) = progressionRewardBonus(state, baseMoney)
+        val tierMultiplier = if (state.endlessRiftActive) state.endlessRiftTier.coerceAtLeast(1) else 1
+        val moneyReward = (baseMoney + bonusMoney) * BigNumber(tierMultiplier.toLong())
+        val nebulaReward = (world.baseNebulaReward + bonusNebula) * tierMultiplier
+        val defeatedState = state.copy(
+            money = state.money + moneyReward,
+            nebula = state.nebula + BigNumber(nebulaReward),
+            defeatedBossIds = if (state.endlessRiftActive) state.defeatedBossIds else state.defeatedBossIds + world.bossId,
+            worldBossVictories = state.worldBossVictories + 1,
+            bossBattleProgress = state.bossBattleProgress + (world.bossId to bossHp),
+            activeBossBattleWorldId = null,
+            relicInventory = if (state.endlessRiftActive) state.relicInventory else state.relicInventory + world.bossId,
+            codexEntries = if (state.endlessRiftActive) state.codexEntries else state.codexEntries + setOf("world:$worldId", "boss:${world.bossId}"),
+            worldMasteryLevels = if (state.endlessRiftActive) state.worldMasteryLevels else state.worldMasteryLevels + (worldId to ((state.worldMasteryLevels[worldId] ?: 0) + 1)),
+            statistics = state.statistics.copy(
+                moneyEarned = state.statistics.moneyEarned + moneyReward,
+                nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+            )
+        )
+        if (!state.endlessRiftActive) return defeatedState
+
+        val worldIndex = WORLD_REQUIREMENTS.indexOf(world).coerceAtLeast(0)
+        val nextWorld = WORLD_REQUIREMENTS[(worldIndex + 1) % WORLD_REQUIREMENTS.size]
+        val nextTier = state.endlessRiftTier + 1
+        return defeatedState.copy(
+            activeWorldId = nextWorld.id,
+            activeBossBattleWorldId = nextWorld.id,
+            bossBattleProgress = defeatedState.bossBattleProgress + (nextWorld.bossId to 0),
+            bossBattleMistakes = defeatedState.bossBattleMistakes + (nextWorld.bossId to 0),
+            endlessRiftTier = nextTier,
+            endlessRiftBestTier = maxOf(state.endlessRiftBestTier, state.endlessRiftTier)
+        )
+    }
+
+    private fun progressionRewardBonus(state: GameState, baseMoney: BigNumber): Pair<BigNumber, Long> {
+        val relicCount = state.equippedRelicIds.intersect(
+            setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        ).size
+        val setRate = when (relicCount) { 2 -> 0.10; 3 -> 0.20; 4 -> 0.35; else -> 0.0 }
+        val masteryRate = (state.worldMasteryLevels[state.activeWorldId] ?: 0).coerceIn(0, 10) * 0.02
+        val sanctuaryRate = (state.homeBaseLevel.coerceAtLeast(0) * 0.02).coerceAtMost(0.40)
+        val eventRate = state.permanentEventBoosts.coerceIn(0, 25) * 0.02
+        val secretId = mapOf(
+            "verdant_grove" to "whispering_hollow",
+            "crystal_caverns" to "shard_archive",
+            "ember_summit" to "ashen_vault",
+            "nebula_rift" to "lost_observatory"
+        )[state.activeWorldId]
+        val secretRate = if (secretId != null && secretId in state.discoveredSecretIds) 0.05 else 0.0
+        val bonusMoney = baseMoney * BigNumber(setRate + masteryRate + sanctuaryRate + secretRate + eventRate)
+        val bonusNebula = (if (relicCount == 4) 10L else 0L) +
+            (if ((state.worldMasteryLevels[state.activeWorldId] ?: 0) >= 5) 5L else 0L) +
+            (if (secretId != null && secretId in state.discoveredSecretIds) 5L else 0L)
+        return bonusMoney to bonusNebula
+    }
+
+    /** Starts or leaves the Android-defined boss battle for an unlocked world. */
+    fun toggleBossBattle(state: GameState, worldId: String): EconomyTransaction {
+        val world = WORLD_REQUIREMENTS.firstOrNull { it.id == worldId }
+            ?: return rejected(state, "Unknown world.")
+        if (worldId !in state.unlockedWorldIds) return rejected(state, "Unlock this world first.")
+        if (world.bossId in state.defeatedBossIds && !state.endlessRiftActive) {
+            return rejected(state, "This boss has already been defeated.")
+        }
+        if (state.activeBossBattleWorldId == worldId) {
+            return accepted(state.copy(activeBossBattleWorldId = null), "Left the ${world.bossName} battle.")
+        }
+        val totalUpgradeLevels = state.upgradeLevels.values.sum()
+        val canFight = state.endlessRiftActive || (
+            state.correctGuesses >= world.fightCorrectGuesses &&
+                totalUpgradeLevels >= world.fightUpgradeLevels &&
+                state.prestigeCount >= world.fightPrestigeCount &&
+                state.ultraCount >= world.fightUltraCount
+        )
+        if (!canFight) return rejected(state, "Boss battle requirements are not met.")
+        return accepted(
+            state.copy(activeWorldId = worldId, activeBossBattleWorldId = worldId),
+            "Started the ${world.bossName} battle."
+        )
+    }
+
     fun worldProgress(state: GameState): List<DesktopWorldProgress> {
         val totalUpgradeLevels = state.upgradeLevels.values.sum()
         return WORLD_REQUIREMENTS.map { world ->
@@ -288,6 +466,15 @@ object DesktopEconomyTransactions {
     private data class WorldRequirement(
         val id: String,
         val name: String,
+        val bossId: String,
+        val bossName: String,
+        val bossHp: Int,
+        val baseMoneyReward: String,
+        val baseNebulaReward: Long,
+        val fightCorrectGuesses: Long,
+        val fightUpgradeLevels: Int,
+        val fightPrestigeCount: Long,
+        val fightUltraCount: Long,
         val requiredBossId: String?,
         val requiredCorrectGuesses: Long,
         val requiredUpgradeLevels: Int,
@@ -295,6 +482,29 @@ object DesktopEconomyTransactions {
         val requiredUltraCount: Long,
         val requirement: String
     )
+
+    data class DesktopBossBattleStatus(
+        val worldId: String,
+        val bossId: String,
+        val bossName: String,
+        val hp: Int,
+        val damage: Int,
+        val mistakes: Int
+    )
+
+    fun activeBossBattleStatus(state: GameState): DesktopBossBattleStatus? {
+        val worldId = state.activeBossBattleWorldId ?: return null
+        val world = WORLD_REQUIREMENTS.firstOrNull { it.id == worldId } ?: return null
+        val hp = world.bossHp + if (state.endlessRiftActive) ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
+        return DesktopBossBattleStatus(
+            worldId = world.id,
+            bossId = world.bossId,
+            bossName = world.bossName,
+            hp = hp,
+            damage = (state.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, hp),
+            mistakes = state.bossBattleMistakes[world.bossId] ?: 0
+        )
+    }
 
     data class DesktopWorldProgress(
         val id: String,
@@ -500,6 +710,23 @@ object DesktopEconomyTransactions {
         )
     }
 
+    /** Restores one Home Base level using Android's persisted cost/progression rules. */
+    fun upgradeHomeBase(state: GameState): EconomyTransaction {
+        val level = state.homeBaseLevel
+        if (level >= 20) return rejected(state, "The sanctuary is fully restored.")
+        if (level < 0) return rejected(state, "Invalid sanctuary level.")
+        val cost = BigNumber(50_000L * (level + 1L))
+        if (state.money < cost) return rejected(state, "Not enough Money to restore the next level.")
+        return accepted(
+            state.copy(
+                money = state.money - cost,
+                homeBaseLevel = level + 1,
+                statistics = state.statistics.copy(moneySpent = state.statistics.moneySpent + cost)
+            ),
+            "Sanctuary restored to level ${level + 1}."
+        )
+    }
+
     fun buyTalent(state: GameState, talentId: String, cost: Long): EconomyTransaction {
         val legacyParents = mapOf(
             "talent_speed_2" to "talent_speed_1",
@@ -532,10 +759,10 @@ object DesktopEconomyTransactions {
     }
 
     private val WORLD_REQUIREMENTS = listOf(
-        WorldRequirement("verdant_grove", "Verdant Grove", null, 0L, 0, 0L, 0L, "Starting world"),
-        WorldRequirement("crystal_caverns", "Crystal Caverns", "verdant_guardian", 25L, 5, 0L, 0L, "Defeat Verdant Guardian · 25 correct guesses · 5 upgrade levels"),
-        WorldRequirement("ember_summit", "Ember Summit", "crystal_golem", 100L, 15, 1L, 0L, "Defeat Crystal Golem · 100 correct guesses · 15 upgrade levels · 1 Prestige"),
-        WorldRequirement("nebula_rift", "Nebula Rift", "ember_dragon", 250L, 40, 3L, 1L, "Defeat Ember Dragon · 250 correct guesses · 40 upgrade levels · 3 Prestige · 1 Ultra")
+        WorldRequirement("verdant_grove", "Verdant Grove", "verdant_guardian", "Verdant Guardian", 3, "25000", 10L, 10L, 3, 0L, 0L, null, 0L, 0, 0L, 0L, "Starting world"),
+        WorldRequirement("crystal_caverns", "Crystal Caverns", "crystal_golem", "Crystal Golem", 5, "100000", 25L, 50L, 10, 0L, 0L, "verdant_guardian", 25L, 5, 0L, 0L, "Defeat Verdant Guardian · 25 correct guesses · 5 upgrade levels"),
+        WorldRequirement("ember_summit", "Ember Summit", "ember_dragon", "Ember Dragon", 7, "500000", 75L, 150L, 25, 1L, 0L, "crystal_golem", 100L, 15, 1L, 0L, "Defeat Crystal Golem · 100 correct guesses · 15 upgrade levels · 1 Prestige"),
+        WorldRequirement("nebula_rift", "Nebula Rift", "nebula_titan", "Nebula Titan", 10, "5000000", 250L, 500L, 75, 5L, 1L, "ember_dragon", 250L, 40, 3L, 1L, "Defeat Ember Dragon · 250 correct guesses · 40 upgrade levels · 3 Prestige · 1 Ultra")
     )
 
     private fun accepted(state: GameState, message: String) =
