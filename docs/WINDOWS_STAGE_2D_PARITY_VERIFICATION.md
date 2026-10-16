@@ -1,16 +1,16 @@
 # Windows Migration Stage 2-D — Parity Verification
 
-**Status:** Candidate CI and focused interactive checks passed; Stage 2 exit gate remains open pending complete W1/W2 parity and full runtime evidence.  
+**Status:** PR #217's Android Validation and Windows Desktop CI passed on its exact head; PR #218's catalog-driven follow-up is pending CI. Stage 2 exit gate remains open pending complete W1/W2 parity and full runtime evidence.  
 **Reviewed:** 2026-10-16  
 **Scope:** Deterministic core guess transitions and Windows save/reload integration. This is not a claim of full gameplay/economy or runtime parity.
 
 ## Current repository candidate (2026-10-16)
 
-The historical Stage 2-D evidence below describes earlier commits and must not be read as proof that the current candidate is green. Current open PR: [#215](https://github.com/ne0gl1tch20/GuessTheNumber/pull/215), head `c2138c0ff8ce2aba8813dd3104a560b489c82575`.
+Historical evidence below refers to the commits named in each row and is not automatically evidence for the current master. PR #215 is merged. PR #217 is merged, and its exact-head Android Validation and Windows Desktop CI passed. Current follow-up: [PR #218](https://github.com/ne0gl1tch20/GuessTheNumber/pull/218), which replaces duplicated hardcoded talent costs/prerequisites with catalog-driven validation; CI for #218 must be checked separately.
 
-- [Android Validation and Tests, run 38890096421](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38890096421): **passed** for the current head.
-- [Windows Desktop CI, run 38890096399](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38890096399): **failed** for the current head. Windows candidate validation remains blocked until this is resolved and rerun successfully.
-- PR #215 includes progression-screen work (boss battle actions, relic transactions, Codex, Endgame and Lucky Stake), but no runtime screenshot parity or full Windows runtime verification is claimed here.
+- [Android Validation and Tests, run 38901674190](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38901674190): **passed** for PR #217 head `9162283e57f3c310e59e474b917ff13caa19f0ab`.
+- [Windows Desktop CI, run 38901674304](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38901674304): **passed** for that same PR #217 head, including compilation/tests and MSI upgrade verification.
+- PR #218 adds catalog-driven talent validation; its checks are separate and pending. No runtime screenshot parity or full Windows runtime verification is claimed.
 - **Stage 2-D / Stage 2 exit gate: still open.** Earlier successful workflow runs listed below are historical evidence for their specific commits only.
 
 ## Evidence collected
@@ -37,12 +37,12 @@ The historical Stage 2-D evidence below describes earlier commits and must not b
 
 - Android and Windows use the same production `GameEngine` and `GameState` source boundary, so this slice avoids a second desktop-only implementation of guessing rules.
 - Windows persists the production state through its desktop-native adapter. The integration test makes guess transitions and disk round-trips one assertion path.
-- The current Windows Play screen still hardcodes save slot 1 and presents only the basic guessing loop and a few counters.
+- The Windows app now has a separate Save Slots destination with ten local slots and active-slot persistence; import/export and slot reset remain pending in the parity audit. Continue verifying save selection and production gameplay integration rather than assuming the slot UI proves every save path.
 - PR #199 adds the initial Windows economy/progression slice: catalog-backed Money/Prestige/Ultra upgrades, reset actions, supported Nebula shop purchases, talent unlocks and the feedback-driven Auto Clicker. See [PR #199](https://github.com/ne0gl1tch20/GuessTheNumber/pull/199).
 - The follow-up reward-parity slice now records daily guess/correct/streak progress, clears stale daily claim state on a date change, applies Android's 1% Epic / 5% Rare / 18% Common chest drop thresholds, and exposes claimable daily rewards plus chest counts in the Windows Play screen. Deterministic tests cover claim amounts, duplicate claims, threshold boundaries and stacked reward bonuses.
 - The latest economy slice implements the two defined shop boosts: Nebula Crystal doubles future Nebula rewards from desktop guess bonuses, daily quests and achievement milestones; Golden Guess Pass adds a critical-sized Money bonus on every tenth lifetime guess when correct. Unsupported/unknown shop effects remain disabled.
 - Desktop guesses and accepted economy transactions now evaluate Android-matching achievement milestones with one-time rewards. Basic world unlock/select hooks enforce the Android world's boss, correct-guess, upgrade, Prestige and Ultra requirements. Full world map/boss/relic/activity parity remains unfinished. PR #215 now contains partial candidate implementations for some of these screens, but they remain unverified and do not close the Stage 2 gate.
-- Candidate CI is confirmed on commit `38c7421`: [Windows Desktop CI run 38840144782](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144782) and [Android Validation run 38840144773](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144773) both completed successfully.
+- Historical CI passed on commit `38c7421`: [Windows Desktop CI run 38840144782](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144782) and [Android Validation run 38840144773](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144773). These are historical results, not validation for later candidates.
 - The user reports that focused Windows checks passed, including Enter-to-submit, button submission, shop/reward/progression checks and restart/save persistence. This is recorded as user-reported runtime evidence, not an independently witnessed session.
 - Existing deterministic economy tests cover stacked bonus totals, Nebula Crystal doubling daily-quest/achievement/guess rewards, Golden Guess Pass on every tenth lifetime guess, one-time achievement rewards, world requirement enforcement and idempotence.
 - The Stage 2 follow-up candidate adds exact-cost 1/10/100/MAX purchases across Money, Prestige and Ultra upgrades, plus mutator toggles and confirmation dialogs for Prestige/Ultra resets. Bulk buys now take the largest affordable prefix for 10/100/MAX, matching Android. The desktop catalog reader now loads from `game/`, with canonical talent, Prestige shop and Ultra shop JSON bundled; deterministic tests cover catalog loading, bulk costs/affordability and mutator range/validation. These additions still need candidate CI and user runtime verification.
@@ -50,14 +50,14 @@ The historical Stage 2-D evidence below describes earlier commits and must not b
 
 ## Stage 2-D gate
 
-**Not passed yet.** The current PR #202 candidate's Windows Desktop CI and Android Validation both pass, and the user reports focused runtime checks for Enter submission, Submit button, shop/rewards/progression and restart/save passed. The remaining gate is broader W1/W2 parity review and evidence: verify required economy/reward/reset behavior against Android and close any remaining gaps, keeping untested runtime rows explicitly unverified. Full world map/boss/activity screens remain Stage 3 work. Do not call Stage 2 complete until the complete W1/W2 requirements are evidenced.
+**Not passed yet.** PR #217's Windows Desktop CI and Android Validation passed, and the user reports focused runtime checks for Enter submission, Submit button, shop/rewards/progression and restart/save passed. PR #218's catalog-driven talent validation still needs its own CI results. The remaining gate is broader W1/W2 parity review and evidence: verify required economy/reward/reset behavior against Android and close any remaining gaps, keeping untested runtime rows explicitly unverified. Full world map/boss/activity screens remain Stage 3 work. Do not call Stage 2 complete until the complete W1/W2 requirements are evidenced.
 
 ## Next required checks
 
 1. **Done for the candidate:** Android Validation run 38840144773 and Windows Desktop CI run 38840144782 passed on commit `38c7421`.
 2. **Automated fixtures present:** exact stacked reward totals, Nebula Crystal reward doubling, Golden Guess Pass tenth-guess behavior, achievement reward idempotence and world unlock/select requirements are covered by `DesktopEconomyTransactionsTest`.
 3. **Focused runtime checks reported passed by user:** Enter/button submission, shop/rewards/progression and restart/save. Broader windowing, localization, update and installer runtime checks remain unverified.
-4. **New candidate still pending validation:** [Stage 2 economy parity branch](https://github.com/ne0gl1tch20/GuessTheNumber/tree/feat/windows-stage-2-economy-parity) adds bulk buys, mutator controls and reset confirmations. Do not treat the added tests as passing until CI reports success.
+4. **Merged earlier:** [PR #204](https://github.com/ne0gl1tch20/GuessTheNumber/pull/204) completed the economy-parity slice for bulk buys, mutator controls and reset confirmations. Continue checking remaining runtime and Android-parity gaps; merge/CI history does not substitute for hands-on Windows verification.
 5. Remaining gaps: rate-limiting/edge-case parity, canonical talent/catalog effects, broad large-number and reset checks, and actual Windows runtime checks for mutators and bulk purchases. Review remaining W1/W2 rows against Android before declaring Stage 2 complete.
 
 
@@ -99,3 +99,13 @@ Examples: a Windows-only keyboard shortcut that opens the reset confirmation is 
 **Decision rule:** If a proposed feature creates a platform difference and owner approval is unclear, ask the owner. Do not reject the idea just because it is platform-specific, and do not treat the parity goal as permission to make product decisions on the owner's behalf.
 
 **Current status:** This is the target architecture and acceptance contract, not a claim that parity has already been achieved. The existing Stage 2-D gate remains open; remaining gaps listed in this document must be resolved and verified against Android.
+
+
+## Latest follow-up — canonical talent catalog (2026-10-16)
+
+- PR #217 merged the initial validation guard and both CI workflows passed for its exact head.
+- PR #218 changes the validation source from a hardcoded Kotlin map to the bundled `game/talents.json` resource, adds a data-driven test over every catalog entry, and makes Talent Web parent gating use the catalog's `requiredParentId`. The Android asset and shared JVM resource were confirmed byte-for-byte identical when this candidate was prepared; the redundant desktop copy was removed and CI now enforces parity.
+- **PR #218 CI:** pending at the time of this documentation update. Update this status with the exact run links/results before merging.
+- **Manual verification still required:** open the Windows app, inspect the Talent Web, buy one affordable talent, verify its effect in gameplay, restart/reload, and confirm the purchase/effect persists. Also verify an unaffordable talent and a locked prerequisite cannot be purchased.
+
+- The Talent Web's visible English labels/descriptions still follow Android's fallback copy rather than the JSON display fields; Windows locale-aware rendering remains a separate parity gap and must not be marked verified.

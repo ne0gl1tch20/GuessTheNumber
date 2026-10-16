@@ -1,6 +1,6 @@
 # Joy Phase Roadmap
 
-**Last updated:** 2026-10-13  
+**Last updated:** 2026-10-16  
 **Planned scope:** 72 focused PRs (#24–#95), subject to adjustment after implementation and test results. The C++/NDK phase is planned after the joy, math-strategy, Lua localization, and LiveOps locale work; build-channel-aware updating follows as a separate delivery-system task. Multiplayer is a later, opt-in phase and starts with local-network peer-to-peer play.
 
 The goal is to make GuessTheNumber feel more rewarding and lively while growing it beyond random guessing into number sense and efficient mathematical strategy, without destabilizing existing gameplay, saves, localization, or offline behavior. Keep changes focused and validate each PR before continuing.
@@ -20,7 +20,9 @@ The goal is to make GuessTheNumber feel more rewarding and lively while growing 
 - Keep evidence honest: merged source, CI, unit tests, Windows runtime checks, screenshot comparisons and installer tests are different evidence types. A passing build is not proof of visual/runtime parity. Never mark a row verified without evidence for the exact candidate.
 - Do not skip a stage gate or mark the Windows port complete while required parity rows remain unverified, blocked or unexplained.
 
-**Current Windows status:** the foundation milestone is recorded separately in [KMP Foundation Status](../../docs/KMP_FOUNDATION_STATUS.md). Feature parity remains in progress; recent route coverage is not equivalent to full screen implementation or runtime parity. Continue with the existing parity plan and current open PRs rather than creating duplicate extraction work.
+**Platform-specific exception policy:** the project owner decides which platform-specific features are allowed. QoL, UI, accessibility and OS integrations may be adapted for each platform; platform-specific gameplay is also allowed when the owner explicitly approves it. Record each exception, its reason, approval and verification plan in the Windows parity matrix. Do not silently change shared balance, progression, rewards or save semantics.
+
+**Current Windows status (2026-10-16):** the foundation milestone is recorded separately in [KMP Foundation Status](../../docs/KMP_FOUNDATION_STATUS.md). Feature parity remains in progress; recent route coverage is not equivalent to full screen implementation or runtime parity. PR #217's talent transaction hardening merged with Android and Windows CI passing; follow-up PR #218 makes validation and Talent Web parent gating catalog-driven and still requires its own checks. Windows Talent Web localization and manual runtime/effect verification remain open. Continue with the existing parity plan rather than creating duplicate extraction work.
 
 
 | PR | Focus | Planned work |

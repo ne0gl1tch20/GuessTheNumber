@@ -6,6 +6,13 @@ import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.ShopItemDef
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import java.time.LocalDate
 import kotlin.random.Random
 
@@ -737,41 +744,70 @@ object DesktopEconomyTransactions {
         return buyTalent(state, talentId, cost, legacyParents[talentId])
     }
 
-    /** Uses the prerequisite declared by the canonical Android talent catalog. */
+    /** Validates talent purchases against the bundled canonical Android talent catalog. */
     fun buyTalent(
         state: GameState,
         talentId: String,
         cost: Long,
         requiredParentId: String?
     ): EconomyTransaction {
-        // Treat the bundled Android talent catalog as authoritative. The caller's
-        // displayed cost/parent are inputs, not permission to mint discounted or
-        // unknown talent unlocks.
-        val canonicalRule = when (talentId) {
-            "talent_speed_1" -> 100L to null
-            "talent_speed_2" -> 500L to "talent_speed_1"
-            "talent_crit_1" -> 250L to null
-            "talent_crit_2" -> 1_000L to "talent_crit_1"
-            "talent_reward_1" -> 2_500L to "talent_crit_2"
-            "talent_master_1" -> 10_000L to "talent_reward_1"
-            else -> return rejected(state, "Unknown talent.")
-        }
-        val (canonicalCost, canonicalParentId) = canonicalRule
-        if (cost != canonicalCost || requiredParentId != canonicalParentId) {
+        // Never trust the UI's displayed price or prerequisite. Read the checked-in
+        // catalog at runtime so a catalog update cannot silently drift from this rule.
+        val canonicalRule = runCatching { canonicalTalentRules[talentId] }.getOrNull()
+            ?: return rejected(state, "Talent catalog unavailable or unknown talent.")
+        if (cost != canonicalRule.cost || requiredParentId != canonicalRule.requiredParentId) {
             return rejected(state, "Talent definition does not match the canonical catalog.")
         }
         if (talentId in state.prestigeShopPurchases) return rejected(state, "Already unlocked.")
-        if (state.prestige < BigNumber(canonicalCost)) return rejected(state, "Not enough Prestige.")
-        if (canonicalParentId != null && canonicalParentId !in state.prestigeShopPurchases) {
+        if (state.prestige < BigNumber(canonicalRule.cost)) return rejected(state, "Not enough Prestige.")
+        if (canonicalRule.requiredParentId != null &&
+            canonicalRule.requiredParentId !in state.prestigeShopPurchases
+        ) {
             return rejected(state, "Unlock the prerequisite talent first.")
         }
         return accepted(
             state.copy(
-                prestige = state.prestige - BigNumber(cost),
+                prestige = state.prestige - BigNumber(canonicalRule.cost),
                 prestigeShopPurchases = state.prestigeShopPurchases + talentId
             ),
             "Talent unlocked."
         )
+    }
+
+    private data class CanonicalTalentRule(
+        val cost: Long,
+        val requiredParentId: String?
+    )
+
+    private val canonicalTalentRules: Map<String, CanonicalTalentRule> by lazy { loadCanonicalTalentRules() }
+
+    private fun loadCanonicalTalentRules(): Map<String, CanonicalTalentRule> {
+        val stream = DesktopEconomyTransactions::class.java.classLoader
+            .getResourceAsStream("game/talents.json")
+            ?: error("Missing canonical talent catalog resource: game/talents.json")
+        val root = stream.bufferedReader(Charsets.UTF_8).use {
+            Json.parseToJsonElement(it.readText()).jsonObject
+        }
+        val entries = root["talents"] as? JsonArray
+            ?: error("Canonical talent catalog has no talents array")
+        val rules = linkedMapOf<String, CanonicalTalentRule>()
+        entries.forEach { entry ->
+            val item = entry as? JsonObject ?: error("Invalid talent catalog entry")
+            val id = item["id"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
+                ?: error("Talent catalog entry has no ID")
+            val cost = item["cost"]?.jsonPrimitive?.content?.toLongOrNull()
+                ?.takeIf { it >= 0L } ?: error("Talent catalog entry has invalid cost")
+            val parentElement = item["requiredParentId"]
+                ?: error("Talent catalog entry has no requiredParentId field")
+            val parentId = if (parentElement == JsonNull) null else {
+                parentElement.jsonPrimitive.content.takeIf { it.isNotBlank() }
+                    ?: error("Talent catalog entry has invalid requiredParentId")
+            }
+            require(rules.put(id, CanonicalTalentRule(cost, parentId)) == null) {
+                "Duplicate talent ID in canonical catalog: $id"
+            }
+        }
+        return rules
     }
 
     private val WORLD_REQUIREMENTS = listOf(

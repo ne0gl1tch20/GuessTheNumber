@@ -3,7 +3,7 @@
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
 
-**Latest increment:** PR #215 expands Android-to-Windows route coverage after PR #214; the newly exposed routes still have missing screen behavior, and runtime screenshot parity remains unverified.
+**Latest increment (2026-10-16):** PR #215's progression-route coverage and PR #217's talent transaction hardening are merged. PR #217's Android Validation and Windows Desktop CI passed on commit `9162283e57f3c310e59e474b917ff13caa19f0ab` (runs [38901674190](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38901674190) and [38901674304](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38901674304)). Current follow-up PR #218 removes duplicated hardcoded talent costs/prerequisites and validates against the bundled canonical catalog; its CI is pending. Runtime screenshot parity and the Stage 2 exit gate remain open.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
@@ -129,7 +129,7 @@ The port is complete only when every Android player-facing screen and reachable 
 ### W2. Economy and resets
 
 - [x] Prestige and Ultra flows enforce shared requirements/rewards and now require confirmation before reset.
-- [x] Load talent names, descriptions, costs and prerequisites from the canonical Android talent catalog.
+- [x] Load talent costs and prerequisites from the canonical catalog; PR #218 makes both purchase validation and Talent Web parent gating read the bundled catalog rather than a second hardcoded rule map. The visible Windows labels/descriptions still use the Android fallback copy, and locale-aware rendering/runtime parity remain open. CI is pending for this follow-up.
 - [ ] Finish parity for remaining permanent Prestige/Ultra shop effects and confirm their Android behavior before enabling purchases.
 - [ ] Verify large-number display and calculations across representative Android-matching cases.
 - [x] Add deterministic exact-cost bulk-purchase tests and retain reset-preservation/duplicate-reward tests.
