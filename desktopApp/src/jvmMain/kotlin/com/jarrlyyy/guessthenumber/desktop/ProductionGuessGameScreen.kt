@@ -250,8 +250,12 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                                 autoClickerFailurePaused = false
                                 state = finalState
                                 feedback = when (result.feedback) {
-                                    GuessFeedback.TOO_LOW -> "Too low. Try again!"
-                                    GuessFeedback.TOO_HIGH -> "Too high. Try again!"
+                                    GuessFeedback.TOO_LOW -> if ("mut_blind" in finalState.activeMutators) {
+                                        "Guess recorded. Blind mutator hides direction hints."
+                                    } else "Too low. Try again!"
+                                    GuessFeedback.TOO_HIGH -> if ("mut_blind" in finalState.activeMutators) {
+                                        "Guess recorded. Blind mutator hides direction hints."
+                                    } else "Too high. Try again!"
                                     GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - currentState.money} Money." +
                                         if (finalState.lootEventId > currentState.lootEventId) " Treasure drop: ${finalState.lastLootDropTier} chest!" else ""
                                 }
@@ -285,6 +289,26 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
             }
             Text(feedback, style = MaterialTheme.typography.bodyLarge)
+
+            SectionTitle("Mutators")
+            val mutators = listOf(
+                Triple("mut_hardcore", "Hardcore", "Doubles the guessing range and rewards."),
+                Triple("mut_speed", "Speed", "Triples correct-guess rewards."),
+                Triple("mut_blind", "Blind", "Quintuples rewards and hides too-low/too-high hints."),
+                Triple("mut_tax", "Tax", "Multiplies rewards and applies the shared incorrect-guess tax.")
+            )
+            mutators.forEach { (id, name, description) ->
+                val active = id in currentState.activeMutators
+                EconomyActionCard(
+                    title = name,
+                    description = description,
+                    detail = if (active) "Active · Reward multiplier is applied by the shared game engine." else "Inactive",
+                    action = if (active) "Disable" else "Enable",
+                    enabled = !isSaving
+                ) {
+                    commitTransaction { DesktopEconomyTransactions.setMutatorActive(it, id, !active, engine) }
+                }
+            }
 
             SectionTitle("Daily quests")
             val dailyQuests = listOf(
