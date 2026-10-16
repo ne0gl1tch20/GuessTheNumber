@@ -129,7 +129,7 @@ The port is complete only when every Android player-facing screen and reachable 
 ### W2. Economy and resets
 
 - [x] Prestige and Ultra flows enforce shared requirements/rewards and now require confirmation before reset.
-- [x] Load talent names, descriptions, costs and prerequisites from the canonical Android talent catalog. PR #218 makes transaction validation read the bundled catalog rather than a second hardcoded rule map; CI is pending for that follow-up.
+- [x] Load talent costs and prerequisites from the canonical catalog; PR #218 makes both purchase validation and Talent Web parent gating read the bundled catalog rather than a second hardcoded rule map. The visible Windows labels/descriptions still use the Android fallback copy, and locale-aware rendering/runtime parity remain open. CI is pending for this follow-up.
 - [ ] Finish parity for remaining permanent Prestige/Ultra shop effects and confirm their Android behavior before enabling purchases.
 - [ ] Verify large-number display and calculations across representative Android-matching cases.
 - [x] Add deterministic exact-cost bulk-purchase tests and retain reset-preservation/duplicate-reward tests.
