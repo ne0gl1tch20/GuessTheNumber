@@ -100,7 +100,7 @@ internal class WindowsDebugUpdateClient(
         const val ACTIONS_API =
             "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions"
         const val WORKFLOW_RUNS_API =
-            "$ACTIONS_API/workflows/windows-desktop.yml/runs?branch=master&status=success&per_page=20"
+            "$ACTIONS_API/workflows/windows-desktop.yml/runs?branch=master&status=completed&per_page=20"
         const val DEBUG_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug"
         const val ARTIFACT_DOWNLOAD_PREFIX =
             "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/"
