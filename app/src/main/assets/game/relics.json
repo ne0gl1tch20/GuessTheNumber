@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "relics": [
+    {
+      "id": "verdant_seed",
+      "name": "Verdant Seed",
+      "description": "A living seed that hums with the first world's quiet energy.",
+      "setId": "verdant",
+      "setName": "Verdant Set",
+      "rarity": "Common",
+      "unlockBossId": "verdant_guardian",
+      "unlockBossName": "Verdant Guardian",
+      "twoPieceBonus": "Preview: +5% Money from correct guesses.",
+      "threePieceBonus": "Preview: +10% Money from correct guesses."
+    },
+    {
+      "id": "grove_charm",
+      "name": "Grove Charm",
+      "description": "A polished charm carried by the forest guardian.",
+      "setId": "verdant",
+      "setName": "Verdant Set",
+      "rarity": "Common",
+      "unlockBossId": "verdant_guardian",
+      "unlockBossName": "Verdant Guardian",
+      "twoPieceBonus": "Preview: +5% Money from correct guesses.",
+      "threePieceBonus": "Preview: +10% Money from correct guesses."
+    },
+    {
+      "id": "mossbound_ring",
+      "name": "Mossbound Ring",
+      "description": "An old ring threaded with resilient moss.",
+      "setId": "verdant",
+      "setName": "Verdant Set",
+      "rarity": "Rare",
+      "unlockBossId": "crystal_golem",
+      "unlockBossName": "Crystal Golem",
+      "twoPieceBonus": "Preview: +5% Money from correct guesses.",
+      "threePieceBonus": "Preview: +10% Money from correct guesses."
+    },
+    {
+      "id": "crystal_heart",
+      "name": "Crystal Heart",
+      "description": "A bright shard that holds a steady pulse.",
+      "setId": "crystal",
+      "setName": "Crystal Set",
+      "rarity": "Rare",
+      "unlockBossId": "crystal_golem",
+      "unlockBossName": "Crystal Golem",
+      "twoPieceBonus": "Preview: +5% Nebula from eligible rewards.",
+      "threePieceBonus": "Preview: +10% Nebula from eligible rewards."
+    },
+    {
+      "id": "prism_guard",
+      "name": "Prism Guard",
+      "description": "A faceted plate that catches light from every angle.",
+      "setId": "crystal",
+      "setName": "Crystal Set",
+      "rarity": "Rare",
+      "unlockBossId": "ember_dragon",
+      "unlockBossName": "Ember Dragon",
+      "twoPieceBonus": "Preview: +5% Nebula from eligible rewards.",
+      "threePieceBonus": "Preview: +10% Nebula from eligible rewards."
+    },
+    {
+      "id": "shard_compass",
+      "name": "Shard Compass",
+      "description": "Its needle points toward forgotten discoveries.",
+      "setId": "crystal",
+      "setName": "Crystal Set",
+      "rarity": "Epic",
+      "unlockBossId": "nebula_titan",
+      "unlockBossName": "Nebula Titan",
+      "twoPieceBonus": "Preview: +5% Nebula from eligible rewards.",
+      "threePieceBonus": "Preview: +10% Nebula from eligible rewards."
+    },
+    {
+      "id": "ember_scale",
+      "name": "Ember Scale",
+      "description": "A warm scale shed by a summit dragon.",
+      "setId": "ember",
+      "setName": "Ember Set",
+      "rarity": "Rare",
+      "unlockBossId": "ember_dragon",
+      "unlockBossName": "Ember Dragon",
+      "twoPieceBonus": "Preview: +5% upgrade efficiency.",
+      "threePieceBonus": "Preview: +10% upgrade efficiency."
+    },
+    {
+      "id": "cinder_crown",
+      "name": "Cinder Crown",
+      "description": "A crown fragment that glows after each victory.",
+      "setId": "ember",
+      "setName": "Ember Set",
+      "rarity": "Epic",
+      "unlockBossId": "nebula_titan",
+      "unlockBossName": "Nebula Titan",
+      "twoPieceBonus": "Preview: +5% upgrade efficiency.",
+      "threePieceBonus": "Preview: +10% upgrade efficiency."
+    },
+    {
+      "id": "rift_lens",
+      "name": "Rift Lens",
+      "description": "A lens shaped by the space between worlds.",
+      "setId": "nebula",
+      "setName": "Nebula Set",
+      "rarity": "Legendary",
+      "unlockBossId": "nebula_titan",
+      "unlockBossName": "Nebula Titan",
+      "twoPieceBonus": "Preview: +5% progression rewards.",
+      "threePieceBonus": "Preview: +10% progression rewards."
+    }
+  ]
+}

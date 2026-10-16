@@ -439,6 +439,57 @@ fun ProductionGuessGameScreen(
                 )
             }
 
+
+            if (section == DesktopGameSection.RELICS) {
+                DesktopRelicsContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onRelicAction = { relicId, action ->
+                        val before = state
+                        if (before == null || isSaving) {
+                            feedback = "Wait for the current save to finish."
+                        } else {
+                            val relic = runCatching { DesktopRelicsCatalog.load().firstOrNull { it.id == relicId } }.getOrNull()
+                            if (relic == null) {
+                                feedback = "That relic is not in the catalog."
+                            } else {
+                                val updated = when (action) {
+                                    "claim" -> if (relic.unlockBossId in before.defeatedBossIds && relicId !in before.relicInventory) before.copy(relicInventory = before.relicInventory + relicId) else null
+                                    "equip" -> DesktopRelicRules.equip(before, relicId)
+                                    "unequip" -> if (relicId in before.equippedRelicIds) before.copy(equippedRelicIds = before.equippedRelicIds - relicId) else null
+                                    else -> null
+                                }
+                                if (updated == null) {
+                                    feedback = when (action) {
+                                        "claim" -> "Defeat " + relic.unlockBossName + " first, or this relic is already claimed."
+                                        "equip" -> "Own the relic first and keep no more than three relics equipped."
+                                        else -> "That relic action is not available."
+                                    }
+                                } else {
+                                    isSaving = true
+                                    scope.launch {
+                                        val persisted = withContext(Dispatchers.IO) {
+                                            saveStore.save(activeSaveSlot, updated.copy(lastSaveTimestamp = System.currentTimeMillis()))
+                                        }
+                                        if (persisted) {
+                                            state = updated
+                                            feedback = when (action) {
+                                                "claim" -> "Relic claimed: " + relic.name + "."
+                                                "equip" -> "Equipped " + relic.name + "."
+                                                else -> "Unequipped " + relic.name + "."
+                                            }
+                                        } else {
+                                            feedback = "Could not save the relic change. Your previous saved state is still intact."
+                                        }
+                                        isSaving = false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                )
+            }
+
             if (section == DesktopGameSection.ACHIEVEMENTS) {
                 DesktopAchievementsContent(
                     state = currentState,
