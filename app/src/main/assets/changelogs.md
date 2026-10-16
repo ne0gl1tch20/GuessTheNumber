@@ -1,5 +1,7 @@
 ## Unreleased (Windows Android visual parity)
 
+- 🎨 **Android theme parity pass**: aligned Windows Material 3 light/dark colors, expressive corner shapes and typography letter spacing with the Android theme tokens. Windows-only system chrome stays native. AMOLED/custom color settings and screenshot comparison remain to be verified.
+
 - 🧭 **Android-style Windows navigation**: Windows now uses the Android app's bottom navigation pattern with Play, Upgrades, Shop and More labels, matching Material icons and selection indicators. Declared Compose Material icon-core explicitly so the desktop target does not rely on a removed transitive dependency. Runtime visual verification is still pending.
 
 ## Unreleased (Windows exact-port UI parity)
