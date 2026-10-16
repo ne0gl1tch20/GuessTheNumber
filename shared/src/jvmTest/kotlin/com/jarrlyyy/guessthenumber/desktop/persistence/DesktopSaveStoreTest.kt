@@ -81,6 +81,7 @@ class DesktopSaveStoreTest {
         val second = GameState(targetNumber = 88, lastSaveTimestamp = 200L)
         assertTrue(store.createFreshSlot(1, first))
         assertFalse(store.createFreshSlot(1, second))
+        assertEquals(10, store.slotSummaries().size)
         assertTrue(store.setActiveSlot(1))
         assertEquals(1, store.activeSlot())
         assertTrue(store.save(1, second))

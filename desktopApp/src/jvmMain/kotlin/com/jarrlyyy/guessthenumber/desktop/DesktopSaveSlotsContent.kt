@@ -56,7 +56,10 @@ internal fun DesktopSaveSlotsContent(
                     }
                     if (slot.hasBackup) Text("A valid recovery backup is available.", color = MaterialTheme.colorScheme.primary)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (slot.isEmpty) Button(onClick = { onCreateSlot(slot.slot) }) { Text("Create slot") }
+                        if (slot.isEmpty) {
+                            Button(onClick = { onCreateSlot(slot.slot) }) { Text("Create slot") }
+                            if (slots.firstOrNull { it.slot == activeSlot }?.state != null) OutlinedButton(onClick = { onDuplicateSlot(activeSlot, slot.slot) }) { Text("Duplicate active here") }
+                        }
                         else if (!slot.isCorrupt && slot.slot != activeSlot) Button(onClick = { onSwitchSlot(slot.slot) }) { Text("Switch to slot") }
                         if (!slot.isEmpty && !slot.isCorrupt && slot.slot != activeSlot) {
                             OutlinedButton(onClick = { onDuplicateSlot(activeSlot, slot.slot) }) { Text("Duplicate active here") }

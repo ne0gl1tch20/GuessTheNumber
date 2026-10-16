@@ -14,7 +14,7 @@ import java.nio.file.StandardOpenOption
 
 private const val MAX_SAVE_SLOTS = 10
 
-internal data class DesktopSaveSlotSummary(val slot: Int, val state: GameState?, val isEmpty: Boolean, val hasBackup: Boolean, val isCorrupt: Boolean)
+data class DesktopSaveSlotSummary(val slot: Int, val state: GameState?, val isEmpty: Boolean, val hasBackup: Boolean, val isCorrupt: Boolean)
 
 internal interface DesktopSaveFileOps {
     fun createDirectories(path: Path)
