@@ -173,6 +173,17 @@ object DesktopEconomyTransactions {
         )
     }
 
+    /** Equips an already-owned cosmetic, matching Android's Shop action. */
+    fun equipCosmetic(state: GameState, itemId: String): EconomyTransaction {
+        if (!itemId.startsWith("cosmetic_") || itemId !in state.shopPurchases) {
+            return rejected(state, "Purchase this cosmetic before equipping it.")
+        }
+        if (state.equippedCosmeticId == itemId) {
+            return rejected(state, "This cosmetic is already equipped.")
+        }
+        return accepted(state.copy(equippedCosmeticId = itemId), "Equipped ${itemId.removePrefix("cosmetic_").replace('_', ' ')}.")
+    }
+
     /** Unlocks a world only when its Android-defined progression requirements are met. */
     fun unlockWorld(state: GameState, worldId: String): EconomyTransaction {
         val world = WORLD_REQUIREMENTS.firstOrNull { it.id == worldId }
