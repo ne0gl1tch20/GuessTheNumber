@@ -27,7 +27,8 @@ PR #214 is merged. It connected saved Android-equivalent theme mode and custom c
 | Mutators | Shared-engine toggles, challenge builder and custom/weekly challenge reward claims; localization/runtime parity pending |\n| Save Slots | Ten local slots, persisted active slot, create, switch, duplicate and backup restore using atomic JSON files; import/export and slot reset pending |\n| Relics | Catalog-backed collection and set-bonus preview; claiming requires the matching boss victory, equip/unequip/ownership/four-slot limits now use shared transactions with focused tests; runtime parity pending |
 | Home Base | Functional level/building screen; shared upgrade transaction, saved level, Android cost progression, building milestones and correct-guess reward bonus connected; localization/runtime parity unverified |
 | Codex | Functional 12-entry Explorer's Codex using Android's exact world/boss/secret IDs, saved discovery state, completion progress and one-time 100 Nebula reward; runtime/localization parity pending |
-| Endgame, Lucky Stake | Navigation routes added; feature data/actions are still missing |
+| Endgame | Functional six-goal tracker for bosses, secrets, relics, sanctuary level, Endless Rift tier and mastery across all worlds; World Map shortcut added; runtime/localization parity pending |
+| Lucky Stake | Navigation route added; stake validation, random outcomes and rewards remain to be ported |
 | Developer Settings, Developer Console, Process Inspector | Navigation routes added; diagnostics/command behavior is still missing |
 | Music Player, Arcade, Activity Hub, Lua Testing Hub, Live Ops | Navigation routes added; feature-specific behavior is still missing |
 | Changelog | Ported to a Windows scrollable Markdown viewer using the canonical Android `changelogs.md` asset; automated resource test added |
