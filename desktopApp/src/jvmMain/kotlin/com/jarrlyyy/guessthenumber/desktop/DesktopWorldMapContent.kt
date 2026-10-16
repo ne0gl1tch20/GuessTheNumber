@@ -118,6 +118,9 @@ internal fun DesktopWorldMapContent(state: GameState, onBack: () -> Unit, onWorl
             ) {
                 val mapWidth = maxWidth
                 val mapHeight = maxHeight
+                val mapPrimary = MaterialTheme.colorScheme.primary
+                val mapOutline = MaterialTheme.colorScheme.outline
+                val mapTertiary = MaterialTheme.colorScheme.tertiary
                 Box(
                     modifier = Modifier.fillMaxSize().graphicsLayer {
                         scaleX = zoom
@@ -139,7 +142,7 @@ internal fun DesktopWorldMapContent(state: GameState, onBack: () -> Unit, onWorl
                         listOf(0 to 1, 1 to 2, 1 to 3, 2 to 3).forEach { (from, to) ->
                             val open = worlds[from].id in state.unlockedWorldIds && worlds[to].id in state.unlockedWorldIds
                             drawLine(
-                                color = if (open) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                color = if (open) mapPrimary else mapOutline,
                                 start = points[from],
                                 end = points[to],
                                 strokeWidth = if (open) 6f else 4f,
@@ -149,13 +152,13 @@ internal fun DesktopWorldMapContent(state: GameState, onBack: () -> Unit, onWorl
                         worlds.forEachIndexed { index, world ->
                             val point = points[index]
                             drawCircle(
-                                color = if (world.id in state.unlockedWorldIds) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
+                                color = if (world.id in state.unlockedWorldIds) mapPrimary.copy(alpha = 0.18f) else mapOutline.copy(alpha = 0.12f),
                                 radius = 36f,
                                 center = point
                             )
                             if (world.secretAt <= state.correctGuesses && world.id in state.unlockedWorldIds) {
                                 drawLine(
-                                    color = MaterialTheme.colorScheme.tertiary,
+                                    color = mapTertiary,
                                     start = point,
                                     end = Offset(point.x + 28f, point.y + 42f),
                                     strokeWidth = 3f,
