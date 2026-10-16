@@ -23,12 +23,14 @@
 - The current Windows Play screen still hardcodes save slot 1 and presents only the basic guessing loop and a few counters.
 - PR #199 adds the initial Windows economy/progression slice: catalog-backed Money/Prestige/Ultra upgrades, reset actions, supported Nebula shop purchases, talent unlocks and the feedback-driven Auto Clicker. See [PR #199](https://github.com/ne0gl1tch20/GuessTheNumber/pull/199).
 - The follow-up reward-parity slice now records daily guess/correct/streak progress, clears stale daily claim state on a date change, applies Android's 1% Epic / 5% Rare / 18% Common chest drop thresholds, and exposes claimable daily rewards plus chest counts in the Windows Play screen. Deterministic tests cover claim amounts, duplicate claims, threshold boundaries and stacked reward bonuses.
-- Shop boost items without working Windows effects remain disabled rather than sold for no benefit. Achievement/world progression hooks and full boost-effect parity remain open; actual Windows runtime behavior also remains unverified until tested.
+- The latest economy slice implements the two defined shop boosts: Nebula Crystal doubles future Nebula rewards from desktop guess bonuses, daily quests and achievement milestones; Golden Guess Pass adds a critical-sized Money bonus on every tenth lifetime guess when correct. Unsupported/unknown shop effects remain disabled.
+- Desktop guesses and accepted economy transactions now evaluate Android-matching achievement milestones with one-time rewards. Basic world unlock/select hooks enforce the Android world's boss, correct-guess, upgrade, Prestige and Ultra requirements. Full world map/boss/relic/activity screens remain Stage 3 work.
+- These source changes need current Windows and Android CI results. Actual Windows runtime behavior remains unverified until tested.
 - A successful build or unit-test run does not verify mouse/keyboard interaction, window resizing, high-DPI rendering, close/reopen behavior or visual parity on an actual Windows session.
 
 ## Stage 2-D gate
 
-**Not passed yet.** PR #197's guessing/save integration coverage is merged. PR #199 advances the initial economy UI/transaction slice, but its CI must pass, remaining Android-owned progression hooks and shop effects need review, and actual Windows runtime verification remains outstanding. Keep Stage 3 work blocked until Stage 2's full W1/W2 requirements are implemented and evidenced.
+**Not passed yet.** The economy slice now includes daily quests/loot, supported shop boosts and basic achievement/world unlock hooks, with deterministic tests added. This branch still needs current Windows Desktop CI and Android validation to pass, followed by actual Windows runtime verification of guessing, shop effects, progression rewards and save/reload. The full world map/boss/activity UI remains Stage 3 work. Do not call Stage 2 complete until its W1/W2 requirements and runtime evidence are recorded.
 
 ## Next required checks
 
