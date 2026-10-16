@@ -306,6 +306,40 @@ fun ProductionGuessGameScreen(
                 CurrencySummary("Correct", currentState.correctGuesses.toString())
                 CurrencySummary("Streak", currentState.streak.toString())
             }
+            if (section == DesktopGameSection.MUTATORS) {
+                DesktopMutatorsContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onMutatorChange = { mutatorId, active ->
+                        commitTransaction { before -> DesktopEconomyTransactions.setMutatorActive(before, mutatorId, active, engine) }
+                    },
+                    onActivateBuilder = { selectedMutators ->
+                        commitTransaction { before ->
+                            val changes = (before.activeMutators - selectedMutators).map { it to false } +
+                                (selectedMutators - before.activeMutators).map { it to true }
+                            var transaction = EconomyTransaction(before, true, "Challenge mutators applied.")
+                            for ((id, active) in changes) {
+                                transaction = DesktopEconomyTransactions.setMutatorActive(transaction.state, id, active, engine)
+                                if (!transaction.accepted) break
+                            }
+                            transaction
+                        }
+                    },
+                    onClaimChallenge = { challengeId, reward ->
+                        commitTransaction { before ->
+                            if (challengeId in before.completedChallenges) EconomyTransaction(before, false, "Challenge already claimed.")
+                            else EconomyTransaction(
+                                before.copy(
+                                    completedChallenges = before.completedChallenges + challengeId,
+                                    nebula = before.nebula + BigNumber(reward),
+                                    statistics = before.statistics.copy(nebulaEarned = before.statistics.nebulaEarned + reward)
+                                ), true, "Challenge reward claimed: +$reward Nebula."
+                            )
+                        }
+                    }
+                )
+            }
+
             if (section == DesktopGameSection.WORLD_MAP) {
                 DesktopWorldMapContent(
                     state = currentState,
