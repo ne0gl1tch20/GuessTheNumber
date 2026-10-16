@@ -23,7 +23,7 @@ PR #214 is merged. It connected saved Android-equivalent theme mode and custom c
 | Settings & Save Management | First pass exists; localization and OS notification delivery remain incomplete |
 | About | Windows update page exists; Android content parity incomplete |
 | Achievements | First functional port: canonical Android catalog, saved unlock state, progress count, rewards/tier display and All/Unlocked/Locked filters. CI and Windows runtime parity verification pending |
-| World Map, Mutators, Save Slots, Relics, Home Base, Codex, Endgame, Lucky Stake | Navigation routes added; feature data/actions are still missing |
+| World Map | Canonical world catalog, saved unlock state, active selection, unlock actions, boss progress and secret thresholds; boss controls and map canvas pending |\n| Mutators | Shared-engine toggles, challenge builder and custom/weekly challenge reward claims; localization/runtime parity pending |\n| Save Slots, Relics, Home Base, Codex, Endgame, Lucky Stake | Navigation routes added; feature data/actions are still missing |
 | Developer Settings, Developer Console, Process Inspector | Navigation routes added; diagnostics/command behavior is still missing |
 | Music Player, Arcade, Activity Hub, Lua Testing Hub, Live Ops | Navigation routes added; feature-specific behavior is still missing |
 | Changelog | Ported to a Windows scrollable Markdown viewer using the canonical Android `changelogs.md` asset; automated resource test added |
