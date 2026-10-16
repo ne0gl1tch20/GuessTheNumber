@@ -25,7 +25,7 @@ class RelicSetBonusGameplayTest {
             correct = true,
             // Force random rolls to their maximum so Crystal Golem's 10% proc never fires.
             rng = object : Random() {
-                override fun nextBits(bitCount: Int): Int = -1
+                override fun nextBits(bitCount: Int): Int = if (bitCount == 32) -1 else (1 shl bitCount) - 1
             }
         )
     }
