@@ -174,6 +174,6 @@ class WindowsDebugUpdateTest {
         const val ACTIONS_API =
             "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions"
         const val WORKFLOW_RUNS_URL =
-            "$ACTIONS_API/workflows/windows-desktop.yml/runs?branch=master&status=success&per_page=20"
+            "$ACTIONS_API/workflows/windows-desktop.yml/runs?branch=master&status=completed&per_page=20"
     }
 }
