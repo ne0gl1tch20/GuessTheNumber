@@ -15,5 +15,6 @@ enum class DesktopGameSection {
     WORLD_MAP,
     MUTATORS,
     SAVE_SLOTS,
-    RELICS
+    RELICS,
+    HOME_BASE
 }
