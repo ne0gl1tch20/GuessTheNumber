@@ -251,6 +251,39 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
             }
             Text(feedback, style = MaterialTheme.typography.bodyLarge)
+
+            SectionTitle("Daily quests")
+            val dailyQuests = listOf(
+                Triple("daily_guesses_10", "Make 10 guesses", currentState.dailyQuestGuesses >= 10),
+                Triple("daily_correct_5", "Get 5 correct guesses", currentState.dailyQuestCorrectGuesses >= 5),
+                Triple("daily_streak_5", "Reach a streak of 5", currentState.dailyQuestBestStreak >= 5),
+                Triple("daily_upgrades_3", "Buy 3 upgrades", currentState.dailyQuestUpgradePurchases >= 3)
+            )
+            dailyQuests.forEach { (id, title, complete) ->
+                val claimed = id in currentState.claimedDailyQuests
+                val progress = when (id) {
+                    "daily_guesses_10" -> "${currentState.dailyQuestGuesses.coerceAtMost(10)} / 10 guesses"
+                    "daily_correct_5" -> "${currentState.dailyQuestCorrectGuesses.coerceAtMost(5)} / 5 correct guesses"
+                    "daily_streak_5" -> "${currentState.dailyQuestBestStreak.coerceAtMost(5)} / 5 best streak"
+                    else -> "${currentState.dailyQuestUpgradePurchases.coerceAtMost(3)} / 3 upgrades"
+                }
+                val reward = when (id) {
+                    "daily_guesses_10" -> "Reward: 10,000 Money"
+                    "daily_correct_5" -> "Reward: 25 Nebula"
+                    "daily_streak_5" -> "Reward: 50 Nebula"
+                    else -> "Reward: 35 Nebula"
+                }
+                EconomyActionCard(
+                    title = title,
+                    description = progress,
+                    detail = reward,
+                    action = if (claimed) "Claimed" else if (complete) "Claim" else "In progress",
+                    enabled = !isSaving && complete && !claimed
+                ) {
+                    commitTransaction { DesktopEconomyTransactions.claimDailyQuest(it, id, LocalDate.now().toString()) }
+                }
+            }
+
             if ("auto_clicker_basic" in currentState.shopPurchases) {
                 Button(
                     onClick = { commitTransaction { DesktopEconomyTransactions.setAutoClickerActive(it, !it.autoClickerActive) } },
