@@ -24,11 +24,14 @@ object DesktopEconomyTransactions {
         BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(currentLevel)
 
     fun buyUpgrade(initialState: GameState, upgrade: UpgradeDef): EconomyTransaction {
-        val state = refreshDailyQuestDay(initialState, LocalDate.now().toString())
-        val level = state.upgradeLevels[upgrade.id] ?: 0
-        if (level >= upgrade.maxLevel) return rejected(state, "Already at maximum level.")
+        // Rejected purchases must remain atomic: even a stale daily-quest date
+        // must not mutate state when the upgrade is unaffordable or maxed out.
+        val level = initialState.upgradeLevels[upgrade.id] ?: 0
+        if (level >= upgrade.maxLevel) return rejected(initialState, "Already at maximum level.")
         val cost = upgradeCost(upgrade, level)
-        if (state.money < cost) return rejected(state, "Not enough Money.")
+        if (initialState.money < cost) return rejected(initialState, "Not enough Money.")
+
+        val state = refreshDailyQuestDay(initialState, LocalDate.now().toString())
         return accepted(
             state.copy(
                 money = state.money - cost,
