@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -305,6 +306,13 @@ fun ProductionGuessGameScreen(
                 CurrencySummary("Correct", currentState.correctGuesses.toString())
                 CurrencySummary("Streak", currentState.streak.toString())
             }
+            if (section == DesktopGameSection.ACHIEVEMENTS) {
+                DesktopAchievementsContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) }
+                )
+            }
+
             if (section == DesktopGameSection.PLAY) {
             Text(
                 "Daily progress: guesses ${currentState.dailyQuestGuesses}/10 · correct ${currentState.dailyQuestCorrectGuesses}/5 · best streak ${currentState.dailyQuestBestStreak}/5 · upgrades ${currentState.dailyQuestUpgradePurchases}/3",
@@ -853,7 +861,7 @@ fun ProductionGuessGameScreen(
                         Button(onClick = onOpenAbout) { Text("About and updates") }
                         Text("More Windows destinations", style = MaterialTheme.typography.titleMedium)
                         Text("These routes are being brought into parity with Android in stages. A connected route does not mean every Android interaction is complete yet.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        val parityDestinations = listOf(DesktopDestination.WORLD_MAP, DesktopDestination.ACHIEVEMENTS, DesktopDestination.MUTATORS, DesktopDestination.SAVE_SLOTS, DesktopDestination.RELICS, DesktopDestination.HOME_BASE, DesktopDestination.CODEX, DesktopDestination.ENDGAME, DesktopDestination.LUCKY_STAKE, DesktopDestination.MUSIC_PLAYER, DesktopDestination.ARCADE, DesktopDestination.ACTIVITY_HUB, DesktopDestination.LUA_TESTING_HUB, DesktopDestination.CHANGELOG, DesktopDestination.LIVE_OPS, DesktopDestination.DEVELOPER_SETTINGS, DesktopDestination.DEVELOPER_CONSOLE, DesktopDestination.PROCESS_INSPECTOR)
+                        val parityDestinations = listOf(DesktopDestination.WORLD_MAP, DesktopDestination.MUTATORS, DesktopDestination.SAVE_SLOTS, DesktopDestination.RELICS, DesktopDestination.HOME_BASE, DesktopDestination.CODEX, DesktopDestination.ENDGAME, DesktopDestination.LUCKY_STAKE, DesktopDestination.MUSIC_PLAYER, DesktopDestination.ARCADE, DesktopDestination.ACTIVITY_HUB, DesktopDestination.LUA_TESTING_HUB, DesktopDestination.CHANGELOG, DesktopDestination.LIVE_OPS, DesktopDestination.DEVELOPER_SETTINGS, DesktopDestination.DEVELOPER_CONSOLE, DesktopDestination.PROCESS_INSPECTOR)
                         parityDestinations.chunked(2).forEach { destinations ->
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 destinations.forEach { destination -> Button(onClick = { onOpenParityDestination(destination) }, modifier = Modifier.weight(1f)) { Text(destination.label) } }
