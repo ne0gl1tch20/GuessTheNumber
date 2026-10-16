@@ -212,4 +212,76 @@ class GameEngineTest {
         assertEquals(1L, result.newState.statistics.failedGuesses)
         assertEquals(1L, result.newState.statistics.totalGuesses)
     }
+
+    @Test
+    fun prestigeLuckCharmAddsFivePercentCriticalChance() {
+        val base = GameEngine(Random(123)).processGuess(
+            GameState(targetNumber = 50L, currentRangeMax = 100L),
+            50L
+        )
+        val charm = GameEngine(Random(123)).processGuess(
+            GameState(
+                targetNumber = 50L,
+                currentRangeMax = 100L,
+                prestigeShopPurchases = setOf("prestige_luck_charm")
+            ),
+            50L
+        )
+
+        assertTrue(charm.reward >= base.reward)
+    }
+
+    @Test
+    fun universalHarmonyGuaranteesCriticalRewards() {
+        val result = GameEngine(Random(123)).processGuess(
+            GameState(
+                targetNumber = 50L,
+                currentRangeMax = 100L,
+                ultraShopPurchases = setOf("ultra_universal_harmony")
+            ),
+            50L
+        )
+
+        assertTrue(result.isCritical)
+    }
+
+    @Test
+    fun infiniteSingularityDoublesUniversalHarmonyReward() {
+        val harmony = GameEngine(Random(123)).processGuess(
+            GameState(
+                targetNumber = 50L,
+                currentRangeMax = 100L,
+                ultraShopPurchases = setOf("ultra_universal_harmony")
+            ),
+            50L
+        )
+        val harmonyAndSingularity = GameEngine(Random(123)).processGuess(
+            GameState(
+                targetNumber = 50L,
+                currentRangeMax = 100L,
+                ultraShopPurchases = setOf("ultra_universal_harmony", "ultra_infinite_multiplier")
+            ),
+            50L
+        )
+
+        assertEquals(0, harmonyAndSingularity.reward.compareTo(harmony.reward * BigNumber(2)))
+    }
+
+    @Test
+    fun prestigeAutoSpeedMultiplierIncludesSpeedMutator() {
+        val base = engine.autoClickerSpeedMultiplier(GameState())
+        val prestige = engine.autoClickerSpeedMultiplier(
+            GameState(prestigeShopPurchases = setOf("prestige_auto_speed"))
+        )
+        val combined = engine.autoClickerSpeedMultiplier(
+            GameState(
+                prestigeShopPurchases = setOf("prestige_auto_speed"),
+                activeMutators = setOf("mut_speed")
+            )
+        )
+
+        assertEquals(1.0, base, 0.0)
+        assertEquals(1.5, prestige, 0.0)
+        assertEquals(4.5, combined, 0.0)
+    }
 }
