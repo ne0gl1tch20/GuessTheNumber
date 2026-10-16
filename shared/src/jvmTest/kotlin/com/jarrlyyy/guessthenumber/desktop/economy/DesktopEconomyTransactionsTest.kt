@@ -281,6 +281,43 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
+    fun dailyQuestClaimsAwardExactRewardsAndCannotBeClaimedTwice() {
+        val today = "2026-10-16"
+        var state = GameState(
+            dailyQuestDate = today,
+            dailyQuestGuesses = 10,
+            dailyQuestCorrectGuesses = 5,
+            dailyQuestBestStreak = 5,
+            dailyQuestUpgradePurchases = 3
+        )
+
+        for (questId in listOf("daily_guesses_10", "daily_correct_5", "daily_streak_5", "daily_upgrades_3")) {
+            val claim = DesktopEconomyTransactions.claimDailyQuest(state, questId, today)
+            assertTrue("Expected $questId to be claimable", claim.accepted)
+            state = claim.state
+        }
+
+        assertEquals(BigNumber(10_000), state.money)
+        assertEquals(BigNumber(110), state.nebula)
+        assertEquals(BigNumber(10_000), state.statistics.moneyEarned)
+        assertEquals(110L, state.statistics.nebulaEarned)
+        assertEquals(4, state.claimedDailyQuests.size)
+
+        val duplicate = DesktopEconomyTransactions.claimDailyQuest(state, "daily_guesses_10", today)
+        assertFalse(duplicate.accepted)
+        assertEquals(state, duplicate.state)
+    }
+
+    @Test
+    fun incompleteDailyQuestCannotBeClaimed() {
+        val state = GameState(dailyQuestDate = "2026-10-16", dailyQuestGuesses = 9)
+        val result = DesktopEconomyTransactions.claimDailyQuest(state, "daily_guesses_10", "2026-10-16")
+
+        assertFalse(result.accepted)
+        assertEquals(state, result.state)
+    }
+
+    @Test
     fun upgradePurchaseRefreshesDailyQuestBeforeCountingPurchase() {
         val stale = GameState(
             money = BigNumber(1000),
