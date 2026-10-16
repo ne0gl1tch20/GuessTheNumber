@@ -310,7 +310,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             )
             if (currentState.achievements.isNotEmpty()) {
                 Text(
-                    currentState.achievements.sorted().joinToString(" · "),
+                    currentState.achievements.sorted().joinToString(" · ") { it.replace('_', ' ') },
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -421,8 +421,8 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                         title = item.name,
                         description = item.description,
                         detail = when (item.id) {
-                            "nebula_boost" -> "Owned: doubles future Nebula quest and achievement rewards · Cost: ${item.nebulaCost} Nebula"
-                            "golden_guess" -> "Owned: doubles the base Money reward on every tenth lifetime guess when correct · Cost: ${item.nebulaCost} Nebula"
+                            "nebula_boost" -> "Effect: doubles future Nebula rewards · Cost: ${item.nebulaCost} Nebula"
+                            "golden_guess" -> "Effect: guarantees critical rewards on every tenth lifetime guess · Cost: ${item.nebulaCost} Nebula"
                             else -> "Cost: ${item.nebulaCost} Nebula"
                         },
                         action = if (purchased) "Owned" else if (supported) "Buy" else "Unavailable",
