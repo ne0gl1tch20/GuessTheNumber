@@ -161,6 +161,19 @@ def main() -> int:
         except Exception as exc:
             errors.append(f"talent catalog parity check failed: {exc}")
 
+    # Windows Arcade reads the same minigame catalog as Android.
+    android_minigames_path = ROOT / "app" / "src" / "main" / "assets" / "game" / "minigames.json"
+    desktop_minigames_path = ROOT / "desktopApp" / "src" / "jvmMain" / "resources" / "game" / "minigames.json"
+    if android_minigames_path.exists():
+        try:
+            android_minigames = load(android_minigames_path)
+            if not desktop_minigames_path.exists():
+                errors.append("Windows canonical minigame resource is missing")
+            elif load(desktop_minigames_path) != android_minigames:
+                errors.append("desktopApp game/minigames.json must match Android's canonical asset")
+        except Exception as exc:
+            errors.append(f"minigame catalog parity check failed: {exc}")
+
     game_root = ROOT / "app" / "src" / "main" / "assets" / "game"
     for filename, prefix in GAME_RULES.items():
         path = game_root / filename

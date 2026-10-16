@@ -19,5 +19,6 @@ enum class DesktopGameSection {
     HOME_BASE,
     CODEX,
     ENDGAME,
-    LUCKY_STAKE
+    LUCKY_STAKE,
+    ARCADE
 }

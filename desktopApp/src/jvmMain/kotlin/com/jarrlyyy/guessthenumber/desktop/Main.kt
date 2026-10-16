@@ -338,7 +338,8 @@ fun main() = application {
                         DesktopDestination.HOME_BASE,
                         DesktopDestination.CODEX,
                         DesktopDestination.ENDGAME,
-                        DesktopDestination.LUCKY_STAKE -> {
+                        DesktopDestination.LUCKY_STAKE,
+                        DesktopDestination.ARCADE -> {
                             Column(modifier = Modifier.fillMaxSize()) {
                                 ProductionGuessGameScreen(
                                     section = when (destination) {
@@ -359,6 +360,7 @@ fun main() = application {
                                         DesktopDestination.CODEX -> DesktopGameSection.CODEX
                                         DesktopDestination.ENDGAME -> DesktopGameSection.ENDGAME
                                         DesktopDestination.LUCKY_STAKE -> DesktopGameSection.LUCKY_STAKE
+                                        DesktopDestination.ARCADE -> DesktopGameSection.ARCADE
                                         else -> DesktopGameSection.PLAY
                                     },
                                     onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
@@ -393,7 +395,6 @@ fun main() = application {
                         DesktopDestination.DEVELOPER_CONSOLE,
                         DesktopDestination.PROCESS_INSPECTOR,
                         DesktopDestination.MUSIC_PLAYER,
-                        DesktopDestination.ARCADE,
                         DesktopDestination.ACTIVITY_HUB,
                         DesktopDestination.LUA_TESTING_HUB,
                         DesktopDestination.LIVE_OPS -> DesktopParityScreen(destination = destination, onBack = { shell.navigate(DesktopDestination.MORE) }, onNavigate = { shell.navigate(it) })

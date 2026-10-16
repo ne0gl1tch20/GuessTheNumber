@@ -18,6 +18,13 @@ data class DesktopTalentDef(
     val requiredParentId: String? = null
 )
 
+data class DesktopMinigameDef(
+    val id: String,
+    val name: String,
+    val description: String,
+    val rewardMultiplier: Double
+)
+
 /** Reads the same checked-in game JSON used by Android. */
 class DesktopEconomyRepository(
     private val readResource: (String) -> String = ::readClasspathResource
@@ -31,6 +38,7 @@ class DesktopEconomyRepository(
     fun ultraShopItems(): List<DesktopCurrencyShopItem> =
         DesktopEconomyJson.currencyShopItems(readResource("ultra_shop.json"))
     fun talents(): List<DesktopTalentDef> = DesktopEconomyJson.talents(readResource("talents.json"))
+    fun minigames(): List<DesktopMinigameDef> = DesktopEconomyJson.minigames(readResource("minigames.json"))
 
     private companion object {
         fun readClasspathResource(name: String): String {

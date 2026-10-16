@@ -3,7 +3,7 @@
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
 
-**Latest increment (2026-10-16):** PR #220 merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f`. It implements all six permanent Prestige/Ultra effects in shared `GameEngine`, centralizes achievement reward calculation for Android/Windows, adds a Windows Arcade reward transaction adapter, and adds desktop-only scrollable main navigation. Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910080423) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910065849) on head `762d029c828f498b10f686e3d74f920865e17437`; a duplicate Windows run [also passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910080000). Owner reports earlier Auto Clicker and Talent Web checks passed. Runtime verification of the newly merged upgrade effects/navigation and the overall Stage 2 parity gate remain open.
+**Latest increment (2026-10-16):** PR #220 merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f` with Android and Windows CI passing. Current candidate PR #221 implements all five Android Arcade minigames on Windows, loads the same canonical `minigames.json`, and routes rewards through `DesktopEconomyTransactions.awardArcadeReward` so the shared Nebula/Money boosts apply. Candidate CI is pending; runtime verification of PR #220's upgrades/navigation and the Arcade port remains open.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
@@ -155,7 +155,8 @@ The port is complete only when every Android player-facing screen and reachable 
 
 ### W4. Activities and events
 
-- [ ] Arcade and minigames.
+- [x] Port the five catalog-backed Android Arcade minigames (Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush) to Windows and route payouts through the shared economy transaction. CI enforces that the packaged desktop minigame catalog matches Android's canonical asset.
+- [ ] Verify Arcade runtime behavior, localized strings and reward/save persistence on Windows.
 - [ ] Random events, challenge/mutator setup and staking where in agreed release scope.
 - [ ] Number Rush and bundled LuaJ activities using existing sandbox/validation boundaries.
 - [ ] Offline event availability and reward validation.
@@ -169,7 +170,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [ ] Save slots, slot switching, backup/export/import and recovery appropriate to Windows.
 - [ ] Tutorial/feature tours and replay entry points.
 - [ ] About, player-facing error states and crash recovery surfaces.
-- [ ] Music controls where Windows audio support exists; document intentional differences.
+- [ ] Music controls where Windows audio support exists; document intentional differences. The Windows Music Player route remains a placeholder.
 - [ ] Localize all visible strings and accessible labels.
 
 **Exit:** Players can configure, save, restore and understand Windows without Android-only screens.
@@ -389,3 +390,10 @@ This is a source and CI review, not a claim of interactive Windows runtime verif
 ### Desktop-only navigation exception (owner-approved, 2026-10-16)
 
 Desktop quick access intentionally differs from Android navigation for reachability only. The ordered Windows main bar/rail is Play → Upgrades → Shop → Prestige → Ultra → Settings → Arcade → Music → Save Slots → Statistics → World Map → Changelog → More. It defaults to the left rail and supports scrollable top/bottom variants. This does not change gameplay rules, progression, save data or Android navigation. Some exposed destinations remain partial/placeholder implementations and are still tracked above.
+
+
+### Arcade port candidate (2026-10-16)
+
+- PR #221 loads the canonical minigame catalog from a Windows classpath resource, with JSON validation and CI parity checking against Android's asset.
+- All five minigames use Android's existing timers, target ranges, success/failure behavior and fixed payout amounts. Reward application uses the shared desktop transaction adapter, which applies the same permanent Money/Nebula upgrade effects and persists state through the active save slot.
+- **Candidate CI:** pending. **Manual verification after CI:** play each of the five minigames, check correct and incorrect outcomes, verify each payout and the Ultra Nebula/Money multipliers, restart to confirm balances persist, and verify the Arcade catalog failure path grants no reward.
