@@ -23,8 +23,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.content
 
 internal data class DesktopAchievementDefinition(
     val id: String,
@@ -44,16 +42,16 @@ internal object DesktopAchievementsCatalog {
 
     internal fun parse(source: String): List<DesktopAchievementDefinition> {
         val root = Json.parseToJsonElement(source).jsonObject
-        require(root["schemaVersion"]?.jsonPrimitive?.int == 1) { "Unsupported achievement catalog schema." }
+        require(root["schemaVersion"]?.jsonPrimitive?.toString()?.trim('"') == "1") { "Unsupported achievement catalog schema." }
         val entries = root["achievements"]?.jsonArray ?: error("Achievement catalog has no achievements array.")
         val parsed = entries.map { item ->
             val value = item.jsonObject
             DesktopAchievementDefinition(
-                id = value.getValue("id").jsonPrimitive.content,
-                name = value.getValue("name").jsonPrimitive.content,
-                description = value.getValue("description").jsonPrimitive.content,
-                rewardNebula = value.getValue("rewardNebula").jsonPrimitive.content.toLong(),
-                tier = value.getValue("tier").jsonPrimitive.content.lowercase()
+                id = value.getValue("id").jsonPrimitive.toString().trim('"'),
+                name = value.getValue("name").jsonPrimitive.toString().trim('"'),
+                description = value.getValue("description").jsonPrimitive.toString().trim('"'),
+                rewardNebula = value.getValue("rewardNebula").jsonPrimitive.toString().toLong(),
+                tier = value.getValue("tier").jsonPrimitive.toString().trim('"').lowercase()
             )
         }
         require(parsed.isNotEmpty()) { "Achievement catalog is empty." }

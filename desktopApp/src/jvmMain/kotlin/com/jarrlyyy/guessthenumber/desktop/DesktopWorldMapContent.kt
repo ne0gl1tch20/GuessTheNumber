@@ -23,10 +23,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.content
-import kotlinx.serialization.json.long
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.float
 
 internal data class DesktopWorldDefinition(
     val id: String, val name: String, val bossId: String, val bossName: String,
@@ -43,17 +39,17 @@ internal object DesktopWorldCatalog {
             ?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
             ?: error("Missing bundled world catalog: /game/worlds.json")
         val root = Json.parseToJsonElement(source).jsonObject
-        require(root["schemaVersion"]?.jsonPrimitive?.content == "1") { "Unsupported world catalog schema." }
+        require(root["schemaVersion"]?.jsonPrimitive?.toString() == "1") { "Unsupported world catalog schema." }
         val worlds = root["worlds"]?.jsonArray ?: error("World catalog has no worlds array.")
         val parsed = worlds.map { entry ->
             val value = entry.jsonObject
-            fun text(key: String) = value.getValue(key).jsonPrimitive.content
+            fun text(key: String) = value.getValue(key).jsonPrimitive.toString().trim('"')
             fun long(key: String) = text(key).toLong()
             fun int(key: String) = text(key).toInt()
             DesktopWorldDefinition(
                 id = text("id"), name = text("fallback"), bossId = text("bossId"), bossName = text("bossFallback"),
                 x = text("x").toFloat(), y = text("y").toFloat(), hp = int("hp"), secretId = text("secretId"),
-                secretAt = long("secretAt"), unlockBossId = value["unlockBossId"]?.takeUnless { it.toString() == "null" }?.jsonPrimitive?.content,
+                secretAt = long("secretAt"), unlockBossId = value["unlockBossId"]?.takeUnless { it.toString() == "null" }?.jsonPrimitive?.toString()?.trim('"'),
                 unlockCorrectGuesses = long("unlockCorrectGuesses"), unlockUpgradeCount = int("unlockUpgradeCount"),
                 unlockPrestigeCount = long("unlockPrestigeCount"), unlockUltraCount = long("unlockUltraCount"),
                 fightCorrectGuesses = long("fightCorrectGuesses"), fightUpgradeCount = int("fightUpgradeCount"),

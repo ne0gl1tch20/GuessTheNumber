@@ -303,7 +303,9 @@ fun main() = application {
                         DesktopDestination.ULTRA,
                         DesktopDestination.TALENT,
                         DesktopDestination.STATS,
-                        DesktopDestination.SETTINGS -> {
+                        DesktopDestination.SETTINGS,
+                        DesktopDestination.ACHIEVEMENTS,
+                        DesktopDestination.WORLD_MAP -> {
                             Column(modifier = Modifier.fillMaxSize()) {
                                 ProductionGuessGameScreen(
                                     section = when (destination) {

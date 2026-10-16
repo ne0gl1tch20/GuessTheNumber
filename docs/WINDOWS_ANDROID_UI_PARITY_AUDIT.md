@@ -31,7 +31,8 @@ PR #214 is merged. It connected saved Android-equivalent theme mode and custom c
 | Guided Tutorial / Feature Tour | Android-equivalent overlays are not ported |
 
 ## Stage 3: Behavior and shared rules
-- [x] Changelog viewer reuses the canonical Android changelog asset instead of maintaining a duplicate Windows copy.\n- [ ] Reuse shared domain rules, repositories, catalog data, localization resources and assets wherever possible.
+- [x] Changelog viewer reuses the canonical Android changelog asset instead of maintaining a duplicate Windows copy.
+- [ ] Reuse shared domain rules, repositories, catalog data, localization resources and assets wherever possible.
 - [ ] Match Android actions, purchases, rewards, unlocks, resets, settings, confirmations and validation.
 - [ ] Preserve offline behavior, save compatibility and recovery behavior, with no ads, analytics or accounts.
 - [ ] Gate development and Live Ops features using equivalent flags and sandbox validation.
@@ -46,4 +47,4 @@ PR #214 is merged. It connected saved Android-equivalent theme mode and custom c
 
 ## This batch
 
-Adds explicit navigation to the remaining Android screen families and per-screen parity notes so gaps are visible rather than hidden behind the More menu. The Changelog route is now a functional first screen port: it loads the canonical Android Markdown asset, renders headings and list items in a scrollable desktop layout, and has a resource smoke test. The Achievements route now loads the canonical Android achievement catalog, reflects the saved unlock set, displays progress, tier and Nebula rewards, and supports All/Unlocked/Locked filters; catalog validation tests were added. CI and Windows runtime verification are pending. Other new routes remain tracking shells, not finished feature ports. Next work should replace each shell with the Android screen real content and shared behavior in small verified batches.
+Adds explicit navigation to the remaining Android screen families and per-screen parity notes so gaps are visible rather than hidden behind the More menu. The Changelog route is now a functional first screen port: it loads the canonical Android Markdown asset, renders headings and list items in a scrollable desktop layout, and has a resource smoke test. The Achievements route loads the canonical Android achievement catalog, reflects the saved unlock set, displays progress, tier and Nebula rewards, and supports All/Unlocked/Locked filters. The World Map now loads the canonical Android world catalog and displays saved world unlocks, active selection, unlock requirements/actions, boss progress and secret thresholds. World unlock and selection reuse existing shared Windows transactions; boss start/leave controls and the interactive map canvas remain unfinished. CI and Windows runtime verification are pending. Other routes remain tracking shells, not finished feature ports. Next work should replace each shell with the Android screen real content and shared behavior in small verified batches.
