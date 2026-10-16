@@ -10,11 +10,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -63,65 +72,40 @@ private fun DesktopNavigationBar(
     currentDestination: DesktopDestination,
     onNavigate: (DesktopDestination) -> Unit
 ) {
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-        if (shouldUseCompactNavigation(maxWidth)) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                DesktopNavigationButtons(currentDestination, onNavigate)
-                Text("Windows Desktop", style = MaterialTheme.typography.labelLarge)
-            }
-        } else {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                DesktopNavigationButtons(currentDestination, onNavigate)
-                Spacer(modifier = Modifier.weight(1f))
-                Text("Windows Desktop", style = MaterialTheme.typography.labelLarge)
-            }
-        }
-    }
-}
-
-@Composable
-private fun DesktopNavigationButtons(
-    currentDestination: DesktopDestination,
-    onNavigate: (DesktopDestination) -> Unit
-) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        DesktopDestination.entries.filter { it in setOf(DesktopDestination.PLAY, DesktopDestination.UPGRADES, DesktopDestination.SHOP, DesktopDestination.MORE) }.forEach { destination ->
-            var isFocused by remember(destination) { mutableStateOf(false) }
-            val focusModifier = Modifier
-                .onFocusChanged { isFocused = it.isFocused }
-                .then(
-                    if (isFocused) {
-                        Modifier.border(
-                            BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
-                            RoundedCornerShape(12.dp)
-                        )
-                    } else {
-                        Modifier
-                    }
-                )
-            Button(
-                modifier = focusModifier.semantics {
-                    selected = currentDestination == destination
-                },
+    val destinations = listOf(
+        DesktopDestination.PLAY,
+        DesktopDestination.UPGRADES,
+        DesktopDestination.SHOP,
+        DesktopDestination.MORE
+    )
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 8.dp
+    ) {
+        destinations.forEach { destination ->
+            val selected = currentDestination == destination
+            NavigationBarItem(
+                selected = selected,
                 onClick = {
-                    if (currentDestination != destination) onNavigate(destination)
+                    if (!selected) onNavigate(destination)
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = desktopNavigationContainerColor(
-                        selected = currentDestination == destination,
-                        colorScheme = MaterialTheme.colorScheme
-                    ),
-                    contentColor = desktopNavigationContentColor(
-                        selected = currentDestination == destination,
-                        colorScheme = MaterialTheme.colorScheme
+                icon = {
+                    Icon(
+                        imageVector = when (destination) {
+                            DesktopDestination.PLAY -> Icons.Default.PlayArrow
+                            DesktopDestination.UPGRADES -> Icons.Default.Star
+                            DesktopDestination.SHOP -> Icons.Default.ShoppingCart
+                            else -> Icons.Default.Menu
+                        },
+                        contentDescription = destination.label
                     )
-                )
-            ) {
-                Text(destination.label)
-            }
+                },
+                label = { Text(destination.label) },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+                modifier = Modifier.semantics { this.selected = selected }
+            )
         }
     }
 }
@@ -201,11 +185,6 @@ fun main() = application {
                         .focusable(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    DesktopNavigationBar(
-                        currentDestination = shellState.destination,
-                        onNavigate = shell::navigate
-                    )
-
                     if (shellState.message != null) {
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Text(
@@ -223,7 +202,8 @@ fun main() = application {
                         DesktopDestination.MORE,
                         DesktopDestination.PRESTIGE,
                         DesktopDestination.ULTRA,
-                        DesktopDestination.TALENT -> {
+                        DesktopDestination.TALENT,
+                        DesktopDestination.STATS -> {
                             Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
                                 ProductionGuessGameScreen(
                                     section = when (shellState.destination) {
@@ -233,12 +213,14 @@ fun main() = application {
                                         DesktopDestination.PRESTIGE -> DesktopGameSection.PRESTIGE
                                         DesktopDestination.ULTRA -> DesktopGameSection.ULTRA
                                         DesktopDestination.TALENT -> DesktopGameSection.TALENT
+                                        DesktopDestination.STATS -> DesktopGameSection.STATS
                                         else -> DesktopGameSection.PLAY
                                     },
                                     onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
                                     onOpenPrestige = { shell.navigate(DesktopDestination.PRESTIGE) },
                                     onOpenUltra = { shell.navigate(DesktopDestination.ULTRA) },
-                                    onOpenTalent = { shell.navigate(DesktopDestination.TALENT) }
+                                    onOpenTalent = { shell.navigate(DesktopDestination.TALENT) },
+                                    onOpenStats = { shell.navigate(DesktopDestination.STATS) }
                                 )
                             }
                         }
@@ -320,6 +302,10 @@ fun main() = application {
                             }
                         }
                     }
+                    DesktopNavigationBar(
+                        currentDestination = shellState.destination,
+                        onNavigate = shell::navigate
+                    )
                 }
             }
         }

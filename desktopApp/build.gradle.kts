@@ -1,5 +1,7 @@
 import buildlogic.GenerateDesktopLogoAssets
 
+import org.gradle.api.tasks.testing.Test
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
@@ -33,6 +35,8 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material3)
+                // Compose Multiplatform 1.8+ no longer brings this in transitively.
+                implementation("org.jetbrains.compose.material:material-icons-core:1.7.3")
                 implementation(compose.ui)
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.serialization.json)
@@ -76,5 +80,12 @@ compose.desktop {
                 shortcut = true
             }
         }
+    }
+}
+
+// Show the parity context banner printed by desktop JVM tests in Gradle/CI test logs.
+tasks.withType<Test>().matching { it.name == "jvmTest" }.configureEach {
+    testLogging {
+        showStandardStreams = true
     }
 }

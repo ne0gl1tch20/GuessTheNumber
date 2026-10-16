@@ -3,9 +3,26 @@ package com.jarrlyyy.guessthenumber.desktop
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import org.junit.Assert.assertTrue
+import org.junit.BeforeClass
 import org.junit.Test
 
 class DesktopThemePaletteTest {
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun printAiContextReminder() {
+            println(
+                """
+                |GTN WINDOWS PARITY REMINDER:
+                |Android is the source of truth. Windows must feel like the same app, not a redesign.
+                |Preserve features, visuals, gameplay, localization and save compatibility.
+                |Adapt only genuine desktop needs. Do not add unnecessary rewrites or complexity.
+                |Theme tests cover theme tokens only; they do NOT prove full UI/runtime parity.
+                """.trimMargin()
+            )
+        }
+    }
+
     @Test
     fun lightSurfaceTextMeetsReadableContrast() {
         assertTrue(contrastRatio(DesktopThemePalette.light.onSurface, DesktopThemePalette.light.surface) >= 4.5)
@@ -22,7 +39,9 @@ class DesktopThemePaletteTest {
     fun bothPalettesProvideDistinctSurfaceAndBackgroundColors() {
         assertTrue(DesktopThemePalette.light.surface != DesktopThemePalette.light.background)
         assertTrue(DesktopThemePalette.dark.surface != DesktopThemePalette.dark.background)
-        assertTrue(DesktopThemePalette.light.primary != DesktopThemePalette.dark.primary)
+        // Android's ExpressiveDarkColorScheme and ExpressiveLightColorScheme both use PrimaryNeonPurple.
+        assertTrue(DesktopThemePalette.light.primary == Color(0xFF9C27B0))
+        assertTrue(DesktopThemePalette.dark.primary == Color(0xFF9C27B0))
     }
 
     @Test

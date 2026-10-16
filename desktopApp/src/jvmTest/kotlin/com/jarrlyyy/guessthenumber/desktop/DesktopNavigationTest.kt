@@ -46,6 +46,7 @@ class DesktopNavigationTest {
         assertEquals(DesktopDestination.MORE, DesktopDestination.fromShortcut(Key.Four, ctrlPressed = true))
         assertEquals(DesktopDestination.ABOUT, DesktopDestination.fromShortcut(Key.Five, ctrlPressed = true))
         assertNull(DesktopDestination.PRESTIGE.shortcutKey)
+        assertNull(DesktopDestination.STATS.shortcutKey)
     }
 
     @Test
@@ -73,6 +74,16 @@ class DesktopNavigationTest {
 
         assertTrue(controller.handleKey(Key.Five, ctrlPressed = true))
         assertEquals(DesktopDestination.ABOUT, controller.state.destination)
+    }
+
+    @Test
+    fun statisticsIsReachableAsAMoreDestinationAndEscapeReturnsToPlay() {
+        val controller = DesktopShellController()
+        controller.navigate(DesktopDestination.STATS)
+
+        assertEquals(DesktopDestination.STATS, controller.state.destination)
+        assertTrue(controller.handleKey(Key.Escape, ctrlPressed = false))
+        assertEquals(DesktopDestination.PLAY, controller.state.destination)
     }
 
     @Test

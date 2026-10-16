@@ -5,6 +5,20 @@
 - Preserve the current app version unless a version bump is explicitly part of the release work. Do not imply a build or tests passed without verified results.
 - The user confirmed PR #36 (undocumented changes changelog update) is merged.
 
+## Test-output context reminders (2026-10-16)
+
+- For Windows/Android parity test suites, print a short, visible context reminder in test output so future AI-assisted sessions and reviewers see the locked goal while inspecting test logs: Android is the source of truth; Windows is the same app adapted for desktop; preserve features, visuals, gameplay, localization and saves; avoid unnecessary rewrites.
+- Keep reminders concise and relevant to the suite. They supplement, never replace, assertions and real verification. Explicitly state each suite's scope and what it does not prove; theme-token tests must not imply full UI/runtime parity.
+- Ensure the relevant Gradle test task exposes standard output in CI logs. Do not add broad, repetitive prints to every individual test.
+
+## Windows product-feel rule (2026-10-16)
+
+- The user wants GuessTheNumber to feel like the exact same app they play on their Android phone, simply adapted for desktop. Keep the Android identity and experience: same player-facing screens and features, colors, typography, icons/artwork, content hierarchy, labels, controls, dialogs/menus, animations and interaction outcomes wherever the platform supports them.
+- Desktop is an adaptation of the same game, not a separate redesign or reduced edition. Adapt only what desktop genuinely needs: window sizing/layout, keyboard and mouse input, focus/hover behavior, desktop navigation conventions, and Windows-specific integration.
+- Preserve the authoritative game rules, economy, progression, settings meaning, localization, save format/compatibility, offline behavior and existing Android behavior. Reuse shared logic and canonical assets wherever practical; prefer thin platform adapters over duplicated implementations or unnecessary rewrites.
+- Avoid adding complexity or new abstractions unless they directly support parity, compatibility, reliability or a real desktop requirement. Make related parity improvements together in the existing coordinated PR where technically reasonable, with tests and an honest status for each area. Do not split work into tiny PRs merely for convenience; do not merge without explicit user authorization.
+- Verify each change with the checks that are actually available, distinguish CI/compilation from real Windows runtime and visual comparison, and never call parity complete while known gaps remain. Protect saves and existing features, and do not weaken tests to make the build pass.
+
 ## Windows exact-port requirement (2026-10-16)
 
 - User's locked goal: Windows should be an exact port of GTN using Kotlin Multiplatform, shared code and shared assets wherever practical.

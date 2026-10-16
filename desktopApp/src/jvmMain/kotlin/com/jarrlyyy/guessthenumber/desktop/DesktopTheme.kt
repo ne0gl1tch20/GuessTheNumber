@@ -14,6 +14,8 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.sun.jna.Memory
 import com.sun.jna.Native
 import com.sun.jna.Pointer
@@ -25,10 +27,19 @@ import java.awt.Window as AwtWindow
 import java.util.concurrent.TimeUnit
 
 internal object DesktopThemePalette {
+    // Keep these values aligned with app/src/main/java/.../ui/theme/Color.kt and Theme.kt.
+    // The Android Activity/window integration stays platform-specific; visual tokens do not.
     val dark = darkColorScheme(
-        primary = Color(0xFFCE93D8),
-        secondary = Color(0xFF80DEEA),
-        tertiary = Color(0xFF69F0AE),
+        primary = Color(0xFF9C27B0),
+        onPrimary = Color(0xFFFFFFFF),
+        primaryContainer = Color(0xFFF3E5F5),
+        onPrimaryContainer = Color(0xFF4A148C),
+        secondary = Color(0xFF00E5FF),
+        onSecondary = Color(0xFF00363A),
+        secondaryContainer = Color(0xFFE0F7FA),
+        tertiary = Color(0xFF00E676),
+        onTertiary = Color(0xFF003311),
+        tertiaryContainer = Color(0xFFE8F5E9),
         background = Color(0xFF0D0B1E),
         surface = Color(0xFF191632),
         surfaceVariant = Color(0xFF25214D),
@@ -37,15 +48,38 @@ internal object DesktopThemePalette {
     )
 
     val light = lightColorScheme(
-        primary = Color(0xFF7B1FA2),
-        secondary = Color(0xFF006874),
-        tertiary = Color(0xFF007A3D),
+        primary = Color(0xFF9C27B0),
+        onPrimary = Color(0xFFFFFFFF),
+        primaryContainer = Color(0xFFF3E5F5),
+        onPrimaryContainer = Color(0xFF4A148C),
+        secondary = Color(0xFF00E5FF),
+        onSecondary = Color(0xFF00363A),
+        secondaryContainer = Color(0xFFE0F7FA),
+        tertiary = Color(0xFF00E676),
+        onTertiary = Color(0xFF003311),
+        tertiaryContainer = Color(0xFFE8F5E9),
         background = Color(0xFFFAF8FF),
         surface = Color(0xFFF1EEFF),
         surfaceVariant = Color(0xFFE5DEFF),
         onBackground = Color(0xFF1D1B20),
         onSurface = Color(0xFF1D1B20)
     )
+
+    val shapes = androidx.compose.material3.Shapes(
+        extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        small = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
+        medium = androidx.compose.foundation.shape.RoundedCornerShape(32.dp),
+        large = androidx.compose.foundation.shape.RoundedCornerShape(44.dp),
+        extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(56.dp)
+    )
+
+    val typography = androidx.compose.material3.Typography().run {
+        copy(
+            displayLarge = displayLarge.copy(letterSpacing = (-0.5).sp),
+            headlineLarge = headlineLarge.copy(letterSpacing = (-0.25).sp),
+            titleLarge = titleLarge.copy(letterSpacing = 0.sp)
+        )
+    }
 }
 
 internal fun desktopNavigationContainerColor(
@@ -152,6 +186,8 @@ fun DesktopTheme(window: AwtWindow, content: @Composable () -> Unit) {
     ) {
         MaterialTheme(
             colorScheme = if (isDark) DesktopThemePalette.dark else DesktopThemePalette.light,
+            shapes = DesktopThemePalette.shapes,
+            typography = DesktopThemePalette.typography,
             content = content
         )
     }

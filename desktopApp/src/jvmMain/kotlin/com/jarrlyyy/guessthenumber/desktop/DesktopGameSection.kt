@@ -8,5 +8,6 @@ enum class DesktopGameSection {
     MORE,
     PRESTIGE,
     ULTRA,
-    TALENT
+    TALENT,
+    STATS
 }

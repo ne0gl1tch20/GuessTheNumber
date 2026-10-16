@@ -1,12 +1,17 @@
 # Android-to-Windows UI parity audit
 
-**Status:** Initial navigation and Upgrades presentation changes are implemented and automated CI passes. Full visual and interaction parity is not claimed.
+**Status:** Initial navigation and Upgrades presentation changes are implemented. Windows Statistics is reachable from More and displays core game metrics. Latest CI and runtime visual comparison are pending; full parity is not claimed.
 
 ## Android reference
 
 Android's `NavGraph.kt` declares four primary bottom-navigation destinations in this order: Play (`PlayScreen`), Upgrades (`UpgradeScreen`), Shop (`ShopScreen`) and More (`MoreScreen`). The previous Windows Play/About-only shell did not match that navigation structure.
 
 ## First batch changes
+
+- Windows primary navigation follows Android's four primary destinations in order: Play, Upgrades, Shop and More, with matching Material icons and a bottom navigation bar.
+- Windows Statistics is reachable from More. This is a functional first port; visual/runtime comparison is still pending.
+
+
 
 - Windows primary navigation now exposes Play, Upgrades, Shop and More in Android's order.
 - Existing guessing, mutator, daily quest, achievement and world progression controls stay together on Play instead of being split into a separate Progress destination.
