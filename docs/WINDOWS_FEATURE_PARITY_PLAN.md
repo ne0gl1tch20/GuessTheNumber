@@ -6,9 +6,13 @@
 
 ## Goal
 
-Bring Windows to the agreed player-facing feature set in deliberate, testable slices. Reuse shared rules and selected UI where helpful, while keeping Windows windowing, input, storage, update and installer behavior in the desktop host.
+**Product wish / locked direction: Windows is an exact port of GTN, built with Kotlin Multiplatform and shared code and assets wherever practical.** Android is the source of truth for the game. Windows must reproduce the same player-facing game, not a smaller desktop edition or a newly organized substitute UI.
 
-This replaces the Windows-related phases buried in the temporary KMP migration roadmap.
+Port the Android experience screen by screen: same features, screen hierarchy, information, labels, controls, menus, dialogs, navigation destinations, locked/unlocked states, loading/empty/error states, and interaction outcomes. Adapt only the presentation and input where desktop requires it (resizable window, keyboard, mouse, focus, hover and desktop conventions). Desktop adaptations must preserve the Android screen's content and meaning; any deliberate feature difference needs an explicit reason and documentation.
+
+Prefer Kotlin Multiplatform shared production rules, models, validation, transaction logic, localization catalogs and canonical assets. Reuse Compose UI components where they work across targets, and use thin Android/Windows host adapters for platform-specific lifecycle, storage, audio, notifications, windowing, installers and updates. Share the original assets rather than creating separate Windows copies. Keep Android working throughout the port and preserve existing save compatibility.
+
+This plan is the single source of truth for Windows parity and replaces Windows migration checklists that duplicate its stages.
 
 ## Locked five-stage execution order
 
@@ -38,10 +42,22 @@ This replaces the Windows-related phases buried in the temporary KMP migration r
 
 - Finish and record each stage's exit gate before treating the next stage as active.
 - Each implementation slice should be a focused PR with relevant tests and parity-matrix updates; merge only when its required checks and review are acceptable.
-- Do not create more migration-only UI extraction work. Reopen KMP foundation work only for a demonstrated defect or a specific cross-platform feature requirement.
+- Do not create extraction-only PRs. Shared-code/UI work is in scope when it directly advances the exact Windows port, prevents duplicated behavior/assets or fixes a demonstrated cross-platform defect.
 - Do not claim runtime verification from a successful build alone. Keep unrun checks marked unverified.
 - Preserve offline play and existing save/MSI/update-channel compatibility; do not add ads, analytics or accounts.
 
+## Definition of exact port
+
+The port is complete only when every Android player-facing screen and reachable interaction has a Windows counterpart or is explicitly classified as an approved platform-specific difference. Matching only the feature list is not enough.
+
+- [ ] Build a source-backed Android screen and route inventory, including nested destinations, menus, popups, dialogs, sheets, tutorials, feature-flagged entries and debug-only tools.
+- [ ] For each screen, compare Android and Windows visible content, hierarchy, typography, spacing, icons, imagery, states, controls, actions and navigation. Record screenshot evidence at comparable window/content sizes where practical.
+- [ ] Preserve every player-facing feature and the same underlying game rules, rewards, progression, localization meaning, save semantics and validation. Do not omit a screen because the current Windows shell has no route for it.
+- [ ] Reuse shared Kotlin code and canonical assets first. Move a rule/model/resource to shared source sets only when its dependencies and platform contracts support that move; otherwise provide a narrow Windows adapter without duplicating authoritative game logic.
+- [ ] Keep Android as the reference implementation. Every Windows port slice must identify the Android source screen/component it matches and check that Android behavior remains unchanged.
+- [ ] Adapt mobile-only interaction patterns to desktop only where needed. Desktop navigation, keyboard shortcuts, hover and window resizing may differ in input mechanics, not in available functionality or meaning.
+- [ ] Track parity per screen and interaction as **Verified**, **Not yet verified**, **Approved platform-specific difference** or **Blocked**, with evidence. A successful compile or unit-test run does not establish visual/runtime parity.
+- [ ] Do not call Windows parity complete until all required rows have evidence and there are no unexplained missing screens, controls, menus or behaviors.
 ## Scope rules
 
 - Android is the behavior reference unless a platform-specific difference is approved.
@@ -57,11 +73,12 @@ This replaces the Windows-related phases buried in the temporary KMP migration r
 ### W0. Inventory and desktop shell
 
 - [x] Inventory Android destinations, visible features, settings, save operations and debug-only routes against Windows (see source-backed inventory below).
-- [x] Update the parity table below before implementation.
+- [x] Update the feature inventory below before implementation.
+- [ ] Build and maintain a screen-by-screen Android-to-Windows visual/interaction parity matrix, including menus, dialogs, nested routes and conditional states.
 - [ ] Confirm desktop navigation, window lifecycle, theme, locale loading and error/loading/empty states.
 - [ ] Verify keyboard/mouse navigation, focus order, Enter/Escape, resizing, minimum window size, high-DPI scaling and narrow layouts.
 
-**Exit:** The desktop shell can host the planned feature slices without navigation or windowing blockers.
+**Exit:** The desktop shell can host the exact-port slices without navigation or windowing blockers.
 
 ### W1. Core gameplay loop
 
@@ -129,13 +146,18 @@ This replaces the Windows-related phases buried in the temporary KMP migration r
 ### W7. Updates, packaging and release readiness
 
 - [ ] Keep debug update discovery/install separate from production releases.
-- [ ] Validate artifacts and show clear errors for missing, expired or incompatible downloads.
+- [ ] **Windows Debug update source:** discover builds from the repository's Windows Desktop CI GitHub Actions workflow runs and their attached artifacts, not GitHub Releases.
+- [ ] **Windows Debug package format:** the CI artifact consumed by the updater must be a ZIP containing the built Windows MSI. Keep the artifact name, run number/attempt, commit SHA, package version and checksum metadata consistent and verifiable.
+- [ ] Update the Windows Debug updater to find the latest eligible successful CI run, locate/download its ZIP artifact, verify the expected channel/version/checksum, extract the MSI to a controlled temporary location and launch the existing install/upgrade flow.
+- [ ] Handle missing artifacts, expired CI artifacts, failed/in-progress runs, checksum mismatch, invalid ZIP/missing MSI and incompatible versions with clear errors; never fall back to production releases or install an unverified package.
+- [ ] Confirm the intended public-repository download path works without embedding a personal access token in the app. Document the Actions artifact retention window and explain when a build has expired.
+- [ ] Keep production update discovery and installer flow separate from the debug CI-artifact flow.
 - [ ] Test clean MSI install, in-place upgrade, repeated upgrade, failed-upgrade recovery, downgrade and uninstall.
 - [ ] Preserve the verified MSI UpgradeCode and user-data location; do not change identifiers blindly.
 - [ ] Verify saves survive restart and supported upgrades.
 - [ ] Align version metadata, locale assets and changelog.
 
-**Exit:** Windows packages install/update predictably and preserve user data.
+**Exit:** Windows packages install/update predictably and preserve user data; the debug channel installs only a verified MSI ZIP from Windows Desktop CI artifacts, while production updates remain isolated.
 
 ### W8. Final parity gate
 
@@ -191,8 +213,8 @@ A shared component or green CI is not proof that a complete feature works end-to
 | Desktop launch and window close | **Implemented in source; runtime unverified.** One resizable Compose Desktop window with an initial 1100×760 dp size and close-to-exit behavior. Minimum size and high-DPI behavior remain unverified. | [desktop Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt); run on Windows and verify launch/close, minimum size and scaling. |
 | Responsive guessing UI | **Shared pilot present; runtime unverified.** Shared content changes layout at a width threshold, but the desktop host uses standalone demo state. | [SharedGuessGameContent.kt](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/ui/SharedGuessGameContent.kt), [SharedGuessGameScreen.kt](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/ui/SharedGuessGameScreen.kt); test resize, narrow window and high DPI. |
 | Production game state, basic guess loop and save persistence | **Partially implemented; full parity not reached.** Windows Play uses the shared production `GameEngine`/`GameState` and desktop-native `DesktopSaveStore`; automated tests cover deterministic core transitions, round trips, backup recovery and failed writes. The UI currently uses save slot 1; the first economy slice, daily quest claims and treasure inventory are wired, while broader progression remains incomplete. | [ProductionGuessGameScreen.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/ProductionGuessGameScreen.kt), [DesktopSaveStore.kt](../shared/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/persistence/DesktopSaveStore.kt), [Stage 2-D verification](WINDOWS_STAGE_2D_PARITY_VERIFICATION.md); complete S2-B and run actual Windows runtime checks. |
-| Desktop navigation shell | **Initial source implementation; runtime unverified.** Windows has Play and About destinations with a testable state controller. The production Android destinations are not yet implemented on Windows. | [DesktopNavigation.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigation.kt), [DesktopNavigationTest.kt](../desktopApp/src/jvmTest/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigationTest.kt), [Screen.kt](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/Screen.kt); validate keyboard focus/navigation and expand destinations only as their features are implemented. |
-| Upgrades, shop, Prestige, Ultra, talents and economy | **Core transaction slice implemented; runtime unverified.** The desktop UI loads Android JSON catalogs and saves accepted changes before publishing state. Auto Clicker, daily quests, treasure drops and once-per-day claims are wired. Nebula Crystal doubles future Nebula rewards from guess bonuses, daily quests and achievement milestones; Golden Guess Pass forces a critical reward through the shared engine on every tenth lifetime guess. Unsupported shop effects remain rejected. | [ProductionGuessGameScreen.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/ProductionGuessGameScreen.kt), [DesktopEconomyTransactions.kt](../shared/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/economy/DesktopEconomyTransactions.kt), [Stage 2 plan](../.openai/plans/windows-migration-stage-2-gameplay-economy.md). |
+| Desktop navigation shell | **Initial source implementation; runtime unverified.** Windows has Play and About destinations with a testable state controller. The production Android destinations are not yet implemented on Windows. | [DesktopNavigation.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigation.kt), [DesktopNavigationTest.kt](../desktopApp/src/jvmTest/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigationTest.kt), [Screen.kt](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/Screen.kt); validate keyboard focus/navigation and port every production Android destination with its corresponding interactions. |
+| Upgrades, shop, Prestige, Ultra, talents and economy | **Core transaction slice implemented; runtime unverified.** The desktop UI loads Android JSON catalogs and saves accepted changes before publishing state. Auto Clicker, daily quests, treasure drops and once-per-day claims are wired. Nebula Crystal doubles future Nebula rewards from guess bonuses, daily quests and achievement milestones; Golden Guess Pass forces a critical reward through the shared engine on every tenth lifetime guess. Unsupported shop effects remain rejected. | [ProductionGuessGameScreen.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/ProductionGuessGameScreen.kt), [DesktopEconomyTransactions.kt](../shared/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/economy/DesktopEconomyTransactions.kt), [Stage 2-D verification](WINDOWS_STAGE_2D_PARITY_VERIFICATION.md). |
 | Achievements, challenges, statistics, map, bosses, relics, Home Base, Codex, Rift and activities | **Achievement reward hooks and basic world unlock/select hooks implemented; full progression UI not wired.** Windows evaluates the existing 27 achievement milestones after guesses and accepted economy actions, pays each milestone once and checks Android world unlock requirements. Full world map, boss combat, relics, Home Base, Codex, Rift and activities remain Stage 3 work. | [ProductionGuessGameScreen.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/ProductionGuessGameScreen.kt), [DesktopEconomyTransactions.kt](../shared/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/economy/DesktopEconomyTransactions.kt), [NavGraph.kt](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt). |
 | Settings, locale, accessibility, save slots and recovery | **Not wired in inspected Windows entry point.** | [NavGraph.kt](../app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt); define Windows-native equivalents in Stage 4. |
 | Localization | **CI validators exist; desktop runtime coverage unverified.** Main window strings inspected are hardcoded English. | [desktop Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt), [Windows Desktop CI](../.github/workflows/windows-desktop.yml); identify reusable locale resources and verify actual Windows rendering. |
@@ -200,7 +222,7 @@ A shared component or green CI is not proof that a complete feature works end-to
 | Responsive shell layout and minimum window size | **Source configured; runtime unverified.** Initial size and 800×600 dp minimum are centralized in `DesktopWindowMetrics`; navigation switches to a compact header below the tested width breakpoint. Shared game content has its own responsive behavior. | [DesktopShellUiPolicy.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopShellUiPolicy.kt), [Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt), [DesktopShellUiPolicyTest.kt](../desktopApp/src/jvmTest/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopShellUiPolicyTest.kt); verify minimum sizing, resize transitions and high-DPI layout on Windows. |
 | Focus indicators and update feedback | **Interactive QA found a contrast failure.** Focus outlines and Narrator status announcements were reported working, while the selected Play button's white text blended into its background. Navigation now uses explicit selected/unselected colors and selected semantics; re-test both palettes. | [Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt), [DesktopTheme.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopTheme.kt), [DesktopThemePaletteTest.kt](../desktopApp/src/jvmTest/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopThemePaletteTest.kt); verify visible contrast and assistive-technology announcements on Windows. |
 | Keyboard navigation and shortcuts | **Interactive QA found an Escape failure.** Ctrl+1/Ctrl+2 and general focus behavior passed; Escape did not return to Play as expected. The key handler/focus ordering was adjusted and Escape now requests shell focus after handling; re-test Escape with and without a message, plus Enter activation. | [DesktopNavigation.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigation.kt), [DesktopShellUiPolicy.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopShellUiPolicy.kt), [DesktopNavigationTest.kt](../desktopApp/src/jvmTest/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigationTest.kt), [DesktopShellUiPolicyTest.kt](../desktopApp/src/jvmTest/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopShellUiPolicyTest.kt); verify keyboard focus and actual key behavior on Windows. |
-| Windows Debug update channel | **Source implemented; end-to-end runtime unverified.** Public prerelease discovery validates manifest channel and checksum shape; installer path exists in desktop host. | [WindowsDebugUpdateClient.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/update/WindowsDebugUpdateClient.kt), [desktop Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt); verify real update and failure paths without crossing into production releases. |
+| Windows Debug update channel | **Current source does not yet match the requested CI-artifact design.** The updater currently discovers GitHub Releases prereleases, while Windows Desktop CI already uploads a ZIP containing the MSI as a short-lived Actions artifact on master pushes. The updater must switch to eligible successful Windows CI runs/artifacts and validate/download the ZIP; end-to-end runtime remains unverified. | [WindowsDebugUpdateClient.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/update/WindowsDebugUpdateClient.kt), [Windows Desktop CI](../.github/workflows/windows-desktop.yml), [desktop Main.kt](../desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt); implement the Actions-artifact discovery/download flow, preserve checksum/channel checks and verify expiry/error paths without crossing into production releases. |
 | MSI packaging and upgrade identity | **Build configuration and CI checks present; full lifecycle not established.** UpgradeCode is explicitly preserved. | [desktopApp/build.gradle.kts](../desktopApp/build.gradle.kts), [Windows Desktop CI](../.github/workflows/windows-desktop.yml); retain UpgradeCode and complete install/upgrade/recovery regression in Stage 5. |
 | Shared deterministic rules | **Shared foundation and common tests exist; Windows end-to-end use is not established by the desktop entry point.** | [KMP Foundation Status](KMP_FOUNDATION_STATUS.md), [shared rules](../shared/src/commonMain/kotlin/com/jarrlyyy/guessthenumber/shared/rules/GuessRules.kt); connect the authoritative game flow and test integration. |
 

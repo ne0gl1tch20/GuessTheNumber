@@ -152,3 +152,8 @@ Complete only when: clean build compiles; APK installs/launches; game works full
 ## 🚀 FINAL RESULT
 
 A new player can **Play → earn Money → upgrade → Prestige → use Prestige tree → reach Ultra → Ultra reset → use Ultra tree → earn Nebula in Arcade → unlock achievements/challenges → buy Shop items → use Auto-clicker → configure Settings → view About/licenses.** Prioritize stable gameplay first, then polish. Deliver a complete compilable, installable, playable offline game, NOT a prototype or UI demonstration.
+
+
+## Windows exact-port requirement (locked)
+
+Windows must be an exact port of GuessTheNumber, using Kotlin Multiplatform and shared production code and assets wherever practical. Android is the source of truth for screens, features, information hierarchy, labels, controls, menus, dialogs, navigation, state handling and gameplay behavior. Desktop adaptations are limited to presentation/input needs such as a resizable window, keyboard, mouse, focus and hover; they must not remove features or reorganize the game into a different experience. Prefer shared rules, models, localization and canonical assets with thin platform adapters. Maintain Android compatibility and existing save contracts throughout. Follow docs/WINDOWS_FEATURE_PARITY_PLAN.md; do not declare parity complete from compilation alone.

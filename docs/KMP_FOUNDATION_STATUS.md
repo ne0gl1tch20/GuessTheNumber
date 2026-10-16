@@ -9,7 +9,7 @@ This replaces the old temporary step-by-step migration checklist. Stop treating 
 
 ## Track A: KMP foundation
 
-**Goal:** Shared deterministic logic and selected reusable UI work on Android and Windows, while platform-specific services stay in their host source sets.
+**Goal:** Kotlin Multiplatform shares production logic, models, UI components and canonical assets wherever practical. The Windows product goal is an exact port of the Android GTN experience, with desktop-specific input/windowing and platform-service adapters only where required.
 
 ### Implemented
 
@@ -43,7 +43,7 @@ The implementation milestone can now be treated as **KMP foundation complete for
 
 ## Track B: Windows feature parity
 
-Windows parity is a separate product-development track, not a reason to keep the foundation migration open indefinitely. Follow the [Windows Feature Parity Plan](WINDOWS_FEATURE_PARITY_PLAN.md).
+Windows parity is the exact-port product goal, not merely a feature checklist. Follow the [Windows Feature Parity Plan](WINDOWS_FEATURE_PARITY_PLAN.md), which defines Android as the source of truth and requires screen-by-screen visual, interaction and behavior evidence. Reuse shared Kotlin code and assets wherever practical; keep host-specific services behind adapters.
 
 ## Post-foundation QA
 
