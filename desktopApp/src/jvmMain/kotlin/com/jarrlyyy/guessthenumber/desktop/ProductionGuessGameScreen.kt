@@ -52,7 +52,10 @@ import kotlin.random.Random
 
 /** Windows presentation backed by the production engine, economy rules and desktop save adapter. */
 @Composable
-fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
+fun ProductionGuessGameScreen(
+    section: DesktopGameSection = DesktopGameSection.PLAY,
+    modifier: Modifier = Modifier
+) {
     val engine = remember { GameEngine() }
     val autoClicker = remember { DesktopGuessingBot() }
     val saveStore = remember { DesktopSaveStore(defaultDesktopSaveDirectory()) }
@@ -216,16 +219,18 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 CurrencySummary("Correct", currentState.correctGuesses.toString())
                 CurrencySummary("Streak", currentState.streak.toString())
             }
-            Text(
-                "Daily progress: guesses ${currentState.dailyQuestGuesses}/10 · correct ${currentState.dailyQuestCorrectGuesses}/5 · best streak ${currentState.dailyQuestBestStreak}/5 · upgrades ${currentState.dailyQuestUpgradePurchases}/3",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                "Treasure chests: Common ${currentState.lootCommonChests} · Rare ${currentState.lootRareChests} · Epic ${currentState.lootEpicChests}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            if (section == DesktopGameSection.PROGRESSION) {
+                Text(
+                    "Daily progress: guesses ${currentState.dailyQuestGuesses}/10 · correct ${currentState.dailyQuestCorrectGuesses}/5 · best streak ${currentState.dailyQuestBestStreak}/5 · upgrades ${currentState.dailyQuestUpgradePurchases}/3",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    "Treasure chests: Common ${currentState.lootCommonChests} · Rare ${currentState.lootRareChests} · Epic ${currentState.lootEpicChests}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
             val submitGuess = {
                     val guess = guessText.toLongOrNull()
                     if (guess == null) {
@@ -277,6 +282,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                         }
                     }
             }
+            if (section == DesktopGameSection.PLAY) {
             OutlinedTextField(
                 value = guessText,
                 onValueChange = { input -> guessText = input.filter(Char::isDigit).take(18) },
@@ -299,7 +305,9 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
             }
             Text(feedback, style = MaterialTheme.typography.bodyLarge)
+            }
 
+            if (section == DesktopGameSection.PLAY) {
             SectionTitle("Mutators")
             val mutators = listOf(
                 Triple("mut_hardcore", "Hardcore", "Doubles the guessing range and rewards."),
@@ -320,6 +328,9 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 }
             }
 
+            }
+
+            if (section == DesktopGameSection.PROGRESSION) {
             SectionTitle("Daily quests")
             val dailyQuests = listOf(
                 Triple("daily_guesses_10", "Make 10 guesses", currentState.dailyQuestGuesses >= 10),
@@ -390,13 +401,16 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 }
             }
 
-            if ("auto_clicker_basic" in currentState.shopPurchases) {
+            }
+
+            if (section == DesktopGameSection.PLAY && "auto_clicker_basic" in currentState.shopPurchases) {
                 Button(
                     onClick = { commitTransaction { DesktopEconomyTransactions.setAutoClickerActive(it, !it.autoClickerActive) } },
                     enabled = !isSaving
                 ) { Text(if (currentState.autoClickerActive) "Pause auto-clicker" else "Resume auto-clicker") }
             }
 
+            if (section == DesktopGameSection.ECONOMY) {
             SectionTitle("Money upgrades")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Buy multiplier:")
@@ -528,6 +542,8 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                         }
                     }
                 }
+            }
+
             }
 
             Text(
