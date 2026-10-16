@@ -18,5 +18,6 @@ enum class DesktopGameSection {
     RELICS,
     HOME_BASE,
     CODEX,
-    ENDGAME
+    ENDGAME,
+    LUCKY_STAKE
 }
