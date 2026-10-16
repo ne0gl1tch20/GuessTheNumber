@@ -35,7 +35,8 @@ internal data class DesktopRelicDefinition(
     val unlockBossId: String,
     val unlockBossName: String,
     val twoPieceBonus: String,
-    val threePieceBonus: String
+    val threePieceBonus: String,
+    val fourPieceBonus: String
 )
 
 internal object DesktopRelicsCatalog {
@@ -57,26 +58,29 @@ internal object DesktopRelicsCatalog {
                 id = text("id"), name = text("name"), description = text("description"),
                 setId = text("setId"), setName = text("setName"), rarity = text("rarity"),
                 unlockBossId = text("unlockBossId"), unlockBossName = text("unlockBossName"),
-                twoPieceBonus = text("twoPieceBonus"), threePieceBonus = text("threePieceBonus")
+                twoPieceBonus = text("twoPieceBonus"), threePieceBonus = text("threePieceBonus"),
+                fourPieceBonus = text("fourPieceBonus")
             )
         }
         require(parsed.isNotEmpty()) { "Relic catalog is empty." }
         require(parsed.map { it.id }.distinct().size == parsed.size) { "Relic catalog contains duplicate IDs." }
         require(parsed.all { relic ->
             listOf(relic.id, relic.name, relic.description, relic.setId, relic.setName, relic.rarity,
-                relic.unlockBossId, relic.unlockBossName, relic.twoPieceBonus, relic.threePieceBonus).all(String::isNotBlank)
+                relic.unlockBossId, relic.unlockBossName, relic.twoPieceBonus, relic.threePieceBonus,
+                relic.fourPieceBonus).all(String::isNotBlank)
         }) { "Relic catalog contains invalid entries." }
         require(parsed.groupBy { it.setId }.values.all { set ->
             set.map { it.setName }.distinct().size == 1 &&
                 set.map { it.twoPieceBonus }.distinct().size == 1 &&
-                set.map { it.threePieceBonus }.distinct().size == 1
+                set.map { it.threePieceBonus }.distinct().size == 1 &&
+                set.map { it.fourPieceBonus }.distinct().size == 1
         }) { "Relic set metadata must be consistent for each set." }
         return parsed
     }
 }
 
 internal object DesktopRelicRules {
-    const val MAX_EQUIPPED_RELICS = 3
+    const val MAX_EQUIPPED_RELICS = 4
 
     fun equip(state: GameState, relicId: String): GameState? {
         if (relicId !in state.relicInventory || relicId in state.equippedRelicIds) return null
@@ -91,9 +95,10 @@ internal object DesktopRelicRules {
             .values
             .mapNotNull { members ->
                 val first = members.first()
-                when {
-                    members.size >= 3 -> first.setName + " (3-piece): " + first.threePieceBonus
-                    members.size >= 2 -> first.setName + " (2-piece): " + first.twoPieceBonus
+                when (members.size) {
+                    4 -> first.setName + " (4-piece): " + first.fourPieceBonus
+                    3 -> first.setName + " (3-piece): " + first.threePieceBonus
+                    2 -> first.setName + " (2-piece): " + first.twoPieceBonus
                     else -> null
                 }
             }
@@ -128,17 +133,17 @@ internal fun DesktopRelicsContent(
                         progress = { if (catalog.isEmpty()) 0f else owned.toFloat() / catalog.size },
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Text("Claim relics after defeating their listed world boss. Equip up to three owned relics.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Defeat world bosses to claim their relics. Equip up to four for stronger set bonuses.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             val activeBonuses = DesktopRelicRules.activeSetBonuses(catalog, state.equippedRelicIds)
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Set bonus preview", style = MaterialTheme.typography.titleMedium)
+                    Text("Active set bonuses", style = MaterialTheme.typography.titleMedium)
                     if (activeBonuses.isEmpty()) {
-                        Text("Equip two or more relics from the same set to preview its bonus.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Equip two or more boss relics to activate a set bonus.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     } else activeBonuses.forEach { bonus -> Text(bonus) }
-                    Text("These bonuses are a preview; passive effects are not applied to gameplay in this Windows batch.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("These bonuses are applied by the Windows gameplay reward calculation after each correct guess.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
