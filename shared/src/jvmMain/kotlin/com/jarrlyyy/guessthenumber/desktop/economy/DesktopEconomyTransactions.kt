@@ -176,6 +176,43 @@ object DesktopEconomyTransactions {
         }
     }
 
+    fun claimDailyQuest(state: GameState, questId: String, today: String): EconomyTransaction {
+        val daily = refreshDailyQuestDay(state, today)
+        val ready = when (questId) {
+            "daily_guesses_10" -> daily.dailyQuestGuesses >= 10
+            "daily_correct_5" -> daily.dailyQuestCorrectGuesses >= 5
+            "daily_streak_5" -> daily.dailyQuestBestStreak >= 5
+            "daily_upgrades_3" -> daily.dailyQuestUpgradePurchases >= 3
+            else -> false
+        }
+        if (!ready || questId in daily.claimedDailyQuests) {
+            return rejected(daily, "Daily quest is not ready or was already claimed.")
+        }
+
+        val rewarded = when (questId) {
+            "daily_guesses_10" -> daily.copy(
+                money = daily.money + BigNumber(10_000),
+                statistics = daily.statistics.copy(moneyEarned = daily.statistics.moneyEarned + BigNumber(10_000))
+            )
+            "daily_correct_5" -> daily.copy(
+                nebula = daily.nebula + BigNumber(25),
+                statistics = daily.statistics.copy(nebulaEarned = daily.statistics.nebulaEarned + 25)
+            )
+            "daily_streak_5" -> daily.copy(
+                nebula = daily.nebula + BigNumber(50),
+                statistics = daily.statistics.copy(nebulaEarned = daily.statistics.nebulaEarned + 50)
+            )
+            else -> daily.copy(
+                nebula = daily.nebula + BigNumber(35),
+                statistics = daily.statistics.copy(nebulaEarned = daily.statistics.nebulaEarned + 35)
+            )
+        }
+        return accepted(
+            rewarded.copy(claimedDailyQuests = rewarded.claimedDailyQuests + questId),
+            "Daily quest claimed."
+        )
+    }
+
     private fun refreshDailyQuestDay(state: GameState, today: String): GameState {
         if (state.dailyQuestDate == today) return state
         return state.copy(
