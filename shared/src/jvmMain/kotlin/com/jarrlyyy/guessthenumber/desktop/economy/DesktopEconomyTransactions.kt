@@ -216,6 +216,25 @@ object DesktopEconomyTransactions {
     }
 
     /** Applies Android's guess-driven boss damage, miss regression and victory rewards. */
+    fun claimRelic(state: GameState, relicId: String, unlockBossId: String): EconomyTransaction {
+        if (relicId.isBlank() || unlockBossId.isBlank()) return rejected(state, "Invalid relic.")
+        if (relicId in state.relicInventory) return rejected(state, "Relic is already claimed.")
+        if (unlockBossId !in state.defeatedBossIds) return rejected(state, "Defeat the required boss first.")
+        return accepted(state.copy(relicInventory = state.relicInventory + relicId), "Relic claimed.")
+    }
+
+    fun equipRelic(state: GameState, relicId: String): EconomyTransaction {
+        if (relicId !in state.relicInventory) return rejected(state, "Claim the relic first.")
+        if (relicId in state.equippedRelicIds) return rejected(state, "Relic is already equipped.")
+        if (state.equippedRelicIds.size >= 4) return rejected(state, "You can equip up to four relics.")
+        return accepted(state.copy(equippedRelicIds = state.equippedRelicIds + relicId), "Relic equipped.")
+    }
+
+    fun unequipRelic(state: GameState, relicId: String): EconomyTransaction {
+        if (relicId !in state.equippedRelicIds) return rejected(state, "Relic is not equipped.")
+        return accepted(state.copy(equippedRelicIds = state.equippedRelicIds - relicId), "Relic unequipped.")
+    }
+
     fun recordBossGuess(state: GameState, correct: Boolean): GameState {
         val worldId = state.activeBossBattleWorldId ?: return state
         val world = WORLD_REQUIREMENTS.firstOrNull { it.id == worldId } ?: return state
