@@ -749,9 +749,10 @@ private fun DesktopUpgradeParityCard(
                     shape = MaterialTheme.shapes.extraSmall,
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                 ) {
+                    val maxLevelLabel = if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel.toString()
                     AnimatedContent(targetState = level, label = "upgradeLevel_${upgrade.id}") { animatedLevel ->
                         Text(
-                            text = "Level: $animatedLevel / ${if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel}",
+                            text = "Level: $animatedLevel / $maxLevelLabel",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
