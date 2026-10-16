@@ -41,7 +41,10 @@ class DesktopNavigationTest {
     @Test
     fun ctrlNumberShortcutsMapToDestinations() {
         assertEquals(DesktopDestination.PLAY, DesktopDestination.fromShortcut(Key.One, ctrlPressed = true))
-        assertEquals(DesktopDestination.ABOUT, DesktopDestination.fromShortcut(Key.Two, ctrlPressed = true))
+        assertEquals(DesktopDestination.UPGRADES, DesktopDestination.fromShortcut(Key.Two, ctrlPressed = true))
+        assertEquals(DesktopDestination.SHOP, DesktopDestination.fromShortcut(Key.Three, ctrlPressed = true))
+        assertEquals(DesktopDestination.MORE, DesktopDestination.fromShortcut(Key.Four, ctrlPressed = true))
+        assertEquals(DesktopDestination.ABOUT, DesktopDestination.fromShortcut(Key.Five, ctrlPressed = true))
     }
 
     @Test
@@ -67,7 +70,7 @@ class DesktopNavigationTest {
         assertEquals(DesktopDestination.PLAY, controller.state.destination)
         assertNull(controller.state.message)
 
-        assertTrue(controller.handleKey(Key.Two, ctrlPressed = true))
+        assertTrue(controller.handleKey(Key.Five, ctrlPressed = true))
         assertEquals(DesktopDestination.ABOUT, controller.state.destination)
     }
 
@@ -81,6 +84,6 @@ class DesktopNavigationTest {
     @Test
     fun shortcutsRequireControlAndIgnoreUnknownKeys() {
         assertNull(DesktopDestination.fromShortcut(Key.One, ctrlPressed = false))
-        assertNull(DesktopDestination.fromShortcut(Key.Three, ctrlPressed = true))
+        assertNull(DesktopDestination.fromShortcut(Key.Six, ctrlPressed = true))
     }
 }
