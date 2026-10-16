@@ -252,15 +252,15 @@ fun ProductionGuessGameScreen(
             after = result.newState,
             correct = correct
         )
-        val finalState = DesktopEconomyTransactions.evaluateAchievements(
-            DesktopEconomyTransactions.recordGuessProgress(
+        val guessProgressState = DesktopEconomyTransactions.recordGuessProgress(
                 before = snapshot,
                 after = bonusAdjustedState,
                 correct = correct,
                 today = LocalDate.now().toString(),
                 lootRoll = if (correct) Random.nextInt(1000) else null
             )
-        )
+        val bossAdjustedState = DesktopEconomyTransactions.recordBossGuess(guessProgressState, correct)
+        val finalState = DesktopEconomyTransactions.evaluateAchievements(bossAdjustedState)
         val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
         if (saved) {
             autoClicker.observeGuess(guess, result.feedback)
@@ -541,15 +541,15 @@ fun ProductionGuessGameScreen(
                             after = result.newState,
                             correct = correct
                         )
-                        val finalState = DesktopEconomyTransactions.evaluateAchievements(
-                            DesktopEconomyTransactions.recordGuessProgress(
+                        val guessProgressState = DesktopEconomyTransactions.recordGuessProgress(
                                 before = currentState,
                                 after = bonusAdjustedState,
                                 correct = correct,
                                 today = LocalDate.now().toString(),
                                 lootRoll = if (correct) Random.nextInt(1000) else null
                             )
-                        )
+                        val bossAdjustedState = DesktopEconomyTransactions.recordBossGuess(guessProgressState, correct)
+                        val finalState = DesktopEconomyTransactions.evaluateAchievements(bossAdjustedState)
                         scope.launch {
                             val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
                             if (saved) {
