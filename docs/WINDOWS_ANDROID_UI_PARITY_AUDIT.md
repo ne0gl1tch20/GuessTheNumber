@@ -71,5 +71,10 @@ PR #218 makes the Windows Talent Web's prerequisite/parent gating and transactio
 ### Latest core-loop parity follow-up (2026-10-16)
 
 - PR #218 merged after Android Validation and Windows Desktop CI passed (runs [38903226288](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226288) and [38903226499](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226499)). Talent transaction validation and Talent Web parent gating now read the shared JVM catalog; CI enforces equality with Android's asset.
-- Current follow-up branch `fix/windows-auto-clicker-speed-parity` moves the Auto Clicker interval formula into shared `GameEngine.autoClickerDelayMillis`, used by both Android and Windows. Tests cover both speed talents, stacked talent speed plus `mut_speed`, inactive state and non-positive speed.
-- Windows runtime speed/feedback verification remains open until a current candidate passes CI and is manually exercised.
+- PR #219 merged the Auto Clicker interval formula into shared `GameEngine.autoClickerDelayMillis`, used by both Android and Windows. Tests cover both speed talents, stacked talent speed plus `mut_speed`, inactive state and non-positive speed. Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393281) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393086) on the same candidate head.
+- Windows runtime speed/feedback and persistence verification remains open.
+
+
+### Owner decision blocker — permanent Prestige/Ultra upgrade effects (2026-10-16)
+
+The canonical `prestige_upgrades.json` and `ultra_upgrades.json` assets describe six permanent effects, but repository code search found no production application of `prestige_money_boost`, `prestige_gain_boost`, `prestige_starting_capital`, `ultra_money_boost`, `ultra_gain_boost` or `ultra_nebula_boost` in Android gameplay logic. The catalog's `effectPerLevel` values do not fully define the intended formulas or stacking order. Do not silently add Windows-only effects or guess the balance. The owner needs to decide whether to define and implement the intended effects in shared logic for both platforms or keep the current behavior.
