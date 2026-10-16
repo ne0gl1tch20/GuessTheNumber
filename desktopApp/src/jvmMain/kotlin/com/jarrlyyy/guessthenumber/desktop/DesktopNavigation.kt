@@ -11,7 +11,9 @@ import androidx.compose.ui.input.key.Key
  */
 enum class DesktopDestination(val label: String, val shortcutKey: Key) {
     PLAY("Play", Key.One),
-    ABOUT("About", Key.Two);
+    PROGRESSION("Progress", Key.Two),
+    ECONOMY("Economy", Key.Three),
+    ABOUT("About", Key.Four);
 
     companion object {
         fun fromShortcut(key: Key, ctrlPressed: Boolean): DesktopDestination? {
@@ -25,6 +27,13 @@ data class DesktopShellState(
     val destination: DesktopDestination = DesktopDestination.PLAY,
     val message: String? = null
 )
+
+/** Sections in the production game, arranged for desktop navigation rather than one long mobile-style page. */
+enum class DesktopGameSection {
+    PLAY,
+    PROGRESSION,
+    ECONOMY
+}
 
 /** Small, UI-independent shell controller so navigation transitions are testable. */
 class DesktopShellController(
