@@ -493,8 +493,8 @@ class DesktopEconomyTransactionsTest {
 
         assertTrue(result.accepted)
         assertEquals(3, result.state.upgradeLevels[rewardUpgrade.id])
-        assertEquals(BigNumber(475), result.state.statistics.moneySpent)
-        assertEquals(BigNumber(525), result.state.money)
+        assertEquals(0, result.state.statistics.moneySpent.compareTo(BigNumber(475)))
+        assertEquals(0, result.state.money.compareTo(BigNumber(525)))
         assertEquals(1, result.state.dailyQuestUpgradePurchases)
     }
 
@@ -505,11 +505,11 @@ class DesktopEconomyTransactionsTest {
         val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, 0, "MAX", initial.money)
         val result = DesktopEconomyTransactions.buyUpgrade(initial, upgrade)
 
-        assertEquals(BigNumber(300), cost)
+        assertEquals(0, cost.compareTo(BigNumber(300)))
         assertTrue(result.accepted)
         assertEquals(2, result.state.upgradeLevels[upgrade.id])
-        assertEquals(BigNumber(50), result.state.money)
-        assertEquals(BigNumber(300), result.state.statistics.moneySpent)
+        assertEquals(0, result.state.money.compareTo(BigNumber(50)))
+        assertEquals(0, result.state.statistics.moneySpent.compareTo(BigNumber(300)))
     }
 
     @Test
