@@ -22,9 +22,6 @@ internal enum class DesktopShellKeyAction {
     NAVIGATE_SHOP,
     NAVIGATE_MORE,
     NAVIGATE_ABOUT,
-    NAVIGATE_PRESTIGE,
-    NAVIGATE_ULTRA,
-    NAVIGATE_TALENT,
     CLEAR_MESSAGE,
     NONE
 }
@@ -46,9 +43,7 @@ internal fun resolveDesktopShellKeyAction(
             DesktopDestination.SHOP -> DesktopShellKeyAction.NAVIGATE_SHOP
             DesktopDestination.MORE -> DesktopShellKeyAction.NAVIGATE_MORE
             DesktopDestination.ABOUT -> DesktopShellKeyAction.NAVIGATE_ABOUT
-            DesktopDestination.PRESTIGE -> DesktopShellKeyAction.NAVIGATE_PRESTIGE
-            DesktopDestination.ULTRA -> DesktopShellKeyAction.NAVIGATE_ULTRA
-            DesktopDestination.TALENT -> DesktopShellKeyAction.NAVIGATE_TALENT
+            DesktopDestination.PRESTIGE, DesktopDestination.ULTRA, DesktopDestination.TALENT -> DesktopShellKeyAction.NONE
             null -> DesktopShellKeyAction.NONE
         }
     }
