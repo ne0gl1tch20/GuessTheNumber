@@ -154,6 +154,14 @@ Complete only when: clean build compiles; APK installs/launches; game works full
 A new player can **Play → earn Money → upgrade → Prestige → use Prestige tree → reach Ultra → Ultra reset → use Ultra tree → earn Nebula in Arcade → unlock achievements/challenges → buy Shop items → use Auto-clicker → configure Settings → view About/licenses.** Prioritize stable gameplay first, then polish. Deliver a complete compilable, installable, playable offline game, NOT a prototype or UI demonstration.
 
 
-## Windows exact-port requirement (locked)
+## Windows product-feel rule (locked)
 
-Windows must be an exact port of GuessTheNumber, using Kotlin Multiplatform and shared production code and assets wherever practical. Android is the source of truth for screens, features, information hierarchy, labels, controls, menus, dialogs, navigation, state handling and gameplay behavior. Desktop adaptations are limited to presentation/input needs such as a resizable window, keyboard, mouse, focus and hover; they must not remove features or reorganize the game into a different experience. Prefer shared rules, models, localization and canonical assets with thin platform adapters. Maintain Android compatibility and existing save contracts throughout. Follow docs/WINDOWS_FEATURE_PARITY_PLAN.md; do not declare parity complete from compilation alone.
+GuessTheNumber on Windows must feel like the same app the player uses on their Android phone, adapted for desktop rather than redesigned as a different app.
+
+- **Preserve the Android experience:** same player-facing screens and features, visual identity, colors, typography, icons/artwork, content hierarchy, labels, controls, menus, dialogs, animations, loading/empty/error/locked states, navigation destinations and interaction outcomes wherever the platform supports them.
+- **Adapt for desktop only where needed:** responsive/resizable window layouts, keyboard and mouse input, focus and hover behavior, desktop navigation conventions and Windows integration. A different input method must not remove functionality or change what an action means.
+- **Keep game behavior consistent:** share authoritative gameplay/economy/progression logic, settings semantics, localization catalogs and canonical assets wherever practical. Preserve offline behavior, existing saves/migrations and Android behavior. Use thin platform adapters for genuine OS-specific concerns.
+- **Avoid unnecessary complexity:** do not rewrite working systems, duplicate game rules/assets or add abstractions without a concrete parity or platform need. Group related parity fixes, tests and documentation into the same existing PR whenever technically reasonable; do not create tiny PRs merely to divide work.
+- **Prove, do not assume:** run relevant automated checks, protect regression coverage and record visual/runtime checks separately from CI. Never claim full parity based on compilation alone or mark an unverified feature complete. Keep the PR open until the user authorizes merging.
+
+Follow docs/WINDOWS_FEATURE_PARITY_PLAN.md as the single source of truth for the parity matrix and staged execution.
