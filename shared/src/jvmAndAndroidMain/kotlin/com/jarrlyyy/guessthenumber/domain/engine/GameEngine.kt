@@ -287,6 +287,61 @@ class GameEngine(private val rng: Random = Random.Default) {
         return minOf(boosted, BigNumber(2_000))
     }
 
+    /**
+     * Unlocks milestone achievements and pays their Nebula reward once.
+     * Shared by Android and Windows so permanent Nebula upgrades have identical
+     * behavior regardless of which host detects the milestone.
+     */
+    fun evaluateAchievements(state: GameState): GameState {
+        val milestones = listOf(
+            "correct_10" to (state.correctGuesses >= 10),
+            "correct_50" to (state.correctGuesses >= 50),
+            "correct_100" to (state.correctGuesses >= 100),
+            "correct_500" to (state.correctGuesses >= 500),
+            "streak_5" to (state.bestStreak >= 5),
+            "streak_10" to (state.bestStreak >= 10),
+            "streak_25" to (state.bestStreak >= 25),
+            "streak_50" to (state.bestStreak >= 50),
+            "millionaire" to (state.money >= BigNumber(1_000_000)),
+            "ten_millionaire" to (state.money >= BigNumber(10_000_000)),
+            "hundred_millionaire" to (state.money >= BigNumber(100_000_000)),
+            "billionaire" to (state.money >= BigNumber(1_000_000_000)),
+            "prestige_1" to (state.prestigeCount >= 1),
+            "prestige_5" to (state.prestigeCount >= 5),
+            "prestige_10" to (state.prestigeCount >= 10),
+            "prestige_25" to (state.prestigeCount >= 25),
+            "ultra_1" to (state.ultraCount >= 1),
+            "ultra_3" to (state.ultraCount >= 3),
+            "ultra_10" to (state.ultraCount >= 10),
+            "ultra_25" to (state.ultraCount >= 25),
+            "playtime_1h" to (state.statistics.playtimeSeconds >= 3_600),
+            "playtime_10h" to (state.statistics.playtimeSeconds >= 36_000),
+            "playtime_50h" to (state.statistics.playtimeSeconds >= 180_000),
+            "frenzy_5" to (state.bestStreak >= 5),
+            "frenzy_10" to (state.bestStreak >= 10),
+            "frenzy_25" to (state.bestStreak >= 25),
+            "frenzy_50" to (state.bestStreak >= 50)
+        )
+        val rewards = mapOf(
+            "correct_10" to 10L, "correct_50" to 20L, "correct_100" to 40L, "correct_500" to 100L,
+            "streak_5" to 25L, "streak_10" to 50L, "streak_25" to 100L, "streak_50" to 250L,
+            "millionaire" to 50L, "ten_millionaire" to 100L, "hundred_millionaire" to 200L, "billionaire" to 500L,
+            "prestige_1" to 25L, "prestige_5" to 75L, "prestige_10" to 150L, "prestige_25" to 300L,
+            "ultra_1" to 100L, "ultra_3" to 250L, "ultra_10" to 500L, "ultra_25" to 1_000L,
+            "playtime_1h" to 25L, "playtime_10h" to 100L, "playtime_50h" to 300L,
+            "frenzy_5" to 30L, "frenzy_10" to 75L, "frenzy_25" to 150L, "frenzy_50" to 350L
+        )
+        val newlyUnlocked = milestones.filter { (id, unlocked) -> unlocked && id !in state.achievements }
+        if (newlyUnlocked.isEmpty()) return state
+        val baseReward = newlyUnlocked.sumOf { (id, _) -> rewards[id] ?: 0L }
+        val reward = calculateNebulaReward(state, baseReward)
+        return state.copy(
+            achievements = state.achievements + newlyUnlocked.map { it.first },
+            nebula = state.nebula + BigNumber(reward),
+            statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + reward)
+        )
+    }
+
     fun claimChallenge(state: GameState, challengeId: String, rewardNebula: Long): Pair<GameState, Boolean> {
         val decision = ChallengeClaimRules.resolve(
             completedChallenges = state.completedChallenges,
