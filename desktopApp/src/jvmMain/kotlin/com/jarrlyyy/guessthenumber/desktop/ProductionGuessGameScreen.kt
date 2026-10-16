@@ -285,20 +285,16 @@ fun ProductionGuessGameScreen(
                         }
                     }
             }
-            OutlinedTextField(
+            com.jarrlyyy.guessthenumber.shared.ui.SharedGuessInputField(
                 value = guessText,
                 onValueChange = { input -> guessText = input.filter(Char::isDigit).take(18) },
-                modifier = Modifier.fillMaxWidth().onPreviewKeyEvent { event ->
-                    if (event.key == Key.Enter && event.type == KeyEventType.KeyUp) {
-                        submitGuess()
-                        true
-                    } else {
-                        false
-                    }
-                },
-                label = { Text("Your guess") },
-                singleLine = true,
-                enabled = !isSaving
+                onSubmit = { submitGuess() },
+                minNumber = currentState.currentRangeMin,
+                maxNumber = currentState.currentRangeMax,
+                modifier = Modifier.fillMaxWidth(),
+                label = "Your guess",
+                enabled = !isSaving,
+                submitOnEnter = true
             )
             Button(
                 onClick = { submitGuess() },
