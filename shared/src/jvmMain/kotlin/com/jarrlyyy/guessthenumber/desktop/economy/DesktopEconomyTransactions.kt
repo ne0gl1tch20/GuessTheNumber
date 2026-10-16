@@ -488,16 +488,25 @@ object DesktopEconomyTransactions {
     }
 
     fun buyTalent(state: GameState, talentId: String, cost: Long): EconomyTransaction {
-        val parents = mapOf(
+        val legacyParents = mapOf(
             "talent_speed_2" to "talent_speed_1",
             "talent_crit_2" to "talent_crit_1",
             "talent_reward_1" to "talent_crit_2",
             "talent_master_1" to "talent_reward_1"
         )
+        return buyTalent(state, talentId, cost, legacyParents[talentId])
+    }
+
+    /** Uses the prerequisite declared by the canonical Android talent catalog. */
+    fun buyTalent(
+        state: GameState,
+        talentId: String,
+        cost: Long,
+        requiredParentId: String?
+    ): EconomyTransaction {
         if (talentId in state.prestigeShopPurchases) return rejected(state, "Already unlocked.")
         if (state.prestige < BigNumber(cost)) return rejected(state, "Not enough Prestige.")
-        val parent = parents[talentId]
-        if (parent != null && parent !in state.prestigeShopPurchases) {
+        if (requiredParentId != null && requiredParentId !in state.prestigeShopPurchases) {
             return rejected(state, "Unlock the prerequisite talent first.")
         }
         return accepted(
