@@ -65,13 +65,13 @@ internal fun DesktopArcadeScreen(
             Card(modifier = Modifier.weight(1f)) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Money", style = MaterialTheme.typography.labelLarge)
-                    Text(state.money.toString(), style = MaterialTheme.typography.titleLarge)
+                    Text(state.money.format(), style = MaterialTheme.typography.titleLarge)
                 }
             }
             Card(modifier = Modifier.weight(1f)) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Nebula", style = MaterialTheme.typography.labelLarge)
-                    Text(state.nebula.toString(), style = MaterialTheme.typography.titleLarge)
+                    Text(state.nebula.format(), style = MaterialTheme.typography.titleLarge)
                 }
             }
         }
