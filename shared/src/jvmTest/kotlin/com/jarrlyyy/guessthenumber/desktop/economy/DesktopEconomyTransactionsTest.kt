@@ -792,4 +792,36 @@ class DesktopEconomyTransactionsTest {
         assertFalse(duplicate.accepted)
         assertEquals(claimed.state, duplicate.state)
     }
+
+    @Test
+    fun luckyStakeSettlementMatchesAndroidMoneyAndStatisticsRules() {
+        val initial = GameState(money = BigNumber(100))
+        val won = DesktopEconomyTransactions.settleStake(initial, BigNumber(10), BigNumber(25), true)
+        assertTrue(won.accepted)
+        assertEquals(BigNumber(115), won.state.money)
+        assertEquals(BigNumber(25), won.state.statistics.moneyEarned)
+        assertEquals(BigNumber(10), won.state.statistics.moneySpent)
+
+        val lost = DesktopEconomyTransactions.settleStake(initial, BigNumber(10), BigNumber.ZERO, false)
+        assertTrue(lost.accepted)
+        assertEquals(BigNumber(90), lost.state.money)
+        assertEquals(BigNumber.ZERO, lost.state.statistics.moneyEarned)
+        assertEquals(BigNumber(10), lost.state.statistics.moneySpent)
+    }
+
+    @Test
+    fun luckyStakeRejectsInvalidAndUnaffordableAmountsWithoutChangingState() {
+        val initial = GameState(money = BigNumber(10))
+        val zero = DesktopEconomyTransactions.settleStake(initial, BigNumber.ZERO, BigNumber.ZERO, false)
+        assertFalse(zero.accepted)
+        assertEquals(initial, zero.state)
+
+        val tooExpensive = DesktopEconomyTransactions.settleStake(initial, BigNumber(11), BigNumber.ZERO, false)
+        assertFalse(tooExpensive.accepted)
+        assertEquals(initial, tooExpensive.state)
+
+        val negativePayout = DesktopEconomyTransactions.settleStake(initial, BigNumber(1), BigNumber(-1), true)
+        assertFalse(negativePayout.accepted)
+        assertEquals(initial, negativePayout.state)
+    }
 }
