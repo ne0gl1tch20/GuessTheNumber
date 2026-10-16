@@ -22,8 +22,8 @@
 - Windows persists the production state through its desktop-native adapter. The integration test makes guess transitions and disk round-trips one assertion path.
 - The current Windows Play screen still hardcodes save slot 1 and presents only the basic guessing loop and a few counters.
 - PR #199 adds the initial Windows economy/progression slice: catalog-backed Money/Prestige/Ultra upgrades, reset actions, supported Nebula shop purchases, talent unlocks and the feedback-driven Auto Clicker. See [PR #199](https://github.com/ne0gl1tch20/GuessTheNumber/pull/199).
-- The follow-up reward-parity slice now records daily guess/correct/streak progress, clears stale daily claim state on a date change, applies Android's 1% Epic / 5% Rare / 18% Common chest drop thresholds, and exposes daily progress and chest counts in the Windows Play screen. Deterministic tests cover threshold boundaries and stacked reward bonuses.
-- Shop boost items without working Windows effects remain disabled rather than sold for no benefit. Daily quest claim actions, achievement/world progression hooks and full boost-effect parity remain open; actual Windows runtime behavior also remains unverified until tested.
+- The follow-up reward-parity slice now records daily guess/correct/streak progress, clears stale daily claim state on a date change, applies Android's 1% Epic / 5% Rare / 18% Common chest drop thresholds, and exposes claimable daily rewards plus chest counts in the Windows Play screen. Deterministic tests cover claim amounts, duplicate claims, threshold boundaries and stacked reward bonuses.
+- Shop boost items without working Windows effects remain disabled rather than sold for no benefit. Achievement/world progression hooks and full boost-effect parity remain open; actual Windows runtime behavior also remains unverified until tested.
 - A successful build or unit-test run does not verify mouse/keyboard interaction, window resizing, high-DPI rendering, close/reopen behavior or visual parity on an actual Windows session.
 
 ## Stage 2-D gate
