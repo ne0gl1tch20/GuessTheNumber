@@ -11,6 +11,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -23,6 +26,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.DesktopGuessingBot
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
@@ -107,6 +115,49 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
 
     val currentState = state
 
+    fun submitGuess() {
+        val snapshot = state ?: return
+        if (isSaving) return
+
+        val guess = guessText.toLongOrNull()
+        if (guess == null) {
+            feedback = "Enter a whole number first."
+            return
+        }
+        if (guess !in snapshot.currentRangeMin..snapshot.currentRangeMax) {
+            feedback = "Choose a number within the displayed range."
+            return
+        }
+
+        isSaving = true
+        val result = engine.processGuess(snapshot, guess)
+        val finalState = DesktopEconomyTransactions.applyGuessBonuses(
+            before = snapshot,
+            after = result.newState,
+            correct = result.feedback == GuessFeedback.CORRECT
+        )
+        scope.launch {
+            val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
+            if (saved) {
+                autoClicker.observeGuess(guess, result.feedback)
+                if (result.feedback == GuessFeedback.CORRECT) {
+                    autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+                }
+                autoClickerFailurePaused = false
+                state = finalState
+                feedback = when (result.feedback) {
+                    GuessFeedback.TOO_LOW -> "Too low. Try again!"
+                    GuessFeedback.TOO_HIGH -> "Too high. Try again!"
+                    GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - snapshot.money} Money."
+                }
+                guessText = ""
+            } else {
+                feedback = "Could not save that guess. Your previous saved state is still intact."
+            }
+            isSaving = false
+        }
+    }
+
     LaunchedEffect(currentState) {
         val snapshot = currentState ?: return@LaunchedEffect
         if (!snapshot.autoClickerActive || autoClickerFailurePaused || "auto_clicker_basic" !in snapshot.shopPurchases) {
@@ -175,48 +226,22 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             OutlinedTextField(
                 value = guessText,
                 onValueChange = { input -> guessText = input.filter(Char::isDigit).take(18) },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Your guess") },
-                singleLine = true,
-                enabled = !isSaving
-            )
-            Button(
-                onClick = {
-                    val guess = guessText.toLongOrNull()
-                    if (guess == null) {
-                        feedback = "Enter a whole number first."
-                    } else if (guess !in currentState.currentRangeMin..currentState.currentRangeMax) {
-                        feedback = "Choose a number within the displayed range."
-                    } else if (!isSaving) {
-                        isSaving = true
-                        val result = engine.processGuess(currentState, guess)
-                        val finalState = DesktopEconomyTransactions.applyGuessBonuses(
-                            before = currentState,
-                            after = result.newState,
-                            correct = result.feedback == GuessFeedback.CORRECT
-                        )
-                        scope.launch {
-                            val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
-                            if (saved) {
-                                autoClicker.observeGuess(guess, result.feedback)
-                                if (result.feedback == GuessFeedback.CORRECT) {
-                                    autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
-                                }
-                                autoClickerFailurePaused = false
-                                state = finalState
-                                feedback = when (result.feedback) {
-                                    GuessFeedback.TOO_LOW -> "Too low. Try again!"
-                                    GuessFeedback.TOO_HIGH -> "Too high. Try again!"
-                                    GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - currentState.money} Money."
-                                }
-                                guessText = ""
-                            } else {
-                                feedback = "Could not save that guess. Your previous saved state is still intact."
-                            }
-                            isSaving = false
-                        }
+                modifier = Modifier.fillMaxWidth().onPreviewKeyEvent { event ->
+                    if (event.key == Key.Enter && event.type == KeyEventType.KeyDown) {
+                        submitGuess()
+                        true
+                    } else {
+                        false
                     }
                 },
+                label = { Text("Your guess") },
+                singleLine = true,
+                enabled = !isSaving,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { submitGuess() })
+            )
+            Button(
+                onClick = { submitGuess() },
                 enabled = guessText.isNotBlank() && !isSaving
             ) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
