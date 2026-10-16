@@ -513,12 +513,16 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
-    fun fixedBulkPurchaseIsRejectedAtomicallyWhenFullBatchIsUnaffordable() {
+    fun fixedBulkPurchaseBuysLargestAffordablePrefix() {
         val initial = GameState(money = BigNumber(200), buyMultiplier = "10")
+        val cost = DesktopEconomyTransactions.upgradeBatchCost(rewardUpgrade, 0, "10", initial.money)
         val result = DesktopEconomyTransactions.buyUpgrade(initial, rewardUpgrade)
 
-        assertFalse(result.accepted)
-        assertEquals(initial, result.state)
+        assertEquals(BigNumber(100), cost)
+        assertTrue(result.accepted)
+        assertEquals(1, result.state.upgradeLevels[rewardUpgrade.id])
+        assertEquals(BigNumber(100), result.state.money)
+        assertEquals(BigNumber(100), result.state.statistics.moneySpent)
     }
 
     @Test
