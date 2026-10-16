@@ -3,7 +3,7 @@
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
 
-**Latest increment (2026-10-16):** PR #218 and PR #219 are merged. PR #218 validates talent purchases and Talent Web prerequisites from the shared JVM catalog, with CI enforcing parity against Android's asset. PR #219 centralizes Auto Clicker timing in shared `GameEngine.autoClickerDelayMillis`, including both speed talents and `mut_speed`; Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393281) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393086) on head `e3a53eaba63a44d26bb4cff8e8457dc94b437c2a`. Runtime screenshot parity and the Stage 2 exit gate remain open.
+**Latest increment (2026-10-16):** PRs #218 and #219 are merged with Android Validation and Windows Desktop CI passing. Current candidate PR #220 shares all six permanent Prestige/Ultra effects through `GameEngine`, centralizes achievement reward calculation for Android and Windows, and adds a desktop-only scrollable main-navigation order. The current candidate's CI is pending; the previous Auto Clicker runtime checklist was reported passed by the owner. Windows screen/runtime parity and the Stage 2 exit gate remain open.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
@@ -122,8 +122,9 @@ The port is complete only when every Android player-facing screen and reachable 
 - [ ] Verify rate limiting and the full set of invalid, boundary, post-solve and mutator runtime cases.
 - [x] Add 1/10/100/MAX quick-buy selection with exact combined costs and atomic bulk purchase transactions for Money, Prestige and Ultra upgrades.
 - [x] Persist/reload a run through the desktop save adapter; user reported the focused restart/save check passed.
-- [x] Use one shared `GameEngine.autoClickerDelayMillis` calculation for Android and Windows, including stacked speed talents and the `mut_speed` multiplier. Automated timing tests and both CI workflows passed for PR #219; Windows runtime speed/persistence verification remains pending.
-- [ ] Complete the remaining Android economy/catalog effect parity review and confirm current candidate CI/runtime checks.
+- [x] Use one shared `GameEngine.autoClickerDelayMillis` calculation for Android and Windows, including stacked speed talents and the `mut_speed` multiplier. Automated timing tests and both CI workflows passed for PR #219; owner reports the focused Windows checks passed.
+- [x] Add Windows-only main-navigation quick access in this order: Play, Upgrades, Shop, Prestige, Ultra, Settings, Arcade, Music, Save Slots, Statistics, World Map, Changelog, More. Left-side navigation remains the desktop default; vertical and horizontal variants scroll. Android navigation and saved settings are unchanged.
+- [ ] Validate current candidate CI, verify reset/earning effects on Windows, and complete the remaining Android economy/catalog effect parity review.
 
 **Exit:** The full core loop works on Windows and matches Android rules for deterministic cases.
 
@@ -131,7 +132,8 @@ The port is complete only when every Android player-facing screen and reachable 
 
 - [x] Prestige and Ultra flows enforce shared requirements/rewards and now require confirmation before reset.
 - [x] Load talent costs and prerequisites from the canonical catalog; PR #218 makes both purchase validation and Talent Web parent gating read the bundled catalog rather than a second hardcoded rule map. Its Android and Windows CI passed before merge. The visible Windows labels/descriptions still use the Android fallback copy, and locale-aware rendering/runtime parity remain open.
-- [ ] Finish parity for remaining permanent Prestige/Ultra shop effects and confirm their Android behavior before enabling purchases. Current code search found catalog descriptions but no production application of the `prestige_money_boost`, `prestige_gain_boost`, `prestige_starting_capital`, `ultra_money_boost`, `ultra_gain_boost` or `ultra_nebula_boost` effects. Their exact formulas are not established by `effectPerLevel` alone; do not invent Windows-only effects. Owner decision needed on whether to define and implement these effects on both platforms or preserve the current behavior.
+- [x] Implement all six permanent Prestige/Ultra upgrade effects in shared rules for Android and Windows, driven by each canonical catalog's `effectPerLevel`: Prestige Wealth adds 0.5× per level to its money multiplier; Cosmic Wealth adds 2× per level to its money multiplier; the two money multipliers stack multiplicatively; Prestige Catalyst multiplies reset Prestige by 1 + 0.2× level; Prestige Endowment grants 1,000 Money per level after Prestige or Ultra reset using the pre-reset level; Eternal Expansion multiplies Ultra reset reward by 1 + 0.5× level while preserving the 2,000 cap; Nebula Resonance multiplies achievement/Arcade Nebula payouts by 1 + level and stacks with the existing `nebula_boost` shop item. Shared achievement unlock/reward logic is now used by both hosts.
+- [ ] Verify all six effects on the current Windows candidate. Windows Arcade and Music Player routes are now directly reachable from the desktop main navigation but still use placeholder screens; the Nebula upgrade's Windows Arcade behavior cannot be confirmed until Arcade is implemented.
 - [ ] Verify large-number display and calculations across representative Android-matching cases.
 - [x] Add deterministic exact-cost bulk-purchase tests and retain reset-preservation/duplicate-reward tests.
 - [ ] Verify all reset preservation and boundary cases on the current candidate.
@@ -140,7 +142,8 @@ The port is complete only when every Android player-facing screen and reachable 
 
 ### W3. Progression and collection
 
-- [ ] Achievements and claimable rewards.
+- [x] Achievement milestone unlocks and one-time Nebula rewards use the shared engine on Android and Windows; the Ultra Nebula upgrade applies to achievement payouts.
+- [ ] Verify the desktop achievements screen's presentation and reward feedback against Android; add claimable reward parity where the Android flow requires it.
 - [ ] Daily/weekly challenges and claim-state persistence.
 - [ ] Statistics and progression summaries.
 - [ ] World map, world unlocks, bosses, relic inventory/sets and mastery.
@@ -381,3 +384,7 @@ This is a source and CI review, not a claim of interactive Windows runtime verif
 - **Current-candidate checks:** follow the CI links in the Stage 2-D PR and report. Successful compilation alone is not runtime evidence.
 - **Stage 2-B update:** PR #198 adds catalog-backed upgrade purchases, Prestige/Ultra resets and upgrades, Nebula shop purchase records and talent unlocks with transaction tests. Remaining gaps include confirming all item effects against Android (notably auto-clicker/background behavior and shop boosts), expanded reward fixtures and actual Windows runtime testing.
 - **Still outstanding:** actual Windows input/window/restart testing and complete UI/localization parity. Do not mark Stage 2 complete or start Stage 3 implementation until the full Stage 2 exit gate is met.
+
+### Desktop-only navigation exception (owner-approved, 2026-10-16)
+
+Desktop quick access intentionally differs from Android navigation for reachability only. The ordered Windows main bar/rail is Play → Upgrades → Shop → Prestige → Ultra → Settings → Arcade → Music → Save Slots → Statistics → World Map → Changelog → More. It defaults to the left rail and supports scrollable top/bottom variants. This does not change gameplay rules, progression, save data or Android navigation. Some exposed destinations remain partial/placeholder implementations and are still tracked above.
