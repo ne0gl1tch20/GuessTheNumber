@@ -379,3 +379,10 @@ This section supersedes older notes where they conflict with the user's latest e
 - Keep CI/verification coverage for both Android and Windows when a change touches shared code or Gradle configuration. Verify save-format and BigNumber compatibility, and update app/src/main/assets/changelogs.md in the same PR for actual player-facing changes.
 - GTN_APP_LOGO.png at repository root is the canonical artwork for both Android mobile launcher icons and Windows app/installer icons. Android launcher density/adaptive/round resources must be generated from it and checked in packaged builds; do not treat the icon task as complete until verified.
 - This is a standing project rule, not a one-time migration checklist. Include it in future plans and reviews.
+
+
+## Windows exact-port continuation (2026-10-16)
+
+- Next focused UI parity increment is branch `feat/windows-shared-guess-feedback`: Windows Play now uses the common `SharedGuessFeedbackCard` also used by Android, with shared status colors, semantic feedback icon tokens, Blind mutator hint suppression and reduced-motion preference.
+- PR should remain open/unmerged until checks pass and the user reviews it. CI can establish compilation/tests; a Windows runtime visual comparison against Android is still needed before marking this UI row verified.
+- Product wish remains locked: Windows should be the same GTN experience the user plays on Android, adapted for desktop input/windowing rather than a smaller or reorganized substitute. Continue one concrete screen/interaction parity gap at a time and keep the parity plan evidence-based.

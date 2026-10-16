@@ -1,3 +1,7 @@
+## Unreleased (Windows exact-port UI parity)
+
+- 🎯 **Shared guess feedback presentation**: Windows Play now uses the same shared status-colored feedback card as Android, including matching ready/invalid, too-low, too-high and correct states. Blind-mutator guesses keep direction hints hidden, and the card respects the saved reduced-motion setting.
+
 ## Unreleased (Windows Play Screen Parity)
 
 - ⌨️ **Shared guess entry**: Windows Play now uses the same shared controlled numeric input component as Android, including the displayed allowed range and Enter-to-submit behavior, while keeping desktop validation, save-before-feedback, and gameplay rules unchanged.

@@ -49,6 +49,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import kotlin.random.Random
+import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
+import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackCard
+import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackIcon
+import com.jarrlyyy.guessthenumber.shared.ui.toSharedFeedbackIcon
 
 /** Windows presentation backed by the production engine, economy rules and desktop save adapter. */
 @Composable
@@ -71,6 +75,7 @@ fun ProductionGuessGameScreen(
     var state by remember { mutableStateOf<GameState?>(null) }
     var guessText by remember { mutableStateOf("") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
+    var feedbackStatus by remember { mutableStateOf(GuessGameStatus.READY) }
     var isSaving by remember { mutableStateOf(false) }
     var autoClickerFailurePaused by remember { mutableStateOf(false) }
     var pendingReset by remember { mutableStateOf<String?>(null) }
@@ -181,6 +186,7 @@ fun ProductionGuessGameScreen(
                 autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
             }
             state = finalState
+            feedbackStatus = desktopFeedbackStatus(result.feedback, "mut_blind" in finalState.activeMutators)
             feedback = when (result.feedback) {
                 GuessFeedback.TOO_LOW -> "Auto Clicker: too low."
                 GuessFeedback.TOO_HIGH -> "Auto Clicker: too high."
@@ -188,6 +194,7 @@ fun ProductionGuessGameScreen(
                     if (finalState.lootEventId > snapshot.lootEventId) " Treasure drop: ${finalState.lastLootDropTier} chest!" else ""
             }
         } else {
+            feedbackStatus = GuessGameStatus.READY
             feedback = "Auto Clicker paused because the save failed. Your previous saved state is still intact."
             autoClickerFailurePaused = true
         }
@@ -237,8 +244,10 @@ fun ProductionGuessGameScreen(
             val submitGuess = {
                     val guess = guessText.toLongOrNull()
                     if (guess == null) {
+                        feedbackStatus = GuessGameStatus.INVALID_INPUT
                         feedback = "Enter a whole number first."
                     } else if (guess !in currentState.currentRangeMin..currentState.currentRangeMax) {
+                        feedbackStatus = GuessGameStatus.INVALID_INPUT
                         feedback = "Choose a number within the displayed range."
                     } else if (!isSaving) {
                         isSaving = true
@@ -267,6 +276,7 @@ fun ProductionGuessGameScreen(
                                 }
                                 autoClickerFailurePaused = false
                                 state = finalState
+                                feedbackStatus = desktopFeedbackStatus(result.feedback, "mut_blind" in finalState.activeMutators)
                                 feedback = when (result.feedback) {
                                     GuessFeedback.TOO_LOW -> if ("mut_blind" in finalState.activeMutators) {
                                         "Guess recorded. Blind mutator hides direction hints."
@@ -279,6 +289,7 @@ fun ProductionGuessGameScreen(
                                 }
                                 guessText = ""
                             } else {
+                                feedbackStatus = GuessGameStatus.READY
                                 feedback = "Could not save that guess. Your previous saved state is still intact."
                             }
                             isSaving = false
@@ -302,7 +313,20 @@ fun ProductionGuessGameScreen(
             ) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
             }
-            Text(feedback, style = MaterialTheme.typography.bodyLarge)
+            SharedGuessFeedbackCard(
+                status = feedbackStatus,
+                message = feedback,
+                leadingContent = { contentColor ->
+                    val icon = when (feedbackStatus.toSharedFeedbackIcon()) {
+                        SharedGuessFeedbackIcon.TIP -> "💡"
+                        SharedGuessFeedbackIcon.TOO_LOW -> "📉"
+                        SharedGuessFeedbackIcon.TOO_HIGH -> "📈"
+                        SharedGuessFeedbackIcon.CORRECT -> "✨"
+                    }
+                    Text(icon, color = contentColor, style = MaterialTheme.typography.titleLarge)
+                },
+                reducedMotion = currentState.settings.reducedMotion
+            )
 
             SectionTitle("Mutators")
             val mutators = listOf(
@@ -452,9 +476,7 @@ fun ProductionGuessGameScreen(
                     enabled = !isSaving && currentState.money >= prestigeRequirement && prestigeReward > BigNumber.ZERO
                 ) { Text("Prestige reset") }
 
-                if (catalog == null) {
-                    Text("Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}")
-                } else catalog.prestigeUpgrades.forEach { upgrade ->
+                catalog?.prestigeUpgrades?.forEach { upgrade ->
                     val level = currentState.prestigeUpgradeLevels[upgrade.id] ?: 0
                     val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, level, currentState.buyMultiplier, currentState.prestige)
                     EconomyActionCard(
@@ -481,9 +503,7 @@ fun ProductionGuessGameScreen(
                         currentState.prestige >= BigNumber(1_000) && ultraReward > BigNumber.ZERO
                 ) { Text("Ultra reset") }
 
-                if (catalog == null) {
-                    Text("Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}")
-                } else catalog.ultraUpgrades.forEach { upgrade ->
+                catalog?.ultraUpgrades?.forEach { upgrade ->
                     val level = currentState.ultraUpgradeLevels[upgrade.id] ?: 0
                     val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, level, currentState.buyMultiplier, currentState.ultra)
                     EconomyActionCard(
@@ -501,9 +521,7 @@ fun ProductionGuessGameScreen(
 
             if (section == DesktopGameSection.SHOP) {
             SectionTitle("Nebula shop")
-                if (catalog == null) {
-                    Text("Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}")
-                } else catalog.shopItems.forEach { item ->
+                catalog?.shopItems?.forEach { item ->
                     val purchased = item.id in currentState.shopPurchases
                     val supported = item.id in setOf("auto_clicker_basic", "nebula_boost", "golden_guess") ||
                         (item.isCosmetic && item.id.startsWith("cosmetic_"))
@@ -648,4 +666,13 @@ private fun EconomyActionCard(
             Button(onClick = onClick, enabled = enabled) { Text(action) }
         }
     }
+}
+
+
+internal fun desktopFeedbackStatus(feedback: GuessFeedback, blindMutatorActive: Boolean): GuessGameStatus = when {
+    blindMutatorActive && feedback != GuessFeedback.CORRECT -> GuessGameStatus.READY
+    feedback == GuessFeedback.TOO_LOW -> GuessGameStatus.TOO_LOW
+    feedback == GuessFeedback.TOO_HIGH -> GuessGameStatus.TOO_HIGH
+    feedback == GuessFeedback.CORRECT -> GuessGameStatus.CORRECT
+    else -> GuessGameStatus.READY
 }
