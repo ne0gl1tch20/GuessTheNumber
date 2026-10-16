@@ -1,3 +1,7 @@
+## Unreleased (Windows Android visual parity)
+
+- 🧭 **Android-style Windows navigation**: Windows now uses the Android app's bottom navigation pattern with Play, Upgrades, Shop and More labels, matching Material icons and selection indicators. Declared Compose Material icon-core explicitly so the desktop target does not rely on a removed transitive dependency. Runtime visual verification is still pending.
+
 ## Unreleased (Windows exact-port UI parity)
 
 - 🛒 **Upgrades screen**: Windows now mirrors Android's Money balance header, buy-multiplier dropdown, upgrade descriptions and levels, combined batch costs, affordability states and purchase-highlight animation. Gameplay transactions still use the existing economy transaction layer.
