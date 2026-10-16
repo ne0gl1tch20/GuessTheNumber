@@ -1,17 +1,35 @@
 package com.jarrlyyy.guessthenumber.desktop
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,6 +102,100 @@ internal fun DesktopWorldMapContent(state: GameState, onBack: () -> Unit, onWorl
                     val unlocked = world.id in state.unlockedWorldIds
                     OutlinedButton(onClick = { selectedId = world.id }, modifier = Modifier.weight(1f)) {
                         Text((if (world.id == selectedId) "● " else "") + world.name + if (unlocked) " ✓" else " 🔒")
+                    }
+                }
+            }
+            var zoom by remember { mutableStateOf(1f) }
+            var pan by remember { mutableStateOf(Offset.Zero) }
+            Text("Drag to explore · use the controls to zoom or reset the map", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { zoom = (zoom / 1.25f).coerceAtLeast(0.7f) }) { Text("− Zoom out") }
+                OutlinedButton(onClick = { zoom = (zoom * 1.25f).coerceAtMost(3f) }) { Text("+ Zoom in") }
+                OutlinedButton(onClick = { zoom = 1f; pan = Offset.Zero }) { Text("Reset map") }
+            }
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxWidth().height(320.dp).clip(RoundedCornerShape(24.dp)).background(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                val mapWidth = maxWidth
+                val mapHeight = maxHeight
+                Box(
+                    modifier = Modifier.fillMaxSize().graphicsLayer {
+                        scaleX = zoom
+                        scaleY = zoom
+                        translationX = pan.x
+                        translationY = pan.y
+                    }.pointerInput(Unit) {
+                        detectTransformGestures { _, gesturePan, gestureZoom, _ ->
+                            zoom = (zoom * gestureZoom).coerceIn(0.7f, 3f)
+                            pan = Offset(
+                                (pan.x + gesturePan.x).coerceIn(-size.width * 0.6f, size.width * 0.6f),
+                                (pan.y + gesturePan.y).coerceIn(-size.height * 0.6f, size.height * 0.6f)
+                            )
+                        }
+                    }
+                ) {
+                    Canvas(Modifier.fillMaxSize()) {
+                        val points = worlds.map { Offset(size.width * it.x, size.height * it.y) }
+                        listOf(0 to 1, 1 to 2, 1 to 3, 2 to 3).forEach { (from, to) ->
+                            val open = worlds[from].id in state.unlockedWorldIds && worlds[to].id in state.unlockedWorldIds
+                            drawLine(
+                                color = if (open) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                start = points[from],
+                                end = points[to],
+                                strokeWidth = if (open) 6f else 4f,
+                                cap = StrokeCap.Round
+                            )
+                        }
+                        worlds.forEachIndexed { index, world ->
+                            val point = points[index]
+                            drawCircle(
+                                color = if (world.id in state.unlockedWorldIds) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
+                                radius = 36f,
+                                center = point
+                            )
+                            if (world.secretAt <= state.correctGuesses && world.id in state.unlockedWorldIds) {
+                                drawLine(
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    start = point,
+                                    end = Offset(point.x + 28f, point.y + 42f),
+                                    strokeWidth = 3f,
+                                    cap = StrokeCap.Round
+                                )
+                            }
+                        }
+                    }
+                    worlds.forEach { world ->
+                        val unlocked = world.id in state.unlockedWorldIds
+                        val selectedWorld = world.id == selectedId
+                        Surface(
+                            onClick = { selectedId = world.id },
+                            modifier = Modifier.offset(x = mapWidth * world.x - 54.dp, y = mapHeight * world.y - 34.dp).size(width = 108.dp, height = 68.dp),
+                            shape = RoundedCornerShape(18.dp),
+                            color = when {
+                                selectedWorld -> MaterialTheme.colorScheme.primaryContainer
+                                unlocked -> MaterialTheme.colorScheme.secondaryContainer
+                                else -> MaterialTheme.colorScheme.surface
+                            },
+                            border = if (selectedWorld) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                            tonalElevation = if (selectedWorld) 5.dp else 1.dp
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize().padding(6.dp),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                            ) {
+                                Text(world.name, style = MaterialTheme.typography.labelMedium, maxLines = 2)
+                                Text(
+                                    when {
+                                        world.bossId in state.defeatedBossIds -> "★ Boss defeated"
+                                        unlocked -> "● Unlocked"
+                                        else -> "🔒 Locked"
+                                    },
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     }
                 }
             }
