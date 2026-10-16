@@ -146,6 +146,21 @@ def main() -> int:
         except Exception as exc:
             errors.append(f"game/worlds.json: localization references could not be checked: {exc}")
 
+    # The JVM transaction layer reads this packaged resource directly. Keep it
+    # byte-for-byte equivalent in meaning to Android's canonical asset so costs
+    # and prerequisite rules cannot drift between platforms.
+    android_talents_path = ROOT / "app" / "src" / "main" / "assets" / "game" / "talents.json"
+    shared_talents_path = ROOT / "shared" / "src" / "jvmMain" / "resources" / "game" / "talents.json"
+    if android_talents_path.exists():
+        try:
+            android_talents = load(android_talents_path)
+            if not shared_talents_path.exists():
+                errors.append("shared JVM canonical talent resource is missing")
+            elif load(shared_talents_path) != android_talents:
+                errors.append("shared JVM game/talents.json must match Android's canonical asset")
+        except Exception as exc:
+            errors.append(f"talent catalog parity check failed: {exc}")
+
     game_root = ROOT / "app" / "src" / "main" / "assets" / "game"
     for filename, prefix in GAME_RULES.items():
         path = game_root / filename
