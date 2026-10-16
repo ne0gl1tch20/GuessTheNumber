@@ -3,7 +3,7 @@
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
 
-**Latest increment:** Windows Upgrades screen first-pass UI port is proposed in PR #211; runtime screenshot parity remains unverified.
+**Latest increment:** PR #215 (`feat/windows-screen-parity-stage-2`) is the current open, unmerged parity candidate. It extends progression screens and shared transactions; runtime screenshot parity remains unverified and Windows Desktop CI currently fails on head `c2138c0ff8ce2aba8813dd3104a560b489c82575`.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
@@ -184,7 +184,7 @@ The PR #202 candidate commit `38c7421c38b476c71e9baaca5cb7d4dc8c8cfea0` passed b
 
 The user reports passing focused Windows runtime checks for Enter-to-submit, button submission, shop/reward/progression behavior and restart/save persistence. These are recorded as user-reported checks, not independently observed runtime evidence. Broader W0/W1/W2 items (including resizing/high-DPI, localization, full economy parity, update channels and MSI lifecycle) are not thereby verified.
 
-The detailed evidence log is [WINDOWS_STAGE_2D_PARITY_VERIFICATION.md](WINDOWS_STAGE_2D_PARITY_VERIFICATION.md). **Stage 2 remains open** until remaining W1/W2 parity gaps are reviewed and every required gate has evidence. Do not start Stage 3 implementation ahead of that gate.
+The detailed evidence log is [WINDOWS_STAGE_2D_PARITY_VERIFICATION.md](WINDOWS_STAGE_2D_PARITY_VERIFICATION.md). **Stage 2 remains open** until remaining W1/W2 parity gaps are reviewed and every required gate has evidence. Stage 2 remains open and must not be declared complete. Some Stage 3 screen slices have been developed in the same ongoing candidate to replace known placeholder routes; treat them as unverified implementation work, not as permission to skip the Stage 2 exit gate or declare Stage 3 active.
 
 ### Windows shared feedback UI increment (2026-10-16)
 
@@ -206,7 +206,17 @@ This candidate closes several concrete gaps found during Stage 2-D review:
 - explicit confirmation before Prestige/Ultra resets;
 - deterministic tests for bulk cost, MAX affordability and mutator validation/range behavior.
 
-Follow-up source review replaced the hardcoded Windows talent list with the canonical Android talent catalog, including costs, descriptions and prerequisite IDs. It also fixed the desktop resource lookup to use the bundled `game/` directory and added the missing canonical talent, Prestige shop and Ultra shop JSON resources. Bulk purchase calculations now use Android's largest-affordable-prefix behavior for 10/100/MAX. These source changes are not yet validated by CI or new Windows runtime checks. The full Stage 2 gate remains open. Remaining review items include rate-limiting/edge-case parity, remaining Prestige/Ultra shop effect parity, broader large-number and reset checks, and actual Windows runtime evidence for mutators and bulk buys.
+Follow-up source review replaced the hardcoded Windows talent list with the canonical Android talent catalog, including costs, descriptions and prerequisite IDs. It also fixed the desktop resource lookup to use the bundled `game/` directory and added the missing canonical talent, Prestige shop and Ultra shop JSON resources. Bulk purchase calculations now use Android's largest-affordable-prefix behavior for 10/100/MAX. These source changes require candidate-specific validation and Windows runtime checks. The full Stage 2 gate remains open. Remaining review items include rate-limiting/edge-case parity, remaining Prestige/Ultra shop effect parity, broader large-number and reset checks, and actual Windows runtime evidence for mutators and bulk buys.
+
+### Current progression-screen candidate (2026-10-16)
+
+PR #215 is open and unmerged. Its current head is `c2138c0ff8ce2aba8813dd3104a560b489c82575`.
+
+- Android Validation and Tests passed: [run 38890096421](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38890096421).
+- Windows Desktop CI failed: [run 38890096399](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38890096399). The candidate is not green; do not treat implementation or tests added in this batch as validated until the failure is resolved and the workflow passes.
+- Source progress includes boss battle start/leave and guess-driven boss damage/rewards, shared relic claim/equip/unequip transactions, the Explorer's Codex and one-time completion reward, a six-goal Endgame tracker, and Lucky Stake input/result handling.
+- The World Map's interactive canvas, visual comparison, localization/runtime parity and other route shells remain unfinished. The Codex and Endgame work are partial screen ports, not verified parity.
+- Stage 2 remains open. This record tracks code already present in the candidate; it does not mark the Stage 2 exit gate passed or authorize declaring later stages complete.
 
 ## Stage 1 source audit (2026-10-15)
 
