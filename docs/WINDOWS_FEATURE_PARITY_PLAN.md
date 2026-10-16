@@ -6,9 +6,13 @@
 
 ## Goal
 
-Bring Windows to the agreed player-facing feature set in deliberate, testable slices. Reuse shared rules and selected UI where helpful, while keeping Windows windowing, input, storage, update and installer behavior in the desktop host.
+**Product wish / locked direction: Windows is an exact port of GTN, built with Kotlin Multiplatform and shared code and assets wherever practical.** Android is the source of truth for the game. Windows must reproduce the same player-facing game, not a smaller desktop edition or a newly organized substitute UI.
 
-This replaces the Windows-related phases buried in the temporary KMP migration roadmap.
+Port the Android experience screen by screen: same features, screen hierarchy, information, labels, controls, menus, dialogs, navigation destinations, locked/unlocked states, loading/empty/error states, and interaction outcomes. Adapt only the presentation and input where desktop requires it (resizable window, keyboard, mouse, focus, hover and desktop conventions). Desktop adaptations must preserve the Android screen's content and meaning; any deliberate feature difference needs an explicit reason and documentation.
+
+Prefer Kotlin Multiplatform shared production rules, models, validation, transaction logic, localization catalogs and canonical assets. Reuse Compose UI components where they work across targets, and use thin Android/Windows host adapters for platform-specific lifecycle, storage, audio, notifications, windowing, installers and updates. Share the original assets rather than creating separate Windows copies. Keep Android working throughout the port and preserve existing save compatibility.
+
+This plan is the single source of truth for Windows parity and replaces Windows migration checklists that duplicate its stages.
 
 ## Locked five-stage execution order
 
@@ -38,10 +42,22 @@ This replaces the Windows-related phases buried in the temporary KMP migration r
 
 - Finish and record each stage's exit gate before treating the next stage as active.
 - Each implementation slice should be a focused PR with relevant tests and parity-matrix updates; merge only when its required checks and review are acceptable.
-- Do not create more migration-only UI extraction work. Reopen KMP foundation work only for a demonstrated defect or a specific cross-platform feature requirement.
+- Do not create extraction-only PRs. Shared-code/UI work is in scope when it directly advances the exact Windows port, prevents duplicated behavior/assets or fixes a demonstrated cross-platform defect.
 - Do not claim runtime verification from a successful build alone. Keep unrun checks marked unverified.
 - Preserve offline play and existing save/MSI/update-channel compatibility; do not add ads, analytics or accounts.
 
+## Definition of exact port
+
+The port is complete only when every Android player-facing screen and reachable interaction has a Windows counterpart or is explicitly classified as an approved platform-specific difference. Matching only the feature list is not enough.
+
+- [ ] Build a source-backed Android screen and route inventory, including nested destinations, menus, popups, dialogs, sheets, tutorials, feature-flagged entries and debug-only tools.
+- [ ] For each screen, compare Android and Windows visible content, hierarchy, typography, spacing, icons, imagery, states, controls, actions and navigation. Record screenshot evidence at comparable window/content sizes where practical.
+- [ ] Preserve every player-facing feature and the same underlying game rules, rewards, progression, localization meaning, save semantics and validation. Do not omit a screen because the current Windows shell has no route for it.
+- [ ] Reuse shared Kotlin code and canonical assets first. Move a rule/model/resource to shared source sets only when its dependencies and platform contracts support that move; otherwise provide a narrow Windows adapter without duplicating authoritative game logic.
+- [ ] Keep Android as the reference implementation. Every Windows port slice must identify the Android source screen/component it matches and check that Android behavior remains unchanged.
+- [ ] Adapt mobile-only interaction patterns to desktop only where needed. Desktop navigation, keyboard shortcuts, hover and window resizing may differ in input mechanics, not in available functionality or meaning.
+- [ ] Track parity per screen and interaction as **Verified**, **Not yet verified**, **Approved platform-specific difference** or **Blocked**, with evidence. A successful compile or unit-test run does not establish visual/runtime parity.
+- [ ] Do not call Windows parity complete until all required rows have evidence and there are no unexplained missing screens, controls, menus or behaviors.
 ## Scope rules
 
 - Android is the behavior reference unless a platform-specific difference is approved.
