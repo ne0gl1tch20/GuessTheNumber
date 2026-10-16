@@ -114,7 +114,7 @@ object DesktopEconomyRules {
         val reward = engine.calculateUltraReward(state)
         if (state.money < requirement || state.prestige < BigNumber(1_000) || reward <= BigNumber.ZERO) return null
         return state.copy(
-            money = BigNumber.ZERO,
+            money = engine.prestigeStartingCapital(state),
             prestige = BigNumber.ZERO,
             ultra = state.ultra + reward,
             upgradeLevels = emptyMap(),
