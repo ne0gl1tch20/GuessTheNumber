@@ -4,7 +4,6 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import kotlin.random.Random
 
 class RelicSetBonusGameplayTest {
     private fun apply(set: Set<String>): GameState {
@@ -22,21 +21,20 @@ class RelicSetBonusGameplayTest {
         return DesktopEconomyTransactions.applyGuessBonuses(
             before = before,
             after = after,
-            correct = true,
-            rng = Random(1234)
+            correct = true
         )
     }
 
     @Test
     fun twoEquippedBossRelicsApplyTenPercentSetBonus() {
-        val result = apply(setOf("verdant_guardian", "crystal_golem"))
-        assertEquals(0, result.money.compareTo(BigNumber(310)))
+        val result = apply(setOf("verdant_guardian", "ember_dragon"))
+        assertEquals(0, result.money.compareTo(BigNumber(245)))
     }
 
     @Test
     fun threeEquippedBossRelicsApplyTwentyPercentSetBonus() {
-        val result = apply(setOf("verdant_guardian", "crystal_golem", "ember_dragon"))
-        assertEquals(0, result.money.compareTo(BigNumber(345)))
+        val result = apply(setOf("verdant_guardian", "ember_dragon", "nebula_titan"))
+        assertEquals(0, result.money.compareTo(BigNumber(280)))
     }
 
     @Test
