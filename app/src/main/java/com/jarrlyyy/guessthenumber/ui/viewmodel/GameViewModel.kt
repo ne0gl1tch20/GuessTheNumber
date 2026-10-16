@@ -560,7 +560,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             val newUltra = state.ultra + reward
             val newStats = state.statistics.copy(ultrasCount = state.statistics.ultrasCount + 1)
             _gameState.value = state.copy(
-                money = BigNumber.ZERO,
+                money = gameEngine.prestigeStartingCapital(state),
                 prestige = BigNumber.ZERO,
                 ultra = newUltra,
                 upgradeLevels = emptyMap(),
