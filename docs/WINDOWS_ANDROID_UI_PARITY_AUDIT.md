@@ -8,6 +8,9 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 
 ## First batch changes
 
+- Windows now declares the Compose Multiplatform Material icon-core dependency explicitly and uses the same four familiar Android navigation icons (Play, Star, Shopping Cart and Menu).
+- The primary navigation is now a bottom `NavigationBar` with labels and Material selection indicators, matching Android's navigation pattern instead of a row of text-only buttons at the top. Runtime screenshot comparison and animation feel still require Windows verification.
+
 - Windows primary navigation now exposes Play, Upgrades, Shop and More in Android's order.
 - Existing guessing, mutator, daily quest, achievement and world progression controls stay together on Play instead of being split into a separate Progress destination.
 - Regular Money upgrades are under Upgrades.
