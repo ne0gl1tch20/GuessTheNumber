@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -77,7 +77,7 @@ internal fun DesktopCodexContent(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Icon(
-                        imageVector = if (found) Icons.Default.MenuBook else Icons.Default.Lock,
+                        imageVector = if (found) Icons.Default.CheckCircle else Icons.Default.Lock,
                         contentDescription = null,
                         tint = if (found) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                     )
