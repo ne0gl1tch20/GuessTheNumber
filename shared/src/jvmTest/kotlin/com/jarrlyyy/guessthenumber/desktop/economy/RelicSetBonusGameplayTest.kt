@@ -42,9 +42,10 @@ class RelicSetBonusGameplayTest {
     @Test
     fun fourEquippedBossRelicsApplyThirtyFivePercentSetBonusAndNebula() {
         val result = apply(setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan"))
-        // Individual relic effects add 10% + 25% + 25%, then the 35% four-piece set bonus.
+        // Individual relic effects add 10% + 25% + 25%, plus the 35% set bonus.
         assertEquals(0, result.money.compareTo(BigNumber(295)))
-        assertEquals(BigNumber(1), result.nebula)
+        // Android also grants +1 Nebula from Ember Dragon, in addition to the full-set +1.
+        assertEquals(BigNumber(2), result.nebula)
     }
 
     @Test
