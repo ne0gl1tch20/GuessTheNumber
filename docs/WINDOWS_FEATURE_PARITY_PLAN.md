@@ -1,7 +1,7 @@
 # Windows Feature Parity Plan
 
-**Status:** In progress; Windows has a desktop shell and shared guessing-screen pilot, not the full Android feature set.
-**Reviewed:** 2026-10-15
+**Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
+**Reviewed:** 2026-10-16
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
@@ -141,6 +141,16 @@ This replaces the Windows-related phases buried in the temporary KMP migration r
 - [ ] Verify Android save compatibility after shared model/logic changes.
 - [ ] Publish final feature matrix with each row marked Verified on Windows, Intentionally platform-specific, Not implemented or Blocked, with evidence.
 - [ ] Fix release-blocking regressions before declaring Windows parity complete.
+
+## Stage 2-D candidate evidence (2026-10-16)
+
+The current PR #202 candidate commit `38c7421c38b476c71e9baaca5cb7d4dc8c8cfea0` passed both required CI workflows:
+- [Windows Desktop CI run 38840144782](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144782) — passed.
+- [Android Validation and Tests run 38840144773](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144773) — passed.
+
+The user reports passing focused Windows runtime checks for Enter-to-submit, button submission, shop/reward/progression behavior and restart/save persistence. Record these as user-reported checks, not independently observed runtime evidence. The broader W0/W1/W2 items (including resizing/high-DPI, localization, full economy parity, update channels and MSI lifecycle) are not thereby verified.
+
+The Stage 2-D evidence log is maintained in [WINDOWS_STAGE_2D_PARITY_VERIFICATION.md](WINDOWS_STAGE_2D_PARITY_VERIFICATION.md). **Stage 2 remains open** until remaining W1/W2 parity gaps are reviewed and every required gate has evidence. Do not start Stage 3 implementation ahead of that gate.
 
 ## Stage 1 source audit (2026-10-15)
 
