@@ -34,7 +34,7 @@ private val desktopMutators = listOf(
     Triple("mut_tax", "Tax", 10.0)
 )
 
-private fun desktopWeeklyChallenges(): List<DesktopChallengeDefinition> {
+internal fun desktopWeeklyChallenges(): List<DesktopChallengeDefinition> {
     val today = LocalDate.now()
     val week = today.get(WeekFields.ISO.weekOfWeekBasedYear())
     val year = today.get(WeekFields.ISO.weekBasedYear())
