@@ -765,4 +765,31 @@ class DesktopEconomyTransactionsTest {
         assertTrue(equipped.accepted)
         assertEquals(4, equipped.state.equippedRelicIds.size)
     }
+
+    @Test
+    fun codexCompletionRewardRequiresAllTwelveEntriesAndCanOnlyBeClaimedOnce() {
+        val incomplete = GameState(codexEntries = setOf("world:verdant_grove"))
+        val denied = DesktopEconomyTransactions.claimCodexCompletionReward(incomplete)
+        assertFalse(denied.accepted)
+        assertEquals(incomplete, denied.state)
+
+        val allEntries = setOf(
+            "world:verdant_grove", "boss:verdant_guardian",
+            "world:crystal_caverns", "boss:crystal_golem",
+            "world:ember_summit", "boss:ember_dragon",
+            "world:nebula_rift", "boss:nebula_titan",
+            "secret:whispering_hollow", "secret:shard_archive",
+            "secret:ashen_vault", "secret:lost_observatory"
+        )
+        val ready = GameState(codexEntries = allEntries, nebula = BigNumber(5))
+        val claimed = DesktopEconomyTransactions.claimCodexCompletionReward(ready)
+        assertTrue(claimed.accepted)
+        assertEquals(BigNumber(105), claimed.state.nebula)
+        assertTrue(claimed.state.codexRewardClaimed)
+        assertEquals(100L, claimed.state.statistics.nebulaEarned)
+
+        val duplicate = DesktopEconomyTransactions.claimCodexCompletionReward(claimed.state)
+        assertFalse(duplicate.accepted)
+        assertEquals(claimed.state, duplicate.state)
+    }
 }
