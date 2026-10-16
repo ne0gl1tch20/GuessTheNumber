@@ -5,6 +5,14 @@
 - Preserve the current app version unless a version bump is explicitly part of the release work. Do not imply a build or tests passed without verified results.
 - The user confirmed PR #36 (undocumented changes changelog update) is merged.
 
+## Windows exact-port requirement (2026-10-16)
+
+- User's locked goal: Windows should be an exact port of GTN using Kotlin Multiplatform, shared code and shared assets wherever practical.
+- Android is the reference for screens, content hierarchy, controls, menus, dialogs, navigation, states, feature availability and game behavior. Desktop-only input/windowing adaptations are allowed; missing or redesigned features are not.
+- Prefer shared production rules/models, UI components, localization catalogs and canonical assets. Keep OS-specific lifecycle, storage, audio, notification, installer and update behavior in host adapters.
+- Audit Android vs Windows screen-by-screen and interaction-by-interaction. Record visual/runtime evidence; compilation and CI do not prove exact UI parity.
+- docs/WINDOWS_FEATURE_PARITY_PLAN.md is the single source of truth for execution and acceptance criteria. Do not maintain duplicate Windows migration plans under .openai/.
+- Keep Android working and preserve save, reward, localization and offline behavior during the Windows port.
 # Project Memory: Gamified Guess the Number Simulator (v3.0.0 Update)
 
 
