@@ -20,44 +20,47 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRepository
-import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRules
+import com.jarrlyyy.guessthenumber.desktop.DesktopGuessingBot
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
+import com.jarrlyyy.guessthenumber.desktop.economy.EconomyTransaction
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveStore
 import com.jarrlyyy.guessthenumber.desktop.persistence.defaultDesktopSaveDirectory
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
-/** Windows presentation backed by production gameplay, shared game configuration and desktop saves. */
+/** Windows presentation backed by the production engine, economy rules and desktop save adapter. */
 @Composable
 fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
     val engine = remember { GameEngine() }
+    val autoClicker = remember { DesktopGuessingBot() }
     val saveStore = remember { DesktopSaveStore(defaultDesktopSaveDirectory()) }
-    val economy = remember { DesktopEconomyRepository() }
-    val upgrades = remember { economy.upgrades() }
-    val prestigeUpgrades = remember { economy.prestigeUpgrades() }
-    val ultraUpgrades = remember { economy.ultraUpgrades() }
-    val shopItems = remember { economy.shopItems() }
-    val prestigeShopItems = remember { economy.prestigeShopItems() }
-    val ultraShopItems = remember { economy.ultraShopItems() }
-    val talents = remember { economy.talents() }
+    val catalogResult = remember { runCatching { DesktopEconomyCatalog.load() } }
+    val catalog = catalogResult.getOrNull()
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<GameState?>(null) }
     var guessText by remember { mutableStateOf("") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
     var isSaving by remember { mutableStateOf(false) }
+    var autoClickerFailurePaused by remember { mutableStateOf(false) }
+    val latestSaving by rememberUpdatedState(isSaving)
 
     LaunchedEffect(Unit) {
         val loaded = withContext(Dispatchers.IO) { saveStore.load(1) }
         if (loaded != null) {
+            autoClicker.reset(loaded.currentRangeMin, loaded.currentRangeMax)
             state = loaded
             feedback = "Saved game loaded."
         } else {
@@ -68,6 +71,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             )
             val created = withContext(Dispatchers.IO) { saveStore.save(1, fresh) }
             if (created) {
+                autoClicker.reset(fresh.currentRangeMin, fresh.currentRangeMax)
                 state = fresh
                 feedback = "New game created."
             } else {
@@ -76,14 +80,24 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    fun persist(next: GameState, successMessage: String) {
+    fun commitTransaction(transform: (GameState) -> EconomyTransaction) {
+        val before = state ?: return
         if (isSaving) return
         isSaving = true
         scope.launch {
-            val saved = withContext(Dispatchers.IO) { saveStore.save(1, next) }
+            val transaction = transform(before)
+            if (!transaction.accepted) {
+                feedback = transaction.message
+                isSaving = false
+                return@launch
+            }
+            val saved = withContext(Dispatchers.IO) { saveStore.save(1, transaction.state) }
             if (saved) {
-                state = next
-                feedback = successMessage
+                state = transaction.state
+                if (before.autoClickerActive != transaction.state.autoClickerActive) {
+                    autoClickerFailurePaused = false
+                }
+                feedback = transaction.message
             } else {
                 feedback = "Could not save that change. Your previous saved state is still intact."
             }
@@ -92,6 +106,43 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
     }
 
     val currentState = state
+
+    LaunchedEffect(currentState) {
+        val snapshot = currentState ?: return@LaunchedEffect
+        if (!snapshot.autoClickerActive || autoClickerFailurePaused || "auto_clicker_basic" !in snapshot.shopPurchases) {
+            return@LaunchedEffect
+        }
+        delay(1_000L)
+        while (latestSaving) delay(100L)
+        if (state != snapshot) return@LaunchedEffect
+
+        val guess = autoClicker.nextGuess(snapshot.currentRangeMin, snapshot.currentRangeMax)
+        isSaving = true
+        val result = engine.processGuess(snapshot, guess)
+        val finalState = DesktopEconomyTransactions.applyGuessBonuses(
+            before = snapshot,
+            after = result.newState,
+            correct = result.feedback == GuessFeedback.CORRECT
+        )
+        val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
+        if (saved) {
+            autoClicker.observeGuess(guess, result.feedback)
+            if (result.feedback == GuessFeedback.CORRECT) {
+                autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+            }
+            state = finalState
+            feedback = when (result.feedback) {
+                GuessFeedback.TOO_LOW -> "Auto Clicker: too low."
+                GuessFeedback.TOO_HIGH -> "Auto Clicker: too high."
+                GuessFeedback.CORRECT -> "Auto Clicker solved the round and earned ${finalState.money - snapshot.money} Money."
+            }
+        } else {
+            feedback = "Auto Clicker paused because the save failed. Your previous saved state is still intact."
+            autoClickerFailurePaused = true
+        }
+        isSaving = false
+    }
+
     Card(modifier = modifier.fillMaxSize()) {
         if (currentState == null) {
             Column(
@@ -105,21 +156,21 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
         }
 
         Column(
-            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(24.dp),
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text("Guess The Number", style = MaterialTheme.typography.headlineMedium)
             Text("Find the hidden number between ${currentState.currentRangeMin} and ${currentState.currentRangeMax}.")
             Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                StatValue("Money", currentState.money.toString())
-                StatValue("Prestige", currentState.prestige.toString())
-                StatValue("Ultra", currentState.ultra.toString())
-                StatValue("Nebula", currentState.nebula.toString())
+                CurrencySummary("Money", currentState.money.toString())
+                CurrencySummary("Prestige", currentState.prestige.toString())
+                CurrencySummary("Ultra", currentState.ultra.toString())
+                CurrencySummary("Nebula", currentState.nebula.toString())
             }
             Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                StatValue("Attempts", currentState.attempts.toString())
-                StatValue("Correct", currentState.correctGuesses.toString())
-                StatValue("Streak", currentState.streak.toString())
+                CurrencySummary("Attempts", currentState.attempts.toString())
+                CurrencySummary("Correct", currentState.correctGuesses.toString())
+                CurrencySummary("Streak", currentState.streak.toString())
             }
             OutlinedTextField(
                 value = guessText,
@@ -136,17 +187,34 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                         feedback = "Enter a whole number first."
                     } else if (guess !in currentState.currentRangeMin..currentState.currentRangeMax) {
                         feedback = "Choose a number within the displayed range."
-                    } else {
+                    } else if (!isSaving) {
+                        isSaving = true
                         val result = engine.processGuess(currentState, guess)
-                        persist(
-                            result.newState,
-                            when (result.feedback) {
-                                GuessFeedback.TOO_LOW -> "Too low. Try again!"
-                                GuessFeedback.TOO_HIGH -> "Too high. Try again!"
-                                GuessFeedback.CORRECT -> "Correct! You earned ${result.reward} Money."
-                            }
+                        val finalState = DesktopEconomyTransactions.applyGuessBonuses(
+                            before = currentState,
+                            after = result.newState,
+                            correct = result.feedback == GuessFeedback.CORRECT
                         )
-                        guessText = ""
+                        scope.launch {
+                            val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
+                            if (saved) {
+                                autoClicker.observeGuess(guess, result.feedback)
+                                if (result.feedback == GuessFeedback.CORRECT) {
+                                    autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+                                }
+                                autoClickerFailurePaused = false
+                                state = finalState
+                                feedback = when (result.feedback) {
+                                    GuessFeedback.TOO_LOW -> "Too low. Try again!"
+                                    GuessFeedback.TOO_HIGH -> "Too high. Try again!"
+                                    GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - currentState.money} Money."
+                                }
+                                guessText = ""
+                            } else {
+                                feedback = "Could not save that guess. Your previous saved state is still intact."
+                            }
+                            isSaving = false
+                        }
                     }
                 },
                 enabled = guessText.isNotBlank() && !isSaving
@@ -154,146 +222,117 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
             }
             Text(feedback, style = MaterialTheme.typography.bodyLarge)
-
-            Text("Money upgrades", style = MaterialTheme.typography.headlineSmall)
-            Text("Increase the power of your guessing run. Costs and descriptions load from the same game configuration as Android.")
-            upgrades.forEach { upgrade ->
-                val level = currentState.upgradeLevels[upgrade.id] ?: 0
-                val cost = DesktopEconomyRules.nextUpgradeCost(upgrade, level)
-                EconomyEntry(
-                    title = upgrade.name,
-                    description = upgrade.description,
-                    detail = "Level $level / ${upgrade.maxLevel} · Next cost: ${cost}",
-                    buttonText = if (level >= upgrade.maxLevel) "Maxed" else "Buy upgrade",
-                    enabled = !isSaving && level < upgrade.maxLevel && currentState.money >= cost
-                ) {
-                    val next = DesktopEconomyRules.buyMoneyUpgrade(currentState, upgrade)
-                    if (next == null) feedback = "Not enough Money for that upgrade."
-                    else persist(next, "${upgrade.name} upgraded.")
-                }
+            if ("auto_clicker_basic" in currentState.shopPurchases) {
+                Button(
+                    onClick = { commitTransaction { DesktopEconomyTransactions.setAutoClickerActive(it, !it.autoClickerActive) } },
+                    enabled = !isSaving
+                ) { Text(if (currentState.autoClickerActive) "Pause auto-clicker" else "Resume auto-clicker") }
             }
 
-            Text("Prestige", style = MaterialTheme.typography.headlineSmall)
-            Text("Requirement: ${engine.calculatePrestigeRequirement(currentState.prestigeCount)} Money · Estimated reward: ${engine.calculatePrestigeReward(currentState.money, currentState.prestigeCount)} Prestige")
-            Button(
-                enabled = !isSaving && currentState.money >= engine.calculatePrestigeRequirement(currentState.prestigeCount) &&
-                    engine.calculatePrestigeReward(currentState.money, currentState.prestigeCount) > BigNumber.ZERO,
-                onClick = {
-                    val next = DesktopEconomyRules.prestigeReset(currentState, engine)
-                    if (next == null) feedback = "You do not meet the Prestige requirement yet."
-                    else persist(next, "Prestige reset complete. Your Prestige currency was preserved.")
+            SectionTitle("Money upgrades")
+            if (catalog == null) {
+                Text("Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}")
+            } else {
+                catalog.upgrades.forEach { upgrade ->
+                    val level = currentState.upgradeLevels[upgrade.id] ?: 0
+                    val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+                    EconomyActionCard(
+                        title = upgrade.name,
+                        description = upgrade.description,
+                        detail = "Level $level / ${upgrade.maxLevel} · Cost: $cost Money",
+                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy",
+                        enabled = !isSaving && level < upgrade.maxLevel && currentState.money >= cost
+                    ) {
+                        commitTransaction { DesktopEconomyTransactions.buyUpgrade(it, upgrade) }
+                    }
                 }
-            ) { Text("Prestige reset") }
-            prestigeUpgrades.forEach { upgrade ->
-                val level = currentState.prestigeUpgradeLevels[upgrade.id] ?: 0
-                val cost = DesktopEconomyRules.nextUpgradeCost(upgrade, level)
-                EconomyEntry(
-                    title = upgrade.name,
-                    description = upgrade.description,
-                    detail = "Level $level / ${upgrade.maxLevel} · Next cost: ${cost} Prestige",
-                    buttonText = if (level >= upgrade.maxLevel) "Maxed" else "Buy Prestige upgrade",
-                    enabled = !isSaving && level < upgrade.maxLevel && currentState.prestige >= cost
-                ) {
-                    val next = DesktopEconomyRules.buyPrestigeUpgrade(currentState, upgrade)
-                    if (next == null) feedback = "Not enough Prestige for that upgrade."
-                    else persist(next, "${upgrade.name} upgraded.")
-                }
-            }
 
-            Text("Ultra", style = MaterialTheme.typography.headlineSmall)
-            Text("Requires ${engine.calculateUltraRequirement(currentState.ultraCount)} Money and at least 1,000 Prestige. Estimated reward: ${engine.calculateUltraReward(currentState.money, currentState.ultraCount)} Ultra.")
-            Button(
-                enabled = !isSaving && currentState.money >= engine.calculateUltraRequirement(currentState.ultraCount) &&
-                    currentState.prestige >= BigNumber(1_000) &&
-                    engine.calculateUltraReward(currentState.money, currentState.ultraCount) > BigNumber.ZERO,
-                onClick = {
-                    val next = DesktopEconomyRules.ultraReset(currentState, engine)
-                    if (next == null) feedback = "You do not meet the Ultra requirements yet."
-                    else persist(next, "Ultra reset complete.")
-                }
-            ) { Text("Ultra reset") }
-            ultraUpgrades.forEach { upgrade ->
-                val level = currentState.ultraUpgradeLevels[upgrade.id] ?: 0
-                val cost = DesktopEconomyRules.nextUpgradeCost(upgrade, level)
-                EconomyEntry(
-                    title = upgrade.name,
-                    description = upgrade.description,
-                    detail = "Level $level / ${upgrade.maxLevel} · Next cost: ${cost} Ultra",
-                    buttonText = if (level >= upgrade.maxLevel) "Maxed" else "Buy Ultra upgrade",
-                    enabled = !isSaving && level < upgrade.maxLevel && currentState.ultra >= cost
-                ) {
-                    val next = DesktopEconomyRules.buyUltraUpgrade(currentState, upgrade)
-                    if (next == null) feedback = "Not enough Ultra for that upgrade."
-                    else persist(next, "${upgrade.name} upgraded.")
-                }
-            }
+                SectionTitle("Prestige")
+                val prestigeRequirement = engine.calculatePrestigeRequirement(currentState.prestigeCount)
+                val prestigeReward = engine.calculatePrestigeReward(currentState.money, currentState.prestigeCount)
+                Text("Requirement: $prestigeRequirement Money · Estimated reward: $prestigeReward Prestige")
+                Button(
+                    onClick = { commitTransaction { DesktopEconomyTransactions.prestigeReset(it, engine) } },
+                    enabled = !isSaving && currentState.money >= prestigeRequirement && prestigeReward > BigNumber.ZERO
+                ) { Text("Prestige reset") }
 
-            Text("Nebula shop", style = MaterialTheme.typography.headlineSmall)
-            shopItems.forEach { item ->
-                val owned = item.id in currentState.shopPurchases
-                EconomyEntry(
-                    title = item.name,
-                    description = item.description,
-                    detail = "${item.nebulaCost} Nebula · ${item.category}",
-                    buttonText = if (owned) "Owned" else "Purchase",
-                    enabled = !isSaving && !owned && currentState.nebula >= BigNumber(item.nebulaCost)
-                ) {
-                    val next = DesktopEconomyRules.buyNebulaShopItem(currentState, item)
-                    if (next == null) feedback = "Not enough Nebula or this item is already owned."
-                    else persist(next, "${item.name} purchased.")
+                catalog.prestigeUpgrades.forEach { upgrade ->
+                    val level = currentState.prestigeUpgradeLevels[upgrade.id] ?: 0
+                    val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+                    EconomyActionCard(
+                        title = upgrade.name,
+                        description = upgrade.description,
+                        detail = "Level $level / ${upgrade.maxLevel} · Cost: $cost Prestige",
+                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy",
+                        enabled = !isSaving && level < upgrade.maxLevel && currentState.prestige >= cost
+                    ) {
+                        commitTransaction { DesktopEconomyTransactions.buyPrestigeUpgrade(it, upgrade) }
+                    }
                 }
-            }
 
-            Text("Prestige shop", style = MaterialTheme.typography.headlineSmall)
-            prestigeShopItems.forEach { item ->
-                val owned = item.id in currentState.prestigeShopPurchases
-                EconomyEntry(
-                    title = item.name,
-                    description = item.description,
-                    detail = "${item.cost} Prestige",
-                    buttonText = if (owned) "Owned" else "Purchase",
-                    enabled = !isSaving && !owned && currentState.prestige >= BigNumber(item.cost)
-                ) {
-                    val next = DesktopEconomyRules.buyPrestigeShopItem(currentState, item)
-                    if (next == null) feedback = "Not enough Prestige or this item is already owned."
-                    else persist(next, "${item.name} purchased.")
+                SectionTitle("Ultra")
+                val ultraRequirement = engine.calculateUltraRequirement(currentState.ultraCount)
+                val ultraReward = engine.calculateUltraReward(currentState.money, currentState.ultraCount)
+                Text("Requirement: $ultraRequirement Money and 1,000 Prestige · Estimated reward: $ultraReward Ultra")
+                Button(
+                    onClick = { commitTransaction { DesktopEconomyTransactions.ultraReset(it, engine) } },
+                    enabled = !isSaving && currentState.money >= ultraRequirement &&
+                        currentState.prestige >= BigNumber(1_000) && ultraReward > BigNumber.ZERO
+                ) { Text("Ultra reset") }
+
+                catalog.ultraUpgrades.forEach { upgrade ->
+                    val level = currentState.ultraUpgradeLevels[upgrade.id] ?: 0
+                    val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+                    EconomyActionCard(
+                        title = upgrade.name,
+                        description = upgrade.description,
+                        detail = "Level $level / ${upgrade.maxLevel} · Cost: $cost Ultra",
+                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy",
+                        enabled = !isSaving && level < upgrade.maxLevel && currentState.ultra >= cost
+                    ) {
+                        commitTransaction { DesktopEconomyTransactions.buyUltraUpgrade(it, upgrade) }
+                    }
                 }
-            }
 
-            Text("Ultra shop", style = MaterialTheme.typography.headlineSmall)
-            ultraShopItems.forEach { item ->
-                val owned = item.id in currentState.ultraShopPurchases
-                EconomyEntry(
-                    title = item.name,
-                    description = item.description,
-                    detail = "${item.cost} Ultra",
-                    buttonText = if (owned) "Owned" else "Purchase",
-                    enabled = !isSaving && !owned && currentState.ultra >= BigNumber(item.cost)
-                ) {
-                    val next = DesktopEconomyRules.buyUltraShopItem(currentState, item)
-                    if (next == null) feedback = "Not enough Ultra or this item is already owned."
-                    else persist(next, "${item.name} purchased.")
+                SectionTitle("Nebula shop")
+                catalog.shopItems.forEach { item ->
+                    val purchased = item.id in currentState.shopPurchases
+                    EconomyActionCard(
+                        title = item.name,
+                        description = item.description,
+                        detail = if (!item.isCosmetic && item.id != "auto_clicker_basic") "Windows effect not implemented yet · Cost: ${item.nebulaCost} Nebula" else "Cost: ${item.nebulaCost} Nebula",
+                        action = if (purchased) "Owned" else if (item.isCosmetic || item.id == "auto_clicker_basic") "Buy" else "Unavailable",
+                        enabled = !isSaving && (item.isCosmetic || item.id == "auto_clicker_basic") && !purchased && currentState.nebula >= BigNumber(item.nebulaCost)
+                    ) {
+                        commitTransaction { DesktopEconomyTransactions.buyShopItem(it, item) }
+                    }
                 }
-            }
 
-            Text("Talents", style = MaterialTheme.typography.headlineSmall)
-            talents.forEach { talent ->
-                val owned = talent.id in currentState.prestigeShopPurchases
-                EconomyEntry(
-                    title = talent.name,
-                    description = talent.description,
-                    detail = "${talent.cost} Prestige" + (talent.requiredParentId?.let { " · Requires $it" } ?: ""),
-                    buttonText = if (owned) "Unlocked" else "Unlock talent",
-                    enabled = !isSaving && !owned && currentState.prestige >= BigNumber(talent.cost)
-                ) {
-                    val next = DesktopEconomyRules.buyTalent(currentState, talent)
-                    if (next == null) feedback = "Not enough Prestige or a required parent talent is locked."
-                    else persist(next, "${talent.name} unlocked.")
+                SectionTitle("Talents")
+                val talents = listOf(
+                    Triple("talent_speed_1", "Quick Hands", 10L),
+                    Triple("talent_crit_1", "Critical Focus", 25L),
+                    Triple("talent_crit_2", "Critical Mastery", 50L),
+                    Triple("talent_reward_1", "Reward Resonance", 100L),
+                    Triple("talent_speed_2", "Rapid Hands", 75L),
+                    Triple("talent_master_1", "Mastery", 250L)
+                )
+                talents.forEach { (id, name, cost) ->
+                    val owned = id in currentState.prestigeShopPurchases
+                    EconomyActionCard(
+                        title = name,
+                        description = id.replace('_', ' '),
+                        detail = if (owned) "Unlocked" else "Cost: $cost Prestige",
+                        action = if (owned) "Owned" else "Unlock",
+                        enabled = !isSaving && !owned && currentState.prestige >= BigNumber(cost)
+                    ) {
+                        commitTransaction { DesktopEconomyTransactions.buyTalent(it, id, cost) }
+                    }
                 }
             }
 
             Text(
-                "Your Windows run is saved locally after each accepted action. A backup is kept for recovery if the primary save is damaged.",
+                "Your Windows run is saved locally after each accepted guess or economy transaction. A backup is kept for recovery if the primary save is damaged.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -302,7 +341,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun StatValue(label: String, value: String) {
+private fun CurrencySummary(label: String, value: String) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(label, style = MaterialTheme.typography.labelMedium)
         Text(value, style = MaterialTheme.typography.titleLarge)
@@ -310,11 +349,16 @@ private fun StatValue(label: String, value: String) {
 }
 
 @Composable
-private fun EconomyEntry(
+private fun SectionTitle(title: String) {
+    Text(title, style = MaterialTheme.typography.headlineSmall)
+}
+
+@Composable
+private fun EconomyActionCard(
     title: String,
     description: String,
     detail: String,
-    buttonText: String,
+    action: String,
     enabled: Boolean,
     onClick: () -> Unit
 ) {
@@ -328,7 +372,7 @@ private fun EconomyEntry(
                 Text(description, style = MaterialTheme.typography.bodyMedium)
                 Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Button(onClick = onClick, enabled = enabled) { Text(buttonText) }
+            Button(onClick = onClick, enabled = enabled) { Text(action) }
         }
     }
 }
