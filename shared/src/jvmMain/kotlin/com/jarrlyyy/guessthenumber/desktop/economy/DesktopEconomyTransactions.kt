@@ -744,9 +744,25 @@ object DesktopEconomyTransactions {
         cost: Long,
         requiredParentId: String?
     ): EconomyTransaction {
+        // Treat the bundled Android talent catalog as authoritative. The caller's
+        // displayed cost/parent are inputs, not permission to mint discounted or
+        // unknown talent unlocks.
+        val canonicalRule = when (talentId) {
+            "talent_speed_1" -> 100L to null
+            "talent_speed_2" -> 500L to "talent_speed_1"
+            "talent_crit_1" -> 250L to null
+            "talent_crit_2" -> 1_000L to "talent_crit_1"
+            "talent_reward_1" -> 2_500L to "talent_crit_2"
+            "talent_master_1" -> 10_000L to "talent_reward_1"
+            else -> return rejected(state, "Unknown talent.")
+        }
+        val (canonicalCost, canonicalParentId) = canonicalRule
+        if (cost != canonicalCost || requiredParentId != canonicalParentId) {
+            return rejected(state, "Talent definition does not match the canonical catalog.")
+        }
         if (talentId in state.prestigeShopPurchases) return rejected(state, "Already unlocked.")
-        if (state.prestige < BigNumber(cost)) return rejected(state, "Not enough Prestige.")
-        if (requiredParentId != null && requiredParentId !in state.prestigeShopPurchases) {
+        if (state.prestige < BigNumber(canonicalCost)) return rejected(state, "Not enough Prestige.")
+        if (canonicalParentId != null && canonicalParentId !in state.prestigeShopPurchases) {
             return rejected(state, "Unlock the prerequisite talent first.")
         }
         return accepted(

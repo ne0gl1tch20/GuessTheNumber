@@ -26,6 +26,13 @@ The historical Stage 2-D evidence below describes earlier commits and must not b
 | User-reported Windows runtime checks (2026-10-16) | User confirmed Enter submission, Submit button, shop/reward/progression checks and restart/save check passed. | **Passed by user report**; not independently observed in this session |
 | Additional Windows runtime coverage | Resizing/high-DPI, localization, update-channel and full installer lifecycle | **Unverified**; do not infer these from CI or the focused gameplay checks |
 
+## Stage 2-D follow-up — talent transaction hardening
+
+- The desktop talent transaction now validates talent IDs, exact canonical costs, and prerequisite IDs against the Android talent catalog before changing Prestige or unlock state.
+- Added deterministic regression coverage for unknown talents, caller-supplied discounted/negative costs, prerequisite mismatches, missing prerequisites, successful purchase at the canonical cost, and duplicate purchases.
+- This closes a transaction-integrity gap in the Stage 2 economy review. It does **not** prove the talent effects themselves are fully applied at runtime, and it does not close the overall Stage 2 gate.
+- Windows and Android CI for this new candidate must pass before this change is considered validated. Runtime checks of talent effects and the remaining W1/W2 rows are still required.
+
 ## Current findings
 
 - Android and Windows use the same production `GameEngine` and `GameState` source boundary, so this slice avoids a second desktop-only implementation of guessing rules.

@@ -474,16 +474,49 @@ class DesktopEconomyTransactionsTest {
 
     @Test
     fun talentRequiresParentAndCannotBePurchasedTwice() {
-        val locked = GameState(prestige = BigNumber(100))
-        val rejected = DesktopEconomyTransactions.buyTalent(locked, "talent_reward_1", 10)
+        val locked = GameState(prestige = BigNumber(3_000))
+        val rejected = DesktopEconomyTransactions.buyTalent(locked, "talent_reward_1", 2_500)
         assertFalse(rejected.accepted)
         assertEquals(locked, rejected.state)
 
         val ready = locked.copy(prestigeShopPurchases = setOf("talent_crit_2"))
-        val bought = DesktopEconomyTransactions.buyTalent(ready, "talent_reward_1", 10)
+        val bought = DesktopEconomyTransactions.buyTalent(ready, "talent_reward_1", 2_500)
         assertTrue(bought.accepted)
-        assertEquals(BigNumber(90), bought.state.prestige)
+        assertEquals(BigNumber(500), bought.state.prestige)
         assertTrue("talent_reward_1" in bought.state.prestigeShopPurchases)
+
+        val duplicate = DesktopEconomyTransactions.buyTalent(bought.state, "talent_reward_1", 2_500)
+        assertFalse(duplicate.accepted)
+        assertEquals(bought.state, duplicate.state)
+    }
+
+    @Test
+    fun talentPurchaseRejectsUnknownOrDiscountedDefinitionsAtomically() {
+        val initial = GameState(
+            prestige = BigNumber(20_000),
+            prestigeShopPurchases = setOf("talent_crit_2")
+        )
+        val unknown = DesktopEconomyTransactions.buyTalent(initial, "talent_admin", 1)
+        assertFalse(unknown.accepted)
+        assertEquals(initial, unknown.state)
+
+        val discounted = DesktopEconomyTransactions.buyTalent(initial, "talent_reward_1", 1)
+        assertFalse(discounted.accepted)
+        assertEquals(initial, discounted.state)
+
+        val negativeCost = DesktopEconomyTransactions.buyTalent(initial, "talent_reward_1", -2_500)
+        assertFalse(negativeCost.accepted)
+        assertEquals(initial, negativeCost.state)
+    }
+
+    @Test
+    fun talentPurchaseRejectsCallerSuppliedPrerequisiteMismatch() {
+        val initial = GameState(prestige = BigNumber(20_000))
+        val result = DesktopEconomyTransactions.buyTalent(
+            initial, "talent_speed_2", 500, requiredParentId = null
+        )
+        assertFalse(result.accepted)
+        assertEquals(initial, result.state)
     }
 
     @Test
