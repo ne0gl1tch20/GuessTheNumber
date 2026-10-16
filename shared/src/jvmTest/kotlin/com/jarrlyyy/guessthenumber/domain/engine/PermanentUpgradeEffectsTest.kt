@@ -6,6 +6,7 @@ import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.random.Random
 
 class PermanentUpgradeEffectsTest {
     private val engine = GameEngine()
@@ -22,6 +23,20 @@ class PermanentUpgradeEffectsTest {
             0,
             engine.applyMoneyEarningBoost(state, BigNumber(100)).compareTo(BigNumber(1_400))
         )
+    }
+
+    @Test
+    fun actualGuessRewardUsesBothPermanentMoneyMultipliers() {
+        val baseState = GameState(targetNumber = 50)
+        val boostedState = baseState.copy(
+            prestigeUpgradeLevels = mapOf("prestige_money_boost" to 2),
+            ultraUpgradeLevels = mapOf("ultra_money_boost" to 3)
+        )
+
+        val base = GameEngine(Random(42)).processGuess(baseState, 50)
+        val boosted = GameEngine(Random(42)).processGuess(boostedState, 50)
+
+        assertEquals(0, (base.reward * BigNumber(14)).compareTo(boosted.reward))
     }
 
     @Test
