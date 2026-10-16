@@ -256,7 +256,7 @@ fun main() = application {
                         DesktopDestination.STATS -> {
                             Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
                                 ProductionGuessGameScreen(
-                                    section = when (shellState.destination) {
+                                    section = when (destination) {
                                         DesktopDestination.UPGRADES -> DesktopGameSection.UPGRADES
                                         DesktopDestination.SHOP -> DesktopGameSection.SHOP
                                         DesktopDestination.MORE -> DesktopGameSection.MORE
