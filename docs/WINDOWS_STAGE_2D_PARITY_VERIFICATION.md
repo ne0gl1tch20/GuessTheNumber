@@ -1,6 +1,6 @@
 # Windows Migration Stage 2-D — Parity Verification
 
-**Status:** PR #220 is merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f` with Android and Windows CI passing. Current candidate PR #221 ports all five Android Arcade minigames to Windows with catalog parity validation; its CI is pending. The owner reports the previous Auto Clicker and Talent Web manual checks passed. Stage 2 exit gate remains open pending current candidate CI, Windows runtime verification and remaining W1/W2 parity.  
+**Status:** PR #221 merged the five Windows Arcade minigames with Android/Windows CI passing. PR #222 fixed the nested vertical-scroll exception in the Arcade route; both CI workflows passed on its exact head and the owner confirmed Arcade opens successfully in the Windows app. The Stage 2 exit gate remains open for broader W1/W2 parity and unverified runtime behavior.  
 **Reviewed:** 2026-10-16  
 **Scope:** Deterministic core guess transitions and Windows save/reload integration. This is not a claim of full gameplay/economy or runtime parity.
 
@@ -10,7 +10,7 @@ Historical evidence below refers to the commits named in each row and is not aut
 
 - [Android Validation and Tests, run 38901674190](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38901674190): **passed** for PR #217 head `9162283e57f3c310e59e474b917ff13caa19f0ab`.
 - [Windows Desktop CI, run 38901674304](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38901674304): **passed** for that same PR #217 head, including compilation/tests and MSI upgrade verification.
-- PR #218 adds catalog-driven talent validation; its checks are separate and pending. No runtime screenshot parity or full Windows runtime verification is claimed.
+- PR #218's catalog-driven talent validation is merged; Android Validation and Windows Desktop CI passed on its exact head. No runtime screenshot parity or full Windows runtime verification is claimed.
 - **Stage 2-D / Stage 2 exit gate: still open.** Earlier successful workflow runs listed below are historical evidence for their specific commits only.
 
 ## Evidence collected
@@ -45,12 +45,12 @@ Historical evidence below refers to the commits named in each row and is not aut
 - Historical CI passed on commit `38c7421`: [Windows Desktop CI run 38840144782](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144782) and [Android Validation run 38840144773](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144773). These are historical results, not validation for later candidates.
 - The user reports that focused Windows checks passed, including Enter-to-submit, button submission, shop/reward/progression checks and restart/save persistence. This is recorded as user-reported runtime evidence, not an independently witnessed session.
 - Existing deterministic economy tests cover stacked bonus totals, Nebula Crystal doubling daily-quest/achievement/guess rewards, Golden Guess Pass on every tenth lifetime guess, one-time achievement rewards, world requirement enforcement and idempotence.
-- The Stage 2 follow-up candidate adds exact-cost 1/10/100/MAX purchases across Money, Prestige and Ultra upgrades, plus mutator toggles and confirmation dialogs for Prestige/Ultra resets. Bulk buys now take the largest affordable prefix for 10/100/MAX, matching Android. The desktop catalog reader now loads from `game/`, with canonical talent, Prestige shop and Ultra shop JSON bundled; deterministic tests cover catalog loading, bulk costs/affordability and mutator range/validation. These additions still need candidate CI and user runtime verification.
+- The merged Stage 2 follow-up adds exact-cost 1/10/100/MAX purchases across Money, Prestige and Ultra upgrades, mutator toggles and confirmation dialogs for Prestige/Ultra resets. Bulk buys take the largest affordable prefix for 10/100/MAX, matching Android. The desktop catalog reader loads canonical talent, Prestige shop and Ultra shop JSON from `game/`; deterministic tests cover catalog loading, bulk costs/affordability and mutator range/validation. Keep broader Windows runtime verification of these flows open.
 - CI and those focused checks do not establish full parity for every W1/W2 row. Window resizing/high-DPI, localization, update-channel behavior and full MSI lifecycle remain unverified.
 
 ## Stage 2-D gate
 
-**Not passed yet.** PR #217's Windows Desktop CI and Android Validation passed, and the user reports focused runtime checks for Enter submission, Submit button, shop/rewards/progression and restart/save passed. PR #218's catalog-driven talent validation still needs its own CI results. The remaining gate is broader W1/W2 parity review and evidence: verify required economy/reward/reset behavior against Android and close any remaining gaps, keeping untested runtime rows explicitly unverified. Full world map/boss/activity screens remain Stage 3 work. Do not call Stage 2 complete until the complete W1/W2 requirements are evidenced.
+**Not passed yet.** PRs #217–#222 are merged with their required CI passing, and the owner has confirmed focused runtime checks including Enter/button submission, shop/rewards/progression, restart/save and that the Windows Arcade route now opens without the nested-scroll crash. The remaining gate is broader W1/W2 parity review and evidence: verify required economy/reward/reset behavior against Android and close remaining gaps, keeping untested runtime rows explicitly unverified. Full world map/boss/activity screens remain Stage 3 work. Do not call Stage 2 complete until the complete W1/W2 requirements are evidenced.
 
 ## Next required checks
 
@@ -125,13 +125,12 @@ Examples: a Windows-only keyboard shortcut that opens the reset confirmation is 
 - The Windows main navigation order is Play, Upgrades, Shop, Prestige, Ultra, Settings, Arcade, Music Player, Save Slots, Statistics, World Map, Changelog, More. It defaults to the left rail and supports scrollable layouts. Android navigation is unchanged.
 - **Automated validation passed:** Android Validation [run 38910080423](${android}) and Windows Desktop CI [run 38910065849](${windows}) both succeeded on the exact PR head before merge. A duplicate Windows run [also passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910080000).
 - **Manual verification now required:** in the merged Windows build, buy levels in all six upgrades; check money earnings, Prestige reward, starting Money after both reset types, Ultra reward and its 2,000 cap, achievement/Arcade Nebula payouts and save/reload persistence. Check that the desktop main nav is scrollable and every item opens its intended route.
-- **Known feature gap:** Windows Arcade and Music Player are exposed in navigation but currently route to placeholder screens. The shared Nebula upgrade rule is ready, but Arcade payout behavior cannot be manually verified on Windows until the Arcade screen is implemented.
+- **Known feature gap:** Windows Arcade is implemented and its route now opens without the reported nested-scroll crash, but the individual minigames' reward behavior and persistence still need runtime checks. Music Player remains a placeholder.
 
 
-## Current candidate — Windows Arcade parity (PR #221)
+## Merged Windows Arcade parity and scroll fix (PRs #221–#222)
 
-- The desktop port loads all five minigames from a packaged `game/minigames.json` resource. `tools/validate_json_assets.py` now checks that resource against Android's canonical asset.
-- Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush preserve the Android timer/input/outcome flow and payout amounts.
-- Reward claims use `DesktopEconomyTransactions.awardArcadeReward`, applying shared permanent Money and Nebula boosts, updating earned-currency statistics and saving through the active slot.
-- **Candidate CI:** pending. **Manual verification after CI:** exercise all five games, include a losing/incorrect path and a winning path, check reward multipliers and save/reload persistence, and verify that a missing/invalid catalog fails closed without issuing rewards.
-- Music Player remains a separate Windows placeholder and is not covered by this Arcade change.
+- PR #221 loads all five minigames from packaged `game/minigames.json`; `tools/validate_json_assets.py` checks parity with Android's canonical asset. Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38913830827) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38913830817) on the exact PR head.
+- Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush use Android-matching timers, target ranges, success/failure behavior and payout amounts. Rewards use `DesktopEconomyTransactions.awardArcadeReward`, applying shared permanent Money/Nebula boosts, updating earned-currency statistics and saving through the active slot.
+- PR #222 renders Arcade outside the parent vertical scroll container to prevent the infinite-height nested-scroll exception. Android Validation and Windows Desktop CI passed on the PR head; the owner confirmed Arcade opens successfully at runtime.
+- **Still to verify at runtime:** each minigame's win/loss path, reward multipliers, save/reload persistence, localization and the invalid-catalog failure path. Music Player remains a separate Windows placeholder.
