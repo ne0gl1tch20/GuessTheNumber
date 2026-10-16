@@ -22,4 +22,19 @@ class DesktopEconomyCatalogTest {
         assertTrue(catalog.shopItems.any { it.id == "auto_clicker_basic" })
         assertTrue(catalog.shopItems.any { it.id.startsWith("cosmetic_") })
     }
+
+    @Test
+    fun repositoryLoadsCanonicalTalentAndCurrencyShopCatalogsFromGameResources() {
+        val repository = DesktopEconomyRepository()
+
+        assertEquals(6, repository.talents().size)
+        assertEquals(
+            listOf("prestige_auto_speed", "prestige_luck_charm"),
+            repository.prestigeShopItems().map { it.id }
+        )
+        assertEquals(
+            listOf("ultra_universal_harmony", "ultra_infinite_multiplier", "ultra_flex_badge"),
+            repository.ultraShopItems().map { it.id }
+        )
+    }
 }

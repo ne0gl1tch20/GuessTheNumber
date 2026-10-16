@@ -65,20 +65,24 @@ This replaces the Windows-related phases buried in the temporary KMP migration r
 
 ### W1. Core gameplay loop
 
-- [ ] Guess input, submit behavior, target/range presentation and feedback.
-- [ ] Correct/incorrect rewards, attempts, streaks, Frenzy and relevant mutators.
-- [ ] Rate limiting, validation, boundary handling and blind-feedback behavior.
-- [ ] Quick-buy controls, base upgrades and shop.
-- [ ] Persist/reload a run and verify reward/counter consistency.
+- [x] Guess input and Submit/Enter behavior use the production engine; range and whole-number validation are implemented. User-reported focused runtime checks passed for Enter and button submission.
+- [x] Correct/incorrect rewards, attempts, streaks and Frenzy flow through the shared production engine.
+- [x] Expose the four shared mutators on Windows, recalculate the range/target on toggle, and hide direction hints for Blind.
+- [ ] Verify rate limiting and the full set of invalid, boundary, post-solve and mutator runtime cases.
+- [x] Add 1/10/100/MAX quick-buy selection with exact combined costs and atomic bulk purchase transactions for Money, Prestige and Ultra upgrades.
+- [x] Persist/reload a run through the desktop save adapter; user reported the focused restart/save check passed.
+- [ ] Complete the remaining Android economy/catalog effect parity review and confirm current candidate CI/runtime checks.
 
 **Exit:** The full core loop works on Windows and matches Android rules for deterministic cases.
 
 ### W2. Economy and resets
 
-- [ ] Prestige and Ultra flows, requirements, confirmation and rewards.
-- [ ] Nebula currency, permanent upgrades and talent tree.
-- [ ] Large-number display and calculations preserve Android semantics.
-- [ ] Test costs, rounding, reset preservation and duplicate reward prevention.
+- [x] Prestige and Ultra flows enforce shared requirements/rewards and now require confirmation before reset.
+- [x] Load talent names, descriptions, costs and prerequisites from the canonical Android talent catalog.
+- [ ] Finish parity for remaining permanent Prestige/Ultra shop effects and confirm their Android behavior before enabling purchases.
+- [ ] Verify large-number display and calculations across representative Android-matching cases.
+- [x] Add deterministic exact-cost bulk-purchase tests and retain reset-preservation/duplicate-reward tests.
+- [ ] Verify all reset preservation and boundary cases on the current candidate.
 
 **Exit:** Economy and reset flows preserve progression and do not corrupt or duplicate rewards.
 
@@ -151,6 +155,19 @@ The PR #202 candidate commit `38c7421c38b476c71e9baaca5cb7d4dc8c8cfea0` passed b
 The user reports passing focused Windows runtime checks for Enter-to-submit, button submission, shop/reward/progression behavior and restart/save persistence. These are recorded as user-reported checks, not independently observed runtime evidence. Broader W0/W1/W2 items (including resizing/high-DPI, localization, full economy parity, update channels and MSI lifecycle) are not thereby verified.
 
 The detailed evidence log is [WINDOWS_STAGE_2D_PARITY_VERIFICATION.md](WINDOWS_STAGE_2D_PARITY_VERIFICATION.md). **Stage 2 remains open** until remaining W1/W2 parity gaps are reviewed and every required gate has evidence. Do not start Stage 3 implementation ahead of that gate.
+
+### Stage 2 economy parity implementation candidate (2026-10-16)
+
+Branch: [`feat/windows-stage-2-economy-parity`](https://github.com/ne0gl1tch20/GuessTheNumber/tree/feat/windows-stage-2-economy-parity).
+
+This candidate closes several concrete gaps found during Stage 2-D review:
+- exact-cost 1/10/100/MAX upgrade purchases for Money, Prestige and Ultra;
+- a shared buy-multiplier state and atomic rejection when a fixed batch is unaffordable;
+- Windows mutator controls using shared engine validation/range rules, including Blind feedback behavior;
+- explicit confirmation before Prestige/Ultra resets;
+- deterministic tests for bulk cost, MAX affordability and mutator validation/range behavior.
+
+Follow-up source review replaced the hardcoded Windows talent list with the canonical Android talent catalog, including costs, descriptions and prerequisite IDs. It also fixed the desktop resource lookup to use the bundled `game/` directory and added the missing canonical talent, Prestige shop and Ultra shop JSON resources. Bulk purchase calculations now use Android's largest-affordable-prefix behavior for 10/100/MAX. These source changes are not yet validated by CI or new Windows runtime checks. The full Stage 2 gate remains open. Remaining review items include rate-limiting/edge-case parity, remaining Prestige/Ultra shop effect parity, broader large-number and reset checks, and actual Windows runtime evidence for mutators and bulk buys.
 
 ## Stage 1 source audit (2026-10-15)
 

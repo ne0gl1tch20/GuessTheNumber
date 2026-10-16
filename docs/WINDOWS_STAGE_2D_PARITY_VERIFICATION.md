@@ -29,6 +29,7 @@
 - Candidate CI is confirmed on commit `38c7421`: [Windows Desktop CI run 38840144782](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144782) and [Android Validation run 38840144773](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144773) both completed successfully.
 - The user reports that focused Windows checks passed, including Enter-to-submit, button submission, shop/reward/progression checks and restart/save persistence. This is recorded as user-reported runtime evidence, not an independently witnessed session.
 - Existing deterministic economy tests cover stacked bonus totals, Nebula Crystal doubling daily-quest/achievement/guess rewards, Golden Guess Pass on every tenth lifetime guess, one-time achievement rewards, world requirement enforcement and idempotence.
+- The Stage 2 follow-up candidate adds exact-cost 1/10/100/MAX purchases across Money, Prestige and Ultra upgrades, plus mutator toggles and confirmation dialogs for Prestige/Ultra resets. Bulk buys now take the largest affordable prefix for 10/100/MAX, matching Android. The desktop catalog reader now loads from `game/`, with canonical talent, Prestige shop and Ultra shop JSON bundled; deterministic tests cover catalog loading, bulk costs/affordability and mutator range/validation. These additions still need candidate CI and user runtime verification.
 - CI and those focused checks do not establish full parity for every W1/W2 row. Window resizing/high-DPI, localization, update-channel behavior and full MSI lifecycle remain unverified.
 
 ## Stage 2-D gate
@@ -40,4 +41,5 @@
 1. **Done for the candidate:** Android Validation run 38840144773 and Windows Desktop CI run 38840144782 passed on commit `38c7421`.
 2. **Automated fixtures present:** exact stacked reward totals, Nebula Crystal reward doubling, Golden Guess Pass tenth-guess behavior, achievement reward idempotence and world unlock/select requirements are covered by `DesktopEconomyTransactionsTest`.
 3. **Focused runtime checks reported passed by user:** Enter/button submission, shop/rewards/progression and restart/save. Broader windowing, localization, update and installer runtime checks remain unverified.
-4. Review remaining W1/W2 feature-parity rows against Android and close any concrete gaps before declaring Stage 2 complete.
+4. **New candidate still pending validation:** [Stage 2 economy parity branch](https://github.com/ne0gl1tch20/GuessTheNumber/tree/feat/windows-stage-2-economy-parity) adds bulk buys, mutator controls and reset confirmations. Do not treat the added tests as passing until CI reports success.
+5. Remaining gaps: rate-limiting/edge-case parity, canonical talent/catalog effects, broad large-number and reset checks, and actual Windows runtime checks for mutators and bulk purchases. Review remaining W1/W2 rows against Android before declaring Stage 2 complete.

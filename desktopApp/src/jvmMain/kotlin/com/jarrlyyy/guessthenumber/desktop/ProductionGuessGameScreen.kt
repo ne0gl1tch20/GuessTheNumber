@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -31,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.DesktopGuessingBot
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRepository
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import com.jarrlyyy.guessthenumber.desktop.economy.EconomyTransaction
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveStore
@@ -55,12 +58,15 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
     val saveStore = remember { DesktopSaveStore(defaultDesktopSaveDirectory()) }
     val catalogResult = remember { runCatching { DesktopEconomyCatalog.load() } }
     val catalog = catalogResult.getOrNull()
+    val talentCatalogResult = remember { runCatching { DesktopEconomyRepository().talents() } }
+    val talentCatalog = talentCatalogResult.getOrNull()
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<GameState?>(null) }
     var guessText by remember { mutableStateOf("") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
     var isSaving by remember { mutableStateOf(false) }
     var autoClickerFailurePaused by remember { mutableStateOf(false) }
+    var pendingReset by remember { mutableStateOf<String?>(null) }
     val latestSaving by rememberUpdatedState(isSaving)
 
     LaunchedEffect(Unit) {
@@ -111,6 +117,13 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             val saved = withContext(Dispatchers.IO) { saveStore.save(1, progressedState) }
             if (saved) {
                 state = progressedState
+                if (
+                    before.activeMutators != progressedState.activeMutators ||
+                    before.currentRangeMin != progressedState.currentRangeMin ||
+                    before.currentRangeMax != progressedState.currentRangeMax
+                ) {
+                    autoClicker.reset(progressedState.currentRangeMin, progressedState.currentRangeMax)
+                }
                 if (before.autoClickerActive != progressedState.autoClickerActive) {
                     autoClickerFailurePaused = false
                 }
@@ -247,8 +260,12 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                                 autoClickerFailurePaused = false
                                 state = finalState
                                 feedback = when (result.feedback) {
-                                    GuessFeedback.TOO_LOW -> "Too low. Try again!"
-                                    GuessFeedback.TOO_HIGH -> "Too high. Try again!"
+                                    GuessFeedback.TOO_LOW -> if ("mut_blind" in finalState.activeMutators) {
+                                        "Guess recorded. Blind mutator hides direction hints."
+                                    } else "Too low. Try again!"
+                                    GuessFeedback.TOO_HIGH -> if ("mut_blind" in finalState.activeMutators) {
+                                        "Guess recorded. Blind mutator hides direction hints."
+                                    } else "Too high. Try again!"
                                     GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - currentState.money} Money." +
                                         if (finalState.lootEventId > currentState.lootEventId) " Treasure drop: ${finalState.lastLootDropTier} chest!" else ""
                                 }
@@ -282,6 +299,26 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
             }
             Text(feedback, style = MaterialTheme.typography.bodyLarge)
+
+            SectionTitle("Mutators")
+            val mutators = listOf(
+                Triple("mut_hardcore", "Hardcore", "Doubles the guessing range and rewards."),
+                Triple("mut_speed", "Speed", "Triples correct-guess rewards."),
+                Triple("mut_blind", "Blind", "Quintuples rewards and hides too-low/too-high hints."),
+                Triple("mut_tax", "Tax", "Multiplies rewards and applies the shared incorrect-guess tax.")
+            )
+            mutators.forEach { (id, name, description) ->
+                val active = id in currentState.activeMutators
+                EconomyActionCard(
+                    title = name,
+                    description = description,
+                    detail = if (active) "Active · Reward multiplier is applied by the shared game engine." else "Inactive",
+                    action = if (active) "Disable" else "Enable",
+                    enabled = !isSaving
+                ) {
+                    commitTransaction { DesktopEconomyTransactions.setMutatorActive(it, id, !active, engine) }
+                }
+            }
 
             SectionTitle("Daily quests")
             val dailyQuests = listOf(
@@ -361,18 +398,36 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             }
 
             SectionTitle("Money upgrades")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Buy multiplier:")
+                listOf("1", "10", "100", "MAX").forEach { multiplier ->
+                    Button(
+                        onClick = {
+                            commitTransaction { DesktopEconomyTransactions.setBuyMultiplier(it, multiplier) }
+                        },
+                        enabled = !isSaving && currentState.buyMultiplier != multiplier
+                    ) {
+                        Text(if (currentState.buyMultiplier == multiplier) "✓ $multiplier" else multiplier)
+                    }
+                }
+            }
+            Text(
+                "Bulk purchases charge the exact combined cost. MAX buys the largest affordable batch.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             if (catalog == null) {
                 Text("Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}")
             } else {
                 catalog.upgrades.forEach { upgrade ->
                     val level = currentState.upgradeLevels[upgrade.id] ?: 0
-                    val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+                    val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, level, currentState.buyMultiplier, currentState.money)
                     EconomyActionCard(
                         title = upgrade.name,
                         description = upgrade.description,
-                        detail = "Level $level / ${upgrade.maxLevel} · Cost: $cost Money",
-                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy",
-                        enabled = !isSaving && level < upgrade.maxLevel && currentState.money >= cost
+                        detail = "Level $level / ${upgrade.maxLevel} · Batch cost: $cost Money",
+                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy ×${currentState.buyMultiplier}",
+                        enabled = !isSaving && level < upgrade.maxLevel && cost > BigNumber.ZERO && currentState.money >= cost
                     ) {
                         commitTransaction { DesktopEconomyTransactions.buyUpgrade(it, upgrade) }
                     }
@@ -383,19 +438,19 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 val prestigeReward = engine.calculatePrestigeReward(currentState.money, currentState.prestigeCount)
                 Text("Requirement: $prestigeRequirement Money · Estimated reward: $prestigeReward Prestige")
                 Button(
-                    onClick = { commitTransaction { DesktopEconomyTransactions.prestigeReset(it, engine) } },
+                    onClick = { pendingReset = "prestige" },
                     enabled = !isSaving && currentState.money >= prestigeRequirement && prestigeReward > BigNumber.ZERO
                 ) { Text("Prestige reset") }
 
                 catalog.prestigeUpgrades.forEach { upgrade ->
                     val level = currentState.prestigeUpgradeLevels[upgrade.id] ?: 0
-                    val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+                    val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, level, currentState.buyMultiplier, currentState.prestige)
                     EconomyActionCard(
                         title = upgrade.name,
                         description = upgrade.description,
-                        detail = "Level $level / ${upgrade.maxLevel} · Cost: $cost Prestige",
-                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy",
-                        enabled = !isSaving && level < upgrade.maxLevel && currentState.prestige >= cost
+                        detail = "Level $level / ${upgrade.maxLevel} · Batch cost: $cost Prestige",
+                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy ×${currentState.buyMultiplier}",
+                        enabled = !isSaving && level < upgrade.maxLevel && cost > BigNumber.ZERO && currentState.prestige >= cost
                     ) {
                         commitTransaction { DesktopEconomyTransactions.buyPrestigeUpgrade(it, upgrade) }
                     }
@@ -406,20 +461,20 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 val ultraReward = engine.calculateUltraReward(currentState.money, currentState.ultraCount)
                 Text("Requirement: $ultraRequirement Money and 1,000 Prestige · Estimated reward: $ultraReward Ultra")
                 Button(
-                    onClick = { commitTransaction { DesktopEconomyTransactions.ultraReset(it, engine) } },
+                    onClick = { pendingReset = "ultra" },
                     enabled = !isSaving && currentState.money >= ultraRequirement &&
                         currentState.prestige >= BigNumber(1_000) && ultraReward > BigNumber.ZERO
                 ) { Text("Ultra reset") }
 
                 catalog.ultraUpgrades.forEach { upgrade ->
                     val level = currentState.ultraUpgradeLevels[upgrade.id] ?: 0
-                    val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+                    val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, level, currentState.buyMultiplier, currentState.ultra)
                     EconomyActionCard(
                         title = upgrade.name,
                         description = upgrade.description,
-                        detail = "Level $level / ${upgrade.maxLevel} · Cost: $cost Ultra",
-                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy",
-                        enabled = !isSaving && level < upgrade.maxLevel && currentState.ultra >= cost
+                        detail = "Level $level / ${upgrade.maxLevel} · Batch cost: $cost Ultra",
+                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy ×${currentState.buyMultiplier}",
+                        enabled = !isSaving && level < upgrade.maxLevel && cost > BigNumber.ZERO && currentState.ultra >= cost
                     ) {
                         commitTransaction { DesktopEconomyTransactions.buyUltraUpgrade(it, upgrade) }
                     }
@@ -446,24 +501,31 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 }
 
                 SectionTitle("Talents")
-                val talents = listOf(
-                    Triple("talent_speed_1", "Quick Hands", 10L),
-                    Triple("talent_crit_1", "Critical Focus", 25L),
-                    Triple("talent_crit_2", "Critical Mastery", 50L),
-                    Triple("talent_reward_1", "Reward Resonance", 100L),
-                    Triple("talent_speed_2", "Rapid Hands", 75L),
-                    Triple("talent_master_1", "Mastery", 250L)
-                )
-                talents.forEach { (id, name, cost) ->
-                    val owned = id in currentState.prestigeShopPurchases
-                    EconomyActionCard(
-                        title = name,
-                        description = id.replace('_', ' '),
-                        detail = if (owned) "Unlocked" else "Cost: $cost Prestige",
-                        action = if (owned) "Owned" else "Unlock",
-                        enabled = !isSaving && !owned && currentState.prestige >= BigNumber(cost)
-                    ) {
-                        commitTransaction { DesktopEconomyTransactions.buyTalent(it, id, cost) }
+                if (talentCatalog == null) {
+                    Text("Talent catalog could not be loaded: ${talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"}")
+                } else {
+                    talentCatalog.forEach { talent ->
+                        val owned = talent.id in currentState.prestigeShopPurchases
+                        val parentOwned = talent.requiredParentId == null ||
+                            talent.requiredParentId in currentState.prestigeShopPurchases
+                        EconomyActionCard(
+                            title = talent.name,
+                            description = talent.description,
+                            detail = when {
+                                owned -> "Unlocked"
+                                !parentOwned -> "Cost: ${talent.cost} Prestige · Requires ${talent.requiredParentId}"
+                                else -> "Cost: ${talent.cost} Prestige"
+                            },
+                            action = if (owned) "Owned" else if (!parentOwned) "Locked" else "Unlock",
+                            enabled = !isSaving && !owned && parentOwned &&
+                                currentState.prestige >= BigNumber(talent.cost)
+                        ) {
+                            commitTransaction {
+                                DesktopEconomyTransactions.buyTalent(
+                                    it, talent.id, talent.cost, talent.requiredParentId
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -474,6 +536,40 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+
+    val resetKind = pendingReset
+    if (resetKind != null) {
+        val isPrestige = resetKind == "prestige"
+        AlertDialog(
+            onDismissRequest = { if (!isSaving) pendingReset = null },
+            title = { Text(if (isPrestige) "Confirm Prestige reset?" else "Confirm Ultra reset?") },
+            text = {
+                Text(
+                    if (isPrestige) {
+                        "This resets Money and regular upgrade levels, then grants Prestige. Your Prestige upgrades and other preserved progression stay."
+                    } else {
+                        "This resets Money, Prestige and regular/Prestige upgrade levels, then grants Ultra. Your Ultra upgrades and other preserved progression stay."
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        pendingReset = null
+                        if (isPrestige) {
+                            commitTransaction { DesktopEconomyTransactions.prestigeReset(it, engine) }
+                        } else {
+                            commitTransaction { DesktopEconomyTransactions.ultraReset(it, engine) }
+                        }
+                    },
+                    enabled = !isSaving
+                ) { Text(if (isPrestige) "Reset for Prestige" else "Reset for Ultra") }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingReset = null }, enabled = !isSaving) { Text("Cancel") }
+            }
+        )
     }
 }
 

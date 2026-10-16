@@ -34,8 +34,9 @@ class DesktopEconomyRepository(
 
     private companion object {
         fun readClasspathResource(name: String): String {
-            val stream = DesktopEconomyRepository::class.java.classLoader.getResourceAsStream(name)
-                ?: error("Missing game economy resource: $name")
+            val resourcePath = "game/$name"
+            val stream = DesktopEconomyRepository::class.java.classLoader.getResourceAsStream(resourcePath)
+                ?: error("Missing game economy resource: $resourcePath")
             return stream.bufferedReader(Charsets.UTF_8).use { it.readText() }
         }
     }

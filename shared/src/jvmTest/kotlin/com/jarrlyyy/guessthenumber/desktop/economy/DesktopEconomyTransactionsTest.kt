@@ -8,6 +8,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.random.Random
 
 class DesktopEconomyTransactionsTest {
     private val rewardUpgrade = UpgradeDef(
@@ -483,5 +484,105 @@ class DesktopEconomyTransactionsTest {
         assertTrue(bought.accepted)
         assertEquals(BigNumber(90), bought.state.prestige)
         assertTrue("talent_reward_1" in bought.state.prestigeShopPurchases)
+    }
+
+    @Test
+    fun bulkMoneyUpgradeChargesExactCombinedCostAndCountsOneQuestPurchase() {
+        val initial = GameState(money = BigNumber(1_000), buyMultiplier = "10")
+        val result = DesktopEconomyTransactions.buyUpgrade(initial, rewardUpgrade)
+
+        assertTrue(result.accepted)
+        assertEquals(3, result.state.upgradeLevels[rewardUpgrade.id])
+        assertEquals(0, result.state.statistics.moneySpent.compareTo(BigNumber(475)))
+        assertEquals(0, result.state.money.compareTo(BigNumber(525)))
+        assertEquals(1, result.state.dailyQuestUpgradePurchases)
+    }
+
+    @Test
+    fun maxUpgradeBuysOnlyLargestAffordablePrefix() {
+        val upgrade = rewardUpgrade.copy(maxLevel = 10, baseCost = "100", costMultiplier = 2.0)
+        val initial = GameState(money = BigNumber(350), buyMultiplier = "MAX")
+        val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, 0, "MAX", initial.money)
+        val result = DesktopEconomyTransactions.buyUpgrade(initial, upgrade)
+
+        assertEquals(0, cost.compareTo(BigNumber(300)))
+        assertTrue(result.accepted)
+        assertEquals(2, result.state.upgradeLevels[upgrade.id])
+        assertEquals(0, result.state.money.compareTo(BigNumber(50)))
+        assertEquals(0, result.state.statistics.moneySpent.compareTo(BigNumber(300)))
+    }
+
+    @Test
+    fun fixedBulkPurchaseBuysLargestAffordablePrefix() {
+        val initial = GameState(money = BigNumber(200), buyMultiplier = "10")
+        val cost = DesktopEconomyTransactions.upgradeBatchCost(rewardUpgrade, 0, "10", initial.money)
+        val result = DesktopEconomyTransactions.buyUpgrade(initial, rewardUpgrade)
+
+        assertEquals(BigNumber(100), cost)
+        assertTrue(result.accepted)
+        assertEquals(1, result.state.upgradeLevels[rewardUpgrade.id])
+        assertEquals(BigNumber(100), result.state.money)
+        assertEquals(BigNumber(100), result.state.statistics.moneySpent)
+    }
+
+    @Test
+    fun buyMultiplierAcceptsOnlySupportedModes() {
+        val initial = GameState()
+        assertEquals("MAX", DesktopEconomyTransactions.setBuyMultiplier(initial, "MAX").state.buyMultiplier)
+        val rejected = DesktopEconomyTransactions.setBuyMultiplier(initial, "1000")
+        assertFalse(rejected.accepted)
+        assertEquals(initial, rejected.state)
+    }
+
+    @Test
+    fun mutatorToggleUsesSharedRulesAndRefreshesRangeAndTarget() {
+        val engine = GameEngine()
+        val initial = GameState(currentRangeMin = 1, currentRangeMax = 100, targetNumber = 50)
+        val result = DesktopEconomyTransactions.setMutatorActive(
+            state = initial,
+            mutatorId = "mut_hardcore",
+            active = true,
+            engine = engine,
+            rng = Random(7)
+        )
+
+        assertTrue(result.accepted)
+        assertTrue("mut_hardcore" in result.state.activeMutators)
+        assertEquals(200L, result.state.currentRangeMax)
+        assertTrue(result.state.targetNumber in 1L..200L)
+    }
+
+    @Test
+    fun unknownMutatorIsRejectedWithoutChangingState() {
+        val initial = GameState()
+        val result = DesktopEconomyTransactions.setMutatorActive(
+            initial, "mut_not_real", true, GameEngine(), Random(1)
+        )
+
+        assertFalse(result.accepted)
+        assertEquals(initial, result.state)
+    }
+
+    @Test
+    fun canonicalTalentPrerequisiteIsEnforcedAndThenAllowsPurchase() {
+        val initial = GameState(prestige = BigNumber(1_000))
+        val blocked = DesktopEconomyTransactions.buyTalent(
+            initial, "talent_speed_2", 500L, "talent_speed_1"
+        )
+        assertFalse(blocked.accepted)
+        assertEquals(initial, blocked.state)
+
+        val root = DesktopEconomyTransactions.buyTalent(
+            initial, "talent_speed_1", 100L, null
+        )
+        assertTrue(root.accepted)
+        assertEquals(BigNumber(900), root.state.prestige)
+
+        val child = DesktopEconomyTransactions.buyTalent(
+            root.state, "talent_speed_2", 500L, "talent_speed_1"
+        )
+        assertTrue(child.accepted)
+        assertEquals(BigNumber(400), child.state.prestige)
+        assertTrue("talent_speed_2" in child.state.prestigeShopPurchases)
     }
 }

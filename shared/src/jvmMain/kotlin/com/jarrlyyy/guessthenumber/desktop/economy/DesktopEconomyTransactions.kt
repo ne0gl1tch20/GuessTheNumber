@@ -23,51 +23,98 @@ object DesktopEconomyTransactions {
     fun upgradeCost(upgrade: UpgradeDef, currentLevel: Int): BigNumber =
         BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(currentLevel)
 
+    private data class UpgradeBatch(val count: Int, val cost: BigNumber)
+
+    private fun upgradeBatch(
+        upgrade: UpgradeDef,
+        currentLevel: Int,
+        multiplier: String,
+        currency: BigNumber
+    ): UpgradeBatch {
+        if (currentLevel >= upgrade.maxLevel) return UpgradeBatch(0, BigNumber.ZERO)
+        val requested = when (multiplier) {
+            "10" -> 10
+            "100" -> 100
+            "MAX" -> upgrade.maxLevel - currentLevel
+            else -> 1
+        }.coerceAtMost(upgrade.maxLevel - currentLevel)
+        var count = 0
+        var total = BigNumber.ZERO
+        while (count < requested) {
+            val nextCost = upgradeCost(upgrade, currentLevel + count)
+            // Android buys the largest affordable prefix for 10, 100 and MAX.
+            // Keep the UI estimate and transaction behavior identical.
+            if (currency < total + nextCost) break
+            total += nextCost
+            count++
+        }
+        return UpgradeBatch(count, total)
+    }
+
+    /** Cost shown by the Windows UI; MAX means the largest currently affordable batch. */
+    fun upgradeBatchCost(
+        upgrade: UpgradeDef,
+        currentLevel: Int,
+        multiplier: String,
+        currency: BigNumber
+    ): BigNumber = upgradeBatch(upgrade, currentLevel, multiplier, currency).cost
+
+    fun setBuyMultiplier(state: GameState, multiplier: String): EconomyTransaction {
+        if (multiplier !in setOf("1", "10", "100", "MAX")) {
+            return rejected(state, "Unsupported buy multiplier.")
+        }
+        if (state.buyMultiplier == multiplier) return rejected(state, "Buy multiplier is already selected.")
+        return accepted(state.copy(buyMultiplier = multiplier), "Buy multiplier set to $multiplier.")
+    }
+
     fun buyUpgrade(initialState: GameState, upgrade: UpgradeDef): EconomyTransaction {
-        // Rejected purchases must remain atomic: even a stale daily-quest date
-        // must not mutate state when the upgrade is unaffordable or maxed out.
+        // Rejected purchases remain atomic, including when a batch is unaffordable.
         val level = initialState.upgradeLevels[upgrade.id] ?: 0
         if (level >= upgrade.maxLevel) return rejected(initialState, "Already at maximum level.")
-        val cost = upgradeCost(upgrade, level)
-        if (initialState.money < cost) return rejected(initialState, "Not enough Money.")
+        val batch = upgradeBatch(upgrade, level, initialState.buyMultiplier, initialState.money)
+        if (batch.count == 0) return rejected(initialState, "Not enough Money.")
+        if (initialState.money < batch.cost) return rejected(initialState, "Not enough Money.")
 
+        val newLevel = level + batch.count
         val state = refreshDailyQuestDay(initialState, LocalDate.now().toString())
         return accepted(
             state.copy(
-                money = state.money - cost,
-                upgradeLevels = state.upgradeLevels + (upgrade.id to (level + 1)),
-                statistics = state.statistics.copy(moneySpent = state.statistics.moneySpent + cost),
+                money = state.money - batch.cost,
+                upgradeLevels = state.upgradeLevels + (upgrade.id to newLevel),
+                statistics = state.statistics.copy(moneySpent = state.statistics.moneySpent + batch.cost),
                 dailyQuestUpgradePurchases = state.dailyQuestUpgradePurchases + 1
             ),
-            "Purchased ${upgrade.name} (level ${level + 1})."
+            "Purchased ${upgrade.name} (${batch.count} level(s), now level $newLevel)."
         )
     }
 
     fun buyPrestigeUpgrade(state: GameState, upgrade: UpgradeDef): EconomyTransaction {
         val level = state.prestigeUpgradeLevels[upgrade.id] ?: 0
         if (level >= upgrade.maxLevel) return rejected(state, "Already at maximum level.")
-        val cost = upgradeCost(upgrade, level)
-        if (state.prestige < cost) return rejected(state, "Not enough Prestige.")
+        val batch = upgradeBatch(upgrade, level, state.buyMultiplier, state.prestige)
+        if (batch.count == 0 || state.prestige < batch.cost) return rejected(state, "Not enough Prestige for that batch.")
+        val newLevel = level + batch.count
         return accepted(
             state.copy(
-                prestige = state.prestige - cost,
-                prestigeUpgradeLevels = state.prestigeUpgradeLevels + (upgrade.id to (level + 1))
+                prestige = state.prestige - batch.cost,
+                prestigeUpgradeLevels = state.prestigeUpgradeLevels + (upgrade.id to newLevel)
             ),
-            "Purchased ${upgrade.name} (level ${level + 1})."
+            "Purchased ${upgrade.name} (${batch.count} level(s), now level $newLevel)."
         )
     }
 
     fun buyUltraUpgrade(state: GameState, upgrade: UpgradeDef): EconomyTransaction {
         val level = state.ultraUpgradeLevels[upgrade.id] ?: 0
         if (level >= upgrade.maxLevel) return rejected(state, "Already at maximum level.")
-        val cost = upgradeCost(upgrade, level)
-        if (state.ultra < cost) return rejected(state, "Not enough Ultra.")
+        val batch = upgradeBatch(upgrade, level, state.buyMultiplier, state.ultra)
+        if (batch.count == 0 || state.ultra < batch.cost) return rejected(state, "Not enough Ultra for that batch.")
+        val newLevel = level + batch.count
         return accepted(
             state.copy(
-                ultra = state.ultra - cost,
-                ultraUpgradeLevels = state.ultraUpgradeLevels + (upgrade.id to (level + 1))
+                ultra = state.ultra - batch.cost,
+                ultraUpgradeLevels = state.ultraUpgradeLevels + (upgrade.id to newLevel)
             ),
-            "Purchased ${upgrade.name} (level ${level + 1})."
+            "Purchased ${upgrade.name} (${batch.count} level(s), now level $newLevel)."
         )
     }
 
@@ -247,6 +294,31 @@ object DesktopEconomyTransactions {
         val requirement: String
     )
 
+    fun setMutatorActive(
+        state: GameState,
+        mutatorId: String,
+        active: Boolean,
+        engine: GameEngine,
+        rng: Random = Random.Default
+    ): EconomyTransaction {
+        if (mutatorId !in setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")) {
+            return rejected(state, "Unknown mutator.")
+        }
+        if ((mutatorId in state.activeMutators) == active) {
+            return rejected(state, if (active) "Mutator is already active." else "Mutator is already inactive.")
+        }
+        val selected = state.activeMutators.toMutableSet().apply {
+            if (active) add(mutatorId) else remove(mutatorId)
+        }.toSet()
+        val updated = engine.applyMutatorSet(state, selected)
+        val rangeMax = engine.getRangeMax(updated).coerceAtLeast(1L)
+        val target = rng.nextLong(1L, rangeMax + 1L)
+        return accepted(
+            updated.copy(currentRangeMin = 1L, currentRangeMax = rangeMax, targetNumber = target),
+            if (active) "Enabled $mutatorId." else "Disabled $mutatorId."
+        )
+    }
+
     fun setAutoClickerActive(state: GameState, active: Boolean): EconomyTransaction {
         if ("auto_clicker_basic" !in state.shopPurchases) {
             return rejected(state, "Purchase the Auto Clicker first.")
@@ -418,16 +490,25 @@ object DesktopEconomyTransactions {
     }
 
     fun buyTalent(state: GameState, talentId: String, cost: Long): EconomyTransaction {
-        val parents = mapOf(
+        val legacyParents = mapOf(
             "talent_speed_2" to "talent_speed_1",
             "talent_crit_2" to "talent_crit_1",
             "talent_reward_1" to "talent_crit_2",
             "talent_master_1" to "talent_reward_1"
         )
+        return buyTalent(state, talentId, cost, legacyParents[talentId])
+    }
+
+    /** Uses the prerequisite declared by the canonical Android talent catalog. */
+    fun buyTalent(
+        state: GameState,
+        talentId: String,
+        cost: Long,
+        requiredParentId: String?
+    ): EconomyTransaction {
         if (talentId in state.prestigeShopPurchases) return rejected(state, "Already unlocked.")
         if (state.prestige < BigNumber(cost)) return rejected(state, "Not enough Prestige.")
-        val parent = parents[talentId]
-        if (parent != null && parent !in state.prestigeShopPurchases) {
+        if (requiredParentId != null && requiredParentId !in state.prestigeShopPurchases) {
             return rejected(state, "Unlock the prerequisite talent first.")
         }
         return accepted(
