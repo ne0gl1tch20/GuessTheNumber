@@ -20,6 +20,11 @@ PATTERNS = [
 
 
 def main() -> int:
+    # Windows PowerShell runners may default to cp1252; audit findings can
+    # contain Unicode punctuation that the active console encoding cannot print.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args()
