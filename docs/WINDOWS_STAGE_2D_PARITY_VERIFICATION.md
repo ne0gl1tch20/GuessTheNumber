@@ -104,6 +104,8 @@ Examples: a Windows-only keyboard shortcut that opens the reset confirmation is 
 ## Latest follow-up — canonical talent catalog (2026-10-16)
 
 - PR #217 merged the initial validation guard and both CI workflows passed for its exact head.
-- PR #218 changes the validation source from a hardcoded Kotlin map to the bundled `game/talents.json` resource, and adds a data-driven test over every catalog entry. The Android asset and desktop resource were confirmed byte-for-byte identical when this candidate was prepared.
+- PR #218 changes the validation source from a hardcoded Kotlin map to the bundled `game/talents.json` resource, adds a data-driven test over every catalog entry, and makes Talent Web parent gating use the catalog's `requiredParentId`. The Android asset and desktop resource were confirmed byte-for-byte identical when this candidate was prepared.
 - **PR #218 CI:** pending at the time of this documentation update. Update this status with the exact run links/results before merging.
 - **Manual verification still required:** open the Windows app, inspect the Talent Web, buy one affordable talent, verify its effect in gameplay, restart/reload, and confirm the purchase/effect persists. Also verify an unaffordable talent and a locked prerequisite cannot be purchased.
+
+- The Talent Web's visible English labels/descriptions still follow Android's fallback copy rather than the JSON display fields; Windows locale-aware rendering remains a separate parity gap and must not be marked verified.
