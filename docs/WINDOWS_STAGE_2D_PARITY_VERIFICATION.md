@@ -1,6 +1,6 @@
 # Windows Migration Stage 2-D — Parity Verification
 
-**Status:** PR #217 and PR #218 both merged after their exact-head Android Validation and Windows Desktop CI passed. Current follow-up centralizes Auto Clicker timing for Android/Windows; its CI is pending. Stage 2 exit gate remains open pending complete W1/W2 parity and full runtime evidence.  
+**Status:** PRs #217, #218 and #219 are merged after their exact-head Android Validation and Windows Desktop CI passed. PR #219 centralizes Auto Clicker timing; both workflows passed on head `e3a53eaba63a44d26bb4cff8e8457dc94b437c2a` (Android run 38904393281, Windows run 38904393086). Stage 2 exit gate remains open pending complete W1/W2 parity and full runtime evidence.  
 **Reviewed:** 2026-10-16  
 **Scope:** Deterministic core guess transitions and Windows save/reload integration. This is not a claim of full gameplay/economy or runtime parity.
 
@@ -114,6 +114,10 @@ Examples: a Windows-only keyboard shortcut that opens the reset confirmation is 
 ## Latest follow-up — Auto Clicker timing parity (2026-10-16)
 
 - The Android Auto Clicker previously calculated its interval from `autoClickerSpeed`, the two speed talents (1.25× and 1.5×), and the `mut_speed` multiplier (3×). Windows had a fixed 1,000 ms interval.
-- The follow-up moves that formula to shared `GameEngine.autoClickerDelayMillis` and calls it from both the Android ViewModel and Windows production Play flow. Tests cover default timing, both talent levels, stacked speed mutator, inactive state and non-positive speed.
-- **Candidate CI:** pending for the current follow-up branch; do not claim the timing change validated until Android and Windows workflows pass.
+- PR #219 moved that formula to shared `GameEngine.autoClickerDelayMillis` and calls it from both the Android ViewModel and Windows production Play flow. Tests cover default timing, both talent levels, stacked speed mutator, inactive state and non-positive speed. Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393281) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393086) on the same candidate head.
 - **Manual verification after merge:** on Windows, buy each speed talent, enable/disable `mut_speed`, confirm the Auto Clicker visibly speeds up/down as expected, then restart and verify the purchased talents persist.
+
+
+## Owner decision blocker — permanent Prestige/Ultra upgrade effects
+
+The canonical upgrade JSON advertises permanent Prestige/Ultra effects, but repository code search did not find production application of the six catalog IDs `prestige_money_boost`, `prestige_gain_boost`, `prestige_starting_capital`, `ultra_money_boost`, `ultra_gain_boost` and `ultra_nebula_boost` in Android gameplay logic. Their intended formulas/stacking are not fully specified by the catalog fields. Keep this W2 row open rather than inventing a Windows-only interpretation; the owner must decide whether to define and implement the effects in shared logic on both platforms or preserve current behavior.
