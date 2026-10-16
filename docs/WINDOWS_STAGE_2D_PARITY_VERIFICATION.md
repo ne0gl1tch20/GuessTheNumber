@@ -1,6 +1,6 @@
 # Windows Migration Stage 2-D — Parity Verification
 
-**Status:** PR #220 is merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f`; Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910080423) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910065849) on exact head `762d029c828f498b10f686e3d74f920865e17437`. The owner reports the previous Auto Clicker and Talent Web manual checks passed. Stage 2 exit gate remains open pending runtime verification of the newly merged effects/navigation and remaining W1/W2 parity.  
+**Status:** PR #220 is merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f` with Android and Windows CI passing. Current candidate PR #221 ports all five Android Arcade minigames to Windows with catalog parity validation; its CI is pending. The owner reports the previous Auto Clicker and Talent Web manual checks passed. Stage 2 exit gate remains open pending current candidate CI, Windows runtime verification and remaining W1/W2 parity.  
 **Reviewed:** 2026-10-16  
 **Scope:** Deterministic core guess transitions and Windows save/reload integration. This is not a claim of full gameplay/economy or runtime parity.
 
@@ -126,3 +126,12 @@ Examples: a Windows-only keyboard shortcut that opens the reset confirmation is 
 - **Automated validation passed:** Android Validation [run 38910080423](${android}) and Windows Desktop CI [run 38910065849](${windows}) both succeeded on the exact PR head before merge. A duplicate Windows run [also passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910080000).
 - **Manual verification now required:** in the merged Windows build, buy levels in all six upgrades; check money earnings, Prestige reward, starting Money after both reset types, Ultra reward and its 2,000 cap, achievement/Arcade Nebula payouts and save/reload persistence. Check that the desktop main nav is scrollable and every item opens its intended route.
 - **Known feature gap:** Windows Arcade and Music Player are exposed in navigation but currently route to placeholder screens. The shared Nebula upgrade rule is ready, but Arcade payout behavior cannot be manually verified on Windows until the Arcade screen is implemented.
+
+
+## Current candidate — Windows Arcade parity (PR #221)
+
+- The desktop port loads all five minigames from a packaged `game/minigames.json` resource. `tools/validate_json_assets.py` now checks that resource against Android's canonical asset.
+- Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush preserve the Android timer/input/outcome flow and payout amounts.
+- Reward claims use `DesktopEconomyTransactions.awardArcadeReward`, applying shared permanent Money and Nebula boosts, updating earned-currency statistics and saving through the active slot.
+- **Candidate CI:** pending. **Manual verification after CI:** exercise all five games, include a losing/incorrect path and a winning path, check reward multipliers and save/reload persistence, and verify that a missing/invalid catalog fails closed without issuing rewards.
+- Music Player remains a separate Windows placeholder and is not covered by this Arcade change.
