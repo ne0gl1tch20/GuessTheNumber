@@ -12,7 +12,7 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 - Existing guessing, mutator, daily quest, achievement and world progression controls stay together on Play instead of being split into a separate Progress destination.
 - Regular Money upgrades are under Upgrades.
 - Nebula purchases are under Shop.
-- Existing Prestige, Ultra and Talent purchase controls remain reachable from More.
+- Prestige, Ultra and Talent have separate desktop routes reachable from More, instead of being crammed into the More menu itself.
 - About and Windows Debug update controls are reachable from More instead of taking a primary-navigation slot.
 - Added shortcut mapping and tests for Ctrl+1 through Ctrl+5. Ctrl+1 through Ctrl+4 follow the four primary destinations; Ctrl+5 opens About.
 
@@ -23,7 +23,7 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 | Play | `ui/screens/PlayScreen.kt` | Production guess loop and currently implemented quest, achievement and world controls remain on Play. Exact layout and all Android interactions still need comparison. |
 | Upgrades | `ui/screens/UpgradeScreen.kt` | Regular Money upgrade purchases are isolated under Upgrades. Android balance header, cards, animations and all details are not yet visually matched. |
 | Shop | `ui/screens/ShopScreen.kt` | Existing Nebula purchases are isolated under Shop. Android category filters, cosmetic equip flow and card presentation still need porting. |
-| More | `ui/screens/MoreScreen.kt` | Entry point exists. Current Prestige, Ultra and Talent controls remain available here. The reorderable, feature-flagged, locked Android menu is not yet ported. |
+| More | `ui/screens/MoreScreen.kt` | Entry point exists. Prestige, Ultra and Talent are separate desktop subroutes reached from More. The reorderable, feature-flagged, locked Android menu is not yet ported. |
 | Prestige | `ui/screens/PrestigeScreen.kt` | Current purchase/reset controls exist under More; dedicated Android screen layout and interactions need review. |
 | Ultra | `ui/screens/UltraScreen.kt` | Current purchase/reset controls exist under More; dedicated Android screen layout and interactions need review. |
 | Talent Web | `ui/screens/TalentScreen.kt` | Current talent purchases exist under More; the Android tree/web presentation is not ported. |
