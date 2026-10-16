@@ -995,34 +995,22 @@ fun ProductionGuessGameScreen(
             }
 
             if (section == DesktopGameSection.TALENT) {
-            SectionTitle("Talents")
                 if (talentCatalog == null) {
                     val talentCatalogError = talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"
                     Text("Talent catalog could not be loaded: $talentCatalogError")
                 } else {
-                    talentCatalog.forEach { talent ->
-                        val owned = talent.id in currentState.prestigeShopPurchases
-                        val parentOwned = talent.requiredParentId == null ||
-                            talent.requiredParentId in currentState.prestigeShopPurchases
-                        EconomyActionCard(
-                            title = talent.name,
-                            description = talent.description,
-                            detail = when {
-                                owned -> "Unlocked"
-                                !parentOwned -> "Cost: ${talent.cost} Prestige · Requires ${talent.requiredParentId}"
-                                else -> "Cost: ${talent.cost} Prestige"
-                            },
-                            action = if (owned) "Owned" else if (!parentOwned) "Locked" else "Unlock",
-                            enabled = !isSaving && !owned && parentOwned &&
-                                currentState.prestige >= BigNumber(talent.cost)
-                        ) {
+                    DesktopTalentWebContent(
+                        state = currentState,
+                        talents = talentCatalog,
+                        isSaving = isSaving,
+                        onBuyTalent = { talent ->
                             commitTransaction {
                                 DesktopEconomyTransactions.buyTalent(
                                     it, talent.id, talent.cost, talent.requiredParentId
                                 )
                             }
                         }
-                    }
+                    )
                 }
             }
 
