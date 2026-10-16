@@ -436,7 +436,7 @@ object DesktopEconomyTransactions {
             money = state.money + finalMoneyReward,
             statistics = state.statistics.copy(
                 moneyEarned = state.statistics.moneyEarned + finalMoneyReward,
-                nebulaEarned = state.statistics.nebulaEarned + finalNebulaReward
+                nebulaEarned = engine.addNebulaEarned(state.statistics.nebulaEarned, finalNebulaReward)
             )
         )
         return accepted(next, "Arcade reward: $finalNebulaReward Nebula and $finalMoneyReward Money.")
