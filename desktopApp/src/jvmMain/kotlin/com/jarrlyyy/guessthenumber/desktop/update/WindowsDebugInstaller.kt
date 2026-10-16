@@ -64,7 +64,7 @@ internal class WindowsDebugInstaller {
         ZipInputStream(Files.newInputStream(artifact)).use { zip ->
             while (true) {
                 val entry = zip.nextEntry ?: break
-                val name = entry.name.replace('\\\\', '/')
+                val name = entry.name.replace('\\', '/')
                 if (name.startsWith("/") || Regex("^[A-Za-z]:").containsMatchIn(name) ||
                     name.split('/').any { it == ".." }
                 ) {
