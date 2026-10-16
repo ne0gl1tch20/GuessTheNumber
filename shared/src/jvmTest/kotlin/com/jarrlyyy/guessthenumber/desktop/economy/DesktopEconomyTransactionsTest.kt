@@ -171,6 +171,94 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
+    fun correctGuessRecordsDailyProgressAndCommonChestDrop() {
+        val before = GameState(
+            dailyQuestDate = "2026-10-15",
+            dailyQuestGuesses = 9,
+            dailyQuestCorrectGuesses = 4,
+            dailyQuestBestStreak = 4,
+            dailyQuestUpgradePurchases = 3,
+            claimedDailyQuests = setOf("daily_guesses_10"),
+            lootCommonChests = 2,
+            lootDropsFound = 2
+        )
+        val after = before.copy(money = BigNumber(150), streak = 2)
+
+        val result = DesktopEconomyTransactions.recordGuessProgress(
+            before = before,
+            after = after,
+            correct = true,
+            today = "2026-10-16",
+            lootRoll = 239
+        )
+
+        assertEquals("2026-10-16", result.dailyQuestDate)
+        assertEquals(1, result.dailyQuestGuesses)
+        assertEquals(1, result.dailyQuestCorrectGuesses)
+        assertEquals(2, result.dailyQuestBestStreak)
+        assertEquals(0, result.dailyQuestUpgradePurchases)
+        assertTrue(result.claimedDailyQuests.isEmpty())
+        assertEquals(3, result.lootCommonChests)
+        assertEquals(3L, result.lootDropsFound)
+        assertEquals("common", result.lastLootDropTier)
+        assertEquals(1L, result.lootEventId)
+        assertEquals(BigNumber(150), result.money)
+    }
+
+    @Test
+    fun treasureDropRollBoundariesMatchAndroidRates() {
+        fun roll(value: Int) = DesktopEconomyTransactions.recordGuessProgress(
+            before = GameState(dailyQuestDate = "2026-10-16"),
+            after = GameState(dailyQuestDate = "2026-10-16", streak = 1),
+            correct = true,
+            today = "2026-10-16",
+            lootRoll = value
+        )
+
+        assertEquals(1, roll(9).lootEpicChests)
+        assertEquals(1, roll(10).lootRareChests)
+        assertEquals(1, roll(59).lootRareChests)
+        assertEquals(1, roll(60).lootCommonChests)
+        assertEquals(1, roll(239).lootCommonChests)
+        assertEquals(0L, roll(240).lootDropsFound)
+        assertEquals(0L, roll(999).lootDropsFound)
+    }
+
+    @Test
+    fun incorrectGuessAdvancesDailyGuessCountWithoutDroppingChest() {
+        val before = GameState(dailyQuestDate = "2026-10-16")
+        val result = DesktopEconomyTransactions.recordGuessProgress(
+            before = before,
+            after = before.copy(streak = 0),
+            correct = false,
+            today = "2026-10-16",
+            lootRoll = 0
+        )
+
+        assertEquals(1, result.dailyQuestGuesses)
+        assertEquals(0, result.dailyQuestCorrectGuesses)
+        assertEquals(0L, result.lootDropsFound)
+        assertEquals(0, result.lootEpicChests)
+    }
+
+    @Test
+    fun upgradePurchaseRefreshesDailyQuestBeforeCountingPurchase() {
+        val stale = GameState(
+            money = BigNumber(1000),
+            dailyQuestDate = "2026-10-15",
+            dailyQuestUpgradePurchases = 2,
+            claimedDailyQuests = setOf("daily_upgrades_3")
+        )
+
+        val result = DesktopEconomyTransactions.buyUpgrade(stale, rewardUpgrade)
+
+        assertTrue(result.accepted)
+        assertEquals(java.time.LocalDate.now().toString(), result.state.dailyQuestDate)
+        assertEquals(1, result.state.dailyQuestUpgradePurchases)
+        assertTrue(result.state.claimedDailyQuests.isEmpty())
+    }
+
+    @Test
     fun autoClickerCanOnlyToggleAfterPurchase() {
         val locked = GameState()
         assertFalse(DesktopEconomyTransactions.setAutoClickerActive(locked, true).accepted)
