@@ -225,6 +225,28 @@ object DesktopEconomyTransactions {
         "secret:ashen_vault", "secret:lost_observatory"
     )
 
+    fun settleStake(
+        state: GameState,
+        stakeAmount: BigNumber,
+        payout: BigNumber,
+        won: Boolean
+    ): EconomyTransaction {
+        if (stakeAmount <= BigNumber.ZERO) return rejected(state, "Enter a positive stake.")
+        if (payout < BigNumber.ZERO) return rejected(state, "Payout cannot be negative.")
+        if (state.money < stakeAmount) return rejected(state, "Insufficient funds for this stake.")
+        val updatedMoney = if (won) state.money - stakeAmount + payout else state.money - stakeAmount
+        return accepted(
+            state.copy(
+                money = updatedMoney,
+                statistics = state.statistics.copy(
+                    moneyEarned = if (won) state.statistics.moneyEarned + payout else state.statistics.moneyEarned,
+                    moneySpent = state.statistics.moneySpent + stakeAmount
+                )
+            ),
+            if (won) "Lucky Guess won!" else "Lucky Guess lost."
+        )
+    }
+
     fun claimCodexCompletionReward(state: GameState): EconomyTransaction {
         if (state.codexRewardClaimed) return rejected(state, "Codex completion reward is already claimed.")
         if (!state.codexEntries.containsAll(CODEX_REQUIRED_ENTRIES)) {
