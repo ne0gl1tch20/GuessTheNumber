@@ -212,6 +212,7 @@ fun main() = application {
                     }
 
                     AnimatedContent(
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
                         targetState = shellState.destination,
                         transitionSpec = {
                             if (reducedMotion) {
@@ -254,7 +255,7 @@ fun main() = application {
                         DesktopDestination.ULTRA,
                         DesktopDestination.TALENT,
                         DesktopDestination.STATS -> {
-                            Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                            Column(modifier = Modifier.fillMaxSize()) {
                                 ProductionGuessGameScreen(
                                     section = when (destination) {
                                         DesktopDestination.UPGRADES -> DesktopGameSection.UPGRADES
