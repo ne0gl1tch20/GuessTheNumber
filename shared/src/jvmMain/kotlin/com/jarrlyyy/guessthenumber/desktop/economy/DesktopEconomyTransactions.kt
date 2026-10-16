@@ -151,7 +151,7 @@ object DesktopEconomyTransactions {
             dailyQuestUpgradePurchases = daily.dailyQuestUpgradePurchases,
             claimedDailyQuests = daily.claimedDailyQuests
         )
-        if (!correct || lootRoll !in 0..999) return progressed
+        if (!correct || lootRoll == null || lootRoll !in 0..999) return progressed
 
         return when (lootRoll) {
             in 0..9 -> progressed.copy(
