@@ -321,7 +321,7 @@ object DesktopEconomyTransactions {
         val baseMoney = BigNumber(world.baseMoneyReward)
         val (bonusMoney, bonusNebula) = progressionRewardBonus(state, baseMoney)
         val tierMultiplier = if (state.endlessRiftActive) state.endlessRiftTier.coerceAtLeast(1) else 1
-        val moneyReward = engine.applyMoneyEarningBoost(state, (baseMoney + bonusMoney) * BigNumber(tierMultiplier.toLong()))
+        val moneyReward = GameEngine().applyMoneyEarningBoost(state, (baseMoney + bonusMoney) * BigNumber(tierMultiplier.toLong()))
         val nebulaReward = (world.baseNebulaReward + bonusNebula) * tierMultiplier
         val defeatedState = state.copy(
             money = state.money + moneyReward,
