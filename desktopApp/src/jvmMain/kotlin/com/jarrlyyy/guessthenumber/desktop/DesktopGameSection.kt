@@ -17,5 +17,6 @@ enum class DesktopGameSection {
     SAVE_SLOTS,
     RELICS,
     HOME_BASE,
-    CODEX
+    CODEX,
+    ENDGAME
 }
