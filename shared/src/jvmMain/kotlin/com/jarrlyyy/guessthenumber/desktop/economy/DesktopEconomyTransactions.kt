@@ -375,10 +375,6 @@ object DesktopEconomyTransactions {
             else -> 0.0
         }
         if (criticalChance > 0.0 && rng.nextDouble() < criticalChance) bonusMoney += eligibleEarnings
-        // Golden Guess Pass guarantees a critical-sized bonus on every tenth lifetime guess.
-        if ("golden_guess" in before.shopPurchases && after.statistics.totalGuesses > 0L &&
-            after.statistics.totalGuesses % 10L == 0L
-        ) bonusMoney += eligibleEarnings
         if ("verdant_guardian" in before.equippedRelicIds) bonusMoney += eligibleEarnings * BigNumber(0.10)
         if ("crystal_golem" in before.equippedRelicIds && rng.nextDouble() < 0.10) bonusMoney += eligibleEarnings * BigNumber(0.5)
         if ("ember_dragon" in before.equippedRelicIds) bonusMoney += eligibleEarnings * BigNumber(0.25)
