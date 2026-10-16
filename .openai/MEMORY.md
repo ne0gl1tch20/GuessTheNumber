@@ -408,3 +408,10 @@ This section supersedes older notes where they conflict with the user's latest e
 - Implement all six permanent Prestige/Ultra upgrades in shared Android/Windows rules. Catalog effect values define formulas: Prestige Wealth `1 + 0.5×level` money multiplier; Cosmic Wealth `1 + 2×level` money multiplier; multipliers stack multiplicatively; Prestige Catalyst `1 + 0.2×level` Prestige reward multiplier; Prestige Endowment gives 1,000 Money per level after Prestige/Ultra reset based on pre-reset level; Eternal Expansion `1 + 0.5×level` Ultra reward multiplier with a 2,000 final cap; Nebula Resonance `1 + level` multiplier for achievement/Arcade Nebula payouts, stacking with `nebula_boost` and saturating at Long.MAX_VALUE.
 - Shared achievement unlock/reward evaluation remains the single implementation for Android and Windows. Windows Arcade and Music Player routes are currently placeholders, so do not claim full feature parity until those routes are implemented and verified.
 - PR #220 merged after Android Validation run 38910080423 and Windows Desktop CI run 38910065849 passed on head 762d029c828f498b10f686e3d74f920865e17437. The owner reports the previous Auto Clicker and Talent Web manual checks passed; the newly merged upgrade effects and desktop navigation still need runtime verification.
+
+
+## Windows Arcade parity batch (2026-10-16)
+
+- Current branch `feat/windows-arcade-minigames-parity` ports Android's five catalog-driven minigames to Windows: Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush.
+- Desktop reads packaged `game/minigames.json` via `DesktopEconomyRepository.minigames()`; `tools/validate_json_assets.py` compares it with Android's canonical asset. Keep this catalog parity guard.
+- Reward payouts must go through `DesktopEconomyTransactions.awardArcadeReward` so the shared Money/Nebula permanent upgrades and active-slot persistence apply. Windows Music Player remains a placeholder. CI and Arcade runtime verification are pending until PR #221 passes.
