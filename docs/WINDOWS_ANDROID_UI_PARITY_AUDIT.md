@@ -1,6 +1,6 @@
 # Android-to-Windows UI parity audit
 
-**Status:** Initial navigation and Upgrades presentation changes are implemented and automated CI passes. Full visual and interaction parity is not claimed.
+**Status:** Initial navigation and Upgrades presentation changes are implemented. A Windows Statistics destination is now reachable from More and renders core game metrics. CI for the latest changes is pending; Windows runtime visual and interaction parity is not claimed.
 
 ## Android reference
 
@@ -33,7 +33,7 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 | Mutators | `ui/screens/MutatorsScreen.kt` | Basic toggles exist on Play. Challenge-builder selection and completion flow are incomplete. |
 | Achievements | `ui/screens/AchievementsScreen.kt` | Basic achievement information exists on Play; dedicated Android screen and reward presentation are missing. |
 | World Map | `ui/screens/WorldMapScreen.kt` | Basic world progression exists on Play; dedicated map and boss navigation are missing. |
-| Statistics | `ui/screens/StatsScreen.kt` | Dedicated Windows screen not implemented. |
+| Statistics | `ui/screens/StatsScreen.kt` | Windows Statistics destination is reachable from More and shows guessing accuracy, correct/failed/total guesses, money earned/spent, current/best streak, Prestige/Ultra resets, Nebula earned, playtime, arcade rounds and current number range. CI and runtime visual comparison are pending. |
 | Settings | `ui/screens/SettingsScreen.kt` | Dedicated Windows screen not implemented. |
 | About | `ui/screens/AboutScreen.kt` | Windows About/update page exists and is now reached from More; Android content parity is incomplete. |
 | Developer Settings | `ui/screens/DevSettingsScreen.kt` | Debug-only Android feature; Windows equivalent not ported. |
@@ -65,6 +65,7 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 - Updated desktop primary navigation, section routing and navigation unit tests in this branch.
 - Latest recorded CI for commit `3153f38eb9c34c426c7d4c12c1545d975ae5079c` passed: Windows Desktop CI run [38857902508](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38857902508) and Android Validation and Tests run [38857902488](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38857902488).
 - Windows runtime interaction and screenshot comparison remain unverified.
+- The Windows Statistics screen is now implemented in the current branch and has a navigation regression test. Its layout is a first functional port of the Android `StatsScreen.kt`; screenshot comparison and Windows runtime behavior remain unverified.
 - This is the start of the real UI port, not a claim that the full Android UI has been reproduced.
 
 ## Permanent parity guard
