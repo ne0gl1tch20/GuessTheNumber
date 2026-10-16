@@ -608,4 +608,28 @@ class DesktopEconomyTransactionsTest {
         assertEquals(owned.nebula, switched.state.nebula)
     }
 
+    @Test
+    fun homeBaseUpgradeChargesScaledCostAndPersistsLevel() {
+        val initial = GameState(money = BigNumber(100_000))
+        val result = DesktopEconomyTransactions.upgradeHomeBase(initial)
+
+        assertTrue(result.accepted)
+        assertEquals(BigNumber(50_000), result.state.money)
+        assertEquals(1, result.state.homeBaseLevel)
+        assertEquals(BigNumber(50_000), result.state.statistics.moneySpent)
+    }
+
+    @Test
+    fun homeBaseUpgradeRejectsUnaffordableAndMaximumLevelWithoutChangingState() {
+        val poor = GameState(money = BigNumber(49_999))
+        val unaffordable = DesktopEconomyTransactions.upgradeHomeBase(poor)
+        assertFalse(unaffordable.accepted)
+        assertEquals(poor, unaffordable.state)
+
+        val maxed = GameState(money = BigNumber(5_000_000), homeBaseLevel = 20)
+        val completed = DesktopEconomyTransactions.upgradeHomeBase(maxed)
+        assertFalse(completed.accepted)
+        assertEquals(maxed, completed.state)
+    }
+
 }
