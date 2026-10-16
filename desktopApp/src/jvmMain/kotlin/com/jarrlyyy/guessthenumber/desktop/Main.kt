@@ -328,7 +328,6 @@ fun main() = application {
                                         navigationPosition = selected
                                         DesktopNavigationPosition.save(selected)
                                     },
-                                    onOpenParityDestination = { shell.navigate(it) },
                                     onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
                                     onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
                                         themeMode = mode
@@ -340,25 +339,6 @@ fun main() = application {
                                 )
                             }
                         }
-
-                        DesktopDestination.ACHIEVEMENTS,
-                        DesktopDestination.WORLD_MAP,
-                        DesktopDestination.MUTATORS,
-                        DesktopDestination.SAVE_SLOTS,
-                        DesktopDestination.RELICS,
-                        DesktopDestination.HOME_BASE,
-                        DesktopDestination.CODEX,
-                        DesktopDestination.ENDGAME,
-                        DesktopDestination.LUCKY_STAKE,
-                        DesktopDestination.DEVELOPER_SETTINGS,
-                        DesktopDestination.DEVELOPER_CONSOLE,
-                        DesktopDestination.PROCESS_INSPECTOR,
-                        DesktopDestination.MUSIC_PLAYER,
-                        DesktopDestination.ARCADE,
-                        DesktopDestination.ACTIVITY_HUB,
-                        DesktopDestination.LUA_TESTING_HUB,
-                        DesktopDestination.CHANGELOG,
-                        DesktopDestination.LIVE_OPS -> DesktopParityScreen(destination = destination, onBack = { shell.navigate(DesktopDestination.MORE) }, onNavigate = { shell.navigate(it) })
 
                         DesktopDestination.ABOUT -> {
                             Card(modifier = Modifier.fillMaxWidth()) {
