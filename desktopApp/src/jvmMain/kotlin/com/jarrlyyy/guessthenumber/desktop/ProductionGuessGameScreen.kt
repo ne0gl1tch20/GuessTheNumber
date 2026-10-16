@@ -26,6 +26,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.DesktopGuessingBot
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
@@ -221,7 +224,14 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             OutlinedTextField(
                 value = guessText,
                 onValueChange = { input -> guessText = input.filter(Char::isDigit).take(18) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().onPreviewKeyEvent { event ->
+                    if (event.key == Key.Enter && event.type == KeyEventType.KeyDown) {
+                        submitGuess()
+                        true
+                    } else {
+                        false
+                    }
+                },
                 label = { Text("Your guess") },
                 singleLine = true,
                 enabled = !isSaving,
