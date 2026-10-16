@@ -238,7 +238,7 @@ object DesktopEconomyTransactions {
         val requirement: String
     )
 
-    private data class DesktopWorldProgress(
+    data class DesktopWorldProgress(
         val id: String,
         val name: String,
         val unlocked: Boolean,
