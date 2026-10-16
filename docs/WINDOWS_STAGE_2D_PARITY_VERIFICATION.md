@@ -1,6 +1,6 @@
 # Windows Migration Stage 2-D — Parity Verification
 
-**Status:** PRs #217, #218 and #219 are merged after exact-head Android Validation and Windows Desktop CI passed. Current candidate PR #220 implements the six permanent Prestige/Ultra effects in shared logic and adds desktop-only quick-access navigation; candidate CI is pending. The owner reports the previous Auto Clicker verification passed. Stage 2 exit gate remains open pending current-candidate CI, the new effects' runtime verification and remaining W1/W2 parity.  
+**Status:** PR #220 is merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f`; Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910080423) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910065849) on exact head `762d029c828f498b10f686e3d74f920865e17437`. The owner reports the previous Auto Clicker and Talent Web manual checks passed. Stage 2 exit gate remains open pending runtime verification of the newly merged effects/navigation and remaining W1/W2 parity.  
 **Reviewed:** 2026-10-16  
 **Scope:** Deterministic core guess transitions and Windows save/reload integration. This is not a claim of full gameplay/economy or runtime parity.
 
@@ -118,11 +118,11 @@ Examples: a Windows-only keyboard shortcut that opens the reset confirmation is 
 - **Manual verification:** owner reports the Windows speed-talent, `mut_speed` and persistence checks passed.
 
 
-## Current candidate — permanent upgrade effects and desktop navigation
+## Merged implementation — permanent upgrade effects and desktop navigation
 
 - PR #220 implements all six effects in shared `GameEngine` code, with deterministic tests for stacking, reset multipliers, starting capital, the Ultra 2,000 cap, Nebula payout scaling, overflow saturation and one-time achievement rewards.
 - Android and Windows now call shared reward calculations for Prestige/Ultra resets; Windows' displayed reward estimates use the same boosted calculations.
 - The Windows main navigation order is Play, Upgrades, Shop, Prestige, Ultra, Settings, Arcade, Music Player, Save Slots, Statistics, World Map, Changelog, More. It defaults to the left rail and supports scrollable layouts. Android navigation is unchanged.
-- **Candidate CI:** pending. Do not claim this new batch passed until Android Validation and Windows Desktop CI complete successfully on the latest PR head.
-- **Manual verification after CI:** buy levels in all six upgrades; check money earnings, Prestige reward, starting Money after both reset types, Ultra reward and its 2,000 cap, achievement/Arcade Nebula payouts and save/reload persistence. Check that the desktop main nav is scrollable and every item opens its intended route.
+- **Automated validation passed:** Android Validation [run 38910080423](${android}) and Windows Desktop CI [run 38910065849](${windows}) both succeeded on the exact PR head before merge. A duplicate Windows run [also passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910080000).
+- **Manual verification now required:** in the merged Windows build, buy levels in all six upgrades; check money earnings, Prestige reward, starting Money after both reset types, Ultra reward and its 2,000 cap, achievement/Arcade Nebula payouts and save/reload persistence. Check that the desktop main nav is scrollable and every item opens its intended route.
 - **Known feature gap:** Windows Arcade and Music Player are exposed in navigation but currently route to placeholder screens. The shared Nebula upgrade rule is ready, but Arcade payout behavior cannot be manually verified on Windows until the Arcade screen is implemented.
