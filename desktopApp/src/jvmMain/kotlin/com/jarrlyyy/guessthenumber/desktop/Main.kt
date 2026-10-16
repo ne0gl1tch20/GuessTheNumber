@@ -217,7 +217,23 @@ fun main() = application {
                     }
 
                     when (shellState.destination) {
-                        DesktopDestination.PLAY -> {
+                        DesktopDestination.PLAY,
+                        DesktopDestination.PROGRESSION,
+                        DesktopDestination.ECONOMY -> {
+                            Column(
+                                modifier = Modifier.weight(1f).fillMaxWidth()
+                            ) {
+                                ProductionGuessGameScreen(
+                                    section = when (shellState.destination) {
+                                        DesktopDestination.PROGRESSION -> DesktopGameSection.PROGRESSION
+                                        DesktopDestination.ECONOMY -> DesktopGameSection.ECONOMY
+                                        else -> DesktopGameSection.PLAY
+                                    }
+                                )
+                            }
+                        }
+
+                        DesktopDestination.ABOUT -> {
                             Card(modifier = Modifier.fillMaxWidth()) {
                                 Column(
                                     modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -242,9 +258,7 @@ fun main() = application {
                                         Button(
                                             onClick = { scope.launch { refreshUpdates() } },
                                             enabled = !isBusy
-                                        ) {
-                                            Text("Check again")
-                                        }
+                                        ) { Text("Check again") }
                                         val update = availableUpdate
                                         if (update != null) {
                                             Button(
@@ -265,9 +279,7 @@ fun main() = application {
                                                     }
                                                 },
                                                 enabled = !isBusy
-                                            ) {
-                                                Text("Install update")
-                                            }
+                                            ) { Text("Install update") }
                                         }
                                         if (isBusy) {
                                             CircularProgressIndicator(modifier = Modifier.semantics { contentDescription = status })
@@ -279,14 +291,6 @@ fun main() = application {
                                     )
                                 }
                             }
-                            Column(
-                                modifier = Modifier.weight(1f).fillMaxWidth()
-                            ) {
-                                ProductionGuessGameScreen()
-                            }
-                        }
-
-                        DesktopDestination.ABOUT -> {
                             Card(modifier = Modifier.fillMaxWidth()) {
                                 Column(
                                     modifier = Modifier.fillMaxWidth().padding(24.dp),
