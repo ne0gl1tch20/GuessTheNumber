@@ -43,7 +43,14 @@ internal fun resolveDesktopShellKeyAction(
             DesktopDestination.SHOP -> DesktopShellKeyAction.NAVIGATE_SHOP
             DesktopDestination.MORE -> DesktopShellKeyAction.NAVIGATE_MORE
             DesktopDestination.ABOUT -> DesktopShellKeyAction.NAVIGATE_ABOUT
-            DesktopDestination.PRESTIGE, DesktopDestination.ULTRA, DesktopDestination.TALENT, DesktopDestination.STATS, DesktopDestination.SETTINGS -> DesktopShellKeyAction.NONE
+            DesktopDestination.PRESTIGE, DesktopDestination.ULTRA, DesktopDestination.TALENT, DesktopDestination.STATS, DesktopDestination.SETTINGS,
+            DesktopDestination.ACHIEVEMENTS, DesktopDestination.WORLD_MAP, DesktopDestination.MUTATORS,
+            DesktopDestination.SAVE_SLOTS, DesktopDestination.RELICS, DesktopDestination.HOME_BASE,
+            DesktopDestination.CODEX, DesktopDestination.ENDGAME, DesktopDestination.LUCKY_STAKE,
+            DesktopDestination.DEVELOPER_SETTINGS, DesktopDestination.DEVELOPER_CONSOLE,
+            DesktopDestination.PROCESS_INSPECTOR, DesktopDestination.MUSIC_PLAYER, DesktopDestination.ARCADE,
+            DesktopDestination.ACTIVITY_HUB, DesktopDestination.LUA_TESTING_HUB, DesktopDestination.CHANGELOG,
+            DesktopDestination.LIVE_OPS -> DesktopShellKeyAction.NONE
             null -> DesktopShellKeyAction.NONE
         }
     }
