@@ -150,7 +150,7 @@ object DesktopEconomyTransactions {
             return rejected(state, "Ultra requires enough Money and at least 1,000 Prestige.")
         }
         val next = state.copy(
-            money = BigNumber.ZERO,
+            money = engine.prestigeStartingCapital(state),
             prestige = BigNumber.ZERO,
             ultra = state.ultra + reward,
             upgradeLevels = emptyMap(),
