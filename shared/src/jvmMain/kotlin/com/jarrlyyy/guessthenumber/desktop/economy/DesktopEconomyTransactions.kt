@@ -6,6 +6,7 @@ import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.ShopItemDef
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
+import java.time.LocalDate
 import kotlin.random.Random
 
 data class EconomyTransaction(
@@ -22,7 +23,8 @@ object DesktopEconomyTransactions {
     fun upgradeCost(upgrade: UpgradeDef, currentLevel: Int): BigNumber =
         BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(currentLevel)
 
-    fun buyUpgrade(state: GameState, upgrade: UpgradeDef): EconomyTransaction {
+    fun buyUpgrade(initialState: GameState, upgrade: UpgradeDef): EconomyTransaction {
+        val state = refreshDailyQuestDay(initialState, LocalDate.now().toString())
         val level = state.upgradeLevels[upgrade.id] ?: 0
         if (level >= upgrade.maxLevel) return rejected(state, "Already at maximum level.")
         val cost = upgradeCost(upgrade, level)
@@ -125,6 +127,64 @@ object DesktopEconomyTransactions {
         return accepted(
             state.copy(autoClickerActive = active),
             if (active) "Auto Clicker resumed." else "Auto Clicker paused."
+        )
+    }
+
+    /**
+     * Mirrors the Android daily-quest progress and correct-guess treasure-drop
+     * bookkeeping. A caller supplies the roll so the complete reward path can
+     * be tested deterministically without relying on wall-clock time or RNG.
+     */
+    fun recordGuessProgress(
+        before: GameState,
+        after: GameState,
+        correct: Boolean,
+        today: String,
+        lootRoll: Int? = null
+    ): GameState {
+        val daily = refreshDailyQuestDay(before, today)
+        val progressed = after.copy(
+            dailyQuestDate = today,
+            dailyQuestGuesses = daily.dailyQuestGuesses + 1,
+            dailyQuestCorrectGuesses = daily.dailyQuestCorrectGuesses + if (correct) 1 else 0,
+            dailyQuestBestStreak = maxOf(daily.dailyQuestBestStreak, after.streak),
+            dailyQuestUpgradePurchases = daily.dailyQuestUpgradePurchases,
+            claimedDailyQuests = daily.claimedDailyQuests
+        )
+        if (!correct || lootRoll !in 0..999) return progressed
+
+        return when (lootRoll) {
+            in 0..9 -> progressed.copy(
+                lootEpicChests = progressed.lootEpicChests + 1,
+                lootDropsFound = progressed.lootDropsFound + 1,
+                lastLootDropTier = "epic",
+                lootEventId = progressed.lootEventId + 1
+            )
+            in 10..59 -> progressed.copy(
+                lootRareChests = progressed.lootRareChests + 1,
+                lootDropsFound = progressed.lootDropsFound + 1,
+                lastLootDropTier = "rare",
+                lootEventId = progressed.lootEventId + 1
+            )
+            in 60..239 -> progressed.copy(
+                lootCommonChests = progressed.lootCommonChests + 1,
+                lootDropsFound = progressed.lootDropsFound + 1,
+                lastLootDropTier = "common",
+                lootEventId = progressed.lootEventId + 1
+            )
+            else -> progressed
+        }
+    }
+
+    private fun refreshDailyQuestDay(state: GameState, today: String): GameState {
+        if (state.dailyQuestDate == today) return state
+        return state.copy(
+            dailyQuestDate = today,
+            dailyQuestGuesses = 0,
+            dailyQuestCorrectGuesses = 0,
+            dailyQuestBestStreak = 0,
+            dailyQuestUpgradePurchases = 0,
+            claimedDailyQuests = emptySet()
         )
     }
 
