@@ -1,3 +1,7 @@
+## Unreleased (Windows Play Screen Parity)
+
+- ⌨️ **Shared guess entry**: Windows Play now uses the same shared controlled numeric input component as Android, including the displayed allowed range and Enter-to-submit behavior, while keeping desktop validation, save-before-feedback, and gameplay rules unchanged.
+
 ## Unreleased (Windows Stage 2 Economy Parity)
 
 - 💰 **Desktop economy actions**: Windows now exposes the shared production economy through upgrade purchases, Prestige and Ultra resets, Prestige/Ultra upgrades, Nebula shop purchases and talent unlocks. Transactions validate affordability and prerequisites, preserve permanent progress across resets and save before updating the visible state.
