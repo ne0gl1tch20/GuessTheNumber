@@ -262,7 +262,12 @@ fun NavGraph(
                     startDestination = startRoute,
                     modifier = Modifier.fillMaxSize(),
                     enterTransition = {
-                        if (state.settings.reducedMotion) EnterTransition.None
+                        // Arcade contains its own LazyColumn. Avoid overlapping NavHost
+                        // scale/slide transitions while that scrollable destination is measured.
+                        if (initialState.destination.route == Screen.Arcade.route ||
+                            targetState.destination.route == Screen.Arcade.route ||
+                            state.settings.reducedMotion
+                        ) EnterTransition.None
                         else fadeIn(animationSpec = tween(220)) +
                             slideInHorizontally(
                                 initialOffsetX = { it / 12 },
@@ -280,13 +285,19 @@ fun NavGraph(
                             )
                     },
                     exitTransition = {
-                        if (state.settings.reducedMotion) ExitTransition.None
+                        if (initialState.destination.route == Screen.Arcade.route ||
+                            targetState.destination.route == Screen.Arcade.route ||
+                            state.settings.reducedMotion
+                        ) ExitTransition.None
                         else fadeOut(animationSpec = tween(140)) +
                             slideOutHorizontally(targetOffsetX = { -it / 16 }, animationSpec = tween(160)) +
                             scaleOut(targetScale = 0.985f, animationSpec = tween(160))
                     },
                     popEnterTransition = {
-                        if (state.settings.reducedMotion) EnterTransition.None
+                        if (initialState.destination.route == Screen.Arcade.route ||
+                            targetState.destination.route == Screen.Arcade.route ||
+                            state.settings.reducedMotion
+                        ) EnterTransition.None
                         else fadeIn(animationSpec = tween(220)) +
                             slideInHorizontally(
                                 initialOffsetX = { -it / 12 },
@@ -304,7 +315,10 @@ fun NavGraph(
                             )
                     },
                     popExitTransition = {
-                        if (state.settings.reducedMotion) ExitTransition.None
+                        if (initialState.destination.route == Screen.Arcade.route ||
+                            targetState.destination.route == Screen.Arcade.route ||
+                            state.settings.reducedMotion
+                        ) ExitTransition.None
                         else fadeOut(animationSpec = tween(140)) +
                             slideOutHorizontally(targetOffsetX = { it / 16 }, animationSpec = tween(160)) +
                             scaleOut(targetScale = 0.985f, animationSpec = tween(160))
