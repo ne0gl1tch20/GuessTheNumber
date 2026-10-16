@@ -41,7 +41,7 @@ fun UltraScreen(
     val locale = remember(state.settings.locale) { JsonConfigRepository(context, state.settings.locale).localeManager }
     val gameEngine = GameEngine()
     val requiredMoney = gameEngine.calculateUltraRequirement(state.ultraCount)
-    val ultraReward = gameEngine.calculateUltraReward(state.money, state.ultraCount)
+    val ultraReward = gameEngine.calculateUltraReward(state)
     val canUltra = state.money >= requiredMoney && state.prestige >= BigNumber(1_000)
     val ultraInteractionSource = remember { MutableInteractionSource() }
     var showUltraCelebration by remember { mutableStateOf(false) }

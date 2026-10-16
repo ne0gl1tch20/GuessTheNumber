@@ -1,6 +1,6 @@
 # Windows Migration Stage 2-D — Parity Verification
 
-**Status:** PRs #217, #218 and #219 are merged after their exact-head Android Validation and Windows Desktop CI passed. PR #219 centralizes Auto Clicker timing; both workflows passed on head `e3a53eaba63a44d26bb4cff8e8457dc94b437c2a` (Android run 38904393281, Windows run 38904393086). Stage 2 exit gate remains open pending complete W1/W2 parity and full runtime evidence.  
+**Status:** PRs #217, #218 and #219 are merged after exact-head Android Validation and Windows Desktop CI passed. Current candidate PR #220 implements the six permanent Prestige/Ultra effects in shared logic and adds desktop-only quick-access navigation; candidate CI is pending. The owner reports the previous Auto Clicker verification passed. Stage 2 exit gate remains open pending current-candidate CI, the new effects' runtime verification and remaining W1/W2 parity.  
 **Reviewed:** 2026-10-16  
 **Scope:** Deterministic core guess transitions and Windows save/reload integration. This is not a claim of full gameplay/economy or runtime parity.
 
@@ -106,7 +106,7 @@ Examples: a Windows-only keyboard shortcut that opens the reset confirmation is 
 - PR #217 merged the initial validation guard and both CI workflows passed for its exact head.
 - PR #218 changes the validation source from a hardcoded Kotlin map to the bundled `game/talents.json` resource, adds a data-driven test over every catalog entry, and makes Talent Web parent gating use the catalog's `requiredParentId`. The Android asset and shared JVM resource were confirmed byte-for-byte identical when this candidate was prepared; the redundant desktop copy was removed and CI now enforces parity.
 - **PR #218 CI passed:** [Android Validation and Tests, run 38903226288](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226288) and [Windows Desktop CI, run 38903226499](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226499) both succeeded on head `2973afe940a6beb4531e639322d102f90f2d91d5`; PR #218 is merged.
-- **Manual verification still required:** open the Windows app, inspect the Talent Web, buy one affordable talent, verify its effect in gameplay, restart/reload, and confirm the purchase/effect persists. Also verify an unaffordable talent and a locked prerequisite cannot be purchased.
+- **Manual verification:** owner reports the Talent Web purchase/effect, restart persistence, unaffordable purchase rejection and locked-prerequisite rejection checks all passed.
 
 - The Talent Web's visible English labels/descriptions still follow Android's fallback copy rather than the JSON display fields; Windows locale-aware rendering remains a separate parity gap and must not be marked verified.
 
@@ -115,9 +115,14 @@ Examples: a Windows-only keyboard shortcut that opens the reset confirmation is 
 
 - The Android Auto Clicker previously calculated its interval from `autoClickerSpeed`, the two speed talents (1.25× and 1.5×), and the `mut_speed` multiplier (3×). Windows had a fixed 1,000 ms interval.
 - PR #219 moved that formula to shared `GameEngine.autoClickerDelayMillis` and calls it from both the Android ViewModel and Windows production Play flow. Tests cover default timing, both talent levels, stacked speed mutator, inactive state and non-positive speed. Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393281) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393086) on the same candidate head.
-- **Manual verification after merge:** on Windows, buy each speed talent, enable/disable `mut_speed`, confirm the Auto Clicker visibly speeds up/down as expected, then restart and verify the purchased talents persist.
+- **Manual verification:** owner reports the Windows speed-talent, `mut_speed` and persistence checks passed.
 
 
-## Owner decision blocker — permanent Prestige/Ultra upgrade effects
+## Current candidate — permanent upgrade effects and desktop navigation
 
-The canonical upgrade JSON advertises permanent Prestige/Ultra effects, but repository code search did not find production application of the six catalog IDs `prestige_money_boost`, `prestige_gain_boost`, `prestige_starting_capital`, `ultra_money_boost`, `ultra_gain_boost` and `ultra_nebula_boost` in Android gameplay logic. Their intended formulas/stacking are not fully specified by the catalog fields. Keep this W2 row open rather than inventing a Windows-only interpretation; the owner must decide whether to define and implement the effects in shared logic on both platforms or preserve current behavior.
+- PR #220 implements all six effects in shared `GameEngine` code, with deterministic tests for stacking, reset multipliers, starting capital, the Ultra 2,000 cap, Nebula payout scaling, overflow saturation and one-time achievement rewards.
+- Android and Windows now call shared reward calculations for Prestige/Ultra resets; Windows' displayed reward estimates use the same boosted calculations.
+- The Windows main navigation order is Play, Upgrades, Shop, Prestige, Ultra, Settings, Arcade, Music Player, Save Slots, Statistics, World Map, Changelog, More. It defaults to the left rail and supports scrollable layouts. Android navigation is unchanged.
+- **Candidate CI:** pending. Do not claim this new batch passed until Android Validation and Windows Desktop CI complete successfully on the latest PR head.
+- **Manual verification after CI:** buy levels in all six upgrades; check money earnings, Prestige reward, starting Money after both reset types, Ultra reward and its 2,000 cap, achievement/Arcade Nebula payouts and save/reload persistence. Check that the desktop main nav is scrollable and every item opens its intended route.
+- **Known feature gap:** Windows Arcade and Music Player are exposed in navigation but currently route to placeholder screens. The shared Nebula upgrade rule is ready, but Arcade payout behavior cannot be manually verified on Windows until the Arcade screen is implemented.

@@ -42,7 +42,7 @@ fun PrestigeScreen(
     val locale = com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager.current
     val gameEngine = GameEngine()
     val requiredMoney = gameEngine.calculatePrestigeRequirement(state.prestigeCount)
-    val prestigeReward = gameEngine.calculatePrestigeReward(state.money, state.prestigeCount)
+    val prestigeReward = gameEngine.calculatePrestigeReward(state)
     val canPrestige = state.money >= requiredMoney
     val prestigeInteractionSource = remember { MutableInteractionSource() }
     var showPrestigeCelebration by remember { mutableStateOf(false) }

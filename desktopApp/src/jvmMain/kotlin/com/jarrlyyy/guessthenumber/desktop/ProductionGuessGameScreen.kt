@@ -865,7 +865,7 @@ fun ProductionGuessGameScreen(
             if (section == DesktopGameSection.PRESTIGE) {
             SectionTitle("Prestige")
                 val prestigeRequirement = engine.calculatePrestigeRequirement(currentState.prestigeCount)
-                val prestigeReward = engine.calculatePrestigeReward(currentState.money, currentState.prestigeCount)
+                val prestigeReward = engine.calculatePrestigeReward(currentState)
                 Text("Requirement: $prestigeRequirement Money · Estimated reward: $prestigeReward Prestige")
                 Button(
                     onClick = { pendingReset = "prestige" },
@@ -891,7 +891,7 @@ fun ProductionGuessGameScreen(
                 if (section == DesktopGameSection.ULTRA) {
                 SectionTitle("Ultra")
                 val ultraRequirement = engine.calculateUltraRequirement(currentState.ultraCount)
-                val ultraReward = engine.calculateUltraReward(currentState.money, currentState.ultraCount)
+                val ultraReward = engine.calculateUltraReward(currentState)
                 Text("Requirement: $ultraRequirement Money and 1,000 Prestige · Estimated reward: $ultraReward Ultra")
                 Button(
                     onClick = { pendingReset = "ultra" },

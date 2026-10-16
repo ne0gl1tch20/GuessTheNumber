@@ -72,9 +72,22 @@ PR #218 makes the Windows Talent Web's prerequisite/parent gating and transactio
 
 - PR #218 merged after Android Validation and Windows Desktop CI passed (runs [38903226288](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226288) and [38903226499](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226499)). Talent transaction validation and Talent Web parent gating now read the shared JVM catalog; CI enforces equality with Android's asset.
 - PR #219 merged the Auto Clicker interval formula into shared `GameEngine.autoClickerDelayMillis`, used by both Android and Windows. Tests cover both speed talents, stacked talent speed plus `mut_speed`, inactive state and non-positive speed. Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393281) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393086) on the same candidate head.
-- Windows runtime speed/feedback and persistence verification remains open.
+- Owner reports the focused Windows Auto Clicker speed/feedback and persistence checks passed.
 
 
-### Owner decision blocker — permanent Prestige/Ultra upgrade effects (2026-10-16)
+### Permanent Prestige/Ultra upgrade effects — implemented in shared rules (2026-10-16)
 
-The canonical `prestige_upgrades.json` and `ultra_upgrades.json` assets describe six permanent effects, but repository code search found no production application of `prestige_money_boost`, `prestige_gain_boost`, `prestige_starting_capital`, `ultra_money_boost`, `ultra_gain_boost` or `ultra_nebula_boost` in Android gameplay logic. The catalog's `effectPerLevel` values do not fully define the intended formulas or stacking order. Do not silently add Windows-only effects or guess the balance. The owner needs to decide whether to define and implement the intended effects in shared logic for both platforms or keep the current behavior.
+Current candidate PR #220 implements all six catalog-described effects in the shared `GameEngine` used by Android and Windows:
+
+- `prestige_money_boost`: money earning multiplier `1 + 0.5 × level`.
+- `ultra_money_boost`: money earning multiplier `1 + 2 × level`; the two money multipliers stack multiplicatively.
+- `prestige_gain_boost`: Prestige reset reward multiplier `1 + 0.2 × level`.
+- `prestige_starting_capital`: grants 1,000 Money per level after Prestige or Ultra reset, based on the level before reset.
+- `ultra_gain_boost`: Ultra reset reward multiplier `1 + 0.5 × level`, preserving the catalog's 2,000 maximum payout.
+- `ultra_nebula_boost`: multiplies achievement and Arcade Nebula payouts by `1 + level`; it stacks with the existing `nebula_boost` shop item and saturates safely at `Long.MAX_VALUE`.
+
+Achievement unlock/reward evaluation now lives in the shared engine and is called by both hosts. Windows Arcade remains a placeholder route, so the shared Arcade reward helper is implemented but the Windows Arcade reward path is not yet available for runtime verification. Current candidate CI is pending; do not mark these new changes validated until it passes.
+
+### Desktop-only navigation exception — owner-approved
+
+Windows' main navigation now exposes Play, Upgrades, Shop, Prestige, Ultra, Settings, Arcade, Music Player, Save Slots, Statistics, World Map, Changelog and More in that order. It defaults to a left-side rail and scrolls in vertical/horizontal layouts. This is a reachability/layout exception only: Android navigation and core game behavior remain unchanged. Arcade and Music Player still need full feature implementation/parity.

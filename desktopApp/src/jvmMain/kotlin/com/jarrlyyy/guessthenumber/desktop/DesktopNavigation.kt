@@ -35,8 +35,8 @@ enum class DesktopNavigationPosition(val label: String) {
 }
 
 /**
- * Windows-owned navigation contract. Destinations are added here as each
- * parity stage implements a real screen; Android navigation stays platform-owned.
+ * Windows-owned navigation contract. Quick-access destinations may expose
+ * partial screens while parity work continues; Android navigation stays platform-owned.
  */
 enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     PLAY("Play", Key.One),
@@ -69,6 +69,23 @@ enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     LIVE_OPS("Live Ops", null);
 
     companion object {
+        /** Desktop-only quick-access order; Android navigation is unchanged. */
+        val MAIN_NAVIGATION_ORDER: List<DesktopDestination> = listOf(
+            PLAY,
+            UPGRADES,
+            SHOP,
+            PRESTIGE,
+            ULTRA,
+            SETTINGS,
+            ARCADE,
+            MUSIC_PLAYER,
+            SAVE_SLOTS,
+            STATS,
+            WORLD_MAP,
+            CHANGELOG,
+            MORE
+        )
+
         fun fromShortcut(key: Key, ctrlPressed: Boolean): DesktopDestination? {
             if (!ctrlPressed) return null
             return entries.firstOrNull { it.shortcutKey == key }
