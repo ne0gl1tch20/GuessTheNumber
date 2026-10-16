@@ -22,7 +22,9 @@ class DesktopThemePaletteTest {
     fun bothPalettesProvideDistinctSurfaceAndBackgroundColors() {
         assertTrue(DesktopThemePalette.light.surface != DesktopThemePalette.light.background)
         assertTrue(DesktopThemePalette.dark.surface != DesktopThemePalette.dark.background)
-        assertTrue(DesktopThemePalette.light.primary != DesktopThemePalette.dark.primary)
+        // Android's ExpressiveDarkColorScheme and ExpressiveLightColorScheme both use PrimaryNeonPurple.
+        assertTrue(DesktopThemePalette.light.primary == Color(0xFF9C27B0))
+        assertTrue(DesktopThemePalette.dark.primary == Color(0xFF9C27B0))
     }
 
     @Test
