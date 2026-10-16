@@ -171,7 +171,12 @@ internal fun DesktopWorldMapContent(state: GameState, onBack: () -> Unit, onWorl
                         val unlocked = world.id in state.unlockedWorldIds
                         val selectedWorld = world.id == selectedId
                         Surface(
-                            onClick = { selectedId = world.id },
+                            onClick = {
+                                selectedId = world.id
+                                if (unlocked && (!state.endlessRiftActive || world.id == state.activeWorldId)) {
+                                    onWorldAction(world.id, "select")
+                                }
+                            },
                             modifier = Modifier.offset(x = mapWidth * world.x - 54.dp, y = mapHeight * world.y - 34.dp).size(width = 108.dp, height = 68.dp),
                             shape = RoundedCornerShape(18.dp),
                             color = when {
