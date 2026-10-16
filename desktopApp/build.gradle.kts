@@ -1,5 +1,7 @@
 import buildlogic.GenerateDesktopLogoAssets
 
+import org.gradle.api.tasks.testing.Test
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
@@ -78,5 +80,12 @@ compose.desktop {
                 shortcut = true
             }
         }
+    }
+}
+
+// Show the parity context banner printed by desktop JVM tests in Gradle/CI test logs.
+tasks.withType<Test>().matching { it.name == "jvmTest" }.configureEach {
+    testLogging {
+        showStandardStreams = true
     }
 }
