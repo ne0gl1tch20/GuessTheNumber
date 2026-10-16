@@ -167,7 +167,7 @@ This candidate closes several concrete gaps found during Stage 2-D review:
 - explicit confirmation before Prestige/Ultra resets;
 - deterministic tests for bulk cost, MAX affordability and mutator validation/range behavior.
 
-Follow-up source review also replaced the hardcoded Windows talent list with the canonical Android talent catalog, including costs, descriptions and prerequisite IDs. These source changes are not yet validated by CI or new Windows runtime checks. The full Stage 2 gate remains open. Remaining review items include rate-limiting/edge-case parity, remaining Prestige/Ultra shop effect parity, broader large-number and reset checks, and actual Windows runtime evidence for mutators and bulk buys.
+Follow-up source review replaced the hardcoded Windows talent list with the canonical Android talent catalog, including costs, descriptions and prerequisite IDs. It also fixed the desktop resource lookup to use the bundled `game/` directory and added the missing canonical talent, Prestige shop and Ultra shop JSON resources. Bulk purchase calculations now use Android's largest-affordable-prefix behavior for 10/100/MAX. These source changes are not yet validated by CI or new Windows runtime checks. The full Stage 2 gate remains open. Remaining review items include rate-limiting/edge-case parity, remaining Prestige/Ultra shop effect parity, broader large-number and reset checks, and actual Windows runtime evidence for mutators and bulk buys.
 
 ## Stage 1 source audit (2026-10-15)
 
