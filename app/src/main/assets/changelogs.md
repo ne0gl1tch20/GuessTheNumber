@@ -1,5 +1,7 @@
 ## Unreleased (Windows Stage 2 Economy Parity)
 
+- 🖥️ **Desktop navigation and layout**: Windows now separates Play, Progress, and Economy into dedicated destinations so guessing controls, daily progression, and shop purchases are easier to find. The Windows Debug updater now lives under About instead of taking space above gameplay. Keyboard shortcuts are Ctrl+1 through Ctrl+4 for Play, Progress, Economy, and About.
+
 - 💰 **Desktop economy actions**: Windows now exposes the shared production economy through upgrade purchases, Prestige and Ultra resets, Prestige/Ultra upgrades, Nebula shop purchases and talent unlocks. Transactions validate affordability and prerequisites, preserve permanent progress across resets and save before updating the visible state.
 - 🧪 **Economy parity coverage**: Added tests for exact upgrade costs, insufficient funds, maximum levels, Prestige/Ultra reset requirements and preserved state, duplicate shop purchases, talent prerequisites and bundled catalog loading.
 - 📦 **Shared catalog data**: Bundled the existing Android upgrade and shop definitions with the Windows desktop app so the desktop catalog starts from the same game data.
