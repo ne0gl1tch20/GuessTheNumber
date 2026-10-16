@@ -466,18 +466,15 @@ fun ProductionGuessGameScreen(
                             if (relic == null) {
                                 feedback = "That relic is not in the catalog."
                             } else {
-                                val updated = when (action) {
-                                    "claim" -> if (relic.unlockBossId in before.defeatedBossIds && relicId !in before.relicInventory) before.copy(relicInventory = before.relicInventory + relicId) else null
-                                    "equip" -> DesktopRelicRules.equip(before, relicId)
-                                    "unequip" -> if (relicId in before.equippedRelicIds) before.copy(equippedRelicIds = before.equippedRelicIds - relicId) else null
-                                    else -> null
+                                val transaction = when (action) {
+                                    "claim" -> DesktopEconomyTransactions.claimRelic(before, relicId, relic.unlockBossId)
+                                    "equip" -> DesktopEconomyTransactions.equipRelic(before, relicId)
+                                    "unequip" -> DesktopEconomyTransactions.unequipRelic(before, relicId)
+                                    else -> EconomyTransaction(before, false, "That relic action is not available.")
                                 }
+                                val updated = transaction.state
                                 if (updated == null) {
-                                    feedback = when (action) {
-                                        "claim" -> "Defeat " + relic.unlockBossName + " first, or this relic is already claimed."
-                                        "equip" -> "Own the relic first and keep no more than three relics equipped."
-                                        else -> "That relic action is not available."
-                                    }
+                                    feedback = transaction.message
                                 } else {
                                     isSaving = true
                                     scope.launch {
