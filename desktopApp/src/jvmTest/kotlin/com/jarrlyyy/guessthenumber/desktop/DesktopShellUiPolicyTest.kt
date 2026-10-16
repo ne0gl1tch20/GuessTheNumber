@@ -35,8 +35,16 @@ class DesktopShellUiPolicyTest {
             resolveDesktopShellKeyAction(Key.One, true, DesktopDestination.ABOUT, false)
         )
         assertEquals(
-            DesktopShellKeyAction.NAVIGATE_ABOUT,
+            DesktopShellKeyAction.NAVIGATE_PROGRESSION,
             resolveDesktopShellKeyAction(Key.Two, true, DesktopDestination.PLAY, false)
+        )
+        assertEquals(
+            DesktopShellKeyAction.NAVIGATE_ECONOMY,
+            resolveDesktopShellKeyAction(Key.Three, true, DesktopDestination.PLAY, false)
+        )
+        assertEquals(
+            DesktopShellKeyAction.NAVIGATE_ABOUT,
+            resolveDesktopShellKeyAction(Key.Four, true, DesktopDestination.PLAY, false)
         )
     }
 
@@ -44,7 +52,7 @@ class DesktopShellUiPolicyTest {
     fun unsupportedControlShortcutDoesNothing() {
         assertEquals(
             DesktopShellKeyAction.NONE,
-            resolveDesktopShellKeyAction(Key.Three, true, DesktopDestination.PLAY, false)
+            resolveDesktopShellKeyAction(Key.Five, true, DesktopDestination.PLAY, false)
         )
     }
 
