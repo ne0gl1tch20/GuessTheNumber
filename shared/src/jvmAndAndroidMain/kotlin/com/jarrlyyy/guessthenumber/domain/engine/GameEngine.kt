@@ -60,6 +60,23 @@ class GameEngine(private val rng: Random = Random.Default) {
     fun applyMutatorSet(state: GameState, mutators: Set<String>): GameState =
         state.copy(activeMutators = validateMutators(mutators))
 
+    /**
+     * Delay used by Android and Windows for the production Auto Clicker loop.
+     * Keep this formula aligned with Android's existing talent and mutator behavior.
+     */
+    fun autoClickerDelayMillis(state: GameState): Long {
+        val talentSpeed =
+            (if ("talent_speed_1" in state.prestigeShopPurchases) 1.25 else 1.0) *
+                (if ("talent_speed_2" in state.prestigeShopPurchases) 1.5 else 1.0)
+        val effectiveSpeed = state.autoClickerSpeed * talentSpeed *
+            if ("mut_speed" in state.activeMutators) 3.0 else 1.0
+        return if (state.autoClickerActive && effectiveSpeed > 0.0) {
+            (1_000.0 / effectiveSpeed).toLong()
+        } else {
+            1_000L
+        }
+    }
+
     /** Effective auto-clicker frequency multiplier from permanent shop effects. */
     fun autoClickerSpeedMultiplier(state: GameState): Double {
         var multiplier = 1.0
