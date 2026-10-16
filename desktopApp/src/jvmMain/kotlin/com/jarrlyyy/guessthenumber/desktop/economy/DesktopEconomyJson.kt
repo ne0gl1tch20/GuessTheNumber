@@ -5,6 +5,7 @@ import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.int
@@ -43,6 +44,32 @@ internal object DesktopEconomyJson {
                 nebulaCost = item.requiredLong("nebulaCost"),
                 category = item["category"]?.jsonPrimitive?.content ?: "general",
                 isCosmetic = item["isCosmetic"]?.jsonPrimitive?.boolean ?: false
+            )
+        }
+
+    fun currencyShopItems(source: String): List<DesktopCurrencyShopItem> =
+        root(source).requiredArray("shopItems").map { value ->
+            val item = value.jsonObject
+            DesktopCurrencyShopItem(
+                id = item.requiredString("id"),
+                name = item.requiredString("name"),
+                description = item.requiredString("description"),
+                cost = item.requiredLong("cost")
+            )
+        }
+
+    fun talents(source: String): List<DesktopTalentDef> =
+        root(source).requiredArray("talents").map { value ->
+            val item = value.jsonObject
+            DesktopTalentDef(
+                id = item.requiredString("id"),
+                name = item.requiredString("name"),
+                description = item.requiredString("description"),
+                cost = item.requiredLong("cost"),
+                requiredParentId = item["requiredParentId"]?.let { parent ->
+                    if (parent is JsonPrimitive && parent.content == "null") null
+                    else parent.jsonPrimitive.content
+                }
             )
         }
 
