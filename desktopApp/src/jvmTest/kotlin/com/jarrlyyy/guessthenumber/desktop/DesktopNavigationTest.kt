@@ -69,7 +69,7 @@ class DesktopNavigationTest {
         assertEquals(DesktopDestination.PLAY, controller.state.destination)
         assertNull(controller.state.message)
 
-        assertTrue(controller.handleKey(Key.Two, ctrlPressed = true))
+        assertTrue(controller.handleKey(Key.Four, ctrlPressed = true))
         assertEquals(DesktopDestination.ABOUT, controller.state.destination)
     }
 
