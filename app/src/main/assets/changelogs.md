@@ -1,5 +1,6 @@
 ## Unreleased (Windows Progression Parity)
 
+- 🌳 **Windows Talent Web**: Replaced the flat talent catalog with a connected six-node tree, selectable node details, zoom controls, drag/pinch navigation, parent-lock feedback and transaction-backed unlocks. Runtime screenshot parity remains unverified.
 - 🗺️ **World and boss progression**: Added Windows boss battle start/leave actions and connected guesses to shared boss damage, miss regression and victory-reward transactions. The interactive map canvas and Windows runtime parity checks remain unfinished.
 - 💎 **Relic transactions**: Relic claiming now checks boss unlock requirements and duplicate ownership; equip/unequip actions validate ownership and the four-slot limit through shared transactions.
 - 📖 **Explorer's Codex**: Added the 12 canonical world, boss and secret entries, saved discovery progress, and a one-time 100 Nebula completion reward.
