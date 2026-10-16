@@ -24,12 +24,12 @@ PR #214 is merged. It connected saved Android-equivalent theme mode and custom c
 | About | Windows update page exists; Android content parity incomplete |
 | Achievements, World Map, Mutators, Save Slots, Relics, Home Base, Codex, Endgame, Lucky Stake | Navigation routes added; feature data/actions are still missing |
 | Developer Settings, Developer Console, Process Inspector | Navigation routes added; diagnostics/command behavior is still missing |
-| Music Player, Arcade, Activity Hub, Lua Testing Hub, Changelog, Live Ops | Navigation routes added; feature-specific behavior is still missing |
+| Music Player, Arcade, Activity Hub, Lua Testing Hub, Live Ops | Navigation routes added; feature-specific behavior is still missing |\n| Changelog | Ported to a Windows scrollable Markdown viewer using the canonical Android `changelogs.md` asset; automated resource test added |
 | Crash Recovery | Windows boot/save recovery parity is not verified |
 | Guided Tutorial / Feature Tour | Android-equivalent overlays are not ported |
 
 ## Stage 3: Behavior and shared rules
-- [ ] Reuse shared domain rules, repositories, catalog data, localization resources and assets wherever possible.
+- [x] Changelog viewer reuses the canonical Android changelog asset instead of maintaining a duplicate Windows copy.\n- [ ] Reuse shared domain rules, repositories, catalog data, localization resources and assets wherever possible.
 - [ ] Match Android actions, purchases, rewards, unlocks, resets, settings, confirmations and validation.
 - [ ] Preserve offline behavior, save compatibility and recovery behavior, with no ads, analytics or accounts.
 - [ ] Gate development and Live Ops features using equivalent flags and sandbox validation.
@@ -44,4 +44,4 @@ PR #214 is merged. It connected saved Android-equivalent theme mode and custom c
 
 ## This batch
 
-Adds explicit navigation to the remaining Android screen families and per-screen parity notes so gaps are visible rather than hidden behind the More menu. These new routes are tracking shells, not finished feature ports. Next work should replace each shell with the Android screen real content and shared behavior in small verified batches.
+Adds explicit navigation to the remaining Android screen families and per-screen parity notes so gaps are visible rather than hidden behind the More menu. The Changelog route is now a functional first screen port: it loads the canonical Android Markdown asset, renders headings and list items in a scrollable desktop layout, and has a resource smoke test. The other new routes remain tracking shells, not finished feature ports. Next work should replace each shell with the Android screen real content and shared behavior in small verified batches.
