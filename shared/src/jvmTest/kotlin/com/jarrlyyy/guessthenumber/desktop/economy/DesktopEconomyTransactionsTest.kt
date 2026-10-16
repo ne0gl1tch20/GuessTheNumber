@@ -558,4 +558,27 @@ class DesktopEconomyTransactionsTest {
         assertFalse(result.accepted)
         assertEquals(initial, result.state)
     }
+
+    @Test
+    fun canonicalTalentPrerequisiteIsEnforcedAndThenAllowsPurchase() {
+        val initial = GameState(prestige = BigNumber(1_000))
+        val blocked = DesktopEconomyTransactions.buyTalent(
+            initial, "talent_speed_2", 500L, "talent_speed_1"
+        )
+        assertFalse(blocked.accepted)
+        assertEquals(initial, blocked.state)
+
+        val root = DesktopEconomyTransactions.buyTalent(
+            initial, "talent_speed_1", 100L, null
+        )
+        assertTrue(root.accepted)
+        assertEquals(BigNumber(900), root.state.prestige)
+
+        val child = DesktopEconomyTransactions.buyTalent(
+            root.state, "talent_speed_2", 500L, "talent_speed_1"
+        )
+        assertTrue(child.accepted)
+        assertEquals(BigNumber(400), child.state.prestige)
+        assertTrue("talent_speed_2" in child.state.prestigeShopPurchases)
+    }
 }
