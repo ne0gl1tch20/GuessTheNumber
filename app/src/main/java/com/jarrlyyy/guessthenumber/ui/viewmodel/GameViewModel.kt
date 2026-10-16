@@ -1429,7 +1429,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             money = state.money + finalMoneyReward,
             statistics = state.statistics.copy(
                 moneyEarned = state.statistics.moneyEarned + finalMoneyReward,
-                nebulaEarned = state.statistics.nebulaEarned + finalNebulaReward
+                nebulaEarned = gameEngine.addNebulaEarned(state.statistics.nebulaEarned, finalNebulaReward)
             )
         )
         saveGameAsync()
