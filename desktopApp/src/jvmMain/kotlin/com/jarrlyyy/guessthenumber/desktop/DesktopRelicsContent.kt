@@ -143,7 +143,7 @@ internal fun DesktopRelicsContent(
                     if (activeBonuses.isEmpty()) {
                         Text("Equip two or more boss relics to activate a set bonus.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     } else activeBonuses.forEach { bonus -> Text(bonus) }
-                    Text("These bonuses are applied by the Windows gameplay reward calculation after each correct guess.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
+                    Text("These bonuses are applied by the shared Windows reward calculation after each correct guess.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
