@@ -24,7 +24,8 @@ PR #214 is merged. It connected saved Android-equivalent theme mode and custom c
 | About | Windows update page exists; Android content parity incomplete |
 | Achievements, World Map, Mutators, Save Slots, Relics, Home Base, Codex, Endgame, Lucky Stake | Navigation routes added; feature data/actions are still missing |
 | Developer Settings, Developer Console, Process Inspector | Navigation routes added; diagnostics/command behavior is still missing |
-| Music Player, Arcade, Activity Hub, Lua Testing Hub, Live Ops | Navigation routes added; feature-specific behavior is still missing |\n| Changelog | Ported to a Windows scrollable Markdown viewer using the canonical Android `changelogs.md` asset; automated resource test added |
+| Music Player, Arcade, Activity Hub, Lua Testing Hub, Live Ops | Navigation routes added; feature-specific behavior is still missing |
+| Changelog | Ported to a Windows scrollable Markdown viewer using the canonical Android `changelogs.md` asset; automated resource test added |
 | Crash Recovery | Windows boot/save recovery parity is not verified |
 | Guided Tutorial / Feature Tour | Android-equivalent overlays are not ported |
 
