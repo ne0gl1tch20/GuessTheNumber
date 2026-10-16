@@ -14,6 +14,8 @@ import java.nio.file.StandardOpenOption
 
 private const val MAX_SAVE_SLOTS = 10
 
+internal data class DesktopSaveSlotSummary(val slot: Int, val state: GameState?, val isEmpty: Boolean, val hasBackup: Boolean, val isCorrupt: Boolean)
+
 internal interface DesktopSaveFileOps {
     fun createDirectories(path: Path)
     fun read(path: Path): String
@@ -117,6 +119,59 @@ class DesktopSaveStore internal constructor(
         }.isSuccess
     }
 
+
+    suspend fun activeSlot(): Int {
+        val path = activeSlotPath()
+        val value = runCatching { if (fileOps.exists(path)) fileOps.read(path).trim().toIntOrNull() else null }.getOrNull()
+        return normalizeSlot(value ?: 1)
+    }
+
+    suspend fun setActiveSlot(slot: Int): Boolean = runCatching {
+        fileOps.createDirectories(rootDirectory)
+        writeAtomically(activeSlotPath(), normalizeSlot(slot).toString())
+    }.isSuccess
+
+    suspend fun slotSummaries(): List<DesktopSaveSlotSummary> = (1..MAX_SAVE_SLOTS).map { slot ->
+        val primary = primaryPath(slot)
+        val backup = backupPath(slot)
+        val primaryExists = runCatching { fileOps.exists(primary) }.getOrDefault(false)
+        val backupExists = runCatching { fileOps.exists(backup) }.getOrDefault(false)
+        val primaryState = readValid(primary)
+        val backupState = readValid(backup)
+        DesktopSaveSlotSummary(slot, primaryState ?: backupState, !primaryExists && !backupExists, backupState != null, (primaryExists || backupExists) && primaryState == null && backupState == null)
+    }
+
+    suspend fun createFreshSlot(slot: Int, state: GameState): Boolean {
+        val normalized = normalizeSlot(slot)
+        if (!validate(state)) return false
+        val occupied = runCatching { fileOps.exists(primaryPath(normalized)) || fileOps.exists(backupPath(normalized)) }.getOrDefault(true)
+        return !occupied && save(normalized, state)
+    }
+
+    suspend fun duplicateSlot(sourceSlot: Int, targetSlot: Int): Boolean {
+        val source = normalizeSlot(sourceSlot)
+        val target = normalizeSlot(targetSlot)
+        if (source == target) return false
+        val sourceState = load(source) ?: return false
+        val occupied = runCatching { fileOps.exists(primaryPath(target)) || fileOps.exists(backupPath(target)) }.getOrDefault(true)
+        if (occupied) return false
+        val saved = save(target, sourceState.copy(lastSaveTimestamp = System.currentTimeMillis()))
+        if (!saved) return false
+        val sourceBackup = readValidJson(backupPath(source))
+        if (sourceBackup != null) runCatching { writeAtomically(backupPath(target), sourceBackup) }
+        return true
+    }
+
+    suspend fun restoreBackup(slot: Int): Boolean {
+        val normalized = normalizeSlot(slot)
+        val previous = readValid(backupPath(normalized)) ?: return false
+        val current = readValid(primaryPath(normalized)) ?: return false
+        return runCatching {
+            writeAtomically(primaryPath(normalized), json.encodeToString(previous))
+            writeAtomically(backupPath(normalized), json.encodeToString(current))
+        }.isSuccess
+    }
+
     fun validate(state: GameState): Boolean =
         Difficulty.isValid(state.difficultyId) &&
             state.money.value >= BigNumber.ZERO.value &&
@@ -180,6 +235,8 @@ class DesktopSaveStore internal constructor(
         fileOps.write(temp, content)
         fileOps.moveReplace(temp, target)
     }
+
+    private fun activeSlotPath(): Path = rootDirectory.resolve("active-slot.txt")
 
     private fun primaryPath(slot: Int): Path = rootDirectory.resolve("slot-${slot}.json")
 
