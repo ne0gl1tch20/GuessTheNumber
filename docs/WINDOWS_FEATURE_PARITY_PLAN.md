@@ -3,7 +3,7 @@
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
 
-**Latest increment (2026-10-16):** PRs #218 and #219 are merged with Android Validation and Windows Desktop CI passing. Current candidate PR #220 shares all six permanent Prestige/Ultra effects through `GameEngine`, centralizes achievement reward calculation for Android and Windows, and adds a desktop-only scrollable main-navigation order. The current candidate's CI is pending; the previous Auto Clicker runtime checklist was reported passed by the owner. Windows screen/runtime parity and the Stage 2 exit gate remain open.
+**Latest increment (2026-10-16):** PR #220 merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f`. It implements all six permanent Prestige/Ultra effects in shared `GameEngine`, centralizes achievement reward calculation for Android/Windows, adds a Windows Arcade reward transaction adapter, and adds desktop-only scrollable main navigation. Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910080423) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910065849) on head `762d029c828f498b10f686e3d74f920865e17437`; a duplicate Windows run [also passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910080000). Owner reports earlier Auto Clicker and Talent Web checks passed. Runtime verification of the newly merged upgrade effects/navigation and the overall Stage 2 parity gate remain open.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
@@ -124,7 +124,8 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Persist/reload a run through the desktop save adapter; user reported the focused restart/save check passed.
 - [x] Use one shared `GameEngine.autoClickerDelayMillis` calculation for Android and Windows, including stacked speed talents and the `mut_speed` multiplier. Automated timing tests and both CI workflows passed for PR #219; owner reports the focused Windows checks passed.
 - [x] Add Windows-only main-navigation quick access in this order: Play, Upgrades, Shop, Prestige, Ultra, Settings, Arcade, Music, Save Slots, Statistics, World Map, Changelog, More. Left-side navigation remains the desktop default; vertical and horizontal variants scroll. Android navigation and saved settings are unchanged.
-- [ ] Validate current candidate CI, verify reset/earning effects on Windows, and complete the remaining Android economy/catalog effect parity review.
+- [x] PR #220 Android Validation and Windows Desktop CI passed on the exact head before merge.
+- [ ] Verify the six new effects and scrollable main navigation in the merged Windows build; complete the remaining Android economy/catalog effect parity review.
 
 **Exit:** The full core loop works on Windows and matches Android rules for deterministic cases.
 
@@ -133,7 +134,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Prestige and Ultra flows enforce shared requirements/rewards and now require confirmation before reset.
 - [x] Load talent costs and prerequisites from the canonical catalog; PR #218 makes both purchase validation and Talent Web parent gating read the bundled catalog rather than a second hardcoded rule map. Its Android and Windows CI passed before merge. The visible Windows labels/descriptions still use the Android fallback copy, and locale-aware rendering/runtime parity remain open.
 - [x] Implement all six permanent Prestige/Ultra upgrade effects in shared rules for Android and Windows, driven by each canonical catalog's `effectPerLevel`: Prestige Wealth adds 0.5× per level to its money multiplier; Cosmic Wealth adds 2× per level to its money multiplier; the two money multipliers stack multiplicatively; Prestige Catalyst multiplies reset Prestige by 1 + 0.2× level; Prestige Endowment grants 1,000 Money per level after Prestige or Ultra reset using the pre-reset level; Eternal Expansion multiplies Ultra reset reward by 1 + 0.5× level while preserving the 2,000 cap; Nebula Resonance multiplies achievement/Arcade Nebula payouts by 1 + level and stacks with the existing `nebula_boost` shop item. Shared achievement unlock/reward logic is now used by both hosts.
-- [ ] Verify all six effects on the current Windows candidate. Windows Arcade and Music Player routes are now directly reachable from the desktop main navigation but still use placeholder screens; the Nebula upgrade's Windows Arcade behavior cannot be confirmed until Arcade is implemented.
+- [ ] Verify all six effects and reset/save persistence in the merged Windows build. Windows Arcade and Music Player routes are now directly reachable from the desktop main navigation but still use placeholder screens; the Nebula upgrade's Windows Arcade behavior cannot be confirmed until Arcade is implemented.
 - [ ] Verify large-number display and calculations across representative Android-matching cases.
 - [x] Add deterministic exact-cost bulk-purchase tests and retain reset-preservation/duplicate-reward tests.
 - [ ] Verify all reset preservation and boundary cases on the current candidate.
