@@ -33,6 +33,9 @@ class GameEngine(private val rng: Random = Random.Default) {
         const val FRENZY_THRESHOLD = FrenzyRules.THRESHOLD
         const val FRENZY_BONUS_PER_TIER = FrenzyRules.BONUS_PER_TIER
         const val FRENZY_MAX_MULTIPLIER = FrenzyRules.MAX_MULTIPLIER
+        const val PRESTIGE_AUTO_SPEED_MULTIPLIER = 1.5
+        const val PRESTIGE_LUCK_CHARM_BONUS = 0.05
+        const val INFINITE_SINGULARITY_REWARD_MULTIPLIER = 2.0
     }
 
     fun frenzyMultiplier(streak: Int): BigNumber =
@@ -57,6 +60,18 @@ class GameEngine(private val rng: Random = Random.Default) {
     fun applyMutatorSet(state: GameState, mutators: Set<String>): GameState =
         state.copy(activeMutators = validateMutators(mutators))
 
+    /** Effective auto-clicker frequency multiplier from permanent shop effects. */
+    fun autoClickerSpeedMultiplier(state: GameState): Double {
+        var multiplier = 1.0
+        if ("prestige_auto_speed" in state.prestigeShopPurchases) {
+            multiplier *= PRESTIGE_AUTO_SPEED_MULTIPLIER
+        }
+        if ("mut_speed" in state.activeMutators) {
+            multiplier *= 3.0
+        }
+        return multiplier
+    }
+
     fun processGuess(state: GameState, guess: Long): GuessResult {
         // Map the existing Android save model into the shared guessing-state slice.
         // Keep currency, statistics, upgrades and persistence in the Android engine.
@@ -75,13 +90,16 @@ class GameEngine(private val rng: Random = Random.Default) {
         val feedback = transition.feedback
 
         if (feedback == GuessFeedback.CORRECT) {
-            val critChance = if (
+            val baseCritChance = CriticalChanceRules.chance(
+                state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0
+            )
+            val critChance = when {
+                "ultra_universal_harmony" in state.ultraShopPurchases -> 1.0
                 "golden_guess" in state.shopPurchases &&
-                (state.statistics.totalGuesses + 1L) % 10L == 0L
-            ) {
-                1.0
-            } else {
-                CriticalChanceRules.chance(state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0)
+                    (state.statistics.totalGuesses + 1L) % 10L == 0L -> 1.0
+                "prestige_luck_charm" in state.prestigeShopPurchases ->
+                    (baseCritChance + PRESTIGE_LUCK_CHARM_BONUS).coerceAtMost(1.0)
+                else -> baseCritChance
             }
             val criticalRoll = rng.nextDouble()
             val newMin = 1L
@@ -117,7 +135,12 @@ class GameEngine(private val rng: Random = Random.Default) {
             val talentMult = BigNumber(economyDecision.talentMultiplier)
             val mutatorMult = BigNumber(economyDecision.mutatorMultiplier)
             val difficultyMultiplier = BigNumber(economyDecision.difficultyMultiplier)
-            val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier
+            val shopRewardMultiplier = if ("ultra_infinite_multiplier" in state.ultraShopPurchases) {
+                BigNumber(INFINITE_SINGULARITY_REWARD_MULTIPLIER)
+            } else {
+                BigNumber.ONE
+            }
+            val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier * shopRewardMultiplier
             val totalReward = maxOf(BigNumber(economyDecision.minimumGuessReward), calculatedReward)
             val newMoney = state.money + totalReward
             val newStreak = transition.streak
