@@ -5,8 +5,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -44,24 +51,24 @@ internal fun DesktopHomeBaseContent(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            OutlinedButton(onClick = onBack) { Text("Back to More") }
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            }
             Text("Home Base", style = MaterialTheme.typography.headlineSmall)
         }
 
-        Card {
+        Card(colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                modifier = Modifier.fillMaxWidth().padding(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("✦", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.primary)
-                Text("Sanctuary Level $level", style = MaterialTheme.typography.headlineMedium)
+                Icon(Icons.Default.Home, contentDescription = null, modifier = Modifier.padding(4.dp))
+                Text("Sanctuary Level $level", style = MaterialTheme.typography.headlineSmall)
                 Text(
                     "Restore your cosmic sanctuary as your journey grows.",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
-                Text("$level / 20 levels restored", style = MaterialTheme.typography.labelMedium)
             }
         }
 
@@ -80,9 +87,10 @@ internal fun DesktopHomeBaseContent(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    Text(
-                        if (level >= requiredLevel) "✓" else "🔒",
-                        style = MaterialTheme.typography.titleMedium
+                    Icon(
+                        imageVector = if (level >= requiredLevel) Icons.Default.CheckCircle else Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = if (level >= requiredLevel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                     )
                 }
             }
@@ -101,7 +109,7 @@ internal fun DesktopHomeBaseContent(
             color = MaterialTheme.colorScheme.tertiary
         )
         Text(
-            "Restoration progress is saved with this save slot.",
+            "Each restoration costs more than the previous one. Your level and building milestones are saved with this slot.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
