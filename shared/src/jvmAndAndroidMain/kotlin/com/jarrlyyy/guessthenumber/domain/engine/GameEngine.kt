@@ -157,8 +157,8 @@ class GameEngine(private val rng: Random = Random.Default) {
             } else {
                 BigNumber.ONE
             }
-            val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier * shopRewardMultiplier * moneyEarningMultiplier(state)
-            val totalReward = maxOf(BigNumber(economyDecision.minimumGuessReward), calculatedReward)
+            val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier * shopRewardMultiplier
+            val totalReward = maxOf(BigNumber(economyDecision.minimumGuessReward), calculatedReward) * moneyEarningMultiplier(state)
             val newMoney = state.money + totalReward
             val newStreak = transition.streak
             val bestStreak = transition.bestStreak
