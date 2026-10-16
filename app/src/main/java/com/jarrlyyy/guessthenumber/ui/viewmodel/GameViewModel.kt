@@ -1152,7 +1152,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             worldMasteryLevels = state.worldMasteryLevels + (worldId to ((state.worldMasteryLevels[worldId] ?: 0) + 1)),
             statistics = state.statistics.copy(
                 moneyEarned = state.statistics.moneyEarned + finalMoneyReward,
-                nebulaEarned = state.statistics.nebulaEarned + finalNebulaReward
+                nebulaEarned = gameEngine.addNebulaEarned(state.statistics.nebulaEarned, finalNebulaReward)
             )
         )
         saveGameAsync()
