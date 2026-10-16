@@ -503,8 +503,9 @@ fun ProductionGuessGameScreen(
                 androidx.compose.material3.HorizontalDivider()
 
                 if (catalog == null) {
+                    val catalogError = catalogResult.exceptionOrNull()?.message ?: "unknown error"
                     Text(
-                        "Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}",
+                        "Economy catalog could not be loaded: $catalogError",
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
@@ -610,7 +611,8 @@ fun ProductionGuessGameScreen(
             if (section == DesktopGameSection.TALENT) {
             SectionTitle("Talents")
                 if (talentCatalog == null) {
-                    Text("Talent catalog could not be loaded: ${talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"}")
+                    val talentCatalogError = talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"
+                    Text("Talent catalog could not be loaded: $talentCatalogError")
                 } else {
                     talentCatalog.forEach { talent ->
                         val owned = talent.id in currentState.prestigeShopPurchases
