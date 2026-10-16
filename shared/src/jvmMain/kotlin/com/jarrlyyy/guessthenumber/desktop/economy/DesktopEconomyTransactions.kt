@@ -420,6 +420,28 @@ object DesktopEconomyTransactions {
     }
 
     /** Applies Android's achievement milestones after any persisted gameplay/economy transition. */
+    fun awardArcadeReward(
+        state: GameState,
+        nebulaReward: Long,
+        moneyReward: BigNumber
+    ): EconomyTransaction {
+        if (nebulaReward < 0L || moneyReward < BigNumber.ZERO) {
+            return rejected(state, "Invalid Arcade reward.")
+        }
+        val engine = GameEngine()
+        val finalNebulaReward = engine.calculateNebulaReward(state, nebulaReward)
+        val finalMoneyReward = engine.applyMoneyEarningBoost(state, moneyReward)
+        val next = state.copy(
+            nebula = state.nebula + BigNumber(finalNebulaReward),
+            money = state.money + finalMoneyReward,
+            statistics = state.statistics.copy(
+                moneyEarned = state.statistics.moneyEarned + finalMoneyReward,
+                nebulaEarned = state.statistics.nebulaEarned + finalNebulaReward
+            )
+        )
+        return accepted(next, "Arcade reward: $finalNebulaReward Nebula and $finalMoneyReward Money.")
+    }
+
     fun evaluateAchievements(state: GameState): GameState =
         GameEngine().evaluateAchievements(state)
 
