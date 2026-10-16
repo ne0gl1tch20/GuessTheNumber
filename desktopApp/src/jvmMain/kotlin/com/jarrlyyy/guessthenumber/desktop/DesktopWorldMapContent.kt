@@ -113,7 +113,19 @@ internal fun DesktopWorldMapContent(state: GameState, onBack: () -> Unit, onWorl
                                 Text("Boss HP: ${(bossHp - damage).coerceAtLeast(0)} / $bossHp")
                                 LinearProgressIndicator(progress = { (damage.toFloat() / bossHp.toFloat()).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth())
                                 Text("Battle requirements: ${world.fightCorrectGuesses} correct guesses, ${world.fightUpgradeCount} upgrade levels, ${world.fightPrestigeCount} Prestige, ${world.fightUltraCount} Ultra")
-                                Text(if (state.activeBossBattleWorldId == world.id) "Battle active in saved state. Boss start/leave controls are not wired on Windows yet." else if (canFight) "Requirements met. Boss battle controls are not wired on Windows yet." else "Keep progressing to meet the boss requirements.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    if (state.activeBossBattleWorldId == world.id) "Battle active. Return to Play and guess the number to damage the boss."
+                                    else if (canFight) "Requirements met. Start the battle to make correct guesses damage this boss."
+                                    else "Keep progressing to meet the boss requirements.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Button(
+                                    onClick = { onWorldAction(world.id, "boss") },
+                                    enabled = canFight || state.activeBossBattleWorldId == world.id
+                                ) {
+                                    Text(if (state.activeBossBattleWorldId == world.id) "Leave battle" else "Start boss battle")
+                                }
                             }
                             Text("Secret area: ${world.secretId} · appears at ${world.secretAt} correct guesses", style = MaterialTheme.typography.bodySmall)
                             Text(if (world.secretId in state.discoveredSecretIds) "Secret discovered" else if (state.correctGuesses >= world.secretAt) "Secret threshold reached" else "Secret not discovered", color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelMedium)
