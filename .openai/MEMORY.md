@@ -5,6 +5,12 @@
 - Preserve the current app version unless a version bump is explicitly part of the release work. Do not imply a build or tests passed without verified results.
 - The user confirmed PR #36 (undocumented changes changelog update) is merged.
 
+## Test-output context reminders (2026-10-16)
+
+- For Windows/Android parity test suites, print a short, visible context reminder in test output so future AI-assisted sessions and reviewers see the locked goal while inspecting test logs: Android is the source of truth; Windows is the same app adapted for desktop; preserve features, visuals, gameplay, localization and saves; avoid unnecessary rewrites.
+- Keep reminders concise and relevant to the suite. They supplement, never replace, assertions and real verification. Explicitly state each suite's scope and what it does not prove; theme-token tests must not imply full UI/runtime parity.
+- Ensure the relevant Gradle test task exposes standard output in CI logs. Do not add broad, repetitive prints to every individual test.
+
 ## Windows product-feel rule (2026-10-16)
 
 - The user wants GuessTheNumber to feel like the exact same app they play on their Android phone, simply adapted for desktop. Keep the Android identity and experience: same player-facing screens and features, colors, typography, icons/artwork, content hierarchy, labels, controls, dialogs/menus, animations and interaction outcomes wherever the platform supports them.
