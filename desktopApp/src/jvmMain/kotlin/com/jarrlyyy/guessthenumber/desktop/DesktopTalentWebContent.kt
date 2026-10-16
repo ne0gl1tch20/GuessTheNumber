@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -80,9 +81,8 @@ internal fun DesktopTalentWebContent(
     val positions = remember(talents) { desktopTalentNodePositions.filter { it.id in byId } }
     val selectedPosition = positions.firstOrNull { it.id == selectedId } ?: positions.firstOrNull()
     val selected = selectedPosition?.let { byId[it.id] }
-    val selectedOwned = selected?.id in state.prestigeShopPurchases
-    val parentOwned = selectedPosition?.parentId == null ||
-        selectedPosition?.parentId in state.prestigeShopPurchases
+    val selectedOwned = selected?.id?.let { it in state.prestigeShopPurchases } ?: false
+    val parentOwned = selectedPosition?.parentId?.let { it in state.prestigeShopPurchases } ?: true
     val affordable = selected != null && state.prestige >= BigNumber(selected.cost)
 
     Column(
