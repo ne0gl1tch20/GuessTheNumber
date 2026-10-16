@@ -33,6 +33,8 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material3)
+                // Compose Multiplatform 1.8+ no longer brings this in transitively.
+                implementation(compose.materialIconsCore)
                 implementation(compose.ui)
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.serialization.json)
