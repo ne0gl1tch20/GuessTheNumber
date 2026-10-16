@@ -500,6 +500,23 @@ object DesktopEconomyTransactions {
         )
     }
 
+    /** Restores one Home Base level using Android's persisted cost/progression rules. */
+    fun upgradeHomeBase(state: GameState): EconomyTransaction {
+        val level = state.homeBaseLevel
+        if (level >= 20) return rejected(state, "The sanctuary is fully restored.")
+        if (level < 0) return rejected(state, "Invalid sanctuary level.")
+        val cost = BigNumber(50_000L * (level + 1L))
+        if (state.money < cost) return rejected(state, "Not enough Money to restore the next level.")
+        return accepted(
+            state.copy(
+                money = state.money - cost,
+                homeBaseLevel = level + 1,
+                statistics = state.statistics.copy(moneySpent = state.statistics.moneySpent + cost)
+            ),
+            "Sanctuary restored to level ${level + 1}."
+        )
+    }
+
     fun buyTalent(state: GameState, talentId: String, cost: Long): EconomyTransaction {
         val legacyParents = mapOf(
             "talent_speed_2" to "talent_speed_1",
