@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -65,13 +64,13 @@ internal fun DesktopArcadeScreen(
             Card(modifier = Modifier.weight(1f)) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Money", style = MaterialTheme.typography.labelLarge)
-                    Text(state.money.format(), style = MaterialTheme.typography.titleLarge)
+                    Text(state.money.toString(), style = MaterialTheme.typography.titleLarge)
                 }
             }
             Card(modifier = Modifier.weight(1f)) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Nebula", style = MaterialTheme.typography.labelLarge)
-                    Text(state.nebula.format(), style = MaterialTheme.typography.titleLarge)
+                    Text(state.nebula.toString(), style = MaterialTheme.typography.titleLarge)
                 }
             }
         }
@@ -133,7 +132,6 @@ internal fun DesktopArcadeScreen(
         )
         null -> Unit
         else -> {
-            // Fail closed for an unsupported catalog ID instead of inventing a reward.
             AlertDialog(
                 onDismissRequest = { activeGame = null },
                 title = { Text("Minigame unavailable") },
@@ -145,240 +143,90 @@ internal fun DesktopArcadeScreen(
 }
 
 @Composable
-private fun QuickGuessArcadeDialog(
-    onDismiss: () -> Unit,
-    isRewarding: Boolean,
-    onReward: (Long, BigNumber) -> Unit
-) {
+private fun QuickGuessArcadeDialog(onDismiss: () -> Unit, isRewarding: Boolean, onReward: (Long, BigNumber) -> Unit) {
     var score by remember { mutableStateOf(0) }
     var timeLeft by remember { mutableStateOf(10) }
     var target by remember { mutableStateOf(Random.nextLong(1, 10)) }
     var input by remember { mutableStateOf("") }
     var gameOver by remember { mutableStateOf(false) }
-
     LaunchedEffect(gameOver) {
-        if (!gameOver) {
-            while (timeLeft > 0) {
-                delay(1_000)
-                timeLeft--
-            }
-            gameOver = true
-        }
+        if (!gameOver) while (timeLeft > 0) { delay(1_000); timeLeft-- }
+        gameOver = true
     }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Quick Guess") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                if (!gameOver) {
-                    Text("Time left: ${timeLeft}s", color = MaterialTheme.colorScheme.primary)
-                    Text("Score: $score", style = MaterialTheme.typography.titleLarge)
-                    Text("Guess the target from 1 to 9: $target")
-                    OutlinedTextField(
-                        value = input,
-                        onValueChange = { input = it.filter(Char::isDigit).take(1) },
-                        label = { Text("Your guess") },
-                        singleLine = true
-                    )
-                } else {
-                    Text("Time's up! Score: $score", style = MaterialTheme.typography.titleLarge)
-                    Text("Reward: 1 Nebula and ${score * 500} Money")
-                }
-            }
-        },
-        confirmButton = {
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("Quick Guess") }, text = {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             if (!gameOver) {
-                Button(onClick = {
-                    if (input.toLongOrNull() == target) {
-                        score++
-                        target = Random.nextLong(1, 10)
-                    }
-                    input = ""
-                }) { Text("Guess") }
+                Text("Time left: ${timeLeft}s", color = MaterialTheme.colorScheme.primary)
+                Text("Score: $score", style = MaterialTheme.typography.titleLarge)
+                Text("Guess the target from 1 to 9")
+                OutlinedTextField(value = input, onValueChange = { input = it.filter(Char::isDigit).take(1) }, label = { Text("Your guess") }, singleLine = true)
             } else {
-                Button(onClick = { onReward(1L, BigNumber((score * 500).toLong())) }, enabled = !isRewarding) {
-                    Text(if (isRewarding) "Saving…" else "Claim reward")
-                }
+                Text("Time's up! Score: $score", style = MaterialTheme.typography.titleLarge)
+                Text("Reward: 1 Nebula and ${score * 500} Money")
             }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Close") } }
-    )
+        }
+    }, confirmButton = {
+        if (!gameOver) Button(onClick = { if (input.toLongOrNull() == target) { score++; target = Random.nextLong(1, 10) }; input = "" }) { Text("Guess") }
+        else Button(onClick = { onReward(1L, BigNumber((score * 500).toLong())) }, enabled = !isRewarding) { Text(if (isRewarding) "Saving…" else "Claim reward") }
+    }, dismissButton = { TextButton(onClick = onDismiss) { Text("Close") } })
 }
 
 @Composable
-private fun ReactionTestArcadeDialog(
-    onDismiss: () -> Unit,
-    isRewarding: Boolean,
-    onReward: (Long, BigNumber) -> Unit
-) {
+private fun ReactionTestArcadeDialog(onDismiss: () -> Unit, isRewarding: Boolean, onReward: (Long, BigNumber) -> Unit) {
     var phase by remember { mutableStateOf("wait") }
     var startTime by remember { mutableStateOf(0L) }
     var reactionTime by remember { mutableStateOf(0L) }
-
-    LaunchedEffect(Unit) {
-        delay(Random.nextLong(1_000, 3_000))
-        if (phase == "wait") {
-            phase = "ready"
-            startTime = System.currentTimeMillis()
+    LaunchedEffect(Unit) { delay(Random.nextLong(1_000, 3_000)); if (phase == "wait") { phase = "ready"; startTime = System.currentTimeMillis() } }
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("Reaction Test") }, text = {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            when (phase) { "wait" -> Text("Wait for green…", color = MaterialTheme.colorScheme.error, fontSize = 20.sp); "ready" -> Text("TAP NOW!", color = MaterialTheme.colorScheme.primary, fontSize = 24.sp); else -> Text(if (reactionTime == 9_999L) "Too early!" else "Reaction: ${reactionTime}ms", fontSize = 20.sp) }
         }
-    }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Reaction Test") },
-        text = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                when (phase) {
-                    "wait" -> Text("Wait for green…", color = MaterialTheme.colorScheme.error, fontSize = 20.sp)
-                    "ready" -> Text("TAP NOW!", color = MaterialTheme.colorScheme.primary, fontSize = 24.sp)
-                    else -> Text(if (reactionTime == 9_999L) "Too early!" else "Reaction: ${reactionTime}ms", fontSize = 20.sp)
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    when (phase) {
-                        "wait" -> { reactionTime = 9_999L; phase = "clicked" }
-                        "ready" -> { reactionTime = System.currentTimeMillis() - startTime; phase = "clicked" }
-                        else -> onReward(1L, BigNumber(2_000))
-                    }
-                },
-                enabled = phase != "clicked" || !isRewarding
-            ) { Text(if (phase == "clicked") if (isRewarding) "Saving…" else "Claim reward" else "Tap") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Close") } }
-    )
+    }, confirmButton = {
+        Button(onClick = { when (phase) { "wait" -> { reactionTime = 9_999L; phase = "clicked" }; "ready" -> { reactionTime = System.currentTimeMillis() - startTime; phase = "clicked" }; else -> onReward(1L, BigNumber(2_000)) } }, enabled = phase != "clicked" || !isRewarding) { Text(if (phase == "clicked") if (isRewarding) "Saving…" else "Claim reward" else "Tap") }
+    }, dismissButton = { TextButton(onClick = onDismiss) { Text("Close") } })
 }
 
 @Composable
-private fun LuckyNumberArcadeDialog(
-    onDismiss: () -> Unit,
-    isRewarding: Boolean,
-    onReward: (Long, BigNumber) -> Unit
-) {
+private fun LuckyNumberArcadeDialog(onDismiss: () -> Unit, isRewarding: Boolean, onReward: (Long, BigNumber) -> Unit) {
     var chosenBox by remember { mutableStateOf<Int?>(null) }
     val winningBox = remember { Random.nextInt(1, 4) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Lucky Number Box") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                if (chosenBox == null) {
-                    Text("Choose one of three mystery boxes to find the jackpot Nebula prize.")
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        (1..3).forEach { box ->
-                            Button(onClick = { chosenBox = box }, contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
-                                Text("Box $box")
-                            }
-                        }
-                    }
-                } else if (chosenBox == winningBox) {
-                    Text("🎉 Jackpot! Box $winningBox won 1 Nebula and 5,000 Money.", color = MaterialTheme.colorScheme.primary)
-                } else {
-                    Text("Box $chosenBox was empty. The winning box was Box $winningBox.", color = MaterialTheme.colorScheme.error)
-                }
-            }
-        },
-        confirmButton = {
-            if (chosenBox != null) {
-                Button(
-                    onClick = { if (chosenBox == winningBox) onReward(1L, BigNumber(5_000)) else onDismiss() },
-                    enabled = !isRewarding
-                ) { Text(if (chosenBox == winningBox) if (isRewarding) "Saving…" else "Claim reward" else "Close") }
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
-    )
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("Lucky Number Box") }, text = {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            if (chosenBox == null) { Text("Choose one of three mystery boxes to find the jackpot Nebula prize."); Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { (1..3).forEach { box -> Button(onClick = { chosenBox = box }, contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) { Text("Box $box") } } } }
+            else if (chosenBox == winningBox) Text("🎉 Jackpot! Box $winningBox won 1 Nebula and 5,000 Money.", color = MaterialTheme.colorScheme.primary)
+            else Text("Box $chosenBox was empty. The winning box was Box $winningBox.", color = MaterialTheme.colorScheme.error)
+        }
+    }, confirmButton = { if (chosenBox != null) Button(onClick = { if (chosenBox == winningBox) onReward(1L, BigNumber(5_000)) else onDismiss() }, enabled = !isRewarding) { Text(if (chosenBox == winningBox) if (isRewarding) "Saving…" else "Claim reward" else "Close") } }, dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
 }
 
 @Composable
-private fun MemoryMatchArcadeDialog(
-    onDismiss: () -> Unit,
-    isRewarding: Boolean,
-    onReward: (Long, BigNumber) -> Unit
-) {
+private fun MemoryMatchArcadeDialog(onDismiss: () -> Unit, isRewarding: Boolean, onReward: (Long, BigNumber) -> Unit) {
     val sequence = remember { List(3) { Random.nextInt(1, 10) } }
     var showDigits by remember { mutableStateOf(true) }
     var input by remember { mutableStateOf("") }
     var result by remember { mutableStateOf<Boolean?>(null) }
-
-    LaunchedEffect(Unit) {
-        delay(2_000)
-        showDigits = false
-    }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Memory Digit Sequence") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                if (showDigits) {
-                    Text("Memorize: ${sequence.joinToString(" ")}", fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
-                } else if (result == null) {
-                    Text("Enter the three digits in order.")
-                    OutlinedTextField(
-                        value = input,
-                        onValueChange = { input = it.filter(Char::isDigit).take(3) },
-                        label = { Text("Sequence") },
-                        singleLine = true
-                    )
-                } else {
-                    Text(if (result == true) "Correct! Won 1 Nebula." else "Incorrect. Expected ${sequence.joinToString("")}")
-                }
-            }
-        },
-        confirmButton = {
-            if (!showDigits && result == null) {
-                Button(onClick = { result = input == sequence.joinToString("") }) { Text("Submit") }
-            } else if (result != null) {
-                Button(
-                    onClick = { if (result == true) onReward(1L, BigNumber(10_000)) else onDismiss() },
-                    enabled = !isRewarding
-                ) { Text(if (result == true) if (isRewarding) "Saving…" else "Claim reward" else "Close") }
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
-    )
+    LaunchedEffect(Unit) { delay(2_000); showDigits = false }
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("Memory Digit Sequence") }, text = {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            if (showDigits) Text("Memorize: ${sequence.joinToString(" ")}", fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
+            else if (result == null) { Text("Enter the three digits in order."); OutlinedTextField(value = input, onValueChange = { input = it.filter(Char::isDigit).take(3) }, label = { Text("Sequence") }, singleLine = true) }
+            else Text(if (result == true) "Correct! Won 1 Nebula." else "Incorrect. Expected ${sequence.joinToString("")}")
+        }
+    }, confirmButton = {
+        if (!showDigits && result == null) Button(onClick = { result = input == sequence.joinToString("") }) { Text("Submit") }
+        else if (result != null) Button(onClick = { if (result == true) onReward(1L, BigNumber(10_000)) else onDismiss() }, enabled = !isRewarding) { Text(if (result == true) if (isRewarding) "Saving…" else "Claim reward" else "Close") }
+    }, dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
 }
 
 @Composable
-private fun NumberRushArcadeDialog(
-    onDismiss: () -> Unit,
-    isRewarding: Boolean,
-    onReward: (Long, BigNumber) -> Unit
-) {
+private fun NumberRushArcadeDialog(onDismiss: () -> Unit, isRewarding: Boolean, onReward: (Long, BigNumber) -> Unit) {
     var currentTarget by remember { mutableStateOf(1) }
     val numbers = remember { (1..5).shuffled() }
     var finished by remember { mutableStateOf(false) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Number Rush") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                if (!finished) {
-                    Text("Tap numbers in ascending order: $currentTarget to 5")
-                    numbers.chunked(3).forEach { rowNumbers ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            rowNumbers.forEach { number ->
-                                Button(onClick = {
-                                    if (number == currentTarget) {
-                                        if (currentTarget == 5) finished = true else currentTarget++
-                                    }
-                                }) { Text(number.toString()) }
-                            }
-                        }
-                    }
-                } else {
-                    Text("Rush completed! Won 1 Nebula.", color = MaterialTheme.colorScheme.primary)
-                }
-            }
-        },
-        confirmButton = {
-            if (finished) {
-                Button(onClick = { onReward(1L, BigNumber(7_500)) }, enabled = !isRewarding) {
-                    Text(if (isRewarding) "Saving…" else "Claim reward")
-                }
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Close") } }
-    )
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("Number Rush") }, text = {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            if (!finished) { Text("Tap numbers in ascending order: $currentTarget to 5"); numbers.chunked(3).forEach { rowNumbers -> Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { rowNumbers.forEach { number -> Button(onClick = { if (number == currentTarget) { if (currentTarget == 5) finished = true else currentTarget++ } }) { Text(number.toString()) } } } } }
+            else Text("Rush completed! Won 1 Nebula.", color = MaterialTheme.colorScheme.primary)
+        }
+    }, confirmButton = { if (finished) Button(onClick = { onReward(1L, BigNumber(7_500)) }, enabled = !isRewarding) { Text(if (isRewarding) "Saving…" else "Claim reward") } }, dismissButton = { TextButton(onClick = onDismiss) { Text("Close") } })
 }
