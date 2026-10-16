@@ -96,10 +96,10 @@ object DesktopEconomyRules {
 
     fun prestigeReset(state: GameState, engine: GameEngine): GameState? {
         val requirement = engine.calculatePrestigeRequirement(state.prestigeCount)
-        val reward = engine.calculatePrestigeReward(state.money, state.prestigeCount)
+        val reward = engine.calculatePrestigeReward(state)
         if (state.money < requirement || reward <= BigNumber.ZERO) return null
         return state.copy(
-            money = BigNumber.ZERO,
+            money = engine.prestigeStartingCapital(state),
             prestige = state.prestige + reward,
             upgradeLevels = emptyMap(),
             currentRangeMin = 1,
@@ -111,7 +111,7 @@ object DesktopEconomyRules {
 
     fun ultraReset(state: GameState, engine: GameEngine): GameState? {
         val requirement = engine.calculateUltraRequirement(state.ultraCount)
-        val reward = engine.calculateUltraReward(state.money, state.ultraCount)
+        val reward = engine.calculateUltraReward(state)
         if (state.money < requirement || state.prestige < BigNumber(1_000) || reward <= BigNumber.ZERO) return null
         return state.copy(
             money = BigNumber.ZERO,
