@@ -55,17 +55,16 @@ private data class DesktopTalentNodePosition(
     val title: String,
     val description: String,
     val x: Float,
-    val y: Float,
-    val parentId: String? = null
+    val y: Float
 )
 
 private val desktopTalentNodePositions = listOf(
     DesktopTalentNodePosition("talent_speed_1", "Velocity I", "Increase automation speed.", .5f, .12f),
     DesktopTalentNodePosition("talent_crit_1", "Precision I", "Improve the rewards of accurate play.", .2f, .32f),
-    DesktopTalentNodePosition("talent_speed_2", "Velocity II", "Push automation further.", .8f, .32f, "talent_speed_1"),
-    DesktopTalentNodePosition("talent_crit_2", "Precision II", "Build on your precision training.", .2f, .55f, "talent_crit_1"),
-    DesktopTalentNodePosition("talent_reward_1", "Nebula Resonance", "Increase earnings across your run.", .5f, .72f, "talent_crit_2"),
-    DesktopTalentNodePosition("talent_master_1", "Cosmic Oracle", "Unlock the final branch of the talent web.", .8f, .88f, "talent_reward_1")
+    DesktopTalentNodePosition("talent_speed_2", "Velocity II", "Push automation further.", .8f, .32f),
+    DesktopTalentNodePosition("talent_crit_2", "Precision II", "Build on your precision training.", .2f, .55f),
+    DesktopTalentNodePosition("talent_reward_1", "Nebula Resonance", "Increase earnings across your run.", .5f, .72f),
+    DesktopTalentNodePosition("talent_master_1", "Cosmic Oracle", "Unlock the final branch of the talent web.", .8f, .88f)
 )
 
 /** Windows counterpart of Android's connected, selectable Prestige Talent Web. */
@@ -84,7 +83,7 @@ internal fun DesktopTalentWebContent(
     val selectedPosition = positions.firstOrNull { it.id == selectedId } ?: positions.firstOrNull()
     val selected = selectedPosition?.let { byId[it.id] }
     val selectedOwned = selected?.id?.let { it in state.prestigeShopPurchases } ?: false
-    val parentOwned = selectedPosition?.parentId?.let { it in state.prestigeShopPurchases } ?: true
+    val parentOwned = selected?.requiredParentId?.let { it in state.prestigeShopPurchases } ?: true
     val affordable = selected != null && state.prestige >= BigNumber(selected.cost)
 
     val unlockedBranchColor = MaterialTheme.colorScheme.primary
@@ -139,8 +138,9 @@ internal fun DesktopTalentWebContent(
                 }
             ) {
                 Canvas(Modifier.fillMaxSize()) {
-                    positions.filter { it.parentId != null }.forEach { node ->
-                        val parent = positions.firstOrNull { it.id == node.parentId } ?: return@forEach
+                    positions.filter { byId[it.id]?.requiredParentId != null }.forEach { node ->
+                        val parentId = byId[node.id]?.requiredParentId ?: return@forEach
+                        val parent = positions.firstOrNull { it.id == parentId } ?: return@forEach
                         val bothOwned = node.id in state.prestigeShopPurchases &&
                             parent.id in state.prestigeShopPurchases
                         drawLine(
@@ -155,7 +155,7 @@ internal fun DesktopTalentWebContent(
                 positions.forEach { node ->
                     val talent = byId[node.id] ?: return@forEach
                     val owned = node.id in state.prestigeShopPurchases
-                    val parentReady = node.parentId == null || node.parentId in state.prestigeShopPurchases
+                    val parentReady = talent.requiredParentId == null || talent.requiredParentId in state.prestigeShopPurchases
                     Surface(
                         onClick = { selectedId = node.id },
                         modifier = Modifier.offset(
