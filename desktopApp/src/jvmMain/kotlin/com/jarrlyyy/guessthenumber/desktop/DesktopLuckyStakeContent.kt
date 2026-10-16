@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,7 +42,7 @@ internal fun DesktopLuckyStakeContent(
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedButton(onClick = onBack) { Text("Back to More") }
             Spacer(Modifier.width(12.dp))
-            Icon(Icons.Default.Casino, contentDescription = null)
+            Icon(Icons.Default.Star, contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text("Combo Streaks & Lucky Stake", style = MaterialTheme.typography.headlineSmall)
         }
