@@ -215,6 +215,31 @@ object DesktopEconomyTransactions {
         return accepted(state.copy(activeWorldId = worldId, activeBossBattleWorldId = if (state.activeBossBattleWorldId == worldId) worldId else null), "Selected ${WORLD_REQUIREMENTS.first { it.id == worldId }.name}.")
     }
 
+    /** Starts or leaves the Android-defined boss battle for an unlocked world. */
+    fun toggleBossBattle(state: GameState, worldId: String): EconomyTransaction {
+        val world = WORLD_REQUIREMENTS.firstOrNull { it.id == worldId }
+            ?: return rejected(state, "Unknown world.")
+        if (worldId !in state.unlockedWorldIds) return rejected(state, "Unlock this world first.")
+        if (world.bossId in state.defeatedBossIds && !state.endlessRiftActive) {
+            return rejected(state, "This boss has already been defeated.")
+        }
+        if (state.activeBossBattleWorldId == worldId) {
+            return accepted(state.copy(activeBossBattleWorldId = null), "Left the ${world.bossName} battle.")
+        }
+        val totalUpgradeLevels = state.upgradeLevels.values.sum()
+        val canFight = state.endlessRiftActive || (
+            state.correctGuesses >= world.fightCorrectGuesses &&
+                totalUpgradeLevels >= world.fightUpgradeLevels &&
+                state.prestigeCount >= world.fightPrestigeCount &&
+                state.ultraCount >= world.fightUltraCount
+        )
+        if (!canFight) return rejected(state, "Boss battle requirements are not met.")
+        return accepted(
+            state.copy(activeWorldId = worldId, activeBossBattleWorldId = worldId),
+            "Started the ${world.bossName} battle."
+        )
+    }
+
     fun worldProgress(state: GameState): List<DesktopWorldProgress> {
         val totalUpgradeLevels = state.upgradeLevels.values.sum()
         return WORLD_REQUIREMENTS.map { world ->
@@ -288,6 +313,12 @@ object DesktopEconomyTransactions {
     private data class WorldRequirement(
         val id: String,
         val name: String,
+        val bossId: String,
+        val bossName: String,
+        val fightCorrectGuesses: Long,
+        val fightUpgradeLevels: Int,
+        val fightPrestigeCount: Long,
+        val fightUltraCount: Long,
         val requiredBossId: String?,
         val requiredCorrectGuesses: Long,
         val requiredUpgradeLevels: Int,
@@ -549,10 +580,10 @@ object DesktopEconomyTransactions {
     }
 
     private val WORLD_REQUIREMENTS = listOf(
-        WorldRequirement("verdant_grove", "Verdant Grove", null, 0L, 0, 0L, 0L, "Starting world"),
-        WorldRequirement("crystal_caverns", "Crystal Caverns", "verdant_guardian", 25L, 5, 0L, 0L, "Defeat Verdant Guardian · 25 correct guesses · 5 upgrade levels"),
-        WorldRequirement("ember_summit", "Ember Summit", "crystal_golem", 100L, 15, 1L, 0L, "Defeat Crystal Golem · 100 correct guesses · 15 upgrade levels · 1 Prestige"),
-        WorldRequirement("nebula_rift", "Nebula Rift", "ember_dragon", 250L, 40, 3L, 1L, "Defeat Ember Dragon · 250 correct guesses · 40 upgrade levels · 3 Prestige · 1 Ultra")
+        WorldRequirement("verdant_grove", "Verdant Grove", "verdant_guardian", "Verdant Guardian", 10L, 3, 0L, 0L, null, 0L, 0, 0L, 0L, "Starting world"),
+        WorldRequirement("crystal_caverns", "Crystal Caverns", "crystal_golem", "Crystal Golem", 50L, 10, 0L, 0L, "verdant_guardian", 25L, 5, 0L, 0L, "Defeat Verdant Guardian · 25 correct guesses · 5 upgrade levels"),
+        WorldRequirement("ember_summit", "Ember Summit", "ember_dragon", "Ember Dragon", 150L, 25, 1L, 0L, "crystal_golem", 100L, 15, 1L, 0L, "Defeat Crystal Golem · 100 correct guesses · 15 upgrade levels · 1 Prestige"),
+        WorldRequirement("nebula_rift", "Nebula Rift", "nebula_titan", "Nebula Titan", 500L, 75, 5L, 1L, "ember_dragon", 250L, 40, 3L, 1L, "Defeat Ember Dragon · 250 correct guesses · 40 upgrade levels · 3 Prestige · 1 Ultra")
     )
 
     private fun accepted(state: GameState, message: String) =
