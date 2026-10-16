@@ -753,7 +753,7 @@ object DesktopEconomyTransactions {
     ): EconomyTransaction {
         // Never trust the UI's displayed price or prerequisite. Read the checked-in
         // catalog at runtime so a catalog update cannot silently drift from this rule.
-        val canonicalRule = runCatching { canonicalTalentRules()[talentId] }.getOrNull()
+        val canonicalRule = runCatching { canonicalTalentRules[talentId] }.getOrNull()
             ?: return rejected(state, "Talent catalog unavailable or unknown talent.")
         if (cost != canonicalRule.cost || requiredParentId != canonicalRule.requiredParentId) {
             return rejected(state, "Talent definition does not match the canonical catalog.")
@@ -779,7 +779,9 @@ object DesktopEconomyTransactions {
         val requiredParentId: String?
     )
 
-    private fun canonicalTalentRules(): Map<String, CanonicalTalentRule> {
+    private val canonicalTalentRules: Map<String, CanonicalTalentRule> by lazy { loadCanonicalTalentRules() }
+
+    private fun loadCanonicalTalentRules(): Map<String, CanonicalTalentRule> {
         val stream = DesktopEconomyTransactions::class.java.classLoader
             .getResourceAsStream("game/talents.json")
             ?: error("Missing canonical talent catalog resource: game/talents.json")
