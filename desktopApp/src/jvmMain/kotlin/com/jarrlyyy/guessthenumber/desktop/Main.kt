@@ -88,7 +88,7 @@ private fun DesktopNavigationButtons(
     onNavigate: (DesktopDestination) -> Unit
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        DesktopDestination.entries.filter { it != DesktopDestination.ABOUT }.forEach { destination ->
+        DesktopDestination.entries.filter { it in setOf(DesktopDestination.PLAY, DesktopDestination.UPGRADES, DesktopDestination.SHOP, DesktopDestination.MORE) }.forEach { destination ->
             var isFocused by remember(destination) { mutableStateOf(false) }
             val focusModifier = Modifier
                 .onFocusChanged { isFocused = it.isFocused }
@@ -220,16 +220,25 @@ fun main() = application {
                         DesktopDestination.PLAY,
                         DesktopDestination.UPGRADES,
                         DesktopDestination.SHOP,
-                        DesktopDestination.MORE -> {
+                        DesktopDestination.MORE,
+                        DesktopDestination.PRESTIGE,
+                        DesktopDestination.ULTRA,
+                        DesktopDestination.TALENT -> {
                             Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
                                 ProductionGuessGameScreen(
                                     section = when (shellState.destination) {
                                         DesktopDestination.UPGRADES -> DesktopGameSection.UPGRADES
                                         DesktopDestination.SHOP -> DesktopGameSection.SHOP
                                         DesktopDestination.MORE -> DesktopGameSection.MORE
+                                        DesktopDestination.PRESTIGE -> DesktopGameSection.PRESTIGE
+                                        DesktopDestination.ULTRA -> DesktopGameSection.ULTRA
+                                        DesktopDestination.TALENT -> DesktopGameSection.TALENT
                                         else -> DesktopGameSection.PLAY
                                     },
-                                    onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) }
+                                    onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
+                                    onOpenPrestige = { shell.navigate(DesktopDestination.PRESTIGE) },
+                                    onOpenUltra = { shell.navigate(DesktopDestination.ULTRA) },
+                                    onOpenTalent = { shell.navigate(DesktopDestination.TALENT) }
                                 )
                             }
                         }
