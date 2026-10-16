@@ -59,6 +59,8 @@ import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameSettings
+import kotlinx.coroutines.Job
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -80,6 +82,8 @@ fun ProductionGuessGameScreen(
     onOpenUltra: () -> Unit = {},
     onOpenTalent: () -> Unit = {},
     onOpenStats: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
+    onBackFromSettings: () -> Unit = {},
     onThemeSettingsLoaded: (
         themeMode: String,
         primaryHex: String,
@@ -105,6 +109,7 @@ fun ProductionGuessGameScreen(
     var isSaving by remember { mutableStateOf(false) }
     var autoClickerFailurePaused by remember { mutableStateOf(false) }
     var pendingReset by remember { mutableStateOf<String?>(null) }
+    var settingsSaveJob by remember { mutableStateOf<Job?>(null) }
     val latestSaving by rememberUpdatedState(isSaving)
 
     LaunchedEffect(Unit) {
@@ -172,6 +177,36 @@ fun ProductionGuessGameScreen(
             } else {
                 feedback = "Could not save that change. Your previous saved state is still intact."
             }
+            isSaving = false
+        }
+    }
+
+    fun updateSettings(settings: GameSettings) {
+        val updated = (state ?: return).copy(settings = settings)
+        state = updated
+        settingsSaveJob?.cancel()
+        settingsSaveJob = scope.launch {
+            delay(200)
+            val saved = withContext(Dispatchers.IO) { saveStore.save(1, updated) }
+            if (!saved) {
+                feedback = "Settings could not be saved. Your last valid save remains available."
+            }
+        }
+    }
+
+    fun resetAllGameData() {
+        settingsSaveJob?.cancel()
+        val resetState = GameState(
+            targetNumber = Random.nextLong(1L, 101L),
+            currentRangeMin = 1L,
+            currentRangeMax = 100L
+        )
+        state = resetState
+        autoClicker.reset(resetState.currentRangeMin, resetState.currentRangeMax)
+        isSaving = true
+        scope.launch {
+            val saved = withContext(Dispatchers.IO) { saveStore.reset(1, resetState) }
+            feedback = if (saved) "Game data reset." else "Could not complete the data reset. Check the local save files."
             isSaving = false
         }
     }
@@ -785,6 +820,21 @@ fun ProductionGuessGameScreen(
                 Text("Current Number Range: ${currentState.currentRangeMin} - ${currentState.currentRangeMax}")
             }
 
+
+            if (section == DesktopGameSection.SETTINGS) {
+                if (currentState == null) {
+                    CircularProgressIndicator()
+                } else {
+                    DesktopSettingsScreen(
+                        state = currentState,
+                        isSaving = isSaving,
+                        onUpdateSettings = ::updateSettings,
+                        onResetData = ::resetAllGameData,
+                        onBack = onBackFromSettings
+                    )
+                }
+            }
+
             if (section == DesktopGameSection.MORE) {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -794,6 +844,7 @@ fun ProductionGuessGameScreen(
                         Button(onClick = onOpenUltra) { Text("Ultra") }
                         Button(onClick = onOpenTalent) { Text("Talent Web") }
                         Button(onClick = onOpenStats) { Text("Statistics") }
+                        Button(onClick = onOpenSettings) { Text("Settings & Save Management") }
                         Button(onClick = onOpenAbout) { Text("About and updates") }
                     }
                 }

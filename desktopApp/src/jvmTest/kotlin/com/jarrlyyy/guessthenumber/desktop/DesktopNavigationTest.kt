@@ -50,6 +50,16 @@ class DesktopNavigationTest {
     }
 
     @Test
+    fun settingsDestinationIsReachableAndReturnsToPlay() {
+        val controller = DesktopShellController()
+        controller.navigate(DesktopDestination.SETTINGS)
+
+        assertEquals(DesktopDestination.SETTINGS, controller.state.destination)
+        assertTrue(controller.handleKey(Key.Escape, ctrlPressed = false))
+        assertEquals(DesktopDestination.PLAY, controller.state.destination)
+    }
+
+    @Test
     fun escapeClearsMessageBeforeReturningToPlay() {
         val controller = DesktopShellController()
         controller.navigate(DesktopDestination.ABOUT)

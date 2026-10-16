@@ -254,7 +254,8 @@ fun main() = application {
                         DesktopDestination.PRESTIGE,
                         DesktopDestination.ULTRA,
                         DesktopDestination.TALENT,
-                        DesktopDestination.STATS -> {
+                        DesktopDestination.STATS,
+                        DesktopDestination.SETTINGS -> {
                             Column(modifier = Modifier.fillMaxSize()) {
                                 ProductionGuessGameScreen(
                                     section = when (destination) {
@@ -265,6 +266,7 @@ fun main() = application {
                                         DesktopDestination.ULTRA -> DesktopGameSection.ULTRA
                                         DesktopDestination.TALENT -> DesktopGameSection.TALENT
                                         DesktopDestination.STATS -> DesktopGameSection.STATS
+                                        DesktopDestination.SETTINGS -> DesktopGameSection.SETTINGS
                                         else -> DesktopGameSection.PLAY
                                     },
                                     onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
@@ -272,6 +274,8 @@ fun main() = application {
                                     onOpenUltra = { shell.navigate(DesktopDestination.ULTRA) },
                                     onOpenTalent = { shell.navigate(DesktopDestination.TALENT) },
                                     onOpenStats = { shell.navigate(DesktopDestination.STATS) },
+                                    onOpenSettings = { shell.navigate(DesktopDestination.SETTINGS) },
+                                    onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
                                     onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
                                         themeMode = mode
                                         primaryHex = primary

@@ -33,7 +33,7 @@ The audit must cover every Android screen and each element within it, including 
 | Achievements | Basic information exists; dedicated Android presentation incomplete |
 | World Map | Basic progression exists; map and boss-navigation parity incomplete |
 | Statistics | A dedicated Windows screen exists; exact parity unverified |
-| Settings & Save Management | Not ported as a dedicated Windows screen |
+| Settings & Save Management | First Windows screen pass added in PR #214: theme, colors, notation, audio levels, accessibility, stored notification preferences, language preference and confirmed reset. Full localization and OS notification delivery remain incomplete. |
 | About | Windows update page exists; Android content parity incomplete |
 | Developer Settings | Not ported |
 | Developer Console | Not ported |
@@ -71,4 +71,4 @@ The audit must cover every Android screen and each element within it, including 
 
 ## Current batch
 
-This batch connects saved Android-equivalent theme settings to the Windows root theme, adds AMOLED/custom-color handling and applies Android-style destination motion with reduced-motion support. It does not claim that all Android screens have been ported. Runtime screenshot comparisons remain pending.
+This batch connects saved Android-equivalent theme settings to the Windows root theme, adds AMOLED/custom-color handling, Android-style destination motion and the first dedicated Settings & Save Management screen. Settings persist through the desktop save adapter; confirmed reset replaces the active slot and removes its previous backup. Windows localization coverage, native notification delivery and runtime screenshot comparisons remain pending. Other Android screens are still partial or missing.

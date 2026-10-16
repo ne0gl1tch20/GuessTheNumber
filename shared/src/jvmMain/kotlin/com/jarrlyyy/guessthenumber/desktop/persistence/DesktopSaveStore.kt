@@ -20,6 +20,7 @@ internal interface DesktopSaveFileOps {
     fun exists(path: Path): Boolean
     fun write(path: Path, content: String)
     fun moveReplace(source: Path, target: Path)
+    fun deleteIfExists(path: Path)
 }
 
 internal object DefaultDesktopSaveFileOps : DesktopSaveFileOps {
@@ -39,6 +40,10 @@ internal object DefaultDesktopSaveFileOps : DesktopSaveFileOps {
             StandardOpenOption.TRUNCATE_EXISTING,
             StandardOpenOption.WRITE
         )
+    }
+
+    override fun deleteIfExists(path: Path) {
+        Files.deleteIfExists(path)
     }
 
     override fun moveReplace(source: Path, target: Path) {
@@ -95,6 +100,20 @@ class DesktopSaveStore internal constructor(
                 writeAtomically(backup, currentPrimary)
             }
             writeAtomically(primary, json.encodeToString(state))
+        }.isSuccess
+    }
+
+    /**
+     * Replaces a slot with a fresh state and removes its old recovery backup.
+     * A reset must not resurrect pre-reset progress from the backup on next launch.
+     */
+    suspend fun reset(slot: Int, state: GameState): Boolean {
+        val normalizedSlot = normalizeSlot(slot)
+        if (!validate(state)) return false
+        return runCatching {
+            fileOps.createDirectories(rootDirectory)
+            writeAtomically(primaryPath(normalizedSlot), json.encodeToString(state))
+            fileOps.deleteIfExists(backupPath(normalizedSlot))
         }.isSuccess
     }
 
