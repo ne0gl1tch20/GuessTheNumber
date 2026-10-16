@@ -17,15 +17,19 @@ enum class DesktopNavigationPosition(val label: String) {
     BOTTOM("Bottom");
 
     companion object {
+        val DEFAULT_POSITION: DesktopNavigationPosition = LEFT
+
         private val preferences: Preferences =
             Preferences.userNodeForPackage(DesktopNavigationPosition::class.java).node("navigation")
 
         fun load(): DesktopNavigationPosition =
-            runCatching { valueOf(preferences.get("position", LEFT.name)) }.getOrDefault(LEFT)
+            runCatching { valueOf(preferences.get("position", DEFAULT_POSITION.name)) }.getOrDefault(LEFT)
 
         fun save(position: DesktopNavigationPosition) {
-            preferences.put("position", position.name)
-            runCatching { preferences.flush() }
+            runCatching {
+                preferences.put("position", position.name)
+                preferences.flush()
+            }
         }
     }
 }

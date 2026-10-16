@@ -10,10 +10,7 @@ import org.junit.Test
 class DesktopNavigationTest {
     @Test
     fun windowsNavigationCanUseEveryEdgeAndDefaultsToLeft() {
-        assertEquals(DesktopNavigationPosition.LEFT, DesktopNavigationPosition.load().let {
-            // The default contract is explicit even when a user's local preference is set.
-            DesktopNavigationPosition.LEFT
-        })
+        assertEquals(DesktopNavigationPosition.LEFT, DesktopNavigationPosition.DEFAULT_POSITION)
         assertEquals(listOf("Left", "Right", "Top", "Bottom"), DesktopNavigationPosition.entries.map { it.label })
     }
 
