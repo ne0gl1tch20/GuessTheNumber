@@ -4,6 +4,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlin.random.Random
 
 class RelicSetBonusGameplayTest {
     private fun apply(set: Set<String>): GameState {
@@ -21,7 +22,8 @@ class RelicSetBonusGameplayTest {
         return DesktopEconomyTransactions.applyGuessBonuses(
             before = before,
             after = after,
-            correct = true
+            correct = true,
+            rng = Random(1234)
         )
     }
 
