@@ -1,3 +1,12 @@
+## Unreleased (Windows Progression Parity)
+
+- 🗺️ **World and boss progression**: Added Windows boss battle start/leave actions and connected guesses to shared boss damage, miss regression and victory-reward transactions. The interactive map canvas and Windows runtime parity checks remain unfinished.
+- 💎 **Relic transactions**: Relic claiming now checks boss unlock requirements and duplicate ownership; equip/unequip actions validate ownership and the four-slot limit through shared transactions.
+- 📖 **Explorer's Codex**: Added the 12 canonical world, boss and secret entries, saved discovery progress, and a one-time 100 Nebula completion reward.
+- 🏁 **Endgame tracker**: Added six saved progression goals covering bosses, secrets, relics, Home Base level, Endless Rift tier and world mastery.
+- 🎲 **Lucky Stake**: Added a Windows coin-flip screen with positive/affordable stake validation and a streak-based payout multiplier. Localization and runtime parity remain unverified.
+- 🧪 **Candidate status**: These are in-progress Windows ports, not a parity-complete release. On PR #215 head `c2138c0ff8ce2aba8813dd3104a560b489c82575`, Android Validation passed and Windows Desktop CI failed; see the parity audit before treating this work as validated.
+
 ## Unreleased (Windows Android visual parity)
 
 - 🎨 **Android theme parity pass**: aligned Windows Material 3 light/dark colors, expressive corner shapes and typography letter spacing with the Android theme tokens. Windows-only system chrome stays native. AMOLED/custom color settings and screenshot comparison remain to be verified.
