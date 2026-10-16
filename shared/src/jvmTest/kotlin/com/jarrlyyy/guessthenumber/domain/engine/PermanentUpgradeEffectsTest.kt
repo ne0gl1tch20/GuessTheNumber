@@ -98,6 +98,27 @@ class PermanentUpgradeEffectsTest {
     }
 
     @Test
+    fun desktopArcadeRewardTransactionUsesTheSamePermanentUpgradeRules() {
+        val state = GameState(
+            ultraUpgradeLevels = mapOf(
+                "ultra_money_boost" to 1,
+                "ultra_nebula_boost" to 2
+            )
+        )
+        val transaction = DesktopEconomyTransactions.awardArcadeReward(
+            state = state,
+            nebulaReward = 10L,
+            moneyReward = BigNumber(100)
+        )
+
+        assertTrue(transaction.accepted)
+        assertEquals(0, transaction.state.nebula.compareTo(BigNumber(30)))
+        assertEquals(0, transaction.state.money.compareTo(BigNumber(300)))
+        assertEquals(30L, transaction.state.statistics.nebulaEarned)
+        assertEquals(0, transaction.state.statistics.moneyEarned.compareTo(BigNumber(300)))
+    }
+
+    @Test
     fun achievementRewardUsesSharedNebulaBoostAndCannotBeClaimedTwice() {
         val state = GameState(
             correctGuesses = 10,
