@@ -83,4 +83,19 @@ The historical Stage 2-D evidence below describes earlier commits and must not b
 5. Keep a list of intentional platform differences with reasons and verification. An unexplained mismatch remains a parity gap.
 6. Keep the Stage 2 exit gate open until the scoped W1/W2 requirements have evidence. Do not describe the whole game as cross-platform complete while screens, mechanics, effects, or runtime paths remain unfinished or unverified.
 
+
+### Platform-specific feature exceptions — owner-approved by design
+
+**The project owner decides which platform-specific features are allowed.** The parity contract is the default, not a restriction on the owner's product decisions. The owner may propose or approve platform-specific QoL, UI, operating-system integration, or gameplay features.
+
+- **QoL and presentation:** Examples include Windows keyboard shortcuts and mouse interactions, Android touch gestures and haptics, responsive desktop layouts, accessibility adaptations, platform-native notifications, widgets, and file-picker integration.
+- **Gameplay exceptions:** A platform may also receive a unique gameplay feature or different behavior when the owner explicitly approves it. Do not introduce gameplay or balance differences silently or infer approval from technical convenience.
+- **Document each exception:** Record the target platform, behavior, purpose, owner approval, affected shared systems, and how it will be verified. Link the decision or issue/PR when available.
+- **Protect shared systems:** Unless the owner explicitly approves a change, platform-specific QoL must not alter core balance, reward calculations, progression, reset semantics, or save compatibility. Approved gameplay exceptions should still preserve save integrity and clearly define any intended cross-platform consequences.
+- **Verify both sides:** Test the platform-specific behavior on its target platform and regression-check shared behavior on the other platform. A documented exception is intentional, not automatically verified.
+
+Examples: a Windows-only keyboard shortcut that opens the reset confirmation is an ordinary QoL exception. A Windows-only feature that changes Prestige rewards is a gameplay exception and requires the owner's explicit approval before implementation.
+
+**Decision rule:** If a proposed feature creates a platform difference and owner approval is unclear, ask the owner. Do not reject the idea just because it is platform-specific, and do not treat the parity goal as permission to make product decisions on the owner's behalf.
+
 **Current status:** This is the target architecture and acceptance contract, not a claim that parity has already been achieved. The existing Stage 2-D gate remains open; remaining gaps listed in this document must be resolved and verified against Android.
