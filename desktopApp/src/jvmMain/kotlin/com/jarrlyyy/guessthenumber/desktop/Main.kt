@@ -310,7 +310,8 @@ fun main() = application {
                         DesktopDestination.SAVE_SLOTS,
                         DesktopDestination.RELICS,
                         DesktopDestination.HOME_BASE,
-                        DesktopDestination.CODEX -> {
+                        DesktopDestination.CODEX,
+                        DesktopDestination.ENDGAME -> {
                             Column(modifier = Modifier.fillMaxSize()) {
                                 ProductionGuessGameScreen(
                                     section = when (destination) {
@@ -329,6 +330,7 @@ fun main() = application {
                                         DesktopDestination.RELICS -> DesktopGameSection.RELICS
                                         DesktopDestination.HOME_BASE -> DesktopGameSection.HOME_BASE
                                         DesktopDestination.CODEX -> DesktopGameSection.CODEX
+                                        DesktopDestination.ENDGAME -> DesktopGameSection.ENDGAME
                                         else -> DesktopGameSection.PLAY
                                     },
                                     onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
@@ -359,7 +361,6 @@ fun main() = application {
 
                         DesktopDestination.SAVE_SLOTS,
                         DesktopDestination.RELICS,
-                        DesktopDestination.ENDGAME,
                         DesktopDestination.LUCKY_STAKE,
                         DesktopDestination.DEVELOPER_SETTINGS,
                         DesktopDestination.DEVELOPER_CONSOLE,
