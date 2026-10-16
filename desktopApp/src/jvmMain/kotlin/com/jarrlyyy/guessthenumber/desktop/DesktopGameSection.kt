@@ -13,5 +13,6 @@ enum class DesktopGameSection {
     SETTINGS,
     ACHIEVEMENTS,
     WORLD_MAP,
-    MUTATORS
+    MUTATORS,
+    SAVE_SLOTS
 }
