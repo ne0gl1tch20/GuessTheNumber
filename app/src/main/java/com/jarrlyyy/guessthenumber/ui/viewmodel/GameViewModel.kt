@@ -531,7 +531,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         if (newAchievements.size > state.achievements.size) {
-            val finalNebulaReward = if ("nebula_boost" in state.shopPurchases) nebulaReward * 2L else nebulaReward
+            val finalNebulaReward = gameEngine.calculateNebulaReward(state, nebulaReward)
             _gameState.value = state.copy(
                 achievements = newAchievements,
                 nebula = state.nebula + BigNumber(finalNebulaReward),
@@ -589,13 +589,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun prestigeReset() {
         val state = _gameState.value
-        val reward = gameEngine.calculatePrestigeReward(state.money, state.prestigeCount)
+        val reward = gameEngine.calculatePrestigeReward(state)
         val requiredMoney = gameEngine.calculatePrestigeRequirement(state.prestigeCount)
         if (state.money >= requiredMoney && reward > BigNumber.ZERO) {
             val newPrestige = state.prestige + reward
             val newStats = state.statistics.copy(prestigesCount = state.statistics.prestigesCount + 1)
             _gameState.value = state.copy(
-                money = BigNumber.ZERO,
+                money = gameEngine.prestigeStartingCapital(state),
                 prestige = newPrestige,
                 upgradeLevels = emptyMap(),
                 currentRangeMin = 1,
@@ -611,7 +611,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun ultraReset() {
         val state = _gameState.value
-        val reward = gameEngine.calculateUltraReward(state.money, state.ultraCount)
+        val reward = gameEngine.calculateUltraReward(state)
         val requiredMoney = gameEngine.calculateUltraRequirement(state.ultraCount)
         val canUltra = state.money >= requiredMoney && state.prestige >= BigNumber(1_000)
         if (canUltra && reward > BigNumber.ZERO) {
@@ -1196,8 +1196,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         val (bonusMoney, bonusNebula) = progressionRewardBonus(state, baseMoneyReward)
-        val finalMoneyReward = baseMoneyReward + bonusMoney
-        val finalNebulaReward = baseNebulaReward + bonusNebula
+        val finalMoneyReward = gameEngine.applyMoneyEarningBoost(state, baseMoneyReward + bonusMoney)
+        val finalNebulaReward = gameEngine.calculateNebulaReward(state, baseNebulaReward + bonusNebula)
         _gameState.value = state.copy(
             money = state.money + finalMoneyReward,
             nebula = state.nebula + BigNumber(finalNebulaReward),
@@ -1481,11 +1481,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun earnMinigameReward(nebulaReward: Long, moneyReward: BigNumber) {
         val state = _gameState.value
         _gameState.value = state.copy(
-            nebula = state.nebula + BigNumber(nebulaReward),
-            money = state.money + moneyReward,
+            val finalNebulaReward = gameEngine.calculateNebulaReward(state, nebulaReward)
+        val finalMoneyReward = gameEngine.applyMoneyEarningBoost(state, moneyReward)
+        _gameState.value = state.copy(
+            nebula = state.nebula + BigNumber(finalNebulaReward),
+            money = state.money + finalMoneyReward,
             statistics = state.statistics.copy(
-                moneyEarned = state.statistics.moneyEarned + moneyReward,
-                nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+                moneyEarned = state.statistics.moneyEarned + finalMoneyReward,
+                nebulaEarned = state.statistics.nebulaEarned + finalNebulaReward
             )
         )
         saveGameAsync()
