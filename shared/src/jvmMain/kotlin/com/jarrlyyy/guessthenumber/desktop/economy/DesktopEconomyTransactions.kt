@@ -410,12 +410,13 @@ object DesktopEconomyTransactions {
             (if (equippedBossRelics.size == 4) 1L else 0L) +
             (if (before.discoveredSecretIds.size >= 4) 1L else 0L) +
             (if (before.activeWorldId == "ember_summit" && "ashen_vault" in before.discoveredSecretIds) 1L else 0L)
+        val finalBonusNebula = if ("nebula_boost" in before.shopPurchases) bonusNebula * 2L else bonusNebula
         return after.copy(
             money = after.money + bonusMoney,
-            nebula = after.nebula + BigNumber(bonusNebula),
+            nebula = after.nebula + BigNumber(finalBonusNebula),
             statistics = after.statistics.copy(
                 moneyEarned = after.statistics.moneyEarned + bonusMoney,
-                nebulaEarned = after.statistics.nebulaEarned + bonusNebula
+                nebulaEarned = after.statistics.nebulaEarned + finalBonusNebula
             )
         )
     }
