@@ -77,7 +77,7 @@ PR #218 makes the Windows Talent Web's prerequisite/parent gating and transactio
 
 ### Permanent Prestige/Ultra upgrade effects — implemented in shared rules (2026-10-16)
 
-Current candidate PR #220 implements all six catalog-described effects in the shared `GameEngine` used by Android and Windows:
+PR #220 merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f` after Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910080423) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38910065849) on head `762d029c828f498b10f686e3d74f920865e17437`. It implements all six catalog-described effects in the shared `GameEngine` used by Android and Windows:
 
 - `prestige_money_boost`: money earning multiplier `1 + 0.5 × level`.
 - `ultra_money_boost`: money earning multiplier `1 + 2 × level`; the two money multipliers stack multiplicatively.
@@ -86,7 +86,7 @@ Current candidate PR #220 implements all six catalog-described effects in the sh
 - `ultra_gain_boost`: Ultra reset reward multiplier `1 + 0.5 × level`, preserving the catalog's 2,000 maximum payout.
 - `ultra_nebula_boost`: multiplies achievement and Arcade Nebula payouts by `1 + level`; it stacks with the existing `nebula_boost` shop item and saturates safely at `Long.MAX_VALUE`.
 
-Achievement unlock/reward evaluation now lives in the shared engine and is called by both hosts. Windows Arcade remains a placeholder route, so the shared Arcade reward helper is implemented but the Windows Arcade reward path is not yet available for runtime verification. Current candidate CI is pending; do not mark these new changes validated until it passes.
+Achievement unlock/reward evaluation now lives in the shared engine and is called by both hosts. Windows Arcade remains a placeholder route, so the shared Arcade reward helper is implemented but the Windows Arcade reward path is not yet available for runtime verification. Automated validation passed before merge. Windows runtime verification of the newly merged effects is still pending.
 
 ### Desktop-only navigation exception — owner-approved
 
