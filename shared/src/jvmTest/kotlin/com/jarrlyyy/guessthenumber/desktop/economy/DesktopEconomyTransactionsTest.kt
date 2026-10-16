@@ -395,29 +395,15 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
-    fun goldenGuessPassAddsCriticalSizedBonusOnEveryTenthLifetimeGuess() {
-        val before = GameState(
-            money = BigNumber(100),
+    fun goldenGuessPassForcesCriticalRewardOnTenthLifetimeGuess() {
+        val state = GameState(
+            targetNumber = 42,
             shopPurchases = setOf("golden_guess"),
-            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(
-                totalGuesses = 9,
-                moneyEarned = BigNumber(100)
-            )
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(totalGuesses = 9)
         )
-        val tenthGuess = before.copy(
-            money = BigNumber(200),
-            statistics = before.statistics.copy(totalGuesses = 10, moneyEarned = BigNumber(200))
-        )
-        val tenthResult = DesktopEconomyTransactions.applyGuessBonuses(before, tenthGuess, correct = true)
-        assertEquals(0, tenthResult.money.compareTo(BigNumber(300)))
-        assertEquals(0, tenthResult.statistics.moneyEarned.compareTo(BigNumber(300)))
-
-        val eleventhGuess = tenthGuess.copy(
-            money = BigNumber(300),
-            statistics = tenthGuess.statistics.copy(totalGuesses = 11, moneyEarned = BigNumber(300))
-        )
-        val eleventhResult = DesktopEconomyTransactions.applyGuessBonuses(tenthGuess, eleventhGuess, correct = true)
-        assertEquals(0, eleventhResult.money.compareTo(BigNumber(300)))
+        val result = GameEngine(kotlin.random.Random(1234)).processGuess(state, 42)
+        assertTrue(result.isCritical)
+        assertEquals(10L, result.newState.statistics.totalGuesses)
     }
 
     @Test
