@@ -8,6 +8,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.random.Random
 
 class DesktopEconomyTransactionsTest {
     private val rewardUpgrade = UpgradeDef(
@@ -527,5 +528,34 @@ class DesktopEconomyTransactionsTest {
         val rejected = DesktopEconomyTransactions.setBuyMultiplier(initial, "1000")
         assertFalse(rejected.accepted)
         assertEquals(initial, rejected.state)
+    }
+
+    @Test
+    fun mutatorToggleUsesSharedRulesAndRefreshesRangeAndTarget() {
+        val engine = GameEngine()
+        val initial = GameState(currentRangeMin = 1, currentRangeMax = 100, targetNumber = 50)
+        val result = DesktopEconomyTransactions.setMutatorActive(
+            state = initial,
+            mutatorId = "mut_hardcore",
+            active = true,
+            engine = engine,
+            rng = Random(7)
+        )
+
+        assertTrue(result.accepted)
+        assertTrue("mut_hardcore" in result.state.activeMutators)
+        assertEquals(200L, result.state.currentRangeMax)
+        assertTrue(result.state.targetNumber in 1L..200L)
+    }
+
+    @Test
+    fun unknownMutatorIsRejectedWithoutChangingState() {
+        val initial = GameState()
+        val result = DesktopEconomyTransactions.setMutatorActive(
+            initial, "mut_not_real", true, GameEngine(), Random(1)
+        )
+
+        assertFalse(result.accepted)
+        assertEquals(initial, result.state)
     }
 }
