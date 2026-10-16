@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 internal fun loadDesktopChangelog(): Result<String> = runCatching {
-    val stream = DesktopChangelogScreen::class.java.classLoader.getResourceAsStream("changelogs.md")
+    val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("changelogs.md")
         ?: error("The bundled changelog could not be found.")
     stream.bufferedReader(Charsets.UTF_8).use { it.readText() }
 }
@@ -70,16 +71,16 @@ internal fun DesktopChangelogScreen(onBack: () -> Unit) {
                     trimmed.startsWith("# ") -> Text(trimmed.removePrefix("# "), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
                     trimmed.startsWith("- ") || trimmed.startsWith("* ") -> Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("•", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                        Text(inlineMarkdown(trimmed.drop(2)), style = MaterialTheme.typography.bodyMedium)
+                        Text(inlineMarkdown(trimmed.drop(2), MaterialTheme.colorScheme.primary), style = MaterialTheme.typography.bodyMedium)
                     }
-                    else -> Text(inlineMarkdown(trimmed), style = MaterialTheme.typography.bodyMedium)
+                    else -> Text(inlineMarkdown(trimmed, MaterialTheme.colorScheme.primary), style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
     }
 }
 
-private fun inlineMarkdown(source: String) = buildAnnotatedString {
+private fun inlineMarkdown(source: String, primaryColor: Color) = buildAnnotatedString {
     var index = 0
     while (index < source.length) {
         when {
@@ -93,7 +94,7 @@ private fun inlineMarkdown(source: String) = buildAnnotatedString {
             source[index] == '`' -> {
                 val end = source.indexOf('`', index + 1)
                 if (end > index + 1) {
-                    withStyle(SpanStyle(fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary)) { append(source.substring(index + 1, end)) }
+                    withStyle(SpanStyle(fontWeight = FontWeight.Medium, color = primaryColor)) { append(source.substring(index + 1, end)) }
                     index = end + 1
                 } else { append(source[index]); index++ }
             }
