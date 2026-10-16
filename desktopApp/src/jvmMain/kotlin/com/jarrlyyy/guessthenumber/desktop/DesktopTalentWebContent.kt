@@ -21,11 +21,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.FitScreen
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ZoomIn
-import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -104,9 +101,9 @@ internal fun DesktopTalentWebContent(
                 Text("Prestige balance: ${state.prestige.format()}", style = MaterialTheme.typography.titleMedium)
                 Text("Select a connected node to inspect and unlock its skill.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            OutlinedButton(onClick = { zoom = .82f; pan = Offset.Zero }) { Icon(Icons.Default.FitScreen, contentDescription = "Fit tree") }
-            OutlinedButton(onClick = { zoom = (zoom / 1.25f).coerceAtLeast(.55f) }) { Icon(Icons.Default.ZoomOut, contentDescription = "Zoom out") }
-            OutlinedButton(onClick = { zoom = (zoom * 1.25f).coerceAtMost(2.8f) }) { Icon(Icons.Default.ZoomIn, contentDescription = "Zoom in") }
+            OutlinedButton(onClick = { zoom = .82f; pan = Offset.Zero }) { Text("Fit") }
+            OutlinedButton(onClick = { zoom = (zoom / 1.25f).coerceAtLeast(.55f) }) { Text("−") }
+            OutlinedButton(onClick = { zoom = (zoom * 1.25f).coerceAtMost(2.8f) }) { Text("+") }
         }
 
         BoxWithConstraints(
