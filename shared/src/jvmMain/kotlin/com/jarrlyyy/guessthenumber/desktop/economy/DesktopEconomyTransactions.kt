@@ -216,6 +216,31 @@ object DesktopEconomyTransactions {
     }
 
     /** Applies Android's guess-driven boss damage, miss regression and victory rewards. */
+    private val CODEX_REQUIRED_ENTRIES = setOf(
+        "world:verdant_grove", "boss:verdant_guardian",
+        "world:crystal_caverns", "boss:crystal_golem",
+        "world:ember_summit", "boss:ember_dragon",
+        "world:nebula_rift", "boss:nebula_titan",
+        "secret:whispering_hollow", "secret:shard_archive",
+        "secret:ashen_vault", "secret:lost_observatory"
+    )
+
+    fun claimCodexCompletionReward(state: GameState): EconomyTransaction {
+        if (state.codexRewardClaimed) return rejected(state, "Codex completion reward is already claimed.")
+        if (!state.codexEntries.containsAll(CODEX_REQUIRED_ENTRIES)) {
+            return rejected(state, "Discover all 12 Codex entries first.")
+        }
+        val reward = BigNumber(100)
+        return accepted(
+            state.copy(
+                nebula = state.nebula + reward,
+                codexRewardClaimed = true,
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 100L)
+            ),
+            "Codex complete! You earned 100 Nebula."
+        )
+    }
+
     fun claimRelic(state: GameState, relicId: String, unlockBossId: String): EconomyTransaction {
         if (relicId.isBlank() || unlockBossId.isBlank()) return rejected(state, "Invalid relic.")
         if (relicId in state.relicInventory) return rejected(state, "Relic is already claimed.")
