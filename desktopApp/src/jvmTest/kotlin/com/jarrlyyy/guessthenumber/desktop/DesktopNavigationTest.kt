@@ -45,6 +45,7 @@ class DesktopNavigationTest {
         assertEquals(DesktopDestination.SHOP, DesktopDestination.fromShortcut(Key.Three, ctrlPressed = true))
         assertEquals(DesktopDestination.MORE, DesktopDestination.fromShortcut(Key.Four, ctrlPressed = true))
         assertEquals(DesktopDestination.ABOUT, DesktopDestination.fromShortcut(Key.Five, ctrlPressed = true))
+        assertNull(DesktopDestination.PRESTIGE.shortcutKey)
     }
 
     @Test
