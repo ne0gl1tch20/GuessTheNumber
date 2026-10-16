@@ -1,11 +1,16 @@
 package com.jarrlyyy.guessthenumber.desktop
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -13,6 +18,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -70,6 +78,7 @@ import kotlinx.coroutines.withContext
 @Composable
 private fun DesktopNavigationBar(
     currentDestination: DesktopDestination,
+    position: DesktopNavigationPosition,
     onNavigate: (DesktopDestination) -> Unit
 ) {
     val destinations = listOf(
@@ -78,34 +87,64 @@ private fun DesktopNavigationBar(
         DesktopDestination.SHOP,
         DesktopDestination.MORE
     )
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        tonalElevation = 8.dp
-    ) {
-        destinations.forEach { destination ->
-            val selected = currentDestination == destination
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    if (!selected) onNavigate(destination)
-                },
-                icon = {
-                    Icon(
-                        imageVector = when (destination) {
-                            DesktopDestination.PLAY -> Icons.Default.PlayArrow
-                            DesktopDestination.UPGRADES -> Icons.Default.Star
-                            DesktopDestination.SHOP -> Icons.Default.ShoppingCart
-                            else -> Icons.Default.Menu
-                        },
-                        contentDescription = destination.label
-                    )
-                },
-                label = { Text(destination.label) },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                modifier = Modifier.semantics { this.selected = selected }
-            )
+    val vertical = position == DesktopNavigationPosition.LEFT ||
+        position == DesktopNavigationPosition.RIGHT
+
+    if (vertical) {
+        NavigationRail(modifier = Modifier.fillMaxHeight()) {
+            destinations.forEach { destination ->
+                val selected = currentDestination == destination
+                NavigationRailItem(
+                    selected = selected,
+                    onClick = { if (!selected) onNavigate(destination) },
+                    icon = {
+                        Icon(
+                            imageVector = when (destination) {
+                                DesktopDestination.PLAY -> Icons.Default.PlayArrow
+                                DesktopDestination.UPGRADES -> Icons.Default.Star
+                                DesktopDestination.SHOP -> Icons.Default.ShoppingCart
+                                else -> Icons.Default.Menu
+                            },
+                            contentDescription = destination.label
+                        )
+                    },
+                    label = { Text(destination.label) },
+                    alwaysShowLabel = true,
+                    colors = NavigationRailItemDefaults.colors(
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    modifier = Modifier.semantics { this.selected = selected }
+                )
+            }
+        }
+    } else {
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            tonalElevation = 8.dp
+        ) {
+            destinations.forEach { destination ->
+                val selected = currentDestination == destination
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = { if (!selected) onNavigate(destination) },
+                    icon = {
+                        Icon(
+                            imageVector = when (destination) {
+                                DesktopDestination.PLAY -> Icons.Default.PlayArrow
+                                DesktopDestination.UPGRADES -> Icons.Default.Star
+                                DesktopDestination.SHOP -> Icons.Default.ShoppingCart
+                                else -> Icons.Default.Menu
+                            },
+                            contentDescription = destination.label
+                        )
+                    },
+                    label = { Text(destination.label) },
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    modifier = Modifier.semantics { this.selected = selected }
+                )
+            }
         }
     }
 }
@@ -125,7 +164,20 @@ fun main() = application {
                 with(density) { DesktopWindowMetrics.MIN_HEIGHT.roundToPx() }
             )
         }
-        DesktopTheme(window = window) {
+        var themeMode by remember { mutableStateOf("System") }
+        var primaryHex by remember { mutableStateOf("#7C4DFF") }
+        var secondaryHex by remember { mutableStateOf("#00BCD4") }
+        var tertiaryHex by remember { mutableStateOf("#00C853") }
+        var reducedMotion by remember { mutableStateOf(false) }
+        var navigationPosition by remember { mutableStateOf(DesktopNavigationPosition.load()) }
+
+        DesktopTheme(
+            window = window,
+            themeMode = themeMode,
+            primaryHex = primaryHex,
+            secondaryHex = secondaryHex,
+            tertiaryHex = tertiaryHex
+        ) {
             val scope = rememberCoroutineScope()
             val shellFocusRequester = remember { FocusRequester() }
             val shell = remember { DesktopShellController() }
@@ -195,7 +247,54 @@ fun main() = application {
                         }
                     }
 
-                    when (shellState.destination) {
+                    if (navigationPosition == DesktopNavigationPosition.TOP) {
+                        DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
+                    }
+
+                    Row(
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        if (navigationPosition == DesktopNavigationPosition.LEFT) {
+                            DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
+                        }
+
+                    AnimatedContent(
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        targetState = shellState.destination,
+                        transitionSpec = {
+                            if (reducedMotion) {
+                                EnterTransition.None togetherWith ExitTransition.None
+                            } else {
+                                (
+                                    fadeIn(tween(220)) +
+                                        slideInHorizontally(
+                                            initialOffsetX = { it / 12 },
+                                            animationSpec = spring(
+                                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                                stiffness = Spring.StiffnessMediumLow
+                                            )
+                                        ) +
+                                        scaleIn(
+                                            initialScale = 0.97f,
+                                            animationSpec = spring(
+                                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                stiffness = Spring.StiffnessMediumLow
+                                            )
+                                        )
+                                ) togetherWith (
+                                    fadeOut(tween(140)) +
+                                        slideOutHorizontally(
+                                            targetOffsetX = { -it / 16 },
+                                            animationSpec = tween(160)
+                                        ) +
+                                        scaleOut(targetScale = 0.985f, animationSpec = tween(160))
+                                )
+                            }
+                        },
+                        label = "androidStyleDestinationTransition"
+                    ) { destination ->
+                    when (destination) {
                         DesktopDestination.PLAY,
                         DesktopDestination.UPGRADES,
                         DesktopDestination.SHOP,
@@ -203,10 +302,11 @@ fun main() = application {
                         DesktopDestination.PRESTIGE,
                         DesktopDestination.ULTRA,
                         DesktopDestination.TALENT,
-                        DesktopDestination.STATS -> {
-                            Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                        DesktopDestination.STATS,
+                        DesktopDestination.SETTINGS -> {
+                            Column(modifier = Modifier.fillMaxSize()) {
                                 ProductionGuessGameScreen(
-                                    section = when (shellState.destination) {
+                                    section = when (destination) {
                                         DesktopDestination.UPGRADES -> DesktopGameSection.UPGRADES
                                         DesktopDestination.SHOP -> DesktopGameSection.SHOP
                                         DesktopDestination.MORE -> DesktopGameSection.MORE
@@ -214,13 +314,28 @@ fun main() = application {
                                         DesktopDestination.ULTRA -> DesktopGameSection.ULTRA
                                         DesktopDestination.TALENT -> DesktopGameSection.TALENT
                                         DesktopDestination.STATS -> DesktopGameSection.STATS
+                                        DesktopDestination.SETTINGS -> DesktopGameSection.SETTINGS
                                         else -> DesktopGameSection.PLAY
                                     },
                                     onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
                                     onOpenPrestige = { shell.navigate(DesktopDestination.PRESTIGE) },
                                     onOpenUltra = { shell.navigate(DesktopDestination.ULTRA) },
                                     onOpenTalent = { shell.navigate(DesktopDestination.TALENT) },
-                                    onOpenStats = { shell.navigate(DesktopDestination.STATS) }
+                                    onOpenStats = { shell.navigate(DesktopDestination.STATS) },
+                                    onOpenSettings = { shell.navigate(DesktopDestination.SETTINGS) },
+                                    navigationPosition = navigationPosition,
+                                    onNavigationPositionChange = { selected ->
+                                        navigationPosition = selected
+                                        DesktopNavigationPosition.save(selected)
+                                    },
+                                    onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
+                                    onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
+                                        themeMode = mode
+                                        primaryHex = primary
+                                        secondaryHex = secondary
+                                        tertiaryHex = tertiary
+                                        reducedMotion = reduced
+                                    }
                                 )
                             }
                         }
@@ -302,10 +417,15 @@ fun main() = application {
                             }
                         }
                     }
-                    DesktopNavigationBar(
-                        currentDestination = shellState.destination,
-                        onNavigate = shell::navigate
-                    )
+                    }
+                        if (navigationPosition == DesktopNavigationPosition.RIGHT) {
+                            DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
+                        }
+                    }
+
+                    if (navigationPosition == DesktopNavigationPosition.BOTTOM) {
+                        DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
+                    }
                 }
             }
         }

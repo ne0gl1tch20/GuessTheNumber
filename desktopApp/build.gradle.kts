@@ -34,6 +34,7 @@ kotlin {
                 implementation(project(":shared"))
                 implementation(compose.runtime)
                 implementation(compose.foundation)
+                implementation(compose.animation)
                 implementation(compose.material3)
                 // Compose Multiplatform 1.8+ no longer brings this in transitively.
                 implementation("org.jetbrains.compose.material:material-icons-core:1.7.3")

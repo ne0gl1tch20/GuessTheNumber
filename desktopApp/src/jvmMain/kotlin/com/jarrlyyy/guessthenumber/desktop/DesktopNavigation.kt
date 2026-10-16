@@ -4,6 +4,35 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.Key
+import java.util.prefs.Preferences
+
+/**
+ * Windows-only navigation placement. Stored separately from GameSettings so Android
+ * save files and settings remain unchanged.
+ */
+enum class DesktopNavigationPosition(val label: String) {
+    LEFT("Left"),
+    RIGHT("Right"),
+    TOP("Top"),
+    BOTTOM("Bottom");
+
+    companion object {
+        val DEFAULT_POSITION: DesktopNavigationPosition = LEFT
+
+        private val preferences: Preferences =
+            Preferences.userNodeForPackage(DesktopNavigationPosition::class.java).node("navigation")
+
+        fun load(): DesktopNavigationPosition =
+            runCatching { valueOf(preferences.get("position", DEFAULT_POSITION.name)) }.getOrDefault(LEFT)
+
+        fun save(position: DesktopNavigationPosition) {
+            runCatching {
+                preferences.put("position", position.name)
+                preferences.flush()
+            }
+        }
+    }
+}
 
 /**
  * Windows-owned navigation contract. Destinations are added here as each
@@ -18,7 +47,8 @@ enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     PRESTIGE("Prestige", null),
     ULTRA("Ultra", null),
     TALENT("Talent Web", null),
-    STATS("Statistics", null);
+    STATS("Statistics", null),
+    SETTINGS("Settings & Save Management", null);
 
     companion object {
         fun fromShortcut(key: Key, ctrlPressed: Boolean): DesktopDestination? {

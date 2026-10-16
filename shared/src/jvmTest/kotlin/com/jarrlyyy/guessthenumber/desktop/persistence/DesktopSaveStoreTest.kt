@@ -33,6 +33,19 @@ class DesktopSaveStoreTest {
     }
 
     @Test
+    fun resetRemovesPreviousBackupSoOldProgressCannotBeRecovered() = runBlocking {
+        val directory = Files.createTempDirectory("gtn-save-reset")
+        val store = DesktopSaveStore(directory)
+        val oldState = GameState(targetNumber = 50, lastSaveTimestamp = 100L)
+        assertTrue(store.save(1, oldState))
+        val newState = GameState(targetNumber = 42, lastSaveTimestamp = 200L)
+
+        assertTrue(store.reset(1, newState))
+        assertEquals(newState, store.load(1))
+        assertFalse(Files.exists(directory.resolve("slot-1.backup.json")))
+    }
+
+    @Test
     fun corruptPrimaryRecoversFromBackup() = runBlocking {
         val directory = Files.createTempDirectory("gtn-save-recovery")
         val store = DesktopSaveStore(directory)

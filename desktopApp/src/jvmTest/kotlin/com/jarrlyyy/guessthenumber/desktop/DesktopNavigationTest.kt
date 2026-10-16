@@ -9,6 +9,12 @@ import org.junit.Test
 
 class DesktopNavigationTest {
     @Test
+    fun windowsNavigationCanUseEveryEdgeAndDefaultsToLeft() {
+        assertEquals(DesktopNavigationPosition.LEFT, DesktopNavigationPosition.DEFAULT_POSITION)
+        assertEquals(listOf("Left", "Right", "Top", "Bottom"), DesktopNavigationPosition.entries.map { it.label })
+    }
+
+    @Test
     fun startsOnPlay() {
         val controller = DesktopShellController()
 
@@ -47,6 +53,16 @@ class DesktopNavigationTest {
         assertEquals(DesktopDestination.ABOUT, DesktopDestination.fromShortcut(Key.Five, ctrlPressed = true))
         assertNull(DesktopDestination.PRESTIGE.shortcutKey)
         assertNull(DesktopDestination.STATS.shortcutKey)
+    }
+
+    @Test
+    fun settingsDestinationIsReachableAndReturnsToPlay() {
+        val controller = DesktopShellController()
+        controller.navigate(DesktopDestination.SETTINGS)
+
+        assertEquals(DesktopDestination.SETTINGS, controller.state.destination)
+        assertTrue(controller.handleKey(Key.Escape, ctrlPressed = false))
+        assertEquals(DesktopDestination.PLAY, controller.state.destination)
     }
 
     @Test

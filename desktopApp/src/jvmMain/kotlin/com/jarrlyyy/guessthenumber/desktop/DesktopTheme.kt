@@ -155,9 +155,75 @@ private object DesktopWindowChrome {
     }
 }
 
-/** Follows Windows' app-theme preference and applies it to Compose and native window chrome. */
+private fun parseDesktopHexColor(raw: String, fallback: Color): Color {
+    val digits = raw.trim().removePrefix("#")
+    val parsed = digits.toLongOrNull(16) ?: return fallback
+    return when (digits.length) {
+        6 -> Color(0xFF000000L or parsed)
+        8 -> Color(parsed)
+        else -> fallback
+    }
+}
+
+/** Mirrors Android's theme-mode and custom-color selection using desktop-safe APIs. */
+internal fun desktopColorScheme(
+    themeMode: String,
+    systemIsDark: Boolean,
+    primaryHex: String,
+    secondaryHex: String,
+    tertiaryHex: String
+): ColorScheme {
+    val dark = when (themeMode) {
+        "Dark", "AMOLED" -> true
+        "Light" -> false
+        else -> systemIsDark
+    }
+    val base = if (dark) DesktopThemePalette.dark else DesktopThemePalette.light
+    val primary = parseDesktopHexColor(primaryHex, Color(0xFF7C4DFF))
+    val secondary = parseDesktopHexColor(secondaryHex, Color(0xFF00BCD4))
+    val tertiary = parseDesktopHexColor(tertiaryHex, Color(0xFF00C853))
+    val customized = if (dark) {
+        darkColorScheme(
+            primary = primary,
+            secondary = secondary,
+            tertiary = tertiary,
+            background = base.background,
+            surface = base.surface,
+            surfaceVariant = base.surfaceVariant,
+            onBackground = base.onBackground,
+            onSurface = base.onSurface
+        )
+    } else {
+        lightColorScheme(
+            primary = primary,
+            secondary = secondary,
+            tertiary = tertiary,
+            background = base.background,
+            surface = base.surface,
+            surfaceVariant = base.surfaceVariant,
+            onBackground = base.onBackground,
+            onSurface = base.onSurface
+        )
+    }
+    return if (themeMode == "AMOLED") {
+        customized.copy(
+            background = Color.Black,
+            surface = Color.Black,
+            surfaceVariant = Color(0xFF121212)
+        )
+    } else customized
+}
+
+/** Uses saved Android-equivalent theme settings and applies the matching theme to window chrome. */
 @Composable
-fun DesktopTheme(window: AwtWindow, content: @Composable () -> Unit) {
+fun DesktopTheme(
+    window: AwtWindow,
+    themeMode: String = "System",
+    primaryHex: String = "#7C4DFF",
+    secondaryHex: String = "#00BCD4",
+    tertiaryHex: String = "#00C853",
+    content: @Composable () -> Unit
+) {
     val fallbackIsDark = isSystemInDarkTheme()
     val isDark by produceState(initialValue = fallbackIsDark) {
         if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) {
@@ -171,21 +237,33 @@ fun DesktopTheme(window: AwtWindow, content: @Composable () -> Unit) {
         }
     }
 
-    val contextMenuRepresentation = if (isDark) {
+    val resolvedDark = when (themeMode) {
+        "Dark", "AMOLED" -> true
+        "Light" -> false
+        else -> isDark
+    }
+    val colorScheme = desktopColorScheme(
+        themeMode = themeMode,
+        systemIsDark = isDark,
+        primaryHex = primaryHex,
+        secondaryHex = secondaryHex,
+        tertiaryHex = tertiaryHex
+    )
+    val contextMenuRepresentation = if (resolvedDark) {
         DarkDefaultContextMenuRepresentation
     } else {
         LightDefaultContextMenuRepresentation
     }
 
     SideEffect {
-        DesktopWindowChrome.apply(window, isDark)
+        DesktopWindowChrome.apply(window, resolvedDark)
     }
 
     CompositionLocalProvider(
         LocalContextMenuRepresentation provides contextMenuRepresentation
     ) {
         MaterialTheme(
-            colorScheme = if (isDark) DesktopThemePalette.dark else DesktopThemePalette.light,
+            colorScheme = colorScheme,
             shapes = DesktopThemePalette.shapes,
             typography = DesktopThemePalette.typography,
             content = content

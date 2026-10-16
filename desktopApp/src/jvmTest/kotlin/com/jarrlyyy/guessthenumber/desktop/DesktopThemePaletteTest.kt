@@ -63,6 +63,47 @@ class DesktopThemePaletteTest {
     }
 
     @Test
+    fun savedAndroidThemeModeAndCustomColorsAreApplied() {
+        val custom = desktopColorScheme(
+            themeMode = "Light",
+            systemIsDark = true,
+            primaryHex = "#123456",
+            secondaryHex = "#234567",
+            tertiaryHex = "#345678"
+        )
+        assertTrue(custom.primary == Color(0xFF123456))
+        assertTrue(custom.secondary == Color(0xFF234567))
+        assertTrue(custom.tertiary == Color(0xFF345678))
+        assertTrue(custom.background == DesktopThemePalette.light.background)
+    }
+
+    @Test
+    fun amoledModeUsesBlackBackgroundAndSurface() {
+        val amoled = desktopColorScheme(
+            themeMode = "AMOLED",
+            systemIsDark = false,
+            primaryHex = "#7C4DFF",
+            secondaryHex = "#00BCD4",
+            tertiaryHex = "#00C853"
+        )
+        assertTrue(amoled.background == Color.Black)
+        assertTrue(amoled.surface == Color.Black)
+        assertTrue(amoled.surfaceVariant == Color(0xFF121212))
+    }
+
+    @Test
+    fun invalidCustomColorsFallBackToAndroidDefaults() {
+        val scheme = desktopColorScheme(
+            themeMode = "Dark",
+            systemIsDark = false,
+            primaryHex = "not-a-color",
+            secondaryHex = "#00BCD4",
+            tertiaryHex = "#00C853"
+        )
+        assertTrue(scheme.primary == Color(0xFF7C4DFF))
+    }
+
+    @Test
     fun parsesWindowsLightAndDarkAppPreferences() {
         assertTrue(
             parseWindowsThemePreference(
