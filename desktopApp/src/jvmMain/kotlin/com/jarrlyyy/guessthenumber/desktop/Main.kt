@@ -306,7 +306,8 @@ fun main() = application {
                         DesktopDestination.SETTINGS,
                         DesktopDestination.ACHIEVEMENTS,
                         DesktopDestination.WORLD_MAP,
-                        DesktopDestination.MUTATORS -> {
+                        DesktopDestination.MUTATORS,
+                        DesktopDestination.SAVE_SLOTS -> {
                             Column(modifier = Modifier.fillMaxSize()) {
                                 ProductionGuessGameScreen(
                                     section = when (destination) {
@@ -321,6 +322,7 @@ fun main() = application {
                                         DesktopDestination.ACHIEVEMENTS -> DesktopGameSection.ACHIEVEMENTS
                                         DesktopDestination.WORLD_MAP -> DesktopGameSection.WORLD_MAP
                                         DesktopDestination.MUTATORS -> DesktopGameSection.MUTATORS
+                                        DesktopDestination.SAVE_SLOTS -> DesktopGameSection.SAVE_SLOTS
                                         else -> DesktopGameSection.PLAY
                                     },
                                     onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
