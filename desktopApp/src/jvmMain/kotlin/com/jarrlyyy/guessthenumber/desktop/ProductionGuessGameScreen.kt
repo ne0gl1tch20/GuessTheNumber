@@ -194,6 +194,7 @@ fun ProductionGuessGameScreen(
                     if (finalState.lootEventId > snapshot.lootEventId) " Treasure drop: ${finalState.lastLootDropTier} chest!" else ""
             }
         } else {
+            feedbackStatus = GuessGameStatus.READY
             feedback = "Auto Clicker paused because the save failed. Your previous saved state is still intact."
             autoClickerFailurePaused = true
         }
@@ -672,7 +673,7 @@ private fun EconomyActionCard(
 }
 
 
-private fun desktopFeedbackStatus(feedback: GuessFeedback, blindMutatorActive: Boolean): GuessGameStatus = when {
+internal fun desktopFeedbackStatus(feedback: GuessFeedback, blindMutatorActive: Boolean): GuessGameStatus = when {
     blindMutatorActive && feedback != GuessFeedback.CORRECT -> GuessGameStatus.READY
     feedback == GuessFeedback.TOO_LOW -> GuessGameStatus.TOO_LOW
     feedback == GuessFeedback.TOO_HIGH -> GuessGameStatus.TOO_HIGH
