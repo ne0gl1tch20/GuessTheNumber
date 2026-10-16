@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.NavigationBar
@@ -81,40 +85,48 @@ private fun DesktopNavigationBar(
     position: DesktopNavigationPosition,
     onNavigate: (DesktopDestination) -> Unit
 ) {
-    val destinations = listOf(
-        DesktopDestination.PLAY,
-        DesktopDestination.UPGRADES,
-        DesktopDestination.SHOP,
-        DesktopDestination.MORE
-    )
+    val destinations = DesktopDestination.MAIN_NAVIGATION_ORDER
     val vertical = position == DesktopNavigationPosition.LEFT ||
         position == DesktopNavigationPosition.RIGHT
 
     if (vertical) {
         NavigationRail(modifier = Modifier.fillMaxHeight()) {
-            destinations.forEach { destination ->
-                val selected = currentDestination == destination
-                NavigationRailItem(
-                    selected = selected,
-                    onClick = { if (!selected) onNavigate(destination) },
-                    icon = {
-                        Icon(
-                            imageVector = when (destination) {
-                                DesktopDestination.PLAY -> Icons.Default.PlayArrow
-                                DesktopDestination.UPGRADES -> Icons.Default.Star
-                                DesktopDestination.SHOP -> Icons.Default.ShoppingCart
-                                else -> Icons.Default.Menu
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .widthIn(max = 152.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                destinations.forEach { destination ->
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        val selected = currentDestination == destination
+                        NavigationRailItem(
+                            selected = selected,
+                            onClick = { if (!selected) onNavigate(destination) },
+                            icon = {
+                                Icon(
+                                    imageVector = when (destination) {
+                                        DesktopDestination.PLAY -> Icons.Default.PlayArrow
+                                        DesktopDestination.UPGRADES,
+                                        DesktopDestination.PRESTIGE,
+                                        DesktopDestination.ULTRA -> Icons.Default.Star
+                                        DesktopDestination.SHOP -> Icons.Default.ShoppingCart
+                                        else -> Icons.Default.Menu
+                                    },
+                                    contentDescription = desktopNavigationLabel(destination)
+                                )
                             },
-                            contentDescription = destination.label
+                            label = { Text(desktopNavigationLabel(destination), maxLines = 1) },
+                            alwaysShowLabel = true,
+                            colors = NavigationRailItemDefaults.colors(
+                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .semantics { this.selected = selected }
                         )
-                    },
-                    label = { Text(destination.label) },
-                    alwaysShowLabel = true,
-                    colors = NavigationRailItemDefaults.colors(
-                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    modifier = Modifier.semantics { this.selected = selected }
-                )
+                    }
+                }
             }
         }
     } else {
@@ -122,31 +134,45 @@ private fun DesktopNavigationBar(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             tonalElevation = 8.dp
         ) {
-            destinations.forEach { destination ->
-                val selected = currentDestination == destination
-                NavigationBarItem(
-                    selected = selected,
-                    onClick = { if (!selected) onNavigate(destination) },
-                    icon = {
-                        Icon(
-                            imageVector = when (destination) {
-                                DesktopDestination.PLAY -> Icons.Default.PlayArrow
-                                DesktopDestination.UPGRADES -> Icons.Default.Star
-                                DesktopDestination.SHOP -> Icons.Default.ShoppingCart
-                                else -> Icons.Default.Menu
-                            },
-                            contentDescription = destination.label
+            Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                destinations.forEach { destination ->
+                    val selected = currentDestination == destination
+                    NavigationBarItem(
+                        selected = selected,
+                        onClick = { if (!selected) onNavigate(destination) },
+                        icon = {
+                            Icon(
+                                imageVector = when (destination) {
+                                    DesktopDestination.PLAY -> Icons.Default.PlayArrow
+                                    DesktopDestination.UPGRADES,
+                                    DesktopDestination.PRESTIGE,
+                                    DesktopDestination.ULTRA -> Icons.Default.Star
+                                    DesktopDestination.SHOP -> Icons.Default.ShoppingCart
+                                    else -> Icons.Default.Menu
+                                },
+                                contentDescription = desktopNavigationLabel(destination)
+                            )
+                        },
+                        label = { Text(desktopNavigationLabel(destination), maxLines = 1) },
+                        modifier = Modifier.widthIn(min = 76.dp).semantics { this.selected = selected },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
                         )
-                    },
-                    label = { Text(destination.label) },
-                    colors = NavigationBarItemDefaults.colors(
-                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    modifier = Modifier.semantics { this.selected = selected }
-                )
+                    )
+                }
             }
         }
     }
+}
+
+private fun desktopNavigationLabel(destination: DesktopDestination): String = when (destination) {
+    DesktopDestination.SETTINGS -> "Settings"
+    DesktopDestination.MUSIC_PLAYER -> "Music"
+    DesktopDestination.SAVE_SLOTS -> "Saves"
+    DesktopDestination.STATS -> "Stats"
+    DesktopDestination.WORLD_MAP -> "World"
+    DesktopDestination.CHANGELOG -> "Changelog"
+    else -> destination.label
 }
 
 fun main() = application {
