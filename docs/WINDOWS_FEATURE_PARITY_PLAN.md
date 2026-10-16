@@ -157,7 +157,7 @@ The detailed evidence log is [WINDOWS_STAGE_2D_PARITY_VERIFICATION.md](WINDOWS_S
 
 ### Stage 2 economy parity implementation candidate (2026-10-16)
 
-Branch: `feat/windows-stage-2-economy-parity` (PR pending creation during this work).
+Branch: [`feat/windows-stage-2-economy-parity`](https://github.com/ne0gl1tch20/GuessTheNumber/tree/feat/windows-stage-2-economy-parity).
 
 This candidate closes several concrete gaps found during Stage 2-D review:
 - exact-cost 1/10/100/MAX upgrade purchases for Money, Prestige and Ultra;
