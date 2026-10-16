@@ -701,14 +701,15 @@ class DesktopEconomyTransactionsTest {
     @Test
     fun bossMissesRegressDamageAtAndroidPhaseOneInterval() {
         var state = GameState(
-            activeBossBattleWorldId = "verdant_grove",
-            bossBattleProgress = mapOf("verdant_guardian" to 2)
+            unlockedWorldIds = setOf("verdant_grove", "crystal_caverns"),
+            activeBossBattleWorldId = "crystal_caverns",
+            bossBattleProgress = mapOf("crystal_golem" to 1)
         )
         repeat(3) { state = DesktopEconomyTransactions.recordBossGuess(state, false) }
-        assertEquals(2, state.bossBattleProgress["verdant_guardian"])
+        assertEquals(1, state.bossBattleProgress["crystal_golem"])
         state = DesktopEconomyTransactions.recordBossGuess(state, false)
-        assertEquals(1, state.bossBattleProgress["verdant_guardian"])
-        assertEquals(4, state.bossBattleMistakes["verdant_guardian"])
+        assertEquals(0, state.bossBattleProgress["crystal_golem"])
+        assertEquals(4, state.bossBattleMistakes["crystal_golem"])
     }
 
     @Test
