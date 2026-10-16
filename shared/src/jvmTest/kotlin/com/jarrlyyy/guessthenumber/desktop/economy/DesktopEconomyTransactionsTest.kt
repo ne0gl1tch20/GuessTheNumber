@@ -484,4 +484,48 @@ class DesktopEconomyTransactionsTest {
         assertEquals(BigNumber(90), bought.state.prestige)
         assertTrue("talent_reward_1" in bought.state.prestigeShopPurchases)
     }
+
+    @Test
+    fun bulkMoneyUpgradeChargesExactCombinedCostAndCountsOneQuestPurchase() {
+        val initial = GameState(money = BigNumber(1_000), buyMultiplier = "10")
+        val result = DesktopEconomyTransactions.buyUpgrade(initial, rewardUpgrade)
+
+        assertTrue(result.accepted)
+        assertEquals(3, result.state.upgradeLevels[rewardUpgrade.id])
+        assertEquals(BigNumber(475), result.state.statistics.moneySpent)
+        assertEquals(BigNumber(525), result.state.money)
+        assertEquals(1, result.state.dailyQuestUpgradePurchases)
+    }
+
+    @Test
+    fun maxUpgradeBuysOnlyLargestAffordablePrefix() {
+        val upgrade = rewardUpgrade.copy(maxLevel = 10, baseCost = "100", costMultiplier = 2.0)
+        val initial = GameState(money = BigNumber(350), buyMultiplier = "MAX")
+        val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, 0, "MAX", initial.money)
+        val result = DesktopEconomyTransactions.buyUpgrade(initial, upgrade)
+
+        assertEquals(BigNumber(300), cost)
+        assertTrue(result.accepted)
+        assertEquals(2, result.state.upgradeLevels[upgrade.id])
+        assertEquals(BigNumber(50), result.state.money)
+        assertEquals(BigNumber(300), result.state.statistics.moneySpent)
+    }
+
+    @Test
+    fun fixedBulkPurchaseIsRejectedAtomicallyWhenFullBatchIsUnaffordable() {
+        val initial = GameState(money = BigNumber(200), buyMultiplier = "10")
+        val result = DesktopEconomyTransactions.buyUpgrade(initial, rewardUpgrade)
+
+        assertFalse(result.accepted)
+        assertEquals(initial, result.state)
+    }
+
+    @Test
+    fun buyMultiplierAcceptsOnlySupportedModes() {
+        val initial = GameState()
+        assertEquals("MAX", DesktopEconomyTransactions.setBuyMultiplier(initial, "MAX").state.buyMultiplier)
+        val rejected = DesktopEconomyTransactions.setBuyMultiplier(initial, "1000")
+        assertFalse(rejected.accepted)
+        assertEquals(initial, rejected.state)
+    }
 }
