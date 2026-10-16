@@ -672,4 +672,42 @@ class DesktopEconomyTransactionsTest {
         assertFalse(result.accepted)
         assertEquals(defeated, result.state)
     }
+
+    @Test
+    fun bossGuessDamageAndVictoryRewardsUseSavedProgressionState() {
+        var state = GameState(
+            activeBossBattleWorldId = "verdant_grove",
+            correctGuesses = 10,
+            upgradeLevels = mapOf("click_power" to 3)
+        )
+        state = DesktopEconomyTransactions.recordBossGuess(state, true)
+        assertEquals(1, state.bossBattleProgress["verdant_guardian"])
+        assertTrue(state.defeatedBossIds.isEmpty())
+
+        state = DesktopEconomyTransactions.recordBossGuess(state, true)
+        assertEquals(2, state.bossBattleProgress["verdant_guardian"])
+        state = DesktopEconomyTransactions.recordBossGuess(state, true)
+
+        assertTrue("verdant_guardian" in state.defeatedBossIds)
+        assertEquals(null, state.activeBossBattleWorldId)
+        assertEquals(3, state.bossBattleProgress["verdant_guardian"])
+        assertTrue("verdant_guardian" in state.relicInventory)
+        assertTrue("world:verdant_grove" in state.codexEntries)
+        assertEquals(1, state.worldMasteryLevels["verdant_grove"])
+        assertTrue(state.money >= BigNumber(25_000))
+        assertTrue(state.nebula >= BigNumber(10))
+    }
+
+    @Test
+    fun bossMissesRegressDamageAtAndroidPhaseOneInterval() {
+        var state = GameState(
+            activeBossBattleWorldId = "verdant_grove",
+            bossBattleProgress = mapOf("verdant_guardian" to 2)
+        )
+        repeat(3) { state = DesktopEconomyTransactions.recordBossGuess(state, false) }
+        assertEquals(2, state.bossBattleProgress["verdant_guardian"])
+        state = DesktopEconomyTransactions.recordBossGuess(state, false)
+        assertEquals(1, state.bossBattleProgress["verdant_guardian"])
+        assertEquals(4, state.bossBattleMistakes["verdant_guardian"])
+    }
 }
