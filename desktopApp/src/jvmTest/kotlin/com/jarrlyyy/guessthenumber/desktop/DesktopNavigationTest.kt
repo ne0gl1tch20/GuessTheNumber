@@ -15,6 +15,28 @@ class DesktopNavigationTest {
     }
 
     @Test
+    fun desktopMainNavigationHasTheApprovedQuickAccessOrder() {
+        assertEquals(
+            listOf(
+                DesktopDestination.PLAY,
+                DesktopDestination.UPGRADES,
+                DesktopDestination.SHOP,
+                DesktopDestination.PRESTIGE,
+                DesktopDestination.ULTRA,
+                DesktopDestination.SETTINGS,
+                DesktopDestination.ARCADE,
+                DesktopDestination.MUSIC_PLAYER,
+                DesktopDestination.SAVE_SLOTS,
+                DesktopDestination.STATS,
+                DesktopDestination.WORLD_MAP,
+                DesktopDestination.CHANGELOG,
+                DesktopDestination.MORE
+            ),
+            DesktopDestination.MAIN_NAVIGATION_ORDER
+        )
+    }
+
+    @Test
     fun startsOnPlay() {
         val controller = DesktopShellController()
 
