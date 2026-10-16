@@ -45,7 +45,9 @@ fun SharedGuessFeedbackCard(
     }
 
     Surface(
-        modifier = modifier.fillMaxWidth().animateContentSize(),
+        modifier = modifier.fillMaxWidth().then(
+            if (reducedMotion) Modifier else Modifier.animateContentSize()
+        ),
         shape = MaterialTheme.shapes.large,
         color = containerColor,
         tonalElevation = if (reducedMotion) 0.dp else 2.dp
