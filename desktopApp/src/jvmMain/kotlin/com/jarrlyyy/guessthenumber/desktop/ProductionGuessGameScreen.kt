@@ -55,6 +55,7 @@ import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRepository
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import com.jarrlyyy.guessthenumber.desktop.economy.EconomyTransaction
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveStore
+import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveSlotSummary
 import com.jarrlyyy.guessthenumber.desktop.persistence.defaultDesktopSaveDirectory
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
@@ -106,6 +107,8 @@ fun ProductionGuessGameScreen(
     val talentCatalog = talentCatalogResult.getOrNull()
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<GameState?>(null) }
+    var activeSaveSlot by remember { mutableStateOf(1) }
+    var saveSlotSummaries by remember { mutableStateOf<List<DesktopSaveSlotSummary>>(emptyList()) }
     var guessText by remember { mutableStateOf("") }
     var selectedShopCategory by remember { mutableStateOf("all") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
@@ -117,7 +120,9 @@ fun ProductionGuessGameScreen(
     val latestSaving by rememberUpdatedState(isSaving)
 
     LaunchedEffect(Unit) {
-        val loaded = withContext(Dispatchers.IO) { saveStore.load(1) }
+        val selectedSlot = withContext(Dispatchers.IO) { saveStore.activeSlot() }
+        activeSaveSlot = selectedSlot
+        val loaded = withContext(Dispatchers.IO) { saveStore.load(selectedSlot) }
         if (loaded != null) {
             autoClicker.reset(loaded.currentRangeMin, loaded.currentRangeMax)
             state = loaded
@@ -128,7 +133,7 @@ fun ProductionGuessGameScreen(
                 currentRangeMin = 1L,
                 currentRangeMax = 100L
             )
-            val created = withContext(Dispatchers.IO) { saveStore.save(1, fresh) }
+            val created = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, fresh) }
             if (created) {
                 autoClicker.reset(fresh.currentRangeMin, fresh.currentRangeMax)
                 state = fresh
@@ -209,7 +214,7 @@ fun ProductionGuessGameScreen(
         autoClicker.reset(resetState.currentRangeMin, resetState.currentRangeMax)
         isSaving = true
         scope.launch {
-            val saved = withContext(Dispatchers.IO) { saveStore.reset(1, resetState) }
+            val saved = withContext(Dispatchers.IO) { saveStore.reset(activeSaveSlot, resetState) }
             feedback = if (saved) "Game data reset." else "Could not complete the data reset. Check the local save files."
             isSaving = false
         }
@@ -306,6 +311,84 @@ fun ProductionGuessGameScreen(
                 CurrencySummary("Correct", currentState.correctGuesses.toString())
                 CurrencySummary("Streak", currentState.streak.toString())
             }
+
+            if (section == DesktopGameSection.SAVE_SLOTS) {
+                LaunchedEffect(activeSaveSlot, currentState?.lastSaveTimestamp, section) {
+                    saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                }
+                DesktopSaveSlotsContent(
+                    activeSlot = activeSaveSlot,
+                    slots = saveSlotSummaries,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onRefresh = { scope.launch { saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() } } },
+                    onSwitchSlot = { targetSlot ->
+                        val snapshot = state
+                        if (snapshot != null && !isSaving && targetSlot != activeSaveSlot) {
+                            scope.launch {
+                                isSaving = true
+                                val saved = withContext(Dispatchers.IO) {
+                                    saveStore.save(activeSaveSlot, snapshot.copy(lastSaveTimestamp = System.currentTimeMillis())) &&
+                                        saveStore.setActiveSlot(targetSlot)
+                                }
+                                if (saved) {
+                                    val loaded = withContext(Dispatchers.IO) { saveStore.load(targetSlot) }
+                                    if (loaded != null) {
+                                        activeSaveSlot = targetSlot
+                                        state = loaded
+                                        autoClicker.reset(loaded.currentRangeMin, loaded.currentRangeMax)
+                                        feedback = "Switched to save slot $targetSlot."
+                                    } else feedback = "That slot has no valid save. Create a new slot or recover its backup first."
+                                } else feedback = "Could not save the current slot. Switching was cancelled."
+                                isSaving = false
+                                saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                            }
+                        }
+                    },
+                    onCreateSlot = { targetSlot ->
+                        val current = state
+                        if (current != null) scope.launch {
+                            val fresh = GameState(
+                                targetNumber = Random.nextLong(1L, 101L),
+                                currentRangeMin = 1L,
+                                currentRangeMax = 100L,
+                                settings = current.settings,
+                                tutorialCompleted = current.tutorialCompleted,
+                                profileName = "Slot $targetSlot",
+                                lastSaveTimestamp = System.currentTimeMillis()
+                            )
+                            val created = withContext(Dispatchers.IO) {
+                                saveStore.createFreshSlot(targetSlot, fresh) && saveStore.setActiveSlot(targetSlot)
+                            }
+                            if (created) {
+                                activeSaveSlot = targetSlot
+                                state = fresh
+                                autoClicker.reset(fresh.currentRangeMin, fresh.currentRangeMax)
+                                feedback = "Created and switched to slot $targetSlot."
+                            } else feedback = "Could not create that slot. It may already contain data."
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    },
+                    onDuplicateSlot = { source, target ->
+                        scope.launch {
+                            val duplicated = withContext(Dispatchers.IO) { saveStore.duplicateSlot(source, target) }
+                            feedback = if (duplicated) "Duplicated slot $source to slot $target." else "Could not duplicate that slot. The target may not be empty."
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    },
+                    onRestoreBackup = { target ->
+                        scope.launch {
+                            val restored = withContext(Dispatchers.IO) { saveStore.restoreBackup(target) }
+                            if (restored && target == activeSaveSlot) {
+                                val recovered = withContext(Dispatchers.IO) { saveStore.load(target) }
+                                if (recovered != null) state = recovered
+                            }
+                            feedback = if (restored) "Restored the previous backup for slot $target." else "Could not restore a valid backup for that slot."
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    }
+                )
+            }
+
             if (section == DesktopGameSection.MUTATORS) {
                 DesktopMutatorsContent(
                     state = currentState,
