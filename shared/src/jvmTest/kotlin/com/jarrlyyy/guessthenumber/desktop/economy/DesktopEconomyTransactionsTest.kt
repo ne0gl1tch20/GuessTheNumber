@@ -632,4 +632,44 @@ class DesktopEconomyTransactionsTest {
         assertEquals(maxed, completed.state)
     }
 
+
+    @Test
+    fun bossBattleRequiresAndroidProgressionAndCanBeLeft() {
+        val locked = GameState()
+        val lockedAttempt = DesktopEconomyTransactions.toggleBossBattle(locked, "verdant_grove")
+        assertFalse(lockedAttempt.accepted)
+        assertEquals(locked, lockedAttempt.state)
+
+        val underProgressed = GameState(unlockedWorldIds = setOf("verdant_grove"))
+        val rejected = DesktopEconomyTransactions.toggleBossBattle(underProgressed, "verdant_grove")
+        assertFalse(rejected.accepted)
+        assertEquals(underProgressed, rejected.state)
+
+        val ready = underProgressed.copy(
+            correctGuesses = 10,
+            upgradeLevels = mapOf("click_power" to 3)
+        )
+        val started = DesktopEconomyTransactions.toggleBossBattle(ready, "verdant_grove")
+        assertTrue(started.accepted)
+        assertEquals("verdant_grove", started.state.activeWorldId)
+        assertEquals("verdant_grove", started.state.activeBossBattleWorldId)
+
+        val left = DesktopEconomyTransactions.toggleBossBattle(started.state, "verdant_grove")
+        assertTrue(left.accepted)
+        assertEquals(null, left.state.activeBossBattleWorldId)
+        assertEquals(started.state.activeWorldId, left.state.activeWorldId)
+    }
+
+    @Test
+    fun bossBattleRejectsDefeatedBossOutsideEndlessRift() {
+        val defeated = GameState(
+            unlockedWorldIds = setOf("verdant_grove"),
+            defeatedBossIds = setOf("verdant_guardian"),
+            correctGuesses = 10,
+            upgradeLevels = mapOf("click_power" to 3)
+        )
+        val result = DesktopEconomyTransactions.toggleBossBattle(defeated, "verdant_grove")
+        assertFalse(result.accepted)
+        assertEquals(defeated, result.state)
+    }
 }
