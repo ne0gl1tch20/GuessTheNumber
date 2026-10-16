@@ -1,9 +1,25 @@
 package com.jarrlyyy.guessthenumber.desktop
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -428,43 +444,94 @@ fun ProductionGuessGameScreen(
             }
 
             if (section == DesktopGameSection.UPGRADES) {
-            SectionTitle("Money upgrades")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Buy multiplier:")
-                listOf("1", "10", "100", "MAX").forEach { multiplier ->
-                    Button(
-                        onClick = {
-                            commitTransaction { DesktopEconomyTransactions.setBuyMultiplier(it, multiplier) }
-                        },
-                        enabled = !isSaving && currentState.buyMultiplier != multiplier
+                SectionTitle("Upgrades")
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    tonalElevation = 6.dp
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(if (currentState.buyMultiplier == multiplier) "✓ $multiplier" else multiplier)
-                    }
-                }
-            }
-            Text(
-                "Bulk purchases charge the exact combined cost. MAX buys the largest affordable batch.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            if (catalog == null) {
-                Text("Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}")
-            } else {
-                catalog.upgrades.forEach { upgrade ->
-                    val level = currentState.upgradeLevels[upgrade.id] ?: 0
-                    val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, level, currentState.buyMultiplier, currentState.money)
-                    EconomyActionCard(
-                        title = upgrade.name,
-                        description = upgrade.description,
-                        detail = "Level $level / ${upgrade.maxLevel} · Batch cost: $cost Money",
-                        action = if (level >= upgrade.maxLevel) "MAX" else "Buy ×${currentState.buyMultiplier}",
-                        enabled = !isSaving && level < upgrade.maxLevel && cost > BigNumber.ZERO && currentState.money >= cost
-                    ) {
-                        commitTransaction { DesktopEconomyTransactions.buyUpgrade(it, upgrade) }
+                        Column {
+                            Text("Available Money", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            AnimatedContent(targetState = currentState.money.format(), label = "UpgradeMoneyAnimation") { moneyText ->
+                                Text("$moneyText Money", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                        Text("🛒", style = MaterialTheme.typography.headlineMedium)
                     }
                 }
 
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Buy Multiplier:", style = MaterialTheme.typography.titleMedium)
+                    var multiplierMenuExpanded by remember { mutableStateOf(false) }
+                    Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
+                        OutlinedButton(
+                            onClick = { multiplierMenuExpanded = true },
+                            shape = MaterialTheme.shapes.medium,
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                            enabled = !isSaving
+                        ) {
+                            Text("${currentState.buyMultiplier}x", style = MaterialTheme.typography.labelLarge)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("▾", style = MaterialTheme.typography.titleMedium)
+                        }
+                        DropdownMenu(
+                            expanded = multiplierMenuExpanded,
+                            onDismissRequest = { multiplierMenuExpanded = false }
+                        ) {
+                            listOf("1", "10", "100", "MAX").forEach { multiplier ->
+                                DropdownMenuItem(
+                                    text = { Text("$multiplier x", style = MaterialTheme.typography.bodyMedium) },
+                                    onClick = {
+                                        commitTransaction { DesktopEconomyTransactions.setBuyMultiplier(it, multiplier) }
+                                        multiplierMenuExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
+                androidx.compose.material3.HorizontalDivider()
+
+                if (catalog == null) {
+                    val catalogError = catalogResult.exceptionOrNull()?.message ?: "unknown error"
+                    Text(
+                        "Economy catalog could not be loaded: $catalogError",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    catalog.upgrades.forEach { upgrade ->
+                        val level = currentState.upgradeLevels[upgrade.id] ?: 0
+                        val cost = desktopUpgradeDisplayCost(
+                            upgrade = upgrade,
+                            level = level,
+                            multiplier = currentState.buyMultiplier,
+                            money = currentState.money
+                        )
+                        DesktopUpgradeParityCard(
+                            upgrade = upgrade,
+                            level = level,
+                            cost = cost,
+                            canAfford = currentState.money >= cost,
+                            isSaving = isSaving,
+                            reducedMotion = currentState.settings.reducedMotion,
+                            multiplier = currentState.buyMultiplier
+                        ) {
+                            commitTransaction { DesktopEconomyTransactions.buyUpgrade(it, upgrade) }
+                        }
+                    }
+                }
+            }
 
             if (section == DesktopGameSection.PRESTIGE) {
             SectionTitle("Prestige")
@@ -545,7 +612,8 @@ fun ProductionGuessGameScreen(
             if (section == DesktopGameSection.TALENT) {
             SectionTitle("Talents")
                 if (talentCatalog == null) {
-                    Text("Talent catalog could not be loaded: ${talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"}")
+                    val talentCatalogError = talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"
+                    Text("Talent catalog could not be loaded: $talentCatalogError")
                 } else {
                     talentCatalog.forEach { talent ->
                         val owned = talent.id in currentState.prestigeShopPurchases
@@ -571,8 +639,6 @@ fun ProductionGuessGameScreen(
                         }
                     }
                 }
-            }
-
             }
 
             if (section == DesktopGameSection.MORE) {
@@ -629,6 +695,127 @@ fun ProductionGuessGameScreen(
             }
         )
     }
+}
+
+
+@Composable
+private fun DesktopUpgradeParityCard(
+    upgrade: UpgradeDef,
+    level: Int,
+    cost: BigNumber,
+    canAfford: Boolean,
+    isSaving: Boolean,
+    reducedMotion: Boolean,
+    multiplier: String,
+    onBuy: () -> Unit
+) {
+    var previousLevel by remember(upgrade.id) { mutableStateOf(level) }
+    var purchaseHighlight by remember(upgrade.id) { mutableStateOf(false) }
+    LaunchedEffect(level) {
+        val oldLevel = previousLevel
+        previousLevel = level
+        if (level > oldLevel) {
+            purchaseHighlight = true
+            delay(if (reducedMotion) 350L else 650L)
+            purchaseHighlight = false
+        }
+    }
+
+    val isMaxed = level >= upgrade.maxLevel
+    val targetColor = if (purchaseHighlight) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceVariant
+    val cardColor = if (reducedMotion) targetColor else animateColorAsState(
+        targetValue = targetColor,
+        label = "upgradePurchaseColor_${upgrade.id}"
+    ).value
+
+    Surface(
+        modifier = Modifier.fillMaxWidth().then(
+            if (reducedMotion) Modifier else Modifier.animateContentSize()
+        ),
+        shape = MaterialTheme.shapes.large,
+        color = cardColor,
+        tonalElevation = if (purchaseHighlight && !reducedMotion) 4.dp else 2.dp
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(upgrade.name, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(upgrade.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(modifier = Modifier.height(6.dp))
+                Surface(
+                    shape = MaterialTheme.shapes.extraSmall,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                ) {
+                    val maxLevelLabel = if (upgrade.maxLevel >= 999999) "MAX" else upgrade.maxLevel.toString()
+                    AnimatedContent(targetState = level, label = "upgradeLevel_${upgrade.id}") { animatedLevel ->
+                        Text(
+                            text = "Level: $animatedLevel / $maxLevelLabel",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+                if (!isMaxed) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "Cost (${multiplier}x): ${cost.format()} Money",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Button(
+                onClick = onBuy,
+                enabled = !isSaving && !isMaxed && canAfford,
+                shape = MaterialTheme.shapes.medium,
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text(if (isMaxed) "MAX" else "Buy")
+            }
+        }
+    }
+}
+
+private fun desktopUpgradeDisplayCost(
+    upgrade: UpgradeDef,
+    level: Int,
+    multiplier: String,
+    money: BigNumber
+): BigNumber {
+    val base = BigNumber(upgrade.baseCost)
+    val costMultiplier = BigNumber(upgrade.costMultiplier)
+    val effectiveLevels = when (multiplier) {
+        "10" -> minOf(10, (upgrade.maxLevel - level).coerceAtLeast(0))
+        "100" -> minOf(100, (upgrade.maxLevel - level).coerceAtLeast(0))
+        "MAX" -> {
+            var count = 0
+            var total = BigNumber.ZERO
+            var currentLevel = level
+            while (currentLevel < upgrade.maxLevel) {
+                val nextCost = base * costMultiplier.pow(currentLevel)
+                if (money >= total + nextCost) {
+                    total += nextCost
+                    count++
+                    currentLevel++
+                } else {
+                    break
+                }
+            }
+            if (count == 0 && level < upgrade.maxLevel && money >= base * costMultiplier.pow(level)) 1 else count
+        }
+        else -> minOf(1, (upgrade.maxLevel - level).coerceAtLeast(0))
+    }
+    var totalCost = BigNumber.ZERO
+    for (offset in 0 until maxOf(1, effectiveLevels)) {
+        totalCost += base * costMultiplier.pow(level + offset)
+    }
+    return totalCost
 }
 
 @Composable

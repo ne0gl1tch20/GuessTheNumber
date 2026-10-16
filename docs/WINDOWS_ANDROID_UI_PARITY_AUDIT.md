@@ -1,6 +1,6 @@
 # Android-to-Windows UI parity audit
 
-**Status:** First corrective batch in progress. Full visual and interaction parity is not claimed.
+**Status:** Initial navigation and Upgrades presentation changes are implemented and automated CI passes. Full visual and interaction parity is not claimed.
 
 ## Android reference
 
@@ -21,7 +21,7 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 | Android destination / route | Android source | Windows status after this batch |
 | --- | --- | --- |
 | Play | `ui/screens/PlayScreen.kt` | Production guess loop and currently implemented quest, achievement and world controls remain on Play. Exact layout and all Android interactions still need comparison. |
-| Upgrades | `ui/screens/UpgradeScreen.kt` | Regular Money upgrade purchases are isolated under Upgrades. Android balance header, cards, animations and all details are not yet visually matched. |
+| Upgrades | `ui/screens/UpgradeScreen.kt` | First visual-parity pass added the Money balance header, multiplier dropdown, matching upgrade-card hierarchy, level badge, batch cost and purchase highlight. CI passes, but runtime screenshot comparison and full interaction review remain pending. |
 | Shop | `ui/screens/ShopScreen.kt` | Existing Nebula purchases are isolated under Shop. Android category filters, cosmetic equip flow and card presentation still need porting. |
 | More | `ui/screens/MoreScreen.kt` | Entry point exists. Prestige, Ultra and Talent are separate desktop subroutes reached from More. The reorderable, feature-flagged, locked Android menu is not yet ported. |
 | Prestige | `ui/screens/PrestigeScreen.kt` | Current purchase/reset controls exist under More; dedicated Android screen layout and interactions need review. |
@@ -60,5 +60,6 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 
 - Source-reviewed `Screen.kt`, `NavGraph.kt`, `PlayScreen.kt`, `UpgradeScreen.kt`, `ShopScreen.kt` and `MoreScreen.kt` on `master`.
 - Updated desktop primary navigation, section routing and navigation unit tests in this branch.
-- Automated tests have not been run in this session. Windows runtime and screenshot comparison remain unverified.
+- Latest recorded CI for commit `3153f38eb9c34c426c7d4c12c1545d975ae5079c` passed: Windows Desktop CI run [38857902508](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38857902508) and Android Validation and Tests run [38857902488](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38857902488).
+- Windows runtime interaction and screenshot comparison remain unverified.
 - This is the start of the real UI port, not a claim that the full Android UI has been reproduced.
