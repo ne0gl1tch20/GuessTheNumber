@@ -500,6 +500,14 @@ fun ProductionGuessGameScreen(
                 )
             }
 
+            if (section == DesktopGameSection.ENDGAME) {
+                DesktopEndgameContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onOpenWorldMap = { onOpenParityDestination(DesktopDestination.WORLD_MAP) }
+                )
+            }
+
             if (section == DesktopGameSection.CODEX) {
                 DesktopCodexContent(
                     state = currentState,
