@@ -727,4 +727,42 @@ class DesktopEconomyTransactionsTest {
         assertEquals(3, status?.mistakes)
         assertEquals(null, DesktopEconomyTransactions.activeBossBattleStatus(state.copy(activeBossBattleWorldId = null)))
     }
+
+    @Test
+    fun relicClaimRequiresBossVictoryAndCannotDuplicateOwnership() {
+        val locked = GameState()
+        val denied = DesktopEconomyTransactions.claimRelic(locked, "verdant_guardian", "verdant_guardian")
+        assertFalse(denied.accepted)
+        assertEquals(locked, denied.state)
+
+        val defeated = locked.copy(defeatedBossIds = setOf("verdant_guardian"))
+        val claimed = DesktopEconomyTransactions.claimRelic(defeated, "verdant_guardian", "verdant_guardian")
+        assertTrue(claimed.accepted)
+        assertTrue("verdant_guardian" in claimed.state.relicInventory)
+
+        val duplicate = DesktopEconomyTransactions.claimRelic(claimed.state, "verdant_guardian", "verdant_guardian")
+        assertFalse(duplicate.accepted)
+        assertEquals(claimed.state, duplicate.state)
+    }
+
+    @Test
+    fun relicEquipAndUnequipEnforceOwnershipAndFourRelicLimit() {
+        val notOwned = DesktopEconomyTransactions.equipRelic(GameState(), "verdant_guardian")
+        assertFalse(notOwned.accepted)
+
+        val full = GameState(
+            relicInventory = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan", "fifth_relic"),
+            equippedRelicIds = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        )
+        val overflow = DesktopEconomyTransactions.equipRelic(full, "fifth_relic")
+        assertFalse(overflow.accepted)
+        assertEquals(full, overflow.state)
+
+        val removed = DesktopEconomyTransactions.unequipRelic(full, "nebula_titan")
+        assertTrue(removed.accepted)
+        assertFalse("nebula_titan" in removed.state.equippedRelicIds)
+        val equipped = DesktopEconomyTransactions.equipRelic(removed.state, "fifth_relic")
+        assertTrue(equipped.accepted)
+        assertEquals(4, equipped.state.equippedRelicIds.size)
+    }
 }
