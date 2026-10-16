@@ -19,7 +19,7 @@ PR #214 is merged. It connected saved Android-equivalent theme mode and custom c
 | --- | --- |
 | Play, Upgrades, Shop | Partial implementations; exact visual and interaction parity unverified |
 | More | Links to the existing screens and the remaining parity routes |
-| Prestige, Ultra, Talent Web, Statistics | Dedicated partial screens exist; exact parity unverified |
+| Prestige, Ultra, Talent Web, Statistics | Prestige/Ultra/Statistics remain partial; Talent Web now has a connected, selectable six-node tree with zoom/pan and parent-gated purchases. Exact visual/runtime parity remains unverified |
 | Settings & Save Management | First pass exists; localization and OS notification delivery remain incomplete |
 | About | Windows update page exists; Android content parity incomplete |
 | Achievements | First functional port: canonical Android catalog, saved unlock state, progress count, rewards/tier display and All/Unlocked/Locked filters. CI and Windows runtime parity verification pending |
