@@ -108,7 +108,10 @@ object DesktopEconomyTransactions {
     }
 
     fun buyShopItem(state: GameState, item: ShopItemDef): EconomyTransaction {
-        if (!item.isCosmetic && item.id != "auto_clicker_basic") return rejected(state, "This shop effect is not wired for Windows yet.")
+        val supported = item.id in setOf(
+            "auto_clicker_basic", "nebula_boost", "golden_guess"
+        ) || (item.isCosmetic && item.id.startsWith("cosmetic_"))
+        if (!supported) return rejected(state, "This shop effect is not supported on Windows yet.")
         if (item.id in state.shopPurchases) return rejected(state, "Already purchased.")
         val cost = BigNumber(item.nebulaCost)
         if (state.nebula < cost) return rejected(state, "Not enough Nebula.")
@@ -122,6 +125,127 @@ object DesktopEconomyTransactions {
             "Purchased ${item.name}."
         )
     }
+
+    /** Unlocks a world only when its Android-defined progression requirements are met. */
+    fun unlockWorld(state: GameState, worldId: String): EconomyTransaction {
+        val world = WORLD_REQUIREMENTS.firstOrNull { it.id == worldId }
+            ?: return rejected(state, "Unknown world.")
+        if (worldId in state.unlockedWorldIds) return rejected(state, "World is already unlocked.")
+        val totalUpgradeLevels = state.upgradeLevels.values.sum()
+        val eligible = world.requiredBossId?.let { it in state.defeatedBossIds } ?: true
+        val meetsRequirements = eligible &&
+            state.correctGuesses >= world.requiredCorrectGuesses &&
+            totalUpgradeLevels >= world.requiredUpgradeLevels &&
+            state.prestigeCount >= world.requiredPrestigeCount &&
+            state.ultraCount >= world.requiredUltraCount
+        if (!meetsRequirements) return rejected(state, "World requirements are not met.")
+        return accepted(
+            state.copy(
+                unlockedWorldIds = state.unlockedWorldIds + worldId,
+                activeWorldId = worldId
+            ),
+            "Unlocked ${world.name}."
+        )
+    }
+
+    fun selectWorld(state: GameState, worldId: String): EconomyTransaction {
+        if (WORLD_REQUIREMENTS.none { it.id == worldId }) return rejected(state, "Unknown world.")
+        if (worldId !in state.unlockedWorldIds) return rejected(state, "Unlock this world first.")
+        if (state.endlessRiftActive && worldId != state.activeWorldId) {
+            return rejected(state, "World selection is locked during Endless Rift.")
+        }
+        return accepted(state.copy(activeWorldId = worldId, activeBossBattleWorldId = if (state.activeBossBattleWorldId == worldId) worldId else null), "Selected ${WORLD_REQUIREMENTS.first { it.id == worldId }.name}.")
+    }
+
+    fun worldProgress(state: GameState): List<DesktopWorldProgress> {
+        val totalUpgradeLevels = state.upgradeLevels.values.sum()
+        return WORLD_REQUIREMENTS.map { world ->
+            val bossReady = world.requiredBossId?.let { it in state.defeatedBossIds } ?: true
+            DesktopWorldProgress(
+                id = world.id,
+                name = world.name,
+                unlocked = world.id in state.unlockedWorldIds,
+                selected = world.id == state.activeWorldId,
+                canUnlock = world.id !in state.unlockedWorldIds && bossReady &&
+                    state.correctGuesses >= world.requiredCorrectGuesses &&
+                    totalUpgradeLevels >= world.requiredUpgradeLevels &&
+                    state.prestigeCount >= world.requiredPrestigeCount &&
+                    state.ultraCount >= world.requiredUltraCount,
+                requirement = world.requirement
+            )
+        }
+    }
+
+    /** Applies Android's achievement milestones after any persisted gameplay/economy transition. */
+    fun evaluateAchievements(state: GameState): GameState {
+        val milestones = listOf(
+            "correct_10" to (state.correctGuesses >= 10),
+            "correct_50" to (state.correctGuesses >= 50),
+            "correct_100" to (state.correctGuesses >= 100),
+            "correct_500" to (state.correctGuesses >= 500),
+            "streak_5" to (state.bestStreak >= 5),
+            "streak_10" to (state.bestStreak >= 10),
+            "streak_25" to (state.bestStreak >= 25),
+            "streak_50" to (state.bestStreak >= 50),
+            "millionaire" to (state.money >= BigNumber(1_000_000)),
+            "ten_millionaire" to (state.money >= BigNumber(10_000_000)),
+            "hundred_millionaire" to (state.money >= BigNumber(100_000_000)),
+            "billionaire" to (state.money >= BigNumber(1_000_000_000)),
+            "prestige_1" to (state.prestigeCount >= 1),
+            "prestige_5" to (state.prestigeCount >= 5),
+            "prestige_10" to (state.prestigeCount >= 10),
+            "prestige_25" to (state.prestigeCount >= 25),
+            "ultra_1" to (state.ultraCount >= 1),
+            "ultra_3" to (state.ultraCount >= 3),
+            "ultra_10" to (state.ultraCount >= 10),
+            "ultra_25" to (state.ultraCount >= 25),
+            "playtime_1h" to (state.statistics.playtimeSeconds >= 3_600),
+            "playtime_10h" to (state.statistics.playtimeSeconds >= 36_000),
+            "playtime_50h" to (state.statistics.playtimeSeconds >= 180_000),
+            "frenzy_5" to (state.bestStreak >= 5),
+            "frenzy_10" to (state.bestStreak >= 10),
+            "frenzy_25" to (state.bestStreak >= 25),
+            "frenzy_50" to (state.bestStreak >= 50)
+        )
+        val rewards = mapOf(
+            "correct_10" to 10L, "correct_50" to 20L, "correct_100" to 40L, "correct_500" to 100L,
+            "streak_5" to 25L, "streak_10" to 50L, "streak_25" to 100L, "streak_50" to 250L,
+            "millionaire" to 50L, "ten_millionaire" to 100L, "hundred_millionaire" to 200L, "billionaire" to 500L,
+            "prestige_1" to 25L, "prestige_5" to 75L, "prestige_10" to 150L, "prestige_25" to 300L,
+            "ultra_1" to 100L, "ultra_3" to 250L, "ultra_10" to 500L, "ultra_25" to 1_000L,
+            "playtime_1h" to 25L, "playtime_10h" to 100L, "playtime_50h" to 300L,
+            "frenzy_5" to 30L, "frenzy_10" to 75L, "frenzy_25" to 150L, "frenzy_50" to 350L
+        )
+        val newlyUnlocked = milestones.filter { (id, unlocked) -> unlocked && id !in state.achievements }
+        if (newlyUnlocked.isEmpty()) return state
+        val baseReward = newlyUnlocked.sumOf { (id, _) -> rewards[id] ?: 0L }
+        val reward = if ("nebula_boost" in state.shopPurchases) baseReward * 2L else baseReward
+        return state.copy(
+            achievements = state.achievements + newlyUnlocked.map { it.first },
+            nebula = state.nebula + BigNumber(reward),
+            statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + reward)
+        )
+    }
+
+    private data class WorldRequirement(
+        val id: String,
+        val name: String,
+        val requiredBossId: String?,
+        val requiredCorrectGuesses: Long,
+        val requiredUpgradeLevels: Int,
+        val requiredPrestigeCount: Long,
+        val requiredUltraCount: Long,
+        val requirement: String
+    )
+
+    data class DesktopWorldProgress(
+        val id: String,
+        val name: String,
+        val unlocked: Boolean,
+        val selected: Boolean,
+        val canUnlock: Boolean,
+        val requirement: String
+    )
 
     fun setAutoClickerActive(state: GameState, active: Boolean): EconomyTransaction {
         if ("auto_clicker_basic" !in state.shopPurchases) {
@@ -192,22 +316,23 @@ object DesktopEconomyTransactions {
             return rejected(daily, "Daily quest is not ready or was already claimed.")
         }
 
+        val nebulaMultiplier = if ("nebula_boost" in daily.shopPurchases) 2L else 1L
         val rewarded = when (questId) {
             "daily_guesses_10" -> daily.copy(
                 money = daily.money + BigNumber(10_000),
                 statistics = daily.statistics.copy(moneyEarned = daily.statistics.moneyEarned + BigNumber(10_000))
             )
             "daily_correct_5" -> daily.copy(
-                nebula = daily.nebula + BigNumber(25),
-                statistics = daily.statistics.copy(nebulaEarned = daily.statistics.nebulaEarned + 25)
+                nebula = daily.nebula + BigNumber(25L * nebulaMultiplier),
+                statistics = daily.statistics.copy(nebulaEarned = daily.statistics.nebulaEarned + 25L * nebulaMultiplier)
             )
             "daily_streak_5" -> daily.copy(
-                nebula = daily.nebula + BigNumber(50),
-                statistics = daily.statistics.copy(nebulaEarned = daily.statistics.nebulaEarned + 50)
+                nebula = daily.nebula + BigNumber(50L * nebulaMultiplier),
+                statistics = daily.statistics.copy(nebulaEarned = daily.statistics.nebulaEarned + 50L * nebulaMultiplier)
             )
             else -> daily.copy(
-                nebula = daily.nebula + BigNumber(35),
-                statistics = daily.statistics.copy(nebulaEarned = daily.statistics.nebulaEarned + 35)
+                nebula = daily.nebula + BigNumber(35L * nebulaMultiplier),
+                statistics = daily.statistics.copy(nebulaEarned = daily.statistics.nebulaEarned + 35L * nebulaMultiplier)
             )
         }
         return accepted(
@@ -281,12 +406,13 @@ object DesktopEconomyTransactions {
             (if (equippedBossRelics.size == 4) 1L else 0L) +
             (if (before.discoveredSecretIds.size >= 4) 1L else 0L) +
             (if (before.activeWorldId == "ember_summit" && "ashen_vault" in before.discoveredSecretIds) 1L else 0L)
+        val finalBonusNebula = if ("nebula_boost" in before.shopPurchases) bonusNebula * 2L else bonusNebula
         return after.copy(
             money = after.money + bonusMoney,
-            nebula = after.nebula + BigNumber(bonusNebula),
+            nebula = after.nebula + BigNumber(finalBonusNebula),
             statistics = after.statistics.copy(
                 moneyEarned = after.statistics.moneyEarned + bonusMoney,
-                nebulaEarned = after.statistics.nebulaEarned + bonusNebula
+                nebulaEarned = after.statistics.nebulaEarned + finalBonusNebula
             )
         )
     }
@@ -312,6 +438,13 @@ object DesktopEconomyTransactions {
             "Talent unlocked."
         )
     }
+
+    private val WORLD_REQUIREMENTS = listOf(
+        WorldRequirement("verdant_grove", "Verdant Grove", null, 0L, 0, 0L, 0L, "Starting world"),
+        WorldRequirement("crystal_caverns", "Crystal Caverns", "verdant_guardian", 25L, 5, 0L, 0L, "Defeat Verdant Guardian · 25 correct guesses · 5 upgrade levels"),
+        WorldRequirement("ember_summit", "Ember Summit", "crystal_golem", 100L, 15, 1L, 0L, "Defeat Crystal Golem · 100 correct guesses · 15 upgrade levels · 1 Prestige"),
+        WorldRequirement("nebula_rift", "Nebula Rift", "ember_dragon", 250L, 40, 3L, 1L, "Defeat Ember Dragon · 250 correct guesses · 40 upgrade levels · 3 Prestige · 1 Ultra")
+    )
 
     private fun accepted(state: GameState, message: String) =
         EconomyTransaction(state, true, message)

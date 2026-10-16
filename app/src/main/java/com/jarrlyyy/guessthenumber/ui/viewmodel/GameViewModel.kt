@@ -531,11 +531,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         if (newAchievements.size > state.achievements.size) {
+            val finalNebulaReward = if ("nebula_boost" in state.shopPurchases) nebulaReward * 2L else nebulaReward
             _gameState.value = state.copy(
                 achievements = newAchievements,
-                nebula = state.nebula + BigNumber(nebulaReward),
+                nebula = state.nebula + BigNumber(finalNebulaReward),
                 statistics = state.statistics.copy(
-                    nebulaEarned = state.statistics.nebulaEarned + nebulaReward
+                    nebulaEarned = state.statistics.nebulaEarned + finalNebulaReward
                 )
             )
         }
@@ -810,7 +811,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             (if (equippedBossRelics.size == 4) 1L else 0L) +
             (if (before.discoveredSecretIds.size >= 4) 1L else 0L) +
             (if (before.activeWorldId == "ember_summit" && "ashen_vault" in before.discoveredSecretIds) 1L else 0L)
-        return after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(bonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + bonusNebula))
+        val finalBonusNebula = if ("nebula_boost" in before.shopPurchases) bonusNebula * 2L else bonusNebula
+        return after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(finalBonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + finalBonusNebula))
     }
 
     fun buyPrestigeShopItem(itemId: String, cost: Long) {
@@ -1427,22 +1429,23 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             _gameState.value = state
             return
         }
+        val nebulaMultiplier = if ("nebula_boost" in state.shopPurchases) 2L else 1L
         val rewardState = when (questId) {
             "daily_guesses_10" -> state.copy(
                 money = state.money + BigNumber(10_000),
                 statistics = state.statistics.copy(moneyEarned = state.statistics.moneyEarned + BigNumber(10_000))
             )
             "daily_correct_5" -> state.copy(
-                nebula = state.nebula + BigNumber(25),
-                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 25)
+                nebula = state.nebula + BigNumber(25L * nebulaMultiplier),
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 25L * nebulaMultiplier)
             )
             "daily_streak_5" -> state.copy(
-                nebula = state.nebula + BigNumber(50),
-                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 50)
+                nebula = state.nebula + BigNumber(50L * nebulaMultiplier),
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 50L * nebulaMultiplier)
             )
             "daily_upgrades_3" -> state.copy(
-                nebula = state.nebula + BigNumber(35),
-                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 35)
+                nebula = state.nebula + BigNumber(35L * nebulaMultiplier),
+                statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + 35L * nebulaMultiplier)
             )
             else -> state
         }

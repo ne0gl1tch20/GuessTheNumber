@@ -5,6 +5,8 @@
 - 📦 **Shared catalog data**: Bundled the existing Android upgrade and shop definitions with the Windows desktop app so the desktop catalog starts from the same game data.
 - 🎁 **Daily quests and treasure drops**: Windows records daily guess/correct/streak progress, resets stale daily claims on a new day, lets players claim the four Android-matching daily rewards once per day, tracks common/rare/epic chest drops, and shows quest progress and chest counts in the Play screen.
 - 🧮 **Reward parity fixtures**: Added deterministic coverage for stacked talent, event, mastery, relic-set, Home Base and secret bonuses, including Money/Nebula statistics.
+- 🛍️ **Shop effects**: Windows now supports Nebula Crystal's 2× future Nebula rewards and Golden Guess Pass's critical-sized bonus on every tenth lifetime guess when that guess is correct. Unknown shop effects remain unavailable.
+- 🏆 **Progression hooks**: Achievement milestones award their configured Nebula rewards once and update lifetime earned statistics. World unlocks check boss, correct-guess, upgrade, Prestige and Ultra requirements, with explicit unlock/select controls on Play.
 
 ## v3.0.3 (First-Run Tours & Update Reliability)
 
