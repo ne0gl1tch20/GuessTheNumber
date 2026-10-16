@@ -240,7 +240,7 @@ fun ProductionGuessGameScreen(
         if (!snapshot.autoClickerActive || autoClickerFailurePaused || "auto_clicker_basic" !in snapshot.shopPurchases) {
             return@LaunchedEffect
         }
-        delay(1_000L)
+        delay(engine.autoClickerDelayMillis(snapshot))
         while (latestSaving) delay(100L)
         if (state != snapshot) return@LaunchedEffect
 
