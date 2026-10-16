@@ -10,7 +10,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -40,10 +39,7 @@ fun ExpressiveScreen(enabled: Boolean = true, content: @Composable () -> Unit) {
             scaleIn(initialScale = 0.97f, animationSpec = ExpressiveMotion.standardSpring),
         exit = fadeOut() + scaleOut(targetScale = 0.985f)
     ) {
-        // Keep the animated destination viewport bounded so scrollable screens
-        // (including LazyColumn-based navigation destinations) receive the
-        // available screen constraints rather than wrapping their content.
-        Box(modifier = Modifier.fillMaxSize()) { content() }
+        Box { content() }
     }
 }
 
