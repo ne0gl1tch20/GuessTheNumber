@@ -421,6 +421,23 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
+    fun nebulaBoostDoublesNebulaGrantedByGuessBonuses() {
+        val before = GameState(
+            nebula = BigNumber(4),
+            shopPurchases = setOf("nebula_boost"),
+            prestigeShopPurchases = setOf("talent_master_1"),
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(nebulaEarned = 4)
+        )
+        val after = before.copy(
+            money = BigNumber(100),
+            statistics = before.statistics.copy(moneyEarned = BigNumber(100))
+        )
+        val result = DesktopEconomyTransactions.applyGuessBonuses(before, after, correct = true)
+        assertEquals(BigNumber(6), result.nebula)
+        assertEquals(6L, result.statistics.nebulaEarned)
+    }
+
+    @Test
     fun achievementMilestonePaysOnceAndUpdatesNebulaLifetimeStats() {
         val initial = GameState(
             correctGuesses = 10,
