@@ -18,6 +18,9 @@ internal fun shouldUseCompactNavigation(width: Dp): Boolean =
 
 internal enum class DesktopShellKeyAction {
     NAVIGATE_PLAY,
+    NAVIGATE_UPGRADES,
+    NAVIGATE_SHOP,
+    NAVIGATE_MORE,
     NAVIGATE_ABOUT,
     CLEAR_MESSAGE,
     NONE
@@ -36,7 +39,11 @@ internal fun resolveDesktopShellKeyAction(
     if (ctrlPressed) {
         return when (DesktopDestination.fromShortcut(key, ctrlPressed = true)) {
             DesktopDestination.PLAY -> DesktopShellKeyAction.NAVIGATE_PLAY
+            DesktopDestination.UPGRADES -> DesktopShellKeyAction.NAVIGATE_UPGRADES
+            DesktopDestination.SHOP -> DesktopShellKeyAction.NAVIGATE_SHOP
+            DesktopDestination.MORE -> DesktopShellKeyAction.NAVIGATE_MORE
             DesktopDestination.ABOUT -> DesktopShellKeyAction.NAVIGATE_ABOUT
+            DesktopDestination.PRESTIGE, DesktopDestination.ULTRA, DesktopDestination.TALENT -> DesktopShellKeyAction.NONE
             null -> DesktopShellKeyAction.NONE
         }
     }

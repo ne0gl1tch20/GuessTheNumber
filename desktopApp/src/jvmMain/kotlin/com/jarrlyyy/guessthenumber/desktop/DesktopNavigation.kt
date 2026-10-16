@@ -9,9 +9,15 @@ import androidx.compose.ui.input.key.Key
  * Windows-owned navigation contract. Destinations are added here as each
  * parity stage implements a real screen; Android navigation stays platform-owned.
  */
-enum class DesktopDestination(val label: String, val shortcutKey: Key) {
+enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     PLAY("Play", Key.One),
-    ABOUT("About", Key.Two);
+    UPGRADES("Upgrades", Key.Two),
+    SHOP("Shop", Key.Three),
+    MORE("More", Key.Four),
+    ABOUT("About", Key.Five),
+    PRESTIGE("Prestige", null),
+    ULTRA("Ultra", null),
+    TALENT("Talent Web", null);
 
     companion object {
         fun fromShortcut(key: Key, ctrlPressed: Boolean): DesktopDestination? {
@@ -55,6 +61,9 @@ class DesktopShellController(
         )
         when (action) {
             DesktopShellKeyAction.NAVIGATE_PLAY -> navigate(DesktopDestination.PLAY)
+            DesktopShellKeyAction.NAVIGATE_UPGRADES -> navigate(DesktopDestination.UPGRADES)
+            DesktopShellKeyAction.NAVIGATE_SHOP -> navigate(DesktopDestination.SHOP)
+            DesktopShellKeyAction.NAVIGATE_MORE -> navigate(DesktopDestination.MORE)
             DesktopShellKeyAction.NAVIGATE_ABOUT -> navigate(DesktopDestination.ABOUT)
             DesktopShellKeyAction.CLEAR_MESSAGE -> clearMessage()
             DesktopShellKeyAction.NONE -> return false

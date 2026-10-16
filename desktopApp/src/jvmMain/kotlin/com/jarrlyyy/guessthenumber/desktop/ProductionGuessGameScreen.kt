@@ -52,7 +52,14 @@ import kotlin.random.Random
 
 /** Windows presentation backed by the production engine, economy rules and desktop save adapter. */
 @Composable
-fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
+fun ProductionGuessGameScreen(
+    section: DesktopGameSection = DesktopGameSection.PLAY,
+    onOpenAbout: () -> Unit = {},
+    onOpenPrestige: () -> Unit = {},
+    onOpenUltra: () -> Unit = {},
+    onOpenTalent: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     val engine = remember { GameEngine() }
     val autoClicker = remember { DesktopGuessingBot() }
     val saveStore = remember { DesktopSaveStore(defaultDesktopSaveDirectory()) }
@@ -216,6 +223,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 CurrencySummary("Correct", currentState.correctGuesses.toString())
                 CurrencySummary("Streak", currentState.streak.toString())
             }
+            if (section == DesktopGameSection.PLAY) {
             Text(
                 "Daily progress: guesses ${currentState.dailyQuestGuesses}/10 · correct ${currentState.dailyQuestCorrectGuesses}/5 · best streak ${currentState.dailyQuestBestStreak}/5 · upgrades ${currentState.dailyQuestUpgradePurchases}/3",
                 style = MaterialTheme.typography.bodySmall,
@@ -397,6 +405,9 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 ) { Text(if (currentState.autoClickerActive) "Pause auto-clicker" else "Resume auto-clicker") }
             }
 
+            }
+
+            if (section == DesktopGameSection.UPGRADES) {
             SectionTitle("Money upgrades")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Buy multiplier:")
@@ -433,7 +444,10 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     }
                 }
 
-                SectionTitle("Prestige")
+                }
+
+            if (section == DesktopGameSection.PRESTIGE) {
+            SectionTitle("Prestige")
                 val prestigeRequirement = engine.calculatePrestigeRequirement(currentState.prestigeCount)
                 val prestigeReward = engine.calculatePrestigeReward(currentState.money, currentState.prestigeCount)
                 Text("Requirement: $prestigeRequirement Money · Estimated reward: $prestigeReward Prestige")
@@ -456,6 +470,9 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     }
                 }
 
+                }
+
+                if (section == DesktopGameSection.ULTRA) {
                 SectionTitle("Ultra")
                 val ultraRequirement = engine.calculateUltraRequirement(currentState.ultraCount)
                 val ultraReward = engine.calculateUltraReward(currentState.money, currentState.ultraCount)
@@ -480,7 +497,10 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     }
                 }
 
-                SectionTitle("Nebula shop")
+                }
+
+            if (section == DesktopGameSection.SHOP) {
+            SectionTitle("Nebula shop")
                 catalog.shopItems.forEach { item ->
                     val purchased = item.id in currentState.shopPurchases
                     val supported = item.id in setOf("auto_clicker_basic", "nebula_boost", "golden_guess") ||
@@ -500,7 +520,10 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     }
                 }
 
-                SectionTitle("Talents")
+                }
+
+            if (section == DesktopGameSection.TALENT) {
+            SectionTitle("Talents")
                 if (talentCatalog == null) {
                     Text("Talent catalog could not be loaded: ${talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"}")
                 } else {
@@ -526,6 +549,21 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                                 )
                             }
                         }
+                    }
+                }
+            }
+
+            }
+
+            if (section == DesktopGameSection.MORE) {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("More", style = MaterialTheme.typography.titleLarge)
+                        Text("Choose a destination.")
+                        Button(onClick = onOpenPrestige) { Text("Prestige") }
+                        Button(onClick = onOpenUltra) { Text("Ultra") }
+                        Button(onClick = onOpenTalent) { Text("Talent Web") }
+                        Button(onClick = onOpenAbout) { Text("About and updates") }
                     }
                 }
             }
