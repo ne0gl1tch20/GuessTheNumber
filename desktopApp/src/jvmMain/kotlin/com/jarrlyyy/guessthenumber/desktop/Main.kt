@@ -341,6 +341,8 @@ fun main() = application {
                             }
                         }
 
+                        DesktopDestination.CHANGELOG -> DesktopChangelogScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
+
                         DesktopDestination.ACHIEVEMENTS,
                         DesktopDestination.WORLD_MAP,
                         DesktopDestination.MUTATORS,
@@ -357,7 +359,6 @@ fun main() = application {
                         DesktopDestination.ARCADE,
                         DesktopDestination.ACTIVITY_HUB,
                         DesktopDestination.LUA_TESTING_HUB,
-                        DesktopDestination.CHANGELOG,
                         DesktopDestination.LIVE_OPS -> DesktopParityScreen(destination = destination, onBack = { shell.navigate(DesktopDestination.MORE) }, onNavigate = { shell.navigate(it) })
 
                         DesktopDestination.ABOUT -> {

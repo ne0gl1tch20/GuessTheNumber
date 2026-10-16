@@ -30,6 +30,8 @@ kotlin {
             resources.srcDir(generatedDesktopResources)
             // Consume the canonical game configuration instead of maintaining desktop copies.
             resources.srcDir(rootProject.file("app/src/main/assets/game"))
+            // Share the canonical Android changelog with the Windows app bundle.
+            resources.srcDir(rootProject.file("app/src/main/assets"))
             dependencies {
                 implementation(project(":shared"))
                 implementation(compose.runtime)
