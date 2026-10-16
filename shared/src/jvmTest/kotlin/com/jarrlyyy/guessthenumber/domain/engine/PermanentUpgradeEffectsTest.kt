@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.domain.engine
 
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -57,6 +58,27 @@ class PermanentUpgradeEffectsTest {
             ultraUpgradeLevels = mapOf("ultra_gain_boost" to 10)
         )
         assertEquals(0, engine.calculateUltraReward(maxed).compareTo(BigNumber(2_000)))
+    }
+
+    @Test
+    fun desktopPrestigeAndUltraResetsGrantEndowmentBeforeResettingUpgradeLevels() {
+        val prestigeState = GameState(
+            money = engine.calculatePrestigeRequirement(0),
+            prestigeUpgradeLevels = mapOf("prestige_starting_capital" to 2)
+        )
+        val prestige = DesktopEconomyTransactions.prestigeReset(prestigeState, engine)
+        assertTrue(prestige.accepted)
+        assertEquals(0, prestige.state.money.compareTo(BigNumber(2_000)))
+
+        val ultraState = GameState(
+            money = engine.calculateUltraRequirement(0) * BigNumber(100),
+            prestige = BigNumber(1_000),
+            prestigeUpgradeLevels = mapOf("prestige_starting_capital" to 3)
+        )
+        val ultra = DesktopEconomyTransactions.ultraReset(ultraState, engine)
+        assertTrue(ultra.accepted)
+        assertEquals(0, ultra.state.money.compareTo(BigNumber(3_000)))
+        assertTrue(ultra.state.prestigeUpgradeLevels.isEmpty())
     }
 
     @Test
