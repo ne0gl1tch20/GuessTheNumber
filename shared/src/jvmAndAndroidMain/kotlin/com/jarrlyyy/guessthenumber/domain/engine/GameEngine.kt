@@ -75,7 +75,14 @@ class GameEngine(private val rng: Random = Random.Default) {
         val feedback = transition.feedback
 
         if (feedback == GuessFeedback.CORRECT) {
-            val critChance = CriticalChanceRules.chance(state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0)
+            val critChance = if (
+                "golden_guess" in state.shopPurchases &&
+                (state.statistics.totalGuesses + 1L) % 10L == 0L
+            ) {
+                1.0
+            } else {
+                CriticalChanceRules.chance(state.prestigeUpgradeLevels["critical_precision_boost"] ?: 0)
+            }
             val criticalRoll = rng.nextDouble()
             val newMin = 1L
             val newMax = getRangeMax(state)
