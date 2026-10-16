@@ -152,7 +152,7 @@ fun ProductionGuessGameScreen(
             val transaction = transform(before)
             if (!transaction.accepted) {
                 if (transaction.state != before) {
-                    val refreshedSave = withContext(Dispatchers.IO) { saveStore.save(1, transaction.state) }
+                    val refreshedSave = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, transaction.state) }
                     if (refreshedSave) {
                         state = transaction.state
                         feedback = transaction.message
@@ -166,7 +166,7 @@ fun ProductionGuessGameScreen(
                 return@launch
             }
             val progressedState = DesktopEconomyTransactions.evaluateAchievements(transaction.state)
-            val saved = withContext(Dispatchers.IO) { saveStore.save(1, progressedState) }
+            val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, progressedState) }
             if (saved) {
                 state = progressedState
                 if (
@@ -196,7 +196,7 @@ fun ProductionGuessGameScreen(
         settingsSaveJob?.cancel()
         settingsSaveJob = scope.launch {
             delay(200)
-            val saved = withContext(Dispatchers.IO) { saveStore.save(1, updated) }
+            val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, updated) }
             if (!saved) {
                 feedback = "Settings could not be saved. Your last valid save remains available."
             }
@@ -260,7 +260,7 @@ fun ProductionGuessGameScreen(
                 lootRoll = if (correct) Random.nextInt(1000) else null
             )
         )
-        val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
+        val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
         if (saved) {
             autoClicker.observeGuess(guess, result.feedback)
             if (result.feedback == GuessFeedback.CORRECT) {
@@ -484,7 +484,7 @@ fun ProductionGuessGameScreen(
                             )
                         )
                         scope.launch {
-                            val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
+                            val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
                             if (saved) {
                                 autoClicker.observeGuess(guess, result.feedback)
                                 if (result.feedback == GuessFeedback.CORRECT) {
