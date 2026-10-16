@@ -246,6 +246,12 @@ class GameEngine(private val rng: Random = Random.Default) {
     fun applyMoneyEarningBoost(state: GameState, baseReward: BigNumber): BigNumber =
         if (baseReward <= BigNumber.ZERO) baseReward else baseReward * moneyEarningMultiplier(state)
 
+    fun addNebulaEarned(currentTotal: Long, reward: Long): Long {
+        val current = currentTotal.coerceAtLeast(0L)
+        if (reward <= 0L) return current
+        return if (current > Long.MAX_VALUE - reward) Long.MAX_VALUE else current + reward
+    }
+
     fun calculateNebulaReward(state: GameState, baseReward: Long): Long {
         if (baseReward <= 0L) return 0L
         val upgradeLevel = (state.ultraUpgradeLevels["ultra_nebula_boost"] ?: 0).coerceIn(0, 15)
@@ -338,7 +344,7 @@ class GameEngine(private val rng: Random = Random.Default) {
         return state.copy(
             achievements = state.achievements + newlyUnlocked.map { it.first },
             nebula = state.nebula + BigNumber(reward),
-            statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + reward)
+            statistics = state.statistics.copy(nebulaEarned = addNebulaEarned(state.statistics.nebulaEarned, reward))
         )
     }
 
