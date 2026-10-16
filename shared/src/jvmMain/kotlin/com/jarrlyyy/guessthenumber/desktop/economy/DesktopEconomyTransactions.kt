@@ -154,7 +154,7 @@ object DesktopEconomyTransactions {
         if (state.endlessRiftActive && worldId != state.activeWorldId) {
             return rejected(state, "World selection is locked during Endless Rift.")
         }
-        return accepted(state.copy(activeWorldId = worldId), "Selected ${WORLD_REQUIREMENTS.first { it.id == worldId }.name}.")
+        return accepted(state.copy(activeWorldId = worldId, activeBossBattleWorldId = if (state.activeBossBattleWorldId == worldId) worldId else null), "Selected ${WORLD_REQUIREMENTS.first { it.id == worldId }.name}.")
     }
 
     fun worldProgress(state: GameState): List<DesktopWorldProgress> {
