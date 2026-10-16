@@ -4,6 +4,15 @@
 **Reviewed:** 2026-10-16  
 **Scope:** Deterministic core guess transitions and Windows save/reload integration. This is not a claim of full gameplay/economy or runtime parity.
 
+## Current repository candidate (2026-10-16)
+
+The historical Stage 2-D evidence below describes earlier commits and must not be read as proof that the current candidate is green. Current open PR: [#215](https://github.com/ne0gl1tch20/GuessTheNumber/pull/215), head `c2138c0ff8ce2aba8813dd3104a560b489c82575`.
+
+- [Android Validation and Tests, run 38890096421](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38890096421): **passed** for the current head.
+- [Windows Desktop CI, run 38890096399](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38890096399): **failed** for the current head. Windows candidate validation remains blocked until this is resolved and rerun successfully.
+- PR #215 includes progression-screen work (boss battle actions, relic transactions, Codex, Endgame and Lucky Stake), but no runtime screenshot parity or full Windows runtime verification is claimed here.
+- **Stage 2-D / Stage 2 exit gate: still open.** Earlier successful workflow runs listed below are historical evidence for their specific commits only.
+
 ## Evidence collected
 
 | Area | Evidence | Result |
@@ -25,7 +34,7 @@
 - PR #199 adds the initial Windows economy/progression slice: catalog-backed Money/Prestige/Ultra upgrades, reset actions, supported Nebula shop purchases, talent unlocks and the feedback-driven Auto Clicker. See [PR #199](https://github.com/ne0gl1tch20/GuessTheNumber/pull/199).
 - The follow-up reward-parity slice now records daily guess/correct/streak progress, clears stale daily claim state on a date change, applies Android's 1% Epic / 5% Rare / 18% Common chest drop thresholds, and exposes claimable daily rewards plus chest counts in the Windows Play screen. Deterministic tests cover claim amounts, duplicate claims, threshold boundaries and stacked reward bonuses.
 - The latest economy slice implements the two defined shop boosts: Nebula Crystal doubles future Nebula rewards from desktop guess bonuses, daily quests and achievement milestones; Golden Guess Pass adds a critical-sized Money bonus on every tenth lifetime guess when correct. Unsupported/unknown shop effects remain disabled.
-- Desktop guesses and accepted economy transactions now evaluate Android-matching achievement milestones with one-time rewards. Basic world unlock/select hooks enforce the Android world's boss, correct-guess, upgrade, Prestige and Ultra requirements. Full world map/boss/relic/activity screens remain Stage 3 work.
+- Desktop guesses and accepted economy transactions now evaluate Android-matching achievement milestones with one-time rewards. Basic world unlock/select hooks enforce the Android world's boss, correct-guess, upgrade, Prestige and Ultra requirements. Full world map/boss/relic/activity parity remains unfinished. PR #215 now contains partial candidate implementations for some of these screens, but they remain unverified and do not close the Stage 2 gate.
 - Candidate CI is confirmed on commit `38c7421`: [Windows Desktop CI run 38840144782](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144782) and [Android Validation run 38840144773](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38840144773) both completed successfully.
 - The user reports that focused Windows checks passed, including Enter-to-submit, button submission, shop/reward/progression checks and restart/save persistence. This is recorded as user-reported runtime evidence, not an independently witnessed session.
 - Existing deterministic economy tests cover stacked bonus totals, Nebula Crystal doubling daily-quest/achievement/guess rewards, Golden Guess Pass on every tenth lifetime guess, one-time achievement rewards, world requirement enforcement and idempotence.
