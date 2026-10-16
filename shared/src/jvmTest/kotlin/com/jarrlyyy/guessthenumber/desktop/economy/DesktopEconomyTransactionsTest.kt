@@ -710,4 +710,21 @@ class DesktopEconomyTransactionsTest {
         assertEquals(1, state.bossBattleProgress["verdant_guardian"])
         assertEquals(4, state.bossBattleMistakes["verdant_guardian"])
     }
+
+    @Test
+    fun activeBossBattleStatusMatchesSavedCombatProgress() {
+        val state = GameState(
+            activeBossBattleWorldId = "verdant_grove",
+            bossBattleProgress = mapOf("verdant_guardian" to 2),
+            bossBattleMistakes = mapOf("verdant_guardian" to 3)
+        )
+        val status = DesktopEconomyTransactions.activeBossBattleStatus(state)
+        assertEquals("verdant_grove", status?.worldId)
+        assertEquals("verdant_guardian", status?.bossId)
+        assertEquals("Verdant Guardian", status?.bossName)
+        assertEquals(3, status?.hp)
+        assertEquals(2, status?.damage)
+        assertEquals(3, status?.mistakes)
+        assertEquals(null, DesktopEconomyTransactions.activeBossBattleStatus(state.copy(activeBossBattleWorldId = null)))
+    }
 }
