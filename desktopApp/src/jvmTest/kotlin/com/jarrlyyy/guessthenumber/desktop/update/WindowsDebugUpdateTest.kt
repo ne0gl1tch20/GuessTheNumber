@@ -38,8 +38,8 @@ class WindowsDebugUpdateTest {
         val runsUrl = WORKFLOW_RUNS_URL
         val artifactsUrl = "$ACTIONS_API/runs/123/artifacts?per_page=100"
         val responses = mapOf(
-            runsUrl to "{\\"workflow_runs\\":[{\\"id\\":123,\\"run_number\\":7,\\"run_attempt\\":1,\\"event\\":\\"pull_request\\",\\"head_branch\\":\\"master\\",\\"conclusion\\":\\"success\\"},{\\"id\\":123,\\"run_number\\":6,\\"run_attempt\\":1,\\"event\\":\\"push\\",\\"head_branch\\":\\"master\\",\\"conclusion\\":\\"success\\"}]}",
-            artifactsUrl to "{\\"artifacts\\":[{\\"name\\":\\"GuessTheNumber-Windows-Debug\\",\\"expired\\":true,\\"archive_download_url\\":\\"https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/88/zip\\"}]}"
+            runsUrl to "{\"workflow_runs\":[{\"id\":123,\"run_number\":7,\"run_attempt\":1,\"event\":\"pull_request\",\"head_branch\":\"master\",\"conclusion\":\"success\"},{\"id\":123,\"run_number\":6,\"run_attempt\":1,\"event\":\"push\",\"head_branch\":\"master\",\"conclusion\":\"success\"}]}",
+            artifactsUrl to "{\"artifacts\":[{\"name\":\"GuessTheNumber-Windows-Debug\",\"expired\":true,\"archive_download_url\":\"https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/88/zip\"}]}"
         )
         val client = WindowsDebugUpdateClient { url ->
             StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
@@ -125,8 +125,8 @@ class WindowsDebugUpdateTest {
         val artifactsUrl = "$ACTIONS_API/runs/123/artifacts?per_page=100"
         val downloadUrl = "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/88/zip"
         val responses = mapOf(
-            runsUrl to "{\\"workflow_runs\\":[{\\"id\\":123,\\"run_number\\":$runNumber,\\"run_attempt\\":1,\\"event\\":\\"push\\",\\"head_branch\\":\\"master\\",\\"conclusion\\":\\"success\\"}]}",
-            artifactsUrl to "{\\"artifacts\\":[{\\"name\\":\\"GuessTheNumber-Windows-Debug\\",\\"expired\\":false,\\"archive_download_url\\":\\"$downloadUrl\\"}]}"
+            runsUrl to "{\"workflow_runs\":[{\"id\":123,\"run_number\":$runNumber,\"run_attempt\":1,\"event\":\"push\",\"head_branch\":\"master\",\"conclusion\":\"success\"}]}",
+            artifactsUrl to "{\"artifacts\":[{\"name\":\"GuessTheNumber-Windows-Debug\",\"expired\":false,\"archive_download_url\":\"$downloadUrl\"}]}"
         )
         return WindowsDebugUpdateClient { url ->
             StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
