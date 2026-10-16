@@ -417,6 +417,29 @@ object DesktopEconomyTransactions {
         val requirement: String
     )
 
+    data class DesktopBossBattleStatus(
+        val worldId: String,
+        val bossId: String,
+        val bossName: String,
+        val hp: Int,
+        val damage: Int,
+        val mistakes: Int
+    )
+
+    fun activeBossBattleStatus(state: GameState): DesktopBossBattleStatus? {
+        val worldId = state.activeBossBattleWorldId ?: return null
+        val world = WORLD_REQUIREMENTS.firstOrNull { it.id == worldId } ?: return null
+        val hp = world.bossHp + if (state.endlessRiftActive) ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
+        return DesktopBossBattleStatus(
+            worldId = world.id,
+            bossId = world.bossId,
+            bossName = world.bossName,
+            hp = hp,
+            damage = (state.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, hp),
+            mistakes = state.bossBattleMistakes[world.bossId] ?: 0
+        )
+    }
+
     data class DesktopWorldProgress(
         val id: String,
         val name: String,
