@@ -1,6 +1,6 @@
 # Windows Feature Parity Plan
 
-**Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
+**Status:** In progress; Stage 2-D economy candidate merged and Stage 2-E desktop UI organization in review. Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
@@ -305,3 +305,18 @@ This is a source and CI review, not a claim of interactive Windows runtime verif
 - **Current-candidate checks:** follow the CI links in the Stage 2-D PR and report. Successful compilation alone is not runtime evidence.
 - **Stage 2-B update:** PR #198 adds catalog-backed upgrade purchases, Prestige/Ultra resets and upgrades, Nebula shop purchase records and talent unlocks with transaction tests. Remaining gaps include confirming all item effects against Android (notably auto-clicker/background behavior and shop boosts), expanded reward fixtures and actual Windows runtime testing.
 - **Still outstanding:** actual Windows input/window/restart testing and complete UI/localization parity. Do not mark Stage 2 complete or start Stage 3 implementation until the full Stage 2 exit gate is met.
+
+## Stage 2-E desktop UI organization candidate (2026-10-16)
+
+Branch: [`feat/windows-stage-2e-desktop-ui-parity`](https://github.com/ne0gl1tch20/GuessTheNumber/tree/feat/windows-stage-2e-desktop-ui-parity).
+
+This slice organizes the existing Windows production-game UI into desktop destinations without changing game rules or save format:
+
+- **Play** contains the guessing input, feedback, mutators and auto-clicker control.
+- **Progress** contains daily quest progress/claims, treasure chest counts, achievements and world unlock/selection actions.
+- **Economy** contains Money/Prestige/Ultra upgrades, resets, shop purchases and talents.
+- **About** contains the Windows Debug updater and app information, keeping update controls out of the gameplay surface.
+- Ctrl+1 through Ctrl+4 navigate to Play, Progress, Economy and About; Escape returns to Play, while Enter remains available to focused controls.
+- Navigation/controller and shortcut policy tests were updated for the added destinations.
+
+This is source-level organization, not a claim of Windows runtime verification. Review the candidate CI and then verify resizing, keyboard focus, page navigation, economy actions and save persistence on Windows before marking the relevant parity rows verified. Stage 2 remains open; do not start Stage 3 until its full exit gate is met.
