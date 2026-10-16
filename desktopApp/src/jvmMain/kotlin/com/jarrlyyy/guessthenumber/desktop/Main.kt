@@ -202,7 +202,8 @@ fun main() = application {
                         DesktopDestination.MORE,
                         DesktopDestination.PRESTIGE,
                         DesktopDestination.ULTRA,
-                        DesktopDestination.TALENT -> {
+                        DesktopDestination.TALENT,
+                        DesktopDestination.STATS -> {
                             Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
                                 ProductionGuessGameScreen(
                                     section = when (shellState.destination) {
@@ -212,12 +213,14 @@ fun main() = application {
                                         DesktopDestination.PRESTIGE -> DesktopGameSection.PRESTIGE
                                         DesktopDestination.ULTRA -> DesktopGameSection.ULTRA
                                         DesktopDestination.TALENT -> DesktopGameSection.TALENT
+                                        DesktopDestination.STATS -> DesktopGameSection.STATS
                                         else -> DesktopGameSection.PLAY
                                     },
                                     onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
                                     onOpenPrestige = { shell.navigate(DesktopDestination.PRESTIGE) },
                                     onOpenUltra = { shell.navigate(DesktopDestination.ULTRA) },
-                                    onOpenTalent = { shell.navigate(DesktopDestination.TALENT) }
+                                    onOpenTalent = { shell.navigate(DesktopDestination.TALENT) },
+                                    onOpenStats = { shell.navigate(DesktopDestination.STATS) }
                                 )
                             }
                         }

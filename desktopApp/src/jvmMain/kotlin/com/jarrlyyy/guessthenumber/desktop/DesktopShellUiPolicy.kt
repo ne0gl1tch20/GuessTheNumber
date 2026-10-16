@@ -43,7 +43,7 @@ internal fun resolveDesktopShellKeyAction(
             DesktopDestination.SHOP -> DesktopShellKeyAction.NAVIGATE_SHOP
             DesktopDestination.MORE -> DesktopShellKeyAction.NAVIGATE_MORE
             DesktopDestination.ABOUT -> DesktopShellKeyAction.NAVIGATE_ABOUT
-            DesktopDestination.PRESTIGE, DesktopDestination.ULTRA, DesktopDestination.TALENT -> DesktopShellKeyAction.NONE
+            DesktopDestination.PRESTIGE, DesktopDestination.ULTRA, DesktopDestination.TALENT, DesktopDestination.STATS -> DesktopShellKeyAction.NONE
             null -> DesktopShellKeyAction.NONE
         }
     }

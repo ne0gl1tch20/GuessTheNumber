@@ -78,6 +78,7 @@ fun ProductionGuessGameScreen(
     onOpenPrestige: () -> Unit = {},
     onOpenUltra: () -> Unit = {},
     onOpenTalent: () -> Unit = {},
+    onOpenStats: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val engine = remember { GameEngine() }
@@ -641,6 +642,73 @@ fun ProductionGuessGameScreen(
                 }
             }
 
+            if (section == DesktopGameSection.STATS) {
+                val stats = currentState.statistics
+                val totalGuesses = stats.totalGuesses
+                val accuracy = if (totalGuesses > 0) {
+                    (stats.correctGuesses.toDouble() / totalGuesses.toDouble()) * 100.0
+                } else {
+                    0.0
+                }
+                val roundedAccuracy = kotlin.math.round(accuracy * 10.0) / 10.0
+                val playtimeHours = stats.playtimeSeconds / 3600
+                val playtimeMinutes = (stats.playtimeSeconds % 3600) / 60
+                val playtimeSeconds = stats.playtimeSeconds % 60
+
+                SectionTitle("Advanced Statistics")
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    tonalElevation = 4.dp
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text("Guessing Precision", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text("$roundedAccuracy%", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text(
+                            "Correct: ${stats.correctGuesses} · Failed: ${stats.failedGuesses} · Total: $totalGuesses",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        androidx.compose.material3.LinearProgressIndicator(
+                            progress = { if (totalGuesses > 0) stats.correctGuesses.toFloat() / totalGuesses.toFloat() else 0f },
+                            modifier = Modifier.fillMaxWidth().height(8.dp)
+                        )
+                    }
+                }
+
+                SectionTitle("Performance & Economy")
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        CurrencySummary("Money Earned", stats.moneyEarned.format())
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        CurrencySummary("Money Spent", stats.moneySpent.format())
+                    }
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        CurrencySummary("Current Streak", currentState.streak.toString())
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        CurrencySummary("Best Streak", currentState.bestStreak.toString())
+                    }
+                }
+
+                SectionTitle("Resets & Meta Progression")
+                Text("Prestige Resets: ${stats.prestigesCount}")
+                Text("Ultra Resets: ${stats.ultrasCount}")
+                Text("Nebula Earned: ${stats.nebulaEarned}")
+
+                SectionTitle("Session & Arcade")
+                Text("Total Playtime: ${playtimeHours} hr ${playtimeMinutes} min ${playtimeSeconds} sec")
+                Text("Arcade Minigames Played: ${stats.arcadePlayed}")
+                Text("Current Number Range: ${currentState.currentRangeMin} - ${currentState.currentRangeMax}")
+            }
+
             if (section == DesktopGameSection.MORE) {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -649,6 +717,7 @@ fun ProductionGuessGameScreen(
                         Button(onClick = onOpenPrestige) { Text("Prestige") }
                         Button(onClick = onOpenUltra) { Text("Ultra") }
                         Button(onClick = onOpenTalent) { Text("Talent Web") }
+                        Button(onClick = onOpenStats) { Text("Statistics") }
                         Button(onClick = onOpenAbout) { Text("About and updates") }
                     }
                 }

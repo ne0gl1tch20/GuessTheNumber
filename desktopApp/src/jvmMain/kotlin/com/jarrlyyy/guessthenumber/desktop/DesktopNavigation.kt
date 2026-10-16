@@ -17,7 +17,8 @@ enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     ABOUT("About", Key.Five),
     PRESTIGE("Prestige", null),
     ULTRA("Ultra", null),
-    TALENT("Talent Web", null);
+    TALENT("Talent Web", null),
+    STATS("Statistics", null);
 
     companion object {
         fun fromShortcut(key: Key, ctrlPressed: Boolean): DesktopDestination? {
