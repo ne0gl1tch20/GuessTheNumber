@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.DesktopGuessingBot
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRepository
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import com.jarrlyyy.guessthenumber.desktop.economy.EconomyTransaction
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveStore
@@ -57,6 +58,8 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
     val saveStore = remember { DesktopSaveStore(defaultDesktopSaveDirectory()) }
     val catalogResult = remember { runCatching { DesktopEconomyCatalog.load() } }
     val catalog = catalogResult.getOrNull()
+    val talentCatalogResult = remember { runCatching { DesktopEconomyRepository().talents() } }
+    val talentCatalog = talentCatalogResult.getOrNull()
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<GameState?>(null) }
     var guessText by remember { mutableStateOf("") }
@@ -491,24 +494,31 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 }
 
                 SectionTitle("Talents")
-                val talents = listOf(
-                    Triple("talent_speed_1", "Quick Hands", 10L),
-                    Triple("talent_crit_1", "Critical Focus", 25L),
-                    Triple("talent_crit_2", "Critical Mastery", 50L),
-                    Triple("talent_reward_1", "Reward Resonance", 100L),
-                    Triple("talent_speed_2", "Rapid Hands", 75L),
-                    Triple("talent_master_1", "Mastery", 250L)
-                )
-                talents.forEach { (id, name, cost) ->
-                    val owned = id in currentState.prestigeShopPurchases
-                    EconomyActionCard(
-                        title = name,
-                        description = id.replace('_', ' '),
-                        detail = if (owned) "Unlocked" else "Cost: $cost Prestige",
-                        action = if (owned) "Owned" else "Unlock",
-                        enabled = !isSaving && !owned && currentState.prestige >= BigNumber(cost)
-                    ) {
-                        commitTransaction { DesktopEconomyTransactions.buyTalent(it, id, cost) }
+                if (talentCatalog == null) {
+                    Text("Talent catalog could not be loaded: ${talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"}")
+                } else {
+                    talentCatalog.forEach { talent ->
+                        val owned = talent.id in currentState.prestigeShopPurchases
+                        val parentOwned = talent.requiredParentId == null ||
+                            talent.requiredParentId in currentState.prestigeShopPurchases
+                        EconomyActionCard(
+                            title = talent.name,
+                            description = talent.description,
+                            detail = when {
+                                owned -> "Unlocked"
+                                !parentOwned -> "Cost: ${talent.cost} Prestige · Requires ${talent.requiredParentId}"
+                                else -> "Cost: ${talent.cost} Prestige"
+                            },
+                            action = if (owned) "Owned" else if (!parentOwned) "Locked" else "Unlock",
+                            enabled = !isSaving && !owned && parentOwned &&
+                                currentState.prestige >= BigNumber(talent.cost)
+                        ) {
+                            commitTransaction {
+                                DesktopEconomyTransactions.buyTalent(
+                                    it, talent.id, talent.cost, talent.requiredParentId
+                                )
+                            }
+                        }
                     }
                 }
             }
