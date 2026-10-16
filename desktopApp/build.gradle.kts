@@ -40,6 +40,8 @@ kotlin {
                 implementation(compose.material3)
                 // Compose Multiplatform 1.8+ no longer brings this in transitively.
                 implementation("org.jetbrains.compose.material:material-icons-core:1.7.3")
+                // Extended icons (FitScreen, ZoomIn, ZoomOut) are not in the core set.
+                implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
                 implementation(compose.ui)
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.serialization.json)
