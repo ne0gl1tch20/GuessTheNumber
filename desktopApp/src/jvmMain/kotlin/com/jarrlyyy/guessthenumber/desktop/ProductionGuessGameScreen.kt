@@ -106,6 +106,8 @@ fun ProductionGuessGameScreen(
     val catalog = catalogResult.getOrNull()
     val talentCatalogResult = remember { runCatching { DesktopEconomyRepository().talents() } }
     val talentCatalog = talentCatalogResult.getOrNull()
+    val minigameCatalogResult = remember { runCatching { DesktopEconomyRepository().minigames() } }
+    val minigameCatalog = minigameCatalogResult.getOrNull()
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<GameState?>(null) }
     var activeSaveSlot by remember { mutableStateOf(1) }
@@ -533,6 +535,31 @@ fun ProductionGuessGameScreen(
                     state = currentState,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) }
                 )
+            }
+
+            if (section == DesktopGameSection.ARCADE) {
+                val minigames = minigameCatalog
+                if (minigames == null) {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text("Arcade unavailable", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.error)
+                            Text("The canonical minigame catalog could not be loaded. No Arcade rewards can be claimed.")
+                            Button(onClick = { onOpenParityDestination(DesktopDestination.MORE) }) { Text("Back to More") }
+                        }
+                    }
+                } else {
+                    DesktopArcadeScreen(
+                        state = currentState,
+                        minigames = minigames,
+                        isRewarding = isSaving,
+                        onEarnReward = { nebulaReward, moneyReward ->
+                            commitTransaction { before ->
+                                DesktopEconomyTransactions.awardArcadeReward(before, nebulaReward, moneyReward)
+                            }
+                        },
+                        onBack = { onOpenParityDestination(DesktopDestination.MORE) }
+                    )
+                }
             }
 
             if (section == DesktopGameSection.PLAY) {
