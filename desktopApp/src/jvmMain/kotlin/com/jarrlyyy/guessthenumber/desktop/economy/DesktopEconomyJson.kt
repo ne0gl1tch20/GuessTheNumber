@@ -73,6 +73,23 @@ internal object DesktopEconomyJson {
             )
         }
 
+    fun minigames(source: String): List<DesktopMinigameDef> {
+        val config = root(source)
+        require(config.requiredInt("schemaVersion") == 1) { "Unsupported minigame catalog schema." }
+        val games = config.requiredArray("minigames").map { value ->
+            val item = value.jsonObject
+            DesktopMinigameDef(
+                id = item.requiredString("id"),
+                name = item.requiredString("name"),
+                description = item.requiredString("description"),
+                rewardMultiplier = item.requiredDouble("rewardMultiplier")
+            )
+        }
+        require(games.isNotEmpty()) { "Minigame catalog is empty." }
+        require(games.map { it.id }.toSet().size == games.size) { "Minigame IDs must be unique." }
+        return games
+    }
+
     private fun JsonObject.requiredArray(key: String): JsonArray =
         (this[key] ?: error("Missing required economy field: $key")).jsonArray
     private fun JsonObject.requiredString(key: String): String =
