@@ -500,6 +500,16 @@ fun ProductionGuessGameScreen(
                 )
             }
 
+            if (section == DesktopGameSection.CODEX) {
+                DesktopCodexContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onClaimCompletionReward = {
+                        commitTransaction { DesktopEconomyTransactions.claimCodexCompletionReward(it) }
+                    }
+                )
+            }
+
             if (section == DesktopGameSection.ACHIEVEMENTS) {
                 DesktopAchievementsContent(
                     state = currentState,
