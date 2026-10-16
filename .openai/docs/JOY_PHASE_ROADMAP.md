@@ -7,6 +7,21 @@ The goal is to make GuessTheNumber feel more rewarding and lively while growing 
 
 **Status note (2026-10-14):** This roadmap tracks intended scope, not proof that every feature is merged. Items marked implemented are supported by the current `master` changelog; partial implementations are labeled as such. Work found only on feature branches must not be marked complete until it lands on `master` and its checks are reviewed.
 
+## Locked Windows KMP wish and delivery contract (2026-10-16)
+
+**The wish is an exact Windows port of GuessTheNumber, built with Kotlin Multiplatform and shared production code and canonical assets wherever practical. Android is the source of truth. Windows must deliver the same player-facing game, not a reduced desktop edition or a substitute redesign.** This is a product requirement, not a claim that parity is already achieved.
+
+- Follow the single, sequential five-stage delivery order in [Windows Feature Parity Plan](../../docs/WINDOWS_FEATURE_PARITY_PLAN.md). That document owns the Windows parity matrix, stage gates and evidence; this roadmap must not create a competing Windows phase list.
+- Match Android screens and reachable interactions: content, hierarchy, labels, controls, menus, dialogs, navigation, locked/unlocked states, loading/empty/error states, progression, rewards, settings meaning, localization, save behavior and offline play.
+- Reuse common Kotlin rules, models/contracts, validation, transaction logic and Compose UI components when their dependencies support it. Reuse canonical assets instead of maintaining separate Windows copies.
+- Keep Android and Windows host adapters thin and platform-specific: lifecycle, storage, audio, notifications, input/focus, windowing, update/install and packaging. Do not move platform APIs into common code merely to increase code sharing, and do not duplicate authoritative game rules in the Windows host.
+- Desktop adaptations may change input mechanics and layout for resizable windows, keyboard, mouse, hover and focus. They must preserve feature availability and meaning. Any intentional feature difference needs a documented reason and explicit classification in the parity matrix.
+- Preserve existing Android save compatibility, offline-first behavior, and the no-ads/no-analytics/no-accounts requirement.
+- Keep evidence honest: merged source, CI, unit tests, Windows runtime checks, screenshot comparisons and installer tests are different evidence types. A passing build is not proof of visual/runtime parity. Never mark a row verified without evidence for the exact candidate.
+- Do not skip a stage gate or mark the Windows port complete while required parity rows remain unverified, blocked or unexplained.
+
+**Current Windows status:** the foundation milestone is recorded separately in [KMP Foundation Status](../../docs/KMP_FOUNDATION_STATUS.md). Feature parity remains in progress; recent route coverage is not equivalent to full screen implementation or runtime parity. Continue with the existing parity plan and current open PRs rather than creating duplicate extraction work.
+
 
 | PR | Focus | Planned work |
 |---|---|---|
