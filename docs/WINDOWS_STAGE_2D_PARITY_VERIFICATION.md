@@ -59,3 +59,28 @@ The historical Stage 2-D evidence below describes earlier commits and must not b
 3. **Focused runtime checks reported passed by user:** Enter/button submission, shop/rewards/progression and restart/save. Broader windowing, localization, update and installer runtime checks remain unverified.
 4. **New candidate still pending validation:** [Stage 2 economy parity branch](https://github.com/ne0gl1tch20/GuessTheNumber/tree/feat/windows-stage-2-economy-parity) adds bulk buys, mutator controls and reset confirmations. Do not treat the added tests as passing until CI reports success.
 5. Remaining gaps: rate-limiting/edge-case parity, canonical talent/catalog effects, broad large-number and reset checks, and actual Windows runtime checks for mutators and bulk purchases. Review remaining W1/W2 rows against Android before declaring Stage 2 complete.
+
+
+## Cross-platform parity target — one game across every platform
+
+**Product goal:** Android and Windows must be the same game, not separate implementations that merely offer similar features. Android is the reference implementation for intended gameplay and behavior unless a requirement explicitly defines a platform-specific adaptation.
+
+### Parity contract
+
+- **Screen parity:** Every supported screen and flow must have an equivalent on each platform, including content, navigation, controls, dialogs, loading/empty/error states, locked states, and progression feedback. Layout may adapt to phone and desktop form factors, but functionality and meaning must not silently disappear.
+- **Logic parity:** The same inputs and starting state must produce the same gameplay outcomes across platforms: guesses, rewards, economy calculations, upgrade costs, purchase validation, talents and their effects, achievements, daily rewards, resets, unlock requirements, bosses, relics, save/reload behavior, and other supported mechanics.
+- **Shared authoritative rules:** Prefer one shared Kotlin implementation for game rules, state transitions, catalogs, validation, and calculations. Android and Windows should call that shared implementation rather than independently reimplementing the same rules. Keep platform-specific adapters for storage, lifecycle, input, notifications, audio, and operating-system integration where needed.
+- **Shared UI where practical:** Reuse common screen/components when the multiplatform architecture supports it. Where native or platform-specific UI is necessary, treat Android as the behavioral and content reference and verify the Windows counterpart against it.
+- **Intentional platform adaptations only:** Touch versus mouse/keyboard input, window resizing, responsive layout, and OS-specific integrations may differ when needed. Document each intentional difference and confirm it does not change the underlying game rules or remove a supported capability.
+- **No parity by assumption:** Compilation, shared source files, and unit tests are useful evidence but do not alone prove screen or runtime parity. Track automated results and hands-on runtime evidence separately.
+
+### Definition of done for cross-platform parity
+
+1. Maintain a screen-by-screen inventory mapping each Android screen/flow to its Windows equivalent, with matching states, actions, navigation, and visible information.
+2. Map each gameplay/economy mechanic to its authoritative shared implementation and tests. Remove duplicate platform-specific rule implementations where practical.
+3. Use deterministic fixtures or parity tests to run the same starting states and actions on each platform and compare resulting state, rewards, balances, unlocks, and persisted data.
+4. Verify the actual Windows app at runtime for the relevant flows; CI compilation alone is not enough. Record the platform/build, steps, result, and any screenshots or logs available.
+5. Keep a list of intentional platform differences with reasons and verification. An unexplained mismatch remains a parity gap.
+6. Keep the Stage 2 exit gate open until the scoped W1/W2 requirements have evidence. Do not describe the whole game as cross-platform complete while screens, mechanics, effects, or runtime paths remain unfinished or unverified.
+
+**Current status:** This is the target architecture and acceptance contract, not a claim that parity has already been achieved. The existing Stage 2-D gate remains open; remaining gaps listed in this document must be resolved and verified against Android.
