@@ -66,3 +66,10 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 - Latest recorded CI for commit `3153f38eb9c34c426c7d4c12c1545d975ae5079c` passed: Windows Desktop CI run [38857902508](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38857902508) and Android Validation and Tests run [38857902488](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38857902488).
 - Windows runtime interaction and screenshot comparison remain unverified.
 - This is the start of the real UI port, not a claim that the full Android UI has been reproduced.
+
+## Permanent parity guard
+
+- Android is the source of truth for shared UI and theme behavior. Do not hand-copy new Windows values without checking Android first.
+- Windows Desktop CI runs `tools/validate_android_windows_theme_parity.py` against Android's real theme source. It fails if the base light/dark color tokens, expressive corner sizes or typography letter spacing drift.
+- When changing Android theme tokens, update the compatible Windows theme in the same change. Extend the checker whenever another shared visual token is ported.
+- This automated check covers source tokens, not runtime screenshots, animation timing, theme preferences or full-screen parity. Those still need dedicated tests and real app comparisons.
