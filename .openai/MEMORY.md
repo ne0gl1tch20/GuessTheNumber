@@ -412,6 +412,7 @@ This section supersedes older notes where they conflict with the user's latest e
 
 ## Windows Arcade parity batch (2026-10-16)
 
-- Current branch `feat/windows-arcade-minigames-parity` ports Android's five catalog-driven minigames to Windows: Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush.
+- PR #221 is merged: Windows now has Android's five catalog-driven minigames (Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush).
 - Desktop reads packaged `game/minigames.json` via `DesktopEconomyRepository.minigames()`; `tools/validate_json_assets.py` compares it with Android's canonical asset. Keep this catalog parity guard.
-- Reward payouts must go through `DesktopEconomyTransactions.awardArcadeReward` so the shared Money/Nebula permanent upgrades and active-slot persistence apply. Windows Music Player remains a placeholder. CI and Arcade runtime verification are pending until PR #221 passes.
+- Reward payouts must go through `DesktopEconomyTransactions.awardArcadeReward` so the shared Money/Nebula permanent upgrades and active-slot persistence apply.
+- PR #222 fixed the nested-scroll exception in the Arcade route. Both CI workflows passed and the owner confirmed Arcade opens successfully in Windows. Runtime checks for individual minigames, reward effects and persistence remain open; Windows Music Player remains a placeholder.
