@@ -1,6 +1,7 @@
 ## Unreleased (Windows exact-port UI parity)
 
 - 🛒 **Upgrades screen**: Windows now mirrors Android's Money balance header, buy-multiplier dropdown, upgrade descriptions and levels, combined batch costs, affordability states and purchase-highlight animation. Gameplay transactions still use the existing economy transaction layer.
+- ✨ **Nebula Shop parity pass**: Added the Nebula balance/equipped-cosmetic header, Android's All / Automation / Boosts / Cosmetics filters, catalog-driven shop cards and owned-cosmetic Equip/Equipped states. Cosmetic equipping validates ownership and persists through the desktop economy transaction flow.
 
 - 🎯 **Shared guess feedback presentation**: Windows Play now uses the same shared status-colored feedback card as Android, including matching ready/invalid, too-low, too-high and correct states. Blind-mutator guesses keep direction hints hidden, and the card respects the saved reduced-motion setting.
 
