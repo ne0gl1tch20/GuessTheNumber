@@ -670,7 +670,7 @@ object DesktopEconomyTransactions {
     }
 
     private val WORLD_REQUIREMENTS = listOf(
-        WorldRequirement("verdant_grove", "Verdant Grove", "verdant_guardian", "Verdant Guardian", 3, "25000", 10L, 10L, 3, 0L, 0, 0L, 0L, "Starting world"),
+        WorldRequirement("verdant_grove", "Verdant Grove", "verdant_guardian", "Verdant Guardian", 3, "25000", 10L, 10L, 3, 0L, 0L, null, 0L, 0, 0L, 0L, "Starting world"),
         WorldRequirement("crystal_caverns", "Crystal Caverns", "crystal_golem", "Crystal Golem", 5, "100000", 25L, 50L, 10, 0L, 0L, "verdant_guardian", 25L, 5, 0L, 0L, "Defeat Verdant Guardian · 25 correct guesses · 5 upgrade levels"),
         WorldRequirement("ember_summit", "Ember Summit", "ember_dragon", "Ember Dragon", 7, "500000", 75L, 150L, 25, 1L, 0L, "crystal_golem", 100L, 15, 1L, 0L, "Defeat Crystal Golem · 100 correct guesses · 15 upgrade levels · 1 Prestige"),
         WorldRequirement("nebula_rift", "Nebula Rift", "nebula_titan", "Nebula Titan", 10, "5000000", 250L, 500L, 75, 5L, 1L, "ember_dragon", 250L, 40, 3L, 1L, "Defeat Ember Dragon · 250 correct guesses · 40 upgrade levels · 3 Prestige · 1 Ultra")
