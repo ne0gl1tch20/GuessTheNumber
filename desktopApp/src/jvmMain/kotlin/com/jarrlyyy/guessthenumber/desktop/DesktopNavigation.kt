@@ -64,6 +64,8 @@ class DesktopShellController(
         )
         when (action) {
             DesktopShellKeyAction.NAVIGATE_PLAY -> navigate(DesktopDestination.PLAY)
+            DesktopShellKeyAction.NAVIGATE_PROGRESSION -> navigate(DesktopDestination.PROGRESSION)
+            DesktopShellKeyAction.NAVIGATE_ECONOMY -> navigate(DesktopDestination.ECONOMY)
             DesktopShellKeyAction.NAVIGATE_ABOUT -> navigate(DesktopDestination.ABOUT)
             DesktopShellKeyAction.CLEAR_MESSAGE -> clearMessage()
             DesktopShellKeyAction.NONE -> return false
