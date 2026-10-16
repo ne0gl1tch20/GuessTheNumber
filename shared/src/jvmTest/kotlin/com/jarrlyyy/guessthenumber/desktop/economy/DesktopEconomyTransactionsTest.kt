@@ -635,7 +635,7 @@ class DesktopEconomyTransactionsTest {
 
     @Test
     fun bossBattleRequiresAndroidProgressionAndCanBeLeft() {
-        val locked = GameState()
+        val locked = GameState(unlockedWorldIds = emptySet())
         val lockedAttempt = DesktopEconomyTransactions.toggleBossBattle(locked, "verdant_grove")
         assertFalse(lockedAttempt.accepted)
         assertEquals(locked, lockedAttempt.state)
