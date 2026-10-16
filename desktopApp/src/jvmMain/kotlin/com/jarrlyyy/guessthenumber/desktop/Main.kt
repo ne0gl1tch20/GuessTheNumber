@@ -196,7 +196,7 @@ fun main() = application {
                         updateClient.findLatestUpdate(WindowsBuildVersion.current)
                     }
                     status = if (availableUpdate == null) {
-                        "You're using the latest published Windows Debug build."
+                        "You're using the latest available Windows Debug CI artifact."
                     } else {
                         "Version ${availableUpdate!!.version} is ready to install."
                     }
