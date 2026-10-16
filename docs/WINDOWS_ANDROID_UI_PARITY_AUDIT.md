@@ -22,7 +22,8 @@ PR #214 is merged. It connected saved Android-equivalent theme mode and custom c
 | Prestige, Ultra, Talent Web, Statistics | Dedicated partial screens exist; exact parity unverified |
 | Settings & Save Management | First pass exists; localization and OS notification delivery remain incomplete |
 | About | Windows update page exists; Android content parity incomplete |
-| Achievements, World Map, Mutators, Save Slots, Relics, Home Base, Codex, Endgame, Lucky Stake | Navigation routes added; feature data/actions are still missing |
+| Achievements | First functional port: canonical Android catalog, saved unlock state, progress count, rewards/tier display and All/Unlocked/Locked filters. CI and Windows runtime parity verification pending |
+| World Map, Mutators, Save Slots, Relics, Home Base, Codex, Endgame, Lucky Stake | Navigation routes added; feature data/actions are still missing |
 | Developer Settings, Developer Console, Process Inspector | Navigation routes added; diagnostics/command behavior is still missing |
 | Music Player, Arcade, Activity Hub, Lua Testing Hub, Live Ops | Navigation routes added; feature-specific behavior is still missing |
 | Changelog | Ported to a Windows scrollable Markdown viewer using the canonical Android `changelogs.md` asset; automated resource test added |
@@ -45,4 +46,4 @@ PR #214 is merged. It connected saved Android-equivalent theme mode and custom c
 
 ## This batch
 
-Adds explicit navigation to the remaining Android screen families and per-screen parity notes so gaps are visible rather than hidden behind the More menu. The Changelog route is now a functional first screen port: it loads the canonical Android Markdown asset, renders headings and list items in a scrollable desktop layout, and has a resource smoke test. The other new routes remain tracking shells, not finished feature ports. Next work should replace each shell with the Android screen real content and shared behavior in small verified batches.
+Adds explicit navigation to the remaining Android screen families and per-screen parity notes so gaps are visible rather than hidden behind the More menu. The Changelog route is now a functional first screen port: it loads the canonical Android Markdown asset, renders headings and list items in a scrollable desktop layout, and has a resource smoke test. The Achievements route now loads the canonical Android achievement catalog, reflects the saved unlock set, displays progress, tier and Nebula rewards, and supports All/Unlocked/Locked filters; catalog validation tests were added. CI and Windows runtime verification are pending. Other new routes remain tracking shells, not finished feature ports. Next work should replace each shell with the Android screen real content and shared behavior in small verified batches.
