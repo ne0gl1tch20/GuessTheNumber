@@ -88,7 +88,17 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
         scope.launch {
             val transaction = transform(before)
             if (!transaction.accepted) {
-                feedback = transaction.message
+                if (transaction.state != before) {
+                    val refreshedSave = withContext(Dispatchers.IO) { saveStore.save(1, transaction.state) }
+                    if (refreshedSave) {
+                        state = transaction.state
+                        feedback = transaction.message
+                    } else {
+                        feedback = "Could not save the refreshed state. Your previous saved state is still intact."
+                    }
+                } else {
+                    feedback = transaction.message
+                }
                 isSaving = false
                 return@launch
             }
