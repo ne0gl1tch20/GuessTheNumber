@@ -98,6 +98,23 @@ class PermanentUpgradeEffectsTest {
     }
 
     @Test
+    fun achievementNebulaStatisticsSaturateInsteadOfWrappingNegative() {
+        val state = GameState(
+            correctGuesses = 10,
+            ultraUpgradeLevels = mapOf("ultra_nebula_boost" to 15),
+            shopPurchases = setOf("nebula_boost"),
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(
+                nebulaEarned = Long.MAX_VALUE - 5L
+            )
+        )
+
+        val updated = engine.evaluateAchievements(state)
+
+        assertEquals(Long.MAX_VALUE, updated.statistics.nebulaEarned)
+        assertTrue(updated.nebula > state.nebula)
+    }
+
+    @Test
     fun desktopArcadeRewardTransactionUsesTheSamePermanentUpgradeRules() {
         val state = GameState(
             ultraUpgradeLevels = mapOf(
