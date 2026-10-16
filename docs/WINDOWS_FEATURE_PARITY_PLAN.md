@@ -3,7 +3,7 @@
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
 
-**Latest increment (2026-10-16):** PR #218 merged after Android Validation and Windows Desktop CI passed on head `2973afe940a6beb4531e639322d102f90f2d91d5` (runs [38903226288](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226288) and [38903226499](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226499)). It validates talent purchases and Talent Web prerequisites from the shared JVM catalog, with CI enforcing parity against Android's asset. Current follow-up centralizes Auto Clicker timing so Windows matches Android's talent-speed and speed-mutator behavior. Runtime screenshot parity and the Stage 2 exit gate remain open.
+**Latest increment (2026-10-16):** PR #218 and PR #219 are merged. PR #218 validates talent purchases and Talent Web prerequisites from the shared JVM catalog, with CI enforcing parity against Android's asset. PR #219 centralizes Auto Clicker timing in shared `GameEngine.autoClickerDelayMillis`, including both speed talents and `mut_speed`; Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393281) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38904393086) on head `e3a53eaba63a44d26bb4cff8e8457dc94b437c2a`. Runtime screenshot parity and the Stage 2 exit gate remain open.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
@@ -122,7 +122,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [ ] Verify rate limiting and the full set of invalid, boundary, post-solve and mutator runtime cases.
 - [x] Add 1/10/100/MAX quick-buy selection with exact combined costs and atomic bulk purchase transactions for Money, Prestige and Ultra upgrades.
 - [x] Persist/reload a run through the desktop save adapter; user reported the focused restart/save check passed.
-- [x] Use one shared `GameEngine.autoClickerDelayMillis` calculation for Android and Windows, including stacked speed talents and the `mut_speed` multiplier. Automated timing tests added; CI and Windows runtime verification for this follow-up remain pending.
+- [x] Use one shared `GameEngine.autoClickerDelayMillis` calculation for Android and Windows, including stacked speed talents and the `mut_speed` multiplier. Automated timing tests and both CI workflows passed for PR #219; Windows runtime speed/persistence verification remains pending.
 - [ ] Complete the remaining Android economy/catalog effect parity review and confirm current candidate CI/runtime checks.
 
 **Exit:** The full core loop works on Windows and matches Android rules for deterministic cases.
@@ -130,8 +130,8 @@ The port is complete only when every Android player-facing screen and reachable 
 ### W2. Economy and resets
 
 - [x] Prestige and Ultra flows enforce shared requirements/rewards and now require confirmation before reset.
-- [x] Load talent costs and prerequisites from the canonical catalog; PR #218 makes both purchase validation and Talent Web parent gating read the bundled catalog rather than a second hardcoded rule map. The visible Windows labels/descriptions still use the Android fallback copy, and locale-aware rendering/runtime parity remain open. CI is pending for this follow-up.
-- [ ] Finish parity for remaining permanent Prestige/Ultra shop effects and confirm their Android behavior before enabling purchases.
+- [x] Load talent costs and prerequisites from the canonical catalog; PR #218 makes both purchase validation and Talent Web parent gating read the bundled catalog rather than a second hardcoded rule map. Its Android and Windows CI passed before merge. The visible Windows labels/descriptions still use the Android fallback copy, and locale-aware rendering/runtime parity remain open.
+- [ ] Finish parity for remaining permanent Prestige/Ultra shop effects and confirm their Android behavior before enabling purchases. Current code search found catalog descriptions but no production application of the `prestige_money_boost`, `prestige_gain_boost`, `prestige_starting_capital`, `ultra_money_boost`, `ultra_gain_boost` or `ultra_nebula_boost` effects. Their exact formulas are not established by `effectPerLevel` alone; do not invent Windows-only effects. Owner decision needed on whether to define and implement these effects on both platforms or preserve the current behavior.
 - [ ] Verify large-number display and calculations across representative Android-matching cases.
 - [x] Add deterministic exact-cost bulk-purchase tests and retain reset-preservation/duplicate-reward tests.
 - [ ] Verify all reset preservation and boundary cases on the current candidate.
