@@ -69,6 +69,23 @@ enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     LIVE_OPS("Live Ops", null);
 
     companion object {
+        /** Desktop-only quick-access order; Android navigation is unchanged. */
+        val MAIN_NAVIGATION_ORDER: List<DesktopDestination> = listOf(
+            PLAY,
+            UPGRADES,
+            SHOP,
+            PRESTIGE,
+            ULTRA,
+            SETTINGS,
+            ARCADE,
+            MUSIC_PLAYER,
+            SAVE_SLOTS,
+            STATS,
+            WORLD_MAP,
+            CHANGELOG,
+            MORE
+        )
+
         fun fromShortcut(key: Key, ctrlPressed: Boolean): DesktopDestination? {
             if (!ctrlPressed) return null
             return entries.firstOrNull { it.shortcutKey == key }
