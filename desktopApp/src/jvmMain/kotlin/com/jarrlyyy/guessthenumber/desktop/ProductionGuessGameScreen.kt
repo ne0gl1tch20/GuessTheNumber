@@ -433,6 +433,7 @@ fun ProductionGuessGameScreen(
                             when (action) {
                                 "unlock" -> DesktopEconomyTransactions.unlockWorld(before, worldId)
                                 "select" -> DesktopEconomyTransactions.selectWorld(before, worldId)
+                                "boss" -> DesktopEconomyTransactions.toggleBossBattle(before, worldId)
                                 else -> EconomyTransaction(before, false, "That world action is not supported yet.")
                             }
                         }
