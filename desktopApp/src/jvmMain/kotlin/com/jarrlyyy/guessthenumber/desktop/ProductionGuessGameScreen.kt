@@ -473,7 +473,7 @@ fun ProductionGuessGameScreen(
                                     else -> EconomyTransaction(before, false, "That relic action is not available.")
                                 }
                                 val updated = transaction.state
-                                if (updated == null) {
+                                if (!transaction.accepted) {
                                     feedback = transaction.message
                                 } else {
                                     isSaving = true
