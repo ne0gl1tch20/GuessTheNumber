@@ -350,21 +350,122 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
-    fun shopEffectWithoutDesktopImplementationIsRejected() {
+    fun nebulaBoostCanBePurchasedAndUnknownEffectsRemainRejected() {
         val initial = GameState(nebula = BigNumber(100))
-        val item = com.jarrlyyy.guessthenumber.domain.model.ShopItemDef(
+        val boost = com.jarrlyyy.guessthenumber.domain.model.ShopItemDef(
             id = "nebula_boost",
             name = "Nebula Crystal",
-            description = "Nebula gain boost.",
-            nebulaCost = 25,
-            category = "automation",
+            description = "Permanently doubles Nebula rewards.",
+            nebulaCost = 50,
+            category = "boosts",
             isCosmetic = false
         )
 
-        val result = DesktopEconomyTransactions.buyShopItem(initial, item)
+        val bought = DesktopEconomyTransactions.buyShopItem(initial, boost)
+        assertTrue(bought.accepted)
+        assertEquals(BigNumber(50), bought.state.nebula)
+        assertTrue("nebula_boost" in bought.state.shopPurchases)
 
-        assertFalse(result.accepted)
-        assertEquals(initial, result.state)
+        val unknown = boost.copy(id = "unimplemented_boost")
+        val rejected = DesktopEconomyTransactions.buyShopItem(initial, unknown)
+        assertFalse(rejected.accepted)
+        assertEquals(initial, rejected.state)
+    }
+
+    @Test
+    fun nebulaBoostDoublesDailyQuestAndAchievementRewardsExactlyOnce() {
+        val boosted = GameState(
+            nebula = BigNumber(3),
+            shopPurchases = setOf("nebula_boost"),
+            dailyQuestDate = "2026-10-16",
+            dailyQuestCorrectGuesses = 5
+        )
+        val quest = DesktopEconomyTransactions.claimDailyQuest(boosted, "daily_correct_5", "2026-10-16")
+        assertTrue(quest.accepted)
+        assertEquals(BigNumber(53), quest.state.nebula)
+        assertEquals(50L, quest.state.statistics.nebulaEarned)
+
+        val eligible = quest.state.copy(correctGuesses = 10)
+        val rewarded = DesktopEconomyTransactions.evaluateAchievements(eligible)
+        assertTrue("correct_10" in rewarded.achievements)
+        assertEquals(BigNumber(73), rewarded.nebula)
+        assertEquals(70L, rewarded.statistics.nebulaEarned)
+
+        assertEquals(rewarded, DesktopEconomyTransactions.evaluateAchievements(rewarded))
+    }
+
+    @Test
+    fun goldenGuessPassAddsCriticalSizedBonusOnEveryTenthLifetimeGuess() {
+        val before = GameState(
+            money = BigNumber(100),
+            shopPurchases = setOf("golden_guess"),
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(
+                totalGuesses = 9,
+                moneyEarned = BigNumber(100)
+            )
+        )
+        val tenthGuess = before.copy(
+            money = BigNumber(200),
+            statistics = before.statistics.copy(totalGuesses = 10, moneyEarned = BigNumber(200))
+        )
+        val tenthResult = DesktopEconomyTransactions.applyGuessBonuses(before, tenthGuess, correct = true)
+        assertEquals(0, tenthResult.money.compareTo(BigNumber(300)))
+        assertEquals(0, tenthResult.statistics.moneyEarned.compareTo(BigNumber(300)))
+
+        val eleventhGuess = tenthGuess.copy(
+            money = BigNumber(300),
+            statistics = tenthGuess.statistics.copy(totalGuesses = 11, moneyEarned = BigNumber(300))
+        )
+        val eleventhResult = DesktopEconomyTransactions.applyGuessBonuses(tenthGuess, eleventhGuess, correct = true)
+        assertEquals(0, eleventhResult.money.compareTo(BigNumber(400)))
+    }
+
+    @Test
+    fun achievementMilestonePaysOnceAndUpdatesNebulaLifetimeStats() {
+        val initial = GameState(
+            correctGuesses = 10,
+            nebula = BigNumber(2),
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(nebulaEarned = 2)
+        )
+        val first = DesktopEconomyTransactions.evaluateAchievements(initial)
+        assertTrue("correct_10" in first.achievements)
+        assertEquals(BigNumber(12), first.nebula)
+        assertEquals(12L, first.statistics.nebulaEarned)
+        assertEquals(first, DesktopEconomyTransactions.evaluateAchievements(first))
+    }
+
+    @Test
+    fun worldUnlockChecksRequirementsAndIsIdempotent() {
+        val locked = GameState(
+            correctGuesses = 24,
+            upgradeLevels = mapOf("a" to 3, "b" to 2),
+            defeatedBossIds = setOf("verdant_guardian")
+        )
+        val denied = DesktopEconomyTransactions.unlockWorld(locked, "crystal_caverns")
+        assertFalse(denied.accepted)
+        assertEquals(locked, denied.state)
+
+        val ready = locked.copy(correctGuesses = 25)
+        val unlocked = DesktopEconomyTransactions.unlockWorld(ready, "crystal_caverns")
+        assertTrue(unlocked.accepted)
+        assertTrue("crystal_caverns" in unlocked.state.unlockedWorldIds)
+        assertEquals("crystal_caverns", unlocked.state.activeWorldId)
+
+        val duplicate = DesktopEconomyTransactions.unlockWorld(unlocked.state, "crystal_caverns")
+        assertFalse(duplicate.accepted)
+        assertEquals(unlocked.state, duplicate.state)
+    }
+
+    @Test
+    fun worldSelectionCannotBypassUnlockRequirements() {
+        val state = GameState()
+        val denied = DesktopEconomyTransactions.selectWorld(state, "nebula_rift")
+        assertFalse(denied.accepted)
+        assertEquals(state, denied.state)
+
+        val selected = DesktopEconomyTransactions.selectWorld(state, "verdant_grove")
+        assertTrue(selected.accepted)
+        assertEquals("verdant_grove", selected.state.activeWorldId)
     }
 
     @Test
