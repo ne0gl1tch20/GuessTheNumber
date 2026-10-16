@@ -83,6 +83,7 @@ The port is complete only when every Android player-facing screen and reachable 
 ### W1. Core gameplay loop
 
 - [x] Guess input and Submit/Enter behavior use the production engine; range and whole-number validation are implemented. User-reported focused runtime checks passed for Enter and button submission.
+- [x] Windows Play reuses Android's shared status-colored guess feedback card and semantic status-to-icon mapping; visual/runtime comparison remains unverified.
 - [x] Correct/incorrect rewards, attempts, streaks and Frenzy flow through the shared production engine.
 - [x] Expose the four shared mutators on Windows, recalculate the range/target on toggle, and hide direction hints for Blind.
 - [ ] Verify rate limiting and the full set of invalid, boundary, post-solve and mutator runtime cases.
@@ -177,6 +178,15 @@ The PR #202 candidate commit `38c7421c38b476c71e9baaca5cb7d4dc8c8cfea0` passed b
 The user reports passing focused Windows runtime checks for Enter-to-submit, button submission, shop/reward/progression behavior and restart/save persistence. These are recorded as user-reported checks, not independently observed runtime evidence. Broader W0/W1/W2 items (including resizing/high-DPI, localization, full economy parity, update channels and MSI lifecycle) are not thereby verified.
 
 The detailed evidence log is [WINDOWS_STAGE_2D_PARITY_VERIFICATION.md](WINDOWS_STAGE_2D_PARITY_VERIFICATION.md). **Stage 2 remains open** until remaining W1/W2 parity gaps are reviewed and every required gate has evidence. Do not start Stage 3 implementation ahead of that gate.
+
+### Windows shared feedback UI increment (2026-10-16)
+
+Branch: [`feat/windows-shared-guess-feedback`](https://github.com/ne0gl1tch20/GuessTheNumber/tree/feat/windows-shared-guess-feedback).
+
+- Windows Play now calls the same common `SharedGuessFeedbackCard` used by Android, instead of rendering feedback as unstyled body text.
+- Maps ready/invalid, too-low, too-high and correct outcomes to the shared feedback status and semantic icon tokens. Blind mode keeps direction feedback neutral and hidden, matching Android's intent.
+- Honors the saved reduced-motion preference for the shared card.
+- **Evidence status: implemented in source, pending CI and Windows runtime comparison.** A successful build will not establish visual parity by itself.
 
 ### Stage 2 economy parity implementation candidate (2026-10-16)
 
