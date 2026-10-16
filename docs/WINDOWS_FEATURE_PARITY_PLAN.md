@@ -78,7 +78,8 @@ This replaces the Windows-related phases buried in the temporary KMP migration r
 ### W2. Economy and resets
 
 - [x] Prestige and Ultra flows enforce shared requirements/rewards and now require confirmation before reset.
-- [ ] Finish Android parity for all permanent upgrade/shop/talent catalog effects; the current Windows talent list still needs canonical catalog parity.
+- [x] Load talent names, descriptions, costs and prerequisites from the canonical Android talent catalog.
+- [ ] Finish parity for remaining permanent Prestige/Ultra shop effects and confirm their Android behavior before enabling purchases.
 - [ ] Verify large-number display and calculations across representative Android-matching cases.
 - [x] Add deterministic exact-cost bulk-purchase tests and retain reset-preservation/duplicate-reward tests.
 - [ ] Verify all reset preservation and boundary cases on the current candidate.
@@ -166,7 +167,7 @@ This candidate closes several concrete gaps found during Stage 2-D review:
 - explicit confirmation before Prestige/Ultra resets;
 - deterministic tests for bulk cost, MAX affordability and mutator validation/range behavior.
 
-These source changes are not yet validated by CI or new Windows runtime checks. The full Stage 2 gate remains open. Remaining review items include rate-limiting/edge-case parity, canonical talent/catalog effects, broader large-number and reset checks, and actual Windows runtime evidence for mutators and bulk buys.
+Follow-up source review also replaced the hardcoded Windows talent list with the canonical Android talent catalog, including costs, descriptions and prerequisite IDs. These source changes are not yet validated by CI or new Windows runtime checks. The full Stage 2 gate remains open. Remaining review items include rate-limiting/edge-case parity, remaining Prestige/Ultra shop effect parity, broader large-number and reset checks, and actual Windows runtime evidence for mutators and bulk buys.
 
 ## Stage 1 source audit (2026-10-15)
 
