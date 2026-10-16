@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -91,6 +92,7 @@ fun ProductionGuessGameScreen(
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<GameState?>(null) }
     var guessText by remember { mutableStateOf("") }
+    var selectedShopCategory by remember { mutableStateOf("all") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
     var feedbackStatus by remember { mutableStateOf(GuessGameStatus.READY) }
     var isSaving by remember { mutableStateOf(false) }
@@ -588,27 +590,83 @@ fun ProductionGuessGameScreen(
                 }
 
             if (section == DesktopGameSection.SHOP) {
-            SectionTitle("Nebula shop")
-                catalog?.shopItems?.forEach { item ->
-                    val purchased = item.id in currentState.shopPurchases
-                    val supported = item.id in setOf("auto_clicker_basic", "nebula_boost", "golden_guess") ||
-                        (item.isCosmetic && item.id.startsWith("cosmetic_"))
-                    EconomyActionCard(
-                        title = item.name,
-                        description = item.description,
-                        detail = when (item.id) {
-                            "nebula_boost" -> "Effect: doubles future Nebula rewards · Cost: ${item.nebulaCost} Nebula"
-                            "golden_guess" -> "Effect: guarantees critical rewards on every tenth lifetime guess · Cost: ${item.nebulaCost} Nebula"
-                            else -> "Cost: ${item.nebulaCost} Nebula"
-                        },
-                        action = if (purchased) "Owned" else if (supported) "Buy" else "Unavailable",
-                        enabled = !isSaving && supported && !purchased && currentState.nebula >= BigNumber(item.nebulaCost)
+                SectionTitle("Nebula shop")
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        commitTransaction { DesktopEconomyTransactions.buyShopItem(it, item) }
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text("Available Nebula", style = MaterialTheme.typography.labelLarge)
+                            Text(currentState.nebula.format(), style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
+                            currentState.equippedCosmeticId?.let { equippedId ->
+                                Text("Equipped: " + equippedId.removePrefix("cosmetic_").replace('_', ' '), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                        Text("✦", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
                     }
                 }
 
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("all" to "All", "automation" to "Automation", "boosts" to "Boosts", "cosmetics" to "Cosmetics").forEach { (categoryId, label) ->
+                        FilterChip(selected = selectedShopCategory == categoryId, onClick = { selectedShopCategory = categoryId }, label = { Text(label) })
+                    }
                 }
+
+                if (catalog == null) {
+                    val catalogError = catalogResult.exceptionOrNull()?.message ?: "unknown error"
+                    Text("Shop catalog could not be loaded: $catalogError", color = MaterialTheme.colorScheme.error)
+                } else {
+                    val visibleItems = catalog.shopItems.filter { item -> selectedShopCategory == "all" || item.category == selectedShopCategory }
+                    if (visibleItems.isEmpty()) {
+                        Text("No items in this category yet.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    visibleItems.forEach { item ->
+                        val purchased = item.id in currentState.shopPurchases
+                        val equipped = currentState.equippedCosmeticId == item.id
+                        val supported = item.id in setOf("auto_clicker_basic", "nebula_boost", "golden_guess") || (item.isCosmetic && item.id.startsWith("cosmetic_"))
+                        val canAfford = currentState.nebula >= BigNumber(item.nebulaCost)
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Text(item.name, style = MaterialTheme.typography.titleMedium)
+                                    Text(item.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(
+                                        when (item.id) {
+                                            "nebula_boost" -> "Effect: doubles future Nebula rewards"
+                                            "golden_guess" -> "Effect: guarantees critical rewards on every tenth lifetime guess"
+                                            "auto_clicker_basic" -> "Effect: unlocks the Auto Clicker"
+                                            else -> if (item.isCosmetic) "Cosmetic" else "Shop item"
+                                        },
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text("Cost: ${item.nebulaCost} Nebula", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                                }
+                                when {
+                                    item.isCosmetic && purchased -> OutlinedButton(
+                                        onClick = { commitTransaction { DesktopEconomyTransactions.equipCosmetic(it, item.id) } },
+                                        enabled = !isSaving && !equipped
+                                    ) {
+                                        AnimatedContent(targetState = equipped, label = "desktopCosmeticEquip_${item.id}") { isEquipped ->
+                                            Text(if (isEquipped) "Equipped" else "Equip")
+                                        }
+                                    }
+                                    else -> Button(
+                                        onClick = { commitTransaction { DesktopEconomyTransactions.buyShopItem(it, item) } },
+                                        enabled = !isSaving && supported && !purchased && canAfford
+                                    ) {
+                                        AnimatedContent(targetState = purchased, label = "desktopShopPurchase_${item.id}") { isPurchased ->
+                                            Text(when { isPurchased -> "Owned"; !supported -> "Unavailable"; else -> "Acquire" })
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             if (section == DesktopGameSection.TALENT) {
             SectionTitle("Talents")

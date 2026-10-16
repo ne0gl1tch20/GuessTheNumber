@@ -585,4 +585,27 @@ class DesktopEconomyTransactionsTest {
         assertEquals(BigNumber(400), child.state.prestige)
         assertTrue("talent_speed_2" in child.state.prestigeShopPurchases)
     }
+
+    @Test
+    fun cosmeticCanOnlyBeEquippedAfterPurchaseAndCanBeSwitched() {
+        val locked = GameState()
+        val rejected = DesktopEconomyTransactions.equipCosmetic(locked, "cosmetic_blue")
+        assertFalse(rejected.accepted)
+        assertEquals(locked, rejected.state)
+
+        val owned = locked.copy(
+            shopPurchases = setOf("cosmetic_blue", "cosmetic_starfield"),
+            equippedCosmeticId = "cosmetic_blue"
+        )
+        val same = DesktopEconomyTransactions.equipCosmetic(owned, "cosmetic_blue")
+        assertFalse(same.accepted)
+        assertEquals(owned, same.state)
+
+        val switched = DesktopEconomyTransactions.equipCosmetic(owned, "cosmetic_starfield")
+        assertTrue(switched.accepted)
+        assertEquals("cosmetic_starfield", switched.state.equippedCosmeticId)
+        assertEquals(owned.shopPurchases, switched.state.shopPurchases)
+        assertEquals(owned.nebula, switched.state.nebula)
+    }
+
 }

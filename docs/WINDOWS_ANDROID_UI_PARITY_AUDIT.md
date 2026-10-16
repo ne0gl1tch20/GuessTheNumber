@@ -1,6 +1,6 @@
 # Android-to-Windows UI parity audit
 
-**Status:** Initial navigation and Upgrades presentation changes are implemented. A Windows Statistics destination is now reachable from More and renders core game metrics. CI for the latest changes is pending; Windows runtime visual and interaction parity is not claimed.
+**Status:** Initial navigation and Upgrades presentation changes are implemented. Windows Statistics is reachable from More and displays core game metrics. Latest CI and runtime visual comparison are pending; full parity is not claimed.
 
 ## Android reference
 
@@ -8,8 +8,10 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 
 ## First batch changes
 
-- Windows now declares the Compose Multiplatform Material icon-core dependency explicitly and uses the same four familiar Android navigation icons (Play, Star, Shopping Cart and Menu).
-- The primary navigation is now a bottom `NavigationBar` with labels and Material selection indicators, matching Android's navigation pattern instead of a row of text-only buttons at the top. Runtime screenshot comparison and animation feel still require Windows verification.
+- Windows primary navigation follows Android's four primary destinations in order: Play, Upgrades, Shop and More, with matching Material icons and a bottom navigation bar.
+- Windows Statistics is reachable from More. This is a functional first port; visual/runtime comparison is still pending.
+
+
 
 - Windows primary navigation now exposes Play, Upgrades, Shop and More in Android's order.
 - Existing guessing, mutator, daily quest, achievement and world progression controls stay together on Play instead of being split into a separate Progress destination.
@@ -25,7 +27,7 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 | --- | --- | --- |
 | Play | `ui/screens/PlayScreen.kt` | Production guess loop and currently implemented quest, achievement and world controls remain on Play. Exact layout and all Android interactions still need comparison. |
 | Upgrades | `ui/screens/UpgradeScreen.kt` | First visual-parity pass added the Money balance header, multiplier dropdown, matching upgrade-card hierarchy, level badge, batch cost and purchase highlight. CI passes, but runtime screenshot comparison and full interaction review remain pending. |
-| Shop | `ui/screens/ShopScreen.kt` | Existing Nebula purchases are isolated under Shop. Android category filters, cosmetic equip flow and card presentation still need porting. |
+| Shop | `ui/screens/ShopScreen.kt` | First parity pass now includes the Nebula balance header, All / Automation / Boosts / Cosmetics filters, catalog-driven cards and owned-cosmetic Equip/Equipped actions. Runtime screenshot and interaction comparison remain pending. |
 | More | `ui/screens/MoreScreen.kt` | Entry point exists. Prestige, Ultra and Talent are separate desktop subroutes reached from More. The reorderable, feature-flagged, locked Android menu is not yet ported. |
 | Prestige | `ui/screens/PrestigeScreen.kt` | Current purchase/reset controls exist under More; dedicated Android screen layout and interactions need review. |
 | Ultra | `ui/screens/UltraScreen.kt` | Current purchase/reset controls exist under More; dedicated Android screen layout and interactions need review. |
@@ -33,7 +35,7 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 | Mutators | `ui/screens/MutatorsScreen.kt` | Basic toggles exist on Play. Challenge-builder selection and completion flow are incomplete. |
 | Achievements | `ui/screens/AchievementsScreen.kt` | Basic achievement information exists on Play; dedicated Android screen and reward presentation are missing. |
 | World Map | `ui/screens/WorldMapScreen.kt` | Basic world progression exists on Play; dedicated map and boss navigation are missing. |
-| Statistics | `ui/screens/StatsScreen.kt` | Windows Statistics destination is reachable from More and shows guessing accuracy, correct/failed/total guesses, money earned/spent, current/best streak, Prestige/Ultra resets, Nebula earned, playtime, arcade rounds and current number range. CI and runtime visual comparison are pending. |
+| Statistics | `ui/screens/StatsScreen.kt` | Dedicated Windows screen not implemented. |
 | Settings | `ui/screens/SettingsScreen.kt` | Dedicated Windows screen not implemented. |
 | About | `ui/screens/AboutScreen.kt` | Windows About/update page exists and is now reached from More; Android content parity is incomplete. |
 | Developer Settings | `ui/screens/DevSettingsScreen.kt` | Debug-only Android feature; Windows equivalent not ported. |
@@ -64,13 +66,5 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 - Source-reviewed `Screen.kt`, `NavGraph.kt`, `PlayScreen.kt`, `UpgradeScreen.kt`, `ShopScreen.kt` and `MoreScreen.kt` on `master`.
 - Updated desktop primary navigation, section routing and navigation unit tests in this branch.
 - Latest recorded CI for commit `3153f38eb9c34c426c7d4c12c1545d975ae5079c` passed: Windows Desktop CI run [38857902508](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38857902508) and Android Validation and Tests run [38857902488](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38857902488).
-- Windows runtime interaction and screenshot comparison remain unverified.
-- The Windows Statistics screen is now implemented in the current branch and has a navigation regression test. Its layout is a first functional port of the Android `StatsScreen.kt`; screenshot comparison and Windows runtime behavior remain unverified.
+- Shop category selection, cosmetic equip ownership/idempotence and transaction persistence have source-level regression coverage; Windows runtime interaction and screenshot comparison remain unverified.
 - This is the start of the real UI port, not a claim that the full Android UI has been reproduced.
-
-## Permanent parity guard
-
-- Android is the source of truth for shared UI and theme behavior. Do not hand-copy new Windows values without checking Android first.
-- Windows Desktop CI runs `tools/validate_android_windows_theme_parity.py` against Android's real theme source. It fails if the base light/dark color tokens, expressive corner sizes or typography letter spacing drift.
-- When changing Android theme tokens, update the compatible Windows theme in the same change. Extend the checker whenever another shared visual token is ported.
-- This automated check covers source tokens, not runtime screenshots, animation timing, theme preferences or full-screen parity. Those still need dedicated tests and real app comparisons.
