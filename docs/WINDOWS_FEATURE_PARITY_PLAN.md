@@ -48,6 +48,11 @@ This plan is the single source of truth for Windows parity and replaces Windows 
 - Do not claim runtime verification from a successful build alone. Keep unrun checks marked unverified.
 - Preserve offline play and existing save/MSI/update-channel compatibility; do not add ads, analytics or accounts.
 
+
+## Product-feel rule (locked)
+
+Windows must feel like the same GuessTheNumber app the player uses on Android, adapted for desktop rather than redesigned or reduced. Preserve Android's player-facing screens, features, visual identity, assets, hierarchy, controls, dialogs, navigation, states, animations and interaction meaning wherever supported. Adapt only genuine desktop needs such as window sizing, keyboard/mouse input, focus/hover and Windows integration. Keep gameplay/economy/progression rules, settings semantics, localization, offline behavior and save compatibility consistent; prefer shared code/assets and thin platform adapters. Avoid unnecessary rewrites and abstractions. Bundle related parity changes and tests into the existing PR when technically reasonable. CI/compilation is not proof of runtime or visual parity; record evidence and keep unverified rows open.
+
 ## Definition of exact port
 
 The port is complete only when every Android player-facing screen and reachable interaction has a Windows counterpart or is explicitly classified as an approved platform-specific difference. Matching only the feature list is not enough.
