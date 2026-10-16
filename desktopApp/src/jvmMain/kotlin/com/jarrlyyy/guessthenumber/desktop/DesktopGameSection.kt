@@ -11,5 +11,6 @@ enum class DesktopGameSection {
     TALENT,
     STATS,
     SETTINGS,
-    ACHIEVEMENTS
+    ACHIEVEMENTS,
+    WORLD_MAP
 }

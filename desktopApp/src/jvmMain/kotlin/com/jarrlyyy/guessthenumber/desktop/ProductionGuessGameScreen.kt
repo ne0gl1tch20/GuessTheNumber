@@ -306,6 +306,22 @@ fun ProductionGuessGameScreen(
                 CurrencySummary("Correct", currentState.correctGuesses.toString())
                 CurrencySummary("Streak", currentState.streak.toString())
             }
+            if (section == DesktopGameSection.WORLD_MAP) {
+                DesktopWorldMapContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onWorldAction = { worldId, action ->
+                        commitTransaction { before ->
+                            when (action) {
+                                "unlock" -> DesktopEconomyTransactions.unlockWorld(before, worldId)
+                                "select" -> DesktopEconomyTransactions.selectWorld(before, worldId)
+                                else -> EconomyTransaction(before, false, "That world action is not supported yet.")
+                            }
+                        }
+                    }
+                )
+            }
+
             if (section == DesktopGameSection.ACHIEVEMENTS) {
                 DesktopAchievementsContent(
                     state = currentState,

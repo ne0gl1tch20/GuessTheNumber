@@ -316,6 +316,7 @@ fun main() = application {
                                         DesktopDestination.STATS -> DesktopGameSection.STATS
                                         DesktopDestination.SETTINGS -> DesktopGameSection.SETTINGS
                                         DesktopDestination.ACHIEVEMENTS -> DesktopGameSection.ACHIEVEMENTS
+                                        DesktopDestination.WORLD_MAP -> DesktopGameSection.WORLD_MAP
                                         else -> DesktopGameSection.PLAY
                                     },
                                     onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
@@ -344,7 +345,6 @@ fun main() = application {
 
                         DesktopDestination.CHANGELOG -> DesktopChangelogScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
 
-                        DesktopDestination.WORLD_MAP,
                         DesktopDestination.MUTATORS,
                         DesktopDestination.SAVE_SLOTS,
                         DesktopDestination.RELICS,
