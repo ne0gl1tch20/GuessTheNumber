@@ -102,13 +102,17 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 isSaving = false
                 return@launch
             }
-            val saved = withContext(Dispatchers.IO) { saveStore.save(1, transaction.state) }
+            val progressedState = DesktopEconomyTransactions.evaluateAchievements(transaction.state)
+            val saved = withContext(Dispatchers.IO) { saveStore.save(1, progressedState) }
             if (saved) {
-                state = transaction.state
-                if (before.autoClickerActive != transaction.state.autoClickerActive) {
+                state = progressedState
+                if (before.autoClickerActive != progressedState.autoClickerActive) {
                     autoClickerFailurePaused = false
                 }
-                feedback = transaction.message
+                val newAchievements = progressedState.achievements - before.achievements
+                feedback = if (newAchievements.isNotEmpty()) {
+                    "${transaction.message} Achievement unlocked: ${newAchievements.sorted().joinToString()}."
+                } else transaction.message
             } else {
                 feedback = "Could not save that change. Your previous saved state is still intact."
             }
@@ -136,12 +140,14 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             after = result.newState,
             correct = correct
         )
-        val finalState = DesktopEconomyTransactions.recordGuessProgress(
-            before = snapshot,
-            after = bonusAdjustedState,
-            correct = correct,
-            today = LocalDate.now().toString(),
-            lootRoll = if (correct) Random.nextInt(1000) else null
+        val finalState = DesktopEconomyTransactions.evaluateAchievements(
+            DesktopEconomyTransactions.recordGuessProgress(
+                before = snapshot,
+                after = bonusAdjustedState,
+                correct = correct,
+                today = LocalDate.now().toString(),
+                lootRoll = if (correct) Random.nextInt(1000) else null
+            )
         )
         val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
         if (saved) {
@@ -226,12 +232,14 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                             after = result.newState,
                             correct = correct
                         )
-                        val finalState = DesktopEconomyTransactions.recordGuessProgress(
-                            before = currentState,
-                            after = bonusAdjustedState,
-                            correct = correct,
-                            today = LocalDate.now().toString(),
-                            lootRoll = if (correct) Random.nextInt(1000) else null
+                        val finalState = DesktopEconomyTransactions.evaluateAchievements(
+                            DesktopEconomyTransactions.recordGuessProgress(
+                                before = currentState,
+                                after = bonusAdjustedState,
+                                correct = correct,
+                                today = LocalDate.now().toString(),
+                                lootRoll = if (correct) Random.nextInt(1000) else null
+                            )
                         )
                         scope.launch {
                             val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
@@ -291,6 +299,44 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     enabled = !isSaving && complete && !claimed
                 ) {
                     commitTransaction { DesktopEconomyTransactions.claimDailyQuest(it, id, LocalDate.now().toString()) }
+                }
+            }
+
+            SectionTitle("Achievements")
+            Text(
+                "${currentState.achievements.size} / 27 unlocked · milestone rewards are credited automatically once",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            if (currentState.achievements.isNotEmpty()) {
+                Text(
+                    currentState.achievements.sorted().joinToString(" · "),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            SectionTitle("World progression")
+            DesktopEconomyTransactions.worldProgress(currentState).forEach { world ->
+                EconomyActionCard(
+                    title = world.name,
+                    description = world.requirement,
+                    detail = when {
+                        world.selected -> "Currently selected"
+                        world.unlocked -> "Unlocked"
+                        else -> "Locked until requirements are met"
+                    },
+                    action = when {
+                        world.selected -> "Selected"
+                        world.unlocked -> "Select"
+                        world.canUnlock -> "Unlock"
+                        else -> "Locked"
+                    },
+                    enabled = !isSaving && !world.selected && (world.unlocked || world.canUnlock)
+                ) {
+                    commitTransaction {
+                        if (world.unlocked) DesktopEconomyTransactions.selectWorld(it, world.id)
+                        else DesktopEconomyTransactions.unlockWorld(it, world.id)
+                    }
                 }
             }
 
@@ -369,12 +415,18 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 SectionTitle("Nebula shop")
                 catalog.shopItems.forEach { item ->
                     val purchased = item.id in currentState.shopPurchases
+                    val supported = item.id in setOf("auto_clicker_basic", "nebula_boost", "golden_guess") ||
+                        (item.isCosmetic && item.id.startsWith("cosmetic_"))
                     EconomyActionCard(
                         title = item.name,
                         description = item.description,
-                        detail = if (!item.isCosmetic && item.id != "auto_clicker_basic") "Windows effect not implemented yet · Cost: ${item.nebulaCost} Nebula" else "Cost: ${item.nebulaCost} Nebula",
-                        action = if (purchased) "Owned" else if (item.isCosmetic || item.id == "auto_clicker_basic") "Buy" else "Unavailable",
-                        enabled = !isSaving && (item.isCosmetic || item.id == "auto_clicker_basic") && !purchased && currentState.nebula >= BigNumber(item.nebulaCost)
+                        detail = when (item.id) {
+                            "nebula_boost" -> "Owned: doubles future Nebula quest and achievement rewards · Cost: ${item.nebulaCost} Nebula"
+                            "golden_guess" -> "Owned: doubles the base Money reward on every tenth lifetime guess when correct · Cost: ${item.nebulaCost} Nebula"
+                            else -> "Cost: ${item.nebulaCost} Nebula"
+                        },
+                        action = if (purchased) "Owned" else if (supported) "Buy" else "Unavailable",
+                        enabled = !isSaving && supported && !purchased && currentState.nebula >= BigNumber(item.nebulaCost)
                     ) {
                         commitTransaction { DesktopEconomyTransactions.buyShopItem(it, item) }
                     }
