@@ -35,8 +35,8 @@ enum class DesktopNavigationPosition(val label: String) {
 }
 
 /**
- * Windows-owned navigation contract. Destinations are added here as each
- * parity stage implements a real screen; Android navigation stays platform-owned.
+ * Windows-owned navigation contract. Quick-access destinations may expose
+ * partial screens while parity work continues; Android navigation stays platform-owned.
  */
 enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     PLAY("Play", Key.One),
