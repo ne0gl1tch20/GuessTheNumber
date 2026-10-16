@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -510,6 +511,42 @@ fun ProductionGuessGameScreen(
             }
 
             if (section == DesktopGameSection.PLAY) {
+            DesktopEconomyTransactions.activeBossBattleStatus(currentState)?.let { boss ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("⚔", style = MaterialTheme.typography.titleLarge)
+                            Spacer(Modifier.width(8.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Boss Battle Active", style = MaterialTheme.typography.titleMedium)
+                                Text(boss.bossName, style = MaterialTheme.typography.bodyMedium)
+                            }
+                            Text("${boss.hp - boss.damage} / ${boss.hp} HP", style = MaterialTheme.typography.labelMedium)
+                        }
+                        LinearProgressIndicator(
+                            progress = { boss.damage.toFloat() / boss.hp.toFloat() },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Text(
+                            "Correct guesses deal damage. Wrong guesses can restore HP as the boss changes phase.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        OutlinedButton(
+                            onClick = {
+                                commitTransaction { DesktopEconomyTransactions.toggleBossBattle(it, boss.worldId) }
+                            },
+                            enabled = !isSaving,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("Leave battle") }
+                    }
+                }
+            }
             Text(
                 "Daily progress: guesses ${currentState.dailyQuestGuesses}/10 · correct ${currentState.dailyQuestCorrectGuesses}/5 · best streak ${currentState.dailyQuestBestStreak}/5 · upgrades ${currentState.dailyQuestUpgradePurchases}/3",
                 style = MaterialTheme.typography.bodySmall,
