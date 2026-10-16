@@ -85,6 +85,10 @@ jobs:
         shell: pwsh
         run: python tools/validate_versions.py
 
+      - name: Verify Android and Windows theme compatibility
+        shell: pwsh
+        run: python tools/validate_android_windows_theme_parity.py
+
       - name: Validate All JSON Assets
         shell: pwsh
         run: python tools/validate_json_assets.py
