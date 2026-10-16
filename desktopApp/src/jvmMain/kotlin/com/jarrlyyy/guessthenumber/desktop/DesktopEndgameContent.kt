@@ -7,8 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -53,7 +52,7 @@ internal fun DesktopEndgameContent(
         }
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)) {
             Column(modifier = Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(Icons.Default.Explore, contentDescription = null)
+                Icon(Icons.Default.CheckCircle, contentDescription = null)
                 Text("Beyond the final portal", style = MaterialTheme.typography.titleLarge)
                 Text("Complete long-term goals to prove your mastery of every system.")
                 Text("$completed / ${goals.size} challenges completed", style = MaterialTheme.typography.titleMedium)
@@ -67,7 +66,7 @@ internal fun DesktopEndgameContent(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Icon(
-                        if (goal.complete) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
+                        if (goal.complete) Icons.Default.CheckCircle else Icons.Default.Lock,
                         contentDescription = null,
                         tint = if (goal.complete) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                     )
