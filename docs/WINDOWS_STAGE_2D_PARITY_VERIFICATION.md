@@ -26,6 +26,13 @@ The historical Stage 2-D evidence below describes earlier commits and must not b
 | User-reported Windows runtime checks (2026-10-16) | User confirmed Enter submission, Submit button, shop/reward/progression checks and restart/save check passed. | **Passed by user report**; not independently observed in this session |
 | Additional Windows runtime coverage | Resizing/high-DPI, localization, update-channel and full installer lifecycle | **Unverified**; do not infer these from CI or the focused gameplay checks |
 
+## Stage 2-D follow-up — talent transaction hardening
+
+- The desktop talent transaction now validates talent IDs, exact canonical costs, and prerequisite IDs against the Android talent catalog before changing Prestige or unlock state.
+- Added deterministic regression coverage for unknown talents, caller-supplied discounted/negative costs, prerequisite mismatches, missing prerequisites, successful purchase at the canonical cost, and duplicate purchases.
+- This closes a transaction-integrity gap in the Stage 2 economy review. It does **not** prove the talent effects themselves are fully applied at runtime, and it does not close the overall Stage 2 gate.
+- Windows and Android CI for this new candidate must pass before this change is considered validated. Runtime checks of talent effects and the remaining W1/W2 rows are still required.
+
 ## Current findings
 
 - Android and Windows use the same production `GameEngine` and `GameState` source boundary, so this slice avoids a second desktop-only implementation of guessing rules.
@@ -52,3 +59,43 @@ The historical Stage 2-D evidence below describes earlier commits and must not b
 3. **Focused runtime checks reported passed by user:** Enter/button submission, shop/rewards/progression and restart/save. Broader windowing, localization, update and installer runtime checks remain unverified.
 4. **New candidate still pending validation:** [Stage 2 economy parity branch](https://github.com/ne0gl1tch20/GuessTheNumber/tree/feat/windows-stage-2-economy-parity) adds bulk buys, mutator controls and reset confirmations. Do not treat the added tests as passing until CI reports success.
 5. Remaining gaps: rate-limiting/edge-case parity, canonical talent/catalog effects, broad large-number and reset checks, and actual Windows runtime checks for mutators and bulk purchases. Review remaining W1/W2 rows against Android before declaring Stage 2 complete.
+
+
+## Cross-platform parity target — one game across every platform
+
+**Product goal:** Android and Windows must be the same game, not separate implementations that merely offer similar features. Android is the reference implementation for intended gameplay and behavior unless a requirement explicitly defines a platform-specific adaptation.
+
+### Parity contract
+
+- **Screen parity:** Every supported screen and flow must have an equivalent on each platform, including content, navigation, controls, dialogs, loading/empty/error states, locked states, and progression feedback. Layout may adapt to phone and desktop form factors, but functionality and meaning must not silently disappear.
+- **Logic parity:** The same inputs and starting state must produce the same gameplay outcomes across platforms: guesses, rewards, economy calculations, upgrade costs, purchase validation, talents and their effects, achievements, daily rewards, resets, unlock requirements, bosses, relics, save/reload behavior, and other supported mechanics.
+- **Shared authoritative rules:** Prefer one shared Kotlin implementation for game rules, state transitions, catalogs, validation, and calculations. Android and Windows should call that shared implementation rather than independently reimplementing the same rules. Keep platform-specific adapters for storage, lifecycle, input, notifications, audio, and operating-system integration where needed.
+- **Shared UI where practical:** Reuse common screen/components when the multiplatform architecture supports it. Where native or platform-specific UI is necessary, treat Android as the behavioral and content reference and verify the Windows counterpart against it.
+- **Intentional platform adaptations only:** Touch versus mouse/keyboard input, window resizing, responsive layout, and OS-specific integrations may differ when needed. Document each intentional difference and confirm it does not change the underlying game rules or remove a supported capability.
+- **No parity by assumption:** Compilation, shared source files, and unit tests are useful evidence but do not alone prove screen or runtime parity. Track automated results and hands-on runtime evidence separately.
+
+### Definition of done for cross-platform parity
+
+1. Maintain a screen-by-screen inventory mapping each Android screen/flow to its Windows equivalent, with matching states, actions, navigation, and visible information.
+2. Map each gameplay/economy mechanic to its authoritative shared implementation and tests. Remove duplicate platform-specific rule implementations where practical.
+3. Use deterministic fixtures or parity tests to run the same starting states and actions on each platform and compare resulting state, rewards, balances, unlocks, and persisted data.
+4. Verify the actual Windows app at runtime for the relevant flows; CI compilation alone is not enough. Record the platform/build, steps, result, and any screenshots or logs available.
+5. Keep a list of intentional platform differences with reasons and verification. An unexplained mismatch remains a parity gap.
+6. Keep the Stage 2 exit gate open until the scoped W1/W2 requirements have evidence. Do not describe the whole game as cross-platform complete while screens, mechanics, effects, or runtime paths remain unfinished or unverified.
+
+
+### Platform-specific feature exceptions — owner-approved by design
+
+**The project owner decides which platform-specific features are allowed.** The parity contract is the default, not a restriction on the owner's product decisions. The owner may propose or approve platform-specific QoL, UI, operating-system integration, or gameplay features.
+
+- **QoL and presentation:** Examples include Windows keyboard shortcuts and mouse interactions, Android touch gestures and haptics, responsive desktop layouts, accessibility adaptations, platform-native notifications, widgets, and file-picker integration.
+- **Gameplay exceptions:** A platform may also receive a unique gameplay feature or different behavior when the owner explicitly approves it. Do not introduce gameplay or balance differences silently or infer approval from technical convenience.
+- **Document each exception:** Record the target platform, behavior, purpose, owner approval, affected shared systems, and how it will be verified. Link the decision or issue/PR when available.
+- **Protect shared systems:** Unless the owner explicitly approves a change, platform-specific QoL must not alter core balance, reward calculations, progression, reset semantics, or save compatibility. Approved gameplay exceptions should still preserve save integrity and clearly define any intended cross-platform consequences.
+- **Verify both sides:** Test the platform-specific behavior on its target platform and regression-check shared behavior on the other platform. A documented exception is intentional, not automatically verified.
+
+Examples: a Windows-only keyboard shortcut that opens the reset confirmation is an ordinary QoL exception. A Windows-only feature that changes Prestige rewards is a gameplay exception and requires the owner's explicit approval before implementation.
+
+**Decision rule:** If a proposed feature creates a platform difference and owner approval is unclear, ask the owner. Do not reject the idea just because it is platform-specific, and do not treat the parity goal as permission to make product decisions on the owner's behalf.
+
+**Current status:** This is the target architecture and acceptance contract, not a claim that parity has already been achieved. The existing Stage 2-D gate remains open; remaining gaps listed in this document must be resolved and verified against Android.
