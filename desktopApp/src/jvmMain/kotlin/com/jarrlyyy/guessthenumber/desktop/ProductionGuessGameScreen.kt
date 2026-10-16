@@ -80,6 +80,13 @@ fun ProductionGuessGameScreen(
     onOpenUltra: () -> Unit = {},
     onOpenTalent: () -> Unit = {},
     onOpenStats: () -> Unit = {},
+    onThemeSettingsLoaded: (
+        themeMode: String,
+        primaryHex: String,
+        secondaryHex: String,
+        tertiaryHex: String,
+        reducedMotion: Boolean
+    ) -> Unit = { _, _, _, _, _ -> },
     modifier: Modifier = Modifier
 ) {
     val engine = remember { GameEngine() }
@@ -170,6 +177,17 @@ fun ProductionGuessGameScreen(
     }
 
     val currentState = state
+
+    LaunchedEffect(currentState?.settings) {
+        val settings = currentState?.settings ?: return@LaunchedEffect
+        onThemeSettingsLoaded(
+            settings.themeMode,
+            settings.customPrimaryColor,
+            settings.customSecondaryColor,
+            settings.customTertiaryColor,
+            settings.reducedMotion
+        )
+    }
 
     LaunchedEffect(currentState) {
         val snapshot = currentState ?: return@LaunchedEffect

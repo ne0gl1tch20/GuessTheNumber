@@ -1,5 +1,9 @@
 package com.jarrlyyy.guessthenumber.desktop
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -125,7 +129,19 @@ fun main() = application {
                 with(density) { DesktopWindowMetrics.MIN_HEIGHT.roundToPx() }
             )
         }
-        DesktopTheme(window = window) {
+        var themeMode by remember { mutableStateOf("System") }
+        var primaryHex by remember { mutableStateOf("#7C4DFF") }
+        var secondaryHex by remember { mutableStateOf("#00BCD4") }
+        var tertiaryHex by remember { mutableStateOf("#00C853") }
+        var reducedMotion by remember { mutableStateOf(false) }
+
+        DesktopTheme(
+            window = window,
+            themeMode = themeMode,
+            primaryHex = primaryHex,
+            secondaryHex = secondaryHex,
+            tertiaryHex = tertiaryHex
+        ) {
             val scope = rememberCoroutineScope()
             val shellFocusRequester = remember { FocusRequester() }
             val shell = remember { DesktopShellController() }
@@ -195,7 +211,41 @@ fun main() = application {
                         }
                     }
 
-                    when (shellState.destination) {
+                    AnimatedContent(
+                        targetState = shellState.destination,
+                        transitionSpec = {
+                            if (reducedMotion) {
+                                EnterTransition.None togetherWith ExitTransition.None
+                            } else {
+                                (
+                                    fadeIn(tween(220)) +
+                                        slideInHorizontally(
+                                            initialOffsetX = { it / 12 },
+                                            animationSpec = spring(
+                                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                                stiffness = Spring.StiffnessMediumLow
+                                            )
+                                        ) +
+                                        scaleIn(
+                                            initialScale = 0.97f,
+                                            animationSpec = spring(
+                                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                stiffness = Spring.StiffnessMediumLow
+                                            )
+                                        )
+                                ) togetherWith (
+                                    fadeOut(tween(140)) +
+                                        slideOutHorizontally(
+                                            targetOffsetX = { -it / 16 },
+                                            animationSpec = tween(160)
+                                        ) +
+                                        scaleOut(targetScale = 0.985f, animationSpec = tween(160))
+                                )
+                            }
+                        },
+                        label = "androidStyleDestinationTransition"
+                    ) { destination ->
+                    when (destination) {
                         DesktopDestination.PLAY,
                         DesktopDestination.UPGRADES,
                         DesktopDestination.SHOP,
@@ -220,7 +270,14 @@ fun main() = application {
                                     onOpenPrestige = { shell.navigate(DesktopDestination.PRESTIGE) },
                                     onOpenUltra = { shell.navigate(DesktopDestination.ULTRA) },
                                     onOpenTalent = { shell.navigate(DesktopDestination.TALENT) },
-                                    onOpenStats = { shell.navigate(DesktopDestination.STATS) }
+                                    onOpenStats = { shell.navigate(DesktopDestination.STATS) },
+                                    onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
+                                        themeMode = mode
+                                        primaryHex = primary
+                                        secondaryHex = secondary
+                                        tertiaryHex = tertiary
+                                        reducedMotion = reduced
+                                    }
                                 )
                             }
                         }
@@ -301,6 +358,7 @@ fun main() = application {
                                 }
                             }
                         }
+                    }
                     }
                     DesktopNavigationBar(
                         currentDestination = shellState.destination,

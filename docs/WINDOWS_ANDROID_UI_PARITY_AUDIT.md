@@ -1,70 +1,74 @@
-# Android-to-Windows UI parity audit
+# Android-to-Windows exact-port audit
 
-**Status:** Initial navigation and Upgrades presentation changes are implemented. Windows Statistics is reachable from More and displays core game metrics. Latest CI and runtime visual comparison are pending; full parity is not claimed.
+**Goal:** Windows is the same GuessTheNumber app as Android, implemented with desktop platform APIs. Android source, content, shared rules and assets are authoritative. A screen is not complete based on compilation alone.
 
-## Android reference
+## Repository scan
 
-Android's `NavGraph.kt` declares four primary bottom-navigation destinations in this order: Play (`PlayScreen`), Upgrades (`UpgradeScreen`), Shop (`ShopScreen`) and More (`MoreScreen`). The previous Windows Play/About-only shell did not match that navigation structure.
+The current repository tree contains 28 Android UI screen Kotlin files, a separate JVM/Compose desktop app and a shared module with common UI contracts and game/domain rules. Android's primary navigation is Play, Upgrades, Shop and More. Its theme supports System, Dark, Light and AMOLED modes, custom primary/secondary/tertiary colors and reduced motion.
 
-## First batch changes
+## Ordered implementation stages
 
-- Windows primary navigation follows Android's four primary destinations in order: Play, Upgrades, Shop and More, with matching Material icons and a bottom navigation bar.
-- Windows Statistics is reachable from More. This is a functional first port; visual/runtime comparison is still pending.
+### 1. Shared visual foundation and shell
 
+- [x] Match Android's four primary navigation destinations, order, labels and Material icons.
+- [x] Use the saved Android-equivalent theme mode and custom theme colors on Windows.
+- [x] Add Android-style destination transitions and respect the saved reduced-motion preference.
+- [ ] Verify real Android/Windows screenshots at matching sizes and theme settings.
+- [ ] Verify selected/unselected navigation states, focus, hover, resizing and keyboard navigation at runtime.
 
+### 2. Port every screen and visual element
 
-- Windows primary navigation now exposes Play, Upgrades, Shop and More in Android's order.
-- Existing guessing, mutator, daily quest, achievement and world progression controls stay together on Play instead of being split into a separate Progress destination.
-- Regular Money upgrades are under Upgrades.
-- Nebula purchases are under Shop.
-- Prestige, Ultra and Talent have separate desktop routes reachable from More, instead of being crammed into the More menu itself.
-- About and Windows Debug update controls are reachable from More instead of taking a primary-navigation slot.
-- Added shortcut mapping and tests for Ctrl+1 through Ctrl+5. Ctrl+1 through Ctrl+4 follow the four primary destinations; Ctrl+5 opens About.
+The audit must cover every Android screen and each element within it, including labels, icons, typography, spacing, cards, empty/loading/error/locked states, menus, dialogs, animations and original assets.
 
-## Source-backed destination inventory
+| Android screen | Windows status |
+| --- | --- |
+| Play | Partial implementation; exact visual and interaction parity unverified |
+| Upgrades | Partial implementation; exact visual and interaction parity unverified |
+| Shop | Partial implementation; catalog, filters and cosmetic equip exist; exact parity unverified |
+| More | Partial implementation; full reorderable/feature-flagged menu parity unverified |
+| Prestige | Partial controls exist; dedicated screen parity unverified |
+| Ultra | Partial controls exist; dedicated screen parity unverified |
+| Talent Web | Partial purchases exist; Android tree/web UI not ported |
+| Mutators | Basic toggles exist; challenge-builder flow incomplete |
+| Achievements | Basic information exists; dedicated Android presentation incomplete |
+| World Map | Basic progression exists; map and boss-navigation parity incomplete |
+| Statistics | A dedicated Windows screen exists; exact parity unverified |
+| Settings & Save Management | Not ported as a dedicated Windows screen |
+| About | Windows update page exists; Android content parity incomplete |
+| Developer Settings | Not ported |
+| Developer Console | Not ported |
+| Process Inspector | Not ported |
+| Save Slots | Local save exists; Android slot-management UI not ported |
+| Music Player | Not ported |
+| Arcade | Not ported |
+| Activity Hub | Not ported |
+| Lua Testing Hub | Not ported |
+| Changelog Viewer | Not ported |
+| Lucky Stake | Not ported |
+| Relics | Not ported |
+| Home Base | Not ported |
+| Codex | Not ported |
+| Endgame | Not ported |
+| Live Ops | Not ported; Android route is feature-flagged |
+| Crash Recovery | Windows boot/save recovery parity not verified |
+| Guided Tutorial / Feature Tour | Not ported as Android-equivalent overlays |
 
-| Android destination / route | Android source | Windows status after this batch |
-| --- | --- | --- |
-| Play | `ui/screens/PlayScreen.kt` | Production guess loop and currently implemented quest, achievement and world controls remain on Play. Exact layout and all Android interactions still need comparison. |
-| Upgrades | `ui/screens/UpgradeScreen.kt` | First visual-parity pass added the Money balance header, multiplier dropdown, matching upgrade-card hierarchy, level badge, batch cost and purchase highlight. CI passes, but runtime screenshot comparison and full interaction review remain pending. |
-| Shop | `ui/screens/ShopScreen.kt` | First parity pass now includes the Nebula balance header, All / Automation / Boosts / Cosmetics filters, catalog-driven cards and owned-cosmetic Equip/Equipped actions. Runtime screenshot and interaction comparison remain pending. |
-| More | `ui/screens/MoreScreen.kt` | Entry point exists. Prestige, Ultra and Talent are separate desktop subroutes reached from More. The reorderable, feature-flagged, locked Android menu is not yet ported. |
-| Prestige | `ui/screens/PrestigeScreen.kt` | Current purchase/reset controls exist under More; dedicated Android screen layout and interactions need review. |
-| Ultra | `ui/screens/UltraScreen.kt` | Current purchase/reset controls exist under More; dedicated Android screen layout and interactions need review. |
-| Talent Web | `ui/screens/TalentScreen.kt` | Current talent purchases exist under More; the Android tree/web presentation is not ported. |
-| Mutators | `ui/screens/MutatorsScreen.kt` | Basic toggles exist on Play. Challenge-builder selection and completion flow are incomplete. |
-| Achievements | `ui/screens/AchievementsScreen.kt` | Basic achievement information exists on Play; dedicated Android screen and reward presentation are missing. |
-| World Map | `ui/screens/WorldMapScreen.kt` | Basic world progression exists on Play; dedicated map and boss navigation are missing. |
-| Statistics | `ui/screens/StatsScreen.kt` | Dedicated Windows screen not implemented. |
-| Settings | `ui/screens/SettingsScreen.kt` | Dedicated Windows screen not implemented. |
-| About | `ui/screens/AboutScreen.kt` | Windows About/update page exists and is now reached from More; Android content parity is incomplete. |
-| Developer Settings | `ui/screens/DevSettingsScreen.kt` | Debug-only Android feature; Windows equivalent not ported. |
-| Process Inspector | `ui/screens/ProcessInspectorScreen.kt` | Debug-only Android feature; Windows equivalent not ported. |
-| Save Slots | `ui/screens/SaveSlotsScreen.kt` | Windows has local save persistence, not Android slot-management UI. |
-| Music Player | `ui/screens/MusicPlayerScreen.kt` | Dedicated Windows screen not implemented. |
-| Arcade | `ui/screens/ArcadeScreen.kt` | Dedicated Windows screen not implemented. |
-| Activity Hub | `ui/screens/LuaActivityHubScreen.kt` | Dedicated Windows screen not implemented. |
-| Lua Testing Hub | `ui/screens/LuaTestingHubScreen.kt` | Debug-only Android feature; Windows equivalent not ported. |
-| Changelog | `ui/screens/MarkdownViewerScreen.kt` | Dedicated Windows screen not implemented. |
-| Lucky Stake | `ui/screens/StakingScreen.kt` | Dedicated Windows screen not implemented. |
-| Relics | `ui/screens/RelicsScreen.kt` | Dedicated Windows screen not implemented. |
-| Home Base | `ui/screens/HomeBaseScreen.kt` | Dedicated Windows screen not implemented. |
-| Codex | `ui/screens/CodexScreen.kt` | Dedicated Windows screen not implemented. |
-| Endgame | `ui/screens/EndgameScreen.kt` | Dedicated Windows screen not implemented. |
-| Live Ops | `NavGraph.kt` route `live_ops` | Dedicated Windows screen not implemented; Android route is feature-flagged. |
+### 3. Connect all behavior and shared game rules
 
-## Remaining UI parity rules
+- Reuse shared domain rules, repositories, catalog data, localization resources and assets wherever possible.
+- Match every Android action, purchase, reward, unlock, reset, setting, confirmation, validation message and navigation path.
+- Preserve offline behavior, existing save compatibility, recovery behavior and current no-ads/no-analytics/no-accounts requirements.
+- Add a dedicated Windows route for each Android route; feature-gated Android features must follow equivalent flags or explicit platform capability handling.
+- Test each interaction and its persisted state, not just navigation or rendering.
 
-- Compare the actual Android source screen-by-screen before implementing its desktop counterpart.
-- Preserve labels, balances, descriptions, requirements, locked states, purchase actions, menus, confirmation dialogs and loading/error/empty states.
-- Adapt mobile navigation and scrolling to desktop sizing and mouse/keyboard input without deleting content or changing its information hierarchy.
-- Do not copy Android-only APIs into desktop source. Reuse shared game rules and catalogs where possible.
-- A passing build is not visual or interactive parity evidence. Keep screenshot and runtime checks marked unverified until performed.
+### 4. Polish and verification
 
-## Verification
+- Match Android motion and reduced-motion behavior, sound/music controls, feedback and visual effects where the platform supports them.
+- Adapt only genuinely platform-specific behavior: mouse, keyboard, window sizing, file pickers and native window chrome.
+- Compare Android and Windows screenshots screen by screen and retain a mismatch checklist.
+- Run focused JVM tests and existing CI; perform Windows runtime checks before claiming runtime parity.
+- Mark a feature verified only when both appearance and behavior have evidence.
 
-- Source-reviewed `Screen.kt`, `NavGraph.kt`, `PlayScreen.kt`, `UpgradeScreen.kt`, `ShopScreen.kt` and `MoreScreen.kt` on `master`.
-- Updated desktop primary navigation, section routing and navigation unit tests in this branch.
-- Latest recorded CI for commit `3153f38eb9c34c426c7d4c12c1545d975ae5079c` passed: Windows Desktop CI run [38857902508](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38857902508) and Android Validation and Tests run [38857902488](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38857902488).
-- Shop category selection, cosmetic equip ownership/idempotence and transaction persistence have source-level regression coverage; Windows runtime interaction and screenshot comparison remain unverified.
-- This is the start of the real UI port, not a claim that the full Android UI has been reproduced.
+## Current batch
+
+This batch connects saved Android-equivalent theme settings to the Windows root theme, adds AMOLED/custom-color handling and applies Android-style destination motion with reduced-motion support. It does not claim that all Android screens have been ported. Runtime screenshot comparisons remain pending.
