@@ -84,6 +84,8 @@ fun ProductionGuessGameScreen(
     onOpenStats: () -> Unit = {},
     onOpenSettings: () -> Unit = {},
     onBackFromSettings: () -> Unit = {},
+    navigationPosition: DesktopNavigationPosition = DesktopNavigationPosition.LEFT,
+    onNavigationPositionChange: (DesktopNavigationPosition) -> Unit = {},
     onThemeSettingsLoaded: (
         themeMode: String,
         primaryHex: String,
@@ -830,6 +832,8 @@ fun ProductionGuessGameScreen(
                         isSaving = isSaving,
                         onUpdateSettings = ::updateSettings,
                         onResetData = ::resetAllGameData,
+                        navigationPosition = navigationPosition,
+                        onNavigationPositionChange = onNavigationPositionChange,
                         onBack = onBackFromSettings
                     )
                 }

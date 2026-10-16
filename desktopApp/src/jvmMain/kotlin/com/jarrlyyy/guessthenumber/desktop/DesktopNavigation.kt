@@ -4,6 +4,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.Key
+import java.util.prefs.Preferences
+
+/**
+ * Windows-only navigation placement. Stored separately from GameSettings so Android
+ * save files and settings remain unchanged.
+ */
+enum class DesktopNavigationPosition(val label: String) {
+    LEFT("Left"),
+    RIGHT("Right"),
+    TOP("Top"),
+    BOTTOM("Bottom");
+
+    companion object {
+        private val preferences: Preferences =
+            Preferences.userNodeForPackage(DesktopNavigationPosition::class.java).node("navigation")
+
+        fun load(): DesktopNavigationPosition =
+            runCatching { valueOf(preferences.get("position", LEFT.name)) }.getOrDefault(LEFT)
+
+        fun save(position: DesktopNavigationPosition) {
+            preferences.put("position", position.name)
+            runCatching { preferences.flush() }
+        }
+    }
+}
 
 /**
  * Windows-owned navigation contract. Destinations are added here as each

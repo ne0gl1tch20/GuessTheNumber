@@ -17,6 +17,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -74,6 +77,7 @@ import kotlinx.coroutines.withContext
 @Composable
 private fun DesktopNavigationBar(
     currentDestination: DesktopDestination,
+    position: DesktopNavigationPosition,
     onNavigate: (DesktopDestination) -> Unit
 ) {
     val destinations = listOf(
@@ -82,34 +86,64 @@ private fun DesktopNavigationBar(
         DesktopDestination.SHOP,
         DesktopDestination.MORE
     )
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        tonalElevation = 8.dp
-    ) {
-        destinations.forEach { destination ->
-            val selected = currentDestination == destination
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    if (!selected) onNavigate(destination)
-                },
-                icon = {
-                    Icon(
-                        imageVector = when (destination) {
-                            DesktopDestination.PLAY -> Icons.Default.PlayArrow
-                            DesktopDestination.UPGRADES -> Icons.Default.Star
-                            DesktopDestination.SHOP -> Icons.Default.ShoppingCart
-                            else -> Icons.Default.Menu
-                        },
-                        contentDescription = destination.label
-                    )
-                },
-                label = { Text(destination.label) },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                modifier = Modifier.semantics { this.selected = selected }
-            )
+    val vertical = position == DesktopNavigationPosition.LEFT ||
+        position == DesktopNavigationPosition.RIGHT
+
+    if (vertical) {
+        NavigationRail {
+            destinations.forEach { destination ->
+                val selected = currentDestination == destination
+                NavigationRailItem(
+                    selected = selected,
+                    onClick = { if (!selected) onNavigate(destination) },
+                    icon = {
+                        Icon(
+                            imageVector = when (destination) {
+                                DesktopDestination.PLAY -> Icons.Default.PlayArrow
+                                DesktopDestination.UPGRADES -> Icons.Default.Star
+                                DesktopDestination.SHOP -> Icons.Default.ShoppingCart
+                                else -> Icons.Default.Menu
+                            },
+                            contentDescription = destination.label
+                        )
+                    },
+                    label = { Text(destination.label) },
+                    alwaysShowLabel = true,
+                    colors = NavigationRailItemDefaults.colors(
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    modifier = Modifier.semantics { this.selected = selected }
+                )
+            }
+        }
+    } else {
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            tonalElevation = 8.dp
+        ) {
+            destinations.forEach { destination ->
+                val selected = currentDestination == destination
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = { if (!selected) onNavigate(destination) },
+                    icon = {
+                        Icon(
+                            imageVector = when (destination) {
+                                DesktopDestination.PLAY -> Icons.Default.PlayArrow
+                                DesktopDestination.UPGRADES -> Icons.Default.Star
+                                DesktopDestination.SHOP -> Icons.Default.ShoppingCart
+                                else -> Icons.Default.Menu
+                            },
+                            contentDescription = destination.label
+                        )
+                    },
+                    label = { Text(destination.label) },
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    modifier = Modifier.semantics { this.selected = selected }
+                )
+            }
         }
     }
 }
@@ -134,6 +168,7 @@ fun main() = application {
         var secondaryHex by remember { mutableStateOf("#00BCD4") }
         var tertiaryHex by remember { mutableStateOf("#00C853") }
         var reducedMotion by remember { mutableStateOf(false) }
+        var navigationPosition by remember { mutableStateOf(DesktopNavigationPosition.load()) }
 
         DesktopTheme(
             window = window,
@@ -211,8 +246,20 @@ fun main() = application {
                         }
                     }
 
-                    AnimatedContent(
+                    if (navigationPosition == DesktopNavigationPosition.TOP) {
+                        DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
+                    }
+
+                    Row(
                         modifier = Modifier.weight(1f).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        if (navigationPosition == DesktopNavigationPosition.LEFT) {
+                            DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
+                        }
+
+                    AnimatedContent(
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
                         targetState = shellState.destination,
                         transitionSpec = {
                             if (reducedMotion) {
@@ -275,6 +322,11 @@ fun main() = application {
                                     onOpenTalent = { shell.navigate(DesktopDestination.TALENT) },
                                     onOpenStats = { shell.navigate(DesktopDestination.STATS) },
                                     onOpenSettings = { shell.navigate(DesktopDestination.SETTINGS) },
+                                    navigationPosition = navigationPosition,
+                                    onNavigationPositionChange = { selected ->
+                                        navigationPosition = selected
+                                        DesktopNavigationPosition.save(selected)
+                                    },
                                     onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
                                     onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
                                         themeMode = mode
@@ -365,10 +417,14 @@ fun main() = application {
                         }
                     }
                     }
-                    DesktopNavigationBar(
-                        currentDestination = shellState.destination,
-                        onNavigate = shell::navigate
-                    )
+                        if (navigationPosition == DesktopNavigationPosition.RIGHT) {
+                            DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
+                        }
+                    }
+
+                    if (navigationPosition == DesktopNavigationPosition.BOTTOM) {
+                        DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
+                    }
                 }
             }
         }

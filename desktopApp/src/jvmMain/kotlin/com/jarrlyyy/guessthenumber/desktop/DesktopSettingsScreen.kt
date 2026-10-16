@@ -54,6 +54,8 @@ fun DesktopSettingsScreen(
     isSaving: Boolean,
     onUpdateSettings: (GameSettings) -> Unit,
     onResetData: () -> Unit,
+    navigationPosition: DesktopNavigationPosition,
+    onNavigationPositionChange: (DesktopNavigationPosition) -> Unit,
     onBack: () -> Unit
 ) {
     val settings = state.settings
@@ -74,6 +76,22 @@ fun DesktopSettingsScreen(
                 Text("Your settings use the same saved GameSettings model as Android.", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             TextButton(onClick = onBack) { Text("Back") }
+        }
+
+        SettingsCard("Windows Navigation") {
+            Text(
+                "Choose which edge of the app holds the navigation bar. Left is the default.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall
+            )
+            DropdownSettingRow(
+                "Navigation Position",
+                navigationPosition.label,
+                DesktopNavigationPosition.entries.map { it.label to it.name },
+                onSelect = { selected ->
+                    DesktopNavigationPosition.entries.firstOrNull { it.name == selected }?.let(onNavigationPositionChange)
+                }
+            )
         }
 
         SettingsCard("Game Preferences") {
