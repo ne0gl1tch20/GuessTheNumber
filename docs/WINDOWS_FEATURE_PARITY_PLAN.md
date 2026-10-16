@@ -3,7 +3,7 @@
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
 
-**Latest increment:** Windows Upgrades screen first-pass UI port is proposed in PR #211; runtime screenshot parity remains unverified.
+**Latest increment:** PR #215 expands Android-to-Windows route coverage after PR #214; the newly exposed routes still have missing screen behavior, and runtime screenshot parity remains unverified.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
@@ -13,6 +13,32 @@
 Port the Android experience screen by screen: same features, screen hierarchy, information, labels, controls, menus, dialogs, navigation destinations, locked/unlocked states, loading/empty/error states, and interaction outcomes. Adapt only the presentation and input where desktop requires it (resizable window, keyboard, mouse, focus, hover and desktop conventions). Desktop adaptations must preserve the Android screen's content and meaning; any deliberate feature difference needs an explicit reason and documentation.
 
 Prefer Kotlin Multiplatform shared production rules, models, validation, transaction logic, localization catalogs and canonical assets. Reuse Compose UI components where they work across targets, and use thin Android/Windows host adapters for platform-specific lifecycle, storage, audio, notifications, windowing, installers and updates. Share the original assets rather than creating separate Windows copies. Keep Android working throughout the port and preserve existing save compatibility.
+
+## KMP exact-port implementation contract (locked)
+
+The product wish is an **exact Windows port of GuessTheNumber using Kotlin Multiplatform and shared code/assets wherever practical**. Android is the source of truth. This plan is the authoritative implementation and verification tracker for that wish.
+
+### What “exact port” means in practice
+
+- **Same game, not a reduced edition:** every Android player-facing feature and reachable screen/interaction must have a Windows counterpart unless a deliberate platform-specific difference is explicitly approved and documented.
+- **Same behavior and meaning:** preserve game rules, reward and progression outcomes, eligibility, shop/economy semantics, settings meaning, localization meaning, save semantics, offline behavior and recovery paths.
+- **Same experience structure:** match visible content, information hierarchy, labels, controls, menus, dialogs, sheets, tutorials, nested destinations, locked/unlocked states, loading/empty/error states and navigation outcomes.
+- **Shared implementation first where sensible:** use common Kotlin production rules, models/contracts, validators, transaction logic, localization catalogs, canonical assets and compatible Compose UI. Share only where dependencies and platform contracts genuinely permit it; do not force Android platform APIs into commonMain.
+- **Thin platform hosts:** Android retains its production host integrations; Windows supplies desktop lifecycle, keyboard/mouse/focus/hover, windowing, filesystem, audio/notification integration where supported, updates and MSI packaging. Windows must not become a second authority for game rules, rewards or persistence semantics.
+- **Desktop adaptation, not redesign:** resizable layouts and desktop input conventions are allowed. They must not remove features, alter the meaning of a screen or replace Android's hierarchy with an unrelated substitute UI. Document and justify any intentional difference.
+- **Canonical assets and localization:** prefer the original shared assets and shared translation source. Do not create parallel Windows-only copies of content that should remain consistent.
+- **Compatibility and product constraints:** preserve existing Android save compatibility, Windows MSI identity/in-place upgrade behavior, offline-first play, and the no-ads/no-analytics/no-accounts requirement.
+
+### Evidence and completion rules
+
+- Track parity at screen-and-interaction level, not only by feature name or route existence.
+- For each slice, name the Android reference screen/component, describe the Windows counterpart, cover relevant state/action paths, identify shared code/assets and host-specific adapters, and update the matrix in the same PR.
+- Keep **source implemented**, **CI passed**, **automated behavior tested**, **Windows runtime verified**, **screenshot compared** and **installer tested** distinct. One does not imply the others.
+- Use evidence from the exact candidate commit. If Windows runtime testing is unavailable, keep the row unverified and state that plainly; do not infer a pass from compilation, CI or a route placeholder.
+- Keep the five stages below sequential. Stage 2 remains open until its remaining core gameplay/economy gaps have evidence. Do not start Stage 3 implementation ahead of the Stage 2 exit gate.
+- Declare overall parity complete only when every required row is verified with evidence, explicitly approved as platform-specific, or excluded by documented agreement, and all release blockers are resolved.
+
+Roadmap coordination: [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) records the locked product wish and broader planned work. This document alone owns Windows parity stages, the screen-by-screen matrix and its verification status.
 
 This plan is the single source of truth for Windows parity and replaces Windows migration checklists that duplicate its stages.
 
