@@ -117,6 +117,13 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             val saved = withContext(Dispatchers.IO) { saveStore.save(1, progressedState) }
             if (saved) {
                 state = progressedState
+                if (
+                    before.activeMutators != progressedState.activeMutators ||
+                    before.currentRangeMin != progressedState.currentRangeMin ||
+                    before.currentRangeMax != progressedState.currentRangeMax
+                ) {
+                    autoClicker.reset(progressedState.currentRangeMin, progressedState.currentRangeMax)
+                }
                 if (before.autoClickerActive != progressedState.autoClickerActive) {
                     autoClickerFailurePaused = false
                 }
