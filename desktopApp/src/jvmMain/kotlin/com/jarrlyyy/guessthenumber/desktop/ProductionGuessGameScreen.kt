@@ -640,8 +640,6 @@ fun ProductionGuessGameScreen(
                 }
             }
 
-            }
-
             if (section == DesktopGameSection.MORE) {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
