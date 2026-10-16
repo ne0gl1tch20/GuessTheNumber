@@ -65,4 +65,11 @@ Adds explicit navigation to the remaining Android screen families and per-screen
 
 ### Talent Web source-of-truth follow-up (2026-10-16)
 
-PR #218 makes the Windows Talent Web's prerequisite/parent gating and transaction validation read the bundled talent catalog instead of maintaining separate prerequisite maps. The shared JVM resource was copied from the Android asset, the redundant desktop resource copy was removed, and the JSON validation workflow now enforces Android/shared-resource parity. The desktop tree still uses fallback English display copy aligned with the Android screen's fallback strings; locale-aware Windows rendering and actual Windows interaction/effect checks remain unverified. PR #218 CI must pass on its latest head before merge.
+PR #218 makes the Windows Talent Web's prerequisite/parent gating and transaction validation read the bundled talent catalog instead of maintaining separate prerequisite maps. The shared JVM resource was copied from the Android asset, the redundant desktop resource copy was removed, and the JSON validation workflow now enforces Android/shared-resource parity. The desktop tree still uses fallback English display copy aligned with the Android screen's fallback strings; locale-aware Windows rendering and actual Windows interaction/effect checks remain unverified. PR #218 merged after its exact-head Android Validation and Windows Desktop CI passed; the current pending candidate is the shared Auto Clicker timing follow-up.
+
+
+### Latest core-loop parity follow-up (2026-10-16)
+
+- PR #218 merged after Android Validation and Windows Desktop CI passed (runs [38903226288](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226288) and [38903226499](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226499)). Talent transaction validation and Talent Web parent gating now read the shared JVM catalog; CI enforces equality with Android's asset.
+- Current follow-up branch `fix/windows-auto-clicker-speed-parity` moves the Auto Clicker interval formula into shared `GameEngine.autoClickerDelayMillis`, used by both Android and Windows. Tests cover both speed talents, stacked talent speed plus `mut_speed`, inactive state and non-positive speed.
+- Windows runtime speed/feedback verification remains open until a current candidate passes CI and is manually exercised.

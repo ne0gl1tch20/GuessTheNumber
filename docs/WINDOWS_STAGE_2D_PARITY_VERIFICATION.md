@@ -1,12 +1,12 @@
 # Windows Migration Stage 2-D — Parity Verification
 
-**Status:** PR #217's Android Validation and Windows Desktop CI passed on its exact head; PR #218's catalog-driven follow-up is pending CI. Stage 2 exit gate remains open pending complete W1/W2 parity and full runtime evidence.  
+**Status:** PR #217 and PR #218 both merged after their exact-head Android Validation and Windows Desktop CI passed. Current follow-up centralizes Auto Clicker timing for Android/Windows; its CI is pending. Stage 2 exit gate remains open pending complete W1/W2 parity and full runtime evidence.  
 **Reviewed:** 2026-10-16  
 **Scope:** Deterministic core guess transitions and Windows save/reload integration. This is not a claim of full gameplay/economy or runtime parity.
 
 ## Current repository candidate (2026-10-16)
 
-Historical evidence below refers to the commits named in each row and is not automatically evidence for the current master. PR #215 is merged. PR #217 is merged, and its exact-head Android Validation and Windows Desktop CI passed. Current follow-up: [PR #218](https://github.com/ne0gl1tch20/GuessTheNumber/pull/218), which replaces duplicated hardcoded talent costs/prerequisites with catalog-driven validation; CI for #218 must be checked separately.
+Historical evidence below refers to the commits named in each row and is not automatically evidence for the current master. PRs #215, #217 and #218 are merged. PR #218's Android Validation and Windows Desktop CI passed on its exact head (runs 38903226288 and 38903226499). The current Auto Clicker timing follow-up uses shared rules and has its own pending CI.
 
 - [Android Validation and Tests, run 38901674190](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38901674190): **passed** for PR #217 head `9162283e57f3c310e59e474b917ff13caa19f0ab`.
 - [Windows Desktop CI, run 38901674304](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38901674304): **passed** for that same PR #217 head, including compilation/tests and MSI upgrade verification.
@@ -105,7 +105,15 @@ Examples: a Windows-only keyboard shortcut that opens the reset confirmation is 
 
 - PR #217 merged the initial validation guard and both CI workflows passed for its exact head.
 - PR #218 changes the validation source from a hardcoded Kotlin map to the bundled `game/talents.json` resource, adds a data-driven test over every catalog entry, and makes Talent Web parent gating use the catalog's `requiredParentId`. The Android asset and shared JVM resource were confirmed byte-for-byte identical when this candidate was prepared; the redundant desktop copy was removed and CI now enforces parity.
-- **PR #218 CI:** pending at the time of this documentation update. Update this status with the exact run links/results before merging.
+- **PR #218 CI passed:** [Android Validation and Tests, run 38903226288](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226288) and [Windows Desktop CI, run 38903226499](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226499) both succeeded on head `2973afe940a6beb4531e639322d102f90f2d91d5`; PR #218 is merged.
 - **Manual verification still required:** open the Windows app, inspect the Talent Web, buy one affordable talent, verify its effect in gameplay, restart/reload, and confirm the purchase/effect persists. Also verify an unaffordable talent and a locked prerequisite cannot be purchased.
 
 - The Talent Web's visible English labels/descriptions still follow Android's fallback copy rather than the JSON display fields; Windows locale-aware rendering remains a separate parity gap and must not be marked verified.
+
+
+## Latest follow-up — Auto Clicker timing parity (2026-10-16)
+
+- The Android Auto Clicker previously calculated its interval from `autoClickerSpeed`, the two speed talents (1.25× and 1.5×), and the `mut_speed` multiplier (3×). Windows had a fixed 1,000 ms interval.
+- The follow-up moves that formula to shared `GameEngine.autoClickerDelayMillis` and calls it from both the Android ViewModel and Windows production Play flow. Tests cover default timing, both talent levels, stacked speed mutator, inactive state and non-positive speed.
+- **Candidate CI:** pending for the current follow-up branch; do not claim the timing change validated until Android and Windows workflows pass.
+- **Manual verification after merge:** on Windows, buy each speed talent, enable/disable `mut_speed`, confirm the Auto Clicker visibly speeds up/down as expected, then restart and verify the purchased talents persist.

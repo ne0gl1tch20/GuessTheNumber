@@ -3,7 +3,7 @@
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
 
-**Latest increment (2026-10-16):** PR #215's progression-route coverage and PR #217's talent transaction hardening are merged. PR #217's Android Validation and Windows Desktop CI passed on commit `9162283e57f3c310e59e474b917ff13caa19f0ab` (runs [38901674190](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38901674190) and [38901674304](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38901674304)). Current follow-up PR #218 removes duplicated hardcoded talent costs/prerequisites and validates against the bundled canonical catalog; its CI is pending. Runtime screenshot parity and the Stage 2 exit gate remain open.
+**Latest increment (2026-10-16):** PR #218 merged after Android Validation and Windows Desktop CI passed on head `2973afe940a6beb4531e639322d102f90f2d91d5` (runs [38903226288](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226288) and [38903226499](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38903226499)). It validates talent purchases and Talent Web prerequisites from the shared JVM catalog, with CI enforcing parity against Android's asset. Current follow-up centralizes Auto Clicker timing so Windows matches Android's talent-speed and speed-mutator behavior. Runtime screenshot parity and the Stage 2 exit gate remain open.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
@@ -122,6 +122,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [ ] Verify rate limiting and the full set of invalid, boundary, post-solve and mutator runtime cases.
 - [x] Add 1/10/100/MAX quick-buy selection with exact combined costs and atomic bulk purchase transactions for Money, Prestige and Ultra upgrades.
 - [x] Persist/reload a run through the desktop save adapter; user reported the focused restart/save check passed.
+- [x] Use one shared `GameEngine.autoClickerDelayMillis` calculation for Android and Windows, including stacked speed talents and the `mut_speed` multiplier. Automated timing tests added; CI and Windows runtime verification for this follow-up remain pending.
 - [ ] Complete the remaining Android economy/catalog effect parity review and confirm current candidate CI/runtime checks.
 
 **Exit:** The full core loop works on Windows and matches Android rules for deterministic cases.

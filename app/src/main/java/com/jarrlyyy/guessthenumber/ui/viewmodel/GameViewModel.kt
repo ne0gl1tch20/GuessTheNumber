@@ -1639,14 +1639,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         autoClickerJob = viewModelScope.launch(Dispatchers.Default) {
             while (true) {
                 val state = _gameState.value
-                val talentSpeed = (if ("talent_speed_1" in state.prestigeShopPurchases) 1.25 else 1.0) * (if ("talent_speed_2" in state.prestigeShopPurchases) 1.5 else 1.0)
-                val effectiveSpeed = state.autoClickerSpeed * talentSpeed * if ("mut_speed" in state.activeMutators) 3.0 else 1.0
-                val delayMillis = if (state.autoClickerActive && effectiveSpeed > 0.0) {
-                    (1000.0 / effectiveSpeed).toLong()
-                } else {
-                    1000L
-                }
-                delay(delayMillis)
+                delay(gameEngine.autoClickerDelayMillis(state))
                 withContext(Dispatchers.Main) {
                     val currentState = refreshDailyQuestDay(_gameState.value)
                     if (currentState.autoClickerActive) {
