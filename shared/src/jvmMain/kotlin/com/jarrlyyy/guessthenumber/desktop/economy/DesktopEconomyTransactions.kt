@@ -42,7 +42,9 @@ object DesktopEconomyTransactions {
         var total = BigNumber.ZERO
         while (count < requested) {
             val nextCost = upgradeCost(upgrade, currentLevel + count)
-            if (multiplier == "MAX" && currency < total + nextCost) break
+            // Android buys the largest affordable prefix for 10, 100 and MAX.
+            // Keep the UI estimate and transaction behavior identical.
+            if (currency < total + nextCost) break
             total += nextCost
             count++
         }
