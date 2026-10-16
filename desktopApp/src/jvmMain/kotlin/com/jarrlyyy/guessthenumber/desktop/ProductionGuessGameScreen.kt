@@ -39,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import kotlin.random.Random
 
 /** Windows presentation backed by the production engine, economy rules and desktop save adapter. */
@@ -87,7 +88,17 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
         scope.launch {
             val transaction = transform(before)
             if (!transaction.accepted) {
-                feedback = transaction.message
+                if (transaction.state != before) {
+                    val refreshedSave = withContext(Dispatchers.IO) { saveStore.save(1, transaction.state) }
+                    if (refreshedSave) {
+                        state = transaction.state
+                        feedback = transaction.message
+                    } else {
+                        feedback = "Could not save the refreshed state. Your previous saved state is still intact."
+                    }
+                } else {
+                    feedback = transaction.message
+                }
                 isSaving = false
                 return@launch
             }
@@ -119,10 +130,18 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
         val guess = autoClicker.nextGuess(snapshot.currentRangeMin, snapshot.currentRangeMax)
         isSaving = true
         val result = engine.processGuess(snapshot, guess)
-        val finalState = DesktopEconomyTransactions.applyGuessBonuses(
+        val correct = result.feedback == GuessFeedback.CORRECT
+        val bonusAdjustedState = DesktopEconomyTransactions.applyGuessBonuses(
             before = snapshot,
             after = result.newState,
-            correct = result.feedback == GuessFeedback.CORRECT
+            correct = correct
+        )
+        val finalState = DesktopEconomyTransactions.recordGuessProgress(
+            before = snapshot,
+            after = bonusAdjustedState,
+            correct = correct,
+            today = LocalDate.now().toString(),
+            lootRoll = if (correct) Random.nextInt(1000) else null
         )
         val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
         if (saved) {
@@ -134,7 +153,8 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
             feedback = when (result.feedback) {
                 GuessFeedback.TOO_LOW -> "Auto Clicker: too low."
                 GuessFeedback.TOO_HIGH -> "Auto Clicker: too high."
-                GuessFeedback.CORRECT -> "Auto Clicker solved the round and earned ${finalState.money - snapshot.money} Money."
+                GuessFeedback.CORRECT -> "Auto Clicker solved the round and earned ${finalState.money - snapshot.money} Money." +
+                    if (finalState.lootEventId > snapshot.lootEventId) " Treasure drop: ${finalState.lastLootDropTier} chest!" else ""
             }
         } else {
             feedback = "Auto Clicker paused because the save failed. Your previous saved state is still intact."
@@ -172,6 +192,16 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 CurrencySummary("Correct", currentState.correctGuesses.toString())
                 CurrencySummary("Streak", currentState.streak.toString())
             }
+            Text(
+                "Daily progress: guesses ${currentState.dailyQuestGuesses}/10 · correct ${currentState.dailyQuestCorrectGuesses}/5 · best streak ${currentState.dailyQuestBestStreak}/5 · upgrades ${currentState.dailyQuestUpgradePurchases}/3",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                "Treasure chests: Common ${currentState.lootCommonChests} · Rare ${currentState.lootRareChests} · Epic ${currentState.lootEpicChests}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             OutlinedTextField(
                 value = guessText,
                 onValueChange = { input -> guessText = input.filter(Char::isDigit).take(18) },
@@ -190,10 +220,18 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                     } else if (!isSaving) {
                         isSaving = true
                         val result = engine.processGuess(currentState, guess)
-                        val finalState = DesktopEconomyTransactions.applyGuessBonuses(
+                        val correct = result.feedback == GuessFeedback.CORRECT
+                        val bonusAdjustedState = DesktopEconomyTransactions.applyGuessBonuses(
                             before = currentState,
                             after = result.newState,
-                            correct = result.feedback == GuessFeedback.CORRECT
+                            correct = correct
+                        )
+                        val finalState = DesktopEconomyTransactions.recordGuessProgress(
+                            before = currentState,
+                            after = bonusAdjustedState,
+                            correct = correct,
+                            today = LocalDate.now().toString(),
+                            lootRoll = if (correct) Random.nextInt(1000) else null
                         )
                         scope.launch {
                             val saved = withContext(Dispatchers.IO) { saveStore.save(1, finalState) }
@@ -207,7 +245,8 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                                 feedback = when (result.feedback) {
                                     GuessFeedback.TOO_LOW -> "Too low. Try again!"
                                     GuessFeedback.TOO_HIGH -> "Too high. Try again!"
-                                    GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - currentState.money} Money."
+                                    GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - currentState.money} Money." +
+                                        if (finalState.lootEventId > currentState.lootEventId) " Treasure drop: ${finalState.lastLootDropTier} chest!" else ""
                                 }
                                 guessText = ""
                             } else {
@@ -222,6 +261,39 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
             }
             Text(feedback, style = MaterialTheme.typography.bodyLarge)
+
+            SectionTitle("Daily quests")
+            val dailyQuests = listOf(
+                Triple("daily_guesses_10", "Make 10 guesses", currentState.dailyQuestGuesses >= 10),
+                Triple("daily_correct_5", "Get 5 correct guesses", currentState.dailyQuestCorrectGuesses >= 5),
+                Triple("daily_streak_5", "Reach a streak of 5", currentState.dailyQuestBestStreak >= 5),
+                Triple("daily_upgrades_3", "Buy 3 upgrades", currentState.dailyQuestUpgradePurchases >= 3)
+            )
+            dailyQuests.forEach { (id, title, complete) ->
+                val claimed = id in currentState.claimedDailyQuests
+                val progress = when (id) {
+                    "daily_guesses_10" -> "${currentState.dailyQuestGuesses.coerceAtMost(10)} / 10 guesses"
+                    "daily_correct_5" -> "${currentState.dailyQuestCorrectGuesses.coerceAtMost(5)} / 5 correct guesses"
+                    "daily_streak_5" -> "${currentState.dailyQuestBestStreak.coerceAtMost(5)} / 5 best streak"
+                    else -> "${currentState.dailyQuestUpgradePurchases.coerceAtMost(3)} / 3 upgrades"
+                }
+                val reward = when (id) {
+                    "daily_guesses_10" -> "Reward: 10,000 Money"
+                    "daily_correct_5" -> "Reward: 25 Nebula"
+                    "daily_streak_5" -> "Reward: 50 Nebula"
+                    else -> "Reward: 35 Nebula"
+                }
+                EconomyActionCard(
+                    title = title,
+                    description = progress,
+                    detail = reward,
+                    action = if (claimed) "Claimed" else if (complete) "Claim" else "In progress",
+                    enabled = !isSaving && complete && !claimed
+                ) {
+                    commitTransaction { DesktopEconomyTransactions.claimDailyQuest(it, id, LocalDate.now().toString()) }
+                }
+            }
+
             if ("auto_clicker_basic" in currentState.shopPurchases) {
                 Button(
                     onClick = { commitTransaction { DesktopEconomyTransactions.setAutoClickerActive(it, !it.autoClickerActive) } },

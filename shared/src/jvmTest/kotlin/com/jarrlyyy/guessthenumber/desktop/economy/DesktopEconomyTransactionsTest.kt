@@ -163,11 +163,175 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
+    fun stackedProgressionBonusesMatchExpectedMoneyAndNebulaTotals() {
+        val before = GameState(
+            money = BigNumber(100),
+            nebula = BigNumber(10),
+            prestigeShopPurchases = setOf("talent_reward_1", "talent_master_1"),
+            permanentEventBoosts = 5,
+            activeWorldId = "ember_summit",
+            worldMasteryLevels = mapOf("ember_summit" to 5),
+            equippedRelicIds = setOf("verdant_guardian", "ember_dragon", "nebula_titan"),
+            discoveredSecretIds = setOf("ashen_vault"),
+            homeBaseLevel = 2,
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(
+                moneyEarned = BigNumber(100),
+                nebulaEarned = 5
+            )
+        )
+        val after = before.copy(
+            money = BigNumber(200),
+            statistics = before.statistics.copy(moneyEarned = BigNumber(200))
+        )
+
+        val result = DesktopEconomyTransactions.applyGuessBonuses(
+            before = before,
+            after = after,
+            correct = true,
+            rng = kotlin.random.Random(1234)
+        )
+
+        // 50% talent + 10% event + 10% mastery + 10% relic +
+        // 25% Ember + 25% Nebula Titan + 20% three-relic set +
+        // 4% Home Base + 5% active-world secret = 159% of base earnings.
+        assertEquals(0, result.money.compareTo(BigNumber(359)))
+        assertEquals(0, result.statistics.moneyEarned.compareTo(BigNumber(359)))
+        // Master talent + event tier + Ember relic + active-world secret.
+        assertEquals(BigNumber(14), result.nebula)
+        assertEquals(9L, result.statistics.nebulaEarned)
+    }
+
+    @Test
     fun incorrectGuessDoesNotApplyPostGuessBonuses() {
         val before = GameState(prestigeShopPurchases = setOf("talent_reward_1"))
         val after = before.copy(money = BigNumber(10))
 
         assertEquals(after, DesktopEconomyTransactions.applyGuessBonuses(before, after, correct = false))
+    }
+
+    @Test
+    fun correctGuessRecordsDailyProgressAndCommonChestDrop() {
+        val before = GameState(
+            dailyQuestDate = "2026-10-15",
+            dailyQuestGuesses = 9,
+            dailyQuestCorrectGuesses = 4,
+            dailyQuestBestStreak = 4,
+            dailyQuestUpgradePurchases = 3,
+            claimedDailyQuests = setOf("daily_guesses_10"),
+            lootCommonChests = 2,
+            lootDropsFound = 2
+        )
+        val after = before.copy(money = BigNumber(150), streak = 2)
+
+        val result = DesktopEconomyTransactions.recordGuessProgress(
+            before = before,
+            after = after,
+            correct = true,
+            today = "2026-10-16",
+            lootRoll = 239
+        )
+
+        assertEquals("2026-10-16", result.dailyQuestDate)
+        assertEquals(1, result.dailyQuestGuesses)
+        assertEquals(1, result.dailyQuestCorrectGuesses)
+        assertEquals(2, result.dailyQuestBestStreak)
+        assertEquals(0, result.dailyQuestUpgradePurchases)
+        assertTrue(result.claimedDailyQuests.isEmpty())
+        assertEquals(3, result.lootCommonChests)
+        assertEquals(3L, result.lootDropsFound)
+        assertEquals("common", result.lastLootDropTier)
+        assertEquals(1L, result.lootEventId)
+        assertEquals(BigNumber(150), result.money)
+    }
+
+    @Test
+    fun treasureDropRollBoundariesMatchAndroidRates() {
+        fun roll(value: Int) = DesktopEconomyTransactions.recordGuessProgress(
+            before = GameState(dailyQuestDate = "2026-10-16"),
+            after = GameState(dailyQuestDate = "2026-10-16", streak = 1),
+            correct = true,
+            today = "2026-10-16",
+            lootRoll = value
+        )
+
+        assertEquals(1, roll(9).lootEpicChests)
+        assertEquals(1, roll(10).lootRareChests)
+        assertEquals(1, roll(59).lootRareChests)
+        assertEquals(1, roll(60).lootCommonChests)
+        assertEquals(1, roll(239).lootCommonChests)
+        assertEquals(0L, roll(240).lootDropsFound)
+        assertEquals(0L, roll(999).lootDropsFound)
+    }
+
+    @Test
+    fun incorrectGuessAdvancesDailyGuessCountWithoutDroppingChest() {
+        val before = GameState(dailyQuestDate = "2026-10-16")
+        val result = DesktopEconomyTransactions.recordGuessProgress(
+            before = before,
+            after = before.copy(streak = 0),
+            correct = false,
+            today = "2026-10-16",
+            lootRoll = 0
+        )
+
+        assertEquals(1, result.dailyQuestGuesses)
+        assertEquals(0, result.dailyQuestCorrectGuesses)
+        assertEquals(0L, result.lootDropsFound)
+        assertEquals(0, result.lootEpicChests)
+    }
+
+    @Test
+    fun dailyQuestClaimsAwardExactRewardsAndCannotBeClaimedTwice() {
+        val today = "2026-10-16"
+        var state = GameState(
+            dailyQuestDate = today,
+            dailyQuestGuesses = 10,
+            dailyQuestCorrectGuesses = 5,
+            dailyQuestBestStreak = 5,
+            dailyQuestUpgradePurchases = 3
+        )
+
+        for (questId in listOf("daily_guesses_10", "daily_correct_5", "daily_streak_5", "daily_upgrades_3")) {
+            val claim = DesktopEconomyTransactions.claimDailyQuest(state, questId, today)
+            assertTrue("Expected $questId to be claimable", claim.accepted)
+            state = claim.state
+        }
+
+        assertEquals(BigNumber(10_000), state.money)
+        assertEquals(BigNumber(110), state.nebula)
+        assertEquals(BigNumber(10_000), state.statistics.moneyEarned)
+        assertEquals(110L, state.statistics.nebulaEarned)
+        assertEquals(4, state.claimedDailyQuests.size)
+
+        val duplicate = DesktopEconomyTransactions.claimDailyQuest(state, "daily_guesses_10", today)
+        assertFalse(duplicate.accepted)
+        assertEquals(state, duplicate.state)
+    }
+
+    @Test
+    fun incompleteDailyQuestCannotBeClaimed() {
+        val state = GameState(dailyQuestDate = "2026-10-16", dailyQuestGuesses = 9)
+        val result = DesktopEconomyTransactions.claimDailyQuest(state, "daily_guesses_10", "2026-10-16")
+
+        assertFalse(result.accepted)
+        assertEquals(state, result.state)
+    }
+
+    @Test
+    fun upgradePurchaseRefreshesDailyQuestBeforeCountingPurchase() {
+        val stale = GameState(
+            money = BigNumber(1000),
+            dailyQuestDate = "2026-10-15",
+            dailyQuestUpgradePurchases = 2,
+            claimedDailyQuests = setOf("daily_upgrades_3")
+        )
+
+        val result = DesktopEconomyTransactions.buyUpgrade(stale, rewardUpgrade)
+
+        assertTrue(result.accepted)
+        assertEquals(java.time.LocalDate.now().toString(), result.state.dailyQuestDate)
+        assertEquals(1, result.state.dailyQuestUpgradePurchases)
+        assertTrue(result.state.claimedDailyQuests.isEmpty())
     }
 
     @Test

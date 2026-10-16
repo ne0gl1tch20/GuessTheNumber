@@ -3,6 +3,8 @@
 - 💰 **Desktop economy actions**: Windows now exposes the shared production economy through upgrade purchases, Prestige and Ultra resets, Prestige/Ultra upgrades, Nebula shop purchases and talent unlocks. Transactions validate affordability and prerequisites, preserve permanent progress across resets and save before updating the visible state.
 - 🧪 **Economy parity coverage**: Added tests for exact upgrade costs, insufficient funds, maximum levels, Prestige/Ultra reset requirements and preserved state, duplicate shop purchases, talent prerequisites and bundled catalog loading.
 - 📦 **Shared catalog data**: Bundled the existing Android upgrade and shop definitions with the Windows desktop app so the desktop catalog starts from the same game data.
+- 🎁 **Daily quests and treasure drops**: Windows records daily guess/correct/streak progress, resets stale daily claims on a new day, lets players claim the four Android-matching daily rewards once per day, tracks common/rare/epic chest drops, and shows quest progress and chest counts in the Play screen.
+- 🧮 **Reward parity fixtures**: Added deterministic coverage for stacked talent, event, mastery, relic-set, Home Base and secret bonuses, including Money/Nebula statistics.
 
 ## v3.0.3 (First-Run Tours & Update Reliability)
 
