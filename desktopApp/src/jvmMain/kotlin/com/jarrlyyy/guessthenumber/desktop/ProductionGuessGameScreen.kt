@@ -55,6 +55,9 @@ import kotlin.random.Random
 fun ProductionGuessGameScreen(
     section: DesktopGameSection = DesktopGameSection.PLAY,
     onOpenAbout: () -> Unit = {},
+    onOpenPrestige: () -> Unit = {},
+    onOpenUltra: () -> Unit = {},
+    onOpenTalent: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val engine = remember { GameEngine() }
@@ -443,7 +446,7 @@ fun ProductionGuessGameScreen(
 
                 }
 
-            if (section == DesktopGameSection.MORE) {
+            if (section == DesktopGameSection.PRESTIGE) {
             SectionTitle("Prestige")
                 val prestigeRequirement = engine.calculatePrestigeRequirement(currentState.prestigeCount)
                 val prestigeReward = engine.calculatePrestigeReward(currentState.money, currentState.prestigeCount)
@@ -467,6 +470,9 @@ fun ProductionGuessGameScreen(
                     }
                 }
 
+                }
+
+                if (section == DesktopGameSection.ULTRA) {
                 SectionTitle("Ultra")
                 val ultraRequirement = engine.calculateUltraRequirement(currentState.ultraCount)
                 val ultraReward = engine.calculateUltraReward(currentState.money, currentState.ultraCount)
@@ -516,7 +522,7 @@ fun ProductionGuessGameScreen(
 
                 }
 
-            if (section == DesktopGameSection.MORE) {
+            if (section == DesktopGameSection.TALENT) {
             SectionTitle("Talents")
                 if (talentCatalog == null) {
                     Text("Talent catalog could not be loaded: ${talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"}")
@@ -553,7 +559,10 @@ fun ProductionGuessGameScreen(
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("More", style = MaterialTheme.typography.titleLarge)
-                        Text("Additional destinations are being ported from Android. About and Windows Debug updates are available here.")
+                        Text("Choose a destination.")
+                        Button(onClick = onOpenPrestige) { Text("Prestige") }
+                        Button(onClick = onOpenUltra) { Text("Ultra") }
+                        Button(onClick = onOpenTalent) { Text("Talent Web") }
                         Button(onClick = onOpenAbout) { Text("About and updates") }
                     }
                 }
