@@ -441,6 +441,16 @@ fun ProductionGuessGameScreen(
             }
 
 
+            if (section == DesktopGameSection.HOME_BASE) {
+                DesktopHomeBaseContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onUpgrade = {
+                        commitTransaction { before -> DesktopEconomyTransactions.upgradeHomeBase(before) }
+                    }
+                )
+            }
+
             if (section == DesktopGameSection.RELICS) {
                 DesktopRelicsContent(
                     state = currentState,
