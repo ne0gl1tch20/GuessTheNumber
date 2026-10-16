@@ -500,6 +500,16 @@ fun ProductionGuessGameScreen(
                 )
             }
 
+            if (section == DesktopGameSection.LUCKY_STAKE) {
+                DesktopLuckyStakeContent(
+                    state = currentState,
+                    onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onStakeResult = { stake, payout, won ->
+                        commitTransaction { DesktopEconomyTransactions.settleStake(it, stake, payout, won) }
+                    }
+                )
+            }
+
             if (section == DesktopGameSection.ENDGAME) {
                 DesktopEndgameContent(
                     state = currentState,
