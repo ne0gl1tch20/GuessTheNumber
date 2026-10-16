@@ -163,6 +163,45 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
+    fun stackedProgressionBonusesMatchExpectedMoneyAndNebulaTotals() {
+        val before = GameState(
+            money = BigNumber(100),
+            nebula = BigNumber(10),
+            prestigeShopPurchases = setOf("talent_reward_1", "talent_master_1"),
+            permanentEventBoosts = 5,
+            activeWorldId = "ember_summit",
+            worldMasteryLevels = mapOf("ember_summit" to 5),
+            equippedRelicIds = setOf("verdant_guardian", "ember_dragon", "nebula_titan"),
+            discoveredSecretIds = setOf("ashen_vault"),
+            homeBaseLevel = 2,
+            statistics = com.jarrlyyy.guessthenumber.domain.model.GameStatistics(
+                moneyEarned = BigNumber(100),
+                nebulaEarned = 5
+            )
+        )
+        val after = before.copy(
+            money = BigNumber(200),
+            statistics = before.statistics.copy(moneyEarned = BigNumber(200))
+        )
+
+        val result = DesktopEconomyTransactions.applyGuessBonuses(
+            before = before,
+            after = after,
+            correct = true,
+            rng = kotlin.random.Random(1234)
+        )
+
+        // 50% talent + 10% event + 10% mastery + 10% relic +
+        // 25% Ember + 25% Nebula Titan + 20% three-relic set +
+        // 4% Home Base + 5% active-world secret = 159% of base earnings.
+        assertEquals(0, result.money.compareTo(BigNumber(359)))
+        assertEquals(0, result.statistics.moneyEarned.compareTo(BigNumber(359)))
+        // Master talent + event tier + Ember relic + active-world secret.
+        assertEquals(BigNumber(14), result.nebula)
+        assertEquals(9L, result.statistics.nebulaEarned)
+    }
+
+    @Test
     fun incorrectGuessDoesNotApplyPostGuessBonuses() {
         val before = GameState(prestigeShopPurchases = setOf("talent_reward_1"))
         val after = before.copy(money = BigNumber(10))
