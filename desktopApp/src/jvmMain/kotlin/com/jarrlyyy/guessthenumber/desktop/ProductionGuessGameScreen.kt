@@ -110,6 +110,7 @@ fun ProductionGuessGameScreen(
     var activeSaveSlot by remember { mutableStateOf(1) }
     var saveSlotSummaries by remember { mutableStateOf<List<DesktopSaveSlotSummary>>(emptyList()) }
     var guessText by remember { mutableStateOf("") }
+    var lastGuessTimestampNanos by remember { mutableStateOf(0L) }
     var selectedShopCategory by remember { mutableStateOf("all") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
     var feedbackStatus by remember { mutableStateOf(GuessGameStatus.READY) }
@@ -516,7 +517,11 @@ fun ProductionGuessGameScreen(
                     } else if (guess !in currentState.currentRangeMin..currentState.currentRangeMax) {
                         feedbackStatus = GuessGameStatus.INVALID_INPUT
                         feedback = "Choose a number within the displayed range."
+                    } else if (!isSaving && lastGuessTimestampNanos != 0L && System.nanoTime() - lastGuessTimestampNanos < 50_000_000L) {
+                        feedbackStatus = GuessGameStatus.READY
+                        feedback = "Please wait a moment before guessing again."
                     } else if (!isSaving) {
+                        lastGuessTimestampNanos = System.nanoTime()
                         isSaving = true
                         val result = engine.processGuess(currentState, guess)
                         val correct = result.feedback == GuessFeedback.CORRECT
