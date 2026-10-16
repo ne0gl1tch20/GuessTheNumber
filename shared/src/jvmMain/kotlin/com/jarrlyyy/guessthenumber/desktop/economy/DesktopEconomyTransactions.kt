@@ -292,6 +292,31 @@ object DesktopEconomyTransactions {
         val requirement: String
     )
 
+    fun setMutatorActive(
+        state: GameState,
+        mutatorId: String,
+        active: Boolean,
+        engine: GameEngine,
+        rng: Random = Random.Default
+    ): EconomyTransaction {
+        if (mutatorId !in setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")) {
+            return rejected(state, "Unknown mutator.")
+        }
+        if ((mutatorId in state.activeMutators) == active) {
+            return rejected(state, if (active) "Mutator is already active." else "Mutator is already inactive.")
+        }
+        val selected = state.activeMutators.toMutableSet().apply {
+            if (active) add(mutatorId) else remove(mutatorId)
+        }.toSet()
+        val updated = engine.applyMutatorSet(state, selected)
+        val rangeMax = engine.getRangeMax(updated).coerceAtLeast(1L)
+        val target = rng.nextLong(1L, rangeMax + 1L)
+        return accepted(
+            updated.copy(currentRangeMin = 1L, currentRangeMax = rangeMax, targetNumber = target),
+            if (active) "Enabled $mutatorId." else "Disabled $mutatorId."
+        )
+    }
+
     fun setAutoClickerActive(state: GameState, active: Boolean): EconomyTransaction {
         if ("auto_clicker_basic" !in state.shopPurchases) {
             return rejected(state, "Purchase the Auto Clicker first.")
