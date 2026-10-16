@@ -1,3 +1,7 @@
+## Unreleased (Windows exact-port UI parity)
+
+- 🎯 **Shared guess feedback presentation**: Windows Play now uses the same shared status-colored feedback card as Android, including matching ready/invalid, too-low, too-high and correct states. Blind-mutator guesses keep direction hints hidden, and the card respects the saved reduced-motion setting.
+
 ## Unreleased (Windows Stage 2 Economy Parity)
 
 - 💰 **Desktop economy actions**: Windows now exposes the shared production economy through upgrade purchases, Prestige and Ultra resets, Prestige/Ultra upgrades, Nebula shop purchases and talent unlocks. Transactions validate affordability and prerequisites, preserve permanent progress across resets and save before updating the visible state.
