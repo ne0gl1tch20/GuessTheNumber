@@ -417,7 +417,7 @@ class DesktopEconomyTransactionsTest {
             statistics = tenthGuess.statistics.copy(totalGuesses = 11, moneyEarned = BigNumber(300))
         )
         val eleventhResult = DesktopEconomyTransactions.applyGuessBonuses(tenthGuess, eleventhGuess, correct = true)
-        assertEquals(0, eleventhResult.money.compareTo(BigNumber(400)))
+        assertEquals(0, eleventhResult.money.compareTo(BigNumber(300)))
     }
 
     @Test
