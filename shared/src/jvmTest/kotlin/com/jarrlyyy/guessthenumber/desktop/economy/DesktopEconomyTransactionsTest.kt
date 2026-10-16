@@ -4,6 +4,11 @@ import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -470,6 +475,33 @@ class DesktopEconomyTransactionsTest {
         val selected = DesktopEconomyTransactions.selectWorld(state, "verdant_grove")
         assertTrue(selected.accepted)
         assertEquals("verdant_grove", selected.state.activeWorldId)
+    }
+
+    @Test
+    fun everyBundledTalentDefinitionCanBePurchasedAtItsCanonicalCostAndParent() {
+        val stream = javaClass.classLoader.getResourceAsStream("game/talents.json")
+            ?: error("Missing canonical talent test resource")
+        val entries = stream.bufferedReader(Charsets.UTF_8).use {
+            Json.parseToJsonElement(it.readText()).jsonObject["talents"]!!.jsonArray
+        }
+        var owned = emptySet<String>()
+        entries.forEach { entry ->
+            val talent = entry.jsonObject
+            val id = talent["id"]!!.jsonPrimitive.content
+            val cost = talent["cost"]!!.jsonPrimitive.content.toLong()
+            val parentElement = talent["requiredParentId"]!!
+            val parentId = if (parentElement == JsonNull) null else parentElement.jsonPrimitive.content
+            val initial = GameState(
+                prestige = BigNumber(1_000_000),
+                prestigeShopPurchases = owned
+            )
+            val result = DesktopEconomyTransactions.buyTalent(initial, id, cost, parentId)
+            assertTrue("$id should match the bundled canonical talent catalog", result.accepted)
+            assertEquals(0, result.state.prestige.compareTo(BigNumber(1_000_000 - cost)))
+            assertTrue(id in result.state.prestigeShopPurchases)
+            owned = result.state.prestigeShopPurchases
+        }
+        assertTrue("The canonical talent catalog must not be empty", owned.isNotEmpty())
     }
 
     @Test
