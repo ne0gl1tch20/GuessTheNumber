@@ -88,7 +88,7 @@ private fun DesktopNavigationButtons(
     onNavigate: (DesktopDestination) -> Unit
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        DesktopDestination.entries.forEach { destination ->
+        DesktopDestination.entries.filter { it != DesktopDestination.ABOUT }.forEach { destination ->
             var isFocused by remember(destination) { mutableStateOf(false) }
             val focusModifier = Modifier
                 .onFocusChanged { isFocused = it.isFocused }
@@ -217,7 +217,24 @@ fun main() = application {
                     }
 
                     when (shellState.destination) {
-                        DesktopDestination.PLAY -> {
+                        DesktopDestination.PLAY,
+                        DesktopDestination.UPGRADES,
+                        DesktopDestination.SHOP,
+                        DesktopDestination.MORE -> {
+                            Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                ProductionGuessGameScreen(
+                                    section = when (shellState.destination) {
+                                        DesktopDestination.UPGRADES -> DesktopGameSection.UPGRADES
+                                        DesktopDestination.SHOP -> DesktopGameSection.SHOP
+                                        DesktopDestination.MORE -> DesktopGameSection.MORE
+                                        else -> DesktopGameSection.PLAY
+                                    },
+                                    onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) }
+                                )
+                            }
+                        }
+
+                        DesktopDestination.ABOUT -> {
                             Card(modifier = Modifier.fillMaxWidth()) {
                                 Column(
                                     modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -279,14 +296,7 @@ fun main() = application {
                                     )
                                 }
                             }
-                            Column(
-                                modifier = Modifier.weight(1f).fillMaxWidth()
-                            ) {
-                                ProductionGuessGameScreen()
-                            }
-                        }
 
-                        DesktopDestination.ABOUT -> {
                             Card(modifier = Modifier.fillMaxWidth()) {
                                 Column(
                                     modifier = Modifier.fillMaxWidth().padding(24.dp),
