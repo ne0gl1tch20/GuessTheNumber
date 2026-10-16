@@ -21,7 +21,7 @@ Android's `NavGraph.kt` declares four primary bottom-navigation destinations in 
 | Android destination / route | Android source | Windows status after this batch |
 | --- | --- | --- |
 | Play | `ui/screens/PlayScreen.kt` | Production guess loop and currently implemented quest, achievement and world controls remain on Play. Exact layout and all Android interactions still need comparison. |
-| Upgrades | `ui/screens/UpgradeScreen.kt` | Regular Money upgrade purchases are isolated under Upgrades. Android balance header, cards, animations and all details are not yet visually matched. |
+| Upgrades | `ui/screens/UpgradeScreen.kt` | First visual-parity pass added the Money balance header, multiplier dropdown, matching upgrade-card hierarchy, level badge, batch cost and purchase highlight. Runtime screenshot comparison and full interaction review remain pending. |
 | Shop | `ui/screens/ShopScreen.kt` | Existing Nebula purchases are isolated under Shop. Android category filters, cosmetic equip flow and card presentation still need porting. |
 | More | `ui/screens/MoreScreen.kt` | Entry point exists. Prestige, Ultra and Talent are separate desktop subroutes reached from More. The reorderable, feature-flagged, locked Android menu is not yet ported. |
 | Prestige | `ui/screens/PrestigeScreen.kt` | Current purchase/reset controls exist under More; dedicated Android screen layout and interactions need review. |

@@ -2,6 +2,8 @@
 
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
+
+**Latest increment:** Windows Upgrades screen first-pass UI port is proposed in PR #211; runtime screenshot parity remains unverified.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
