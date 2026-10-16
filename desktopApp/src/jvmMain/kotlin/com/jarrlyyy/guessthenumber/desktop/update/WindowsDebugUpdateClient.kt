@@ -13,12 +13,13 @@ internal data class WindowsDebugUpdate(
     val version: String,
     val tagName: String,
     val downloadUrl: String,
-    val sha256: String
+    val runNumber: Long,
+    val runAttempt: Long
 )
 
 /**
- * Discovers public Windows Debug prereleases. It deliberately uses GitHub's public
- * Releases API rather than private Actions artifact endpoints, so the app needs no token.
+ * Finds the newest successful Windows Desktop CI artifact from pushes to master.
+ * Actions artifacts are public but short-lived, so the app never needs a GitHub token.
  */
 internal class WindowsDebugUpdateClient(
     private val connectionFactory: (URL) -> HttpURLConnection = {
@@ -26,47 +27,43 @@ internal class WindowsDebugUpdateClient(
     }
 ) {
     fun findLatestUpdate(installedVersion: String): WindowsDebugUpdate? {
-        val releases = getJson(URL(RELEASES_API)).jsonArray
-        val latest = releases
-            .mapNotNull { it as? JsonObject }
-            .filter { it["prerelease"]?.jsonPrimitive?.content == "true" }
-            .mapNotNull { release ->
-                val tag = release["tag_name"]?.jsonPrimitive?.content ?: return@mapNotNull null
-                val order = debugTagOrder(tag) ?: return@mapNotNull null
-                Triple(release, tag, order)
-            }
-            .maxByOrNull { it.third }
+        val runs = getJson(URL(WORKFLOW_RUNS_API)).jsonObject["workflow_runs"]?.jsonArray
             ?: return null
 
-        val assets = latest.first.assets()
-        val manifestAsset = assets.mapNotNull { it as? JsonObject }.firstOrNull {
-            it["name"]?.jsonPrimitive?.content == MANIFEST_ASSET
-        } ?: return null
-        val manifestUrl = manifestAsset["browser_download_url"]?.jsonPrimitive?.content ?: return null
-        val manifest = getJson(URL(manifestUrl)).jsonObject
-        val version = manifest["version"]?.jsonPrimitive?.content ?: return null
-        val assetName = manifest["assetName"]?.jsonPrimitive?.content ?: return null
-        val checksum = manifest["sha256"]?.jsonPrimitive?.content?.lowercase() ?: return null
-        if (!CHECKSUM_REGEX.matches(checksum)) return null
-        if (manifest["channel"]?.jsonPrimitive?.content != "windows-debug") return null
-        if (manifest["tag"]?.jsonPrimitive?.content != latest.second) return null
-        if (compareVersions(version, installedVersion) <= 0) return null
+        for (runValue in runs) {
+            val run = runValue as? JsonObject ?: continue
+            if (run["event"]?.jsonPrimitive?.content != "push") continue
+            if (run["head_branch"]?.jsonPrimitive?.content != "master") continue
+            if (run["conclusion"]?.jsonPrimitive?.content != "success") continue
 
-        val installerAsset = assets.mapNotNull { it as? JsonObject }.firstOrNull {
-            it["name"]?.jsonPrimitive?.content == assetName
-        } ?: return null
-        val downloadUrl = installerAsset["browser_download_url"]?.jsonPrimitive?.content ?: return null
-        if (!downloadUrl.startsWith("https://github.com/")) return null
+            val runId = run["id"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
+            val runNumber = run["run_number"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
+            val runAttempt = run["run_attempt"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
+            val version = "1.0.$runNumber"
+            if (compareVersions(version, installedVersion) <= 0) return null
 
-        return WindowsDebugUpdate(
-            version = version,
-            tagName = latest.second,
-            downloadUrl = downloadUrl,
-            sha256 = checksum
-        )
+            val artifactsUrl = URL("$ACTIONS_API/runs/$runId/artifacts?per_page=100")
+            val artifacts = getJson(artifactsUrl).jsonObject["artifacts"]?.jsonArray
+                ?: continue
+            val artifact = artifacts.mapNotNull { it as? JsonObject }.firstOrNull {
+                it["name"]?.jsonPrimitive?.content == DEBUG_ARTIFACT_NAME &&
+                    it["expired"]?.jsonPrimitive?.content == "false"
+            } ?: continue
+            val downloadUrl = artifact["archive_download_url"]?.jsonPrimitive?.content ?: continue
+            if (!downloadUrl.startsWith(ARTIFACT_DOWNLOAD_PREFIX) || !downloadUrl.endsWith("/zip")) {
+                continue
+            }
+
+            return WindowsDebugUpdate(
+                version = version,
+                tagName = "windows-debug-$runNumber-$runAttempt",
+                downloadUrl = downloadUrl,
+                runNumber = runNumber,
+                runAttempt = runAttempt
+            )
+        }
+        return null
     }
-
-    private fun JsonObject.assets(): JsonArray = this["assets"]?.jsonArray ?: JsonArray(emptyList())
 
     private fun getJson(url: URL) = connectionFactory(url).run {
         requestMethod = "GET"
@@ -88,13 +85,6 @@ internal class WindowsDebugUpdateClient(
         }
     }
 
-    private fun debugTagOrder(tag: String): Long? {
-        val match = DEBUG_TAG_REGEX.matchEntire(tag) ?: return null
-        val run = match.groupValues[1].toLongOrNull() ?: return null
-        val attempt = match.groupValues[2].toLongOrNull() ?: return null
-        return run * 1_000_000L + attempt
-    }
-
     private fun compareVersions(left: String, right: String): Int {
         val leftParts = left.split('.').map { it.toIntOrNull() ?: return left.compareTo(right) }
         val rightParts = right.split('.').map { it.toIntOrNull() ?: return left.compareTo(right) }
@@ -107,11 +97,13 @@ internal class WindowsDebugUpdateClient(
     }
 
     private companion object {
-        const val RELEASES_API =
-            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/releases?per_page=100"
-        const val MANIFEST_ASSET = "windows-debug-manifest.json"
+        const val ACTIONS_API =
+            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions"
+        const val WORKFLOW_RUNS_API =
+            "$ACTIONS_API/workflows/windows-desktop.yml/runs?branch=master&status=success&per_page=20"
+        const val DEBUG_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug"
+        const val ARTIFACT_DOWNLOAD_PREFIX =
+            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/"
         const val MAX_RESPONSE_CHARS = 1_000_000
-        val DEBUG_TAG_REGEX = Regex("windows-debug-(\\d+)-(\\d+)")
-        val CHECKSUM_REGEX = Regex("[0-9a-f]{64}")
     }
 }
