@@ -11,9 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -465,12 +462,7 @@ fun ProductionGuessGameScreen(
                                 Text("$moneyText Money", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
                             }
                         }
-                        Icon(
-                            imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(32.dp)
-                        )
+                        Text("🛒", style = MaterialTheme.typography.headlineMedium)
                     }
                 }
 
@@ -490,7 +482,7 @@ fun ProductionGuessGameScreen(
                         ) {
                             Text("${currentState.buyMultiplier}x", style = MaterialTheme.typography.labelLarge)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Choose buy multiplier")
+                            Text("▾", style = MaterialTheme.typography.titleMedium)
                         }
                         DropdownMenu(
                             expanded = multiplierMenuExpanded,
@@ -530,7 +522,8 @@ fun ProductionGuessGameScreen(
                             cost = cost,
                             canAfford = currentState.money >= cost,
                             isSaving = isSaving,
-                            reducedMotion = currentState.settings.reducedMotion
+                            reducedMotion = currentState.settings.reducedMotion,
+                            multiplier = currentState.buyMultiplier
                         ) {
                             commitTransaction { DesktopEconomyTransactions.buyUpgrade(it, upgrade) }
                         }
@@ -712,6 +705,7 @@ private fun DesktopUpgradeParityCard(
     canAfford: Boolean,
     isSaving: Boolean,
     reducedMotion: Boolean,
+    multiplier: String,
     onBuy: () -> Unit
 ) {
     var previousLevel by remember(upgrade.id) { mutableStateOf(level) }
@@ -767,7 +761,7 @@ private fun DesktopUpgradeParityCard(
                 if (!isMaxed) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        "Cost: ${cost.format()} Money",
+                        "Cost (${multiplier}x): ${cost.format()} Money",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
