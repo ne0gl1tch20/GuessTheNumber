@@ -52,18 +52,20 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 
 private data class DesktopTalentNodePosition(
     val id: String,
+    val title: String,
+    val description: String,
     val x: Float,
     val y: Float,
     val parentId: String? = null
 )
 
 private val desktopTalentNodePositions = listOf(
-    DesktopTalentNodePosition("talent_speed_1", .5f, .12f),
-    DesktopTalentNodePosition("talent_crit_1", .2f, .32f),
-    DesktopTalentNodePosition("talent_speed_2", .8f, .32f, "talent_speed_1"),
-    DesktopTalentNodePosition("talent_crit_2", .2f, .55f, "talent_crit_1"),
-    DesktopTalentNodePosition("talent_reward_1", .5f, .72f, "talent_crit_2"),
-    DesktopTalentNodePosition("talent_master_1", .8f, .88f, "talent_reward_1")
+    DesktopTalentNodePosition("talent_speed_1", "Velocity I", "Increase automation speed.", .5f, .12f),
+    DesktopTalentNodePosition("talent_crit_1", "Precision I", "Improve the rewards of accurate play.", .2f, .32f),
+    DesktopTalentNodePosition("talent_speed_2", "Velocity II", "Push automation further.", .8f, .32f, "talent_speed_1"),
+    DesktopTalentNodePosition("talent_crit_2", "Precision II", "Build on your precision training.", .2f, .55f, "talent_crit_1"),
+    DesktopTalentNodePosition("talent_reward_1", "Nebula Resonance", "Increase earnings across your run.", .5f, .72f, "talent_crit_2"),
+    DesktopTalentNodePosition("talent_master_1", "Cosmic Oracle", "Unlock the final branch of the talent web.", .8f, .88f, "talent_reward_1")
 )
 
 /** Windows counterpart of Android's connected, selectable Prestige Talent Web. */
@@ -85,6 +87,8 @@ internal fun DesktopTalentWebContent(
     val parentOwned = selectedPosition?.parentId?.let { it in state.prestigeShopPurchases } ?: true
     val affordable = selected != null && state.prestige >= BigNumber(selected.cost)
 
+    val unlockedBranchColor = MaterialTheme.colorScheme.primary
+    val lockedBranchColor = MaterialTheme.colorScheme.outlineVariant
     Column(
         modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -134,7 +138,7 @@ internal fun DesktopTalentWebContent(
                         val bothOwned = node.id in state.prestigeShopPurchases &&
                             parent.id in state.prestigeShopPurchases
                         drawLine(
-                            color = if (bothOwned) androidx.compose.ui.graphics.Color(0xFF4F9D69) else androidx.compose.ui.graphics.Color(0xFF9AA0A6),
+                            color = if (bothOwned) unlockedBranchColor else lockedBranchColor,
                             start = androidx.compose.ui.geometry.Offset(size.width * parent.x, size.height * parent.y),
                             end = androidx.compose.ui.geometry.Offset(size.width * node.x, size.height * node.y),
                             strokeWidth = 7f,
@@ -172,7 +176,7 @@ internal fun DesktopTalentWebContent(
                                 contentDescription = null,
                                 tint = if (owned) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
                             )
-                            Text(talent.name, style = MaterialTheme.typography.labelMedium, maxLines = 2)
+                            Text(node.title, style = MaterialTheme.typography.labelMedium, maxLines = 2)
                             Text("${talent.cost} Prestige", style = MaterialTheme.typography.labelSmall)
                         }
                     }
@@ -186,8 +190,8 @@ internal fun DesktopTalentWebContent(
                     modifier = Modifier.fillMaxWidth().padding(14.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Text(selected.name, style = MaterialTheme.typography.titleLarge)
-                    Text(selected.description, style = MaterialTheme.typography.bodyMedium)
+                    Text(selectedPosition?.title ?: selected.name, style = MaterialTheme.typography.titleLarge)
+                    Text(selectedPosition?.description ?: selected.description, style = MaterialTheme.typography.bodyMedium)
                     if (!parentOwned) {
                         Text("Unlock the connected parent node first.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                     }
