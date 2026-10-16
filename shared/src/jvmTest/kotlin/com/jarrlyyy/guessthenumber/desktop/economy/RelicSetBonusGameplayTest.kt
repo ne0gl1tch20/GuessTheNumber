@@ -48,7 +48,7 @@ class RelicSetBonusGameplayTest {
         // Individual relic effects add 10% + 25% + 25%, plus the 35% set bonus.
         assertEquals(0, result.money.compareTo(BigNumber(295)))
         // Android also grants +1 Nebula from Ember Dragon, in addition to the full-set +1.
-        assertEquals(BigNumber(2), result.nebula)
+        assertEquals(0, result.nebula.compareTo(BigNumber(2)))
     }
 
     @Test
