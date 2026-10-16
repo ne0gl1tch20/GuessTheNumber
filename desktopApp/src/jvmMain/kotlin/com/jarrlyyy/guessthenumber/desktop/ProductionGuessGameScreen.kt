@@ -285,20 +285,16 @@ fun ProductionGuessGameScreen(
                         }
                     }
             }
-            OutlinedTextField(
+            com.jarrlyyy.guessthenumber.shared.ui.SharedGuessInputField(
                 value = guessText,
                 onValueChange = { input -> guessText = input.filter(Char::isDigit).take(18) },
-                modifier = Modifier.fillMaxWidth().onPreviewKeyEvent { event ->
-                    if (event.key == Key.Enter && event.type == KeyEventType.KeyUp) {
-                        submitGuess()
-                        true
-                    } else {
-                        false
-                    }
-                },
-                label = { Text("Your guess") },
-                singleLine = true,
-                enabled = !isSaving
+                onSubmit = { submitGuess() },
+                minNumber = currentState.currentRangeMin,
+                maxNumber = currentState.currentRangeMax,
+                modifier = Modifier.fillMaxWidth(),
+                label = "Your guess",
+                enabled = !isSaving,
+                submitOnEnter = true
             )
             Button(
                 onClick = { submitGuess() },
@@ -456,7 +452,9 @@ fun ProductionGuessGameScreen(
                     enabled = !isSaving && currentState.money >= prestigeRequirement && prestigeReward > BigNumber.ZERO
                 ) { Text("Prestige reset") }
 
-                catalog.prestigeUpgrades.forEach { upgrade ->
+                if (catalog == null) {
+                    Text("Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}")
+                } else catalog.prestigeUpgrades.forEach { upgrade ->
                     val level = currentState.prestigeUpgradeLevels[upgrade.id] ?: 0
                     val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, level, currentState.buyMultiplier, currentState.prestige)
                     EconomyActionCard(
@@ -483,7 +481,9 @@ fun ProductionGuessGameScreen(
                         currentState.prestige >= BigNumber(1_000) && ultraReward > BigNumber.ZERO
                 ) { Text("Ultra reset") }
 
-                catalog.ultraUpgrades.forEach { upgrade ->
+                if (catalog == null) {
+                    Text("Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}")
+                } else catalog.ultraUpgrades.forEach { upgrade ->
                     val level = currentState.ultraUpgradeLevels[upgrade.id] ?: 0
                     val cost = DesktopEconomyTransactions.upgradeBatchCost(upgrade, level, currentState.buyMultiplier, currentState.ultra)
                     EconomyActionCard(
@@ -501,7 +501,9 @@ fun ProductionGuessGameScreen(
 
             if (section == DesktopGameSection.SHOP) {
             SectionTitle("Nebula shop")
-                catalog.shopItems.forEach { item ->
+                if (catalog == null) {
+                    Text("Economy catalog could not be loaded: ${catalogResult.exceptionOrNull()?.message ?: "unknown error"}")
+                } else catalog.shopItems.forEach { item ->
                     val purchased = item.id in currentState.shopPurchases
                     val supported = item.id in setOf("auto_clicker_basic", "nebula_boost", "golden_guess") ||
                         (item.isCosmetic && item.id.startsWith("cosmetic_"))
