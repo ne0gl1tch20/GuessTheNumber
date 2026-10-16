@@ -61,3 +61,8 @@ Adds explicit navigation to the remaining Android screen families and per-screen
 - [x] PR #217 merged: rejects unknown, discounted, negative-cost and prerequisite-mismatched talent transactions. Android Validation and Windows Desktop CI passed on that PR's exact head.
 - [ ] PR #218 open: replaces the duplicated talent-rule map with catalog-driven validation and a test that iterates the bundled talent definitions. Check results must be confirmed for PR #218's exact head before merge.
 - [ ] Manual Windows runtime verification remains open for talent effects, screenshot comparisons, localization, responsive/high-DPI behavior and the remaining Stage 2 flows.
+
+
+### Talent Web source-of-truth follow-up (2026-10-16)
+
+PR #218 makes the Windows Talent Web's prerequisite/parent gating and transaction validation read the bundled talent catalog instead of maintaining separate prerequisite maps. The shared JVM resource was copied from the Android asset, and the desktop resource was confirmed byte-for-byte identical to that Android asset. The desktop tree still uses fallback English display copy aligned with the Android screen's fallback strings; locale-aware Windows rendering and actual Windows interaction/effect checks remain unverified. PR #218 CI must pass on its latest head before merge.
