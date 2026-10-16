@@ -14,6 +14,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -208,16 +213,7 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            OutlinedTextField(
-                value = guessText,
-                onValueChange = { input -> guessText = input.filter(Char::isDigit).take(18) },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Your guess") },
-                singleLine = true,
-                enabled = !isSaving
-            )
-            Button(
-                onClick = {
+            val submitGuess = {
                     val guess = guessText.toLongOrNull()
                     if (guess == null) {
                         feedback = "Enter a whole number first."
@@ -263,7 +259,24 @@ fun ProductionGuessGameScreen(modifier: Modifier = Modifier) {
                             isSaving = false
                         }
                     }
+            }
+            OutlinedTextField(
+                value = guessText,
+                onValueChange = { input -> guessText = input.filter(Char::isDigit).take(18) },
+                modifier = Modifier.fillMaxWidth().onPreviewKeyEvent { event ->
+                    if (event.key == Key.Enter && event.type == KeyEventType.KeyUp) {
+                        submitGuess()
+                        true
+                    } else {
+                        false
+                    }
                 },
+                label = { Text("Your guess") },
+                singleLine = true,
+                enabled = !isSaving
+            )
+            Button(
+                onClick = { submitGuess() },
                 enabled = guessText.isNotBlank() && !isSaving
             ) {
                 Text(if (isSaving) "Saving…" else "Submit guess")
