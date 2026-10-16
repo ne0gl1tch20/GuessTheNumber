@@ -48,7 +48,25 @@ enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     ULTRA("Ultra", null),
     TALENT("Talent Web", null),
     STATS("Statistics", null),
-    SETTINGS("Settings & Save Management", null);
+    SETTINGS("Settings & Save Management", null),
+    ACHIEVEMENTS("Achievements", null),
+    WORLD_MAP("World Map", null),
+    MUTATORS("Mutators", null),
+    SAVE_SLOTS("Save Slots", null),
+    RELICS("Relics", null),
+    HOME_BASE("Home Base", null),
+    CODEX("Codex", null),
+    ENDGAME("Endgame", null),
+    LUCKY_STAKE("Lucky Stake", null),
+    DEVELOPER_SETTINGS("Developer Settings", null),
+    DEVELOPER_CONSOLE("Developer Console", null),
+    PROCESS_INSPECTOR("Process Inspector", null),
+    MUSIC_PLAYER("Music Player", null),
+    ARCADE("Arcade", null),
+    ACTIVITY_HUB("Activity Hub", null),
+    LUA_TESTING_HUB("Lua Testing Hub", null),
+    CHANGELOG("Changelog", null),
+    LIVE_OPS("Live Ops", null);
 
     companion object {
         fun fromShortcut(key: Key, ctrlPressed: Boolean): DesktopDestination? {
