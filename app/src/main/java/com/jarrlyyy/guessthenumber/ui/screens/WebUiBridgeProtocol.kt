@@ -71,3 +71,26 @@ internal object WebUiBridgeProtocol {
         }
     }
 }
+
+
+/**
+ * Bounded per-page replay guard. IDs are recorded before dispatch so a repeated
+ * request cannot apply a gameplay action twice while the page is alive.
+ */
+internal class WebUiRequestIdWindow(private val capacity: Int = 128) {
+    private val seen = LinkedHashSet<String>()
+
+    init {
+        require(capacity > 0) { "capacity must be positive" }
+    }
+
+    fun markIfNew(id: String): Boolean {
+        if (!seen.add(id)) return false
+        if (seen.size > capacity) {
+            val oldest = seen.iterator()
+            oldest.next()
+            oldest.remove()
+        }
+        return true
+    }
+}
