@@ -118,6 +118,8 @@ fun ProductionGuessGameScreen(
     var feedback by remember { mutableStateOf("Loading your saved game…") }
     var feedbackStatus by remember { mutableStateOf(GuessGameStatus.READY) }
     var isSaving by remember { mutableStateOf(false) }
+    var webLastGuessStatus by remember { mutableStateOf<String?>(null) }
+    val webRequestIds = remember { LinkedHashSet<String>() }
     var autoClickerFailurePaused by remember { mutableStateOf(false) }
     var pendingReset by remember { mutableStateOf<String?>(null) }
     var settingsSaveJob by remember { mutableStateOf<Job?>(null) }
@@ -324,6 +326,149 @@ fun ProductionGuessGameScreen(
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) }
                 )
             }
+            return@Card
+        }
+
+        if (section == DesktopGameSection.PLAY ||
+            section == DesktopGameSection.UPGRADES ||
+            section == DesktopGameSection.SHOP
+        ) {
+            DesktopSharedWebView(
+                onRequest = { raw, reply ->
+                    scope.launch {
+                        val request = runCatching { org.json.JSONObject(raw) }.getOrNull()
+                        val requestId = request?.optString("id", "").orEmpty()
+                        fun sendError(code: String) {
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "error").put("error", code).toString())
+                        }
+                        if (request == null || raw.length > 512 ||
+                            request.optInt("version", -1) != 1 ||
+                            !requestId.matches(Regex("[A-Za-z0-9_-]{1,48}")) ||
+                            request.opt("type") !is String
+                        ) {
+                            sendError("invalid_request")
+                            return@launch
+                        }
+                        if (!webRequestIds.add(requestId)) {
+                            sendError("duplicate_request")
+                            return@launch
+                        }
+                        if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
+                        val type = request.getString("type")
+                        val expectedKeys = when (type) {
+                            "read_state" -> 3
+                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic" -> 4
+                            else -> -1
+                        }
+                        if (expectedKeys < 0 || request.length() != expectedKeys) {
+                            sendError("unknown_action")
+                            return@launch
+                        }
+                        var accepted = true
+                        var message = ""
+                        var nextState = state
+                        var guessStatus = webLastGuessStatus
+                        if (type == "submit_guess") {
+                            val guess = request.optString("guess", "").takeIf { it.matches(Regex("-?[0-9]{1,19}")) }?.toLongOrNull()
+                            val before = state
+                            if (guess == null || before == null || guess !in before.currentRangeMin..before.currentRangeMax) {
+                                accepted = false
+                                message = "Enter a whole number inside the displayed range."
+                            } else if (isSaving) {
+                                accepted = false
+                                message = "Please wait for the current save to finish."
+                            } else {
+                                isSaving = true
+                                val result = engine.processGuess(before, guess)
+                                val correct = result.feedback == GuessFeedback.CORRECT
+                                val bonusAdjusted = DesktopEconomyTransactions.applyGuessBonuses(before, result.newState, correct)
+                                val progressed = DesktopEconomyTransactions.recordGuessProgress(
+                                    before = before,
+                                    after = bonusAdjusted,
+                                    correct = correct,
+                                    today = LocalDate.now().toString(),
+                                    lootRoll = if (correct) Random.nextInt(1000) else null
+                                )
+                                val finalState = DesktopEconomyTransactions.evaluateAchievements(
+                                    DesktopEconomyTransactions.recordBossGuess(progressed, correct)
+                                )
+                                val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
+                                if (saved) {
+                                    state = finalState
+                                    nextState = finalState
+                                    guessStatus = result.feedback.name
+                                    webLastGuessStatus = guessStatus
+                                    autoClicker.observeGuess(guess, result.feedback)
+                                    if (correct) autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+                                    message = when (result.feedback) {
+                                        GuessFeedback.TOO_LOW -> "Too low. Try again!"
+                                        GuessFeedback.TOO_HIGH -> "Too high. Try again!"
+                                        GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - before.money} Money."
+                                    }
+                                } else {
+                                    accepted = false
+                                    message = "Could not save that guess. Your previous save is intact."
+                                }
+                                isSaving = false
+                            }
+                        } else if (type != "read_state") {
+                            val before = state
+                            if (before == null || isSaving || catalog == null) {
+                                accepted = false
+                                message = "The game is still loading or saving."
+                            } else {
+                                val transaction = when (type) {
+                                    "update_multiplier" -> DesktopEconomyTransactions.setBuyMultiplier(before, request.optString("multiplier"))
+                                    "buy_upgrade" -> {
+                                        val id = request.optString("upgradeId")
+                                        val upgrade = catalog.upgrades.firstOrNull { it.id == id }
+                                        if (upgrade == null) null else DesktopEconomyTransactions.buyUpgrade(before, upgrade)
+                                    }
+                                    "buy_shop_item" -> {
+                                        val id = request.optString("itemId")
+                                        val item = catalog.shopItems.firstOrNull { it.id == id }
+                                        if (item == null) null else DesktopEconomyTransactions.buyShopItem(before, item)
+                                    }
+                                    "equip_cosmetic" -> {
+                                        val id = request.optString("itemId")
+                                        if (catalog.shopItems.none { it.id == id && it.isCosmetic }) null
+                                        else DesktopEconomyTransactions.equipCosmetic(before, id)
+                                    }
+                                    else -> null
+                                }
+                                if (transaction == null) {
+                                    accepted = false
+                                    message = "That item or action is not available."
+                                } else if (!transaction.accepted) {
+                                    accepted = false
+                                    message = transaction.message
+                                } else {
+                                    isSaving = true
+                                    val progressed = DesktopEconomyTransactions.evaluateAchievements(transaction.state)
+                                    val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, progressed) }
+                                    if (saved) {
+                                        state = progressed
+                                        nextState = progressed
+                                        message = transaction.message
+                                    } else {
+                                        accepted = false
+                                        message = "Could not save that change. Your previous save is intact."
+                                    }
+                                    isSaving = false
+                                }
+                            }
+                        }
+                        val visibleState = nextState ?: state
+                        val payload = if (visibleState != null && catalog != null) {
+                            desktopWebPlayState(visibleState, catalog, accepted, guessStatus, message)
+                        } else org.json.JSONObject().put("accepted", false).put("message", "Loading game…")
+                        reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                            .put("type", "state").put("state", payload).toString())
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
             return@Card
         }
 
