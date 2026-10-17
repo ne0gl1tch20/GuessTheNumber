@@ -83,6 +83,11 @@
     <section class="boss-card card" id="bossPanel" hidden aria-label="Active boss encounter">
       <div class="boss-art" aria-hidden="true">♜</div><div class="boss-content"><span class="eyebrow">ENCOUNTER IN PROGRESS</span><h2 id="bossName">Boss encounter</h2><p>Correct guesses deal damage. Keep your run going.</p><div class="boss-health-row"><span>HEALTH</span><strong id="bossHealthText">0 / 0 HP</strong></div><div class="boss-health-track"><div id="bossHealthFill" class="boss-health-fill"></div></div></div><span class="boss-live">ACTIVE</span>
     </section>
+    <section class="world-card card" id="worldPanel" aria-label="Worlds and boss encounters">
+      <div class="panel-title"><span class="panel-glyph world-glyph">♜</span><div><span class="eyebrow">WORLD EXPEDITION</span><h2>Worlds & bosses</h2></div><span class="panel-chip" id="worldBossStatus">READY</span></div>
+      <p class="world-intro">Unlock new realms and challenge their guardians. Boss rules and rewards are handled by the game engine.</p>
+      <div class="world-list" id="worldList"><div class="world-empty">Syncing your world map…</div></div>
+    </section>
     <section class="quest-card card" id="questPanel" aria-label="Daily momentum">
       <div class="panel-title"><span class="panel-glyph quest-glyph">✦</span><div><span class="eyebrow">DAILY MOMENTUM</span><h2>Today's run</h2></div><span class="panel-chip" id="claimedQuests">0 CLAIMED</span></div>
       <div class="quest-metrics"><div><strong id="dailyGuesses">0</strong><span>Guesses made</span></div><div><strong id="dailyCorrect">0</strong><span>Correct guesses</span></div><div><strong id="dailyBestStreak">0</strong><span>Best daily streak</span></div></div>
