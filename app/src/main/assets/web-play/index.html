@@ -115,6 +115,24 @@
       <div class="microcopy" id="microcopy">The engine decides. The interface celebrates.</div>
     </section>
 
+    <section class="event-card card" id="randomEventPanel" aria-label="Latest random event" hidden>
+      <div class="panel-title"><span class="panel-glyph event-glyph">✦</span><div><span class="eyebrow">UNEXPECTED BONUS</span><h2 id="eventTitle">Random event</h2></div><span class="panel-chip">EVENT</span></div>
+      <p id="eventDescription" class="event-description">A surprise from the game engine.</p>
+      <div class="event-footnote"><span>EVENTS TRIGGERED</span><strong id="eventCount">0</strong></div>
+    </section>
+
+    <section class="strategy-card card" id="strategyPanel" aria-label="Math Strategy Lab">
+      <div class="panel-title"><span class="panel-glyph strategy-glyph">⌁</span><div><span class="eyebrow">THINK LIKE A PLAYER</span><h2>Math Strategy Lab</h2></div><span class="panel-chip">OPTIONAL</span></div>
+      <p class="strategy-intro">Use the current range to plan your next guess. These are hints only; the game engine still decides the result.</p>
+      <div class="strategy-grid">
+        <div><span>RANGE WIDTH</span><strong id="strategyWidth">—</strong></div>
+        <div><span>MIDPOINT</span><strong id="strategyMidpoint">—</strong></div>
+        <div><span>EVEN VALUES</span><strong id="strategyEvenCount">—</strong></div>
+      </div>
+      <div class="strategy-advice" id="strategyAdvice" role="status">A midpoint guess can split a range into smaller sections.</div>
+      <button type="button" class="strategy-use" id="useMidpoint">Use midpoint in guess box <span>↗</span></button>
+    </section>
+
     <section class="quick-actions">
       <button class="action-card" id="beyondButton" type="button"><span class="action-icon">◈</span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong>›</strong></button>
       <button class="action-card" id="questButton" type="button"><span class="action-icon">✦</span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong>›</strong></button>
