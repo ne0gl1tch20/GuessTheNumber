@@ -7,6 +7,6 @@
     "challenge_builder": true,
     "dev_console": true,
     "lua_scripting": true,
-    "shared_web_play": false
+    "shared_web_play": true
   }
 }
