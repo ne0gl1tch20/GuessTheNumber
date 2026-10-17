@@ -1,30 +1,30 @@
 # Windows Feature Parity Plan
 
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
-**Reviewed:** 2026-10-16
+**Reviewed:** 2026-10-17
 
 **Latest increment (2026-10-16):** PR #220 merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f` with Android and Windows CI passing. PR #221 then merged the five Android Arcade minigames for Windows, using the canonical `minigames.json` and shared `DesktopEconomyTransactions.awardArcadeReward` transaction. PR #222 fixed a nested vertical-scroll crash in the Windows Arcade route; Android Validation and Windows Desktop CI passed on its exact head, and the owner confirmed Arcade opens successfully in the Windows app. Broader runtime verification of the five games, reward effects/save persistence and PR #220's upgrades/navigation remains open.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
 
-**Product wish / locked direction: Windows is an exact port of GTN, built with Kotlin Multiplatform and shared code and assets wherever practical.** Android is the source of truth for the game. Windows must reproduce the same player-facing game, not a smaller desktop edition or a newly organized substitute UI.
+**Product wish / locked direction: Windows must deliver the same GuessTheNumber experience as Android, not a smaller desktop edition.** The proposed implementation direction is one shared HTML/CSS/JavaScript frontend for player-facing screens, Kotlin/KMP as the authoritative game engine, and native host adapters for platform services. This changes the preferred UI technology, not the exact-parity requirement. The web architecture remains proposed until its prototype and exit gates pass.
 
 Port the Android experience screen by screen: same features, screen hierarchy, information, labels, controls, menus, dialogs, navigation destinations, locked/unlocked states, loading/empty/error states, and interaction outcomes. Adapt only the presentation and input where desktop requires it (resizable window, keyboard, mouse, focus, hover and desktop conventions). Desktop adaptations must preserve the Android screen's content and meaning; any deliberate feature difference needs an explicit reason and documentation.
 
-Prefer Kotlin Multiplatform shared production rules, models, validation, transaction logic, localization catalogs and canonical assets. Reuse Compose UI components where they work across targets, and use thin Android/Windows host adapters for platform-specific lifecycle, storage, audio, notifications, windowing, installers and updates. Share the original assets rather than creating separate Windows copies. Keep Android working throughout the port and preserve existing save compatibility.
+Prefer Kotlin Multiplatform shared production rules, models, validation, transaction logic and canonical assets. Under the proposed direction, use one shared HTML/CSS/JavaScript frontend for player-facing screens instead of rebuilding those screens separately in Compose. Retain Compose/Kotlin for native host/system surfaces and platform-specific lifecycle, storage, audio, notifications, windowing, installers and updates. Use Cordova only on supported platforms where its bridge fits; Windows needs a maintained embedded WebView host. Share original assets rather than creating platform copies. Keep Android working and preserve existing save compatibility throughout any migration.
 
-## KMP exact-port implementation contract (locked)
+## Cross-platform exact-experience implementation contract (locked)
 
-The product wish is an **exact Windows port of GuessTheNumber using Kotlin Multiplatform and shared code/assets wherever practical**. Android is the source of truth. This plan is the authoritative implementation and verification tracker for that wish.
+The product wish is an **exact Windows experience of GuessTheNumber with shared player-facing screens and authoritative Kotlin/KMP game logic**. Android is the behavioral source of truth. The proposed shared-web implementation is documented in [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md); this plan remains the authoritative Windows parity and verification tracker.
 
 ### What “exact port” means in practice
 
 - **Same game, not a reduced edition:** every Android player-facing feature and reachable screen/interaction must have a Windows counterpart unless a deliberate platform-specific difference is explicitly approved and documented.
 - **Same behavior and meaning:** preserve game rules, reward and progression outcomes, eligibility, shop/economy semantics, settings meaning, localization meaning, save semantics, offline behavior and recovery paths.
 - **Same experience structure:** match visible content, information hierarchy, labels, controls, menus, dialogs, sheets, tutorials, nested destinations, locked/unlocked states, loading/empty/error states and navigation outcomes.
-- **Shared implementation first where sensible:** use common Kotlin production rules, models/contracts, validators, transaction logic, localization catalogs, canonical assets and compatible Compose UI. Share only where dependencies and platform contracts genuinely permit it; do not force Android platform APIs into commonMain.
-- **Thin platform hosts:** Android retains its production host integrations; Windows supplies desktop lifecycle, keyboard/mouse/focus/hover, windowing, filesystem, audio/notification integration where supported, updates and MSI packaging. Windows must not become a second authority for game rules, rewards or persistence semantics.
+- **Shared implementation first where sensible:** keep authoritative rules, models/contracts, validators and transactions in Kotlin/KMP. The proposed frontend target is one shared HTML/CSS/JavaScript bundle for player-facing screens; retain Compose where it serves native/system surfaces. Share only where dependencies and platform contracts genuinely permit it; do not force platform APIs into commonMain.
+- **Thin platform hosts:** Android retains its production integrations and may host the shared web UI through Cordova/WebView after prototype validation. Windows supplies desktop lifecycle, keyboard/mouse/focus/hover, windowing, filesystem, updates and MSI packaging, embedding the same web bundle through a maintained WebView integration. Neither host nor JavaScript may become a second authority for game rules, rewards or persistence semantics.
 - **Desktop adaptation, not redesign:** resizable layouts and desktop input conventions are allowed. They must not remove features, alter the meaning of a screen or replace Android's hierarchy with an unrelated substitute UI. Document and justify any intentional difference.
 - **Canonical assets and localization:** prefer the original shared assets and shared translation source. Do not create parallel Windows-only copies of content that should remain consistent.
 - **Compatibility and product constraints:** preserve existing Android save compatibility, Windows MSI identity/in-place upgrade behavior, offline-first play, and the no-ads/no-analytics/no-accounts requirement.
@@ -38,7 +38,7 @@ The product wish is an **exact Windows port of GuessTheNumber using Kotlin Multi
 - Keep the five stages below sequential. Stage 2 remains open until its remaining core gameplay/economy gaps have evidence. Do not start Stage 3 implementation ahead of the Stage 2 exit gate.
 - Declare overall parity complete only when every required row is verified with evidence, explicitly approved as platform-specific, or excluded by documented agreement, and all release blockers are resolved.
 
-Roadmap coordination: [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) records the locked product wish and broader planned work. This document alone owns Windows parity stages, the screen-by-screen matrix and its verification status.
+Roadmap coordination: [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) records the product wish and broader planned work. The proposed [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md) defines the web/Kotlin bridge and migration gates. This document alone owns Windows parity stages, the screen-by-screen matrix and its verification status.
 
 This plan is the single source of truth for Windows parity and replaces Windows migration checklists that duplicate its stages.
 
