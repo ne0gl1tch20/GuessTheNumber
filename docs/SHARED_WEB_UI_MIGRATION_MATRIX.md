@@ -1,6 +1,6 @@
 # Shared Web UI Migration Matrix
 
-**Status:** The local web bundle is integrated into Android's main player-facing route through `ProductionWebAppScreen`. The current bundle has Play, Worlds, Rewards and Journey tabs; complete coverage of every former Compose destination and runtime parity remain unfinished/unverified.
+**Status (2026-10-17):** `NavGraph` now honors the bundled `shared_web_play` feature flag and selects `ProductionWebPlayScreen` when enabled, so the canonical `web-play/` HTML/CSS/JS bundle is the actual Android route when the flag is on. The flag configuration is enabled. The four tabs cover the current Play, Worlds, Rewards and Journey slice; remaining player-facing destinations are not yet migrated, and no device/runtime parity claim is made.
 **Reviewed:** 2026-10-17
 **Architecture authority:** [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md)
 **Product roadmap:** [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md)
@@ -72,9 +72,9 @@ The complete screen inventory is not yet source-audited. Add each screen only af
 |---|---|---|
 | Shared web bridge prototype | Debug-only Android experiment; separate from the production web app | Run focused tests and APK build, exercise lifecycle/offline/bridge behavior on device, complete Windows host spike |
 | Shared web theme foundation | Reusable CSS token foundation exists; the production Play bundle currently has its own more advanced styling | Unify the production bundle with shared tokens in a cohesive visual-system pass; validate contrast, scaling, accessibility, safe areas and host behavior |
-| Play: core guessing surface | Compose; first production migration candidate | Finalize bridge contract and hybrid-vs-whole-route layout decision |
+| Play / Worlds / Rewards / Journey | Shared HTML/CSS/JS route wired behind `shared_web_play`; bundled flag enabled; source integration only | Android runtime/IME/back/lifecycle/accessibility checks, plus parity for every action and state |
 | Play: economy/progression/boss/event sections | Compose | Inventory individual sections and callbacks before deciding whether they remain Compose temporarily or move with the route |
-| Upgrade, Shop, More and progression destinations | Compose | Source-backed inventory, then migrate by coherent feature slices |
+| Upgrade, Shop, More, settings, save management, minigames and remaining progression destinations | Migration gap remains; the current web bundle does not yet replace these full destinations | Migrate as coherent HTML screens with authoritative Kotlin bridge actions; preserve Compose fallback until verified |
 | Native/system surfaces | Compose or platform integrations | Keep native where justified; document the boundary rather than forcing them into HTML |
 
 ## Evidence rules
