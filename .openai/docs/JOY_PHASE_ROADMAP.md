@@ -7,6 +7,21 @@ The goal is to make GuessTheNumber feel more rewarding and lively while growing 
 
 **Status note (2026-10-14):** This roadmap tracks intended scope, not proof that every feature is merged. Items marked implemented are supported by the current `master` changelog; partial implementations are labeled as such. Work found only on feature branches must not be marked complete until it lands on `master` and its checks are reviewed.
 
+## Actual game UI migration goal (2026-10-17)
+
+**Product goal:** Migrate the real GuessTheNumber player-facing game screens to a shared HTML/CSS/JavaScript frontend so the game can have a cohesive theme, more game-like layouts, richer visual hierarchy, responsive panels, polished transitions and consistent presentation on Android and Windows. This is a real product UI migration, not a permanent bridge demo or a goal to merely embed a web page inside the app.
+
+- The current debug bridge prototype is only a technical stepping stone. Its temporary counter is not a gameplay screen and must not become the final deliverable for this initiative.
+- Build a reusable game UI foundation first: shared theme/design tokens, typography, backgrounds, panels/cards, buttons, navigation, progress/XP bars, currency and level displays, dialogs, feedback states, motion and reduced-motion behavior. Keep the visual language original and consistent with GuessTheNumber.
+- Migrate real screens incrementally, starting with a representative, bounded player-facing screen that exercises actual Kotlin-owned state and actions. The first production slice must replace or sit behind a reversible route for a real Compose screen, not another throwaway counter.
+- Keep HTML/CSS/JS responsible for presentation, screen composition, responsive layout, interaction feedback and visual animation. Kotlin/KMP remains authoritative for guessing rules, balances, rewards, eligibility, progression, save transactions and recovery.
+- Share the same canonical frontend assets across Android and Windows. Android can use a supported local WebView host; Windows requires a separately validated maintained embedded web host. Do not claim parity until both hosts are proven.
+- Keep native Compose/Kotlin surfaces for system integration and genuinely native host UI. Do not rewrite game logic into JavaScript and do not remove native code simply to maximize HTML coverage.
+- Preserve offline operation, existing save compatibility, localization, accessibility, input support and the no-ads/no-analytics/no-accounts requirements.
+- Track actual screen migrations, visual comparisons, action parity, save behavior and runtime evidence. A prototype, successful compile or shared CSS file alone does not mean the game UI has migrated.
+
+**Execution order:** (1) finish and verify the isolated bridge proof, (2) define the shared game theme and component foundation, (3) migrate one real gameplay screen through the Kotlin-authoritative bridge, (4) validate the same screen on Android and Windows, then (5) migrate remaining player-facing screens in focused slices. Keep each stage reversible until its acceptance checks pass. Coordinate Windows-specific gates through the existing [Windows Feature Parity Plan](../../docs/WINDOWS_FEATURE_PARITY_PLAN.md); do not create a competing parity-stage list.
+
 ## Cross-platform sameness and chosen shared-web UI direction (2026-10-17)
 
 **The product requirement remains an exact same-game experience across platforms.** The chosen target is one HTML/CSS/JavaScript frontend for player-facing screens, Kotlin/KMP as the trusted game engine, and thin native host adapters, with Compose retained for native/system surfaces and the desktop shell. The architecture decision is locked; the migration has not shipped. See [Shared Web UI Architecture](../../docs/SHARED_WEB_UI_ARCHITECTURE.md) for the bridge contract, platform map, source-reviewed current state and exit gates.
