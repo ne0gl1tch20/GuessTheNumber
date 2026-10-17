@@ -4,7 +4,7 @@ Build a complete polished Android game combining **Guess the Number + incrementa
 
 ## 🛠️ STACK
 
-Use Kotlin + Jetpack Compose + Material 3 + AndroidX + Navigation Compose + DataStore + JSON + modern Android architecture. Support edge-to-edge, lifecycle-aware state, accessibility, adaptive portrait/landscape, phones/tablets/foldables, split-screen and efficient rendering. Use unidirectional state flow, immutable/stable state and avoid unnecessary recomposition.
+Use HTML/CSS/JavaScript as the chosen target for shared player-facing screens across Android and Windows. Keep Kotlin/KMP authoritative for game rules, state validation, economy, progression, rewards, save transactions/migrations and platform-neutral contracts. Keep Compose for native host/system surfaces and the Windows desktop shell. The current Android and Windows apps still use Compose screens; the web migration is not implemented yet. Evaluate Android WebView/Cordova and a maintained Windows embedded WebView through a small offline vertical slice before adding dependencies or migrating production screens. Preserve modern Android architecture, edge-to-edge, lifecycle-aware state, accessibility, adaptive portrait/landscape, phones/tablets/foldables, split-screen and efficient rendering.
 
 ## 🎯 CORE LOOP
 
@@ -123,11 +123,13 @@ Track guesses, correct/failed, best streak, highest multiplier, currencies earne
 
 ## 🎨 UI + ACCESSIBILITY
 
-Material 3, rounded cards, hierarchy, animated counters, upgrade-tree connections, locked states, reward popups, confirmations and responsive layouts. Do NOT look like a calculator/business app. Support TalkBack, content descriptions, keyboard navigation, large fonts, minimum touch targets, color-independent feedback, contrast, reduced motion and accessible dialogs. Error/crash messages must be understandable and actionable without exposing internal stack traces.
+Build the shared web UI with semantic HTML, shared CSS design tokens, clear hierarchy, rounded cards, animated counters, upgrade-tree connections, locked states, reward popups, confirmations and responsive layouts. Use Compose/Material 3 for native host/system surfaces where retained. Do NOT look like a calculator/business app. Support TalkBack/screen readers, content descriptions, keyboard and mouse navigation, focus visibility, large fonts, minimum touch targets, color-independent feedback, contrast, reduced motion and accessible dialogs. Error/crash messages must be understandable and actionable without exposing internal stack traces.
 
 ## 🧱 ARCHITECTURE
 
-`UI → ViewModel → Game/Domain → Repository → DataStore/JSON`. Separate state, economy, currencies, upgrades, Prestige, Ultra, Shop, minigames, achievements, challenges, commands, saves, settings, logging, crash handling and navigation. Use `CurrencyRegistry,UpgradeRegistry,ResetLayerRegistry,ShopRegistry,MinigameRegistry,AchievementRegistry,ChallengeRegistry,CommandRegistry,NavigationRegistry,NumberFormatRegistry`. Avoid giant Compose files.
+**Target shared player UI:** `HTML/CSS/JavaScript → typed, versioned native bridge → Kotlin host/ViewModel → Game/Domain → Repository → DataStore/JSON`. Kotlin validates requests and owns all authoritative state and persistence; the frontend never supplies trusted balances, rewards, eligibility or save paths. Keep the bridge allowlisted, schema-validated, size-bounded and explicit about errors. Do not expose reflection, filesystem, shell, JNI or unrestricted network access to JavaScript.
+
+Compose remains available for native/system surfaces and host integration, including the Windows desktop shell. Until the prototype and migration gates pass, preserve the existing Compose runtime rather than pretending the web frontend exists. Separate state, economy, currencies, upgrades, Prestige, Ultra, Shop, minigames, achievements, challenges, commands, saves, settings, logging, crash handling and navigation. Use `CurrencyRegistry,UpgradeRegistry,ResetLayerRegistry,ShopRegistry,MinigameRegistry,AchievementRegistry,ChallengeRegistry,CommandRegistry,NavigationRegistry,NumberFormatRegistry`. Avoid giant UI files.
 
 ## ⚡ PERFORMANCE + RELEASE
 

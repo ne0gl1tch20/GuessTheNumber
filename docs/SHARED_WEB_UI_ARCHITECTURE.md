@@ -1,16 +1,17 @@
-# Shared Web UI and Native Host Architecture Proposal
+# Shared Web UI and Native Host Architecture
 
-**Status:** Proposed direction; documentation only. No application runtime has been migrated.
-**Owner decision:** Use one HTML/CSS/JavaScript frontend for the shared player-facing experience while retaining Kotlin as the trusted game engine and using native host layers where needed.
+**Decision:** Chosen architecture direction; documentation-only decision. No application runtime has been migrated.
+**Owner decision:** Use one HTML/CSS/JavaScript frontend for shared player-facing screens across Android and Windows, retain Kotlin/KMP as the trusted game authority, and keep Compose for native host/system surfaces and desktop-shell integration.
+**Implementation status (source review, 2026-10-17):** Android still enters through `MainActivity` + Compose `setContent` and `NavGraph`; Windows still uses a Compose Desktop `Window`. The build files contain no WebView/Cordova integration, and no bundled app HTML/CSS/JS frontend exists yet. The existing shared module contains selected Kotlin rules/contracts and a controlled Compose guessing screen. These are current facts, not a blocker to the chosen direction.
 **Reviewed:** 2026-10-17
 
 ## Goal
 
 Make GuessTheNumber look and behave like the same game across Android and Windows, with future platforms able to reuse the same screens and interactions. Share the actual frontend bundle rather than separately reimplementing every screen in Compose on each platform.
 
-This proposal changes the preferred **UI delivery layer**, not the game's product requirements. Preserve offline play, existing save compatibility, Kotlin-owned progression/rewards, localization, recovery, and the no-ads/no-analytics/no-accounts rule.
+This chosen direction changes the preferred **UI delivery layer**, not the game's product requirements. Preserve offline play, existing save compatibility, Kotlin-owned progression/rewards, localization, recovery, and the no-ads/no-analytics/no-accounts rule.
 
-## Proposed stack
+## Chosen target stack
 
 - **HTML:** semantic screen structure and accessible controls.
 - **CSS:** shared design tokens, layout, responsive behavior, typography, colors, animations and reduced-motion support.
@@ -120,4 +121,4 @@ Do not rewrite the whole app in one PR. Keep the existing app working while vali
 
 ## Decision status
 
-This document records the proposed direction and migration gates. It does **not** mean Cordova has been added, Compose screens have been removed, the app has been converted to HTML, or any runtime parity has been tested.
+The HTML/CSS/JavaScript shared frontend with Kotlin authority and Compose-supported native hosts is the **chosen architecture direction**. This decision locks the target, not an implementation schedule or permission to skip migration gates. It does **not** mean Cordova has been added, a WebView host has been integrated, Compose screens have been removed, the app has been converted to HTML, or any runtime parity has been tested. Prototype and production slices must still pass the documented bridge, save-compatibility, offline, accessibility, performance and cross-platform verification gates.

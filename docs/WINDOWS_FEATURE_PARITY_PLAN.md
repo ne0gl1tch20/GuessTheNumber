@@ -8,22 +8,22 @@
 
 ## Goal
 
-**Product wish / locked direction: Windows must deliver the same GuessTheNumber experience as Android, not a smaller desktop edition.** The proposed implementation direction is one shared HTML/CSS/JavaScript frontend for player-facing screens, Kotlin/KMP as the authoritative game engine, and native host adapters for platform services. This changes the preferred UI technology, not the exact-parity requirement. The web architecture remains proposed until its prototype and exit gates pass.
+**Locked product and architecture direction: Windows must deliver the same GuessTheNumber experience as Android, not a smaller desktop edition.** The chosen implementation target is one shared HTML/CSS/JavaScript frontend for player-facing screens, Kotlin/KMP as the authoritative game engine, and native host adapters for platform services, with Compose retained for native/system surfaces and the desktop shell. This changes the preferred UI technology, not the exact-parity requirement. The target is chosen; implementation remains unstarted until the prototype and exit gates pass.
 
 Port the Android experience screen by screen: same features, screen hierarchy, information, labels, controls, menus, dialogs, navigation destinations, locked/unlocked states, loading/empty/error states, and interaction outcomes. Adapt only the presentation and input where desktop requires it (resizable window, keyboard, mouse, focus, hover and desktop conventions). Desktop adaptations must preserve the Android screen's content and meaning; any deliberate feature difference needs an explicit reason and documentation.
 
-Prefer Kotlin Multiplatform shared production rules, models, validation, transaction logic and canonical assets. Under the proposed direction, use one shared HTML/CSS/JavaScript frontend for player-facing screens instead of rebuilding those screens separately in Compose. Retain Compose/Kotlin for native host/system surfaces and platform-specific lifecycle, storage, audio, notifications, windowing, installers and updates. Use Cordova only on supported platforms where its bridge fits; Windows needs a maintained embedded WebView host. Share original assets rather than creating platform copies. Keep Android working and preserve existing save compatibility throughout any migration.
+Prefer Kotlin Multiplatform shared production rules, models, validation, transaction logic and canonical assets. Under the chosen direction, target one shared HTML/CSS/JavaScript frontend for player-facing screens instead of rebuilding those screens separately in Compose. Retain Compose/Kotlin for native host/system surfaces and platform-specific lifecycle, storage, audio, notifications, windowing, installers and updates. Use Cordova only on supported platforms where its bridge fits; Windows needs a maintained embedded WebView host. Share original assets rather than creating platform copies. Keep Android working and preserve existing save compatibility throughout any migration.
 
 ## Cross-platform exact-experience implementation contract (locked)
 
-The product wish is an **exact Windows experience of GuessTheNumber with shared player-facing screens and authoritative Kotlin/KMP game logic**. Android is the behavioral source of truth. The proposed shared-web implementation is documented in [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md); this plan remains the authoritative Windows parity and verification tracker.
+The locked target is an **exact Windows experience of GuessTheNumber with shared player-facing screens and authoritative Kotlin/KMP game logic**. Android is the behavioral source of truth. The chosen shared-web implementation target is documented in [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md); this plan remains the authoritative Windows parity and verification tracker.
 
 ### What “exact port” means in practice
 
 - **Same game, not a reduced edition:** every Android player-facing feature and reachable screen/interaction must have a Windows counterpart unless a deliberate platform-specific difference is explicitly approved and documented.
 - **Same behavior and meaning:** preserve game rules, reward and progression outcomes, eligibility, shop/economy semantics, settings meaning, localization meaning, save semantics, offline behavior and recovery paths.
 - **Same experience structure:** match visible content, information hierarchy, labels, controls, menus, dialogs, sheets, tutorials, nested destinations, locked/unlocked states, loading/empty/error states and navigation outcomes.
-- **Shared implementation first where sensible:** keep authoritative rules, models/contracts, validators and transactions in Kotlin/KMP. The proposed frontend target is one shared HTML/CSS/JavaScript bundle for player-facing screens; retain Compose where it serves native/system surfaces. Share only where dependencies and platform contracts genuinely permit it; do not force platform APIs into commonMain.
+- **Shared implementation first where sensible:** keep authoritative rules, models/contracts, validators and transactions in Kotlin/KMP. The chosen frontend target is one shared HTML/CSS/JavaScript bundle for player-facing screens; retain Compose where it serves native/system surfaces. Share only where dependencies and platform contracts genuinely permit it; do not force platform APIs into commonMain.
 - **Thin platform hosts:** Android retains its production integrations and may host the shared web UI through Cordova/WebView after prototype validation. Windows supplies desktop lifecycle, keyboard/mouse/focus/hover, windowing, filesystem, updates and MSI packaging, embedding the same web bundle through a maintained WebView integration. Neither host nor JavaScript may become a second authority for game rules, rewards or persistence semantics.
 - **Desktop adaptation, not redesign:** resizable layouts and desktop input conventions are allowed. They must not remove features, alter the meaning of a screen or replace Android's hierarchy with an unrelated substitute UI. Document and justify any intentional difference.
 - **Canonical assets and localization:** prefer the original shared assets and shared translation source. Do not create parallel Windows-only copies of content that should remain consistent.
@@ -38,7 +38,7 @@ The product wish is an **exact Windows experience of GuessTheNumber with shared 
 - Keep the five stages below sequential. Stage 2 remains open until its remaining core gameplay/economy gaps have evidence. Do not start Stage 3 implementation ahead of the Stage 2 exit gate.
 - Declare overall parity complete only when every required row is verified with evidence, explicitly approved as platform-specific, or excluded by documented agreement, and all release blockers are resolved.
 
-Roadmap coordination: [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) records the product wish and broader planned work. The proposed [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md) defines the web/Kotlin bridge and migration gates. This document alone owns Windows parity stages, the screen-by-screen matrix and its verification status.
+Roadmap coordination: [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) records the product direction and broader planned work. The chosen [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md) defines the web/Kotlin bridge and migration gates. This document alone owns Windows parity stages, the screen-by-screen matrix and its verification status.
 
 This plan is the single source of truth for Windows parity and replaces Windows migration checklists that duplicate its stages.
 
@@ -372,7 +372,7 @@ The primary blocker is not a missing cosmetic tweak: Windows currently hosts the
 4. Add focused desktop tests for navigation/state transitions and document which checks still require an actual Windows session.
 5. Keep updater behavior intact and separate; do not change MSI identity or start Stage 2 feature work until the Stage 1 exit gate is met.
 
-This is a proposed implementation boundary derived from the inspected source, not a claim that these tasks are already implemented. No Windows interactive runtime session was run during this audit.
+This is the chosen target implementation boundary derived from the inspected source, not a claim that these tasks are already implemented. No Windows interactive runtime session was run during this audit.
 
 ## Definition of done
 
