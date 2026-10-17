@@ -420,6 +420,8 @@ fun NavGraph(
                         }
                         composable("web_ui_prototype") {
                             SharedWebUiPrototypeScreen(
+                                state = state,
+                                onSubmitGuess = viewModel::makeGuessWithResult,
                                 onBack = { navController.popBackStack() }
                             )
                         }
