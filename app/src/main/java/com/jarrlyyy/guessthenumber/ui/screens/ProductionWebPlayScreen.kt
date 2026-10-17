@@ -23,6 +23,7 @@ import org.json.JSONObject
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GuessSubmissionResult
+import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 
 private const val WEB_UI_ORIGIN = "https://appassets.androidplatform.net"
 private const val WEB_UI_PATH = "/assets/web-play/"
@@ -49,6 +50,7 @@ fun ProductionWebPlayScreen(
     AndroidView(
         modifier = Modifier.fillMaxSize(),
         factory = { context ->
+            val worldDefinitions = WorldConfigRepository(context).loadWorlds()
             val assetLoader = WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
                 .build()
@@ -87,6 +89,8 @@ fun ProductionWebPlayScreen(
                                         val result = if (parsed.type == "submit_guess" && parsed.guess != null) try { submitGuess(parsed.guess) } catch (_: Exception) { null } else null
                                         if (parsed.type == "submit_guess" && result == null) { replyProxy.postMessage(errorResponse(parsed.id, "guess_processing_failed")); return@post }
                                         val game = readState()
+                                        val activeBossWorld = game.activeBossBattleWorldId?.let { id -> worldDefinitions.firstOrNull { it.id == id } }
+                                        val bossDamage = activeBossWorld?.let { (game.bossBattleProgress[it.bossId] ?: 0).coerceIn(0, it.hp) } ?: 0
                                         val viewState = JSONObject()
                                             .put("rangeMin", result?.rangeMin ?: game.currentRangeMin)
                                             .put("rangeMax", result?.rangeMax ?: game.currentRangeMax)
@@ -97,6 +101,29 @@ fun ProductionWebPlayScreen(
                                             .put("accepted", result?.accepted ?: true)
                                             .put("money", game.money.format())
                                             .put("incomePerSecond", currentIncome.format())
+
+                                            .put("prestige", game.prestige.format())
+                                            .put("ultra", game.ultra.format())
+                                            .put("nebula", game.nebula.format())
+                                            .put("prestigeCount", game.prestigeCount)
+                                            .put("ultraCount", game.ultraCount)
+                                            .put("activeWorldId", game.activeWorldId)
+                                            .put("unlockedWorldCount", game.unlockedWorldIds.size)
+                                            .put("defeatedBossCount", game.defeatedBossIds.size)
+                                            .put("worldBossVictories", game.worldBossVictories)
+                                            .put("homeBaseLevel", game.homeBaseLevel)
+                                            .put("endlessRiftBestTier", game.endlessRiftBestTier)
+                                            .put("dailyQuestGuesses", game.dailyQuestGuesses)
+                                            .put("dailyQuestCorrectGuesses", game.dailyQuestCorrectGuesses)
+                                            .put("dailyQuestBestStreak", game.dailyQuestBestStreak)
+                                            .put("claimedDailyQuestCount", game.claimedDailyQuests.size)
+                                            .put("lootCommonChests", game.lootCommonChests)
+                                            .put("lootRareChests", game.lootRareChests)
+                                            .put("lootEpicChests", game.lootEpicChests)
+                                            .put("activeBossBattle", activeBossWorld != null)
+                                            .put("activeBossName", activeBossWorld?.bossFallback ?: "")
+                                            .put("activeBossHpTotal", activeBossWorld?.hp ?: 0)
+                                            .put("activeBossHpRemaining", activeBossWorld?.let { it.hp - bossDamage } ?: 0)
                                         if (result != null) viewState.put("lastGuessStatus", result.status ?: "rate_limited")
                                         replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "state").put("state", viewState).toString())
                                     }
