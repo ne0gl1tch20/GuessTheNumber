@@ -8,7 +8,7 @@
 
 ## Goal
 
-Make GuessTheNumber look and behave like the same game across Android and Windows, with future platforms able to reuse the same screens and interactions. Share the actual frontend bundle rather than separately reimplementing every screen in Compose on each platform.
+Make GuessTheNumber look and behave like the same game across Android and Windows, with future platforms able to reuse the same screens and interactions. Share the actual frontend bundle rather than separately reimplementing every screen in Compose on each platform. The product purpose is a cohesive, game-like presentation: a reusable theme, expressive layouts, polished feedback and animations, and real gameplay screens in HTML/CSS/JavaScript. The isolated counter prototype is only a bridge proof and is not the intended product outcome. See the [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) for the actual UI migration goal and execution order.
 
 This chosen direction changes the preferred **UI delivery layer**, not the game's product requirements. Preserve offline play, existing save compatibility, Kotlin-owned progression/rewards, localization, recovery, and the no-ads/no-analytics/no-accounts rule.
 
@@ -73,19 +73,23 @@ Still required before Phase 0 can be considered complete:
 - Compare Android WebView with Cordova only if a required plugin/packaging capability justifies Cordova's extra layer; Cordova is not a prerequisite for using HTML in Android.
 - Measure startup time, memory, bundle size, input latency and packaged app size on available devices.
 
-### Phase 1 — Define contracts and design tokens
+### Phase 1 — Define contracts and the game UI foundation
 
 - Write versioned request/response schemas and bridge error semantics.
-- Define shared design tokens, localization key handling and accessibility expectations.
+- Define the shared game theme and design tokens: color palettes, typography, spacing, backgrounds, panels/cards, buttons, navigation, progress indicators, currency/level displays, feedback states, dialogs, animation timing and reduced-motion behavior.
+- Define shared localization key handling, keyboard/mouse/touch behavior, focus visibility, accessibility labels and scalable layouts.
+- Build reusable HTML/CSS components around the intended game-like visual identity instead of copying generic app settings layouts or shipping a prototype-only design.
 - Add contract tests for invalid payloads, duplicate requests, stale state and failed persistence.
 - Do not move authoritative rules into JavaScript for convenience.
 
-### Phase 2 — First production vertical slice
+### Phase 2 — First real production gameplay screen
 
-- Migrate one bounded, low-risk screen to the shared web frontend.
-- Keep Kotlin responsible for all actions and persistence.
-- Compare Android and Windows screenshots and action outcomes.
-- Keep a reversible route back to the existing Compose screen until parity and save compatibility are demonstrated.
+- Migrate one bounded, representative player-facing screen to the shared web frontend. It must render real Kotlin-owned game state and invoke at least one real, validated game action; a throwaway counter does not satisfy this milestone.
+- Select a screen with meaningful visual and interaction coverage while keeping the slice reversible and low risk.
+- Keep Kotlin responsible for all gameplay decisions, rewards and persistence.
+- Compare Android and Windows screenshots, accessibility/input behavior and action outcomes using the same state and canonical web assets.
+- Keep a reversible route back to the existing Compose screen until parity, save compatibility and runtime behavior are demonstrated.
+- After this slice passes its exit checks, migrate the remaining player-facing screens in focused feature slices and update the screen-level migration matrix. Keep native/system surfaces in Compose where appropriate.
 
 ### Phase 3 — Migrate by feature slices
 
