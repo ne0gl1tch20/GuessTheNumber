@@ -5,10 +5,11 @@
 **Implementation status (2026-10-17):** Production player-facing screens still use Compose on Android and Windows. This branch adds an isolated debug-only Android WebView prototype with bundled HTML/CSS/JS and an origin-restricted, versioned message bridge. It uses a throwaway Kotlin-owned counter and does not read or modify game saves. No production screen has migrated; Windows still has no embedded web host. The prototype is a feasibility slice, not evidence of cross-platform parity or release readiness.
 **Windows host assessment:** [Windows WebView host evaluation](WINDOWS_WEBVIEW_HOST_EVALUATION.md) records the current JVM/Compose/MSI constraints and a source-based candidate assessment. WebView2 remains a candidate to investigate, not an implemented or selected dependency.
 **Reviewed:** 2026-10-17
+**Latest source-level hardening:** The prototype disposal effect is no longer keyed to the WebView reference, avoiding destruction when the AndroidView factory first supplies the view. Main-frame navigation is limited to the exact bundled index page. These changes have not been built or runtime-tested.
 
 ## Goal
 
-Make GuessTheNumber look and behave like the same game across Android and Windows, with future platforms able to reuse the same screens and interactions. Share the actual frontend bundle rather than separately reimplementing every screen in Compose on each platform. The product purpose is a cohesive, game-like presentation: a reusable theme, expressive layouts, polished feedback and animations, and real gameplay screens in HTML/CSS/JavaScript. The isolated counter prototype is only a bridge proof and is not the intended product outcome. See the [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) for the actual UI migration goal and execution order.
+Make GuessTheNumber look and behave like the same game across Android and Windows, with future platforms able to reuse the same screens and interactions. Share the actual frontend bundle rather than separately reimplementing every screen in Compose on each platform. The product purpose is a cohesive, game-like presentation: a reusable theme, expressive layouts, polished feedback and animations, and real gameplay screens in HTML/CSS/JavaScript. The isolated counter prototype is only a bridge proof and is not the intended product outcome. See the [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) for the actual UI migration goal and execution order, and the [Shared Web UI Migration Matrix](SHARED_WEB_UI_MIGRATION_MATRIX.md) for the source-audited first production gameplay slice and acceptance checks.
 
 This chosen direction changes the preferred **UI delivery layer**, not the game's product requirements. Preserve offline play, existing save compatibility, Kotlin-owned progression/rewards, localization, recovery, and the no-ads/no-analytics/no-accounts rule.
 
@@ -84,8 +85,8 @@ Still required before Phase 0 can be considered complete:
 
 ### Phase 2 — First real production gameplay screen
 
-- Migrate one bounded, representative player-facing screen to the shared web frontend. It must render real Kotlin-owned game state and invoke at least one real, validated game action; a throwaway counter does not satisfy this milestone.
-- Select a screen with meaningful visual and interaction coverage while keeping the slice reversible and low risk.
+- Start with the source-audited core guessing surface in the existing Play screen, as defined in the [Shared Web UI Migration Matrix](SHARED_WEB_UI_MIGRATION_MATRIX.md). It must render real Kotlin-owned game state and invoke the existing Kotlin guess path through a production bridge contract; a throwaway counter does not satisfy this milestone.
+- Keep the first slice reversible. The migration matrix records the candidate scope and requires an explicit hybrid-panel versus whole-Play-route decision after checking scroll, keyboard, focus and accessibility behavior.
 - Keep Kotlin responsible for all gameplay decisions, rewards and persistence.
 - Compare Android and Windows screenshots, accessibility/input behavior and action outcomes using the same state and canonical web assets.
 - Keep a reversible route back to the existing Compose screen until parity, save compatibility and runtime behavior are demonstrated.
