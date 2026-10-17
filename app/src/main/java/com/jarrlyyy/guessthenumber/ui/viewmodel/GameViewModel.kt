@@ -55,6 +55,21 @@ import java.time.LocalDate
 import java.time.Instant
 import kotlin.random.Random
 
+/**
+ * Secret-free result for UI adapters. The status comes from the authoritative engine result;
+ * this DTO deliberately excludes targetNumber and reward internals.
+ */
+data class GuessSubmissionResult(
+    val accepted: Boolean,
+    val status: String?,
+    val rangeMin: Long,
+    val rangeMax: Long,
+    val attempts: Long,
+    val correctGuesses: Long,
+    val streak: Int,
+    val bestStreak: Int
+)
+
 class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val saveManager = SaveManager(application)
     private val slotOperationMutex = Mutex()
@@ -440,11 +455,22 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun makeGuess(guess: Long): Boolean {
+    /**
+     * Compatibility entry point for existing Compose and automation callers.
+     * Keep its Boolean contract while newer UI adapters consume the typed outcome.
+     */
+    fun makeGuess(guess: Long): Boolean = makeGuessWithResult(guess).accepted
+
+    /**
+     * Runs the same authoritative production guess pipeline as makeGuess().
+     * Only the public feedback token and safe counters/range are returned; never expose targetNumber.
+     * Persistence remains asynchronous through the existing saveGameAsync() path.
+     */
+    fun makeGuessWithResult(guess: Long): GuessSubmissionResult {
         val correlationId = "guess-${System.nanoTime().toString(16)}"
         if (!AntiCheatService.validateGuessRate()) {
             GameLogger.log(LogLevel.WARN, LoggerCategory.GUESS, "GUESS_RATE_LIMITED", "Guess input was rate-limited.", correlationId)
-            return false
+            return _gameState.value.toGuessSubmissionResult(accepted = false, status = null)
         }
         val currentState = refreshDailyQuestDay(_gameState.value)
         GameLogger.log(LogLevel.DEBUG, LoggerCategory.GUESS, "GUESS_BEGIN", "Processing guess within range ${currentState.currentRangeMin}..${currentState.currentRangeMax}.", correlationId)
@@ -477,8 +503,25 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             "Guess $guess resulted in ${result.feedback}; reward=${result.reward}; attempts=${finalState.attempts}; streak=${finalState.streak}.",
             correlationId
         )
-        return true
+        return finalState.toGuessSubmissionResult(
+            accepted = true,
+            status = result.feedback.name
+        )
     }
+
+    private fun GameState.toGuessSubmissionResult(
+        accepted: Boolean,
+        status: String?
+    ) = GuessSubmissionResult(
+        accepted = accepted,
+        status = status,
+        rangeMin = currentRangeMin,
+        rangeMax = currentRangeMax,
+        attempts = attempts,
+        correctGuesses = correctGuesses,
+        streak = streak,
+        bestStreak = bestStreak
+    )
 
     private fun checkAchievements(state: GameState) {
         _gameState.value = gameEngine.evaluateAchievements(state)
