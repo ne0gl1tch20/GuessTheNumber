@@ -398,3 +398,13 @@ Desktop quick access intentionally differs from Android navigation for reachabil
 - PR #221 merged the canonical minigame catalog and all five Windows Arcade minigames. Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38913830827) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38913830817) on its exact head.
 - PR #222 moved Arcade outside the parent vertically scrollable game column, preventing the nested-scroll infinite-height exception. Android Validation and Windows Desktop CI both passed on the PR head; the owner confirmed Arcade opens successfully in the Windows app.
 - **Runtime scope confirmed:** Arcade opens without the reported crash. This does not yet verify every minigame's outcomes, payout amounts, Money/Nebula multipliers, localization, save/reload persistence or the invalid-catalog path. Keep those checks open.
+
+## Shared Android player UI migration target (owner direction, 2026-10-17)
+
+**Target:** all player-facing Android mobile screens use the same HTML/CSS/JavaScript interface bundle as the shared web Play experience. This is a migration goal, not a claim that the existing Compose screens have already been converted.
+
+- Keep one canonical screen hierarchy and content model across Android and Windows. Responsive layout and touch/keyboard adaptations may differ by form factor, but Android must not retain a separate Compose recreation of a migrated player screen.
+- Migrate every player-facing route, not only Play: first-run/save-slot selection, Play, Upgrades, Shop, More, Settings, progression (world map, bosses, prestige/ultra, Home Base, relics, Codex and Endgame), Arcade/minigames, music, statistics/achievements, changelog, tutorial/overlays, loading and crash/recovery states.
+- Retain Compose/native UI only for the host and genuine platform/system surfaces such as lifecycle, permission prompts, Android file pickers, notifications, widgets and service integration. Do not move authoritative game rules, rewards, validation or persistence into JavaScript.
+- Use a typed, versioned host bridge with Kotlin/KMP authoritative for state changes and saves. Bundle every required UI asset locally so the app remains offline; preserve localization, accessibility, reduced-motion settings, back navigation, deep links, save recovery and existing save compatibility.
+- Migrate in cohesive route groups. For each group, compare content and behavior against the existing Android screen, cover success/error/loading/empty states, validate bridge rejection and lifecycle recovery, and verify Android plus Windows parity before retiring the Compose implementation. Keep a working fallback until that route passes its exit checks.
