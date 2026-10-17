@@ -148,44 +148,27 @@ fun SharedWebUiPrototypeScreen(onBack: () -> Unit) {
                                                 replyProxy.postMessage(errorResponse("", "origin_not_allowed"))
                                                 return@post
                                             }
-                                            if (raw.length > 512) {
-                                                replyProxy.postMessage(errorResponse("", "message_too_large"))
-                                                return@post
-                                            }
-
-                                            try {
-                                                val request = JSONObject(raw)
-                                                val id = request.optString("id")
-                                                val type = request.optString("type")
-                                                if (
-                                                    request.length() != 3 ||
-                                                    request.optInt("version", -1) != 1 ||
-                                                    !id.matches(Regex("[A-Za-z0-9_-]{1,48}"))
-                                                ) {
-                                                    replyProxy.postMessage(errorResponse(id, "invalid_request"))
+                                            when (val parsed = WebUiBridgeProtocol.parse(raw)) {
+                                                is WebUiBridgeProtocol.ParseResult.Invalid -> {
+                                                    replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                                     return@post
                                                 }
-
-                                                when (type) {
-                                                    "read_state" -> Unit
-                                                    "increment_counter" -> {
-                                                        if (counter < Int.MAX_VALUE) counter++
+                                                is WebUiBridgeProtocol.ParseResult.Valid -> {
+                                                    when (parsed.type) {
+                                                        "read_state" -> Unit
+                                                        "increment_counter" -> {
+                                                            if (counter < Int.MAX_VALUE) counter++
+                                                        }
                                                     }
-                                                    else -> {
-                                                        replyProxy.postMessage(errorResponse(id, "unknown_action"))
-                                                        return@post
-                                                    }
+                                                    replyProxy.postMessage(
+                                                        JSONObject()
+                                                            .put("version", 1)
+                                                            .put("id", parsed.id)
+                                                            .put("type", "state")
+                                                            .put("state", JSONObject().put("counter", counter))
+                                                            .toString()
+                                                    )
                                                 }
-                                                replyProxy.postMessage(
-                                                    JSONObject()
-                                                        .put("version", 1)
-                                                        .put("id", id)
-                                                        .put("type", "state")
-                                                        .put("state", JSONObject().put("counter", counter))
-                                                        .toString()
-                                                )
-                                            } catch (_: Exception) {
-                                                replyProxy.postMessage(errorResponse("", "invalid_json"))
                                             }
                                         }
                                     }
