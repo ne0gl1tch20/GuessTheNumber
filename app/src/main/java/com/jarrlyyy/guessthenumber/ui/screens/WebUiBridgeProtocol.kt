@@ -37,21 +37,18 @@ internal object WebUiBridgeProtocol {
             return ParseResult.Invalid("invalid_json")
         }
 
-        val id = request.optString("id")
-        val type = request.optString("type")
-        if (
-            request.length() != 3 ||
-            request.optInt("version", -1) != 1 ||
-            !id.matches(Regex("[A-Za-z0-9_-]{1,48}")) ||
-            type !in setOf("read_state", "increment_counter")
-        ) {
-            val error = if (
-                request.length() == 3 &&
-                request.optInt("version", -1) == 1 &&
-                id.matches(Regex("[A-Za-z0-9_-]{1,48}")) &&
-                type !in setOf("read_state", "increment_counter")
-            ) "unknown_action" else "invalid_request"
-            return ParseResult.Invalid(error, id)
+        val rawId = request.opt("id")
+        val rawVersion = request.opt("version")
+        val rawType = request.opt("type")
+        val id = rawId as? String ?: ""
+        val type = rawType as? String ?: ""
+        val validEnvelope = request.length() == 3 &&
+            rawVersion is Number && rawVersion.toInt() == 1 &&
+            rawId is String && id.matches(Regex("[A-Za-z0-9_-]{1,48}")) &&
+            rawType is String
+        if (!validEnvelope) return ParseResult.Invalid("invalid_request", id)
+        if (type !in setOf("read_state", "increment_counter")) {
+            return ParseResult.Invalid("unknown_action", id)
         }
 
         return ParseResult.Valid(id, type)
