@@ -57,6 +57,25 @@ class WebUiBridgeProtocolTest {
         assertEquals("invalid_route", (unknown as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
+
+    @Test
+    fun acceptsOnlyAllowlistedWorldActions() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("world-1", "world_action", worldId = "verdant_grove", worldAction = "boss"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"world-1","type":"world_action","worldId":"verdant_grove","action":"boss"}""")
+        )
+        val unknownAction = WebUiBridgeProtocol.parse("""{"version":1,"id":"world-2","type":"world_action","worldId":"verdant_grove","action":"grant_reward"}""")
+        assertEquals("invalid_world_action", (unknownAction as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        val malformedId = WebUiBridgeProtocol.parse("""{"version":1,"id":"world-3","type":"world_action","worldId":"../save","action":"unlock"}""")
+        assertEquals("invalid_world", (malformedId as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
+    fun rejectsExtraFieldsOnWorldActions() {
+        val result = WebUiBridgeProtocol.parse("""{"version":1,"id":"world-4","type":"world_action","worldId":"verdant_grove","action":"boss","reward":100000}""")
+        assertEquals("invalid_request", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
     @Test
     fun acceptsIncrementRequest() {
         assertEquals(
