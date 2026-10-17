@@ -159,7 +159,9 @@ fun SharedWebUiPrototypeScreen(onBack: () -> Unit) {
 
                                                 when (type) {
                                                     "read_state" -> Unit
-                                                    "increment_counter" -> if (counter < Int.MAX_VALUE) counter++
+                                                    "increment_counter" -> {
+                                                        if (counter < Int.MAX_VALUE) counter++
+                                                    }
                                                     else -> {
                                                         replyProxy.postMessage(errorResponse(id, "unknown_action"))
                                                         return@post
