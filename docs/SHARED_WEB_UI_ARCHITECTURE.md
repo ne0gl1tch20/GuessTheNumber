@@ -1,13 +1,15 @@
 # Shared Web UI and Native Host Architecture
 
-**Decision:** Chosen architecture direction; documentation-only decision. No application runtime has been migrated.
+**Decision:** Chosen architecture direction; documentation-only decision. No production application runtime has been migrated.
 **Owner decision:** Use one HTML/CSS/JavaScript frontend for shared player-facing screens across Android and Windows, retain Kotlin/KMP as the trusted game authority, and keep Compose for native host/system surfaces and desktop-shell integration.
-**Implementation status (source review, 2026-10-17):** Android still enters through `MainActivity` + Compose `setContent` and `NavGraph`; Windows still uses a Compose Desktop `Window`. The build files contain no WebView/Cordova integration, and no bundled app HTML/CSS/JS frontend exists yet. The existing shared module contains selected Kotlin rules/contracts and a controlled Compose guessing screen. These are current facts, not a blocker to the chosen direction.
+**Implementation status (2026-10-17):** Production player-facing screens still use Compose on Android and Windows. This branch adds an isolated debug-only Android WebView prototype with bundled HTML/CSS/JS and an origin-restricted, versioned message bridge. It uses a throwaway Kotlin-owned counter and does not read or modify game saves. No production screen has migrated; Windows still has no embedded web host. The prototype is a feasibility slice, not evidence of cross-platform parity or release readiness.
+**Windows host assessment:** [Windows WebView host evaluation](WINDOWS_WEBVIEW_HOST_EVALUATION.md) records the current JVM/Compose/MSI constraints and a source-based candidate assessment. WebView2 remains a candidate to investigate, not an implemented or selected dependency.
 **Reviewed:** 2026-10-17
+**Latest source-level hardening:** The prototype disposal effect is no longer keyed to the WebView reference, avoiding destruction when the AndroidView factory first supplies the view. Main-frame navigation is limited to the exact bundled index page. These changes have not been built or runtime-tested.
 
 ## Goal
 
-Make GuessTheNumber look and behave like the same game across Android and Windows, with future platforms able to reuse the same screens and interactions. Share the actual frontend bundle rather than separately reimplementing every screen in Compose on each platform.
+Make GuessTheNumber look and behave like the same game across Android and Windows, with future platforms able to reuse the same screens and interactions. Share the actual frontend bundle rather than separately reimplementing every screen in Compose on each platform. The product purpose is a cohesive, game-like presentation: a reusable theme, expressive layouts, polished feedback and animations, and real gameplay screens in HTML/CSS/JavaScript. The isolated counter prototype is only a bridge proof and is not the intended product outcome. See the [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) for the actual UI migration goal and execution order, the [Shared Web UI Migration Matrix](SHARED_WEB_UI_MIGRATION_MATRIX.md) for the source-audited first production gameplay slice, the [Gameplay Bridge Contract](SHARED_WEB_UI_GAMEPLAY_BRIDGE_CONTRACT.md) for the proposed request/response boundary and acceptance checks, and the [Theme Foundation](SHARED_WEB_UI_THEME_FOUNDATION.md) for the initial shared CSS tokens.
 
 This chosen direction changes the preferred **UI delivery layer**, not the game's product requirements. Preserve offline play, existing save compatibility, Kotlin-owned progression/rewards, localization, recovery, and the no-ads/no-analytics/no-accounts rule.
 
@@ -19,7 +21,7 @@ This chosen direction changes the preferred **UI delivery layer**, not the game'
 - **Kotlin/KMP:** authoritative game rules, progression, economy, reward validation, save transactions/migrations, and platform-neutral contracts where existing KMP support is appropriate.
 - **Compose:** native host-owned UI where it provides value, including platform-specific settings/system surfaces and desktop shell behavior. Do not recreate the shared game screens in Compose merely to say every platform uses Compose.
 - **Cordova:** mobile WebView packaging and plugin bridge on supported Cordova platforms, starting with Android if a prototype proves the integration.
-- **Windows host:** keep the Kotlin/Compose Desktop application and host the same packaged web frontend through a maintained Windows WebView integration (for example WebView2 or a justified alternative). Do not depend on Cordova's legacy Windows platform, which is no longer actively maintained.
+- **Windows host:** keep the Kotlin/Compose Desktop application and host the same packaged web frontend through a maintained Windows WebView integration. WebView2 is a candidate, but the JVM binding, runtime distribution and MSI integration must be proven before choosing it. Do not depend on Cordova's legacy Windows platform, which is no longer actively maintained.
 - **Dependencies:** add only what a concrete requirement needs. Prefer a small dependency set, pinned versions, licenses and maintenance checks, and explicit bundle-size/build impact review.
 
 ## Platform map
@@ -27,7 +29,7 @@ This chosen direction changes the preferred **UI delivery layer**, not the game'
 | Platform | Shared player UI | Native host and system integration |
 |---|---|---|
 | Android | Shared HTML/CSS/JS bundle inside the chosen WebView host | Kotlin game authority and Android adapters; Cordova plugins may provide a documented JS-to-native bridge |
-| Windows | The exact same web bundle | Kotlin/Compose Desktop shell and a maintained embedded WebView integration; implement the same bridge contract without pretending Cordova Windows is supported |
+| Windows | The exact same web bundle | Kotlin/Compose Desktop shell and a maintained embedded web integration; implement the same bridge contract without pretending Cordova Windows is supported |
 | Future iOS | Reuse the same web bundle if the platform is approved | Cordova iOS or another supported WebView host plus a native adapter to Kotlin/KMP where feasible; validate separately before promising parity |
 | Browser/Electron, if later approved | Reuse the same web bundle | A dedicated adapter; native-only features must degrade clearly and never silently alter game rules |
 
@@ -40,7 +42,7 @@ The web frontend is a presentation client, not a second game engine.
 3. Kotlin validates the request and current game state, applies the action once, persists as required, and returns a typed result plus the updated view state.
 4. Never accept a reward amount, currency balance, eligibility result, save path, arbitrary class name or native method name from the web UI as trusted authority.
 5. Keep the bridge allowlisted, schema-validated, size-bounded, asynchronous where appropriate and explicit about errors/cancellation. No arbitrary JavaScript-to-reflection, filesystem, shell, JNI or unrestricted network access.
-6. Native APIs are exposed only through narrow platform adapters. Cordova plugin calls and the Windows WebView bridge implement the same documented frontend-facing contract.
+6. Native APIs are exposed only through narrow platform adapters. Cordova plugin calls and the Windows web bridge implement the same documented frontend-facing contract.
 7. Keep existing Kotlin/Lua/LiveOps boundaries intact. The web layer must not weaken the Lua sandbox or allow remotely supplied content to execute privileged native actions.
 
 ## Visual consistency rules
@@ -57,27 +59,38 @@ Do not rewrite the whole app in one PR. Keep the existing app working while vali
 
 ### Phase 0 — Audit and prototype
 
+**Prototype slice status:** An isolated Android-only debug route is now available from Developer Settings. It loads local assets through `WebViewAssetLoader`, feature-detects AndroidX WebKit's origin-restricted `WEB_MESSAGE_LISTENER`, allows only the app-assets HTTPS origin, validates small versioned requests through a separately tested protocol parser, strictly checks JSON field types, restricts bridge calls to the exact bundled prototype page, applies a restrictive Content Security Policy, and supports only `read_state` and `increment_counter`. The counter is in-memory Compose/Kotlin state and has no connection to game state or save files. This is intentionally not a production UI migration.
+
+Still required before Phase 0 can be considered complete:
+- Build and manually exercise the debug APK on a supported Android device; verify offline loading, back/navigation lifecycle, bridge feature detection, keyboard/focus and accessibility.
+- Run the focused `WebUiBridgeProtocolTest` suite covering malformed JSON, oversized messages, unknown actions, invalid fields, disallowed origins, non-main-frame calls and wrong pages. The tests are added but have not yet been executed.
+- Complete the Windows host spike described in [the Windows WebView host evaluation](WINDOWS_WEBVIEW_HOST_EVALUATION.md), including runtime/installer behavior, before claiming Android/Windows parity.
+- Measure startup, memory, bundle size and input latency on available hardware.
+
 - Inventory the current Compose destinations, Kotlin action/state APIs, save/recovery behavior, localization, audio, notifications, widgets, update channels and desktop integrations.
 - Record which screens are candidates for the shared web UI and which are native/system-only.
 - Build a small throwaway or isolated vertical-slice prototype containing one read-only state screen and one harmless state-changing action.
 - Prove Android WebView lifecycle, offline asset loading, keyboard/focus/resizing, accessibility and a Kotlin-authoritative action round trip. For the first bridge experiment, evaluate AndroidX WebKit `addWebMessageListener` with a strict local-origin allowlist; do not expose a broad `addJavascriptInterface` object as the default design. Feature-detect bridge support and document any fallback.
 - Compare Android WebView with Cordova only if a required plugin/packaging capability justifies Cordova's extra layer; Cordova is not a prerequisite for using HTML in Android.
-- Evaluate Windows WebView2 as the first host candidate, including Compose Desktop integration, runtime detection, offline installer behavior, supported Windows versions, package size, licensing, maintenance and bridge implementation. Microsoft recommends Evergreen distribution for most apps, but the prototype must account for machines where the runtime is absent and for offline installation. Do not select the dependency until this trade-off is documented.
 - Measure startup time, memory, bundle size, input latency and packaged app size on available devices.
 
-### Phase 1 — Define contracts and design tokens
+### Phase 1 — Define contracts and the game UI foundation
 
 - Write versioned request/response schemas and bridge error semantics.
-- Define shared design tokens, localization key handling and accessibility expectations.
+- Define the shared game theme and design tokens: color palettes, typography, spacing, backgrounds, panels/cards, buttons, navigation, progress indicators, currency/level displays, feedback states, dialogs, animation timing and reduced-motion behavior.
+- Define shared localization key handling, keyboard/mouse/touch behavior, focus visibility, accessibility labels and scalable layouts.
+- Build reusable HTML/CSS components around the intended game-like visual identity instead of copying generic app settings layouts or shipping a prototype-only design.
 - Add contract tests for invalid payloads, duplicate requests, stale state and failed persistence.
 - Do not move authoritative rules into JavaScript for convenience.
 
-### Phase 2 — First production vertical slice
+### Phase 2 — First real production gameplay screen
 
-- Migrate one bounded, low-risk screen to the shared web frontend.
-- Keep Kotlin responsible for all actions and persistence.
-- Compare Android and Windows screenshots and action outcomes.
-- Keep a reversible route back to the existing Compose screen until parity and save compatibility are demonstrated.
+- Start with the source-audited core guessing surface in the existing Play screen, as defined in the [Shared Web UI Migration Matrix](SHARED_WEB_UI_MIGRATION_MATRIX.md). It must render real Kotlin-owned game state and invoke the existing Kotlin guess path through a production bridge contract; a throwaway counter does not satisfy this milestone.
+- Keep the first slice reversible. The migration matrix records the candidate scope and requires an explicit hybrid-panel versus whole-Play-route decision after checking scroll, keyboard, focus and accessibility behavior.
+- Keep Kotlin responsible for all gameplay decisions, rewards and persistence.
+- Compare Android and Windows screenshots, accessibility/input behavior and action outcomes using the same state and canonical web assets.
+- Keep a reversible route back to the existing Compose screen until parity, save compatibility and runtime behavior are demonstrated.
+- After this slice passes its exit checks, migrate the remaining player-facing screens in focused feature slices and update the screen-level migration matrix. Keep native/system surfaces in Compose where appropriate.
 
 ### Phase 3 — Migrate by feature slices
 
@@ -110,7 +123,7 @@ Do not rewrite the whole app in one PR. Keep the existing app working while vali
 - WebView rendering differs slightly across Android WebView and Windows WebView implementations; shared CSS reduces drift but does not erase platform differences.
 - A native bridge creates a security and correctness boundary. It must be much narrower than unrestricted JS access to Kotlin.
 - A large web rewrite can regress input, accessibility, lifecycle, performance, save behavior or offline startup. Use a vertical slice and preserve rollback.
-- Cordova's Windows platform is not actively maintained. The Windows host needs its own maintained WebView integration.
+- Cordova's Windows platform is not actively maintained. The Windows host needs its own maintained web integration.
 - Compose remains useful for native/system surfaces and host integration, but forcing Compose to render the same game screens would duplicate the frontend and undermine the goal.
 - Sharing UI does not automatically share game rules. Kotlin remains authoritative and bridge contract tests must prove that.
 

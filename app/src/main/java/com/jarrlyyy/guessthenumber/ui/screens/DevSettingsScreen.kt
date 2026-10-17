@@ -123,6 +123,18 @@ fun DevSettingsScreen(
                 }
             }
 
+            // Phase 0: isolated shared-web UI experiment (debug builds only).
+            item {
+                Button(
+                    onClick = { onNavigate("web_ui_prototype") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(imageVector = Icons.Default.Web, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Shared Web UI Prototype", fontSize = 16.sp)
+                }
+            }
+
             // Keep Lua testing tools separate from the player-facing Activity Hub.
             item {
                 Button(

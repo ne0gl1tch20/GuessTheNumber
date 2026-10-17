@@ -418,6 +418,13 @@ fun NavGraph(
                                 onBack = { navController.popBackStack() }
                             )
                         }
+                        composable("web_ui_prototype") {
+                            SharedWebUiPrototypeScreen(
+                                state = state,
+                                onSubmitGuess = viewModel::makeGuessWithResult,
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
                     }
                     composable(Screen.SaveSlots.route) {
                         SaveSlotsScreen(
