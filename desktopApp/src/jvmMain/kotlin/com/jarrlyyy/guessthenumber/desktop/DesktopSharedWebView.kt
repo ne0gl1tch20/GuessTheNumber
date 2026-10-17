@@ -61,11 +61,9 @@ private class DesktopSharedWebViewController {
                 val webEngine = webView.engine
                 engine = webEngine
                 webEngine.isJavaScriptEnabled = true
-                val bridge = DesktopJavaScriptBridge { raw, reply ->
+                val bridge = DesktopJavaScriptBridge { raw ->
                     val currentHandler = handler.get()
-                    if (currentHandler == null || raw.length > 512) {
-                        reply(errorMessage(raw, "host_unavailable"))
-                    } else {
+                    if (currentHandler != null && raw.length <= 512) {
                         currentHandler(raw) { response ->
                             Platform.runLater {
                                 if (!disposed) {
@@ -150,17 +148,12 @@ private class DesktopSharedWebViewController {
         return index
     }
 
-    private fun errorMessage(raw: String, code: String): String {
-        val id = runCatching { org.json.JSONObject(raw).optString("id", "") }.getOrDefault("")
-        return org.json.JSONObject().put("version", 1).put("id", id)
-            .put("type", "error").put("error", code).toString()
-    }
 }
 
 private class DesktopJavaScriptBridge(
-    private val dispatch: (String, (String) -> Unit) -> Unit
+    private val dispatch: (String) -> Unit
 ) {
     fun postMessage(raw: String) {
-        dispatch(raw) { }
+        dispatch(raw)
     }
 }
