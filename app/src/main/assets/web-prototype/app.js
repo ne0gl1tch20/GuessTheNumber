@@ -11,6 +11,7 @@
   const streak = document.querySelector("#streak");
   let nextId = 1;
   let pending = false;
+  let pendingRequestId = null;
   let ready = false;
 
   function send(type, guess) {
@@ -19,6 +20,7 @@
       return;
     }
     const id = String(nextId++);
+    pendingRequestId = id;
     const request = { version: 1, id, type };
     if (typeof guess === "string") request.guess = guess;
     window.gtnHost.postMessage(JSON.stringify(request));
@@ -33,7 +35,11 @@
     let response;
     try { response = JSON.parse(message.data); }
     catch { showFeedback("The host returned an unreadable response.", "error"); pending = false; button.disabled = !ready; return; }
-    if (response.version !== 1) { showFeedback("Unsupported bridge version.", "error"); return; }
+    // Ignore delayed or unrelated replies instead of letting them roll the UI
+    // back to an older state or unlock a newer in-flight request.
+    if (typeof response.id !== "string" || response.id !== pendingRequestId) return;
+    pendingRequestId = null;
+    if (response.version !== 1) { showFeedback("Unsupported bridge version.", "error"); pending = false; button.disabled = !ready; return; }
     if (response.type === "error") {
       showFeedback(response.error === "guess_processing_failed" ? "The guess could not be processed. Try again." : "Request rejected: " + String(response.error || "unknown_error"), "error");
       pending = false;
