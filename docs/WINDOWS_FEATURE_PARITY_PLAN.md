@@ -3,7 +3,7 @@
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
 **Reviewed:** 2026-10-16
 
-**Latest increment (2026-10-16):** PR #220 merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f` with Android and Windows CI passing. Current candidate PR #221 implements all five Android Arcade minigames on Windows, loads the same canonical `minigames.json`, and routes rewards through `DesktopEconomyTransactions.awardArcadeReward` so the shared Nebula/Money boosts apply. Candidate CI is pending; runtime verification of PR #220's upgrades/navigation and the Arcade port remains open.
+**Latest increment (2026-10-16):** PR #220 merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f` with Android and Windows CI passing. PR #221 then merged the five Android Arcade minigames for Windows, using the canonical `minigames.json` and shared `DesktopEconomyTransactions.awardArcadeReward` transaction. PR #222 fixed a nested vertical-scroll crash in the Windows Arcade route; Android Validation and Windows Desktop CI passed on its exact head, and the owner confirmed Arcade opens successfully in the Windows app. Broader runtime verification of the five games, reward effects/save persistence and PR #220's upgrades/navigation remains open.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
@@ -134,7 +134,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Prestige and Ultra flows enforce shared requirements/rewards and now require confirmation before reset.
 - [x] Load talent costs and prerequisites from the canonical catalog; PR #218 makes both purchase validation and Talent Web parent gating read the bundled catalog rather than a second hardcoded rule map. Its Android and Windows CI passed before merge. The visible Windows labels/descriptions still use the Android fallback copy, and locale-aware rendering/runtime parity remain open.
 - [x] Implement all six permanent Prestige/Ultra upgrade effects in shared rules for Android and Windows, driven by each canonical catalog's `effectPerLevel`: Prestige Wealth adds 0.5× per level to its money multiplier; Cosmic Wealth adds 2× per level to its money multiplier; the two money multipliers stack multiplicatively; Prestige Catalyst multiplies reset Prestige by 1 + 0.2× level; Prestige Endowment grants 1,000 Money per level after Prestige or Ultra reset using the pre-reset level; Eternal Expansion multiplies Ultra reset reward by 1 + 0.5× level while preserving the 2,000 cap; Nebula Resonance multiplies achievement/Arcade Nebula payouts by 1 + level and stacks with the existing `nebula_boost` shop item. Shared achievement unlock/reward logic is now used by both hosts.
-- [ ] Verify all six effects and reset/save persistence in the merged Windows build. Windows Arcade and Music Player routes are now directly reachable from the desktop main navigation but still use placeholder screens; the Nebula upgrade's Windows Arcade behavior cannot be confirmed until Arcade is implemented.
+- [ ] Verify all six effects and reset/save persistence in the merged Windows build. The Windows Arcade screen is now implemented; the owner confirmed it opens without the nested-scroll crash fixed in PR #222. Verify individual minigame outcomes, Nebula/Money reward multipliers and save/reload persistence separately. The Music Player remains a placeholder.
 - [ ] Verify large-number display and calculations across representative Android-matching cases.
 - [x] Add deterministic exact-cost bulk-purchase tests and retain reset-preservation/duplicate-reward tests.
 - [ ] Verify all reset preservation and boundary cases on the current candidate.
@@ -156,7 +156,8 @@ The port is complete only when every Android player-facing screen and reachable 
 ### W4. Activities and events
 
 - [x] Port the five catalog-backed Android Arcade minigames (Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush) to Windows and route payouts through the shared economy transaction. CI enforces that the packaged desktop minigame catalog matches Android's canonical asset.
-- [ ] Verify Arcade runtime behavior, localized strings and reward/save persistence on Windows.
+- [x] Confirm the Windows Arcade route opens without the nested-scroll exception (PR #222; owner-reported runtime verification).
+- [ ] Verify all five minigames' win/loss behavior, localized strings, reward multipliers and reward/save persistence on Windows.
 - [ ] Random events, challenge/mutator setup and staking where in agreed release scope.
 - [ ] Number Rush and bundled LuaJ activities using existing sandbox/validation boundaries.
 - [ ] Offline event availability and reward validation.
@@ -392,8 +393,8 @@ This is a source and CI review, not a claim of interactive Windows runtime verif
 Desktop quick access intentionally differs from Android navigation for reachability only. The ordered Windows main bar/rail is Play → Upgrades → Shop → Prestige → Ultra → Settings → Arcade → Music → Save Slots → Statistics → World Map → Changelog → More. It defaults to the left rail and supports scrollable top/bottom variants. This does not change gameplay rules, progression, save data or Android navigation. Some exposed destinations remain partial/placeholder implementations and are still tracked above.
 
 
-### Arcade port candidate (2026-10-16)
+### Merged Arcade port and Windows scroll fix (2026-10-16)
 
-- PR #221 loads the canonical minigame catalog from a Windows classpath resource, with JSON validation and CI parity checking against Android's asset.
-- All five minigames use Android's existing timers, target ranges, success/failure behavior and fixed payout amounts. Reward application uses the shared desktop transaction adapter, which applies the same permanent Money/Nebula upgrade effects and persists state through the active save slot.
-- **Candidate CI:** pending. **Manual verification after CI:** play each of the five minigames, check correct and incorrect outcomes, verify each payout and the Ultra Nebula/Money multipliers, restart to confirm balances persist, and verify the Arcade catalog failure path grants no reward.
+- PR #221 merged the canonical minigame catalog and all five Windows Arcade minigames. Android Validation [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38913830827) and Windows Desktop CI [passed](https://github.com/ne0gl1tch20/GuessTheNumber/actions/runs/38913830817) on its exact head.
+- PR #222 moved Arcade outside the parent vertically scrollable game column, preventing the nested-scroll infinite-height exception. Android Validation and Windows Desktop CI both passed on the PR head; the owner confirmed Arcade opens successfully in the Windows app.
+- **Runtime scope confirmed:** Arcade opens without the reported crash. This does not yet verify every minigame's outcomes, payout amounts, Money/Nebula multipliers, localization, save/reload persistence or the invalid-catalog path. Keep those checks open.
