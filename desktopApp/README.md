@@ -18,7 +18,7 @@ On Windows PowerShell, use `.\gradlew.bat :desktopApp:run`.
 - The shared screen uses `:shared`'s `GuessRules` for feedback, supports mouse interaction, submit-on-Enter and a responsive max-width layout.
 - Runs offline and does not connect to services.
 
-This is the first shared-UI slice, not the full Android UI migration. Android's production Play screen still contains Android-specific repositories, localization access and game-state callbacks, so it has intentionally not been replaced by the smaller pilot screen. Next work should introduce platform adapters and move production gameplay state behind shared contracts before migrating the full Play screen and navigation. Save persistence, LuaJ, LiveOps, audio and installer/update paths remain platform-specific until individually audited.
+This is the first shared-UI slice, not the full Android UI migration. Android's production Play screen still contains Android-specific repositories, localization access and game-state callbacks, so it has intentionally not been replaced by the smaller pilot screen. The chosen long-term direction is one HTML/CSS/JavaScript frontend for shared player-facing screens, with Kotlin/KMP authoritative and Compose retained for native/system surfaces and the desktop shell. That migration has not started: this module still renders Compose screens, and no embedded WebView host is configured. Before production migration, prototype the shared bundle and typed Kotlin-authoritative bridge, then verify offline loading, keyboard/focus/resizing, accessibility, performance and parity. Save persistence, LuaJ, LiveOps, audio and installer/update paths remain platform-specific until individually audited.
 
 
 ## Windows Debug update channel
