@@ -50,6 +50,7 @@ fun ProductionWebPlayScreen(
     AndroidView(
         modifier = Modifier.fillMaxSize(),
         factory = { context ->
+            val worldDefinitions = WorldConfigRepository(context).loadWorlds()
             val assetLoader = WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
                 .build()
@@ -88,7 +89,7 @@ fun ProductionWebPlayScreen(
                                         val result = if (parsed.type == "submit_guess" && parsed.guess != null) try { submitGuess(parsed.guess) } catch (_: Exception) { null } else null
                                         if (parsed.type == "submit_guess" && result == null) { replyProxy.postMessage(errorResponse(parsed.id, "guess_processing_failed")); return@post }
                                         val game = readState()
-                                        val activeBossWorld = game.activeBossBattleWorldId?.let { id -> WorldConfigRepository(context).loadWorlds().firstOrNull { it.id == id } }
+                                        val activeBossWorld = game.activeBossBattleWorldId?.let { id -> worldDefinitions.firstOrNull { it.id == id } }
                                         val bossDamage = activeBossWorld?.let { (game.bossBattleProgress[it.bossId] ?: 0).coerceIn(0, it.hp) } ?: 0
                                         val viewState = JSONObject()
                                             .put("rangeMin", result?.rangeMin ?: game.currentRangeMin)
