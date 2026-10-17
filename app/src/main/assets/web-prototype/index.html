@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Shared Web UI Prototype</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <p class="eyebrow">PHASE 0 · PROTOTYPE</p>
+    <h1>One UI, two hosts.</h1>
+    <p class="intro">This tiny screen is bundled with the app. Kotlin owns the state; HTML only displays it and sends a named action.</p>
+    <section class="panel" aria-labelledby="counter-heading">
+      <h2 id="counter-heading">Host-owned counter</h2>
+      <p id="counter" class="counter" aria-live="polite">Connecting…</p>
+      <button id="increment" type="button" disabled>Increment in Kotlin</button>
+      <p id="status" class="status" role="status">Waiting for the local host bridge…</p>
+    </section>
+    <p class="footnote">Prototype state only. This does not read or modify your game save.</p>
+  </main>
+</body>
+</html>
