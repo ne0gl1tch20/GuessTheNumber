@@ -57,7 +57,7 @@ Do not rewrite the whole app in one PR. Keep the existing app working while vali
 
 ### Phase 0 — Audit and prototype
 
-**Prototype slice status:** An isolated Android-only debug route is now available from Developer Settings. It loads local assets through `WebViewAssetLoader`, feature-detects AndroidX WebKit's origin-restricted `WEB_MESSAGE_LISTENER`, allows only the app-assets HTTPS origin, validates small versioned requests, and supports only `read_state` and `increment_counter`. The counter is in-memory Compose/Kotlin state and has no connection to game state or save files. This is intentionally not a production UI migration.
+**Prototype slice status:** An isolated Android-only debug route is now available from Developer Settings. It loads local assets through `WebViewAssetLoader`, feature-detects AndroidX WebKit's origin-restricted `WEB_MESSAGE_LISTENER`, allows only the app-assets HTTPS origin, validates small versioned requests, restricts bridge calls to the exact bundled prototype page, applies a restrictive Content Security Policy, and supports only `read_state` and `increment_counter`. The counter is in-memory Compose/Kotlin state and has no connection to game state or save files. This is intentionally not a production UI migration.
 
 Still required before Phase 0 can be considered complete:
 - Build and manually exercise the debug APK on a supported Android device; verify offline loading, back/navigation lifecycle, bridge feature detection, keyboard/focus and accessibility.
