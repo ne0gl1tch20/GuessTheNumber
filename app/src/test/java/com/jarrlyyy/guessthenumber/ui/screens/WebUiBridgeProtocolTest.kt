@@ -46,6 +46,17 @@ class WebUiBridgeProtocolTest {
         assertEquals("invalid_request", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
+
+    @Test
+    fun acceptsOnlyAllowlistedProgressionRoutes() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("nav-1", "navigate", route = "world_map"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"nav-1","type":"navigate","route":"world_map"}""")
+        )
+        val unknown = WebUiBridgeProtocol.parse("""{"version":1,"id":"nav-2","type":"navigate","route":"dev_settings"}""")
+        assertEquals("invalid_route", (unknown as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
     @Test
     fun acceptsIncrementRequest() {
         assertEquals(
