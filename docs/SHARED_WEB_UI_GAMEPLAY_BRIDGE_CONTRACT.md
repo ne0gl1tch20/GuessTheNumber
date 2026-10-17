@@ -95,4 +95,4 @@ Move only the primary guessing interaction first. Keep economy panels, boss/even
 
 ## Current implementation status
 
-The existing debug prototype supports only `read_state` and `increment_counter` against a temporary Kotlin counter. It does not implement this contract, submit guesses, access the game save or demonstrate Windows parity. This document defines the next integration target; it does not mark Phase 0 complete.
+The debug-only Android preview now supports `read_state` and `submit_guess` through the versioned, origin-restricted bridge. The host calls `GameViewModel.makeGuessWithResult()` and returns only public feedback and safe counters/range; it never sends the secret target or reward internals to JavaScript. The legacy temporary counter action remains only for compatibility with existing protocol coverage. This is still an isolated preview route, not a migration of the production Play screen. Builds, tests, device behavior, durable-save confirmation and Windows parity remain unverified.
