@@ -58,6 +58,50 @@
       <div class="progress-caption"><span>RUN MOMENTUM</span><span id="bestStreak">BEST 0</span></div>
     </section>
 
+    <section class="progression-card card" id="progressionPanel" aria-label="Beyond the Numbers progression">
+      <div class="panel-title"><span class="panel-glyph">◈</span><div><span class="eyebrow">BEYOND THE NUMBERS</span><h2>Your universe</h2></div><span class="panel-chip" id="worldCount">1 WORLD</span></div>
+      <div class="currency-grid">
+        <article class="currency-tile prestige-tile"><span>✦ PRESTIGE</span><strong id="prestige">0</strong><small id="prestigeCount">0 ascensions</small></article>
+        <article class="currency-tile ultra-tile"><span>⬡ ULTRA</span><strong id="ultra">0</strong><small id="ultraCount">0 ultra resets</small></article>
+        <article class="currency-tile nebula-tile"><span>☄ NEBULA</span><strong id="nebula">0</strong><small>Cosmic currency</small></article>
+      </div>
+      <div class="realm-row"><div class="realm-emblem">✧</div><div class="realm-copy"><span class="stat-label">CURRENT REALM</span><strong id="activeWorld">Verdant Grove</strong><small id="realmSubtext">Your adventure is taking shape.</small></div><div class="realm-score"><strong id="bossVictories">0</strong><small>BOSSES</small></div></div>
+      <div class="progression-mini-grid">
+        <div><span>⌂</span><strong id="homeBase">Lv. 0</strong><small>Home base</small></div>
+        <div><span>∞</span><strong id="riftTier">Tier 0</strong><small>Endless Rift best</small></div>
+        <div><span>♜</span><strong id="defeatedBosses">0</strong><small>Bosses defeated</small></div>
+      </div>
+    </section>
+
+    <section class="boss-card card" id="bossPanel" hidden aria-label="Active boss encounter">
+      <div class="boss-art" aria-hidden="true">♜</div>
+      <div class="boss-content"><span class="eyebrow">ENCOUNTER IN PROGRESS</span><h2 id="bossName">Boss encounter</h2><p>Correct guesses deal damage. Keep your run going.</p>
+        <div class="boss-health-row"><span>HEALTH</span><strong id="bossHealthText">0 / 0 HP</strong></div>
+        <div class="boss-health-track"><div id="bossHealthFill" class="boss-health-fill"></div></div>
+      </div>
+      <span class="boss-live">ACTIVE</span>
+    </section>
+
+    <section class="quest-card card" id="questPanel" aria-label="Daily momentum">
+      <div class="panel-title"><span class="panel-glyph quest-glyph">✦</span><div><span class="eyebrow">DAILY MOMENTUM</span><h2>Today's run</h2></div><span class="panel-chip" id="claimedQuests">0 CLAIMED</span></div>
+      <div class="quest-metrics">
+        <div><strong id="dailyGuesses">0</strong><span>Guesses made</span></div>
+        <div><strong id="dailyCorrect">0</strong><span>Correct guesses</span></div>
+        <div><strong id="dailyBestStreak">0</strong><span>Best daily streak</span></div>
+      </div>
+      <div class="quest-foot"><span class="quest-pulse"></span><span id="questMessage">Every guess builds your run.</span></div>
+    </section>
+
+    <section class="loot-card card" aria-label="Loot inventory">
+      <div class="loot-heading"><span class="panel-glyph loot-glyph">◇</span><div><span class="eyebrow">LOOT INVENTORY</span><h2>Ready to open</h2></div></div>
+      <div class="loot-items">
+        <div><span class="loot-icon common">□</span><span><strong id="commonChests">0</strong><small>Common</small></span></div>
+        <div><span class="loot-icon rare">◆</span><span><strong id="rareChests">0</strong><small>Rare</small></span></div>
+        <div><span class="loot-icon epic">✦</span><span><strong id="epicChests">0</strong><small>Epic</small></span></div>
+      </div>
+      <p class="loot-note">Your inventory is synced from the game engine.</p>
+    </section>
+
     <section class="guess-card card">
       <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
       <form id="guessForm" autocomplete="off">
