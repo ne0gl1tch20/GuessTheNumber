@@ -92,7 +92,11 @@ fun NavGraph(
         onClaimDailyQuest = viewModel::claimDailyQuest,
         onOpenLootChest = viewModel::openLootChest,
         onNavigateProgression = {},
-        onWorldAction = viewModel::worldProgressAction
+        onWorldAction = viewModel::worldProgressAction,
+        onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
+        onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
+        onEquipCosmetic = viewModel::equipCosmetic,
+        onUpdateMultiplier = viewModel::updateBuyMultiplier
     )
 
     if (initialDestination != null) {
