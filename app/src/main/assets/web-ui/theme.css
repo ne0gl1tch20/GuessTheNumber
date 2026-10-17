@@ -1,0 +1,184 @@
+/*
+ * Shared GuessTheNumber web UI foundation.
+ * Keep this file presentation-only and host-neutral so Android WebView and the
+ * future Windows host can load the same design tokens and components.
+ */
+:root {
+  color-scheme: dark light;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --gtn-color-bg: #11151d;
+  --gtn-color-surface: #191f2b;
+  --gtn-color-surface-raised: #242d3d;
+  --gtn-color-text: #f4f6fb;
+  --gtn-color-text-muted: #b7c0d1;
+  --gtn-color-accent: #a8c7fa;
+  --gtn-color-on-accent: #10213c;
+  --gtn-color-border: #3a465a;
+  --gtn-color-focus: #d6e5ff;
+  --gtn-color-danger: #ffb4ab;
+  --gtn-color-on-danger: #690005;
+
+  --gtn-space-1: 4px;
+  --gtn-space-2: 8px;
+  --gtn-space-3: 12px;
+  --gtn-space-4: 16px;
+  --gtn-space-5: 20px;
+  --gtn-space-6: 24px;
+  --gtn-space-8: 32px;
+
+  --gtn-radius-sm: 10px;
+  --gtn-radius-md: 16px;
+  --gtn-radius-lg: 24px;
+  --gtn-radius-pill: 999px;
+
+  --gtn-control-min-height: 48px;
+  --gtn-content-max-width: 760px;
+  --gtn-motion-fast: 120ms;
+  --gtn-motion-standard: 200ms;
+  --gtn-focus-width: 3px;
+  --gtn-focus-offset: 3px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --gtn-color-bg: #f6f7fb;
+    --gtn-color-surface: #ffffff;
+    --gtn-color-surface-raised: #edf1f8;
+    --gtn-color-text: #171b24;
+    --gtn-color-text-muted: #505b6c;
+    --gtn-color-accent: #244f91;
+    --gtn-color-on-accent: #ffffff;
+    --gtn-color-border: #c5cedd;
+    --gtn-color-focus: #163f7a;
+    --gtn-color-danger: #ba1a1a;
+    --gtn-color-on-danger: #ffffff;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 0;
+  background: var(--gtn-color-bg);
+  color: var(--gtn-color-text);
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--gtn-color-bg);
+  color: var(--gtn-color-text);
+  font-family: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+[role="button"] {
+  min-height: var(--gtn-control-min-height);
+}
+
+button {
+  border: 0;
+  border-radius: var(--gtn-radius-md);
+  padding: var(--gtn-space-3) var(--gtn-space-5);
+  background: var(--gtn-color-accent);
+  color: var(--gtn-color-on-accent);
+  font-weight: 750;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: var(--gtn-focus-width) solid var(--gtn-color-focus);
+  outline-offset: var(--gtn-focus-offset);
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  opacity: .58;
+  cursor: not-allowed;
+}
+
+.gtn-screen {
+  width: min(100%, var(--gtn-content-max-width));
+  margin-inline: auto;
+  padding: max(var(--gtn-space-6), env(safe-area-inset-top))
+    var(--gtn-space-5)
+    max(var(--gtn-space-6), env(safe-area-inset-bottom));
+}
+
+.gtn-panel {
+  padding: var(--gtn-space-6);
+  border: 1px solid var(--gtn-color-border);
+  border-radius: var(--gtn-radius-lg);
+  background: var(--gtn-color-surface-raised);
+}
+
+.gtn-muted {
+  color: var(--gtn-color-text-muted);
+  line-height: 1.55;
+}
+
+.gtn-eyebrow {
+  color: var(--gtn-color-accent);
+  font-size: .78rem;
+  font-weight: 750;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.gtn-number {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.gtn-status {
+  min-height: 1.5em;
+  color: var(--gtn-color-text-muted);
+  line-height: 1.5;
+}
+
+.gtn-error {
+  color: var(--gtn-color-danger);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button {
+    transition:
+      filter var(--gtn-motion-fast) ease,
+      transform var(--gtn-motion-fast) ease;
+  }
+
+  button:active:not(:disabled) {
+    transform: scale(.985);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
