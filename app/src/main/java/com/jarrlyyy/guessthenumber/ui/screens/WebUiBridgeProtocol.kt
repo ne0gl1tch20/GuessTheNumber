@@ -9,6 +9,7 @@ internal object WebUiBridgeProtocol {
     private val dailyQuestIds = setOf("daily_guesses_10", "daily_correct_5", "daily_streak_5", "daily_upgrades_3")
     private val lootTiers = setOf("common", "rare", "epic")
     private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements")
+    private val worldActions = setOf("unlock", "boss")
 
     sealed interface ParseResult {
         data class Valid(
@@ -72,6 +73,14 @@ internal object WebUiBridgeProtocol {
                 val route = request.opt("route") as? String ?: return ParseResult.Invalid("invalid_route", id)
                 if (route !in navigationRoutes) return ParseResult.Invalid("invalid_route", id)
                 ParseResult.Valid(id, type, route = route)
+            }
+            "world_action" -> {
+                if (request.length() != 5 || !request.has("worldId") || !request.has("action")) return ParseResult.Invalid("invalid_request", id)
+                val worldId = request.opt("worldId") as? String ?: return ParseResult.Invalid("invalid_world", id)
+                val action = request.opt("action") as? String ?: return ParseResult.Invalid("invalid_world_action", id)
+                if (!worldId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) return ParseResult.Invalid("invalid_world", id)
+                if (action !in worldActions) return ParseResult.Invalid("invalid_world_action", id)
+                ParseResult.Valid(id, type, worldId = worldId, worldAction = action)
             }
             else -> ParseResult.Invalid("unknown_action", id)
         }

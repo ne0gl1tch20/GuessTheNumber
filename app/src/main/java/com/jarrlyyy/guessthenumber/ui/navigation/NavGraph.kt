@@ -323,7 +323,8 @@ fun NavGraph(
                                 },
                                 onClaimDailyQuest = viewModel::claimDailyQuest,
                                 onOpenLootChest = viewModel::openLootChest,
-                                onNavigateProgression = { route -> navController.navigate(route) { launchSingleTop = true } }
+                                onNavigateProgression = { route -> navController.navigate(route) { launchSingleTop = true } },
+                                onWorldAction = viewModel::worldProgressAction
                             )
                         } else {
                             ExpressiveScreen(enabled = !state.settings.reducedMotion) {
