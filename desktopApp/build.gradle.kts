@@ -2,16 +2,16 @@ import buildlogic.GenerateDesktopLogoAssets
 
 import org.gradle.api.tasks.testing.Test
 
-javafx {
-    version = "21.0.6"
-    modules("javafx.controls", "javafx.web", "javafx.swing")
-}
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     id("org.openjfx.javafxplugin") version "0.1.0"
+}
+
+javafx {
+    version = "21.0.6"
+    modules("javafx.controls", "javafx.web", "javafx.swing")
 }
 
 val windowsPackageVersion = providers.environmentVariable("GTN_WINDOWS_PACKAGE_VERSION")
