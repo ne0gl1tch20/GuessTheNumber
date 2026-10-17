@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Guess The Number</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="app" aria-live="polite">
+  <main class="app">
     <header class="topbar">
       <div class="brand-lockup">
         <div class="brand-orb" aria-hidden="true">✦</div>
@@ -26,7 +26,7 @@
         <span class="eyebrow">CURRENT RUN</span>
         <div class="range-label">Find the secret number</div>
         <div class="range" id="rangeText">1 — 100</div>
-        <div class="feedback" id="feedback">Make your move.</div>
+        <div class="feedback" id="feedback" role="status" aria-live="polite" aria-atomic="true">Make your move.</div>
       </div>
       <div class="sparkle-field" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
