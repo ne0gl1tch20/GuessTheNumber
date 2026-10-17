@@ -8,6 +8,7 @@ internal object WebUiBridgeProtocol {
     const val MAX_MESSAGE_LENGTH = 512
     private val dailyQuestIds = setOf("daily_guesses_10", "daily_correct_5", "daily_streak_5", "daily_upgrades_3")
     private val lootTiers = setOf("common", "rare", "epic")
+    private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements")
 
     sealed interface ParseResult {
         data class Valid(
@@ -15,7 +16,8 @@ internal object WebUiBridgeProtocol {
             val type: String,
             val guess: Long? = null,
             val questId: String? = null,
-            val tier: String? = null
+            val tier: String? = null,
+            val route: String? = null
         ) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
@@ -64,6 +66,12 @@ internal object WebUiBridgeProtocol {
                 val tier = request.opt("tier") as? String ?: return ParseResult.Invalid("invalid_tier", id)
                 if (tier !in lootTiers) return ParseResult.Invalid("invalid_tier", id)
                 ParseResult.Valid(id, type, tier = tier)
+            }
+            "navigate" -> {
+                if (request.length() != 4 || !request.has("route")) return ParseResult.Invalid("invalid_request", id)
+                val route = request.opt("route") as? String ?: return ParseResult.Invalid("invalid_route", id)
+                if (route !in navigationRoutes) return ParseResult.Invalid("invalid_route", id)
+                ParseResult.Valid(id, type, route = route)
             }
             else -> ParseResult.Invalid("unknown_action", id)
         }
