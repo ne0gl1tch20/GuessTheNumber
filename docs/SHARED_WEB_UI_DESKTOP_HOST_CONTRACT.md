@@ -1,6 +1,6 @@
 # Shared Web Play UI: Desktop and Multi-Host Contract
 
-**Status:** Frontend responsiveness implemented on the idle-game Play bundle branch. Windows/other native hosts are not implemented by this document.
+**Status:** Responsive local HTML/CSS/JS Play bundle is integrated into the Android player-facing route. Windows/other native hosts are not implemented by this document.
 **Reviewed:** 2026-10-17
 **Related:** [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md), [Migration Matrix](SHARED_WEB_UI_MIGRATION_MATRIX.md), [Gameplay Bridge Contract](SHARED_WEB_UI_GAMEPLAY_BRIDGE_CONTRACT.md), [Windows Feature Parity Plan](WINDOWS_FEATURE_PARITY_PLAN.md)
 

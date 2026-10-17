@@ -1,6 +1,6 @@
 # Shared Web UI Migration Matrix
 
-**Status:** Shared idle-game Play bundle and Android WebView host source are present on the PR branch; production route migration and all runtime parity remain unverified.
+**Status:** The local web bundle is integrated into Android's main player-facing route through `ProductionWebAppScreen`. The current bundle has Play, Worlds, Rewards and Journey tabs; complete coverage of every former Compose destination and runtime parity remain unfinished/unverified.
 **Reviewed:** 2026-10-17
 **Architecture authority:** [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md)
 **Product roadmap:** [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md)
@@ -70,8 +70,8 @@ The complete screen inventory is not yet source-audited. Add each screen only af
 
 | Screen / surface | Current status | Next evidence required |
 |---|---|---|
-| Shared web bridge prototype | Debug-only Android experiment; not production UI; loads the shared CSS foundation | Run focused tests and APK build, exercise lifecycle/offline/bridge behavior on device, complete Windows host spike |
-| Shared web theme foundation | Reusable CSS tokens and basic game UI primitives; used by the prototype only | Validate contrast, scaling, accessibility, safe areas and host behavior; adopt in the first production screen |
+| Shared web bridge prototype | Debug-only Android experiment; separate from the production web app | Run focused tests and APK build, exercise lifecycle/offline/bridge behavior on device, complete Windows host spike |
+| Shared web theme foundation | Reusable CSS token foundation exists; the production Play bundle currently has its own more advanced styling | Unify the production bundle with shared tokens in a cohesive visual-system pass; validate contrast, scaling, accessibility, safe areas and host behavior |
 | Play: core guessing surface | Compose; first production migration candidate | Finalize bridge contract and hybrid-vs-whole-route layout decision |
 | Play: economy/progression/boss/event sections | Compose | Inventory individual sections and callbacks before deciding whether they remain Compose temporarily or move with the route |
 | Upgrade, Shop, More and progression destinations | Compose | Source-backed inventory, then migrate by coherent feature slices |
