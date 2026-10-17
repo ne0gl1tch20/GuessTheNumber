@@ -89,6 +89,10 @@ fun NavGraph(
         incomePerSecond = incomePerSecond,
         stateProvider = { viewModel.gameState.value },
         onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
+        onBuyUpgrade = onBuyUpgrade,
+        onBuyShopItem = onBuyShopItem,
+        onEquipCosmetic = onEquipCosmetic,
+        onUpdateMultiplier = onUpdateMultiplier,
         onClaimDailyQuest = viewModel::claimDailyQuest,
         onOpenLootChest = viewModel::openLootChest,
         onWorldAction = viewModel::worldProgressAction
