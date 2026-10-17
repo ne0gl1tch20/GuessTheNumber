@@ -1,0 +1,67 @@
+package com.jarrlyyy.guessthenumber.ui.screens
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+
+@RunWith(RobolectricTestRunner::class)
+class WebUiBridgeProtocolTest {
+    @Test
+    fun acceptsReadStateRequest() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("req_1", "read_state"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"req_1","type":"read_state"}""")
+        )
+    }
+
+    @Test
+    fun acceptsIncrementRequest() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("tap-2", "increment_counter"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"tap-2","type":"increment_counter"}""")
+        )
+    }
+
+    @Test
+    fun rejectsMalformedJson() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Invalid("invalid_json"),
+            WebUiBridgeProtocol.parse("{not-json")
+        )
+    }
+
+    @Test
+    fun rejectsOversizedMessagesBeforeParsing() {
+        val result = WebUiBridgeProtocol.parse("x".repeat(WebUiBridgeProtocol.MAX_MESSAGE_LENGTH + 1))
+        assertEquals(WebUiBridgeProtocol.ParseResult.Invalid("message_too_large"), result)
+    }
+
+    @Test
+    fun rejectsUnknownActions() {
+        val result = WebUiBridgeProtocol.parse("""{"version":1,"id":"req-3","type":"delete_save"}""")
+        assertEquals(WebUiBridgeProtocol.ParseResult.Invalid("unknown_action", "req-3"), result)
+    }
+
+    @Test
+    fun rejectsUnexpectedFields() {
+        val result = WebUiBridgeProtocol.parse(
+            """{"version":1,"id":"req-4","type":"read_state","payload":"unexpected"}"""
+        )
+        assertTrue(result is WebUiBridgeProtocol.ParseResult.Invalid)
+        assertEquals("invalid_request", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
+    fun rejectsUnsupportedVersions() {
+        val result = WebUiBridgeProtocol.parse("""{"version":2,"id":"req-5","type":"read_state"}""")
+        assertEquals("invalid_request", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
+    fun rejectsInvalidRequestIds() {
+        val result = WebUiBridgeProtocol.parse("""{"version":1,"id":"bad id","type":"read_state"}""")
+        assertEquals("invalid_request", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+}
