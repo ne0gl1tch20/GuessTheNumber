@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Guess The Number</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app" aria-live="polite">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-orb" aria-hidden="true">✦</div>
+        <div>
+          <div class="eyebrow">NUMBERVERSE</div>
+          <h1>Guess The Number</h1>
+        </div>
+      </div>
+      <div class="live-pill"><span class="live-dot"></span><span id="statusLabel">ONLINE</span></div>
+    </header>
+
+    <section class="hero-card card">
+      <div class="hero-glow"></div>
+      <div class="hero-copy">
+        <span class="eyebrow">CURRENT RUN</span>
+        <div class="range-label">Find the secret number</div>
+        <div class="range" id="rangeText">1 — 100</div>
+        <div class="feedback" id="feedback">Make your move.</div>
+      </div>
+      <div class="sparkle-field" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    </section>
+
+    <section class="stats-grid" aria-label="Run statistics">
+      <article class="stat-card card">
+        <span class="stat-icon">🎯</span>
+        <span class="stat-value" id="attempts">0</span>
+        <span class="stat-label">ATTEMPTS</span>
+      </article>
+      <article class="stat-card card">
+        <span class="stat-icon">✨</span>
+        <span class="stat-value" id="correct">0</span>
+        <span class="stat-label">CORRECT</span>
+      </article>
+      <article class="stat-card card">
+        <span class="stat-icon">🔥</span>
+        <span class="stat-value" id="streak">0</span>
+        <span class="stat-label">STREAK</span>
+      </article>
+    </section>
+
+    <section class="economy-card card">
+      <div class="economy-row">
+        <div><span class="stat-label">MONEY</span><strong id="money">0</strong></div>
+        <div class="income"><span>＋</span><strong id="income">0</strong><small>/s</small></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-caption"><span>RUN MOMENTUM</span><span id="bestStreak">BEST 0</span></div>
+    </section>
+
+    <section class="guess-card card">
+      <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
+      <form id="guessForm" autocomplete="off">
+        <div class="input-shell">
+          <input id="guessInput" type="text" inputmode="numeric" pattern="-?[0-9]+" maxlength="20" placeholder="Enter a number" aria-label="Your guess">
+          <button id="guessButton" type="submit"><span>GUESS</span><b>→</b></button>
+        </div>
+      </form>
+      <div class="microcopy" id="microcopy">The engine decides. The interface celebrates.</div>
+    </section>
+
+    <section class="quick-actions">
+      <button class="action-card" id="beyondButton" type="button"><span class="action-icon">◈</span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong>›</strong></button>
+      <button class="action-card" id="questButton" type="button"><span class="action-icon">✦</span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong>›</strong></button>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
