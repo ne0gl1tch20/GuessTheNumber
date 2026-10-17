@@ -33,13 +33,17 @@ fun ProductionWebPlayScreen(
     state: GameState,
     incomePerSecond: BigNumber,
     stateProvider: () -> GameState,
-    onSubmitGuess: (Long) -> GuessSubmissionResult
+    onSubmitGuess: (Long) -> GuessSubmissionResult,
+    onClaimDailyQuest: (String) -> Unit,
+    onOpenLootChest: (String) -> Unit
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val currentGameState by rememberUpdatedState(state)
     val currentIncome by rememberUpdatedState(incomePerSecond)
     val readState by rememberUpdatedState(stateProvider)
     val submitGuess by rememberUpdatedState(onSubmitGuess)
+    val claimDailyQuest by rememberUpdatedState(onClaimDailyQuest)
+    val openLootChest by rememberUpdatedState(onOpenLootChest)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
@@ -86,9 +90,28 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        val beforeAction = readState()
                                         val result = if (parsed.type == "submit_guess" && parsed.guess != null) try { submitGuess(parsed.guess) } catch (_: Exception) { null } else null
                                         if (parsed.type == "submit_guess" && result == null) { replyProxy.postMessage(errorResponse(parsed.id, "guess_processing_failed")); return@post }
+                                        try {
+                                            when (parsed.type) {
+                                                "claim_daily_quest" -> parsed.questId?.let(claimDailyQuest)
+                                                "open_loot_chest" -> parsed.tier?.let(openLootChest)
+                                            }
+                                        } catch (_: Exception) {
+                                            replyProxy.postMessage(errorResponse(parsed.id, "action_processing_failed")); return@post
+                                        }
                                         val game = readState()
+                                        val actionAccepted = when (parsed.type) {
+                                            "claim_daily_quest" -> parsed.questId != null && parsed.questId in game.claimedDailyQuests && parsed.questId !in beforeAction.claimedDailyQuests
+                                            "open_loot_chest" -> when (parsed.tier) {
+                                                "common" -> game.lootCommonChests < beforeAction.lootCommonChests
+                                                "rare" -> game.lootRareChests < beforeAction.lootRareChests
+                                                "epic" -> game.lootEpicChests < beforeAction.lootEpicChests
+                                                else -> false
+                                            }
+                                            else -> true
+                                        }
                                         val activeBossWorld = game.activeBossBattleWorldId?.let { id -> worldDefinitions.firstOrNull { it.id == id } }
                                         val bossDamage = activeBossWorld?.let { (game.bossBattleProgress[it.bossId] ?: 0).coerceIn(0, it.hp) } ?: 0
                                         val viewState = JSONObject()
@@ -98,7 +121,7 @@ fun ProductionWebPlayScreen(
                                             .put("correctGuesses", result?.correctGuesses ?: game.correctGuesses)
                                             .put("streak", result?.streak ?: game.streak)
                                             .put("bestStreak", result?.bestStreak ?: game.bestStreak)
-                                            .put("accepted", result?.accepted ?: true)
+                                            .put("accepted", result?.accepted ?: actionAccepted)
                                             .put("money", game.money.format())
                                             .put("incomePerSecond", currentIncome.format())
 
@@ -117,6 +140,8 @@ fun ProductionWebPlayScreen(
                                             .put("dailyQuestCorrectGuesses", game.dailyQuestCorrectGuesses)
                                             .put("dailyQuestBestStreak", game.dailyQuestBestStreak)
                                             .put("claimedDailyQuestCount", game.claimedDailyQuests.size)
+                                            .put("claimedDailyQuests", org.json.JSONArray(game.claimedDailyQuests.toList()))
+                                            .put("dailyQuestUpgradePurchases", game.dailyQuestUpgradePurchases)
                                             .put("lootCommonChests", game.lootCommonChests)
                                             .put("lootRareChests", game.lootRareChests)
                                             .put("lootEpicChests", game.lootEpicChests)
