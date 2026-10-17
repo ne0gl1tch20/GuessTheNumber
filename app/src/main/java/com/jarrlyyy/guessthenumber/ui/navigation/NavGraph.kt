@@ -2,12 +2,16 @@ package com.jarrlyyy.guessthenumber.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.screens.CrashRecoveryScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProductionWebAppScreen
+import com.jarrlyyy.guessthenumber.ui.screens.ProductionWebPlayScreen
 import com.jarrlyyy.guessthenumber.ui.screens.SaveSlotsScreen
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 
@@ -84,15 +88,35 @@ fun NavGraph(
         return
     }
 
-    ProductionWebAppScreen(
-        state = state,
-        incomePerSecond = incomePerSecond,
-        stateProvider = { viewModel.gameState.value },
-        onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
-        onClaimDailyQuest = viewModel::claimDailyQuest,
-        onOpenLootChest = viewModel::openLootChest,
-        onWorldAction = viewModel::worldProgressAction
-    )
+    val context = LocalContext.current
+    val useSharedWebPlay = remember(context) {
+        FeatureFlagRepository(context).isEnabled("shared_web_play")
+    }
+
+    if (useSharedWebPlay) {
+        ProductionWebPlayScreen(
+            state = state,
+            incomePerSecond = incomePerSecond,
+            stateProvider = { viewModel.gameState.value },
+            onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
+            onClaimDailyQuest = viewModel::claimDailyQuest,
+            onOpenLootChest = viewModel::openLootChest,
+            // Destination panels are migrated in follow-up slices; the HTML surface
+            // explains when a destination is not part of the current bundle yet.
+            onNavigateProgression = {},
+            onWorldAction = viewModel::worldProgressAction
+        )
+    } else {
+        ProductionWebAppScreen(
+            state = state,
+            incomePerSecond = incomePerSecond,
+            stateProvider = { viewModel.gameState.value },
+            onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
+            onClaimDailyQuest = viewModel::claimDailyQuest,
+            onOpenLootChest = viewModel::openLootChest,
+            onWorldAction = viewModel::worldProgressAction
+        )
+    }
 
     if (initialDestination != null) {
         onNotificationDestinationHandled()
