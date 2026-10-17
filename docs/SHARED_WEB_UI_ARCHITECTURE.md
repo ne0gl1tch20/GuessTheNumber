@@ -2,7 +2,7 @@
 
 **Decision:** Chosen architecture direction; documentation-only decision. No application runtime has been migrated.
 **Owner decision:** Use one HTML/CSS/JavaScript frontend for shared player-facing screens across Android and Windows, retain Kotlin/KMP as the trusted game authority, and keep Compose for native host/system surfaces and desktop-shell integration.
-**Implementation status (source review, 2026-10-17):** Android still enters through `MainActivity` + Compose `setContent` and `NavGraph`; Windows still uses a Compose Desktop `Window`. The build files contain no WebView/Cordova integration, and no bundled app HTML/CSS/JS frontend exists yet. The existing shared module contains selected Kotlin rules/contracts and a controlled Compose guessing screen. These are current facts, not a blocker to the chosen direction.
+**Implementation status (2026-10-17):** Production player-facing screens still use Compose on Android and Windows. This branch adds an isolated debug-only Android WebView prototype with bundled HTML/CSS/JS and an origin-restricted, versioned message bridge. It uses a throwaway Kotlin-owned counter and does not read or modify game saves. No production screen has migrated; Windows still has no embedded web host. The prototype is a feasibility slice, not evidence of cross-platform parity or release readiness.
 **Reviewed:** 2026-10-17
 
 ## Goal
@@ -56,6 +56,14 @@ The web frontend is a presentation client, not a second game engine.
 Do not rewrite the whole app in one PR. Keep the existing app working while validating the new architecture.
 
 ### Phase 0 — Audit and prototype
+
+**Prototype slice status:** An isolated Android-only debug route is now available from Developer Settings. It loads local assets through `WebViewAssetLoader`, feature-detects AndroidX WebKit's origin-restricted `WEB_MESSAGE_LISTENER`, allows only the app-assets HTTPS origin, validates small versioned requests, and supports only `read_state` and `increment_counter`. The counter is in-memory Compose/Kotlin state and has no connection to game state or save files. This is intentionally not a production UI migration.
+
+Still required before Phase 0 can be considered complete:
+- Build and manually exercise the debug APK on a supported Android device; verify offline loading, back/navigation lifecycle, bridge feature detection, keyboard/focus and accessibility.
+- Review the bridge implementation and add focused tests for malformed, oversized, unknown and disallowed-origin requests.
+- Evaluate Windows WebView2 runtime/distribution and implement a comparable isolated Windows host slice before claiming Android/Windows parity.
+- Measure startup, memory, bundle size and input latency on available hardware.
 
 - Inventory the current Compose destinations, Kotlin action/state APIs, save/recovery behavior, localization, audio, notifications, widgets, update channels and desktop integrations.
 - Record which screens are candidates for the shared web UI and which are native/system-only.
