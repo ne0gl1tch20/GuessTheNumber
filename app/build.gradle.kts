@@ -127,6 +127,7 @@ dependencies {
     implementation(libs.androidx.glance)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.media)
+    implementation(libs.androidx.webkit)
 
     testImplementation(libs.junit)
     testImplementation("org.robolectric:robolectric:4.15")
