@@ -19,6 +19,7 @@ import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
+import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -35,6 +36,10 @@ fun ProductionWebAppScreen(
     incomePerSecond: BigNumber,
     stateProvider: () -> GameState,
     onSubmitGuess: (Long) -> GuessSubmissionResult,
+    onBuyUpgrade: (String, BigNumber) -> Unit,
+    onBuyShopItem: (String, Long) -> Unit,
+    onEquipCosmetic: (String) -> Unit,
+    onUpdateMultiplier: (String) -> Unit,
     onClaimDailyQuest: (String) -> Unit,
     onOpenLootChest: (String) -> Unit,
     onWorldAction: (String, String) -> Unit
@@ -42,6 +47,10 @@ fun ProductionWebAppScreen(
     val requestIds = remember { WebUiRequestIdWindow() }
     val readState by rememberUpdatedState(stateProvider)
     val submitGuess by rememberUpdatedState(onSubmitGuess)
+    val buyUpgrade by rememberUpdatedState(onBuyUpgrade)
+    val buyShopItem by rememberUpdatedState(onBuyShopItem)
+    val equipCosmetic by rememberUpdatedState(onEquipCosmetic)
+    val updateMultiplier by rememberUpdatedState(onUpdateMultiplier)
     val claimDailyQuest by rememberUpdatedState(onClaimDailyQuest)
     val openLootChest by rememberUpdatedState(onOpenLootChest)
     val worldAction by rememberUpdatedState(onWorldAction)
@@ -56,6 +65,41 @@ fun ProductionWebAppScreen(
         modifier = Modifier.fillMaxSize(),
         factory = { context ->
             val worldDefinitions = WorldConfigRepository(context).loadWorlds()
+            val configRepository = JsonConfigRepository(context, state.settings.locale)
+            val upgradeDefinitions = configRepository.loadUpgrades()
+            val shopDefinitions = configRepository.loadShopItems()
+            val upgradePurchaseCost: (String, GameState) -> BigNumber? = { upgradeId, game ->
+                val definition = upgradeDefinitions.firstOrNull { it.id == upgradeId }
+                if (definition == null) null else {
+                    val level = game.upgradeLevels[upgradeId] ?: 0
+                    val remaining = definition.maxLevel - level
+                    if (remaining <= 0) null else {
+                        val base = BigNumber(definition.baseCost)
+                        val growth = BigNumber(definition.costMultiplier)
+                        var count = 0
+                        var total = BigNumber.ZERO
+                        if (game.buyMultiplier == "MAX") {
+                            var cursor = level
+                            while (cursor < definition.maxLevel) {
+                                val next = base * growth.pow(cursor)
+                                if (game.money >= total + next) {
+                                    total += next
+                                    count++
+                                    cursor++
+                                } else break
+                            }
+                        } else {
+                            count = minOf(when (game.buyMultiplier) {
+                                "10" -> 10
+                                "100" -> 100
+                                else -> 1
+                            }, remaining)
+                            for (offset in 0 until count) total += base * growth.pow(level + offset)
+                        }
+                        if (count == 0) null else total
+                    }
+                }
+            }
             val assetLoader = WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
                 .build()
@@ -95,6 +139,27 @@ fun ProductionWebAppScreen(
                                         if (parsed.type == "submit_guess" && result == null) { replyProxy.postMessage(errorResponse(parsed.id, "guess_processing_failed")); return@post }
                                         try {
                                             when (parsed.type) {
+                                                "buy_upgrade" -> {
+                                                    val id = parsed.upgradeId ?: run { replyProxy.postMessage(errorResponse(parsed.id, "invalid_upgrade")); return@post }
+                                                    val current = readState()
+                                                    val cost = upgradePurchaseCost(id, current)
+                                                    if (cost == null || current.money < cost) { replyProxy.postMessage(errorResponse(parsed.id, "upgrade_unavailable")); return@post }
+                                                    buyUpgrade(id, cost)
+                                                }
+                                                "buy_shop_item" -> {
+                                                    val id = parsed.itemId ?: run { replyProxy.postMessage(errorResponse(parsed.id, "invalid_item")); return@post }
+                                                    val item = shopDefinitions.firstOrNull { it.id == id } ?: run { replyProxy.postMessage(errorResponse(parsed.id, "unknown_item")); return@post }
+                                                    val current = readState()
+                                                    if (id in current.shopPurchases || current.nebula < BigNumber(item.nebulaCost)) { replyProxy.postMessage(errorResponse(parsed.id, "item_unavailable")); return@post }
+                                                    buyShopItem(id, item.nebulaCost)
+                                                }
+                                                "equip_cosmetic" -> {
+                                                    val id = parsed.itemId ?: run { replyProxy.postMessage(errorResponse(parsed.id, "invalid_item")); return@post }
+                                                    val item = shopDefinitions.firstOrNull { it.id == id && it.isCosmetic } ?: run { replyProxy.postMessage(errorResponse(parsed.id, "invalid_cosmetic")); return@post }
+                                                    if (id !in readState().shopPurchases) { replyProxy.postMessage(errorResponse(parsed.id, "cosmetic_not_owned")); return@post }
+                                                    equipCosmetic(id)
+                                                }
+                                                "set_buy_multiplier" -> parsed.multiplier?.let(updateMultiplier)
                                                 "claim_daily_quest" -> parsed.questId?.let(claimDailyQuest)
                                                 "open_loot_chest" -> parsed.tier?.let(openLootChest)
                                                 "world_action" -> if (parsed.worldId != null && parsed.worldAction != null) worldAction(parsed.worldId, parsed.worldAction)
@@ -118,7 +183,37 @@ fun ProductionWebAppScreen(
                                             val damage = (game.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, hp)
                                             worldsJson.put(JSONObject().put("id", world.id).put("name", world.fallback).put("bossName", world.bossFallback).put("hp", hp).put("damage", damage).put("unlocked", unlocked).put("defeated", defeated).put("canUnlock", canUnlock).put("canFight", canFight).put("active", game.activeWorldId == world.id).put("activeBoss", game.activeBossBattleWorldId == world.id))
                                         }
+                                        val upgradesJson = JSONArray()
+                                        upgradeDefinitions.forEach { definition ->
+                                            val level = game.upgradeLevels[definition.id] ?: 0
+                                            val cost = upgradePurchaseCost(definition.id, game)
+                                            upgradesJson.put(JSONObject()
+                                                .put("id", definition.id)
+                                                .put("name", definition.name)
+                                                .put("description", definition.description)
+                                                .put("level", level)
+                                                .put("maxLevel", definition.maxLevel)
+                                                .put("cost", cost?.format() ?: "MAX")
+                                                .put("affordable", cost != null && game.money >= cost))
+                                        }
+                                        val shopItemsJson = JSONArray()
+                                        shopDefinitions.forEach { item ->
+                                            val purchased = item.id in game.shopPurchases
+                                            shopItemsJson.put(JSONObject()
+                                                .put("id", item.id)
+                                                .put("name", item.name)
+                                                .put("description", item.description)
+                                                .put("nebulaCost", item.nebulaCost)
+                                                .put("category", item.category)
+                                                .put("isCosmetic", item.isCosmetic)
+                                                .put("purchased", purchased)
+                                                .put("equipped", game.equippedCosmeticId == item.id)
+                                                .put("affordable", game.nebula >= BigNumber(item.nebulaCost)))
+                                        }
                                         val viewState = JSONObject()
+                                            .put("buyMultiplier", game.buyMultiplier)
+                                            .put("upgrades", upgradesJson)
+                                            .put("shopItems", shopItemsJson)
                                             .put("rangeMin", (result?.rangeMin ?: game.currentRangeMin).toString())
                                             .put("rangeMax", (result?.rangeMax ?: game.currentRangeMax).toString())
                                             .put("attempts", result?.attempts ?: game.attempts)
