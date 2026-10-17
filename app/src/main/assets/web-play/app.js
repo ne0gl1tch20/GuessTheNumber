@@ -4,7 +4,7 @@ const $=id=>document.getElementById(id);
 const el={
  range:$('rangeText'),feedback:$('feedback'),attempts:$('attempts'),correct:$('correct'),streak:$('streak'),best:$('bestStreak'),
  money:$('money'),income:$('income'),progress:$('progressFill'),input:$('guessInput'),button:$('guessButton'),
- status:$('statusLabel'),micro:$('microcopy'),toast:$('toast'),hero:document.querySelector('.hero-card'),progressionPanel:$('progressionPanel'),questPanel:$('questPanel'),
+ status:$('statusLabel'),micro:$('microcopy'),toast:$('toast'),hero:document.querySelector('.hero-card'),progressionPanel:$('progressionPanel'),questPanel:$('questPanel'),progressionPanel:$('progressionPanel'),questPanel:$('questPanel'),
  prestige:$('prestige'),prestigeCount:$('prestigeCount'),ultra:$('ultra'),ultraCount:$('ultraCount'),nebula:$('nebula'),
  worldCount:$('worldCount'),activeWorld:$('activeWorld'),realmSubtext:$('realmSubtext'),bossVictories:$('bossVictories'),
  homeBase:$('homeBase'),riftTier:$('riftTier'),defeatedBosses:$('defeatedBosses'),
