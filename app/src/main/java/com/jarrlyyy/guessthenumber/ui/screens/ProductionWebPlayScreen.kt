@@ -35,7 +35,8 @@ fun ProductionWebPlayScreen(
     stateProvider: () -> GameState,
     onSubmitGuess: (Long) -> GuessSubmissionResult,
     onClaimDailyQuest: (String) -> Unit,
-    onOpenLootChest: (String) -> Unit
+    onOpenLootChest: (String) -> Unit,
+    onNavigateProgression: (String) -> Unit
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val currentGameState by rememberUpdatedState(state)
@@ -44,6 +45,7 @@ fun ProductionWebPlayScreen(
     val submitGuess by rememberUpdatedState(onSubmitGuess)
     val claimDailyQuest by rememberUpdatedState(onClaimDailyQuest)
     val openLootChest by rememberUpdatedState(onOpenLootChest)
+    val navigateProgression by rememberUpdatedState(onNavigateProgression)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
@@ -97,6 +99,7 @@ fun ProductionWebPlayScreen(
                                             when (parsed.type) {
                                                 "claim_daily_quest" -> parsed.questId?.let(claimDailyQuest)
                                                 "open_loot_chest" -> parsed.tier?.let(openLootChest)
+                                                "navigate" -> parsed.route?.let(navigateProgression)
                                             }
                                         } catch (_: Exception) {
                                             replyProxy.postMessage(errorResponse(parsed.id, "action_processing_failed")); return@post
