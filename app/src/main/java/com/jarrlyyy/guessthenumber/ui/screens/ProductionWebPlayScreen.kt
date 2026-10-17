@@ -202,6 +202,7 @@ fun ProductionWebPlayScreen(
                                             var amount = when (game.buyMultiplier) {
                                                 "10" -> minOf(10, upgrade.maxLevel - level)
                                                 "100" -> minOf(100, upgrade.maxLevel - level)
+                                                "MAX" -> 0
                                                 else -> if (maxed) 0 else 1
                                             }
                                             var cost = BigNumber.ZERO
