@@ -5,23 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' data:; font-src 'self'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>Shared Web UI Prototype</title>
+  <title>Guess The Number · Web UI Preview</title>
   <link rel="stylesheet" href="../web-ui/theme.css">
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
 </head>
 <body>
-  <main class="shell">
-    <p class="eyebrow">PHASE 0 · PROTOTYPE</p>
-    <h1>One UI, two hosts.</h1>
-    <p class="intro">This tiny screen is bundled with the app. Kotlin owns the state; HTML only displays it and sends a named action.</p>
-    <section class="panel" aria-labelledby="counter-heading">
-      <h2 id="counter-heading">Host-owned counter</h2>
-      <p id="counter" class="counter" aria-live="polite">Connecting…</p>
-      <button id="increment" type="button" disabled>Increment in Kotlin</button>
-      <p id="status" class="status" role="status">Waiting for the local host bridge…</p>
+  <main class="shell gtn-screen">
+    <header class="hero">
+      <p class="gtn-eyebrow">GUESS THE NUMBER · UI PREVIEW</p>
+      <h1>Find the <span>number.</span></h1>
+      <p class="intro">A shared HTML interface, powered by the existing Kotlin game engine.</p>
+    </header>
+    <section class="panel gtn-panel" aria-labelledby="range-heading">
+      <div class="panel-heading">
+        <div><p class="gtn-eyebrow">YOUR RANGE</p><h2 id="range-heading">Make a guess</h2></div>
+        <span id="range-badge" class="gtn-badge">Connecting…</span>
+      </div>
+      <p class="range"><span id="range-min">—</span><span class="range-separator">to</span><span id="range-max">—</span></p>
+      <form id="guess-form" class="guess-form">
+        <label for="guess-input">Your number</label>
+        <div class="input-row">
+          <input id="guess-input" class="gtn-input" type="number" inputmode="numeric" step="1" required placeholder="Enter a number" autocomplete="off">
+          <button id="guess-submit" class="gtn-button" type="submit" disabled>Guess</button>
+        </div>
+      </form>
+      <p id="feedback" class="gtn-feedback" role="status" aria-live="polite">Connecting to Kotlin…</p>
     </section>
-    <p class="footnote">Prototype state only. This does not read or modify your game save.</p>
+    <section class="stats" aria-label="Game statistics">
+      <article class="stat gtn-stat"><span class="gtn-stat__label">Attempts</span><strong id="attempts" class="gtn-stat__value">—</strong></article>
+      <article class="stat gtn-stat"><span class="gtn-stat__label">Correct guesses</span><strong id="correct-guesses" class="gtn-stat__value">—</strong></article>
+      <article class="stat gtn-stat"><span class="gtn-stat__label">Current streak</span><strong id="streak" class="gtn-stat__value">—</strong></article>
+    </section>
+    <p class="footnote">Preview only. Kotlin owns the target, guess rules, rewards and saved game state.</p>
   </main>
 </body>
 </html>
