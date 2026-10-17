@@ -34,7 +34,8 @@ This is a single implementation pass covering localization expansion, de-hardcod
 
 Inspect the complete repository surface during the implementation pass, including:
 
-- Kotlin/Compose source
+- Kotlin/Compose source for retained native/system UI and current screens
+- Shared HTML/CSS/JavaScript assets for player-facing screens as the migration begins
 - Android resources and XML
 - `app/src/main/assets/**`
 - `app/src/main/assets/locales/**`
@@ -55,11 +56,12 @@ Machine-readable identifiers, schema keys, log tags, package names, encryption m
 - Merge each selected overlay over the English catalog so missing translations safely fall back to English.
 - Resolve locales through BCP-47 tags.
 - Keep placeholders identical between baseline and translated values.
+- The shared HTML/CSS/JavaScript frontend must consume the same canonical locale keys and resolved locale snapshot through a narrow host contract; do not fork a second translation catalog in JavaScript.
 - Make adding future locales a file + registry change rather than a Kotlin architecture rewrite.
 
 ## De-hardcoding
 
-Migrate user-visible strings from Kotlin/Compose, widgets, notifications, dialogs, tutorials, settings, developer UI, and data-driven assets into locale resources.
+Migrate user-visible strings from Kotlin/Compose, the shared web frontend, widgets, notifications, dialogs, tutorials, settings, developer UI, and data-driven assets into locale resources. Shared web screens must use localization keys and host-provided locale data rather than hardcoded player-facing copy.
 
 Do not localize machine-readable identifiers or internal schema values.
 
