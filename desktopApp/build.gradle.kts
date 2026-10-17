@@ -2,10 +2,16 @@ import buildlogic.GenerateDesktopLogoAssets
 
 import org.gradle.api.tasks.testing.Test
 
+javafx {
+    version = "21.0.6"
+    modules("javafx.controls", "javafx.web", "javafx.swing")
+}
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 val windowsPackageVersion = providers.environmentVariable("GTN_WINDOWS_PACKAGE_VERSION")
@@ -48,6 +54,7 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.core)
                 implementation("net.java.dev.jna:jna:5.17.0")
                 implementation("net.java.dev.jna:jna-platform:5.17.0")
+                implementation("org.json:json:20250517")
             }
         }
         val jvmTest by getting {
