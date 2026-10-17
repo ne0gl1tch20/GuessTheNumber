@@ -23,7 +23,7 @@ The locked target is an **exact Windows experience of GuessTheNumber with shared
 - **Same game, not a reduced edition:** every Android player-facing feature and reachable screen/interaction must have a Windows counterpart unless a deliberate platform-specific difference is explicitly approved and documented.
 - **Same behavior and meaning:** preserve game rules, reward and progression outcomes, eligibility, shop/economy semantics, settings meaning, localization meaning, save semantics, offline behavior and recovery paths.
 - **Same experience structure:** match visible content, information hierarchy, labels, controls, menus, dialogs, sheets, tutorials, nested destinations, locked/unlocked states, loading/empty/error states and navigation outcomes.
-- **Shared implementation first where sensible:** keep authoritative rules, models/contracts, validators and transactions in Kotlin/KMP. The proposed frontend target is one shared HTML/CSS/JavaScript bundle for player-facing screens; retain Compose where it serves native/system surfaces. Share only where dependencies and platform contracts genuinely permit it; do not force platform APIs into commonMain.
+- **Shared implementation first where sensible:** keep authoritative rules, models/contracts, validators and transactions in Kotlin/KMP. The chosen frontend target is one shared HTML/CSS/JavaScript bundle for player-facing screens; retain Compose where it serves native/system surfaces. Share only where dependencies and platform contracts genuinely permit it; do not force platform APIs into commonMain.
 - **Thin platform hosts:** Android retains its production integrations and may host the shared web UI through Cordova/WebView after prototype validation. Windows supplies desktop lifecycle, keyboard/mouse/focus/hover, windowing, filesystem, updates and MSI packaging, embedding the same web bundle through a maintained WebView integration. Neither host nor JavaScript may become a second authority for game rules, rewards or persistence semantics.
 - **Desktop adaptation, not redesign:** resizable layouts and desktop input conventions are allowed. They must not remove features, alter the meaning of a screen or replace Android's hierarchy with an unrelated substitute UI. Document and justify any intentional difference.
 - **Canonical assets and localization:** prefer the original shared assets and shared translation source. Do not create parallel Windows-only copies of content that should remain consistent.
@@ -372,7 +372,7 @@ The primary blocker is not a missing cosmetic tweak: Windows currently hosts the
 4. Add focused desktop tests for navigation/state transitions and document which checks still require an actual Windows session.
 5. Keep updater behavior intact and separate; do not change MSI identity or start Stage 2 feature work until the Stage 1 exit gate is met.
 
-This is a proposed implementation boundary derived from the inspected source, not a claim that these tasks are already implemented. No Windows interactive runtime session was run during this audit.
+This is the chosen target implementation boundary derived from the inspected source, not a claim that these tasks are already implemented. No Windows interactive runtime session was run during this audit.
 
 ## Definition of done
 
