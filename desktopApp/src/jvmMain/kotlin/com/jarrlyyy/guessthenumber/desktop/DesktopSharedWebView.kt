@@ -63,16 +63,21 @@ private class DesktopSharedWebViewController {
                 webEngine.isJavaScriptEnabled = true
                 val bridge = DesktopJavaScriptBridge { raw ->
                     val currentHandler = handler.get()
-                    if (currentHandler != null && raw.length <= 512) {
-                        currentHandler(raw) { response ->
-                            Platform.runLater {
-                                if (!disposed) {
-                                    val target = engine ?: return@runLater
-                                    val encoded = org.json.JSONObject.quote(response)
-                                    runCatching { target.executeScript("window.gtnHost && window.gtnHost.receive($encoded)") }
-                                }
+                    val replyToPage: (String) -> Unit = { response ->
+                        Platform.runLater {
+                            if (!disposed) {
+                                val target = engine ?: return@runLater
+                                val encoded = org.json.JSONObject.quote(response)
+                                runCatching { target.executeScript("window.gtnHost && window.gtnHost.receive($encoded)") }
                             }
                         }
+                    }
+                    if (currentHandler != null && raw.length <= 512) {
+                        currentHandler(raw, replyToPage)
+                    } else {
+                        val id = runCatching { org.json.JSONObject(raw).optString("id", "") }.getOrDefault("")
+                        replyToPage(org.json.JSONObject().put("version", 1).put("id", id)
+                            .put("type", "error").put("error", "host_unavailable").toString())
                     }
                 }
                 webEngine.loadWorker.stateProperty().addListener { _, _, state ->
