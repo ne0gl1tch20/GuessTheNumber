@@ -123,7 +123,7 @@ Track guesses, correct/failed, best streak, highest multiplier, currencies earne
 
 ## 🎨 UI + ACCESSIBILITY
 
-Material 3, rounded cards, hierarchy, animated counters, upgrade-tree connections, locked states, reward popups, confirmations and responsive layouts. Do NOT look like a calculator/business app. Support TalkBack, content descriptions, keyboard navigation, large fonts, minimum touch targets, color-independent feedback, contrast, reduced motion and accessible dialogs. Error/crash messages must be understandable and actionable without exposing internal stack traces.
+Build the shared web UI with semantic HTML, shared CSS design tokens, clear hierarchy, rounded cards, animated counters, upgrade-tree connections, locked states, reward popups, confirmations and responsive layouts. Use Compose/Material 3 for native host/system surfaces where retained. Do NOT look like a calculator/business app. Support TalkBack/screen readers, content descriptions, keyboard and mouse navigation, focus visibility, large fonts, minimum touch targets, color-independent feedback, contrast, reduced motion and accessible dialogs. Error/crash messages must be understandable and actionable without exposing internal stack traces.
 
 ## 🧱 ARCHITECTURE
 
