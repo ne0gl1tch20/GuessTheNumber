@@ -1,6 +1,6 @@
 # Guess The Number (Incremental & Arcade Edition)
 
-An advanced, feature-rich incremental and arcade game currently built primarily with Kotlin and Jetpack Compose. A proposed architecture change would move shared player-facing screens to one HTML/CSS/JavaScript frontend, keep Kotlin/KMP authoritative for game rules and saves, and retain native hosts for platform integration. This is a plan, not a completed migration. See the architecture and parity plans below.
+An advanced, feature-rich incremental and arcade game currently built primarily with Kotlin and Jetpack Compose. The chosen target architecture uses one shared HTML/CSS/JavaScript frontend for player-facing screens, keeps Kotlin/KMP authoritative for game rules and saves, and retains Compose/native hosts for platform integration. This is the locked direction, not a completed migration. See the architecture and parity plans below.
 
 ## Lua Scripting Layer (Implementation in Progress)
 
@@ -27,16 +27,16 @@ The runtime uses an instruction-budgeted Lua sandbox without Android/Java bridge
 ## Architecture
 
 - Current shipped UI: Android Jetpack Compose and Material 3 Expressive; Windows uses its Kotlin/Compose Desktop UI.
-- Proposed shared UI: HTML/CSS/JavaScript packaged locally and reused by supported hosts, so player-facing screens are implemented once.
-- Kotlin/KMP remains authoritative for game rules, progression, economy, save transactions/migrations and recovery.
-- Compose and Kotlin remain for native host/system integration; Cordova is a candidate mobile host, while Windows needs a maintained embedded WebView host rather than Cordova's legacy Windows platform.
-- The web migration is only a proposal until its prototype and exit gates pass. The app remains offline-first with no ads, analytics or accounts.
+- Chosen shared UI target: HTML/CSS/JavaScript packaged locally and reused by supported hosts, so player-facing screens can be implemented once.
+- Kotlin/KMP remains authoritative for game rules, progression, economy, validation, save transactions/migrations and recovery; JavaScript is a presentation client, not a second game engine.
+- Compose remains for native host/system integration and the Windows desktop shell. Android WebView/Cordova and a maintained Windows embedded WebView are implementation candidates to validate, not integrations already present.
+- The migration has not started: Android and Windows currently use Compose UI, and the app build does not yet include a web frontend or WebView/Cordova host. Prototype and exit gates must pass before expanding migration. The app remains offline-first with no ads, analytics or accounts.
 
 ## KMP foundation and Windows parity
 
-The KMP foundation shares deterministic rules for guess transitions, reward multipliers, penalties, progression requirements and challenge-claim decisions, with common tests. The current UI still has separate Compose implementations and full Windows parity is not established. The proposed [Shared Web UI Architecture](docs/SHARED_WEB_UI_ARCHITECTURE.md) explores replacing duplicate player-facing screens with one frontend while retaining Kotlin as game authority.
+The KMP foundation shares deterministic rules for guess transitions, reward multipliers, penalties, progression requirements and challenge-claim decisions, with common tests. The current UI still has separate Compose implementations and full Windows parity is not established. The chosen [Shared Web UI Architecture](docs/SHARED_WEB_UI_ARCHITECTURE.md) records the target of replacing duplicate player-facing screens with one frontend while retaining Kotlin as game authority.
 
-- [Shared web UI architecture proposal](docs/SHARED_WEB_UI_ARCHITECTURE.md)
+- [Shared web UI architecture and migration gates](docs/SHARED_WEB_UI_ARCHITECTURE.md)
 - [KMP foundation status and exit criteria](docs/KMP_FOUNDATION_STATUS.md)
 - [Windows feature parity plan](docs/WINDOWS_FEATURE_PARITY_PLAN.md)
 - [Android runtime QA checklist](.openai/kmp_runtime_parity_checklist.md)
