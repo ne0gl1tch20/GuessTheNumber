@@ -211,4 +211,31 @@ class WebUiBridgeProtocolTest {
         }
     }
 
+
+    @Test
+    fun acceptsAllowlistedUpgradeAndShopActionsWithoutClientSuppliedCosts() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("upgrade-1", "buy_upgrade", upgradeId = "reward_multiplier"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"upgrade-1","type":"buy_upgrade","upgradeId":"reward_multiplier"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("shop-1", "buy_shop_item", itemId = "auto_clicker_basic"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"shop-1","type":"buy_shop_item","itemId":"auto_clicker_basic"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("mult-1", "set_buy_multiplier", multiplier = "MAX"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"mult-1","type":"set_buy_multiplier","multiplier":"MAX"}""")
+        )
+    }
+
+    @Test
+    fun rejectsClientSuppliedCostsAndInvalidMultipliers() {
+        assertTrue(
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"upgrade-2","type":"buy_upgrade","upgradeId":"reward_multiplier","cost":"0"}""") is WebUiBridgeProtocol.ParseResult.Invalid
+        )
+        assertTrue(
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"mult-2","type":"set_buy_multiplier","multiplier":"999"}""") is WebUiBridgeProtocol.ParseResult.Invalid
+        )
+    }
+
 }
