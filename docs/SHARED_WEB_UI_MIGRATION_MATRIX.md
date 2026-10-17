@@ -23,7 +23,7 @@ Migrate the primary guessing surface as the first real web-backed gameplay exper
 - Accept a numeric guess with accessible touch, keyboard and focus behavior.
 - Send a typed, versioned `submit_guess` request; never send or accept a target number, reward amount, or client-computed result.
 - Let Kotlin run the existing `GameViewModel.makeGuess(guess: Long)` path, including rate limiting, `GameEngine.processGuess`, talent bonuses, daily quest/loot handling, boss interactions, achievements and asynchronous persistence.
-- Return the authoritative updated view state and a controlled result/status to render high/low/correct feedback, attempts and streak. Do not duplicate the guess rules or compute rewards in JavaScript.
+- Return the authoritative updated view state and a controlled result/status to render high/low/correct feedback, attempts and streak. Do not duplicate the guess rules or compute rewards in JavaScript. The current Android callback returns only Boolean and Compose computes feedback using its state, including the target; first introduce a typed secret-free result from the same engine result while preserving existing Boolean callers.
 - Respect locale, reduced-motion settings, validation errors and busy/double-submit state.
 - Keep the surrounding Play screen sections on Compose for this first slice if that makes the migration reversible. Before embedding the web surface inside the existing scroll layout, explicitly verify nested scrolling, height, keyboard resize, focus and accessibility. If those checks make a hybrid panel unreliable, migrate the complete Play route as a cohesive web screen rather than shipping a fragile nested WebView.
 
@@ -38,6 +38,7 @@ Migrate the primary guessing surface as the first real web-backed gameplay exper
 
 - [ ] Use the shared `assets/web-ui/theme.css` token and component foundation; extend it for real screen needs without forking a parallel design system.
 - [ ] Agree on a versioned, typed production bridge schema for read-view-state and submit-guess, including request IDs, duplicate/in-flight behavior, validation failures, cancellation and stale responses.
+- [ ] Add a typed secret-free Kotlin guess outcome without breaking existing Boolean callers; define save-state semantics separately because `saveGameAsync()` is asynchronous.
 - [ ] Derive view state only from Kotlin; do not expose the secret target number or trust JS-calculated feedback, reward, eligibility, balances or save mutations.
 - [ ] Preserve the existing guess/rate-limit/bonus/quest/loot/boss/achievement/save behavior.
 - [ ] Match locale and supported formatting behavior; avoid adding hardcoded player-facing strings to HTML.
