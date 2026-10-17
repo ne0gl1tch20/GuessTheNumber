@@ -8,15 +8,15 @@
 
 ## Goal
 
-**Product wish / locked direction: Windows must deliver the same GuessTheNumber experience as Android, not a smaller desktop edition.** The proposed implementation direction is one shared HTML/CSS/JavaScript frontend for player-facing screens, Kotlin/KMP as the authoritative game engine, and native host adapters for platform services. This changes the preferred UI technology, not the exact-parity requirement. The web architecture remains proposed until its prototype and exit gates pass.
+**Locked product and architecture direction: Windows must deliver the same GuessTheNumber experience as Android, not a smaller desktop edition.** The chosen implementation target is one shared HTML/CSS/JavaScript frontend for player-facing screens, Kotlin/KMP as the authoritative game engine, and native host adapters for platform services, with Compose retained for native/system surfaces and the desktop shell. This changes the preferred UI technology, not the exact-parity requirement. The target is chosen; implementation remains unstarted until the prototype and exit gates pass.
 
 Port the Android experience screen by screen: same features, screen hierarchy, information, labels, controls, menus, dialogs, navigation destinations, locked/unlocked states, loading/empty/error states, and interaction outcomes. Adapt only the presentation and input where desktop requires it (resizable window, keyboard, mouse, focus, hover and desktop conventions). Desktop adaptations must preserve the Android screen's content and meaning; any deliberate feature difference needs an explicit reason and documentation.
 
-Prefer Kotlin Multiplatform shared production rules, models, validation, transaction logic and canonical assets. Under the proposed direction, use one shared HTML/CSS/JavaScript frontend for player-facing screens instead of rebuilding those screens separately in Compose. Retain Compose/Kotlin for native host/system surfaces and platform-specific lifecycle, storage, audio, notifications, windowing, installers and updates. Use Cordova only on supported platforms where its bridge fits; Windows needs a maintained embedded WebView host. Share original assets rather than creating platform copies. Keep Android working and preserve existing save compatibility throughout any migration.
+Prefer Kotlin Multiplatform shared production rules, models, validation, transaction logic and canonical assets. Under the chosen direction, target one shared HTML/CSS/JavaScript frontend for player-facing screens instead of rebuilding those screens separately in Compose. Retain Compose/Kotlin for native host/system surfaces and platform-specific lifecycle, storage, audio, notifications, windowing, installers and updates. Use Cordova only on supported platforms where its bridge fits; Windows needs a maintained embedded WebView host. Share original assets rather than creating platform copies. Keep Android working and preserve existing save compatibility throughout any migration.
 
 ## Cross-platform exact-experience implementation contract (locked)
 
-The product wish is an **exact Windows experience of GuessTheNumber with shared player-facing screens and authoritative Kotlin/KMP game logic**. Android is the behavioral source of truth. The proposed shared-web implementation is documented in [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md); this plan remains the authoritative Windows parity and verification tracker.
+The locked target is an **exact Windows experience of GuessTheNumber with shared player-facing screens and authoritative Kotlin/KMP game logic**. Android is the behavioral source of truth. The chosen shared-web implementation target is documented in [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md); this plan remains the authoritative Windows parity and verification tracker.
 
 ### What “exact port” means in practice
 
@@ -38,7 +38,7 @@ The product wish is an **exact Windows experience of GuessTheNumber with shared 
 - Keep the five stages below sequential. Stage 2 remains open until its remaining core gameplay/economy gaps have evidence. Do not start Stage 3 implementation ahead of the Stage 2 exit gate.
 - Declare overall parity complete only when every required row is verified with evidence, explicitly approved as platform-specific, or excluded by documented agreement, and all release blockers are resolved.
 
-Roadmap coordination: [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) records the product wish and broader planned work. The proposed [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md) defines the web/Kotlin bridge and migration gates. This document alone owns Windows parity stages, the screen-by-screen matrix and its verification status.
+Roadmap coordination: [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) records the product direction and broader planned work. The chosen [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md) defines the web/Kotlin bridge and migration gates. This document alone owns Windows parity stages, the screen-by-screen matrix and its verification status.
 
 This plan is the single source of truth for Windows parity and replaces Windows migration checklists that duplicate its stages.
 
