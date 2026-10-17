@@ -101,3 +101,22 @@ h2{margin:3px 0 0;font-size:17px;letter-spacing:-.035em}.panel-title,.loot-headi
 .brand-tagline{margin:2px 0 0;color:#8e9abf;font-size:9px;line-height:1.25;letter-spacing:.04em}
 .stat-icon svg{display:block;width:1em;height:1em}
 .realm-emblem svg{display:block;width:25px;height:25px}
+
+/* Shared progression catalog screens */
+.screen-nav{grid-template-columns:repeat(6,minmax(0,1fr))}
+.catalog-panel{grid-column:1/-1;border-radius:26px;padding:20px;min-width:0}
+.catalog-intro{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 16px}
+.catalog-list{display:grid;gap:10px;min-width:0}
+.catalog-item{display:flex;align-items:center;justify-content:space-between;gap:14px;min-width:0;padding:15px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.035)}
+.catalog-copy{min-width:0;flex:1}
+.catalog-copy h3{margin:0 0 5px;font-size:15px;overflow-wrap:anywhere}
+.catalog-copy p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+.catalog-meta{margin-top:9px;color:#c6cdef;font-size:10px;font-weight:850;letter-spacing:.055em}
+.catalog-button,.multiplier-row button{border:1px solid rgba(155,124,255,.28);border-radius:12px;background:linear-gradient(135deg,rgba(155,124,255,.22),rgba(98,232,255,.09));color:var(--text);font-weight:850;font-size:11px;padding:11px 13px;min-height:40px;cursor:pointer;flex:0 0 auto}
+.catalog-button:disabled,.multiplier-row button:disabled{opacity:.48;cursor:default}
+.catalog-empty{margin:0;padding:20px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:16px}
+.multiplier-row{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-bottom:15px}
+.multiplier-row span{font-size:10px;letter-spacing:.09em;font-weight:900;color:var(--muted);margin-right:auto}
+.multiplier-row button{padding:8px 11px;min-height:35px}
+.multiplier-row button[aria-pressed="true"]{border-color:rgba(98,232,255,.6);color:var(--accent2);background:rgba(98,232,255,.12)}
+@media(max-width:520px){.screen-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.catalog-panel{padding:14px}.catalog-item{align-items:flex-start;padding:12px;gap:8px}.catalog-button{padding:9px 10px}.multiplier-row span{width:100%}}

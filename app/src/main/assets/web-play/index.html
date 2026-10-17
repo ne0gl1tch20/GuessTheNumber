@@ -25,6 +25,8 @@
       <button type="button" role="tab" id="tab-worlds" aria-controls="screen-worlds" aria-selected="false" data-screen-target="worlds" tabindex="-1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></span><b>Worlds</b></button>
       <button type="button" role="tab" id="tab-rewards" aria-controls="screen-rewards" aria-selected="false" data-screen-target="rewards" tabindex="-1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v9H4v-9M2 7h20v5H2z"/><path d="M12 7v14M12 7H7.5a2.5 2.5 0 1 1 2.5-2.5V7ZM12 7h4.5A2.5 2.5 0 1 0 14 4.5V7Z"/></svg></span><b>Rewards</b></button>
       <button type="button" role="tab" id="tab-journey" aria-controls="screen-journey" aria-selected="false" data-screen-target="journey" tabindex="-1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/><path d="M15 7h4v4"/></svg></span><b>Journey</b></button>
+      <button type="button" role="tab" id="tab-upgrades" aria-controls="screen-upgrades" aria-selected="false" data-screen-target="upgrades" tabindex="-1"><span class="nav-icon" aria-hidden="true">⬆</span><b>Upgrades</b></button>
+      <button type="button" role="tab" id="tab-shop" aria-controls="screen-shop" aria-selected="false" data-screen-target="shop" tabindex="-1"><span class="nav-icon" aria-hidden="true">✦</span><b>Shop</b></button>
     </nav>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
@@ -178,6 +180,24 @@
       <div class="strategy-advice" id="strategyAdvice" role="status">A midpoint guess can split a range into smaller sections.</div>
       <button type="button" class="strategy-use" id="useMidpoint">Use midpoint in guess box <span>↗</span></button>
     </section>
+    </div>
+    <div class="screen" id="screen-upgrades" role="tabpanel" aria-labelledby="tab-upgrades" data-screen="upgrades" hidden>
+      <section class="card catalog-panel">
+        <div class="panel-title"><span class="panel-glyph">⬆</span><div><span class="eyebrow">POWER UP</span><h2>Upgrades</h2></div><span class="panel-chip" id="upgradeCount">0 UPGRADES</span></div>
+        <p class="catalog-intro">Upgrade costs and purchase checks come from the game engine.</p>
+        <div class="multiplier-row" aria-label="Purchase quantity">
+          <span>BUY AMOUNT</span>
+          <button type="button" data-multiplier="1">×1</button><button type="button" data-multiplier="10">×10</button><button type="button" data-multiplier="100">×100</button><button type="button" data-multiplier="MAX">MAX</button>
+        </div>
+        <div class="catalog-list" id="upgradeList"><p class="catalog-empty">Syncing upgrades…</p></div>
+      </section>
+    </div>
+    <div class="screen" id="screen-shop" role="tabpanel" aria-labelledby="tab-shop" data-screen="shop" hidden>
+      <section class="card catalog-panel">
+        <div class="panel-title"><span class="panel-glyph">✦</span><div><span class="eyebrow">COSMIC MARKET</span><h2>Shop</h2></div><span class="panel-chip" id="shopCurrency">NEBULA</span></div>
+        <p class="catalog-intro">Spend Nebula on useful items and cosmetics. Owned cosmetics can be equipped here.</p>
+        <div class="catalog-list" id="shopList"><p class="catalog-empty">Syncing shop…</p></div>
+      </section>
     </div>
   </main>
   <div id="toast" class="toast" role="status"></div>

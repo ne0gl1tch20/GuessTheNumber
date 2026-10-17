@@ -24,6 +24,7 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GuessSubmissionResult
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
+import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 
 private const val WEB_UI_ORIGIN = "https://appassets.androidplatform.net"
 private const val WEB_UI_PATH = "/assets/web-play/"
@@ -37,7 +38,11 @@ fun ProductionWebPlayScreen(
     onClaimDailyQuest: (String) -> Unit,
     onOpenLootChest: (String) -> Unit,
     onNavigateProgression: (String) -> Unit,
-    onWorldAction: (String, String) -> Unit
+    onWorldAction: (String, String) -> Unit,
+    onBuyUpgrade: (String, BigNumber) -> Unit,
+    onBuyShopItem: (String, Long) -> Unit,
+    onEquipCosmetic: (String) -> Unit,
+    onUpdateMultiplier: (String) -> Unit
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val currentGameState by rememberUpdatedState(state)
@@ -48,6 +53,10 @@ fun ProductionWebPlayScreen(
     val openLootChest by rememberUpdatedState(onOpenLootChest)
     val navigateProgression by rememberUpdatedState(onNavigateProgression)
     val dispatchWorldAction by rememberUpdatedState(onWorldAction)
+    val buyUpgrade by rememberUpdatedState(onBuyUpgrade)
+    val buyShopItem by rememberUpdatedState(onBuyShopItem)
+    val equipCosmetic by rememberUpdatedState(onEquipCosmetic)
+    val updateMultiplier by rememberUpdatedState(onUpdateMultiplier)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
@@ -59,6 +68,9 @@ fun ProductionWebPlayScreen(
         modifier = Modifier.fillMaxSize(),
         factory = { context ->
             val worldDefinitions = WorldConfigRepository(context).loadWorlds()
+            val configRepository = JsonConfigRepository(context)
+            val upgradeDefinitions = configRepository.loadUpgrades()
+            val shopDefinitions = configRepository.loadShopItems()
             val assetLoader = WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
                 .build()
@@ -103,6 +115,50 @@ fun ProductionWebPlayScreen(
                                                 "open_loot_chest" -> parsed.tier?.let(openLootChest)
                                                 "navigate" -> parsed.route?.let(navigateProgression)
                                                 "world_action" -> if (parsed.worldId != null && parsed.worldAction != null) dispatchWorldAction(parsed.worldId, parsed.worldAction)
+                                                "update_multiplier" -> parsed.multiplier?.let(updateMultiplier)
+                                                "buy_upgrade" -> parsed.itemId?.let { upgradeId ->
+                                                    val upgrade = upgradeDefinitions.firstOrNull { it.id == upgradeId } ?: throw IllegalArgumentException("Unknown upgrade")
+                                                    val game = readState()
+                                                    val level = game.upgradeLevels[upgrade.id] ?: 0
+                                                    if (level >= upgrade.maxLevel) throw IllegalArgumentException("Upgrade maxed")
+                                                    val base = BigNumber(upgrade.baseCost)
+                                                    val mult = BigNumber(upgrade.costMultiplier)
+                                                    val amount = when (game.buyMultiplier) {
+                                                        "10" -> minOf(10, upgrade.maxLevel - level)
+                                                        "100" -> minOf(100, upgrade.maxLevel - level)
+                                                        else -> 1
+                                                    }
+                                                    var total = BigNumber.ZERO
+                                                    for (i in 0 until amount) total += base * mult.pow(level + i)
+                                                    if (game.buyMultiplier == "MAX") {
+                                                        total = BigNumber.ZERO
+                                                        var count = 0
+                                                        while (level + count < upgrade.maxLevel) {
+                                                            val cost = base * mult.pow(level + count)
+                                                            if (game.money < total + cost) break
+                                                            total += cost
+                                                            count++
+                                                        }
+                                                        if (count == 0) throw IllegalArgumentException("Cannot afford upgrade")
+                                                    }
+                                                    if (game.money < total) throw IllegalArgumentException("Cannot afford upgrade")
+                                                    buyUpgrade(upgradeId, total)
+                                                }
+                                                "buy_shop_item" -> parsed.itemId?.let { itemId ->
+                                                    val item = shopDefinitions.firstOrNull { it.id == itemId } ?: throw IllegalArgumentException("Unknown shop item")
+                                                    val game = readState()
+                                                    if (item.id in game.shopPurchases) {
+                                                        if (item.isCosmetic) equipCosmetic(itemId) else throw IllegalArgumentException("Already purchased")
+                                                    } else {
+                                                        if (game.nebula < BigNumber(item.nebulaCost)) throw IllegalArgumentException("Cannot afford shop item")
+                                                        buyShopItem(itemId, item.nebulaCost)
+                                                    }
+                                                }
+                                                "equip_cosmetic" -> parsed.itemId?.let { itemId ->
+                                                    val item = shopDefinitions.firstOrNull { it.id == itemId && it.isCosmetic } ?: throw IllegalArgumentException("Unknown cosmetic")
+                                                    if (itemId !in readState().shopPurchases) throw IllegalArgumentException("Cosmetic not owned")
+                                                    equipCosmetic(item.id)
+                                                }
                                             }
                                         } catch (_: Exception) {
                                             replyProxy.postMessage(errorResponse(parsed.id, "action_processing_failed")); return@post
@@ -137,7 +193,49 @@ fun ProductionWebPlayScreen(
                                             val damage = (game.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, hp)
                                             worldsJson.put(JSONObject().put("id", world.id).put("name", world.fallback).put("bossId", world.bossId).put("bossName", world.bossFallback).put("hp", hp).put("damage", damage).put("unlocked", unlocked).put("defeated", defeated).put("canUnlock", canUnlock).put("canFight", canFight).put("active", game.activeWorldId == world.id).put("activeBoss", game.activeBossBattleWorldId == world.id))
                                         }
+                                        val upgradesJson = org.json.JSONArray()
+                                        upgradeDefinitions.forEach { upgrade ->
+                                            val level = game.upgradeLevels[upgrade.id] ?: 0
+                                            val maxed = level >= upgrade.maxLevel
+                                            val base = BigNumber(upgrade.baseCost)
+                                            val mult = BigNumber(upgrade.costMultiplier)
+                                            var amount = when (game.buyMultiplier) {
+                                                "10" -> minOf(10, upgrade.maxLevel - level)
+                                                "100" -> minOf(100, upgrade.maxLevel - level)
+                                                "MAX" -> 0
+                                                else -> if (maxed) 0 else 1
+                                            }
+                                            var cost = BigNumber.ZERO
+                                            if (game.buyMultiplier == "MAX" && !maxed) {
+                                                while (level + amount < upgrade.maxLevel) {
+                                                    val nextCost = base * mult.pow(level + amount)
+                                                    if (game.money < cost + nextCost) break
+                                                    cost += nextCost
+                                                    amount++
+                                                }
+                                                if (amount == 0) {
+                                                    val firstCost = base * mult.pow(level)
+                                                    if (game.money >= firstCost) { cost = firstCost; amount = 1 }
+                                                }
+                                            } else {
+                                                for (i in 0 until amount) cost += base * mult.pow(level + i)
+                                            }
+                                            upgradesJson.put(JSONObject().put("id", upgrade.id).put("name", upgrade.name).put("description", upgrade.description)
+                                                .put("level", level).put("maxLevel", upgrade.maxLevel).put("nextCost", cost.format())
+                                                .put("maxed", maxed).put("affordable", !maxed && amount > 0 && game.money >= cost))
+                                        }
+                                        val shopJson = org.json.JSONArray()
+                                        shopDefinitions.forEach { item ->
+                                            val owned = item.id in game.shopPurchases
+                                            shopJson.put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
+                                                .put("cost", item.nebulaCost).put("category", item.category).put("cosmetic", item.isCosmetic)
+                                                .put("owned", owned).put("equipped", game.equippedCosmeticId == item.id)
+                                                .put("affordable", game.nebula >= BigNumber(item.nebulaCost)))
+                                        }
                                         val viewState = JSONObject()
+                                            .put("buyMultiplier", game.buyMultiplier)
+                                            .put("upgrades", upgradesJson)
+                                            .put("shopItems", shopJson)
                                             .put("rangeMin", (result?.rangeMin ?: game.currentRangeMin).toString())
                                             .put("rangeMax", (result?.rangeMax ?: game.currentRangeMax).toString())
                                             .put("attempts", result?.attempts ?: game.attempts)
