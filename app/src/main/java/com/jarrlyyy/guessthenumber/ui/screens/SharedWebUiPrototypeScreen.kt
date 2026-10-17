@@ -47,11 +47,15 @@ fun SharedWebUiPrototypeScreen(onBack: () -> Unit) {
         WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)
     }
 
-    DisposableEffect(webViewRef) {
-        val webView = webViewRef
+    // Keep one disposal effect for this screen instance. Keying this effect to
+    // webViewRef would dispose the just-created WebView when AndroidView's
+    // factory updates the state from null to the new view.
+    DisposableEffect(Unit) {
         onDispose {
-            webView?.stopLoading()
-            webView?.destroy()
+            webViewRef?.let { webView ->
+                webView.stopLoading()
+                webView.destroy()
+            }
         }
     }
 
@@ -117,7 +121,9 @@ fun SharedWebUiPrototypeScreen(onBack: () -> Unit) {
                                 val uri = request.url
                                 return !(uri.scheme == "https" &&
                                     uri.host == "appassets.androidplatform.net" &&
-                                    uri.path?.startsWith(WEB_UI_PATH) == true)
+                                    uri.path == "${WEB_UI_PATH}index.html" &&
+                                    uri.query == null &&
+                                    uri.fragment == null)
                             }
                         }
 
