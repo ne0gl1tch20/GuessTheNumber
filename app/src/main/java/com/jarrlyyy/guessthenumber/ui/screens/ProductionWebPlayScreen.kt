@@ -138,8 +138,8 @@ fun ProductionWebPlayScreen(
                                             worldsJson.put(JSONObject().put("id", world.id).put("name", world.fallback).put("bossId", world.bossId).put("bossName", world.bossFallback).put("hp", hp).put("damage", damage).put("unlocked", unlocked).put("defeated", defeated).put("canUnlock", canUnlock).put("canFight", canFight).put("active", game.activeWorldId == world.id).put("activeBoss", game.activeBossBattleWorldId == world.id))
                                         }
                                         val viewState = JSONObject()
-                                            .put("rangeMin", result?.rangeMin ?: game.currentRangeMin)
-                                            .put("rangeMax", result?.rangeMax ?: game.currentRangeMax)
+                                            .put("rangeMin", (result?.rangeMin ?: game.currentRangeMin).toString())
+                                            .put("rangeMax", (result?.rangeMax ?: game.currentRangeMax).toString())
                                             .put("attempts", result?.attempts ?: game.attempts)
                                             .put("correctGuesses", result?.correctGuesses ?: game.correctGuesses)
                                             .put("streak", result?.streak ?: game.streak)
@@ -175,6 +175,8 @@ fun ProductionWebPlayScreen(
                                             .put("worlds", worldsJson)
                                             .put("activeBossWorldId", game.activeBossBattleWorldId ?: "")
                                             .put("endlessRiftActive", game.endlessRiftActive)
+                                            .put("lastRandomEventId", game.lastRandomEventId ?: "")
+                                            .put("randomEventsTriggered", game.statistics.randomEventsTriggered)
                                         if (result != null) viewState.put("lastGuessStatus", result.status ?: "rate_limited")
                                         replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "state").put("state", viewState).toString())
                                     }

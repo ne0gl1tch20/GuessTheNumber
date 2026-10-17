@@ -18,7 +18,9 @@ internal object WebUiBridgeProtocol {
             val guess: Long? = null,
             val questId: String? = null,
             val tier: String? = null,
-            val route: String? = null
+            val route: String? = null,
+            val worldId: String? = null,
+            val worldAction: String? = null
         ) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
