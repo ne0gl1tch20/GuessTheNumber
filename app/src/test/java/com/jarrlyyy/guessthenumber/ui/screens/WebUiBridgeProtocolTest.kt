@@ -176,4 +176,25 @@ class WebUiBridgeProtocolTest {
         }
     }
 
+
+    @Test
+    fun rejectsBundledPageUrlsWithQueryOrFragment() {
+        val invalidUrls = listOf(
+            "https://appassets.androidplatform.net/assets/web-prototype/index.html?debug=1",
+            "https://appassets.androidplatform.net/assets/web-prototype/index.html#section",
+            "https://user@appassets.androidplatform.net/assets/web-prototype/index.html",
+            "https://appassets.androidplatform.net:443/assets/web-prototype/index.html"
+        )
+        invalidUrls.forEach { url ->
+            assertEquals(
+                false,
+                WebUiBridgeProtocol.isAllowedSource(
+                    isMainFrame = true,
+                    sourceOrigin = Uri.parse("https://appassets.androidplatform.net"),
+                    currentUrl = url
+                )
+            )
+        }
+    }
+
 }
