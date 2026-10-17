@@ -95,6 +95,10 @@ fun SharedWebUiPrototypeScreen(onBack: () -> Unit) {
                         settings.domStorageEnabled = false
                         settings.allowFileAccess = false
                         settings.allowContentAccess = false
+                        settings.allowFileAccessFromFileURLs = false
+                        settings.allowUniversalAccessFromFileURLs = false
+                        settings.javaScriptCanOpenWindowsAutomatically = false
+                        settings.setSupportMultipleWindows(false)
                         settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
                         settings.safeBrowsingEnabled = true
                         settings.builtInZoomControls = false
@@ -132,9 +136,13 @@ fun SharedWebUiPrototypeScreen(onBack: () -> Unit) {
                                     ) {
                                         view.post {
                                             val raw = message.data ?: ""
+                                            val currentUri = view.url?.let(Uri::parse)
                                             if (!isMainFrame ||
                                                 sourceOrigin.scheme != "https" ||
-                                                sourceOrigin.host != "appassets.androidplatform.net"
+                                                sourceOrigin.host != "appassets.androidplatform.net" ||
+                                                currentUri?.scheme != "https" ||
+                                                currentUri.host != "appassets.androidplatform.net" ||
+                                                currentUri.path?.startsWith(WEB_UI_PATH) != true
                                             ) {
                                                 replyProxy.postMessage(errorResponse("", "origin_not_allowed"))
                                                 return@post
