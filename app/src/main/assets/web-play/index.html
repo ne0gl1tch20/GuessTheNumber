@@ -4,16 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>Numberverse</title>
+  <title>GuessTheNumber</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="app">
     <header class="topbar">
       <div class="brand-lockup">
-        <img class="brand-logo" src="gtn-app-logo.png" alt="" aria-hidden="true">
+        <img class="brand-logo" src="gtn-app-logo.png" alt="GuessTheNumber app icon">
         <div>
-          <h1>Numberverse</h1><p class="brand-tagline">The engine decides. The interface celebrates</p>
+          <h1>GuessTheNumber</h1>
         </div>
       </div>
       <div class="live-pill"><span class="live-dot"></span><span id="statusLabel">ONLINE</span></div>
@@ -21,7 +21,7 @@
 
     <nav class="screen-nav" aria-label="Game sections" role="tablist">
       <button type="button" role="tab" id="tab-play" aria-controls="screen-play" aria-selected="true" data-screen-target="play"><span aria-hidden="true">⌂</span><b>Play</b></button>
-      <button type="button" role="tab" id="tab-worlds" aria-controls="screen-worlds" aria-selected="false" data-screen-target="worlds" tabindex="-1"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2 13 13l-3.8 1.8L11 11z"/><path d="M12 3.5v2M20.5 12h-2M12 20.5v-2M3.5 12h2"/></svg><b>Worlds</b></button>
+      <button type="button" role="tab" id="tab-worlds" aria-controls="screen-worlds" aria-selected="false" data-screen-target="worlds" tabindex="-1"><span aria-hidden="true">✦</span><b>Worlds</b></button>
       <button type="button" role="tab" id="tab-rewards" aria-controls="screen-rewards" aria-selected="false" data-screen-target="rewards" tabindex="-1"><span aria-hidden="true">◇</span><b>Rewards</b></button>
       <button type="button" role="tab" id="tab-journey" aria-controls="screen-journey" aria-selected="false" data-screen-target="journey" tabindex="-1"><span aria-hidden="true">◷</span><b>Journey</b></button>
     </nav>
