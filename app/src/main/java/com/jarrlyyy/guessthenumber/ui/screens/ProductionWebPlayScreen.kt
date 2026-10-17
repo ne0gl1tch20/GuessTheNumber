@@ -5,7 +5,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -22,33 +21,29 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import org.json.JSONObject
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GuessSubmissionResult
 
 private const val WEB_UI_ORIGIN = "https://appassets.androidplatform.net"
 private const val WEB_UI_PATH = "/assets/web-play/"
 
-/**
- * Production player-facing web surface. HTML/CSS/JS owns presentation and motion;
- * GameViewModel remains authoritative for guesses, progression, rewards and saves.
- */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductionWebPlayScreen(
     state: GameState,
-    incomePerSecond: com.jarrlyyy.guessthenumber.domain.model.BigNumber,
+    incomePerSecond: BigNumber,
+    stateProvider: () -> GameState,
     onSubmitGuess: (Long) -> GuessSubmissionResult
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val currentGameState by rememberUpdatedState(state)
     val currentIncome by rememberUpdatedState(incomePerSecond)
+    val readState by rememberUpdatedState(stateProvider)
     val submitGuess by rememberUpdatedState(onSubmitGuess)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
     DisposableEffect(Unit) {
-        onDispose {
-            webViewRef?.let { it.stopLoading(); it.destroy() }
-        }
+        onDispose { webViewRef?.let { it.stopLoading(); it.destroy() } }
     }
 
     AndroidView(
@@ -71,7 +66,6 @@ fun ProductionWebPlayScreen(
                 settings.safeBrowsingEnabled = true
                 settings.builtInZoomControls = false
                 settings.displayZoomControls = false
-
                 webViewClient = object : WebViewClient() {
                     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest) = assetLoader.shouldInterceptRequest(request.url)
                     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -79,28 +73,20 @@ fun ProductionWebPlayScreen(
                         return !(uri.scheme == "https" && uri.host == "appassets.androidplatform.net" && uri.path == "${WEB_UI_PATH}index.html" && uri.query == null && uri.fragment == null)
                     }
                 }
-
                 if (supportsMessageListener) {
                     WebViewCompat.addWebMessageListener(this, "gtnHost", setOf(WEB_UI_ORIGIN), object : WebViewCompat.WebMessageListener {
                         override fun onPostMessage(view: WebView, message: WebMessageCompat, sourceOrigin: Uri, isMainFrame: Boolean, replyProxy: JavaScriptReplyProxy) {
                             view.post {
-                                val raw = message.data ?: ""
                                 if (!WebUiBridgeProtocol.isAllowedSource(isMainFrame, sourceOrigin, view.url, "${WEB_UI_PATH}index.html")) {
                                     replyProxy.postMessage(errorResponse("", "origin_not_allowed")); return@post
                                 }
-                                when (val parsed = WebUiBridgeProtocol.parse(raw)) {
+                                when (val parsed = WebUiBridgeProtocol.parse(message.data ?: "")) {
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
-                                        if (!requestIds.markIfNew(parsed.id)) {
-                                            replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post
-                                        }
-                                        val result = if (parsed.type == "submit_guess" && parsed.guess != null) {
-                                            try { submitGuess(parsed.guess) } catch (_: Exception) { null }
-                                        } else null
-                                        if (parsed.type == "submit_guess" && result == null) {
-                                            replyProxy.postMessage(errorResponse(parsed.id, "guess_processing_failed")); return@post
-                                        }
-                                        val game = currentGameState
+                                        if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        val result = if (parsed.type == "submit_guess" && parsed.guess != null) try { submitGuess(parsed.guess) } catch (_: Exception) { null } else null
+                                        if (parsed.type == "submit_guess" && result == null) { replyProxy.postMessage(errorResponse(parsed.id, "guess_processing_failed")); return@post }
+                                        val game = readState()
                                         val viewState = JSONObject()
                                             .put("rangeMin", result?.rangeMin ?: game.currentRangeMin)
                                             .put("rangeMax", result?.rangeMax ?: game.currentRangeMax)
@@ -109,7 +95,7 @@ fun ProductionWebPlayScreen(
                                             .put("streak", result?.streak ?: game.streak)
                                             .put("bestStreak", result?.bestStreak ?: game.bestStreak)
                                             .put("accepted", result?.accepted ?: true)
-                                            .put("money", (if (result != null) currentGameState.money else game.money).format())
+                                            .put("money", game.money.format())
                                             .put("incomePerSecond", currentIncome.format())
                                         if (result != null) viewState.put("lastGuessStatus", result.status ?: "rate_limited")
                                         replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "state").put("state", viewState).toString())
@@ -125,5 +111,4 @@ fun ProductionWebPlayScreen(
     )
 }
 
-private fun errorResponse(id: String, code: String): String = JSONObject()
-    .put("version", 1).put("id", id).put("type", "error").put("error", code).toString()
+private fun errorResponse(id: String, code: String): String = JSONObject().put("version", 1).put("id", id).put("type", "error").put("error", code).toString()
