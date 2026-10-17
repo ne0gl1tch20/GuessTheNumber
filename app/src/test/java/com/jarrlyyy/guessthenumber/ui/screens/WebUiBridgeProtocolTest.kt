@@ -123,4 +123,58 @@ class WebUiBridgeProtocolTest {
         )
     }
 
+
+    @Test
+    fun acceptsSubmitGuessWithDecimalLongString() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("guess_1", "submit_guess", 42L),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"guess_1","type":"submit_guess","guess":"42"}""")
+        )
+    }
+
+    @Test
+    fun acceptsLongMinimumAndMaximumValues() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("max", "submit_guess", Long.MAX_VALUE),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"max","type":"submit_guess","guess":"9223372036854775807"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("min", "submit_guess", Long.MIN_VALUE),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"min","type":"submit_guess","guess":"-9223372036854775808"}""")
+        )
+    }
+
+    @Test
+    fun rejectsInvalidOrOverflowingGuessStrings() {
+        val invalidValues = listOf("", " 4", "4.0", "1e2", "+4", "--4", "9223372036854775808", "-9223372036854775809")
+        invalidValues.forEachIndexed { index, guess ->
+            val result = WebUiBridgeProtocol.parse(
+                """{"version":1,"id":"bad-$index","type":"submit_guess","guess":"$guess"}"""
+            )
+            assertTrue("Expected invalid guess for '$guess'", result is WebUiBridgeProtocol.ParseResult.Invalid)
+            assertEquals("invalid_guess", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        }
+    }
+
+    @Test
+    fun rejectsSubmitGuessWithMissingOrExtraFields() {
+        val missing = WebUiBridgeProtocol.parse(
+            """{"version":1,"id":"missing","type":"submit_guess"}"""
+        )
+        assertEquals("invalid_request", (missing as WebUiBridgeProtocol.ParseResult.Invalid).error)
+
+        val extra = WebUiBridgeProtocol.parse(
+            """{"version":1,"id":"extra","type":"submit_guess","guess":"4","debug":true}"""
+        )
+        assertEquals("invalid_request", (extra as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
+    fun rejectsNonStringGuessValues() {
+        val result = WebUiBridgeProtocol.parse(
+            """{"version":1,"id":"number","type":"submit_guess","guess":4}"""
+        )
+        assertEquals("invalid_guess", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
 }
