@@ -1,10 +1,20 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+import org.gradle.api.tasks.Copy
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
 }
+
+val generatedWebPlayAssets = layout.buildDirectory.dir("generated/webPlayAssets")
+val prepareWebPlayBrandAsset by tasks.registering(Copy::class) {
+    from(rootProject.file("GTN_APP_LOGO.png"))
+    into(generatedWebPlayAssets.map { it.dir("web-play") })
+    rename { "gtn-app-logo.png" }
+}
+
 
 android {
     // Stable project debug signing. CI supplies the keystore through environment variables; local builds can use debug-signing/debug.keystore.
@@ -76,6 +86,8 @@ android {
             }
         }
     }
+    sourceSets.getByName("main").assets.srcDir(generatedWebPlayAssets)
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -96,6 +108,10 @@ android {
     }
     ndkVersion = "30.0.16248370"
     buildToolsVersion = "36.0.0"
+}
+
+tasks.named("preBuild").configure {
+    dependsOn(prepareWebPlayBrandAsset)
 }
 
 kotlin {
