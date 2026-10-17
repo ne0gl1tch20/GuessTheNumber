@@ -43,7 +43,7 @@ internal object WebUiBridgeProtocol {
         val id = rawId as? String ?: ""
         val type = rawType as? String ?: ""
         val validEnvelope = request.length() == 3 &&
-            rawVersion is Number && rawVersion.toInt() == 1 &&
+            rawVersion is Int && rawVersion == 1 &&
             rawId is String && id.matches(Regex("[A-Za-z0-9_-]{1,48}")) &&
             rawType is String
         if (!validEnvelope) return ParseResult.Invalid("invalid_request", id)
