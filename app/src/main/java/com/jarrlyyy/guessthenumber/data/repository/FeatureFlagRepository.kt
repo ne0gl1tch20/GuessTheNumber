@@ -18,7 +18,7 @@ object DefaultFeatureFlags {
         "challenge_builder" to true,
         "dev_console" to true,
         "lua_scripting" to true,
-        "shared_web_play" to false
+        "shared_web_play" to true
     )
 }
 
