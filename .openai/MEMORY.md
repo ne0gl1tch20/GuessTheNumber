@@ -1,3 +1,10 @@
+## Locked Shared UI Architecture Direction (2026-10-17)
+
+- Chosen target: one HTML/CSS/JavaScript frontend for shared player-facing screens across Android and Windows; Kotlin/KMP remains authoritative for rules, state, rewards, economy, validation and persistence; Compose remains for native/system surfaces and the Windows desktop shell.
+- This locks the architecture direction, not the migration status. Source review of `e3eda5238eeef1e68ceb6cffe298bc4fa2230991` found Android still using `MainActivity` + Compose `setContent`/`NavGraph`, Windows still using a Compose Desktop `Window`, no WebView/Cordova dependency in the inspected build files, and no bundled app web frontend. The existing shared module contains selected Kotlin rules/contracts and a controlled Compose guessing screen.
+- Keep migration staged: prototype a local/offline web screen and narrow typed bridge, validate Kotlin authority and invalid-call handling, save compatibility, accessibility, performance and Android/Windows parity before production screen migration. Do not add dependencies or claim implementation/runtime verification prematurely.
+- Cordova is only a mobile-host candidate; Windows must use a maintained embedded WebView integration rather than relying on Cordova's legacy Windows platform. Preserve offline play, saves/recovery, localization and no ads/analytics/accounts.
+
 ## Standing Changelog Rule (2026-10-13)
 
 - Whenever a code, UI, gameplay, localization, configuration, or other player-facing app change is implemented, update `app/src/main/assets/changelogs.md` in the same change/PR so the changelog does not fall behind.
