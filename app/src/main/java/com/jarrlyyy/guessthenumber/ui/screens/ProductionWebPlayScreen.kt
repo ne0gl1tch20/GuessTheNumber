@@ -196,10 +196,32 @@ fun ProductionWebPlayScreen(
                                         val upgradesJson = org.json.JSONArray()
                                         upgradeDefinitions.forEach { upgrade ->
                                             val level = game.upgradeLevels[upgrade.id] ?: 0
-                                            val cost = BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(level)
+                                            val maxed = level >= upgrade.maxLevel
+                                            val base = BigNumber(upgrade.baseCost)
+                                            val mult = BigNumber(upgrade.costMultiplier)
+                                            var amount = when (game.buyMultiplier) {
+                                                "10" -> minOf(10, upgrade.maxLevel - level)
+                                                "100" -> minOf(100, upgrade.maxLevel - level)
+                                                else -> if (maxed) 0 else 1
+                                            }
+                                            var cost = BigNumber.ZERO
+                                            if (game.buyMultiplier == "MAX" && !maxed) {
+                                                while (level + amount < upgrade.maxLevel) {
+                                                    val nextCost = base * mult.pow(level + amount)
+                                                    if (game.money < cost + nextCost) break
+                                                    cost += nextCost
+                                                    amount++
+                                                }
+                                                if (amount == 0) {
+                                                    val firstCost = base * mult.pow(level)
+                                                    if (game.money >= firstCost) { cost = firstCost; amount = 1 }
+                                                }
+                                            } else {
+                                                for (i in 0 until amount) cost += base * mult.pow(level + i)
+                                            }
                                             upgradesJson.put(JSONObject().put("id", upgrade.id).put("name", upgrade.name).put("description", upgrade.description)
                                                 .put("level", level).put("maxLevel", upgrade.maxLevel).put("nextCost", cost.format())
-                                                .put("maxed", level >= upgrade.maxLevel).put("affordable", level < upgrade.maxLevel && game.money >= cost))
+                                                .put("maxed", maxed).put("affordable", !maxed && amount > 0 && game.money >= cost))
                                         }
                                         val shopJson = org.json.JSONArray()
                                         shopDefinitions.forEach { item ->
