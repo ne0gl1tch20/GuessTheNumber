@@ -1,53 +1,88 @@
 (() => {
-  const counter = document.querySelector("#counter");
-  const button = document.querySelector("#increment");
-  const status = document.querySelector("#status");
+  const form = document.querySelector("#guess-form");
+  const input = document.querySelector("#guess-input");
+  const button = document.querySelector("#guess-submit");
+  const feedback = document.querySelector("#feedback");
+  const rangeMin = document.querySelector("#range-min");
+  const rangeMax = document.querySelector("#range-max");
+  const rangeBadge = document.querySelector("#range-badge");
+  const attempts = document.querySelector("#attempts");
+  const correctGuesses = document.querySelector("#correct-guesses");
+  const streak = document.querySelector("#streak");
   let nextId = 1;
+  let pending = false;
+  let ready = false;
 
-  function send(type) {
+  function send(type, guess) {
     if (!window.gtnHost || typeof window.gtnHost.postMessage !== "function") {
-      status.textContent = "The secure local host bridge is unavailable on this device.";
-      button.disabled = true;
+      showFeedback("Secure local bridge unavailable.", "error");
       return;
     }
     const id = String(nextId++);
-    window.gtnHost.postMessage(JSON.stringify({ version: 1, id, type }));
+    const request = { version: 1, id, type };
+    if (typeof guess === "string") request.guess = guess;
+    window.gtnHost.postMessage(JSON.stringify(request));
+  }
+
+  function showFeedback(message, kind) {
+    feedback.textContent = message;
+    feedback.className = "gtn-feedback" + (kind ? " gtn-feedback--" + kind : "");
   }
 
   function applyMessage(message) {
     let response;
-    try {
-      response = JSON.parse(message.data);
-    } catch {
-      status.textContent = "The host returned an unreadable response.";
-      return;
-    }
-    if (response.version !== 1) {
-      status.textContent = "Unsupported host protocol version.";
-      return;
-    }
+    try { response = JSON.parse(message.data); }
+    catch { showFeedback("The host returned an unreadable response.", "error"); pending = false; button.disabled = !ready; return; }
+    if (response.version !== 1) { showFeedback("Unsupported bridge version.", "error"); return; }
     if (response.type === "error") {
-      status.textContent = "Host rejected the request: " + String(response.error || "unknown_error");
+      showFeedback(response.error === "guess_processing_failed" ? "The guess could not be processed. Try again." : "Request rejected: " + String(response.error || "unknown_error"), "error");
+      pending = false;
+      button.disabled = !ready;
       return;
     }
-    if (response.type !== "state" || !Number.isSafeInteger(response.state?.counter)) {
-      status.textContent = "The host returned an invalid state response.";
+    const state = response.state;
+    if (response.type !== "state" || !state || !Number.isFinite(state.rangeMin) || !Number.isFinite(state.rangeMax)) {
+      showFeedback("The host returned invalid game state.", "error");
+      pending = false;
+      button.disabled = !ready;
       return;
     }
-    counter.textContent = String(response.state.counter);
+    rangeMin.textContent = String(state.rangeMin);
+    rangeMax.textContent = String(state.rangeMax);
+    attempts.textContent = String(state.attempts);
+    correctGuesses.textContent = String(state.correctGuesses);
+    streak.textContent = String(state.streak);
+    rangeBadge.textContent = "Kotlin connected";
+    ready = true;
+    pending = false;
     button.disabled = false;
-    status.textContent = "Connected · state supplied by Kotlin.";
+    input.min = String(state.rangeMin);
+    input.max = String(state.rangeMax);
+    const status = state.lastGuessStatus;
+    if (status === "rate_limited" || state.accepted === false) showFeedback("Slow down a moment, then try again.", "warning");
+    else if (status === "CORRECT") showFeedback("Correct! 🎉 New round ready.", "success");
+    else if (status === "TOO_LOW") showFeedback("Too low. Try a higher number.", "warning");
+    else if (status === "TOO_HIGH") showFeedback("Too high. Try a lower number.", "warning");
+    else if (status) showFeedback("Guess recorded.", "");
+    else showFeedback("Ready when you are.", "");
   }
 
-  if (window.gtnHost) {
+  if (window.gtnHost && typeof window.gtnHost.postMessage === "function") {
     window.gtnHost.onmessage = applyMessage;
-    button.addEventListener("click", () => {
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!ready || pending) return;
+      const value = input.value.trim();
+      if (!/^-?[0-9]+$/.test(value)) { showFeedback("Enter a whole number.", "error"); return; }
+      pending = true;
       button.disabled = true;
-      send("increment_counter");
+      showFeedback("Checking guess…", "");
+      send("submit_guess", value);
     });
     send("read_state");
   } else {
-    status.textContent = "Secure host bridge unavailable. This page needs the app prototype host.";
+    rangeBadge.textContent = "Offline preview";
+    showFeedback("The secure host bridge is unavailable. Open this screen inside the app.", "error");
     button.disabled = true;
   }
 })();
