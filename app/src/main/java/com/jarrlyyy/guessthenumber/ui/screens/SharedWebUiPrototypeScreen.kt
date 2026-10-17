@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -34,14 +35,18 @@ import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import org.json.JSONObject
+import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.ui.viewmodel.GuessSubmissionResult
 
 private const val WEB_UI_ORIGIN = "https://appassets.androidplatform.net"
 private const val WEB_UI_PATH = "/assets/web-prototype/"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SharedWebUiPrototypeScreen(onBack: () -> Unit) {
+fun SharedWebUiPrototypeScreen(state: GameState, onSubmitGuess: (Long) -> GuessSubmissionResult, onBack: () -> Unit) {
     var counter by remember { mutableIntStateOf(0) }
+    val currentGameState by rememberUpdatedState(state)
+    val submitGuess by rememberUpdatedState(onSubmitGuess)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val supportsMessageListener = remember {
         WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)
@@ -62,7 +67,7 @@ fun SharedWebUiPrototypeScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Shared Web UI • Prototype") },
+                title = { Text("Shared Web UI • Guessing preview") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -76,7 +81,7 @@ fun SharedWebUiPrototypeScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                "Debug-only experiment. The counter lives in Kotlin and does not touch game saves.",
+                "Debug-only preview using your current game state. Guess processing stays in Kotlin.",
                 style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
                 color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
             )
