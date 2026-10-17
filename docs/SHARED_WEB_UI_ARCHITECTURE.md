@@ -11,7 +11,7 @@ Make GuessTheNumber look and behave like the same game across Android and Window
 
 This chosen direction changes the preferred **UI delivery layer**, not the game's product requirements. Preserve offline play, existing save compatibility, Kotlin-owned progression/rewards, localization, recovery, and the no-ads/no-analytics/no-accounts rule.
 
-## Proposed stack
+## Chosen target stack
 
 - **HTML:** semantic screen structure and accessible controls.
 - **CSS:** shared design tokens, layout, responsive behavior, typography, colors, animations and reduced-motion support.
