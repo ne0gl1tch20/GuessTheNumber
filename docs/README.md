@@ -10,6 +10,7 @@ This directory contains technical notes for the Android game, KMP architecture a
 | [Integration audit status](INTEGRATION_AUDIT_STATUS.md) | Integrated features, known gaps and remaining validation/release work |
 | [KMP foundation status](KMP_FOUNDATION_STATUS.md) | Shared-vs-host architecture boundary and foundation exit criteria |
 | [Shared Web UI architecture](SHARED_WEB_UI_ARCHITECTURE.md) | Chosen HTML/CSS/JavaScript UI direction, Kotlin authority, native hosts and migration gates |
+| [Shared Web UI migration matrix](SHARED_WEB_UI_MIGRATION_MATRIX.md) | Source-audited first production gameplay slice, Kotlin-owned action path, migration scope and acceptance evidence |
 | [Windows WebView host evaluation](WINDOWS_WEBVIEW_HOST_EVALUATION.md) | Source-based Windows host options, MSI/runtime constraints and the next isolated proof of concept |
 | [Windows feature parity plan](WINDOWS_FEATURE_PARITY_PLAN.md) | Ordered plan for the intended player-facing feature set on Windows |
 | [Windows Android UI parity audit](WINDOWS_ANDROID_UI_PARITY_AUDIT.md) | Screen-by-screen implementation status and remaining visual/behavior gaps |
