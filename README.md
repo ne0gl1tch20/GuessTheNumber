@@ -1,6 +1,6 @@
-# Guess The Number (Incremental & Arcade Edition)
+# Numberverse (Incremental & Arcade Edition)
 
-An advanced, feature-rich incremental and arcade game currently built primarily with Kotlin and Jetpack Compose. The chosen target architecture uses one shared HTML/CSS/JavaScript frontend for player-facing screens, keeps Kotlin/KMP authoritative for game rules and saves, and retains Compose/native hosts for platform integration. This is the locked direction, not a completed migration. See the architecture and parity plans below.
+Numberverse is an advanced, feature-rich incremental and arcade game currently built primarily with Kotlin and Jetpack Compose. The chosen target architecture uses one shared HTML/CSS/JavaScript frontend for player-facing screens, keeps Kotlin/KMP authoritative for game rules and saves, and retains Compose/native hosts for platform integration. This is the locked direction, not a completed migration. See the architecture and parity plans below.
 
 ## Lua Scripting Layer (Implementation in Progress)
 
