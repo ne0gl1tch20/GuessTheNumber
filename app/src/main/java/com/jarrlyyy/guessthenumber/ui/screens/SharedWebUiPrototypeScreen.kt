@@ -162,20 +162,25 @@ fun SharedWebUiPrototypeScreen(state: GameState, onSubmitGuess: (Long) -> GuessS
                                                     return@post
                                                 }
                                                 is WebUiBridgeProtocol.ParseResult.Valid -> {
-                                                    when (parsed.type) {
-                                                        "read_state" -> Unit
-                                                        "increment_counter" -> {
-                                                            if (counter < Int.MAX_VALUE) counter++
-                                                        }
+                                                    val result = if (parsed.type == "submit_guess" && parsed.guess != null) {
+                                                        try { submitGuess(parsed.guess) } catch (_: Exception) { null }
+                                                    } else null
+                                                    if (parsed.type == "increment_counter" && counter < Int.MAX_VALUE) counter++
+                                                    if (parsed.type == "submit_guess" && result == null) {
+                                                        replyProxy.postMessage(errorResponse(parsed.id, "guess_processing_failed"))
+                                                    } else {
+                                                        val game = currentGameState
+                                                        val viewState = JSONObject()
+                                                            .put("rangeMin", result?.rangeMin ?: game.currentRangeMin)
+                                                            .put("rangeMax", result?.rangeMax ?: game.currentRangeMax)
+                                                            .put("attempts", result?.attempts ?: game.attempts)
+                                                            .put("correctGuesses", result?.correctGuesses ?: game.correctGuesses)
+                                                            .put("streak", result?.streak ?: game.streak)
+                                                            .put("bestStreak", result?.bestStreak ?: game.bestStreak)
+                                                            .put("accepted", result?.accepted ?: true)
+                                                        if (result != null) viewState.put("lastGuessStatus", result.status ?: "rate_limited")
+                                                        replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "state").put("state", viewState).toString())
                                                     }
-                                                    replyProxy.postMessage(
-                                                        JSONObject()
-                                                            .put("version", 1)
-                                                            .put("id", parsed.id)
-                                                            .put("type", "state")
-                                                            .put("state", JSONObject().put("counter", counter))
-                                                            .toString()
-                                                    )
                                                 }
                                             }
                                         }
