@@ -20,7 +20,14 @@
       <div class="live-pill"><span class="live-dot"></span><span id="statusLabel">ONLINE</span></div>
     </header>
 
-    <section class="hero-card card">
+    <nav class="screen-nav" aria-label="Game sections" role="tablist">
+      <button type="button" role="tab" id="tab-play" aria-controls="screen-play" aria-selected="true" data-screen-target="play"><span aria-hidden="true">⌂</span><b>Play</b></button>
+      <button type="button" role="tab" id="tab-worlds" aria-controls="screen-worlds" aria-selected="false" data-screen-target="worlds" tabindex="-1"><span aria-hidden="true">✧</span><b>Worlds</b></button>
+      <button type="button" role="tab" id="tab-rewards" aria-controls="screen-rewards" aria-selected="false" data-screen-target="rewards" tabindex="-1"><span aria-hidden="true">◇</span><b>Rewards</b></button>
+      <button type="button" role="tab" id="tab-journey" aria-controls="screen-journey" aria-selected="false" data-screen-target="journey" tabindex="-1"><span aria-hidden="true">◷</span><b>Journey</b></button>
+    </nav>
+    <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
+<section class="hero-card card">
       <div class="hero-glow"></div>
       <div class="hero-copy">
         <span class="eyebrow">CURRENT RUN</span>
@@ -30,8 +37,7 @@
       </div>
       <div class="sparkle-field" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
-
-    <section class="stats-grid" aria-label="Run statistics">
+<section class="stats-grid" aria-label="Run statistics">
       <article class="stat-card card">
         <span class="stat-icon">🎯</span>
         <span class="stat-value" id="attempts">0</span>
@@ -48,8 +54,7 @@
         <span class="stat-label">STREAK</span>
       </article>
     </section>
-
-    <section class="economy-card card">
+<section class="economy-card card">
       <div class="economy-row">
         <div><span class="stat-label">MONEY</span><strong id="money">0</strong></div>
         <div class="income"><span>＋</span><strong id="income">0</strong><small>/s</small></div>
@@ -57,8 +62,33 @@
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
       <div class="progress-caption"><span>RUN MOMENTUM</span><span id="bestStreak">BEST 0</span></div>
     </section>
-
-    <section class="progression-card card" id="progressionPanel" aria-label="Beyond the Numbers progression">
+<section class="guess-card card">
+      <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
+      <form id="guessForm" autocomplete="off">
+        <div class="input-shell">
+          <input id="guessInput" type="text" inputmode="numeric" pattern="-?[0-9]+" maxlength="20" placeholder="Enter a number" aria-label="Your guess">
+          <button id="guessButton" type="submit"><span>GUESS</span><b>→</b></button>
+        </div>
+      </form>
+      <p id="actionStatus" class="action-status" role="status" aria-live="polite" aria-atomic="true">Ready when you are.</p>
+      <div class="guess-tools" aria-label="Quick guess helpers">
+        <span class="guess-tools-label">QUICK PICK</span>
+        <div class="guess-tool-buttons">
+          <button type="button" data-guess-pick="min" aria-label="Use lower end of range">LOW END</button>
+          <button type="button" data-guess-pick="mid" aria-label="Use midpoint of range">MIDPOINT</button>
+          <button type="button" data-guess-pick="max" aria-label="Use upper end of range">HIGH END</button>
+          <button type="button" data-guess-pick="clear" aria-label="Clear guess input">CLEAR</button>
+        </div>
+      </div>
+      <div class="microcopy" id="microcopy">The engine decides. The interface celebrates.</div>
+    </section>
+<section class="quick-actions">
+      <button class="action-card" id="beyondButton" type="button"><span class="action-icon">◈</span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong>›</strong></button>
+      <button class="action-card" id="questButton" type="button"><span class="action-icon">✦</span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong>›</strong></button>
+    </section>
+    </div>
+    <div class="screen" id="screen-worlds" role="tabpanel" aria-labelledby="tab-worlds" data-screen="worlds" hidden>
+<section class="progression-card card" id="progressionPanel" aria-label="Beyond the Numbers progression">
       <div class="panel-title"><span class="panel-glyph">◈</span><div><span class="eyebrow">BEYOND THE NUMBERS</span><h2>Your universe</h2></div><span class="panel-chip" id="worldCount">1 WORLD</span></div>
       <div class="currency-grid">
         <article class="currency-tile prestige-tile"><span>✦ PRESTIGE</span><strong id="prestige">0</strong><small id="prestigeCount">0 ascensions</small></article>
@@ -80,7 +110,17 @@
         <button type="button" data-bridge-action="navigate" data-route="codex">Codex <span>↗</span></button>
       </div>
     </section>
-    <section class="milestones-card card" aria-label="Achievement progress">
+<section class="boss-card card" id="bossPanel" hidden aria-label="Active boss encounter">
+      <div class="boss-art" aria-hidden="true">♜</div><div class="boss-content"><span class="eyebrow">ENCOUNTER IN PROGRESS</span><h2 id="bossName">Boss encounter</h2><p>Correct guesses deal damage. Keep your run going.</p><div class="boss-health-row"><span>HEALTH</span><strong id="bossHealthText">0 / 0 HP</strong></div><div class="boss-health-track"><div id="bossHealthFill" class="boss-health-fill"></div></div></div><span class="boss-live">ACTIVE</span>
+    </section>
+<section class="world-card card" id="worldPanel" aria-label="Worlds and boss encounters">
+      <div class="panel-title"><span class="panel-glyph world-glyph">♜</span><div><span class="eyebrow">WORLD EXPEDITION</span><h2>Worlds & bosses</h2></div><span class="panel-chip" id="worldBossStatus">READY</span></div>
+      <p class="world-intro">Unlock new realms and challenge their guardians. Boss rules and rewards are handled by the game engine.</p>
+      <div class="world-list" id="worldList"><div class="world-empty">Syncing your world map…</div></div>
+    </section>
+    </div>
+    <div class="screen" id="screen-rewards" role="tabpanel" aria-labelledby="tab-rewards" data-screen="rewards" hidden>
+<section class="milestones-card card" aria-label="Achievement progress">
       <div class="panel-title"><span class="panel-glyph milestone-glyph">🏆</span><div><span class="eyebrow">PERSONAL MILESTONES</span><h2>Achievement progress</h2></div><span class="panel-chip">3 GOALS</span></div>
       <article class="milestone-row">
         <div class="milestone-copy"><div><strong>Getting the hang of it</strong><span id="achievementCorrectStatus" class="milestone-status">IN PROGRESS</span></div><small>Land 10 correct guesses</small></div>
@@ -96,26 +136,7 @@
       </article>
       <p class="milestone-note">Progress is read from your saved game state. This panel does not grant rewards.</p>
     </section>
-
-    <section class="run-summary-card card" aria-label="Run summary">
-      <div class="panel-title"><span class="panel-glyph summary-glyph">◷</span><div><span class="eyebrow">YOUR JOURNEY</span><h2>Run summary</h2></div></div>
-      <div class="summary-grid">
-        <div><span>RANDOM EVENTS</span><strong id="summaryEvents">0</strong></div>
-        <div><span>CHESTS FOUND</span><strong id="summaryDrops">0</strong></div>
-        <div><span>CHESTS OPENED</span><strong id="summaryOpened">0</strong></div>
-        <div><span>BOSS VICTORIES</span><strong id="summaryVictories">0</strong></div>
-      </div>
-    </section>
-
-    <section class="boss-card card" id="bossPanel" hidden aria-label="Active boss encounter">
-      <div class="boss-art" aria-hidden="true">♜</div><div class="boss-content"><span class="eyebrow">ENCOUNTER IN PROGRESS</span><h2 id="bossName">Boss encounter</h2><p>Correct guesses deal damage. Keep your run going.</p><div class="boss-health-row"><span>HEALTH</span><strong id="bossHealthText">0 / 0 HP</strong></div><div class="boss-health-track"><div id="bossHealthFill" class="boss-health-fill"></div></div></div><span class="boss-live">ACTIVE</span>
-    </section>
-    <section class="world-card card" id="worldPanel" aria-label="Worlds and boss encounters">
-      <div class="panel-title"><span class="panel-glyph world-glyph">♜</span><div><span class="eyebrow">WORLD EXPEDITION</span><h2>Worlds & bosses</h2></div><span class="panel-chip" id="worldBossStatus">READY</span></div>
-      <p class="world-intro">Unlock new realms and challenge their guardians. Boss rules and rewards are handled by the game engine.</p>
-      <div class="world-list" id="worldList"><div class="world-empty">Syncing your world map…</div></div>
-    </section>
-    <section class="quest-card card" id="questPanel" aria-label="Daily momentum">
+<section class="quest-card card" id="questPanel" aria-label="Daily momentum">
       <div class="panel-title"><span class="panel-glyph quest-glyph">✦</span><div><span class="eyebrow">DAILY MOMENTUM</span><h2>Today's run</h2></div><span class="panel-chip" id="claimedQuests">0 CLAIMED</span></div>
       <div class="quest-metrics"><div><strong id="dailyGuesses">0</strong><span>Guesses made</span></div><div><strong id="dailyCorrect">0</strong><span>Correct guesses</span></div><div><strong id="dailyBestStreak">0</strong><span>Best daily streak</span></div></div>
       <div class="quest-board" aria-label="Daily quests">
@@ -126,39 +147,28 @@
       </div>
       <div class="quest-foot"><span class="quest-pulse"></span><span id="questMessage">Every guess builds your run.</span></div>
     </section>
-    <section class="loot-card card" aria-label="Loot inventory">
+<section class="loot-card card" aria-label="Loot inventory">
       <div class="loot-heading"><span class="panel-glyph loot-glyph">◇</span><div><span class="eyebrow">LOOT INVENTORY</span><h2>Ready to open</h2></div></div>
       <div class="loot-items"><div><span class="loot-icon common">□</span><span><strong id="commonChests">0</strong><small>Common</small></span><button class="chest-open" data-bridge-action="chest" data-tier="common" type="button">Open</button></div><div><span class="loot-icon rare">◆</span><span><strong id="rareChests">0</strong><small>Rare</small></span><button class="chest-open" data-bridge-action="chest" data-tier="rare" type="button">Open</button></div><div><span class="loot-icon epic">✦</span><span><strong id="epicChests">0</strong><small>Epic</small></span><button class="chest-open" data-bridge-action="chest" data-tier="epic" type="button">Open</button></div></div>
       <p class="loot-note">Your inventory is synced from the game engine.</p>
     </section>
-    <section class="guess-card card">
-      <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
-      <form id="guessForm" autocomplete="off">
-        <div class="input-shell">
-          <input id="guessInput" type="text" inputmode="numeric" pattern="-?[0-9]+" maxlength="20" placeholder="Enter a number" aria-label="Your guess">
-          <button id="guessButton" type="submit"><span>GUESS</span><b>→</b></button>
-        </div>
-      </form>
-      <p id="actionStatus" class="action-status" role="status" aria-live="polite" aria-atomic="true">Ready when you are.</p>
-      <div class="guess-tools" aria-label="Quick guess helpers">
-        <span class="guess-tools-label">QUICK PICK</span>
-        <div class="guess-tool-buttons">
-          <button type="button" data-guess-pick="min" aria-label="Use lower end of range">LOW END</button>
-          <button type="button" data-guess-pick="mid" aria-label="Use midpoint of range">MIDPOINT</button>
-          <button type="button" data-guess-pick="max" aria-label="Use upper end of range">HIGH END</button>
-          <button type="button" data-guess-pick="clear" aria-label="Clear guess input">CLEAR</button>
-        </div>
+    </div>
+    <div class="screen" id="screen-journey" role="tabpanel" aria-labelledby="tab-journey" data-screen="journey" hidden>
+<section class="run-summary-card card" aria-label="Run summary">
+      <div class="panel-title"><span class="panel-glyph summary-glyph">◷</span><div><span class="eyebrow">YOUR JOURNEY</span><h2>Run summary</h2></div></div>
+      <div class="summary-grid">
+        <div><span>RANDOM EVENTS</span><strong id="summaryEvents">0</strong></div>
+        <div><span>CHESTS FOUND</span><strong id="summaryDrops">0</strong></div>
+        <div><span>CHESTS OPENED</span><strong id="summaryOpened">0</strong></div>
+        <div><span>BOSS VICTORIES</span><strong id="summaryVictories">0</strong></div>
       </div>
-      <div class="microcopy" id="microcopy">The engine decides. The interface celebrates.</div>
     </section>
-
-    <section class="event-card card" id="randomEventPanel" aria-label="Latest random event" hidden>
+<section class="event-card card" id="randomEventPanel" aria-label="Latest random event" hidden>
       <div class="panel-title"><span class="panel-glyph event-glyph">✦</span><div><span class="eyebrow">UNEXPECTED BONUS</span><h2 id="eventTitle">Random event</h2></div><span class="panel-chip">EVENT</span></div>
       <p id="eventDescription" class="event-description">A surprise from the game engine.</p>
       <div class="event-footnote"><span>EVENTS TRIGGERED</span><strong id="eventCount">0</strong></div>
     </section>
-
-    <section class="strategy-card card" id="strategyPanel" aria-label="Math Strategy Lab">
+<section class="strategy-card card" id="strategyPanel" aria-label="Math Strategy Lab">
       <div class="panel-title"><span class="panel-glyph strategy-glyph">⌁</span><div><span class="eyebrow">THINK LIKE A PLAYER</span><h2>Math Strategy Lab</h2></div><span class="panel-chip">OPTIONAL</span></div>
       <p class="strategy-intro">Use the current range to plan your next guess. These are hints only; the game engine still decides the result.</p>
       <div class="strategy-grid">
@@ -169,11 +179,7 @@
       <div class="strategy-advice" id="strategyAdvice" role="status">A midpoint guess can split a range into smaller sections.</div>
       <button type="button" class="strategy-use" id="useMidpoint">Use midpoint in guess box <span>↗</span></button>
     </section>
-
-    <section class="quick-actions">
-      <button class="action-card" id="beyondButton" type="button"><span class="action-icon">◈</span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong>›</strong></button>
-      <button class="action-card" id="questButton" type="button"><span class="action-icon">✦</span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong>›</strong></button>
-    </section>
+    </div>
   </main>
   <div id="toast" class="toast" role="status"></div>
   <script src="app.js"></script>
