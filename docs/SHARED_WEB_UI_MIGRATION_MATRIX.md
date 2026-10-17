@@ -5,6 +5,7 @@
 **Architecture authority:** [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md)
 **Product roadmap:** [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md)
 **Windows parity authority:** [Windows Feature Parity Plan](WINDOWS_FEATURE_PARITY_PLAN.md)
+**Shared visual foundation:** [Shared Web UI Theme Foundation](SHARED_WEB_UI_THEME_FOUNDATION.md)
 
 This matrix tracks real player-facing screen migration. The isolated `SharedWebUiPrototypeScreen` and its temporary counter are excluded from production migration counts.
 
@@ -35,6 +36,7 @@ Migrate the primary guessing surface as the first real web-backed gameplay exper
 
 ### Acceptance checklist
 
+- [ ] Use the shared `assets/web-ui/theme.css` token and component foundation; extend it for real screen needs without forking a parallel design system.
 - [ ] Agree on a versioned, typed production bridge schema for read-view-state and submit-guess, including request IDs, duplicate/in-flight behavior, validation failures, cancellation and stale responses.
 - [ ] Derive view state only from Kotlin; do not expose the secret target number or trust JS-calculated feedback, reward, eligibility, balances or save mutations.
 - [ ] Preserve the existing guess/rate-limit/bonus/quest/loot/boss/achievement/save behavior.
@@ -52,7 +54,8 @@ The complete screen inventory is not yet source-audited. Add each screen only af
 
 | Screen / surface | Current status | Next evidence required |
 |---|---|---|
-| Shared web bridge prototype | Debug-only Android experiment; not production UI | Run focused tests and APK build, exercise lifecycle/offline/bridge behavior on device, complete Windows host spike |
+| Shared web bridge prototype | Debug-only Android experiment; not production UI; loads the shared CSS foundation | Run focused tests and APK build, exercise lifecycle/offline/bridge behavior on device, complete Windows host spike |
+| Shared web theme foundation | Reusable CSS tokens and basic game UI primitives; used by the prototype only | Validate contrast, scaling, accessibility, safe areas and host behavior; adopt in the first production screen |
 | Play: core guessing surface | Compose; first production migration candidate | Finalize bridge contract and hybrid-vs-whole-route layout decision |
 | Play: economy/progression/boss/event sections | Compose | Inventory individual sections and callbacks before deciding whether they remain Compose temporarily or move with the route |
 | Upgrade, Shop, More and progression destinations | Compose | Source-backed inventory, then migrate by coherent feature slices |
