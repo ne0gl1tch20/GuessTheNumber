@@ -11,7 +11,7 @@ internal object WebUiBridgeProtocol {
     const val MAX_MESSAGE_LENGTH = 512
 
     sealed interface ParseResult {
-        data class Valid(val id: String, val type: String) : ParseResult
+        data class Valid(val id: String, val type: String, val guess: Long? = null) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
 
@@ -42,15 +42,32 @@ internal object WebUiBridgeProtocol {
         val rawType = request.opt("type")
         val id = rawId as? String ?: ""
         val type = rawType as? String ?: ""
-        val validEnvelope = request.length() == 3 &&
-            rawVersion is Int && rawVersion == 1 &&
-            rawId is String && id.matches(Regex("[A-Za-z0-9_-]{1,48}")) &&
-            rawType is String
-        if (!validEnvelope) return ParseResult.Invalid("invalid_request", id)
-        if (type !in setOf("read_state", "increment_counter")) {
-            return ParseResult.Invalid("unknown_action", id)
+        val validId = rawId is String && id.matches(Regex("[A-Za-z0-9_-]{1,48}"))
+        if (rawVersion !is Int || rawVersion != 1 || !validId || rawType !is String) {
+            return ParseResult.Invalid("invalid_request", id)
         }
 
-        return ParseResult.Valid(id, type)
+        return when (type) {
+            "read_state", "increment_counter" -> {
+                if (request.length() != 3) ParseResult.Invalid("invalid_request", id)
+                else if (type == "increment_counter") ParseResult.Valid(id, type)
+                else ParseResult.Valid(id, type)
+            }
+            "submit_guess" -> {
+                if (request.length() != 4 || !request.has("guess")) {
+                    return ParseResult.Invalid("invalid_request", id)
+                }
+                val rawGuess = request.opt("guess")
+                val guessText = rawGuess as? String
+                    ?: return ParseResult.Invalid("invalid_guess", id)
+                if (guessText.length !in 1..19 || !guessText.matches(Regex("-?[0-9]+"))) {
+                    return ParseResult.Invalid("invalid_guess", id)
+                }
+                val guess = guessText.toLongOrNull()
+                    ?: return ParseResult.Invalid("invalid_guess", id)
+                ParseResult.Valid(id, type, guess)
+            }
+            else -> ParseResult.Invalid("unknown_action", id)
+        }
     }
 }
