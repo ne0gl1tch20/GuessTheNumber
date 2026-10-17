@@ -4,7 +4,7 @@ const $=id=>document.getElementById(id);
 const el={
  range:$('rangeText'),feedback:$('feedback'),attempts:$('attempts'),correct:$('correct'),streak:$('streak'),best:$('bestStreak'),
  money:$('money'),income:$('income'),progress:$('progressFill'),input:$('guessInput'),button:$('guessButton'),
- status:$('statusLabel'),micro:$('microcopy'),toast:$('toast'),hero:document.querySelector('.hero-card'),
+ status:$('statusLabel'),micro:$('microcopy'),toast:$('toast'),hero:document.querySelector('.hero-card'),progressionPanel:$('progressionPanel'),questPanel:$('questPanel'),
  prestige:$('prestige'),prestigeCount:$('prestigeCount'),ultra:$('ultra'),ultraCount:$('ultraCount'),nebula:$('nebula'),
  worldCount:$('worldCount'),activeWorld:$('activeWorld'),realmSubtext:$('realmSubtext'),bossVictories:$('bossVictories'),
  homeBase:$('homeBase'),riftTier:$('riftTier'),defeatedBosses:$('defeatedBosses'),
@@ -53,7 +53,7 @@ if(host&&typeof host.postMessage==='function'){
  host.onmessage=event=>receive(event.data);
  $('guessForm').addEventListener('submit',event=>{event.preventDefault();const value=el.input.value.trim();if(!/^-?[0-9]+$/.test(value)||value.length>20){toast('Enter a whole number');return}if(send('submit_guess',value))el.input.value=''});
  $('beyondButton').addEventListener('click',()=>el.progressionPanel?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'center'}));
- $('questButton').addEventListener('click',()=>$('questPanel')?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'center'}));
+ $('questButton').addEventListener('click',()=>el.questPanel?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'center'}));
  send('read_state');
 }else{el.status.textContent='OFFLINE';el.micro.textContent='Game engine unavailable.'}
 })();
