@@ -123,4 +123,33 @@ class WebUiBridgeProtocolTest {
         )
     }
 
+
+    @Test
+    fun requestIdWindowRejectsDuplicates() {
+        val window = WebUiRequestIdWindow(capacity = 3)
+        assertTrue(window.markIfNew("guess-1"))
+        assertEquals(false, window.markIfNew("guess-1"))
+        assertTrue(window.markIfNew("guess-2"))
+    }
+
+    @Test
+    fun requestIdWindowEvictsOldIdsAtItsBound() {
+        val window = WebUiRequestIdWindow(capacity = 2)
+        assertTrue(window.markIfNew("guess-1"))
+        assertTrue(window.markIfNew("guess-2"))
+        assertTrue(window.markIfNew("guess-3"))
+        assertTrue(window.markIfNew("guess-1"))
+        assertEquals(false, window.markIfNew("guess-1"))
+    }
+
+    @Test
+    fun requestIdWindowRequiresPositiveCapacity() {
+        try {
+            WebUiRequestIdWindow(capacity = 0)
+            throw AssertionError("Expected zero capacity to be rejected")
+        } catch (_: IllegalArgumentException) {
+            // Expected: a zero-sized replay window cannot enforce uniqueness.
+        }
+    }
+
 }
