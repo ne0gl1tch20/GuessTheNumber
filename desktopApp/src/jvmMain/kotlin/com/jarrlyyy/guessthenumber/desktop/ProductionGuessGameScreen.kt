@@ -358,7 +358,7 @@ fun ProductionGuessGameScreen(
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
                             "read_state" -> 3
-                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic" -> 4
+                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest" -> 4
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
@@ -435,6 +435,9 @@ fun ProductionGuessGameScreen(
                                         if (catalog.shopItems.none { it.id == id && it.isCosmetic }) null
                                         else DesktopEconomyTransactions.equipCosmetic(before, id)
                                     }
+                                    "claim_daily_quest" -> DesktopEconomyTransactions.claimDailyQuest(
+                                        before, request.optString("questId"), LocalDate.now().toString()
+                                    )
                                     else -> null
                                 }
                                 if (transaction == null) {
