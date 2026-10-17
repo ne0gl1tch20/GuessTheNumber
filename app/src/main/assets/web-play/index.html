@@ -4,16 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>GuessTheNumber</title>
+  <title>Numberverse</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="app">
     <header class="topbar">
       <div class="brand-lockup">
-        <img class="brand-logo" src="gtn-app-logo.png" alt="GuessTheNumber app icon">
+        <img class="brand-logo" src="gtn-app-logo.png" alt="Numberverse app icon">
         <div>
-          <h1>GuessTheNumber</h1>
+          <h1>Numberverse</h1>
+          <p style="margin:2px 0 0;color:#8e9abf;font-size:9px;line-height:1.25;letter-spacing:.04em">The engine decides. The interface celebrates.</p>
         </div>
       </div>
       <div class="live-pill"><span class="live-dot"></span><span id="statusLabel">ONLINE</span></div>
@@ -21,7 +22,7 @@
 
     <nav class="screen-nav" aria-label="Game sections" role="tablist">
       <button type="button" role="tab" id="tab-play" aria-controls="screen-play" aria-selected="true" data-screen-target="play"><span aria-hidden="true">⌂</span><b>Play</b></button>
-      <button type="button" role="tab" id="tab-worlds" aria-controls="screen-worlds" aria-selected="false" data-screen-target="worlds" tabindex="-1"><span aria-hidden="true">✦</span><b>Worlds</b></button>
+      <button type="button" role="tab" id="tab-worlds" aria-controls="screen-worlds" aria-selected="false" data-screen-target="worlds" tabindex="-1"><span aria-hidden="true"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><b>Worlds</b></button>
       <button type="button" role="tab" id="tab-rewards" aria-controls="screen-rewards" aria-selected="false" data-screen-target="rewards" tabindex="-1"><span aria-hidden="true">◇</span><b>Rewards</b></button>
       <button type="button" role="tab" id="tab-journey" aria-controls="screen-journey" aria-selected="false" data-screen-target="journey" tabindex="-1"><span aria-hidden="true">◷</span><b>Journey</b></button>
     </nav>
@@ -82,14 +83,14 @@
     </section>
 <section class="quick-actions">
       <button class="action-card" id="beyondButton" type="button"><span class="action-icon">◈</span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong>›</strong></button>
-      <button class="action-card" id="questButton" type="button"><span class="action-icon">✦</span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong>›</strong></button>
+      <button class="action-card" id="questButton" type="button"><span class="action-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong>›</strong></button>
     </section>
     </div>
     <div class="screen" id="screen-worlds" role="tabpanel" aria-labelledby="tab-worlds" data-screen="worlds" hidden>
 <section class="progression-card card" id="progressionPanel" aria-label="Beyond the Numbers progression">
       <div class="panel-title"><span class="panel-glyph">◈</span><div><span class="eyebrow">BEYOND THE NUMBERS</span><h2>Your universe</h2></div><span class="panel-chip" id="worldCount">1 WORLD</span></div>
       <div class="currency-grid">
-        <article class="currency-tile prestige-tile"><span>✦ PRESTIGE</span><strong id="prestige">0</strong><small id="prestigeCount">0 ascensions</small></article>
+        <article class="currency-tile prestige-tile"><span><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg> PRESTIGE</span><strong id="prestige">0</strong><small id="prestigeCount">0 ascensions</small></article>
         <article class="currency-tile ultra-tile"><span>⬡ ULTRA</span><strong id="ultra">0</strong><small id="ultraCount">0 ultra resets</small></article>
         <article class="currency-tile nebula-tile"><span>☄ NEBULA</span><strong id="nebula">0</strong><small>Cosmic currency</small></article>
       </div>
@@ -135,7 +136,7 @@
       <p class="milestone-note">Progress is read from your saved game state. This panel does not grant rewards.</p>
     </section>
 <section class="quest-card card" id="questPanel" aria-label="Daily momentum">
-      <div class="panel-title"><span class="panel-glyph quest-glyph">✦</span><div><span class="eyebrow">DAILY MOMENTUM</span><h2>Today's run</h2></div><span class="panel-chip" id="claimedQuests">0 CLAIMED</span></div>
+      <div class="panel-title"><span class="panel-glyph quest-glyph"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><div><span class="eyebrow">DAILY MOMENTUM</span><h2>Today's run</h2></div><span class="panel-chip" id="claimedQuests">0 CLAIMED</span></div>
       <div class="quest-metrics"><div><strong id="dailyGuesses">0</strong><span>Guesses made</span></div><div><strong id="dailyCorrect">0</strong><span>Correct guesses</span></div><div><strong id="dailyBestStreak">0</strong><span>Best daily streak</span></div></div>
       <div class="quest-board" aria-label="Daily quests">
         <article class="quest-row"><div class="quest-row-copy"><strong>Warm-up</strong><small>Make 10 guesses</small><span class="quest-progress" id="questProgressGuesses">0 / 10</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_guesses_10" type="button">Claim</button></article>
@@ -147,7 +148,7 @@
     </section>
 <section class="loot-card card" aria-label="Loot inventory">
       <div class="loot-heading"><span class="panel-glyph loot-glyph">◇</span><div><span class="eyebrow">LOOT INVENTORY</span><h2>Ready to open</h2></div></div>
-      <div class="loot-items"><div><span class="loot-icon common">□</span><span><strong id="commonChests">0</strong><small>Common</small></span><button class="chest-open" data-bridge-action="chest" data-tier="common" type="button">Open</button></div><div><span class="loot-icon rare">◆</span><span><strong id="rareChests">0</strong><small>Rare</small></span><button class="chest-open" data-bridge-action="chest" data-tier="rare" type="button">Open</button></div><div><span class="loot-icon epic">✦</span><span><strong id="epicChests">0</strong><small>Epic</small></span><button class="chest-open" data-bridge-action="chest" data-tier="epic" type="button">Open</button></div></div>
+      <div class="loot-items"><div><span class="loot-icon common">□</span><span><strong id="commonChests">0</strong><small>Common</small></span><button class="chest-open" data-bridge-action="chest" data-tier="common" type="button">Open</button></div><div><span class="loot-icon rare">◆</span><span><strong id="rareChests">0</strong><small>Rare</small></span><button class="chest-open" data-bridge-action="chest" data-tier="rare" type="button">Open</button></div><div><span class="loot-icon epic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg></span><span><strong id="epicChests">0</strong><small>Epic</small></span><button class="chest-open" data-bridge-action="chest" data-tier="epic" type="button">Open</button></div></div>
       <p class="loot-note">Your inventory is synced from the game engine.</p>
     </section>
     </div>
@@ -162,7 +163,7 @@
       </div>
     </section>
 <section class="event-card card" id="randomEventPanel" aria-label="Latest random event" hidden>
-      <div class="panel-title"><span class="panel-glyph event-glyph">✦</span><div><span class="eyebrow">UNEXPECTED BONUS</span><h2 id="eventTitle">Random event</h2></div><span class="panel-chip">EVENT</span></div>
+      <div class="panel-title"><span class="panel-glyph event-glyph"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg></span><div><span class="eyebrow">UNEXPECTED BONUS</span><h2 id="eventTitle">Random event</h2></div><span class="panel-chip">EVENT</span></div>
       <p id="eventDescription" class="event-description">A surprise from the game engine.</p>
       <div class="event-footnote"><span>EVENTS TRIGGERED</span><strong id="eventCount">0</strong></div>
     </section>
