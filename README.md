@@ -26,7 +26,7 @@ The runtime uses an instruction-budgeted Lua sandbox without Android/Java bridge
 
 ## Architecture
 
-- Current shipped UI remains primarily Android Jetpack Compose and Kotlin/Compose Desktop on Windows. A responsive local HTML/CSS/JavaScript Play bundle and an Android WebView host adapter are present in source, behind the `shared_web_play` feature flag; the production flag remains off until runtime and parity checks are verified.
+- Android now selects the shared HTML/CSS/JavaScript Play/Worlds/Rewards/Journey bundle through the `shared_web_play` feature flag, enabled in the bundled config. This is a first production slice, not complete conversion: remaining player-facing destinations and runtime parity checks are still open. Windows still uses its current desktop UI until its shared-web host is implemented and verified.
 - Locked target: migrate **all player-facing Android mobile game screens** to the same local HTML/CSS/JavaScript UI, then reuse that exact bundle on Windows through a supported embedded web host. Do not stop at the Play screen or treat the current four-tab web Play surface as the finished migration.
 - Kotlin/KMP remains authoritative for game rules, progression, economy, validation, rewards, save transactions/migrations and recovery; JavaScript is a presentation client, not a second game engine.
 - Compose remains for native/system surfaces and platform integration, not duplicate player-facing game screens. Keep a reversible fallback until each migrated slice passes its acceptance checks.
