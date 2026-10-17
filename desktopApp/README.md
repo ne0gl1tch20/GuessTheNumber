@@ -1,6 +1,6 @@
 # Windows desktop application
 
-This module is the Compose Multiplatform desktop host for GuessTheNumber.
+This module is the Compose Multiplatform desktop host for GuessTheNumber. The long-term product direction is to render the same packaged HTML/CSS/JavaScript player UI on Android and Windows, with Kotlin/KMP remaining authoritative for game state, economy, progression and persistence.
 
 ## Run locally
 
@@ -10,16 +10,16 @@ From the repository root, with JDK 17 installed:
 ./gradlew :desktopApp:run
 ```
 
-On Windows PowerShell, use `.\gradlew.bat :desktopApp:run`.
+On Windows PowerShell, use `.gradlew.bat :desktopApp:run`.
 
 ## Current scope
 
-- The desktop entry point now hosts `:shared`'s reusable Compose gameplay screen.
-- The shared screen uses `:shared`'s `GuessRules` for feedback, supports mouse interaction, submit-on-Enter and a responsive max-width layout.
-- Runs offline and does not connect to services.
+- The Windows application currently renders its player-facing screens with Compose Desktop.
+- The canonical Android web bundle is included in the desktop resource inputs, and a JVM resource test checks that Play, Upgrades and Shop assets are available on the desktop classpath.
+- **The shared HTML bundle is not yet hosted as the Windows UI.** A Windows embedded browser host, the Kotlin bridge adapter and runtime/distribution behavior still need to be implemented and verified.
+- The desktop app runs offline and does not connect to services during ordinary gameplay.
 
-This is the first shared-UI slice, not the full Android UI migration. Android's production Play screen still contains Android-specific repositories, localization access and game-state callbacks, so it has intentionally not been replaced by the smaller pilot screen. The chosen long-term direction is one HTML/CSS/JavaScript frontend for shared player-facing screens, with Kotlin/KMP authoritative and Compose retained for native/system surfaces and the desktop shell. That migration has not started: this module still renders Compose screens, and no embedded WebView host is configured. Before production migration, prototype the shared bundle and typed Kotlin-authoritative bridge, then verify offline loading, keyboard/focus/resizing, accessibility, performance and parity. Save persistence, LuaJ, LiveOps, audio and installer/update paths remain platform-specific until individually audited.
-
+The Android HTML migration has started in `app/src/main/assets/web-play/`; it is not complete across all player-facing screens. See [the shared UI migration matrix](../docs/SHARED_WEB_UI_MIGRATION_MATRIX.md), [the execution plan](../docs/SHARED_WEB_UI_CROSS_PLATFORM_EXECUTION_PLAN.md) and [the Windows host evaluation](../docs/WINDOWS_WEBVIEW_HOST_EVALUATION.md). Native Compose remains appropriate for the desktop shell and OS/system surfaces, not as a permanent duplicate of player-facing game screens.
 
 ## Windows Debug update channel
 
