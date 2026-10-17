@@ -3,7 +3,7 @@
 **Status:** Planning only. This temporary Draft PR does not implement the feature.
 
 ## Scope
-Establish coherent shapes, tonal color, typography, component states, and reusable Compose motion/loading patterns. Use brief interactions and real progress states; never fake progress or leave unexplained endless spinners. Respect reduced motion, TalkBack, font scaling, cancellation, rapid taps, and lower-end device performance.
+Establish coherent shapes, tonal color, typography, component states, and loading/motion behavior across the app. For the chosen shared player-facing HTML/CSS/JavaScript UI, define shared CSS tokens and accessible web motion/loading patterns. Keep reusable Compose motion patterns for retained native/system surfaces and host UI rather than rebuilding shared game screens in Compose. Use brief interactions and real progress states; never fake progress or leave unexplained endless spinners. Respect reduced motion, screen readers/TalkBack, font scaling, cancellation, rapid taps, keyboard focus, and lower-end device performance. This plan remains unimplemented; it does not claim the web UI or its motion system exists.
 
 ## Acceptance checklist
 - [ ] Inspect current implementation and related PRs first; avoid duplicate work.
