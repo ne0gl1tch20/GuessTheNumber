@@ -23,6 +23,10 @@ internal object WebUiBridgeProtocol {
         val currentUri = currentUrl?.let(Uri::parse) ?: return false
         return currentUri.scheme == "https" &&
             currentUri.host == "appassets.androidplatform.net" &&
+            currentUri.port == -1 &&
+            currentUri.userInfo == null &&
+            currentUri.query == null &&
+            currentUri.fragment == null &&
             currentUri.path == "/assets/web-prototype/index.html"
     }
 
