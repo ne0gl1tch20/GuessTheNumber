@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="app" aria-live="polite">
+  <main class="app">
     <header class="topbar">
       <div class="brand-lockup">
         <div class="brand-orb" aria-hidden="true">✦</div>
@@ -26,7 +26,7 @@
         <span class="eyebrow">CURRENT RUN</span>
         <div class="range-label">Find the secret number</div>
         <div class="range" id="rangeText">1 — 100</div>
-        <div class="feedback" id="feedback">Make your move.</div>
+        <div class="feedback" id="feedback" role="status" aria-live="polite" aria-atomic="true">Make your move.</div>
       </div>
       <div class="sparkle-field" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
@@ -71,6 +71,14 @@
         <div><span>∞</span><strong id="riftTier">Tier 0</strong><small>Endless Rift best</small></div>
         <div><span>♜</span><strong id="defeatedBosses">0</strong><small>Bosses defeated</small></div>
       </div>
+      <div class="realm-actions" aria-label="Open progression screens">
+        <button type="button" data-bridge-action="navigate" data-route="world_map">World Map <span>↗</span></button>
+        <button type="button" data-bridge-action="navigate" data-route="home_base">Home Base <span>↗</span></button>
+        <button type="button" data-bridge-action="navigate" data-route="prestige">Prestige <span>↗</span></button>
+        <button type="button" data-bridge-action="navigate" data-route="ultra">Ultra <span>↗</span></button>
+        <button type="button" data-bridge-action="navigate" data-route="relics">Relics <span>↗</span></button>
+        <button type="button" data-bridge-action="navigate" data-route="codex">Codex <span>↗</span></button>
+      </div>
     </section>
     <section class="boss-card card" id="bossPanel" hidden aria-label="Active boss encounter">
       <div class="boss-art" aria-hidden="true">♜</div><div class="boss-content"><span class="eyebrow">ENCOUNTER IN PROGRESS</span><h2 id="bossName">Boss encounter</h2><p>Correct guesses deal damage. Keep your run going.</p><div class="boss-health-row"><span>HEALTH</span><strong id="bossHealthText">0 / 0 HP</strong></div><div class="boss-health-track"><div id="bossHealthFill" class="boss-health-fill"></div></div></div><span class="boss-live">ACTIVE</span>
@@ -78,11 +86,17 @@
     <section class="quest-card card" id="questPanel" aria-label="Daily momentum">
       <div class="panel-title"><span class="panel-glyph quest-glyph">✦</span><div><span class="eyebrow">DAILY MOMENTUM</span><h2>Today's run</h2></div><span class="panel-chip" id="claimedQuests">0 CLAIMED</span></div>
       <div class="quest-metrics"><div><strong id="dailyGuesses">0</strong><span>Guesses made</span></div><div><strong id="dailyCorrect">0</strong><span>Correct guesses</span></div><div><strong id="dailyBestStreak">0</strong><span>Best daily streak</span></div></div>
+      <div class="quest-board" aria-label="Daily quests">
+        <article class="quest-row"><div class="quest-row-copy"><strong>Warm-up</strong><small>Make 10 guesses</small><span class="quest-progress" id="questProgressGuesses">0 / 10</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_guesses_10" type="button">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong>Sharp aim</strong><small>Get 5 correct guesses</small><span class="quest-progress" id="questProgressCorrect">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_correct_5" type="button">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong>On a roll</strong><small>Reach a best streak of 5</small><span class="quest-progress" id="questProgressStreak">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_streak_5" type="button">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong>Builder</strong><small>Buy 3 upgrades</small><span class="quest-progress" id="questProgressUpgrades">0 / 3</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_upgrades_3" type="button">Claim</button></article>
+      </div>
       <div class="quest-foot"><span class="quest-pulse"></span><span id="questMessage">Every guess builds your run.</span></div>
     </section>
     <section class="loot-card card" aria-label="Loot inventory">
       <div class="loot-heading"><span class="panel-glyph loot-glyph">◇</span><div><span class="eyebrow">LOOT INVENTORY</span><h2>Ready to open</h2></div></div>
-      <div class="loot-items"><div><span class="loot-icon common">□</span><span><strong id="commonChests">0</strong><small>Common</small></span></div><div><span class="loot-icon rare">◆</span><span><strong id="rareChests">0</strong><small>Rare</small></span></div><div><span class="loot-icon epic">✦</span><span><strong id="epicChests">0</strong><small>Epic</small></span></div></div>
+      <div class="loot-items"><div><span class="loot-icon common">□</span><span><strong id="commonChests">0</strong><small>Common</small></span><button class="chest-open" data-bridge-action="chest" data-tier="common" type="button">Open</button></div><div><span class="loot-icon rare">◆</span><span><strong id="rareChests">0</strong><small>Rare</small></span><button class="chest-open" data-bridge-action="chest" data-tier="rare" type="button">Open</button></div><div><span class="loot-icon epic">✦</span><span><strong id="epicChests">0</strong><small>Epic</small></span><button class="chest-open" data-bridge-action="chest" data-tier="epic" type="button">Open</button></div></div>
       <p class="loot-note">Your inventory is synced from the game engine.</p>
     </section>
     <section class="guess-card card">

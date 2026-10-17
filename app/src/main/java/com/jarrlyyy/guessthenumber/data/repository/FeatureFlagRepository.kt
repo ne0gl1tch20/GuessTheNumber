@@ -17,7 +17,8 @@ object DefaultFeatureFlags {
         "world_map" to true,
         "challenge_builder" to true,
         "dev_console" to true,
-        "lua_scripting" to true
+        "lua_scripting" to true,
+        "shared_web_play" to false
     )
 }
 

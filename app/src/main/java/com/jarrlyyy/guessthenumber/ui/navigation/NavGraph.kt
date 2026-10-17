@@ -311,11 +311,37 @@ fun NavGraph(
                     }
                 ) {
                     composable(Screen.Play.route) {
-                        ExpressiveScreen(enabled = !state.settings.reducedMotion) { PlayScreen(state = state, onMakeGuess = { guess ->
-                            val accepted = onMakeGuess(guess)
-                            if (accepted && tutorialActive && tutorialStep == 0) tutorialStep = 1
-                            accepted
-                        }, onClaimDailyQuest = viewModel::claimDailyQuest, onOpenLootChest = viewModel::openLootChest, onWorldAction = viewModel::worldProgressAction, onNavigateProgression = { route -> navController.navigate(route) }, incomePerSecond = incomePerSecond) }
+                        if (featureFlags["shared_web_play"] == true) {
+                            ProductionWebPlayScreen(
+                                state = state,
+                                incomePerSecond = incomePerSecond,
+                                stateProvider = { viewModel.gameState.value },
+                                onSubmitGuess = { guess ->
+                                    val result = viewModel.makeGuessWithResult(guess)
+                                    if (result.accepted && tutorialActive && tutorialStep == 0) tutorialStep = 1
+                                    result
+                                },
+                                onClaimDailyQuest = viewModel::claimDailyQuest,
+                                onOpenLootChest = viewModel::openLootChest,
+                                onNavigateProgression = { route -> navController.navigate(route) { launchSingleTop = true } }
+                            )
+                        } else {
+                            ExpressiveScreen(enabled = !state.settings.reducedMotion) {
+                                PlayScreen(
+                                    state = state,
+                                    onMakeGuess = { guess ->
+                                        val accepted = onMakeGuess(guess)
+                                        if (accepted && tutorialActive && tutorialStep == 0) tutorialStep = 1
+                                        accepted
+                                    },
+                                    onClaimDailyQuest = viewModel::claimDailyQuest,
+                                    onOpenLootChest = viewModel::openLootChest,
+                                    onWorldAction = viewModel::worldProgressAction,
+                                    onNavigateProgression = { route -> navController.navigate(route) },
+                                    incomePerSecond = incomePerSecond
+                                )
+                            }
+                        }
                     }
                     composable(Screen.Upgrade.route) {
                         ExpressiveScreen(enabled = !state.settings.reducedMotion) { UpgradeScreen(
