@@ -1,3 +1,9 @@
+## Unreleased (Shared HTML Play polish)
+
+- 🎨 The shared Play header now uses the canonical `GTN_APP_LOGO.png` artwork, packaged locally for offline use.
+- 🧹 Removed the extra branding tagline and `NUMBERVERSE` label for a cleaner header.
+- 🧭 Documented the target to migrate all player-facing Android screens to the same shared HTML/CSS/JavaScript interface in staged, verified route groups. Existing Compose screens are not yet all migrated.
+
 ## Unreleased (Windows Progression Parity)
 
 - 🔄 **Windows Debug updates**: The About menu now checks the latest successful Windows Desktop CI run on `master`, downloads its short-lived Actions artifact, verifies the bundled manifest and SHA-256 checksum, and launches the MSI installer. The channel remains separate from production releases; interactive update/install testing is still pending.
