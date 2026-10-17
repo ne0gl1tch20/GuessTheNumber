@@ -26,11 +26,11 @@ The runtime uses an instruction-budgeted Lua sandbox without Android/Java bridge
 
 ## Architecture
 
-- Current shipped UI: Android Jetpack Compose and Material 3 Expressive; Windows uses its Kotlin/Compose Desktop UI.
-- Chosen shared UI target: HTML/CSS/JavaScript packaged locally and reused by supported hosts, so player-facing screens can be implemented once.
-- Kotlin/KMP remains authoritative for game rules, progression, economy, validation, save transactions/migrations and recovery; JavaScript is a presentation client, not a second game engine.
-- Compose remains for native host/system integration and the Windows desktop shell. Android WebView/Cordova and a maintained Windows embedded WebView are implementation candidates to validate, not integrations already present.
-- The migration has not started: Android and Windows currently use Compose UI, and the app build does not yet include a web frontend or WebView/Cordova host. Prototype and exit gates must pass before expanding migration. The app remains offline-first with no ads, analytics or accounts.
+- Current shipped UI remains primarily Android Jetpack Compose and Kotlin/Compose Desktop on Windows. A responsive local HTML/CSS/JavaScript Play bundle and an Android WebView host adapter are present in source, behind the `shared_web_play` feature flag; the production flag remains off until runtime and parity checks are verified.
+- Locked target: migrate **all player-facing Android mobile game screens** to the same local HTML/CSS/JavaScript UI, then reuse that exact bundle on Windows through a supported embedded web host. Do not stop at the Play screen or treat the current four-tab web Play surface as the finished migration.
+- Kotlin/KMP remains authoritative for game rules, progression, economy, validation, rewards, save transactions/migrations and recovery; JavaScript is a presentation client, not a second game engine.
+- Compose remains for native/system surfaces and platform integration, not duplicate player-facing game screens. Keep a reversible fallback until each migrated slice passes its acceptance checks.
+- Preserve offline play, existing saves, localization, accessibility, audio/notifications/widgets where applicable, and no ads, analytics or accounts. See the shared UI migration matrix for the staged conversion and verification gates.
 
 ## KMP foundation and Windows parity
 
