@@ -91,7 +91,6 @@ fun ProductionWebAppScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
-                                        val before = readState()
                                         val result = if (parsed.type == "submit_guess" && parsed.guess != null) try { submitGuess(parsed.guess) } catch (_: Exception) { null } else null
                                         if (parsed.type == "submit_guess" && result == null) { replyProxy.postMessage(errorResponse(parsed.id, "guess_processing_failed")); return@post }
                                         try {
@@ -99,8 +98,7 @@ fun ProductionWebAppScreen(
                                                 "claim_daily_quest" -> parsed.questId?.let(claimDailyQuest)
                                                 "open_loot_chest" -> parsed.tier?.let(openLootChest)
                                                 "world_action" -> if (parsed.worldId != null && parsed.worldAction != null) worldAction(parsed.worldId, parsed.worldAction)
-                                                "navigate", "read_state" -> Unit
-                                                "submit_guess" -> Unit
+                                                "navigate", "read_state", "submit_guess" -> Unit
                                             }
                                         } catch (_: Exception) {
                                             replyProxy.postMessage(errorResponse(parsed.id, "action_processing_failed")); return@post
@@ -160,7 +158,7 @@ fun ProductionWebAppScreen(
                         }
                     })
                 }
-                loadUrl("$WEB_APP_ORIGIN$WEB_APP_PATH#play")
+                loadUrl("$WEB_APP_ORIGIN$WEB_APP_PATH")
             }
         }
     )
