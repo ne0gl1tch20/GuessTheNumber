@@ -358,7 +358,7 @@ fun ProductionGuessGameScreen(
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
                             "read_state" -> 3
-                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest" -> 4
+                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest" -> 4
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
@@ -438,6 +438,43 @@ fun ProductionGuessGameScreen(
                                     "claim_daily_quest" -> DesktopEconomyTransactions.claimDailyQuest(
                                         before, request.optString("questId"), LocalDate.now().toString()
                                     )
+                                    "open_loot_chest" -> {
+                                        val tier = request.optString("tier")
+                                        val available = when (tier) {
+                                            "common" -> before.lootCommonChests
+                                            "rare" -> before.lootRareChests
+                                            "epic" -> before.lootEpicChests
+                                            else -> 0
+                                        }
+                                        if (available <= 0) null else {
+                                            val moneyReward = when (tier) {
+                                                "common" -> BigNumber(5_000)
+                                                "rare" -> BigNumber(25_000)
+                                                else -> BigNumber(100_000)
+                                            }
+                                            val nebulaReward = when (tier) {
+                                                "common" -> 5L
+                                                "rare" -> 25L
+                                                else -> 100L
+                                            }
+                                            val giveNebula = Random.nextBoolean()
+                                            val consumed = when (tier) {
+                                                "common" -> before.copy(lootCommonChests = before.lootCommonChests - 1)
+                                                "rare" -> before.copy(lootRareChests = before.lootRareChests - 1)
+                                                else -> before.copy(lootEpicChests = before.lootEpicChests - 1)
+                                            }
+                                            val rewarded = if (giveNebula) consumed.copy(
+                                                nebula = consumed.nebula + BigNumber(nebulaReward),
+                                                statistics = consumed.statistics.copy(nebulaEarned = consumed.statistics.nebulaEarned + nebulaReward),
+                                                lootChestsOpened = consumed.lootChestsOpened + 1
+                                            ) else consumed.copy(
+                                                money = consumed.money + moneyReward,
+                                                statistics = consumed.statistics.copy(moneyEarned = consumed.statistics.moneyEarned + moneyReward),
+                                                lootChestsOpened = consumed.lootChestsOpened + 1
+                                            )
+                                            EconomyTransaction(rewarded, true, "Opened $tier chest.")
+                                        }
+                                    }
                                     else -> null
                                 }
                                 if (transaction == null) {
