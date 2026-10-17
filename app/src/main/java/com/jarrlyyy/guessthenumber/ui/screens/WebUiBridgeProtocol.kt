@@ -10,6 +10,7 @@ internal object WebUiBridgeProtocol {
     private val lootTiers = setOf("common", "rare", "epic")
     private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements")
     private val worldActions = setOf("unlock", "boss")
+    private val buyMultipliers = setOf("1", "10", "100", "MAX")
 
     sealed interface ParseResult {
         data class Valid(
@@ -20,7 +21,10 @@ internal object WebUiBridgeProtocol {
             val tier: String? = null,
             val route: String? = null,
             val worldId: String? = null,
-            val worldAction: String? = null
+            val worldAction: String? = null,
+            val upgradeId: String? = null,
+            val itemId: String? = null,
+            val multiplier: String? = null
         ) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
@@ -83,6 +87,24 @@ internal object WebUiBridgeProtocol {
                 if (!worldId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) return ParseResult.Invalid("invalid_world", id)
                 if (action !in worldActions) return ParseResult.Invalid("invalid_world_action", id)
                 ParseResult.Valid(id, type, worldId = worldId, worldAction = action)
+            }
+            "buy_upgrade" -> {
+                if (request.length() != 4 || !request.has("upgradeId")) return ParseResult.Invalid("invalid_request", id)
+                val upgradeId = request.opt("upgradeId") as? String ?: return ParseResult.Invalid("invalid_upgrade", id)
+                if (!upgradeId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) return ParseResult.Invalid("invalid_upgrade", id)
+                ParseResult.Valid(id, type, upgradeId = upgradeId)
+            }
+            "buy_shop_item", "equip_cosmetic" -> {
+                if (request.length() != 4 || !request.has("itemId")) return ParseResult.Invalid("invalid_request", id)
+                val itemId = request.opt("itemId") as? String ?: return ParseResult.Invalid("invalid_item", id)
+                if (!itemId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) return ParseResult.Invalid("invalid_item", id)
+                ParseResult.Valid(id, type, itemId = itemId)
+            }
+            "set_buy_multiplier" -> {
+                if (request.length() != 4 || !request.has("multiplier")) return ParseResult.Invalid("invalid_request", id)
+                val multiplier = request.opt("multiplier") as? String ?: return ParseResult.Invalid("invalid_multiplier", id)
+                if (multiplier !in buyMultipliers) return ParseResult.Invalid("invalid_multiplier", id)
+                ParseResult.Valid(id, type, multiplier = multiplier)
             }
             else -> ParseResult.Invalid("unknown_action", id)
         }
