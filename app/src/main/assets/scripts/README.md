@@ -22,7 +22,7 @@ assets/scripts/
 
 Keep scripts small, composable and explicit about entry points. Shared helpers must declare the minimum host API version they need. Scripts must not assume they can access arbitrary files, the network, Android APIs or save data.
 
-Activity copy is returned as a bounded Lua activity table and rendered by Compose; text localization-key integration is a follow-up. Bundled scripts are validated against the catalog and host API, and the Lua runtime applies a source-size and instruction budget.
+Activity copy is currently returned as a bounded Lua activity table and rendered by Compose; text localization-key integration is a follow-up. This describes the current runtime, not the final shared UI architecture. As player-facing screens migrate to HTML/CSS/JavaScript, the frontend must consume the same bounded, validated declarative activity schema. Lua must not supply arbitrary HTML/JavaScript or gain direct access to the native bridge. Bundled scripts are validated against the catalog and host API, and the Lua runtime applies a source-size and instruction budget.
 
 Offline scripts, verified LiveOps scripts, the one-tap GO flow and the debug-only Dev Settings Lua Console must all use one shared Kotlin Lua engine facade and versioned host API. This folder contains content only: no per-script engine, UI bridge, command executor or runtime dependency belongs here. Developer console commands resolve registered script IDs through the shared registry; they do not run arbitrary paths or fetch source directly.
 
