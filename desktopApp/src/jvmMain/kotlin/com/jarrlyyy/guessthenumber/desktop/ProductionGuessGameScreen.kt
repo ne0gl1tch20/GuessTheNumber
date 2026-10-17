@@ -499,6 +499,11 @@ fun ProductionGuessGameScreen(
                                 }
                             }
                         }
+                        if (type == "read_state" && state == null) {
+                            repeat(60) {
+                                if (state == null) delay(50L)
+                            }
+                        }
                         val visibleState = nextState ?: state
                         val payload = if (visibleState != null && catalog != null) {
                             desktopWebPlayState(visibleState, catalog, accepted, guessStatus, message)
