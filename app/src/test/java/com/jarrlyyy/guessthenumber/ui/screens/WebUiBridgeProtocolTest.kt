@@ -152,4 +152,28 @@ class WebUiBridgeProtocolTest {
         }
     }
 
+
+    @Test
+    fun acceptsSignedLongBoundaryStrings() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("max", "submit_guess", Long.MAX_VALUE),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"max","type":"submit_guess","guess":"9223372036854775807"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("min", "submit_guess", Long.MIN_VALUE),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"min","type":"submit_guess","guess":"-9223372036854775808"}""")
+        )
+    }
+
+    @Test
+    fun rejectsSignedLongOverflowStrings() {
+        listOf("9223372036854775808", "-9223372036854775809").forEachIndexed { index, guess ->
+            val result = WebUiBridgeProtocol.parse(
+                """{"version":1,"id":"overflow-$index","type":"submit_guess","guess":"$guess"}"""
+            )
+            assertTrue(result is WebUiBridgeProtocol.ParseResult.Invalid)
+            assertEquals("invalid_guess", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        }
+    }
+
 }

@@ -60,7 +60,7 @@ internal object WebUiBridgeProtocol {
                 val rawGuess = request.opt("guess")
                 val guessText = rawGuess as? String
                     ?: return ParseResult.Invalid("invalid_guess", id)
-                if (guessText.length !in 1..19 || !guessText.matches(Regex("-?[0-9]+"))) {
+                if (guessText.length !in 1..20 || !guessText.matches(Regex("-?[0-9]+"))) {
                     return ParseResult.Invalid("invalid_guess", id)
                 }
                 val guess = guessText.toLongOrNull()
