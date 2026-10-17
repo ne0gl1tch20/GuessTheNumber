@@ -80,6 +80,33 @@
         <button type="button" data-bridge-action="navigate" data-route="codex">Codex <span>↗</span></button>
       </div>
     </section>
+    <section class="milestones-card card" aria-label="Achievement progress">
+      <div class="panel-title"><span class="panel-glyph milestone-glyph">🏆</span><div><span class="eyebrow">PERSONAL MILESTONES</span><h2>Achievement progress</h2></div><span class="panel-chip">3 GOALS</span></div>
+      <article class="milestone-row">
+        <div class="milestone-copy"><div><strong>Getting the hang of it</strong><span id="achievementCorrectStatus" class="milestone-status">IN PROGRESS</span></div><small>Land 10 correct guesses</small></div>
+        <div class="milestone-progress"><div class="milestone-track"><span id="achievementCorrectFill"></span></div><small id="achievementCorrectText">0 / 10</small></div>
+      </article>
+      <article class="milestone-row">
+        <div class="milestone-copy"><div><strong>On a roll</strong><span id="achievementStreakStatus" class="milestone-status">IN PROGRESS</span></div><small>Reach a best streak of 5</small></div>
+        <div class="milestone-progress"><div class="milestone-track"><span id="achievementStreakFill"></span></div><small id="achievementStreakText">0 / 5</small></div>
+      </article>
+      <article class="milestone-row">
+        <div class="milestone-copy"><div><strong>Millionaire</strong><span id="achievementMoneyStatus" class="milestone-status">IN PROGRESS</span></div><small>Reach 1,000,000 money</small></div>
+        <div class="milestone-progress"><div class="milestone-track"><span id="achievementMoneyFill"></span></div><small id="achievementMoneyText">0%</small></div>
+      </article>
+      <p class="milestone-note">Progress is read from your saved game state. This panel does not grant rewards.</p>
+    </section>
+
+    <section class="run-summary-card card" aria-label="Run summary">
+      <div class="panel-title"><span class="panel-glyph summary-glyph">◷</span><div><span class="eyebrow">YOUR JOURNEY</span><h2>Run summary</h2></div></div>
+      <div class="summary-grid">
+        <div><span>RANDOM EVENTS</span><strong id="summaryEvents">0</strong></div>
+        <div><span>CHESTS FOUND</span><strong id="summaryDrops">0</strong></div>
+        <div><span>CHESTS OPENED</span><strong id="summaryOpened">0</strong></div>
+        <div><span>BOSS VICTORIES</span><strong id="summaryVictories">0</strong></div>
+      </div>
+    </section>
+
     <section class="boss-card card" id="bossPanel" hidden aria-label="Active boss encounter">
       <div class="boss-art" aria-hidden="true">♜</div><div class="boss-content"><span class="eyebrow">ENCOUNTER IN PROGRESS</span><h2 id="bossName">Boss encounter</h2><p>Correct guesses deal damage. Keep your run going.</p><div class="boss-health-row"><span>HEALTH</span><strong id="bossHealthText">0 / 0 HP</strong></div><div class="boss-health-track"><div id="bossHealthFill" class="boss-health-fill"></div></div></div><span class="boss-live">ACTIVE</span>
     </section>
