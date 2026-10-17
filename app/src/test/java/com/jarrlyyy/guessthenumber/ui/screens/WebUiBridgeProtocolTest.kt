@@ -104,4 +104,23 @@ class WebUiBridgeProtocolTest {
         )
     }
 
+    @Test
+    fun rejectsCoercedJsonFieldTypes() {
+        val stringVersion = WebUiBridgeProtocol.parse(
+            """{"version":"1","id":"req-6","type":"read_state"}"""
+        )
+        assertEquals(
+            "invalid_request",
+            (stringVersion as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+
+        val numericId = WebUiBridgeProtocol.parse(
+            """{"version":1,"id":7,"type":"read_state"}"""
+        )
+        assertEquals(
+            "invalid_request",
+            (numericId as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+    }
+
 }
