@@ -31,7 +31,7 @@ Every request is a JSON object with exactly these fields:
 - `payload` is an object with an action-specific exact schema. Unknown fields and wrong JSON types are rejected.
 - Apply a strict message-size limit before parsing. Do not treat client validation as authoritative.
 
-For the first slice, `submit_guess` accepts a decimal integer string so the bridge can reject overflow and malformed input explicitly before conversion to Kotlin's `Long`. The Kotlin adapter must still invoke the existing authoritative guess path rather than implement a second copy of the game rules.
+For the first slice, `submit_guess` accepts a decimal integer string so the bridge can reject overflow and malformed input explicitly before conversion to Kotlin's `Long`. The Kotlin adapter must still invoke the existing authoritative guess path rather than implement a second copy of the game rules. Today, `GameViewModel.makeGuess(guess: Long)` returns only a Boolean (rate-limit acceptance) while `PlayScreen.submitGuess()` derives the displayed outcome from its Compose-side state, including the secret target. That return value is not a sufficient web contract. Before connecting HTML, refactor the existing path to expose a small typed, secret-free outcome while keeping the Boolean API compatible for current callers. Derive the outcome from the same `GameEngine.processGuess` result used by the current path; do not recalculate it in JavaScript or from a potentially stale pre-submit state.
 
 ## Version 1 response envelope
 
@@ -59,7 +59,7 @@ Success and rejection use a versioned response with the matching request ID:
 
 This is an illustrative shape only. Field names and status values must be reconciled with the real Kotlin model and localization system before implementation. It intentionally omits the target number and any client-authored reward values.
 
-Use stable machine-readable status codes and localization keys rather than requiring the host to send presentation-ready English strings. Return the authoritative view state after processing so the web UI renders the committed result rather than guessing what happened.
+Use stable machine-readable status codes and localization keys rather than requiring the host to send presentation-ready English strings. Return the authoritative view state after processing so the web UI renders the result rather than guessing what happened. Keep the first slice balanced: HTML/CSS owns layout, input affordances, visual hierarchy and motion; Kotlin owns range/state values, guess outcome, rate limiting, game rules, reward/progression effects and persistence. The web layer must not become a second game engine.
 
 ## Required behavior
 
@@ -68,7 +68,7 @@ Use stable machine-readable status codes and localization keys rather than requi
 3. Track in-flight and recently completed request IDs. A duplicate must not apply the same action twice. Define a bounded retention strategy and a clear response for a repeated ID.
 4. Associate responses with request IDs and state revisions. The UI must ignore stale replies that would roll back a newer rendered state.
 5. Disable or mark the submit control busy while a request is pending, while still treating Kotlin as the final authority for rapid or repeated submissions.
-6. Send a response for validation failures and processing failures. Never report a successful guess if the authoritative action or required persistence fails.
+6. Send a response for validation failures and processing failures. Align save status with the real persistence API before promising durability: the current `makeGuess` path calls `saveGameAsync()` and returns before that asynchronous save has reported success. Do not claim a save has completed merely because the guess action returned. If the bridge requires durable-commit confirmation, introduce an explicit result from the persistence path instead of inferring it.
 7. Preserve existing save compatibility and transaction/recovery behavior. Do not add a parallel web-owned save.
 8. Use existing localization resources, accessible status announcements, keyboard/IME behavior, focus handling and reduced-motion preferences.
 9. Keep a reversible Compose route until parity and acceptance checks pass on Android and the chosen Windows host.
@@ -88,6 +88,10 @@ Include only the core guessing surface: range display, numeric input, submit act
 - Offline startup and reload; Android lifecycle recreation and back navigation.
 - Same bundle and equivalent behavior on the selected Windows host.
 - Save compatibility/recovery checks and a reversible Compose fallback.
+
+## Balanced first-slice boundary
+
+Move only the primary guessing interaction first. Keep economy panels, boss/event sections, navigation and the other large PlayScreen sections in Compose until the hybrid-versus-whole-route choice is measured. Preserve the existing Kotlin action path and use a typed secret-free result from that path; do not duplicate target comparison or hint logic in JavaScript. The current Android callback returns only Boolean and the save call is asynchronous, so those seams need explicit design before the web UI can truthfully display result and save states.
 
 ## Current implementation status
 
