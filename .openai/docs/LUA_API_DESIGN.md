@@ -9,7 +9,7 @@
 3. **Capability-limited.** A script receives only the capabilities granted to its bundle/event.
 4. **Deterministic where practical.** Inject event time and seeded random values through the host API rather than exposing system time or unrestricted randomness.
 5. **Validate on both sides.** Lua-side checks improve errors; Kotlin-side checks enforce rules.
-6. **Stable UI vocabulary.** Scripts describe supported UI components instead of constructing arbitrary Compose trees.
+6. **Stable, host-neutral UI vocabulary.** Scripts describe the bounded supported UI components instead of constructing arbitrary Compose trees or arbitrary HTML/JavaScript. The current activity renderer is Compose; a future shared-web renderer must consume the same validated declarative activity contract, not grant Lua a new privileged bridge.
 
 ## Candidate namespaces
 
@@ -57,7 +57,7 @@ function minigame.on_action(api, action_id, payload)
 end
 ```
 
-The actual bridge must not accept arbitrary callbacks, function source strings, or raw objects from the UI. UI actions should be registered IDs mapped to known Kotlin handlers.
+The actual bridge must not accept arbitrary callbacks, function source strings, raw objects, raw HTML, or executable JavaScript from Lua or the UI. UI actions should be registered IDs mapped to known Kotlin handlers. The shared web frontend may render only validated declarative activity data; Kotlin continues to validate and execute every action.
 
 ## Candidate Kotlin bridge interfaces
 

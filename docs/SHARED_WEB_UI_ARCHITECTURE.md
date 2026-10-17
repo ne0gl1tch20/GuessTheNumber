@@ -60,9 +60,10 @@ Do not rewrite the whole app in one PR. Keep the existing app working while vali
 - Inventory the current Compose destinations, Kotlin action/state APIs, save/recovery behavior, localization, audio, notifications, widgets, update channels and desktop integrations.
 - Record which screens are candidates for the shared web UI and which are native/system-only.
 - Build a small throwaway or isolated vertical-slice prototype containing one read-only state screen and one harmless state-changing action.
-- Prove the Android WebView/Cordova lifecycle and plugin bridge, Windows embedded WebView lifecycle, keyboard/focus/resizing, offline asset loading, accessibility, and Kotlin-authoritative action round trip.
+- Prove Android WebView lifecycle, offline asset loading, keyboard/focus/resizing, accessibility and a Kotlin-authoritative action round trip. For the first bridge experiment, evaluate AndroidX WebKit `addWebMessageListener` with a strict local-origin allowlist; do not expose a broad `addJavascriptInterface` object as the default design. Feature-detect bridge support and document any fallback.
+- Compare Android WebView with Cordova only if a required plugin/packaging capability justifies Cordova's extra layer; Cordova is not a prerequisite for using HTML in Android.
+- Evaluate Windows WebView2 as the first host candidate, including Compose Desktop integration, runtime detection, offline installer behavior, supported Windows versions, package size, licensing, maintenance and bridge implementation. Microsoft recommends Evergreen distribution for most apps, but the prototype must account for machines where the runtime is absent and for offline installation. Do not select the dependency until this trade-off is documented.
 - Measure startup time, memory, bundle size, input latency and packaged app size on available devices.
-- Decide the maintained Windows WebView dependency only after verifying licensing, maintenance, supported OS versions and distribution implications.
 
 ### Phase 1 — Define contracts and design tokens
 
@@ -118,6 +119,10 @@ Do not rewrite the whole app in one PR. Keep the existing app working while vali
 - [Cordova platform support](https://cordova.apache.org/docs/en/latest/guide/support/)
 - [Cordova Android plugin bridge](https://cordova.apache.org/docs/en/latest/guide/platforms/android/plugin.html)
 - [Cordova plugin architecture](https://cordova.apache.org/docs/en/latest/guide/hybrid/plugins/)
+- [Android WebView native API access and JavaScript bridge](https://developer.android.com/develop/ui/views/layout/webapps/native-api-access-jsbridge)
+- [Android WebView native bridge security guidance](https://developer.android.com/privacy-and-security/risks/insecure-webview-native-bridges)
+- [Microsoft WebView2 runtime distribution](https://learn.microsoft.com/microsoft-edge/webview2/concepts/distribution)
+- [Microsoft WebView2 Evergreen vs. Fixed Version](https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/evergreen-vs-fixed-version)
 
 ## Decision status
 
