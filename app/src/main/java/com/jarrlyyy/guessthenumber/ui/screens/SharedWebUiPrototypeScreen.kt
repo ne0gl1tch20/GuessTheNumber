@@ -136,13 +136,14 @@ fun SharedWebUiPrototypeScreen(onBack: () -> Unit) {
                                     ) {
                                         view.post {
                                             val raw = message.data ?: ""
-                                            val currentUri = view.url?.let(Uri::parse)
+                                            val currentUri = view.url?.let { Uri.parse(it) }
                                             if (!isMainFrame ||
                                                 sourceOrigin.scheme != "https" ||
                                                 sourceOrigin.host != "appassets.androidplatform.net" ||
-                                                currentUri?.scheme != "https" ||
+                                                currentUri == null ||
+                                                currentUri.scheme != "https" ||
                                                 currentUri.host != "appassets.androidplatform.net" ||
-                                                currentUri.path?.startsWith(WEB_UI_PATH) != true
+                                                currentUri.path != "${WEB_UI_PATH}index.html"
                                             ) {
                                                 replyProxy.postMessage(errorResponse("", "origin_not_allowed"))
                                                 return@post
