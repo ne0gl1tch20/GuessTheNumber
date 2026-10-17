@@ -34,7 +34,7 @@
   function applyMessage(message) {
     let response;
     try { response = JSON.parse(message.data); }
-    catch { showFeedback("The host returned an unreadable response.", "error"); pending = false; button.disabled = !ready; return; }
+    catch { showFeedback("The host returned an unreadable response. Waiting for a valid reply.", "error"); return; }
     // Ignore delayed or unrelated replies instead of letting them roll the UI
     // back to an older state or unlock a newer in-flight request.
     if (typeof response.id !== "string" || response.id !== pendingRequestId) return;
@@ -79,7 +79,7 @@
       event.preventDefault();
       if (!ready || pending) return;
       const value = input.value.trim();
-      if (!/^-?[0-9]+$/.test(value)) { showFeedback("Enter a whole number.", "error"); return; }
+      if (value.length < 1 || value.length > 20 || !/^-?[0-9]+$/.test(value)) { showFeedback("Enter a whole number using at most 20 characters.", "error"); return; }
       pending = true;
       button.disabled = true;
       showFeedback("Checking guess…", "");
