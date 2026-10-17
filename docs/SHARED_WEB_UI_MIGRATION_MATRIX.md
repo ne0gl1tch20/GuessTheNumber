@@ -1,6 +1,6 @@
 # Shared Web UI Migration Matrix
 
-**Status:** Planning and source audit only; no production player-facing screen has migrated.
+**Status:** Shared idle-game Play bundle and Android WebView host source are present on the PR branch; production route migration and all runtime parity remain unverified.
 **Reviewed:** 2026-10-17
 **Architecture authority:** [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md)
 **Product roadmap:** [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md)
@@ -65,3 +65,27 @@ The complete screen inventory is not yet source-audited. Add each screen only af
 ## Evidence rules
 
 Track source implementation, focused tests, CI, Android runtime behavior, Windows runtime behavior, screenshot comparison, save compatibility and installer validation separately. A source audit or successful build alone does not mark a migration row complete.
+
+
+## Shared idle-game Play bundle: responsive and host portability
+
+The current implementation slice adds the canonical bundle under `app/src/main/assets/web-play/` (`index.html`, `styles.css`, `app.js`) and the Android host adapter in `ProductionWebPlayScreen.kt`. It is a visual/host foundation; the existing production Compose Play route is not switched over yet.
+
+### Portability implemented in the shared frontend
+
+- Mobile-first single-column layout remains the default for narrow touch screens.
+- At 720 CSS pixels and above, the same semantic content reflows into a two-column layout for tablets, desktop windows and wider embedded views; the layout expands again at 1100 pixels.
+- Extra-narrow screens receive a compact stat row and a full-width submit control rather than horizontal overflow.
+- Keyboard focus is visible, mouse hover is only enabled for hover-capable fine pointers, and buttons use a touch-friendly interaction hint.
+- The viewport no longer disables user zoom. Safe-area padding and reduced-motion preferences remain supported.
+- The frontend uses local/system font fallbacks and bundled CSS/JS only; no remote font/CDN dependency or network connection is introduced.
+
+### Host compatibility status (do not overclaim)
+
+| Host | Shared bundle fit | Host adapter status | Verification |
+|---|---|---|---|
+| Android WebView | Same canonical bundle | Source implementation in `ProductionWebPlayScreen.kt` | Build/device, IME, lifecycle and bridge runtime remain unverified |
+| Windows desktop | Same bundle is designed to reflow in a resizable window | A maintained WebView2/Kotlin bridge adapter is still required | Not implemented or runtime-verified |
+| Other WebView-capable platforms | Frontend can be reused subject to engine feature support | Each platform needs a documented, allow-listed host bridge and lifecycle adapter | Not implemented or verified |
+
+The HTML bundle alone does not make Windows or other platforms supported. Platform hosts must implement the same versioned bridge semantics, exact local-origin/page checks, bounded message validation, duplicate-request handling and authoritative Kotlin actions. Do not enable player-facing production routing until the Windows host choice, bridge parity, accessibility/input behavior, save compatibility and runtime evidence are complete.
