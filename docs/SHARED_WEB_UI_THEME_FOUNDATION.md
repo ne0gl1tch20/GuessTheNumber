@@ -18,6 +18,7 @@ The first version is intentionally small. It establishes reusable tokens and bas
 - Shared sizing: minimum control height and content maximum width.
 - Motion: fast and standard duration tokens, focus ring dimensions and reduced-motion handling.
 - Utility classes: `.gtn-screen`, `.gtn-panel`, `.gtn-muted`, `.gtn-eyebrow`, `.gtn-number`, `.gtn-status` and `.gtn-error`.
+- Game UI primitives: stacked/inline layouts, secondary buttons, numeric inputs, stat tiles, badges, semantic feedback states and progress bars.
 - Baseline controls: inherited form typography, visible keyboard focus, touch-friendly buttons and disabled states.
 - Responsive/device behavior: safe-area padding, tabular numbers, color-scheme adaptation and reduced-motion preference support.
 
@@ -47,4 +48,4 @@ The isolated debug prototype loads the shared stylesheet and uses its tokens for
 
 ## Honest status
 
-The CSS file exists and the debug prototype references it. No build, browser runtime, device, accessibility or Windows-host validation has been performed for this increment. The final production theme and reusable production components are still to be designed and verified.
+The CSS file exists and the debug prototype references it. Shared input, stat, badge, feedback, progress and layout primitives are now available for future screens. No build, browser runtime, device, accessibility or Windows-host validation has been performed for this increment. The final production theme and reusable production components are still to be designed and verified.
