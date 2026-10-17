@@ -9,7 +9,7 @@ This replaces the old temporary step-by-step migration checklist. Stop treating 
 
 ## Track A: KMP foundation
 
-**Goal:** Kotlin Multiplatform shares production logic, models, UI components and canonical assets wherever practical. The Windows product goal is an exact port of the Android GTN experience, with desktop-specific input/windowing and platform-service adapters only where required.
+**Goal:** Kotlin Multiplatform shares production logic, models/contracts and canonical assets wherever practical. The newly proposed UI direction is to share player-facing screens through one HTML/CSS/JavaScript frontend while Kotlin remains authoritative for game behavior. Windows still needs desktop-specific input/windowing and platform-service adapters. This proposal does not erase the existing KMP foundation or claim that a web migration has shipped.
 
 ### Implemented
 
@@ -22,13 +22,14 @@ This replaces the old temporary step-by-step migration checklist. Stop treating 
 
 ### Architecture rules
 
-- shared/src/commonMain: deterministic rules, shared models/contracts and selected UI components without platform APIs.
-- Android host: Android navigation/services, localized strings, RNG integration, authoritative GameState mutation, BigNumber currency math, DataStore/save recovery, notifications, audio, haptics and Android-only features.
-- Windows host: desktop window lifecycle, keyboard/mouse/focus behavior, filesystem/update integration, MSI packaging and Windows-specific services.
-- Do not move a dependency into common code just to increase a sharing percentage.
+- shared/src/commonMain: deterministic rules, shared models/contracts and platform-neutral logic without platform APIs.
+- Current Android/Windows hosts still use their existing Compose UI until a web migration is approved and verified.
+- Proposed web frontend: canonical HTML/CSS/JavaScript assets, accessible shared screens, presentation state and typed bridge calls. It must not become a second authority for rewards, eligibility or persistence.
+- Android host: Android lifecycle/services, RNG integration, authoritative GameState mutation, BigNumber currency math, DataStore/save recovery, notifications, audio, haptics and Android-only features. Cordova is a candidate host/plugin bridge, subject to prototype validation.
+- Windows host: Compose Desktop shell, desktop lifecycle/input/focus, filesystem/update integration, MSI packaging and a maintained embedded WebView implementation. Do not rely on Cordova's legacy Windows platform.
+- Do not move a dependency into common code or add web dependencies just to increase a sharing percentage.
 - Preserve Android save format, save slots, backup/import and recovery behavior.
 - Keep the app offline-first: no ads, analytics or accounts.
-- Shared UI should improve consistency; platform-appropriate interaction and layout are allowed.
 
 ### Foundation exit criteria
 
@@ -38,6 +39,7 @@ This replaces the old temporary step-by-step migration checklist. Stop treating 
 - [x] Recent Android and Windows CI checks passed for the cited integration PRs.
 - [ ] Perform a source audit that commonMain has no accidental platform-only dependency.
 - [ ] Record the shared-vs-host boundary if architecture changes materially.
+- [ ] If the shared-web proposal is approved, prototype one small screen and a Kotlin-authoritative action bridge before expanding the migration.
 
 The implementation milestone can now be treated as **KMP foundation complete for the current agreed scope**. The unchecked source audit is a short verification task, not permission to reopen endless component extraction. Android runtime checks remain post-foundation QA; unrun checks must not be reported as passing.
 
