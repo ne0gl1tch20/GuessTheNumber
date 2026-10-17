@@ -9,6 +9,21 @@
 
 This matrix tracks real player-facing screen migration. The isolated `SharedWebUiPrototypeScreen` and its temporary counter are excluded from production migration counts.
 
+## Locked migration scope: all Android player-facing screens
+
+The owner has explicitly chosen a complete shared-web UI for Android mobile, not a permanent hybrid where only Play uses HTML. The same HTML/CSS/JavaScript screen bundle is the target for Windows. Kotlin/KMP remains the only authority for state-changing game decisions and persistence. Compose remains only where a native/system surface or platform host integration is genuinely needed.
+
+Migrate in cohesive, testable feature batches rather than isolated cosmetic PRs:
+
+1. **Foundation and Play:** branding, navigation primitives, shared theme, accessible screen shell, secure local WebView host, typed bridge, and the full core Play loop.
+2. **Core game destinations:** Upgrades, Shop, Prestige, Ultra, talents and all currency/economy actions, reusing existing Kotlin transaction APIs.
+3. **Progression and activities:** worlds/map, bosses, relics, Home Base, Codex, Endless Rift, achievements, daily quests, arcade/minigames and challenge/event screens.
+4. **Player utilities:** settings, music player, save slots/import/export, statistics, changelog, tutorial, localization, and all player-facing More destinations.
+5. **Host/system boundary:** keep crash recovery, permissions, notifications, widgets, file pickers and platform-specific settings native where required; route their presentation/results back to the shared UI without duplicating game rules.
+6. **Windows parity:** host the exact same bundle in the supported Windows web view and implement the same typed bridge contract. Do not claim parity until the host is integrated and runtime-verified.
+
+Do not enable a new HTML route by default until its source, focused tests, offline startup, lifecycle/back navigation, accessibility/IME, save compatibility and feature parity have been reviewed. Keep the old Compose destination as a reversible fallback during each migration batch. A screen counts as migrated only when its actual interactions and localization are covered, not merely because an HTML mockup exists.
+
 ## First production slice: Play screen core loop
 
 **Candidate:** the core guessing experience in `app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/PlayScreen.kt`.
