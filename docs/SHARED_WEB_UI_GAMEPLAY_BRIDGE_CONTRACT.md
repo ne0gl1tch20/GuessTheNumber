@@ -31,7 +31,7 @@ Every request is a JSON object with exactly these fields:
 - `payload` is an object with an action-specific exact schema. Unknown fields and wrong JSON types are rejected.
 - Apply a strict message-size limit before parsing. Do not treat client validation as authoritative.
 
-For the first slice, `submit_guess` accepts a decimal integer string so the bridge can reject overflow and malformed input explicitly before conversion to Kotlin's `Long`. The Kotlin adapter must still invoke the existing authoritative guess path rather than implement a second copy of the game rules. Today, `GameViewModel.makeGuess(guess: Long)` returns only a Boolean (rate-limit acceptance) while `PlayScreen.submitGuess()` derives the displayed outcome from its Compose-side state, including the secret target. That return value is not a sufficient web contract. Before connecting HTML, refactor the existing path to expose a small typed, secret-free outcome while keeping the Boolean API compatible for current callers. Derive the outcome from the same `GameEngine.processGuess` result used by the current path; do not recalculate it in JavaScript or from a potentially stale pre-submit state.
+For the first slice, `submit_guess` accepts a decimal integer string so the bridge can reject overflow and malformed input explicitly before conversion to Kotlin's `Long`. The Kotlin adapter must still invoke the existing authoritative guess path rather than implement a second copy of the game rules. Now `GameViewModel.makeGuessWithResult(guess: Long)` exposes a typed, secret-free outcome while `makeGuess(guess: Long): Boolean` remains as a compatibility wrapper for existing callers. The new result carries acceptance, the engine's public feedback token and safe range/counter fields, never `targetNumber` or reward internals. The result is derived from the same `GameEngine.processGuess` result used by the production pipeline; JavaScript must not recalculate it. This change is source-reviewed only and still needs compilation and focused tests.
 
 ## Version 1 response envelope
 
@@ -91,7 +91,7 @@ Include only the core guessing surface: range display, numeric input, submit act
 
 ## Balanced first-slice boundary
 
-Move only the primary guessing interaction first. Keep economy panels, boss/event sections, navigation and the other large PlayScreen sections in Compose until the hybrid-versus-whole-route choice is measured. Preserve the existing Kotlin action path and use a typed secret-free result from that path; do not duplicate target comparison or hint logic in JavaScript. The current Android callback returns only Boolean and the save call is asynchronous, so those seams need explicit design before the web UI can truthfully display result and save states.
+Move only the primary guessing interaction first. Keep economy panels, boss/event sections, navigation and the other large PlayScreen sections in Compose until the hybrid-versus-whole-route choice is measured. Preserve the existing Kotlin action path and use a typed secret-free result from that path; do not duplicate target comparison or hint logic in JavaScript. The typed guess-result seam is now implemented in `GameViewModel`, with the Boolean API retained. The save call remains asynchronous, so the UI must not claim durable save completion based only on the returned result.
 
 ## Current implementation status
 
