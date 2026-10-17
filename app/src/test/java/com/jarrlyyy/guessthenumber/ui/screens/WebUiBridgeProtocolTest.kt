@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import android.net.Uri
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -64,4 +65,43 @@ class WebUiBridgeProtocolTest {
         val result = WebUiBridgeProtocol.parse("""{"version":1,"id":"bad id","type":"read_state"}""")
         assertEquals("invalid_request", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
+    @Test
+    fun allowsOnlyMainFrameFromExactBundledPrototypePage() {
+        assertTrue(
+            WebUiBridgeProtocol.isAllowedSource(
+                isMainFrame = true,
+                sourceOrigin = Uri.parse("https://appassets.androidplatform.net"),
+                currentUrl = "https://appassets.androidplatform.net/assets/web-prototype/index.html"
+            )
+        )
+    }
+
+    @Test
+    fun rejectsDisallowedOriginsAndPages() {
+        assertEquals(
+            false,
+            WebUiBridgeProtocol.isAllowedSource(
+                isMainFrame = true,
+                sourceOrigin = Uri.parse("https://evil.example"),
+                currentUrl = "https://evil.example/assets/web-prototype/index.html"
+            )
+        )
+        assertEquals(
+            false,
+            WebUiBridgeProtocol.isAllowedSource(
+                isMainFrame = false,
+                sourceOrigin = Uri.parse("https://appassets.androidplatform.net"),
+                currentUrl = "https://appassets.androidplatform.net/assets/web-prototype/index.html"
+            )
+        )
+        assertEquals(
+            false,
+            WebUiBridgeProtocol.isAllowedSource(
+                isMainFrame = true,
+                sourceOrigin = Uri.parse("https://appassets.androidplatform.net"),
+                currentUrl = "https://appassets.androidplatform.net/assets/web-prototype/other.html"
+            )
+        )
+    }
+
 }
