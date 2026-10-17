@@ -86,7 +86,11 @@ android {
             }
         }
     }
-    sourceSets.getByName("main").assets.srcDir(generatedWebPlayAssets)
+    // Android's SourceSet API no longer accepts Provider instances directly.
+    sourceSets.getByName("main").assets.srcDir(generatedWebPlayAssets.get().asFile)
+    // Keep the generated brand asset task ordered before Android asset processing.
+    tasks.matching { it.name == "preBuild" || it.name.endsWith("PreBuild") }
+        .configureEach { dependsOn(prepareWebPlayBrandAsset) }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
