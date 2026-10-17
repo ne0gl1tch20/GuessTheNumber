@@ -1,7 +1,7 @@
 # Windows Feature Parity Plan
 
 **Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
-**Reviewed:** 2026-10-16
+**Reviewed:** 2026-10-17
 
 **Latest increment (2026-10-16):** PR #220 merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f` with Android and Windows CI passing. PR #221 then merged the five Android Arcade minigames for Windows, using the canonical `minigames.json` and shared `DesktopEconomyTransactions.awardArcadeReward` transaction. PR #222 fixed a nested vertical-scroll crash in the Windows Arcade route; Android Validation and Windows Desktop CI passed on its exact head, and the owner confirmed Arcade opens successfully in the Windows app. Broader runtime verification of the five games, reward effects/save persistence and PR #220's upgrades/navigation remains open.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
@@ -14,9 +14,9 @@ Port the Android experience screen by screen: same features, screen hierarchy, i
 
 Prefer Kotlin Multiplatform shared production rules, models, validation, transaction logic and canonical assets. Under the proposed direction, use one shared HTML/CSS/JavaScript frontend for player-facing screens instead of rebuilding those screens separately in Compose. Retain Compose/Kotlin for native host/system surfaces and platform-specific lifecycle, storage, audio, notifications, windowing, installers and updates. Use Cordova only on supported platforms where its bridge fits; Windows needs a maintained embedded WebView host. Share original assets rather than creating platform copies. Keep Android working and preserve existing save compatibility throughout any migration.
 
-## KMP exact-port implementation contract (locked)
+## Cross-platform exact-experience implementation contract (locked)
 
-The product wish is an **exact Windows port of GuessTheNumber using Kotlin Multiplatform and shared code/assets wherever practical**. Android is the source of truth. This plan is the authoritative implementation and verification tracker for that wish.
+The product wish is an **exact Windows experience of GuessTheNumber with shared player-facing screens and authoritative Kotlin/KMP game logic**. Android is the behavioral source of truth. The proposed shared-web implementation is documented in [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md); this plan remains the authoritative Windows parity and verification tracker.
 
 ### What “exact port” means in practice
 
