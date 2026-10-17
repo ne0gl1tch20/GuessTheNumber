@@ -85,6 +85,7 @@ private class DesktopSharedWebViewController {
                     if (state == Worker.State.SCHEDULED || state == Worker.State.RUNNING || state == Worker.State.SUCCEEDED) {
                         runCatching {
                             (webEngine.executeScript("window") as JSObject).setMember("gtnDesktopBridge", bridge)
+                            webEngine.executeScript("window.gtnHost && window.gtnHost.flush()")
                         }
                     }
                 }
@@ -138,8 +139,15 @@ private class DesktopSharedWebViewController {
             <script>
             window.gtnHost = {
               onmessage: null,
+              queue: [],
               postMessage: function(raw) {
-                if (window.gtnDesktopBridge) window.gtnDesktopBridge.postMessage(String(raw));
+                var message = String(raw);
+                if (window.gtnDesktopBridge) window.gtnDesktopBridge.postMessage(message);
+                else this.queue.push(message);
+              },
+              flush: function() {
+                if (!window.gtnDesktopBridge) return;
+                while (this.queue.length) window.gtnDesktopBridge.postMessage(this.queue.shift());
               },
               receive: function(raw) {
                 if (typeof this.onmessage === 'function') this.onmessage({data: String(raw)});
