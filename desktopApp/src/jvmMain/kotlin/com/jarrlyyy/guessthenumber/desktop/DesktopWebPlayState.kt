@@ -1,0 +1,106 @@
+package com.jarrlyyy.guessthenumber.desktop
+
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
+import com.jarrlyyy.guessthenumber.domain.model.GameState
+import org.json.JSONArray
+import org.json.JSONObject
+
+/** Produces only display state; purchase costs and ownership are always revalidated in Kotlin. */
+internal fun desktopWebPlayState(
+    game: GameState,
+    catalog: DesktopEconomyCatalog,
+    accepted: Boolean = true,
+    lastGuessStatus: String? = null,
+    message: String? = null
+): JSONObject {
+    val upgrades = JSONArray()
+    catalog.upgrades.forEach { upgrade ->
+        val level = game.upgradeLevels[upgrade.id] ?: 0
+        val maxed = level >= upgrade.maxLevel
+        val cost = DesktopEconomyTransactions.upgradeBatchCost(
+            upgrade, level, game.buyMultiplier, game.money
+        )
+        val count = when (game.buyMultiplier) {
+            "10" -> minOf(10, upgrade.maxLevel - level)
+            "100" -> minOf(100, upgrade.maxLevel - level)
+            "MAX" -> upgrade.maxLevel - level
+            else -> if (maxed) 0 else 1
+        }
+        upgrades.put(JSONObject()
+            .put("id", upgrade.id)
+            .put("name", upgrade.name)
+            .put("description", upgrade.description)
+            .put("level", level)
+            .put("maxLevel", upgrade.maxLevel)
+            .put("nextCost", cost.format())
+            .put("maxed", maxed)
+            .put("affordable", !maxed && count > 0 && cost > com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO && game.money >= cost))
+    }
+    val shopItems = JSONArray()
+    catalog.shopItems.forEach { item ->
+        val owned = item.id in game.shopPurchases
+        shopItems.put(JSONObject()
+            .put("id", item.id)
+            .put("name", item.name)
+            .put("description", item.description)
+            .put("cost", item.nebulaCost)
+            .put("category", item.category)
+            .put("cosmetic", item.isCosmetic)
+            .put("owned", owned)
+            .put("equipped", game.equippedCosmeticId == item.id)
+            .put("affordable", game.nebula >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(item.nebulaCost)))
+    }
+    return JSONObject()
+        .put("buyMultiplier", game.buyMultiplier)
+        .put("upgrades", upgrades)
+        .put("shopItems", shopItems)
+        .put("rangeMin", game.currentRangeMin.toString())
+        .put("rangeMax", game.currentRangeMax.toString())
+        .put("attempts", game.attempts)
+        .put("correctGuesses", game.correctGuesses)
+        .put("streak", game.streak)
+        .put("bestStreak", game.bestStreak)
+        .put("accepted", accepted)
+        .put("money", game.money.format())
+        .put("incomePerSecond", "0")
+        .put("prestige", game.prestige.format())
+        .put("ultra", game.ultra.format())
+        .put("nebula", game.nebula.format())
+        .put("prestigeCount", game.prestigeCount)
+        .put("ultraCount", game.ultraCount)
+        .put("activeWorldId", game.activeWorldId)
+        .put("unlockedWorldCount", game.unlockedWorldIds.size)
+        .put("defeatedBossCount", game.defeatedBossIds.size)
+        .put("worldBossVictories", game.worldBossVictories)
+        .put("homeBaseLevel", game.homeBaseLevel)
+        .put("endlessRiftBestTier", game.endlessRiftBestTier)
+        .put("dailyQuestGuesses", game.dailyQuestGuesses)
+        .put("dailyQuestCorrectGuesses", game.dailyQuestCorrectGuesses)
+        .put("dailyQuestBestStreak", game.dailyQuestBestStreak)
+        .put("dailyQuestUpgradePurchases", game.dailyQuestUpgradePurchases)
+        .put("claimedDailyQuestCount", game.claimedDailyQuests.size)
+        .put("claimedDailyQuests", JSONArray(game.claimedDailyQuests.toList()))
+        .put("lootCommonChests", game.lootCommonChests)
+        .put("lootRareChests", game.lootRareChests)
+        .put("lootEpicChests", game.lootEpicChests)
+        .put("activeBossBattle", game.activeBossBattleWorldId != null)
+        .put("activeBossName", "")
+        .put("activeBossHpTotal", 0)
+        .put("activeBossHpRemaining", 0)
+        .put("worlds", JSONArray())
+        .put("activeBossWorldId", game.activeBossBattleWorldId ?: "")
+        .put("endlessRiftActive", game.endlessRiftActive)
+        .put("lastRandomEventId", game.lastRandomEventId ?: "")
+        .put("randomEventsTriggered", game.statistics.randomEventsTriggered)
+        .put("lootDropsFound", game.lootDropsFound)
+        .put("lootChestsOpened", game.lootChestsOpened)
+        .put("achievementCorrectProgress", game.correctGuesses.coerceIn(0L, 10L))
+        .put("achievementCorrectUnlocked", game.correctGuesses >= 10L)
+        .put("achievementStreakProgress", game.bestStreak.coerceIn(0, 5))
+        .put("achievementStreakUnlocked", game.bestStreak >= 5)
+        .put("achievementMoneyProgress", (game.money.value.toDouble() / 1_000_000.0).coerceIn(0.0, 1.0))
+        .put("achievementMoneyUnlocked", game.money >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(1_000_000))
+        .put("lastGuessStatus", lastGuessStatus ?: "")
+        .put("message", message ?: "")
+}
