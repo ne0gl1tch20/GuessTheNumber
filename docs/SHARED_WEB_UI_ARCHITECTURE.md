@@ -57,11 +57,11 @@ Do not rewrite the whole app in one PR. Keep the existing app working while vali
 
 ### Phase 0 — Audit and prototype
 
-**Prototype slice status:** An isolated Android-only debug route is now available from Developer Settings. It loads local assets through `WebViewAssetLoader`, feature-detects AndroidX WebKit's origin-restricted `WEB_MESSAGE_LISTENER`, allows only the app-assets HTTPS origin, validates small versioned requests, restricts bridge calls to the exact bundled prototype page, applies a restrictive Content Security Policy, and supports only `read_state` and `increment_counter`. The counter is in-memory Compose/Kotlin state and has no connection to game state or save files. This is intentionally not a production UI migration.
+**Prototype slice status:** An isolated Android-only debug route is now available from Developer Settings. It loads local assets through `WebViewAssetLoader`, feature-detects AndroidX WebKit's origin-restricted `WEB_MESSAGE_LISTENER`, allows only the app-assets HTTPS origin, validates small versioned requests through a separately tested protocol parser, strictly checks JSON field types, restricts bridge calls to the exact bundled prototype page, applies a restrictive Content Security Policy, and supports only `read_state` and `increment_counter`. The counter is in-memory Compose/Kotlin state and has no connection to game state or save files. This is intentionally not a production UI migration.
 
 Still required before Phase 0 can be considered complete:
 - Build and manually exercise the debug APK on a supported Android device; verify offline loading, back/navigation lifecycle, bridge feature detection, keyboard/focus and accessibility.
-- Review the bridge implementation and add focused tests for malformed, oversized, unknown and disallowed-origin requests.
+- Run the focused `WebUiBridgeProtocolTest` suite covering malformed JSON, oversized messages, unknown actions, invalid fields, disallowed origins, non-main-frame calls and wrong pages. The tests are added but have not yet been executed.
 - Evaluate Windows WebView2 runtime/distribution and implement a comparable isolated Windows host slice before claiming Android/Windows parity.
 - Measure startup, memory, bundle size and input latency on available hardware.
 
