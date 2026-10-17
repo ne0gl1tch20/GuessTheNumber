@@ -14,9 +14,9 @@ On Windows PowerShell, use `.gradlew.bat :desktopApp:run`.
 
 ## Current scope
 
-- The Windows application currently renders its player-facing screens with Compose Desktop.
-- The canonical Android web bundle is included in the desktop resource inputs, and a JVM resource test checks that Play, Upgrades and Shop assets are available on the desktop classpath.
-- **The shared HTML bundle is not yet hosted as the Windows UI.** A Windows embedded browser host, the Kotlin bridge adapter and runtime/distribution behavior still need to be implemented and verified.
+- Play, Upgrades and Shop now render the canonical shared HTML/CSS/JavaScript bundle inside an embedded JavaFX WebView hosted by Compose Desktop.
+- The desktop host unpacks only the bundled local web assets, blocks navigation away from the local entry page and exposes a small Kotlin bridge. Game guesses, upgrade purchases, shop purchases/equips, multiplier changes, daily quest claims and loot chest rewards are processed by the existing desktop engine/transaction layer and saved through the existing save store.
+- This is the first working host integration, not full parity: other player-facing screens still use Compose Desktop, and Windows runtime/installer behavior plus actual interaction parity still need CI and runtime verification.
 - The desktop app runs offline and does not connect to services during ordinary gameplay.
 
 The Android HTML migration has started in `app/src/main/assets/web-play/`; it is not complete across all player-facing screens. See [the shared UI migration matrix](../docs/SHARED_WEB_UI_MIGRATION_MATRIX.md), [the execution plan](../docs/SHARED_WEB_UI_CROSS_PLATFORM_EXECUTION_PLAN.md) and [the Windows host evaluation](../docs/WINDOWS_WEBVIEW_HOST_EVALUATION.md). Native Compose remains appropriate for the desktop shell and OS/system surfaces, not as a permanent duplicate of player-facing game screens.
