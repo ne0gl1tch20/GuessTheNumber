@@ -96,3 +96,8 @@ h2{margin:3px 0 0;font-size:17px;letter-spacing:-.035em}.panel-title,.loot-headi
 /* Numberverse identity and scalable navigation icon. */
 .brand-tagline{margin:3px 0 0;color:var(--muted);font-size:10px;line-height:1.35;letter-spacing:.015em;font-weight:600}
 .screen-nav .nav-icon{display:block;width:19px;height:19px;flex:0 0 19px}
+
+/* Numberverse brand lockup and scalable interface icons */
+.brand-tagline{margin:2px 0 0;color:#8e9abf;font-size:9px;line-height:1.25;letter-spacing:.04em}
+.stat-icon svg{display:block;width:1em;height:1em}
+.realm-emblem svg{display:block;width:25px;height:25px}
