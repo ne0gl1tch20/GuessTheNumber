@@ -36,7 +36,8 @@ fun ProductionWebPlayScreen(
     onSubmitGuess: (Long) -> GuessSubmissionResult,
     onClaimDailyQuest: (String) -> Unit,
     onOpenLootChest: (String) -> Unit,
-    onNavigateProgression: (String) -> Unit
+    onNavigateProgression: (String) -> Unit,
+    onWorldAction: (String, String) -> Unit
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val currentGameState by rememberUpdatedState(state)
@@ -46,6 +47,7 @@ fun ProductionWebPlayScreen(
     val claimDailyQuest by rememberUpdatedState(onClaimDailyQuest)
     val openLootChest by rememberUpdatedState(onOpenLootChest)
     val navigateProgression by rememberUpdatedState(onNavigateProgression)
+    val dispatchWorldAction by rememberUpdatedState(onWorldAction)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
@@ -100,6 +102,7 @@ fun ProductionWebPlayScreen(
                                                 "claim_daily_quest" -> parsed.questId?.let(claimDailyQuest)
                                                 "open_loot_chest" -> parsed.tier?.let(openLootChest)
                                                 "navigate" -> parsed.route?.let(navigateProgression)
+                                                "world_action" -> if (parsed.worldId != null && parsed.worldAction != null) dispatchWorldAction(parsed.worldId, parsed.worldAction)
                                             }
                                         } catch (_: Exception) {
                                             replyProxy.postMessage(errorResponse(parsed.id, "action_processing_failed")); return@post
@@ -113,10 +116,27 @@ fun ProductionWebPlayScreen(
                                                 "epic" -> game.lootEpicChests < beforeAction.lootEpicChests
                                                 else -> false
                                             }
+                                            "world_action" -> when (parsed.worldAction) {
+                                                "unlock" -> parsed.worldId != null && parsed.worldId in game.unlockedWorldIds && parsed.worldId !in beforeAction.unlockedWorldIds
+                                                "boss" -> parsed.worldId != null && (game.activeBossBattleWorldId != beforeAction.activeBossBattleWorldId) && (game.activeBossBattleWorldId == parsed.worldId || beforeAction.activeBossBattleWorldId == parsed.worldId)
+                                                else -> false
+                                            }
                                             else -> true
                                         }
                                         val activeBossWorld = game.activeBossBattleWorldId?.let { id -> worldDefinitions.firstOrNull { it.id == id } }
-                                        val bossDamage = activeBossWorld?.let { (game.bossBattleProgress[it.bossId] ?: 0).coerceIn(0, it.hp) } ?: 0
+                                        val activeBossHp = activeBossWorld?.let { it.hp + if (game.endlessRiftActive) ((game.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0 } ?: 0
+                                        val bossDamage = activeBossWorld?.let { (game.bossBattleProgress[it.bossId] ?: 0).coerceIn(0, activeBossHp) } ?: 0
+                                        val totalUpgradeLevels = game.upgradeLevels.values.sum()
+                                        val worldsJson = org.json.JSONArray()
+                                        worldDefinitions.forEach { world ->
+                                            val unlocked = world.id in game.unlockedWorldIds
+                                            val defeated = world.bossId in game.defeatedBossIds && !game.endlessRiftActive
+                                            val canUnlock = world.unlockBossId?.let { requiredBossId -> requiredBossId in game.defeatedBossIds && game.correctGuesses >= world.unlockCorrectGuesses && totalUpgradeLevels >= world.unlockUpgradeCount && game.prestigeCount >= world.unlockPrestigeCount && game.ultraCount >= world.unlockUltraCount } ?: true
+                                            val canFight = game.endlessRiftActive || (game.correctGuesses >= world.fightCorrectGuesses && totalUpgradeLevels >= world.fightUpgradeCount && game.prestigeCount >= world.fightPrestigeCount && game.ultraCount >= world.fightUltraCount)
+                                            val hp = world.hp + if (game.endlessRiftActive) ((game.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
+                                            val damage = (game.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, hp)
+                                            worldsJson.put(JSONObject().put("id", world.id).put("name", world.fallback).put("bossId", world.bossId).put("bossName", world.bossFallback).put("hp", hp).put("damage", damage).put("unlocked", unlocked).put("defeated", defeated).put("canUnlock", canUnlock).put("canFight", canFight).put("active", game.activeWorldId == world.id).put("activeBoss", game.activeBossBattleWorldId == world.id))
+                                        }
                                         val viewState = JSONObject()
                                             .put("rangeMin", result?.rangeMin ?: game.currentRangeMin)
                                             .put("rangeMax", result?.rangeMax ?: game.currentRangeMax)
@@ -150,8 +170,11 @@ fun ProductionWebPlayScreen(
                                             .put("lootEpicChests", game.lootEpicChests)
                                             .put("activeBossBattle", activeBossWorld != null)
                                             .put("activeBossName", activeBossWorld?.bossFallback ?: "")
-                                            .put("activeBossHpTotal", activeBossWorld?.hp ?: 0)
-                                            .put("activeBossHpRemaining", activeBossWorld?.let { it.hp - bossDamage } ?: 0)
+                                            .put("activeBossHpTotal", activeBossHp)
+                                            .put("activeBossHpRemaining", activeBossHp - bossDamage)
+                                            .put("worlds", worldsJson)
+                                            .put("activeBossWorldId", game.activeBossBattleWorldId ?: "")
+                                            .put("endlessRiftActive", game.endlessRiftActive)
                                         if (result != null) viewState.put("lastGuessStatus", result.status ?: "rate_limited")
                                         replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "state").put("state", viewState).toString())
                                     }
