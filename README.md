@@ -1,6 +1,6 @@
 # Guess The Number (Incremental & Arcade Edition)
 
-An advanced, feature-rich incremental and arcade game built with Kotlin and Jetpack Compose. Android is the primary feature-rich platform. The Kotlin Multiplatform foundation shares deterministic game rules and selected guessing UI contracts with the Windows desktop target; this does not mean the full game has feature parity on Windows. See the plans below.
+An advanced, feature-rich incremental and arcade game currently built primarily with Kotlin and Jetpack Compose. A proposed architecture change would move shared player-facing screens to one HTML/CSS/JavaScript frontend, keep Kotlin/KMP authoritative for game rules and saves, and retain native hosts for platform integration. This is a plan, not a completed migration. See the architecture and parity plans below.
 
 ## Lua Scripting Layer (Implementation in Progress)
 
@@ -26,16 +26,17 @@ The runtime uses an instruction-budgeted Lua sandbox without Android/Java bridge
 
 ## Architecture
 
-- Android UI: Jetpack Compose and Material 3 Expressive.
-- Shared KMP foundation: deterministic rules and selected guessing UI components in shared/.
-- Android retains its production navigation, authoritative GameState mutation, BigNumber currency math, persistence, RNG integration and Android-only services.
-- Windows retains desktop window/input behavior, updates and MSI packaging.
-- The app remains offline-first with no ads, analytics or accounts.
+- Current shipped UI: Android Jetpack Compose and Material 3 Expressive; Windows uses its Kotlin/Compose Desktop UI.
+- Proposed shared UI: HTML/CSS/JavaScript packaged locally and reused by supported hosts, so player-facing screens are implemented once.
+- Kotlin/KMP remains authoritative for game rules, progression, economy, save transactions/migrations and recovery.
+- Compose and Kotlin remain for native host/system integration; Cordova is a candidate mobile host, while Windows needs a maintained embedded WebView host rather than Cordova's legacy Windows platform.
+- The web migration is only a proposal until its prototype and exit gates pass. The app remains offline-first with no ads, analytics or accounts.
 
 ## KMP foundation and Windows parity
 
-The KMP foundation shares deterministic rules for guess transitions, reward multipliers, penalties, progression requirements and challenge-claim decisions, with common tests. Selected controlled guessing UI is also shared. Windows has a desktop target, but end-to-end parity for all player-facing features is not yet established.
+The KMP foundation shares deterministic rules for guess transitions, reward multipliers, penalties, progression requirements and challenge-claim decisions, with common tests. The current UI still has separate Compose implementations and full Windows parity is not established. The proposed [Shared Web UI Architecture](docs/SHARED_WEB_UI_ARCHITECTURE.md) explores replacing duplicate player-facing screens with one frontend while retaining Kotlin as game authority.
 
+- [Shared web UI architecture proposal](docs/SHARED_WEB_UI_ARCHITECTURE.md)
 - [KMP foundation status and exit criteria](docs/KMP_FOUNDATION_STATUS.md)
 - [Windows feature parity plan](docs/WINDOWS_FEATURE_PARITY_PLAN.md)
 - [Android runtime QA checklist](.openai/kmp_runtime_parity_checklist.md)
