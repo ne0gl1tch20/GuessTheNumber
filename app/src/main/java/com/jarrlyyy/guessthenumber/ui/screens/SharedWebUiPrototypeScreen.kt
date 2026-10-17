@@ -45,6 +45,7 @@ private const val WEB_UI_PATH = "/assets/web-prototype/"
 @Composable
 fun SharedWebUiPrototypeScreen(state: GameState, onSubmitGuess: (Long) -> GuessSubmissionResult, onBack: () -> Unit) {
     var counter by remember { mutableIntStateOf(0) }
+    val requestIds = remember { WebUiRequestIdWindow() }
     val currentGameState by rememberUpdatedState(state)
     val submitGuess by rememberUpdatedState(onSubmitGuess)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
@@ -162,6 +163,10 @@ fun SharedWebUiPrototypeScreen(state: GameState, onSubmitGuess: (Long) -> GuessS
                                                     return@post
                                                 }
                                                 is WebUiBridgeProtocol.ParseResult.Valid -> {
+                                                    if (!requestIds.markIfNew(parsed.id)) {
+                                                        replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request"))
+                                                        return@post
+                                                    }
                                                     val result = if (parsed.type == "submit_guess" && parsed.guess != null) {
                                                         try { submitGuess(parsed.guess) } catch (_: Exception) { null }
                                                     } else null
