@@ -17,6 +17,35 @@ class WebUiBridgeProtocolTest {
         )
     }
 
+
+    @Test
+    fun acceptsOnlyAllowlistedDailyQuestClaims() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("claim-1", "claim_daily_quest", questId = "daily_correct_5"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"claim-1","type":"claim_daily_quest","questId":"daily_correct_5"}""")
+        )
+        val unknown = WebUiBridgeProtocol.parse("""{"version":1,"id":"claim-2","type":"claim_daily_quest","questId":"grant_infinite_money"}""")
+        assertEquals("invalid_quest", (unknown as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
+    fun acceptsOnlyKnownLootTiers() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("chest-1", "open_loot_chest", tier = "rare"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"chest-1","type":"open_loot_chest","tier":"rare"}""")
+        )
+        val unknown = WebUiBridgeProtocol.parse("""{"version":1,"id":"chest-2","type":"open_loot_chest","tier":"legendary"}""")
+        assertEquals("invalid_tier", (unknown as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
+    fun rejectsExtraFieldsOnGameplayActions() {
+        val result = WebUiBridgeProtocol.parse(
+            """{"version":1,"id":"claim-3","type":"claim_daily_quest","questId":"daily_correct_5","reward":999999999}"""
+        )
+        assertEquals("invalid_request", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
     @Test
     fun acceptsIncrementRequest() {
         assertEquals(
