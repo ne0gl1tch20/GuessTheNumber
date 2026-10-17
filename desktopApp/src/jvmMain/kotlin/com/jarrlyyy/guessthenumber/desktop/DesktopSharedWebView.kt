@@ -155,7 +155,7 @@ private class DesktopSharedWebViewController {
 
 }
 
-private class DesktopJavaScriptBridge(
+internal class DesktopJavaScriptBridge(
     private val dispatch: (String) -> Unit
 ) {
     fun postMessage(raw: String) {
