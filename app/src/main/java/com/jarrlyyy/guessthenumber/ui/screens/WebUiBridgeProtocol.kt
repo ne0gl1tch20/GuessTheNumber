@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import android.net.Uri
 import org.json.JSONObject
 
 /**
@@ -12,6 +13,17 @@ internal object WebUiBridgeProtocol {
     sealed interface ParseResult {
         data class Valid(val id: String, val type: String) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
+    }
+
+    fun isAllowedSource(isMainFrame: Boolean, sourceOrigin: Uri, currentUrl: String?): Boolean {
+        if (!isMainFrame || sourceOrigin.scheme != "https" ||
+            sourceOrigin.host != "appassets.androidplatform.net"
+        ) return false
+
+        val currentUri = currentUrl?.let(Uri::parse) ?: return false
+        return currentUri.scheme == "https" &&
+            currentUri.host == "appassets.androidplatform.net" &&
+            currentUri.path == "/assets/web-prototype/index.html"
     }
 
     fun parse(raw: String): ParseResult {
