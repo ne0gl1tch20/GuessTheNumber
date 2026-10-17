@@ -2,23 +2,19 @@ package com.jarrlyyy.guessthenumber.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.screens.CrashRecoveryScreen
-import com.jarrlyyy.guessthenumber.ui.screens.ProductionWebAppScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProductionWebPlayScreen
 import com.jarrlyyy.guessthenumber.ui.screens.SaveSlotsScreen
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 
 /**
- * Player-facing navigation is now owned by the shared HTML surface.
+ * Player-facing navigation is owned by the shared HTML surface.
  * Kotlin remains the authoritative engine, save system and action host.
- * Native Compose is retained for boot/recovery/system-only surfaces.
+ * Native Compose is retained only for boot/recovery/system-only surfaces.
  */
 @Composable
 fun NavGraph(
@@ -88,35 +84,16 @@ fun NavGraph(
         return
     }
 
-    val context = LocalContext.current
-    val useSharedWebPlay = remember(context) {
-        FeatureFlagRepository(context).isEnabled("shared_web_play")
-    }
-
-    if (useSharedWebPlay) {
-        ProductionWebPlayScreen(
-            state = state,
-            incomePerSecond = incomePerSecond,
-            stateProvider = { viewModel.gameState.value },
-            onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
-            onClaimDailyQuest = viewModel::claimDailyQuest,
-            onOpenLootChest = viewModel::openLootChest,
-            // Destination panels are migrated in follow-up slices; the HTML surface
-            // explains when a destination is not part of the current bundle yet.
-            onNavigateProgression = {},
-            onWorldAction = viewModel::worldProgressAction
-        )
-    } else {
-        ProductionWebAppScreen(
-            state = state,
-            incomePerSecond = incomePerSecond,
-            stateProvider = { viewModel.gameState.value },
-            onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
-            onClaimDailyQuest = viewModel::claimDailyQuest,
-            onOpenLootChest = viewModel::openLootChest,
-            onWorldAction = viewModel::worldProgressAction
-        )
-    }
+    ProductionWebPlayScreen(
+        state = state,
+        incomePerSecond = incomePerSecond,
+        stateProvider = { viewModel.gameState.value },
+        onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
+        onClaimDailyQuest = viewModel::claimDailyQuest,
+        onOpenLootChest = viewModel::openLootChest,
+        onNavigateProgression = {},
+        onWorldAction = viewModel::worldProgressAction
+    )
 
     if (initialDestination != null) {
         onNotificationDestinationHandled()
