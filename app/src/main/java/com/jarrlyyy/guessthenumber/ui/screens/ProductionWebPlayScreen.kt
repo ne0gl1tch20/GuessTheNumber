@@ -1,10 +1,19 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import android.net.Uri
+import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -13,6 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
@@ -75,6 +87,13 @@ fun ProductionWebPlayScreen(
     val awardArcadeReward by rememberUpdatedState(onArcadeReward)
     val settleStake by rememberUpdatedState(onSettleStake)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    var bridgeErrorDetails by remember { mutableStateOf<String?>(null) }
+    val clipboardManager = LocalClipboardManager.current
+    fun reportBridgeException(action: String, requestId: String, error: Exception) {
+        Log.e("GTNWebBridge", "Bridge request failed: action=$action requestId=$requestId", error)
+        val trace = Log.getStackTraceString(error).take(12000)
+        bridgeErrorDetails = "Guess The Number bridge error\nAction: $action\nRequest ID: $requestId\nException: \${error.javaClass.name}: \${error.message ?: "(no message)"}\n\nJava/Kotlin stack trace:\n$trace"
+    }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
     DisposableEffect(Unit) {
@@ -125,7 +144,7 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
                                         val beforeAction = readState()
-                                        val result = if (parsed.type == "submit_guess" && parsed.guess != null) try { submitGuess(parsed.guess) } catch (_: Exception) { null } else null
+                                        val result = if (parsed.type == "submit_guess" && parsed.guess != null) try { submitGuess(parsed.guess) } catch (exception: Exception) { reportBridgeException(parsed.type, parsed.id, exception); null } else null
                                         if (parsed.type == "submit_guess" && result == null) { replyProxy.postMessage(errorResponse(parsed.id, "guess_processing_failed")); return@post }
                                         try {
                                             when (parsed.type) {
@@ -217,7 +236,8 @@ fun ProductionWebPlayScreen(
                                                     equipCosmetic(item.id)
                                                 }
                                             }
-                                        } catch (_: Exception) {
+                                        } catch (exception: Exception) {
+                                            reportBridgeException(parsed.type, parsed.id, exception)
                                             replyProxy.postMessage(errorResponse(parsed.id, "action_processing_failed")); return@post
                                         }
                                         val game = readState()
@@ -381,6 +401,35 @@ fun ProductionWebPlayScreen(
             }
         }
     )
+
+    bridgeErrorDetails?.let { details ->
+        AlertDialog(
+            onDismissRequest = { bridgeErrorDetails = null },
+            title = { Text("Bridge error detected") },
+            text = {
+                Column(
+                    modifier = Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())
+                ) {
+                    Text("The web UI request failed in the Android bridge. Copy the details below to share the error and Java/Kotlin logs.")
+                    SelectionContainer {
+                        Text(
+                            text = details,
+                            modifier = Modifier.heightIn(min = 48.dp),
+                            style = androidx.compose.material3.MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { clipboardManager.setText(AnnotatedString(details)) }) {
+                    Text("Copy error + logs")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { bridgeErrorDetails = null }) { Text("Close") }
+            }
+        )
+    }
 }
 
 private fun errorResponse(id: String, code: String): String = JSONObject().put("version", 1).put("id", id).put("type", "error").put("error", code).toString()
