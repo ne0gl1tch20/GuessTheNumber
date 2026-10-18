@@ -95,6 +95,19 @@ class WebUiBridgeProtocolTest {
         assertEquals("invalid_relic", (invalid as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
+
+    @Test
+    fun acceptsOnlyKnownBooleanSettings() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("setting-1", "update_setting", settingKey = "reducedMotion", settingValue = true),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"setting-1","type":"update_setting","key":"reducedMotion","value":"true"}""")
+        )
+        val unknown = WebUiBridgeProtocol.parse("""{"version":1,"id":"setting-2","type":"update_setting","key":"grantMoney","value":"true"}""")
+        assertEquals("invalid_setting", (unknown as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        val invalidValue = WebUiBridgeProtocol.parse("""{"version":1,"id":"setting-3","type":"update_setting","key":"soundEnabled","value":"yes"}""")
+        assertEquals("invalid_setting_value", (invalidValue as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
     @Test
     fun acceptsIncrementRequest() {
         assertEquals(

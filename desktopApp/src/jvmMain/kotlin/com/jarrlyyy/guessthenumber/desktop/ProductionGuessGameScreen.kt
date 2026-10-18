@@ -359,7 +359,7 @@ fun ProductionGuessGameScreen(
                         val expectedKeys = when (type) {
                             "read_state", "homebase_upgrade", "codex_reward" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest" -> 4
-                            "world_action", "relic_action" -> 5
+                            "world_action", "relic_action", "update_setting" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
@@ -420,6 +420,20 @@ fun ProductionGuessGameScreen(
                                 message = "The game is still loading or saving."
                             } else {
                                 val transaction = when (type) {
+                                    "update_setting" -> {
+                                        val key = request.optString("key")
+                                        val rawValue = request.optString("value")
+                                        val value = if (rawValue == "true" || rawValue == "false") rawValue.toBoolean() else null
+                                        val settings = when (key) {
+                                            "musicEnabled" -> value?.let { before.settings.copy(musicEnabled = it) }
+                                            "soundEnabled" -> value?.let { before.settings.copy(soundEnabled = it) }
+                                            "vibrationEnabled" -> value?.let { before.settings.copy(vibrationEnabled = it) }
+                                            "reducedMotion" -> value?.let { before.settings.copy(reducedMotion = it) }
+                                            "reduceFlashes" -> value?.let { before.settings.copy(reduceFlashes = it) }
+                                            else -> null
+                                        }
+                                        settings?.let { EconomyTransaction(before.copy(settings = it), true, "Preference saved.") }
+                                    }
                                     "update_multiplier" -> DesktopEconomyTransactions.setBuyMultiplier(before, request.optString("multiplier"))
                                     "buy_upgrade" -> {
                                         val id = request.optString("upgradeId")
