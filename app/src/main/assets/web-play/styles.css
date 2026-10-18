@@ -181,3 +181,6 @@ button { touch-action: manipulation; }
 .more-link-card>strong{color:var(--muted);font-size:23px;font-weight:500}
 @media(max-width:520px){.more-screen{gap:12px}.more-heading{padding:18px}.more-links{grid-template-columns:minmax(0,1fr);gap:9px}.more-link-card{min-height:70px;padding:12px}.more-link-card>span:first-child{flex-basis:40px;width:40px;height:40px}}
 @media(prefers-reduced-motion:reduce){.more-link-card{transition:none}.more-link-card:active{transform:none}}
+
+/* Keep debug-only navigation hidden even when card layout styles are active. */
+.more-link-card[hidden]{display:none!important}
