@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - master
-      - "feat/**"
-      - "fix/**"
-      - "ci/**"
     paths:
       - "app/**"
       - "desktopApp/**"
@@ -18,24 +15,7 @@ on:
       - "settings.gradle.kts"
       - "build.gradle.kts"
       - ".github/workflows/windows-desktop.yml"
-      - ".github/workflows/build-apks.yml"
-  pull_request:
-    branches:
-      - master
-    paths:
-      - "app/**"
-      - "desktopApp/**"
-      - "shared/**"
-      - "tools/**"
-      - "gradle/**"
-      - "gradlew"
-      - "gradlew.bat"
-      - "settings.gradle.kts"
-      - "build.gradle.kts"
-      - ".github/workflows/windows-desktop.yml"
-      - ".github/workflows/build-apks.yml"
   workflow_dispatch:
-
 permissions:
   contents: read
 
