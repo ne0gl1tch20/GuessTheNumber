@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "Game sedang tidak tersedia. Silakan buka kembali.",
   "settings_synced_status": "Preferensi Anda telah disimpan.",
   "stake_invalid_amount": "Masukkan taruhan berupa bilangan bulat positif.",
-  "stake_flipping_status": "Koin sedang dilempar…"
+  "stake_flipping_status": "Koin sedang dilempar…",
+  "duration_seconds_format": "%s dtk",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Taruhan Beruntung",
+  "minigame_catalog_unavailable": "Arkade sedang tidak tersedia.",
+  "action_in_progress": "Memproses…",
+  "action_saving_reward": "Menyimpan hadiah…",
+  "reaction_wait": "Tunggu…",
+  "reaction_tap_now": "Ketuk sekarang!",
+  "action_failed_retry": "Tindakan gagal diselesaikan. Coba lagi."
 }
