@@ -246,9 +246,10 @@ fun ProductionWebPlayScreen(
                                             reportBridgeException(parsed.type, parsed.id, exception)
                                             replyProxy.postMessage(errorResponse(parsed.id, "action_processing_failed")); return@post
                                         }
-                                        val game = try {
-                                            readState()
-                                        } catch (exception: Exception) {
+                                        try {
+                                            val game = try {
+                                                readState()
+                                            } catch (exception: Exception) {
                                             reportBridgeException(parsed.type, parsed.id, exception)
                                             replyProxy.postMessage(errorResponse(parsed.id, "state_read_failed"))
                                             return@post
@@ -403,6 +404,10 @@ fun ProductionWebPlayScreen(
                                             .put("achievementMoneyUnlocked", game.money >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(1_000_000))
                                         if (result != null) viewState.put("lastGuessStatus", result.status ?: "rate_limited")
                                         replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "state").put("state", viewState).toString())
+                                        } catch (exception: Exception) {
+                                            reportBridgeException(parsed.type, parsed.id, exception)
+                                            replyProxy.postMessage(errorResponse(parsed.id, "state_response_failed"))
+                                        }
                                     }
                                 }
                             }
