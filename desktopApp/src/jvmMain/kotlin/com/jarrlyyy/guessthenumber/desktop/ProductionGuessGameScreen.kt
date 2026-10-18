@@ -329,10 +329,7 @@ fun ProductionGuessGameScreen(
             return@Card
         }
 
-        if (section == DesktopGameSection.PLAY ||
-            section == DesktopGameSection.UPGRADES ||
-            section == DesktopGameSection.SHOP
-        ) {
+        if (section.sharedHtmlScreen != null) {
             DesktopSharedWebView(
                 onRequest = { raw, reply ->
                     scope.launch {
@@ -564,7 +561,7 @@ fun ProductionGuessGameScreen(
                         }
                         val visibleState = nextState ?: state
                         val payload = if (visibleState != null && catalog != null) {
-                            desktopWebPlayState(visibleState, catalog, accepted, guessStatus, message, talentCatalog.orEmpty(), engine)
+                            desktopWebPlayState(visibleState, catalog, accepted, guessStatus, message, talentCatalog.orEmpty(), engine, section.sharedHtmlScreen ?: "play")
                         } else org.json.JSONObject().put("accepted", false).put("message", "Loading game…")
                         reply(org.json.JSONObject().put("version", 1).put("id", requestId)
                             .put("type", "state").put("state", payload).toString())
@@ -670,7 +667,7 @@ fun ProductionGuessGameScreen(
                 )
             }
 
-            if (section == DesktopGameSection.MUTATORS) {
+            if (section == DesktopGameSection.MUTATORS && section.sharedHtmlScreen == null) {
                 DesktopMutatorsContent(
                     state = currentState,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) },
@@ -704,7 +701,7 @@ fun ProductionGuessGameScreen(
                 )
             }
 
-            if (section == DesktopGameSection.WORLD_MAP) {
+            if (section == DesktopGameSection.WORLD_MAP && section.sharedHtmlScreen == null) {
                 DesktopWorldMapContent(
                     state = currentState,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) },
@@ -722,7 +719,7 @@ fun ProductionGuessGameScreen(
             }
 
 
-            if (section == DesktopGameSection.HOME_BASE) {
+            if (section == DesktopGameSection.HOME_BASE && section.sharedHtmlScreen == null) {
                 DesktopHomeBaseContent(
                     state = currentState,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) },
@@ -732,7 +729,7 @@ fun ProductionGuessGameScreen(
                 )
             }
 
-            if (section == DesktopGameSection.RELICS) {
+            if (section == DesktopGameSection.RELICS && section.sharedHtmlScreen == null) {
                 DesktopRelicsContent(
                     state = currentState,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) },
@@ -789,7 +786,7 @@ fun ProductionGuessGameScreen(
                 )
             }
 
-            if (section == DesktopGameSection.ENDGAME) {
+            if (section == DesktopGameSection.ENDGAME && section.sharedHtmlScreen == null) {
                 DesktopEndgameContent(
                     state = currentState,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) },
@@ -797,7 +794,7 @@ fun ProductionGuessGameScreen(
                 )
             }
 
-            if (section == DesktopGameSection.CODEX) {
+            if (section == DesktopGameSection.CODEX && section.sharedHtmlScreen == null) {
                 DesktopCodexContent(
                     state = currentState,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) },
@@ -807,14 +804,14 @@ fun ProductionGuessGameScreen(
                 )
             }
 
-            if (section == DesktopGameSection.ACHIEVEMENTS) {
+            if (section == DesktopGameSection.ACHIEVEMENTS && section.sharedHtmlScreen == null) {
                 DesktopAchievementsContent(
                     state = currentState,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) }
                 )
             }
 
-            if (section == DesktopGameSection.PLAY) {
+            if (section == DesktopGameSection.PLAY && section.sharedHtmlScreen == null) {
             DesktopEconomyTransactions.activeBossBattleStatus(currentState)?.let { boss ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -1051,7 +1048,7 @@ fun ProductionGuessGameScreen(
 
             }
 
-            if (section == DesktopGameSection.UPGRADES) {
+            if (section == DesktopGameSection.UPGRADES && section.sharedHtmlScreen == null) {
                 SectionTitle("Upgrades")
 
                 Surface(
@@ -1141,7 +1138,7 @@ fun ProductionGuessGameScreen(
                 }
             }
 
-            if (section == DesktopGameSection.PRESTIGE) {
+            if (section == DesktopGameSection.PRESTIGE && section.sharedHtmlScreen == null) {
             SectionTitle("Prestige")
                 val prestigeRequirement = engine.calculatePrestigeRequirement(currentState.prestigeCount)
                 val prestigeReward = engine.calculatePrestigeReward(currentState)
@@ -1167,7 +1164,7 @@ fun ProductionGuessGameScreen(
 
                 }
 
-                if (section == DesktopGameSection.ULTRA) {
+                if (section == DesktopGameSection.ULTRA && section.sharedHtmlScreen == null) {
                 SectionTitle("Ultra")
                 val ultraRequirement = engine.calculateUltraRequirement(currentState.ultraCount)
                 val ultraReward = engine.calculateUltraReward(currentState)
@@ -1194,7 +1191,7 @@ fun ProductionGuessGameScreen(
 
                 }
 
-            if (section == DesktopGameSection.SHOP) {
+            if (section == DesktopGameSection.SHOP && section.sharedHtmlScreen == null) {
                 SectionTitle("Nebula shop")
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Row(
@@ -1273,7 +1270,7 @@ fun ProductionGuessGameScreen(
                 }
             }
 
-            if (section == DesktopGameSection.TALENT) {
+            if (section == DesktopGameSection.TALENT && section.sharedHtmlScreen == null) {
                 if (talentCatalog == null) {
                     val talentCatalogError = talentCatalogResult.exceptionOrNull()?.message ?: "unknown error"
                     Text("Talent catalog could not be loaded: $talentCatalogError")
