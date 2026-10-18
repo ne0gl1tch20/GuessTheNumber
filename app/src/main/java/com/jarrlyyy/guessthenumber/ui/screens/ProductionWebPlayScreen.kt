@@ -313,7 +313,8 @@ fun ProductionWebPlayScreen(
                                         worldDefinitions.forEach { world ->
                                             val unlocked = world.id in game.unlockedWorldIds
                                             val defeated = world.bossId in game.defeatedBossIds && !game.endlessRiftActive
-                                            val canUnlock = world.unlockBossId?.let { requiredBossId -> requiredBossId in game.defeatedBossIds && game.correctGuesses >= world.unlockCorrectGuesses && totalUpgradeLevels >= world.unlockUpgradeCount && game.prestigeCount >= world.unlockPrestigeCount && game.ultraCount >= world.unlockUltraCount } ?: true
+                                            val requiredBossDefeated = world.unlockBossId?.let { it in game.defeatedBossIds } ?: true
+                                            val canUnlock = requiredBossDefeated && game.correctGuesses >= world.unlockCorrectGuesses && totalUpgradeLevels >= world.unlockUpgradeCount && game.prestigeCount >= world.unlockPrestigeCount && game.ultraCount >= world.unlockUltraCount
                                             val canFight = game.endlessRiftActive || (game.correctGuesses >= world.fightCorrectGuesses && totalUpgradeLevels >= world.fightUpgradeCount && game.prestigeCount >= world.fightPrestigeCount && game.ultraCount >= world.fightUltraCount)
                                             val hp = world.hp + if (game.endlessRiftActive) ((game.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
                                             val damage = (game.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, hp)
