@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.BuildConfig
 import android.net.Uri
 import org.json.JSONObject
 
@@ -88,7 +89,7 @@ internal object WebUiBridgeProtocol {
             "navigate" -> {
                 if (request.length() != 4 || !request.has("route")) return ParseResult.Invalid("invalid_request", id)
                 val route = request.opt("route") as? String ?: return ParseResult.Invalid("invalid_route", id)
-                if (route !in navigationRoutes) return ParseResult.Invalid("invalid_route", id)
+                if (route !in navigationRoutes && !(BuildConfig.DEBUG && route == "dev_settings")) return ParseResult.Invalid("invalid_route", id)
                 ParseResult.Valid(id, type, route = route)
             }
             "world_action" -> {
