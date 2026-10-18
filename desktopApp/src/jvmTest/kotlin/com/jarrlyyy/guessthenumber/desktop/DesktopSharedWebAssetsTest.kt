@@ -68,7 +68,7 @@ class DesktopSharedWebAssetsTest {
         val state = desktopWebPlayState(GameState(), DesktopEconomyCatalog.load())
         val strings = state.getJSONObject("uiStrings")
         val keys = listOf(
-            "settings", "background_music", "sound_effects", "vibration_label",
+            "settings", "game_preferences", "background_music", "sound_effects", "vibration_label",
             "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx",
             "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes"
         )
