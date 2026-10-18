@@ -472,6 +472,18 @@ fun ProductionGuessGameScreen(
                                             else -> null
                                         }
                                     }
+                                    "buy_talent" -> {
+                                        val talentId = request.optString("talentId")
+                                        val talent = talentCatalog.orEmpty().firstOrNull { it.id == talentId }
+                                        if (talent == null) null
+                                        else DesktopEconomyTransactions.buyTalent(before, talent.id, talent.cost, talent.requiredParentId)
+                                    }
+                                    "set_mutator" -> {
+                                        val mutatorId = request.optString("mutatorId")
+                                        val activeText = request.optString("active")
+                                        if (activeText !in setOf("true", "false")) null
+                                        else DesktopEconomyTransactions.setMutatorActive(before, mutatorId, activeText == "true", engine)
+                                    }
                                     "prestige_reset" -> DesktopEconomyTransactions.prestigeReset(before, engine)
                                     "ultra_reset" -> DesktopEconomyTransactions.ultraReset(before, engine)
                                     "homebase_upgrade" -> DesktopEconomyTransactions.upgradeHomeBase(before)
