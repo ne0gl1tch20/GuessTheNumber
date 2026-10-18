@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "遊戲目前無法使用，請重新開啟。",
   "settings_synced_status": "已儲存你的偏好設定。",
   "stake_invalid_amount": "請輸入正整數作為下注金額。",
-  "stake_flipping_status": "正在擲硬幣…"
+  "stake_flipping_status": "正在擲硬幣…",
+  "duration_seconds_format": "%s 秒",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "幸運下注",
+  "minigame_catalog_unavailable": "街機目前無法使用。",
+  "action_in_progress": "正在處理…",
+  "action_saving_reward": "正在儲存獎勵…",
+  "reaction_wait": "請稍候…",
+  "reaction_tap_now": "現在點擊！",
+  "action_failed_retry": "無法完成操作，請再試一次。"
 }
