@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "Игра сейчас недоступна. Откройте её снова.",
   "settings_synced_status": "Ваши настройки сохранены.",
   "stake_invalid_amount": "Введите положительное целое число для ставки.",
-  "stake_flipping_status": "Подбрасываем монету…"
+  "stake_flipping_status": "Подбрасываем монету…",
+  "duration_seconds_format": "%s с",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Счастливая ставка",
+  "minigame_catalog_unavailable": "Аркада сейчас недоступна.",
+  "action_in_progress": "Обработка…",
+  "action_saving_reward": "Сохранение награды…",
+  "reaction_wait": "Подождите…",
+  "reaction_tap_now": "Нажмите сейчас!",
+  "action_failed_retry": "Не удалось выполнить действие. Попробуйте ещё раз."
 }
