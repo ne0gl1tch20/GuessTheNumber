@@ -33,6 +33,7 @@ internal val DesktopGameSection.sharedHtmlScreen: String?
         DesktopGameSection.PRESTIGE -> "prestige"
         DesktopGameSection.ULTRA -> "ultra"
         DesktopGameSection.TALENT -> "talent"
+        DesktopGameSection.SETTINGS -> "settings"
         DesktopGameSection.ACHIEVEMENTS -> "rewards"
         DesktopGameSection.WORLD_MAP -> "worlds"
         DesktopGameSection.MUTATORS -> "mutators"
