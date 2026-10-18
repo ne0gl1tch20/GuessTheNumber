@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Krótki przewodnik",
   "more_feature_discovery_step_1": "Ta funkcja ma własne narzędzia i postępy. Rozejrzyj się, a potem wybierz, co chcesz odkryć.",
   "more_feature_discovery_step_2": "W każdej chwili możesz wrócić do tej funkcji z More Hub.",
-  "more_feature_discovery_skip": "Pomiń i otwórz"
+  "more_feature_discovery_skip": "Pomiń i otwórz",
+  "game_temporarily_unavailable": "Gra jest teraz niedostępna. Otwórz ją ponownie.",
+  "settings_synced_status": "Twoje preferencje zostały zapisane.",
+  "stake_invalid_amount": "Wpisz dodatnią liczbę całkowitą jako stawkę.",
+  "stake_flipping_status": "Rzut monetą…"
 }
