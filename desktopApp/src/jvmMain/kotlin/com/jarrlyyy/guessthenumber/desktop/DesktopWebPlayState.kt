@@ -17,7 +17,8 @@ internal fun desktopWebPlayState(
     lastGuessStatus: String? = null,
     message: String? = null,
     talents: List<DesktopTalentDef> = DesktopEconomyRepository().talents(),
-    engine: GameEngine = GameEngine()
+    engine: GameEngine = GameEngine(),
+    initialScreen: String = "play"
 ): JSONObject {
     val upgrades = JSONArray()
     catalog.upgrades.forEach { upgrade ->
@@ -76,6 +77,7 @@ internal fun desktopWebPlayState(
             .put("affordable", game.nebula >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(item.nebulaCost)))
     }
     return JSONObject()
+        .put("initialScreen", initialScreen)
         .put("buyMultiplier", game.buyMultiplier)
         .put("prestigeRequirement", engine.calculatePrestigeRequirement(game.prestigeCount).format())
         .put("prestigeReward", engine.calculatePrestigeReward(game.money, game.prestigeCount).format())
