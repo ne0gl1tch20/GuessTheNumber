@@ -35,9 +35,9 @@
       <button type="button" role="tab" id="tab-ultra" aria-controls="screen-ultra" aria-selected="false" data-screen-target="ultra" tabindex="-1"><span class="nav-icon" aria-hidden="true">✦</span><b>Ultra</b></button>
       <button type="button" role="tab" id="tab-talent" aria-controls="screen-talent" aria-selected="false" data-screen-target="talent" tabindex="-1"><span class="nav-icon" aria-hidden="true">⌘</span><b>Talents</b></button>
       <button type="button" role="tab" id="tab-mutators" aria-controls="screen-mutators" aria-selected="false" data-screen-target="mutators" tabindex="-1"><span class="nav-icon" aria-hidden="true">◈</span><b>Mutators</b></button>
-      <button type="button" role="tab" id="tab-stats" aria-controls="screen-stats" aria-selected="false" data-screen-target="stats" tabindex="-1"><span class="nav-icon" aria-hidden="true">▤</span><b>Stats</b></button>
-      <button type="button" role="tab" id="tab-arcade" aria-controls="screen-arcade" aria-selected="false" data-screen-target="arcade" tabindex="-1"><span class="nav-icon" aria-hidden="true">🎮</span><b>Arcade</b></button>
-      <button type="button" role="tab" id="tab-stake" aria-controls="screen-stake" aria-selected="false" data-screen-target="stake" tabindex="-1"><span class="nav-icon" aria-hidden="true">★</span><b>Lucky Stake</b></button>
+      <button type="button" role="tab" id="tab-stats" aria-controls="screen-stats" aria-selected="false" data-screen-target="stats" tabindex="-1"><span class="nav-icon" aria-hidden="true">▤</span><b data-i18n="stats">Stats</b></button>
+      <button type="button" role="tab" id="tab-arcade" aria-controls="screen-arcade" aria-selected="false" data-screen-target="arcade" tabindex="-1"><span class="nav-icon" aria-hidden="true">🎮</span><b data-i18n="arcade">Arcade</b></button>
+      <button type="button" role="tab" id="tab-stake" aria-controls="screen-stake" aria-selected="false" data-screen-target="stake" tabindex="-1"><span class="nav-icon" aria-hidden="true">★</span><b data-i18n="staking_flip_button">Lucky Stake</b></button>
     </nav>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
@@ -150,7 +150,7 @@
     </section>
 <section class="quest-card card" id="questPanel" aria-label="Daily momentum">
       <div class="panel-title"><span class="panel-glyph quest-glyph"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><div><span class="eyebrow">DAILY MOMENTUM</span><h2>Today's run</h2></div><span class="panel-chip" id="claimedQuests">0 CLAIMED</span></div>
-      <div class="quest-metrics"><div><strong id="dailyGuesses">0</strong><span>Guesses made</span></div><div><strong id="dailyCorrect">0</strong><span>Correct guesses</span></div><div><strong id="dailyBestStreak">0</strong><span>Best daily streak</span></div></div>
+      <div class="quest-metrics"><div><strong id="dailyGuesses">0</strong><span>Guesses made</span></div><div><strong id="dailyCorrect">0</strong><span data-i18n="stats_correct_guesses">Correct guesses</span></div><div><strong id="dailyBestStreak">0</strong><span>Best daily streak</span></div></div>
       <div class="quest-board" aria-label="Daily quests">
         <article class="quest-row"><div class="quest-row-copy"><strong>Warm-up</strong><small>Make 10 guesses</small><span class="quest-progress" id="questProgressGuesses">0 / 10</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_guesses_10" type="button">Claim</button></article>
         <article class="quest-row"><div class="quest-row-copy"><strong>Sharp aim</strong><small>Get 5 correct guesses</small><span class="quest-progress" id="questProgressCorrect">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_correct_5" type="button">Claim</button></article>
@@ -285,51 +285,50 @@
     </div>
     <div class="screen" id="screen-stats" role="tabpanel" aria-labelledby="tab-stats" data-screen="stats" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">▤</span><div><span class="eyebrow">YOUR PROGRESS</span><h2>Statistics</h2></div><span class="panel-chip">LIVE</span></div>
-        <p class="catalog-intro">Your totals are read from the saved game state.</p>
+        <div class="panel-title"><span class="panel-glyph">▤</span><div><span class="eyebrow" data-i18n="stats">YOUR PROGRESS</span><h2 data-i18n="statistics">Statistics</h2></div><span class="panel-chip">LIVE</span></div>
+        
         <div class="stats-grid">
-          <article class="stat-card"><span>Total guesses</span><strong id="statTotalGuesses">0</strong></article>
+          <article class="stat-card"><span data-i18n="stats_total_guesses">Total guesses</span><strong id="statTotalGuesses">0</strong></article>
           <article class="stat-card"><span>Correct guesses</span><strong id="statCorrectGuesses">0</strong></article>
-          <article class="stat-card"><span>Failed guesses</span><strong id="statFailedGuesses">0</strong></article>
-          <article class="stat-card"><span>Accuracy</span><strong id="statAccuracy">0%</strong></article>
-          <article class="stat-card"><span>Money earned</span><strong id="statMoneyEarned">0</strong></article>
-          <article class="stat-card"><span>Money spent</span><strong id="statMoneySpent">0</strong></article>
-          <article class="stat-card"><span>Prestiges</span><strong id="statPrestiges">0</strong></article>
-          <article class="stat-card"><span>Ultra resets</span><strong id="statUltras">0</strong></article>
-          <article class="stat-card"><span>Nebula earned</span><strong id="statNebulaEarned">0</strong></article>
-          <article class="stat-card"><span>Play time</span><strong id="statPlaytime">0m</strong></article>
-          <article class="stat-card"><span>Arcade games</span><strong id="statArcadePlayed">0</strong></article>
-          <article class="stat-card"><span>Random events</span><strong id="statRandomEvents">0</strong></article>
+          <article class="stat-card"><span data-i18n="stats_failed_guesses">Failed guesses</span><strong id="statFailedGuesses">0</strong></article>
+          <article class="stat-card"><span data-i18n="guessing_precision_heading">Accuracy</span><strong id="statAccuracy">0%</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_money_earned">Money earned</span><strong id="statMoneyEarned">0</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_money_spent">Money spent</span><strong id="statMoneySpent">0</strong></article>
+          <article class="stat-card"><span data-i18n="stats_prestige_resets">Prestiges</span><strong id="statPrestiges">0</strong></article>
+          <article class="stat-card"><span data-i18n="stats_ultra_resets">Ultra resets</span><strong id="statUltras">0</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_nebula_earned">Nebula earned</span><strong id="statNebulaEarned">0</strong></article>
+          <article class="stat-card"><span data-i18n="stats_total_playtime">Play time</span><strong id="statPlaytime">0m</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_arcade_played">Arcade games</span><strong id="statArcadePlayed">0</strong></article>
         </div>
       </section>
     </div>
     <div class="screen" id="screen-arcade" role="tabpanel" aria-labelledby="tab-arcade" data-screen="arcade" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">🎮</span><div><span class="eyebrow">QUICK CHALLENGES</span><h2>Arcade</h2></div><span class="panel-chip" id="arcadePlayedCount">0 PLAYED</span></div>
-        <p class="catalog-intro">Play a short minigame to earn rewards. Rewards are calculated and applied by Kotlin.</p>
-        <div class="catalog-list" id="arcadeList"><p class="catalog-empty">Loading minigames…</p></div>
+        <div class="panel-title"><span class="panel-glyph">🎮</span><div><span class="eyebrow" data-i18n="arcade">QUICK CHALLENGES</span><h2 data-i18n="arcade_title">Arcade</h2></div><span class="panel-chip" id="arcadePlayedCount">0 PLAYED</span></div>
+        
+        <div class="catalog-list" id="arcadeList"><p class="catalog-empty" data-i18n="loading_save_data">Loading minigames…</p></div>
         <div class="arcade-game card" id="arcadeGame" hidden>
-          <div class="panel-title"><div><span class="eyebrow" id="arcadeEyebrow">MINIGAME</span><h2 id="arcadeTitle">Quick Guess</h2></div><button type="button" class="world-action-button" id="arcadeClose">Close</button></div>
+          <div class="panel-title"><div><span class="eyebrow" id="arcadeEyebrow" data-i18n="arcade">MINIGAME</span><h2 id="arcadeTitle">Quick Guess</h2></div><button type="button" class="world-action-button" id="arcadeClose" data-i18n="close_button">Close</button></div>
           <p id="arcadeInstructions" class="catalog-intro"></p>
           <div id="arcadePlayArea" class="arcade-play-area"></div>
           <p id="arcadeStatus" role="status" aria-live="polite" class="catalog-intro"></p>
-          <button type="button" class="world-action-button" id="arcadeClaim" disabled>Claim reward</button>
+          <button type="button" class="world-action-button" id="arcadeClaim" data-i18n="claim_reward_button" disabled>Claim reward</button>
         </div>
       </section>
     </div>
     <div class="screen" id="screen-stake" role="tabpanel" aria-labelledby="tab-stake" data-screen="stake" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">★</span><div><span class="eyebrow">50/50 LUCKY COIN FLIP</span><h2>Lucky Stake</h2></div><span class="panel-chip">STREAK BONUS</span></div>
-        <p class="catalog-intro">Stake Money. Win to receive your stake plus a streak-based payout. Lose and the stake is forfeited. The coin flip is decided by Kotlin.</p>
+        <div class="panel-title"><span class="panel-glyph">★</span><div><span class="eyebrow" data-i18n="staking_flip_button">50/50 LUCKY COIN FLIP</span><h2 data-i18n="staking_flip_button">Lucky Stake</h2></div></div>
+        
         <div class="stats-grid">
-          <article class="stat-card"><span>Current streak</span><strong id="stakeStreak">0</strong></article>
-          <article class="stat-card"><span>Best streak</span><strong id="stakeBestStreak">0</strong></article>
-          <article class="stat-card"><span>Available Money</span><strong id="stakeMoney">0</strong></article>
-          <article class="stat-card"><span>Win multiplier</span><strong id="stakeMultiplier">2.0×</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_current_streak">Current streak</span><strong id="stakeStreak">0</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_best_streak">Best streak</span><strong id="stakeBestStreak">0</strong></article>
+          <article class="stat-card"><span data-i18n="available_money_heading">Available Money</span><strong id="stakeMoney">0</strong></article>
+          <article class="stat-card"><span data-i18n="multiplier_format">Win multiplier</span><strong id="stakeMultiplier">2.0×</strong></article>
         </div>
-        <label class="stake-field" for="stakeAmount">Stake amount</label>
-        <input id="stakeAmount" class="stake-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Enter whole Money amount">
-        <button type="button" class="world-action-button" id="stakeFlip">Stake &amp; Flip</button>
+        <label class="stake-field" for="stakeAmount" data-i18n="inspector_money">Stake amount</label>
+        <input id="stakeAmount" class="stake-input" type="number" min="1" step="1" inputmode="numeric" placeholder="">
+        <button type="button" class="world-action-button" id="stakeFlip" data-i18n="staking_flip_button">Stake &amp; Flip</button>
         <p id="stakeStatus" role="status" aria-live="polite" class="catalog-intro"></p>
       </section>
     </div>
