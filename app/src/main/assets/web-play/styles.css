@@ -194,3 +194,10 @@ button { touch-action: manipulation; }
 .setting-field input[type="color"]{width:46px;height:36px;padding:2px;border:1px solid var(--line,rgba(255,255,255,.2));border-radius:9px;background:transparent}
 .setting-field input[type="range"]{width:48%;accent-color:var(--accent2)}
 .setting-field:focus-within,.setting-field select:focus-visible,.setting-field input:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+
+:root[data-theme-mode="Light"]{--bg:#f3f5fb;--panel:#ffffff;--panel2:#e8edf8;--line:rgba(31,42,70,.16);--text:#172038;--muted:#56617c;--gold:#946200;--good:#087b49;--danger:#b72e55}
+:root[data-theme-mode="Light"] body{background:linear-gradient(180deg,#f8f9ff 0%,#edf1fa 100%)}
+:root[data-theme-mode="Light"] .card{background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(239,243,252,.98));box-shadow:0 12px 30px rgba(35,49,83,.1)}
+:root[data-theme-mode="Light"] .setting-field select{background:#fff;color:var(--text)}
+:root.settings-amoled,:root.settings-amoled body{--bg:#000;--panel:#000;--panel2:#080808;background:#000}
+:root.settings-amoled .card{background:linear-gradient(145deg,#050505,#000)}
