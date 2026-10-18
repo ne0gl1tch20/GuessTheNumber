@@ -4,6 +4,7 @@ import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRepository
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopTalentDef
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopMinigameDef
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import org.json.JSONArray
@@ -18,7 +19,8 @@ internal fun desktopWebPlayState(
     message: String? = null,
     talents: List<DesktopTalentDef> = DesktopEconomyRepository().talents(),
     engine: GameEngine = GameEngine(),
-    initialScreen: String = "play"
+    initialScreen: String = "play",
+    minigames: List<DesktopMinigameDef> = DesktopEconomyRepository().minigames()
 ): JSONObject {
     val upgrades = JSONArray()
     catalog.upgrades.forEach { upgrade ->
@@ -52,6 +54,24 @@ internal fun desktopWebPlayState(
             .put("cost", talent.cost).put("owned", owned).put("canUnlock", canUnlock).put("affordable", affordable)
             .put("requirement", if (!canUnlock) "Unlock ${talent.requiredParentId} first" else if (!affordable) "Need ${talent.cost} Prestige" else "Ready to unlock"))
     }
+    val minigamesJson = JSONArray()
+    minigames.forEach { game ->
+        minigamesJson.put(JSONObject().put("id", game.id).put("name", game.name)
+            .put("description", game.description).put("rewardMultiplier", game.rewardMultiplier))
+    }
+    val statistics = JSONObject()
+        .put("totalGuesses", game.statistics.totalGuesses)
+        .put("correctGuesses", game.statistics.correctGuesses)
+        .put("failedGuesses", game.statistics.failedGuesses)
+        .put("moneyEarned", game.statistics.moneyEarned.format())
+        .put("moneySpent", game.statistics.moneySpent.format())
+        .put("prestigesCount", game.statistics.prestigesCount)
+        .put("ultrasCount", game.statistics.ultrasCount)
+        .put("nebulaEarned", game.statistics.nebulaEarned)
+        .put("playtimeSeconds", game.statistics.playtimeSeconds)
+        .put("arcadePlayed", game.statistics.arcadePlayed)
+        .put("arcadeBestScores", JSONObject(game.statistics.arcadeBestScores))
+        .put("randomEventsTriggered", game.statistics.randomEventsTriggered)
     val worlds = JSONArray()
     DesktopEconomyTransactions.worldsForUi(game).forEach { world ->
         worlds.put(JSONObject()
@@ -86,6 +106,10 @@ internal fun desktopWebPlayState(
         .put("ultraReward", engine.calculateUltraReward(game.money, game.ultraCount).format())
         .put("canUltra", game.money >= engine.calculateUltraRequirement(game.ultraCount) && game.prestige >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(1_000) && engine.calculateUltraReward(game.money, game.ultraCount) > com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO)
         .put("settings", JSONObject().put("musicEnabled", game.settings.musicEnabled).put("soundEnabled", game.settings.soundEnabled).put("vibrationEnabled", game.settings.vibrationEnabled).put("reducedMotion", game.settings.reducedMotion).put("reduceFlashes", game.settings.reduceFlashes))
+        .put("statistics", statistics)
+        .put("minigames", minigamesJson)
+        .put("streak", game.streak)
+        .put("bestStreak", game.bestStreak)
         .put("upgrades", upgrades)
         .put("shopItems", shopItems)
         .put("rangeMin", game.currentRangeMin.toString())
