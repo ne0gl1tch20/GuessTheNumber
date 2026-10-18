@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Kurzer Überblick",
   "more_feature_discovery_step_1": "Diese Funktion hat eigene Werkzeuge und Fortschritte. Schau kurz hinein und entscheide dann, was du erkunden möchtest.",
   "more_feature_discovery_step_2": "Du kannst jederzeit über den More Hub zu dieser Funktion zurückkehren.",
-  "more_feature_discovery_skip": "Überspringen und öffnen"
+  "more_feature_discovery_skip": "Überspringen und öffnen",
+  "game_temporarily_unavailable": "Das Spiel ist gerade nicht verfügbar. Bitte öffne es erneut.",
+  "settings_synced_status": "Deine Einstellungen sind gespeichert.",
+  "stake_invalid_amount": "Gib einen positiven ganzzahligen Einsatz ein.",
+  "stake_flipping_status": "Münzwurf läuft…"
 }
