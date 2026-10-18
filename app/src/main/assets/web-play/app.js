@@ -42,9 +42,14 @@ function renderWorlds(s){
   const track=document.createElement('div');track.className='world-hp-track';
   const fill=document.createElement('div');fill.className='world-hp-fill';fill.style.width=(Number(world.hp)>0?Math.max(0,Math.min(100,(Number(world.hp)-Number(world.damage))/Number(world.hp)*100)):0)+'%';track.appendChild(fill);
   const actions=document.createElement('div');actions.className='world-entry-actions';
+  const unmetUnlock=Array.isArray(world.unlockRequirements)?world.unlockRequirements:[];
+  const unmetFight=Array.isArray(world.fightRequirements)?world.fightRequirements:[];
+  let requirementNode=null;
+  if(!world.unlocked&&unmetUnlock.length){requirementNode=document.createElement('p');requirementNode.className='world-requirements';requirementNode.textContent='To unlock: '+unmetUnlock.join(' · ')}
+  else if(world.unlocked&&!world.canFight&&!world.activeBoss&&unmetFight.length){requirementNode=document.createElement('p');requirementNode.className='world-requirements';requirementNode.textContent='Battle requirements: '+unmetFight.join(' · ')}
   if(!world.unlocked){const unlock=document.createElement('button');unlock.type='button';unlock.className='world-action-button unlock-world';unlock.dataset.bridgeAction='world';unlock.dataset.worldId=String(world.id);unlock.dataset.worldAction='unlock';unlock.disabled=!!pending||!world.canUnlock;unlock.textContent=world.canUnlock?'Unlock world':'Requirements pending';actions.appendChild(unlock)}
   const fight=document.createElement('button');fight.type='button';fight.className='world-action-button boss-world';fight.dataset.bridgeAction='world';fight.dataset.worldId=String(world.id);fight.dataset.worldAction='boss';fight.disabled=!!pending||!world.unlocked||(!world.canFight&&!world.activeBoss)||(world.defeated&&!s.endlessRiftActive);fight.textContent=world.activeBoss?'Leave battle':world.defeated&&!s.endlessRiftActive?'Boss defeated':world.canFight||s.endlessRiftActive?'Start battle':'Requirements pending';actions.appendChild(fight);
-  card.append(head,hpRow,track,actions);el.worldList.appendChild(card)
+  if(requirementNode)card.append(head,hpRow,track,requirementNode,actions);else card.append(head,hpRow,track,actions);el.worldList.appendChild(card)
  }
  setText(el.worldBossStatus,s.activeBossBattle?'BATTLE LIVE':String(worlds.filter(w=>w.defeated).length)+' CLEARED')
 }
