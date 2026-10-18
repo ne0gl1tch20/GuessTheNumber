@@ -105,7 +105,9 @@ fun NavGraph(
         onUpdateMultiplier = viewModel::updateBuyMultiplier,
         onUpdateSettings = viewModel::updateSettings,
         onPrestigeReset = viewModel::prestigeReset,
-        onUltraReset = viewModel::ultraReset
+        onUltraReset = viewModel::ultraReset,
+        onBuyTalent = viewModel::buyTalent,
+        onSetMutatorActive = viewModel::setMutatorActive
     )
 
     if (initialDestination != null) {
