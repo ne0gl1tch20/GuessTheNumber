@@ -9,10 +9,16 @@ plugins {
 }
 
 val generatedWebPlayAssets = layout.buildDirectory.dir("generated/webPlayAssets")
+val generatedLauncherIconRes = layout.buildDirectory.dir("generated/launcherIconRes")
 val prepareWebPlayBrandAsset by tasks.registering(Copy::class) {
     from(rootProject.file("GTN_APP_LOGO.png"))
     into(generatedWebPlayAssets.map { it.dir("web-play") })
     rename { "gtn-app-logo.png" }
+}
+val prepareLauncherIcon by tasks.registering(Copy::class) {
+    from(rootProject.file("GTN_APP_LOGO.png"))
+    into(generatedLauncherIconRes.map { it.dir("mipmap-nodpi") })
+    rename { "ic_launcher.png" }
 }
 
 
@@ -88,9 +94,10 @@ android {
     }
     // Android's SourceSet API no longer accepts Provider instances directly.
     sourceSets.getByName("main").assets.srcDir(generatedWebPlayAssets.get().asFile)
-    // Keep the generated brand asset task ordered before Android asset processing.
+    sourceSets.getByName("main").res.srcDir(generatedLauncherIconRes.get().asFile)
+    // Generate the web brand asset and real launcher icon before Android resource processing.
     tasks.matching { it.name == "preBuild" || it.name.endsWith("PreBuild") }
-        .configureEach { dependsOn(prepareWebPlayBrandAsset) }
+        .configureEach { dependsOn(prepareWebPlayBrandAsset, prepareLauncherIcon) }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -115,7 +122,7 @@ android {
 }
 
 tasks.named("preBuild").configure {
-    dependsOn(prepareWebPlayBrandAsset)
+    dependsOn(prepareWebPlayBrandAsset, prepareLauncherIcon)
 }
 
 kotlin {
