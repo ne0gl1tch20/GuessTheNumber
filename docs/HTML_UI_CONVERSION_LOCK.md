@@ -14,8 +14,8 @@ GuessTheNumber's player-facing game UI is now committed to a **single shared HTM
 
 ## Visual identity
 
-- Product UI name: **Numberverse**.
-- Core line: **The engine decides. The interface celebrates.**
+- Product UI name: **Guess The Number**.
+- No player-facing architecture tagline is used in the product UI.
 - Icons are real shared UI assets/SVGs rather than platform-specific text-symbol approximations where an icon is part of the product chrome.
 - The frontend is offline-first: no remote fonts, CDN assets, analytics, ads or account dependency.
 
