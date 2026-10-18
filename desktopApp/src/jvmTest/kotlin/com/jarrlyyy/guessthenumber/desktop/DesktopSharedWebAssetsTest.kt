@@ -75,9 +75,9 @@ class DesktopSharedWebAssetsTest {
         keys.forEach { key -> assertTrue("Missing shared UI translation: $key", strings.has(key)) }
         keys.forEach { key -> assertTrue("Settings markup must use $key", html.contains("data-i18n=\"$key\"")) }
         assertFalse(html.contains("Changes apply on both Android and Windows"))
-        val playerCopy = html.lowercase()
-        listOf("kotlin", "javascript", "lua", "scripting language").forEach { term ->
-            assertFalse("Player-facing HTML should not expose implementation jargon: $term", playerCopy.contains(term))
+        val playerCopy = (html + "\n" + asset("web-play/app.js")).lowercase()
+        listOf("kotlin", "javascript", "typescript", "lua", "python", "scripting language").forEach { term ->
+            assertFalse("Player-facing shared UI should not expose implementation jargon: $term", playerCopy.contains(term))
         }
     }
 
@@ -90,7 +90,7 @@ class DesktopSharedWebAssetsTest {
             "uk.json", "vi.json", "zh_cn.json", "zh_tw.json"
         )
         val keys = listOf(
-            "settings", "background_music", "sound_effects", "vibration_label",
+            "settings", "game_preferences", "background_music", "sound_effects", "vibration_label",
             "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx",
             "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes"
         )
@@ -98,6 +98,10 @@ class DesktopSharedWebAssetsTest {
             val strings = org.json.JSONObject(asset("locales/$locale"))
             keys.forEach { key ->
                 assertTrue("Missing $key in locale $locale", strings.optString(key).isNotBlank())
+            }
+            if (locale != "en_us.json" && locale != "en_gb.json") {
+                assertNotEquals("Background Music", strings.getString("background_music"))
+                assertNotEquals("Sound Effects", strings.getString("sound_effects"))
             }
         }
     }
