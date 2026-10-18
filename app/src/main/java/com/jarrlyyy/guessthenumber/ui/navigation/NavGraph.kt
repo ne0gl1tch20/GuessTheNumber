@@ -1,12 +1,18 @@
 package com.jarrlyyy.guessthenumber.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.jarrlyyy.guessthenumber.BuildConfig
 import androidx.compose.runtime.CompositionLocalProvider
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.screens.CrashRecoveryScreen
+import com.jarrlyyy.guessthenumber.ui.screens.DevSettingsScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProductionWebPlayScreen
 import com.jarrlyyy.guessthenumber.ui.screens.SaveSlotsScreen
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
@@ -67,6 +73,7 @@ fun NavGraph(
     onNotificationDestinationHandled: () -> Unit = {}
 ) {
     val locale = viewModel.localeManager
+    var showDevSettings by remember { mutableStateOf(false) }
 
     if (!hasAnySave) {
         CompositionLocalProvider(LocalAppLocaleManager provides locale) {
@@ -84,6 +91,26 @@ fun NavGraph(
         return
     }
 
+    if (BuildConfig.DEBUG && showDevSettings) {
+        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+            DevSettingsScreen(
+                state = state,
+                onExecuteCommand = viewModel::executeDevCommand,
+                onImportSave = viewModel::importSave,
+                onUpdateSettings = viewModel::updateSettings,
+                onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
+                onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
+                onGetSaveJson = viewModel::getSaveJson,
+                onApplySaveJson = viewModel::applySaveJson,
+                onNavigate = { destination ->
+                    if (BuildConfig.DEBUG && destination == "dev_settings") showDevSettings = true
+                },
+                onBack = { showDevSettings = false }
+            )
+        }
+        return
+    }
+
     ProductionWebPlayScreen(
         state = state,
         incomePerSecond = incomePerSecond,
@@ -94,6 +121,7 @@ fun NavGraph(
         onOpenLootChest = viewModel::openLootChest,
         onNavigateProgression = { progression ->
             when {
+                progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true
                 progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", "")
                 progression == "claim_codex" -> viewModel.progressionAction("claim_codex", "")
                 progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':'))
