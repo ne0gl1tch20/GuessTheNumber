@@ -26,7 +26,7 @@ class ApkUpdateInstaller(private val context: Context) {
         private const val EXPECTED_DEBUG_APK = "GuessTheNumber-debug.apk"
     }
 
-    fun install(downloadUrl: String, requireChecksum: Boolean = false): Result<Unit> {
+    fun install(downloadUrl: String, requireChecksum: Boolean = false, expectedCommitSha: String? = null): Result<Unit> {
         val source = runCatching { java.net.URI(downloadUrl) }.getOrNull()
             ?: return Result.failure(IllegalArgumentException("Invalid update URL."))
         if (source.scheme != "https" || source.host !in setOf("github.com", "api.github.com")) {
@@ -65,7 +65,7 @@ class ApkUpdateInstaller(private val context: Context) {
                 }
                 if ("SHA256SUMS" in names) verifyChecksum(File(extracted, "SHA256SUMS"), apk)
                 else require(!requireChecksum) { "Update checksum is missing." }
-                if ("update-manifest.json" in names) verifyManifest(File(extracted, "update-manifest.json"), apk)
+                if ("update-manifest.json" in names) verifyManifest(File(extracted, "update-manifest.json"), apk, expectedCommitSha)
                 else require(!requireChecksum) { "Update manifest is missing." }
                 validateApk(apk)
                 installApks(listOf(apk))
@@ -143,10 +143,12 @@ class ApkUpdateInstaller(private val context: Context) {
         require(actual.equals(match.groupValues[1], ignoreCase = true)) { "Update checksum does not match the APK." }
     }
 
-    private fun verifyManifest(manifestFile: File, apk: File) {
+    private fun verifyManifest(manifestFile: File, apk: File, expectedCommitSha: String?) {
         val manifest = JSONObject(manifestFile.readText(Charsets.UTF_8))
         require(manifest.optString("packageName") == context.packageName) { "Update manifest package mismatch." }
-        require(manifest.optString("commit").matches(Regex("[a-fA-F0-9]{40}"))) { "Update manifest commit is invalid." }
+        val manifestCommit = manifest.optString("commit")
+        require(manifestCommit.matches(Regex("[a-fA-F0-9]{40}"))) { "Update manifest commit is invalid." }
+        if (expectedCommitSha != null) require(manifestCommit.equals(expectedCommitSha, ignoreCase = true)) { "Artifact commit does not match the selected workflow run." }
         require(manifest.optString("versionName").isNotBlank()) { "Update manifest version is missing." }
         require(manifest.optLong("versionCode", -1L) > 0L) { "Update manifest version code is invalid." }
         val archiveInfo = packageInfoFor(apk)
@@ -170,8 +172,9 @@ class ApkUpdateInstaller(private val context: Context) {
             ?: error("Invalid APK: ${apk.name}")
     }
 
+    @Suppress("DEPRECATION")
     private fun versionCode(info: PackageInfo): Long =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) info.longVersionCode else @Suppress("DEPRECATION") info.versionCode.toLong()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) info.longVersionCode else info.versionCode.toLong()
 
     @Suppress("DEPRECATION")
     private fun hasMatchingSignature(candidate: PackageInfo): Boolean {
