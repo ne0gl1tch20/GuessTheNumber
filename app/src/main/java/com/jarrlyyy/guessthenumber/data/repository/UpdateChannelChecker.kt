@@ -13,7 +13,8 @@ object UpdateChannelChecker {
         val title: String,
         val url: String,
         val details: String,
-        val downloadUrl: String
+        val downloadUrl: String,
+        val expectedCommitSha: String? = null
     )
 
     sealed interface Result {
@@ -89,19 +90,41 @@ object UpdateChannelChecker {
         val downloadUrl = artifact.optString("archive_download_url")
         if (downloadUrl.isBlank() || !isGithubUrl(downloadUrl)) return Result.Unavailable
         val htmlUrl = latest.optString("html_url", "https://github.com/$REPOSITORY/actions/workflows/$DEBUG_WORKFLOW")
+        if (!isGithubUrl(htmlUrl)) return Result.Unavailable
+        val buildGradle = getText("https://raw.githubusercontent.com/$REPOSITORY/$commit/app/build.gradle.kts")
+        val versionName = Regex("""versionName\\s*=\\s*"([^"]+)"""").find(buildGradle)?.groupValues?.getOrNull(1)
+            ?: return Result.Unavailable
+        val versionCode = Regex("""versionCode\\s*=\\s*(\\d+)""").find(buildGradle)?.groupValues?.getOrNull(1)
+            ?: return Result.Unavailable
+        val commitMessage = latest.optJSONObject("head_commit")?.optString("message").orEmpty().take(900)
         return Result.Available(
             AvailableUpdate(
-                title = "Stable Debug build #$runNumber",
+                title = "v$versionName ($versionCode) · Debug #$runNumber",
                 url = htmlUrl,
-                details = "Stable Debug APK · commit ${commit.take(7)} · ZIP artifact",
-                downloadUrl = downloadUrl
+                details = listOf(commitMessage.ifBlank { "Stable Debug APK update" }, "Commit ${commit.take(7)} · ZIP artifact").joinToString("\\n\\n"),
+                downloadUrl = downloadUrl,
+                expectedCommitSha = commit
             )
         )
     }
 
     private fun isGithubUrl(address: String): Boolean {
         val uri = runCatching { java.net.URI(address) }.getOrNull() ?: return false
-        return uri.scheme == "https" && uri.host in setOf("github.com", "api.github.com")
+        return uri.scheme == "https" && uri.host in setOf("github.com", "api.github.com", "raw.githubusercontent.com")
+    }
+
+    private fun getText(address: String): String {
+        require(isGithubUrl(address)) { "Metadata must come from GitHub over HTTPS." }
+        val connection = URL(address).openConnection() as HttpURLConnection
+        connection.connectTimeout = 7000
+        connection.readTimeout = 7000
+        connection.setRequestProperty("User-Agent", "GuessTheNumber-UpdateChecker")
+        return try {
+            if (connection.responseCode !in 200..299) error("Version metadata returned ${connection.responseCode}")
+            connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+        } finally {
+            connection.disconnect()
+        }
     }
 
     private fun getJson(address: String): JSONObject {
