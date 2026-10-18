@@ -74,6 +74,7 @@ fun NavGraph(
 ) {
     val locale = viewModel.localeManager
     var showDevSettings by remember { mutableStateOf(false) }
+    var showSaveSlots by remember { mutableStateOf(false) }
 
     if (!hasAnySave) {
         CompositionLocalProvider(LocalAppLocaleManager provides locale) {
@@ -88,6 +89,13 @@ fun NavGraph(
             onDismiss = onDismissCrash,
             reducedMotion = state.settings.reducedMotion
         )
+        return
+    }
+
+    if (showSaveSlots) {
+        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+            SaveSlotsScreen(viewModel = viewModel, onNavigateBack = { showSaveSlots = false })
+        }
         return
     }
 
@@ -122,6 +130,7 @@ fun NavGraph(
         onNavigateProgression = { progression ->
             when {
                 progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true
+                progression == "save_slots" -> showSaveSlots = true
                 progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", "")
                 progression == "claim_codex" -> viewModel.progressionAction("claim_codex", "")
                 progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':'))
