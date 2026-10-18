@@ -63,6 +63,7 @@ internal fun desktopWebPlayState(
     }
     return JSONObject()
         .put("buyMultiplier", game.buyMultiplier)
+        .put("settings", JSONObject().put("musicEnabled", game.settings.musicEnabled).put("soundEnabled", game.settings.soundEnabled).put("vibrationEnabled", game.settings.vibrationEnabled).put("reducedMotion", game.settings.reducedMotion).put("reduceFlashes", game.settings.reduceFlashes))
         .put("upgrades", upgrades)
         .put("shopItems", shopItems)
         .put("rangeMin", game.currentRangeMin.toString())
