@@ -120,3 +120,14 @@ h2{margin:3px 0 0;font-size:17px;letter-spacing:-.035em}.panel-title,.loot-headi
 .multiplier-row button{padding:8px 11px;min-height:35px}
 .multiplier-row button[aria-pressed="true"]{border-color:rgba(98,232,255,.6);color:var(--accent2);background:rgba(98,232,255,.12)}
 @media(max-width:520px){.screen-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.catalog-panel{padding:14px}.catalog-item{align-items:flex-start;padding:12px;gap:8px}.catalog-button{padding:9px 10px}.multiplier-row span{width:100%}}
+
+/* Shared progression panels */
+.homebase-summary{display:grid;gap:8px;padding:18px;margin:14px 0;border:1px solid var(--line,rgba(255,255,255,.12));border-radius:16px;background:rgba(255,255,255,.035)}
+.homebase-summary strong{font-size:1.3rem;letter-spacing:-.02em}
+.homebase-summary span{color:var(--muted,#9ca3af);font-size:.92rem}
+#relicList .catalog-entry,#codexList .catalog-entry{align-items:center;gap:14px}
+#relicList .catalog-entry-copy,#codexList .catalog-entry-copy{min-width:0;flex:1}
+#relicList .catalog-entry-copy span,#codexList .catalog-entry-copy span{display:block;margin-top:4px;color:var(--muted,#9ca3af);font-size:.88rem}
+#relicList .world-action-button,#claimCodexReward,#upgradeHomeBase{min-height:42px}
+#codexProgressFill{transition:width .28s ease}
+@media(max-width:520px){#relicList .catalog-entry{align-items:flex-start;flex-direction:column}#relicList .world-action-button{width:100%}}

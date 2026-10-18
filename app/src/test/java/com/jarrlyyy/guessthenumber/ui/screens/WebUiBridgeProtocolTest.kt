@@ -76,6 +76,25 @@ class WebUiBridgeProtocolTest {
         assertEquals("invalid_request", (result as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
+
+    @Test
+    fun acceptsOnlyKnownSharedProgressionActions() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("base-1", "homebase_upgrade"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"base-1","type":"homebase_upgrade"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("codex-1", "codex_reward"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"codex-1","type":"codex_reward"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("relic-1", "relic_action", relicId = "verdant_guardian", relicAction = "equip"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"relic-1","type":"relic_action","relicId":"verdant_guardian","action":"equip"}""")
+        )
+        val invalid = WebUiBridgeProtocol.parse("""{"version":1,"id":"relic-2","type":"relic_action","relicId":"grant_money","action":"equip"}""")
+        assertEquals("invalid_relic", (invalid as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
     @Test
     fun acceptsIncrementRequest() {
         assertEquals(

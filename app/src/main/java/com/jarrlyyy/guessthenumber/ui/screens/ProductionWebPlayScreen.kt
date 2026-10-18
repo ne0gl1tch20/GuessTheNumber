@@ -114,6 +114,9 @@ fun ProductionWebPlayScreen(
                                                 "claim_daily_quest" -> parsed.questId?.let(claimDailyQuest)
                                                 "open_loot_chest" -> parsed.tier?.let(openLootChest)
                                                 "navigate" -> parsed.route?.let(navigateProgression)
+                                                "homebase_upgrade" -> navigateProgression("home_upgrade")
+                                                "codex_reward" -> navigateProgression("claim_codex")
+                                                "relic_action" -> parsed.relicId?.let { navigateProgression("equip_relic:$it") }
                                                 "world_action" -> if (parsed.worldId != null && parsed.worldAction != null) dispatchWorldAction(parsed.worldId, parsed.worldAction)
                                                 "update_multiplier" -> parsed.multiplier?.let(updateMultiplier)
                                                 "buy_upgrade" -> parsed.itemId?.let { upgradeId ->
@@ -177,6 +180,12 @@ fun ProductionWebPlayScreen(
                                                 "boss" -> parsed.worldId != null && (game.activeBossBattleWorldId != beforeAction.activeBossBattleWorldId) && (game.activeBossBattleWorldId == parsed.worldId || beforeAction.activeBossBattleWorldId == parsed.worldId)
                                                 else -> false
                                             }
+                                            "homebase_upgrade" -> game.homeBaseLevel > beforeAction.homeBaseLevel
+                                            "codex_reward" -> game.codexRewardClaimed && !beforeAction.codexRewardClaimed
+                                            "relic_action" -> parsed.relicId != null && (
+                                                (parsed.relicAction == "equip" && parsed.relicId in game.equippedRelicIds && parsed.relicId !in beforeAction.equippedRelicIds) ||
+                                                (parsed.relicAction == "unequip" && parsed.relicId !in game.equippedRelicIds && parsed.relicId in beforeAction.equippedRelicIds)
+                                            )
                                             else -> true
                                         }
                                         val activeBossWorld = game.activeBossBattleWorldId?.let { id -> worldDefinitions.firstOrNull { it.id == id } }
@@ -256,6 +265,10 @@ fun ProductionWebPlayScreen(
                                             .put("defeatedBossCount", game.defeatedBossIds.size)
                                             .put("worldBossVictories", game.worldBossVictories)
                                             .put("homeBaseLevel", game.homeBaseLevel)
+                                            .put("relicInventory", org.json.JSONArray(game.relicInventory.toList()))
+                                            .put("equippedRelicIds", org.json.JSONArray(game.equippedRelicIds.toList()))
+                                            .put("codexEntries", org.json.JSONArray(game.codexEntries.toList()))
+                                            .put("codexRewardClaimed", game.codexRewardClaimed)
                                             .put("endlessRiftBestTier", game.endlessRiftBestTier)
                                             .put("dailyQuestGuesses", game.dailyQuestGuesses)
                                             .put("dailyQuestCorrectGuesses", game.dailyQuestCorrectGuesses)

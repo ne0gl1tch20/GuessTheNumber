@@ -24,6 +24,10 @@ class DesktopSharedWebAssetsTest {
         assertTrue(worlds.getJSONObject(0).has("bossName"))
         assertTrue(worlds.getJSONObject(0).has("canFight"))
         assertTrue(state.has("activeBossHpTotal"))
+        assertTrue(state.has("relicInventory"))
+        assertTrue(state.has("equippedRelicIds"))
+        assertTrue(state.has("codexEntries"))
+        assertTrue(state.has("codexRewardClaimed"))
     }
 
     @Test
@@ -35,8 +39,14 @@ class DesktopSharedWebAssetsTest {
         assertTrue(html.contains("id=\"screen-play\""))
         assertTrue(html.contains("id=\"screen-upgrades\""))
         assertTrue(html.contains("id=\"screen-shop\""))
+        assertTrue(html.contains("id=\"screen-homebase\""))
+        assertTrue(html.contains("id=\"screen-relics\""))
+        assertTrue(html.contains("id=\"screen-codex\""))
         assertTrue(script.contains("buy_upgrade"))
         assertTrue(script.contains("buy_shop_item"))
+        assertTrue(script.contains("homebase_upgrade"))
+        assertTrue(script.contains("relic_action"))
+        assertTrue(script.contains("codex_reward"))
         assertTrue(styles.contains(".screen"))
     }
 }

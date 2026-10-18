@@ -357,9 +357,9 @@ fun ProductionGuessGameScreen(
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
-                            "read_state" -> 3
+                            "read_state", "homebase_upgrade", "codex_reward" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest" -> 4
-                            "world_action" -> 5
+                            "world_action", "relic_action" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
@@ -444,6 +444,16 @@ fun ProductionGuessGameScreen(
                                         when (request.optString("action")) {
                                             "unlock" -> DesktopEconomyTransactions.unlockWorld(before, worldId)
                                             "boss" -> DesktopEconomyTransactions.toggleBossBattle(before, worldId)
+                                            else -> null
+                                        }
+                                    }
+                                    "homebase_upgrade" -> DesktopEconomyTransactions.upgradeHomeBase(before)
+                                    "codex_reward" -> DesktopEconomyTransactions.claimCodexCompletionReward(before)
+                                    "relic_action" -> {
+                                        val relicId = request.optString("relicId")
+                                        when (request.optString("action")) {
+                                            "equip" -> DesktopEconomyTransactions.equipRelic(before, relicId)
+                                            "unequip" -> DesktopEconomyTransactions.unequipRelic(before, relicId)
                                             else -> null
                                         }
                                     }

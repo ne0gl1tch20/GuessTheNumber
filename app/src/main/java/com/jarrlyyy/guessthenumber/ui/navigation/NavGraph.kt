@@ -91,7 +91,13 @@ fun NavGraph(
         onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
         onClaimDailyQuest = viewModel::claimDailyQuest,
         onOpenLootChest = viewModel::openLootChest,
-        onNavigateProgression = {},
+        onNavigateProgression = { progression ->
+            when {
+                progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", "")
+                progression == "claim_codex" -> viewModel.progressionAction("claim_codex", "")
+                progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':'))
+            }
+        },
         onWorldAction = viewModel::worldProgressAction,
         onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
         onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },

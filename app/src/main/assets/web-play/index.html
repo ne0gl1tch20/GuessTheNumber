@@ -27,6 +27,9 @@
       <button type="button" role="tab" id="tab-journey" aria-controls="screen-journey" aria-selected="false" data-screen-target="journey" tabindex="-1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/><path d="M15 7h4v4"/></svg></span><b>Journey</b></button>
       <button type="button" role="tab" id="tab-upgrades" aria-controls="screen-upgrades" aria-selected="false" data-screen-target="upgrades" tabindex="-1"><span class="nav-icon" aria-hidden="true">⬆</span><b>Upgrades</b></button>
       <button type="button" role="tab" id="tab-shop" aria-controls="screen-shop" aria-selected="false" data-screen-target="shop" tabindex="-1"><span class="nav-icon" aria-hidden="true">✦</span><b>Shop</b></button>
+      <button type="button" role="tab" id="tab-homebase" aria-controls="screen-homebase" aria-selected="false" data-screen-target="homebase" tabindex="-1"><span class="nav-icon" aria-hidden="true">⌂</span><b>Home Base</b></button>
+      <button type="button" role="tab" id="tab-relics" aria-controls="screen-relics" aria-selected="false" data-screen-target="relics" tabindex="-1"><span class="nav-icon" aria-hidden="true">✧</span><b>Relics</b></button>
+      <button type="button" role="tab" id="tab-codex" aria-controls="screen-codex" aria-selected="false" data-screen-target="codex" tabindex="-1"><span class="nav-icon" aria-hidden="true">▤</span><b>Codex</b></button>
     </nav>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
@@ -197,6 +200,33 @@
         <div class="panel-title"><span class="panel-glyph">✦</span><div><span class="eyebrow">COSMIC MARKET</span><h2>Shop</h2></div><span class="panel-chip" id="shopCurrency">NEBULA</span></div>
         <p class="catalog-intro">Spend Nebula on useful items and cosmetics. Owned cosmetics can be equipped here.</p>
         <div class="catalog-list" id="shopList"><p class="catalog-empty">Syncing shop…</p></div>
+      </section>
+    </div>
+
+    <div class="screen" id="screen-homebase" role="tabpanel" aria-labelledby="tab-homebase" data-screen="homebase" hidden>
+      <section class="card catalog-panel">
+        <div class="panel-title"><span class="panel-glyph">⌂</span><div><span class="eyebrow">YOUR SANCTUARY</span><h2>Home Base</h2></div><span class="panel-chip" id="homeBaseLevelPanel">LEVEL 0</span></div>
+        <p class="catalog-intro">Restore your sanctuary to boost the rewards earned from correct guesses.</p>
+        <div class="homebase-summary"><strong id="homeBaseBonus">0% reward bonus</strong><span id="homeBaseCost">Next level: 50,000 Money</span></div>
+        <button type="button" class="world-action-button" id="upgradeHomeBase" data-bridge-action="homebase_upgrade">Restore next level</button>
+        <p class="catalog-intro" id="homeBaseStatus">Sanctuary progression syncs with your saved game.</p>
+      </section>
+    </div>
+    <div class="screen" id="screen-relics" role="tabpanel" aria-labelledby="tab-relics" data-screen="relics" hidden>
+      <section class="card catalog-panel">
+        <div class="panel-title"><span class="panel-glyph">✧</span><div><span class="eyebrow">BOSS TROPHIES</span><h2>Relics</h2></div><span class="panel-chip" id="relicCount">0 / 4 EQUIPPED</span></div>
+        <p class="catalog-intro">Relics are earned by defeating bosses. Equip up to four for lasting bonuses.</p>
+        <div class="catalog-list" id="relicList"><p class="catalog-empty">Syncing relic collection…</p></div>
+      </section>
+    </div>
+    <div class="screen" id="screen-codex" role="tabpanel" aria-labelledby="tab-codex" data-screen="codex" hidden>
+      <section class="card catalog-panel">
+        <div class="panel-title"><span class="panel-glyph">▤</span><div><span class="eyebrow">DISCOVERY LOG</span><h2>Explorer's Codex</h2></div><span class="panel-chip" id="codexCount">0 / 12</span></div>
+        <div class="progress-track"><div class="progress-fill" id="codexProgressFill"></div></div>
+        <p class="catalog-intro">Explore worlds, defeat their bosses and uncover hidden places.</p>
+        <div class="catalog-list" id="codexList"><p class="catalog-empty">Syncing discoveries…</p></div>
+        <button type="button" class="world-action-button" id="claimCodexReward" data-bridge-action="codex_reward">Claim 100 Nebula</button>
+        <p class="catalog-intro" id="codexRewardStatus"></p>
       </section>
     </div>
   </main>

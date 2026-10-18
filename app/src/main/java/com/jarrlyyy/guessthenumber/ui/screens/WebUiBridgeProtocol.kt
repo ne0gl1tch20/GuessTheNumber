@@ -11,6 +11,7 @@ internal object WebUiBridgeProtocol {
     private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements")
     private val worldActions = setOf("unlock", "boss")
     private val buyMultipliers = setOf("1", "10", "100", "MAX")
+    private val relicActions = setOf("equip", "unequip")
 
     sealed interface ParseResult {
         data class Valid(
@@ -23,7 +24,9 @@ internal object WebUiBridgeProtocol {
             val worldId: String? = null,
             val worldAction: String? = null,
             val itemId: String? = null,
-            val multiplier: String? = null
+            val multiplier: String? = null,
+            val relicId: String? = null,
+            val relicAction: String? = null
         ) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
@@ -52,7 +55,7 @@ internal object WebUiBridgeProtocol {
         val validId = rawId is String && id.matches(Regex("[A-Za-z0-9_-]{1,48}"))
         if (rawVersion !is Int || rawVersion != 1 || !validId || rawType !is String) return ParseResult.Invalid("invalid_request", id)
         return when (type) {
-            "read_state", "increment_counter" ->
+            "read_state", "increment_counter", "homebase_upgrade", "codex_reward" ->
                 if (request.length() != 3) ParseResult.Invalid("invalid_request", id) else ParseResult.Valid(id, type)
             "submit_guess" -> {
                 if (request.length() != 4 || !request.has("guess")) return ParseResult.Invalid("invalid_request", id)
@@ -86,6 +89,14 @@ internal object WebUiBridgeProtocol {
                 if (!worldId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) return ParseResult.Invalid("invalid_world", id)
                 if (action !in worldActions) return ParseResult.Invalid("invalid_world_action", id)
                 ParseResult.Valid(id, type, worldId = worldId, worldAction = action)
+            }
+            "relic_action" -> {
+                if (request.length() != 5 || !request.has("relicId") || !request.has("action")) return ParseResult.Invalid("invalid_request", id)
+                val relicId = request.opt("relicId") as? String ?: return ParseResult.Invalid("invalid_relic", id)
+                val action = request.opt("action") as? String ?: return ParseResult.Invalid("invalid_relic_action", id)
+                if (relicId !in setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")) return ParseResult.Invalid("invalid_relic", id)
+                if (action !in relicActions) return ParseResult.Invalid("invalid_relic_action", id)
+                ParseResult.Valid(id, type, relicId = relicId, relicAction = action)
             }
             "update_multiplier" -> {
                 if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
