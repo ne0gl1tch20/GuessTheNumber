@@ -24,23 +24,31 @@
       <button type="button" role="tab" id="tab-arcade" aria-controls="screen-arcade" aria-selected="false" data-screen-target="arcade" tabindex="-1"><span class="nav-icon" aria-hidden="true">🎮</span><b data-i18n="arcade">Arcade</b></button>
       <button type="button" role="tab" id="tab-play" aria-controls="screen-play" aria-selected="true" data-screen-target="play"><span class="nav-icon" aria-hidden="true">▶</span><b>Play</b></button>
       <button type="button" role="tab" id="tab-upgrades" aria-controls="screen-upgrades" aria-selected="false" data-screen-target="upgrades" tabindex="-1"><span class="nav-icon" aria-hidden="true">⬆</span><b>Upgrades</b></button>
-      <button type="button" id="tab-more" aria-controls="moreMenu" aria-expanded="false" aria-haspopup="true"><span class="nav-icon" aria-hidden="true">☰</span><b>More</b></button>
+      <button type="button" role="tab" id="tab-more" aria-controls="screen-more" aria-selected="false" data-screen-target="more" tabindex="-1"><span class="nav-icon" aria-hidden="true">☰</span><b>More</b></button>
     </nav>
-    <div class="more-menu" id="moreMenu" aria-label="More game sections" hidden>
-      <button type="button" id="more-rewards" data-screen-target="rewards" tabindex="-1"><span>🏆</span><b>Rewards</b></button>
-      <button type="button" id="more-journey" data-screen-target="journey" tabindex="-1"><span>◷</span><b>Journey</b></button>
-      <button type="button" id="more-shop" data-screen-target="shop" tabindex="-1"><span>✦</span><b>Shop</b></button>
-      <button type="button" id="more-homebase" data-screen-target="homebase" tabindex="-1"><span>⌂</span><b>Home Base</b></button>
-      <button type="button" id="more-relics" data-screen-target="relics" tabindex="-1"><span>✧</span><b>Relics</b></button>
-      <button type="button" id="more-codex" data-screen-target="codex" tabindex="-1"><span>▤</span><b>Codex</b></button>
-      <button type="button" id="more-settings" data-screen-target="settings" tabindex="-1"><span>⚙</span><b>Settings</b></button>
-      <button type="button" id="more-prestige" data-screen-target="prestige" tabindex="-1"><span>✧</span><b>Prestige</b></button>
-      <button type="button" id="more-ultra" data-screen-target="ultra" tabindex="-1"><span>✦</span><b>Ultra</b></button>
-      <button type="button" id="more-talents" data-screen-target="talent" tabindex="-1"><span>⌘</span><b>Talents</b></button>
-      <button type="button" id="more-mutators" data-screen-target="mutators" tabindex="-1"><span>◈</span><b>Mutators</b></button>
-      <button type="button" id="more-stats" data-screen-target="stats" tabindex="-1"><span>▤</span><b data-i18n="stats">Stats</b></button>
-      <button type="button" id="more-stake" data-screen-target="stake" tabindex="-1"><span>★</span><b data-i18n="staking_flip_button">Lucky Stake</b></button>
-    </div>
+    <section class="screen more-screen" id="screen-more" role="tabpanel" aria-labelledby="tab-more" data-screen="more" hidden>
+      <section class="more-heading card">
+        <span class="eyebrow">YOUR GAME</span>
+        <h2>More</h2>
+        <p>Progress, rewards and settings, all in one place.</p>
+      </section>
+      <section class="more-links" aria-label="More game sections">
+        <button type="button" class="more-link-card" data-screen-target="rewards"><span>🏆</span><span><b>Rewards</b><small>Achievements and daily rewards</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="journey"><span>◷</span><span><b>Journey</b><small>Your run history and progress</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="shop"><span>✦</span><span><b>Shop</b><small>Browse available items</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="homebase"><span>⌂</span><span><b>Home Base</b><small>Build up your base</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="relics"><span>✧</span><span><b>Relics</b><small>Manage your relic collection</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="codex"><span>▤</span><span><b>Codex</b><small>Explore discoveries</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="settings"><span>⚙</span><span><b>Settings</b><small>Customize your experience</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="prestige"><span>✧</span><span><b>Prestige</b><small>Prestige upgrades and resets</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="ultra"><span>✦</span><span><b>Ultra</b><small>Ultra progression</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="talent"><span>⌘</span><span><b>Talents</b><small>Build your talent path</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="mutators"><span>◈</span><span><b>Mutators</b><small>Customize challenge rules</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="stats"><span>▤</span><span><b data-i18n="stats">Stats</b><small>Review your game statistics</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" id="more-dev-settings" data-screen-target="dev_settings" hidden><span>🔧</span><span><b>Dev Settings</b><small>Developer console and diagnostics</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="stake"><span>★</span><span><b data-i18n="staking_flip_button">Lucky Stake</b><small>Try your luck with a stake</small></span><strong aria-hidden="true">›</strong></button>
+      </section>
+    </section>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
       <div class="hero-glow"></div>
@@ -242,14 +250,36 @@
     <div class="screen" id="screen-settings" role="tabpanel" aria-labelledby="tab-settings" data-screen="settings" hidden>
       <section class="card catalog-panel">
         <div class="panel-title"><span class="panel-glyph">⚙</span><div><span class="eyebrow" data-i18n="game_preferences">Game Preferences</span><h2 data-i18n="settings">Settings</h2></div></div>
-        <div class="settings-list">
+        <div class="settings-group"><h3>Language &amp; Numbers</h3>
+          <label class="setting-field"><span>Language</span><select data-setting-value="locale" id="settingLocale"><option value="en-US">English</option></select></label>
+          <label class="setting-field"><span>Number notation</span><select data-setting-value="numberNotation"><option>Standard</option><option>Scientific</option><option>Engineering</option></select></label>
+        </div>
+        <div class="settings-group"><h3>Appearance</h3>
+          <label class="setting-field"><span>Theme mode</span><select data-setting-value="themeMode"><option>System</option><option>Dark</option><option>Light</option><option>AMOLED</option></select></label>
+          <label class="setting-field"><span>Theme preset</span><select data-setting-value="themePreset"><option>Neon</option><option>Sunset</option><option>Ocean</option><option>Forest</option><option>Custom</option></select></label>
+          <label class="setting-field"><span>Primary color</span><input type="color" data-setting-value="customPrimaryColor" value="#7C4DFF"></label>
+          <label class="setting-field"><span>Secondary color</span><input type="color" data-setting-value="customSecondaryColor" value="#00BCD4"></label>
+          <label class="setting-field"><span>Tertiary color</span><input type="color" data-setting-value="customTertiaryColor" value="#00C853"></label>
+        </div>
+        <div class="settings-group"><h3>Audio &amp; Haptics</h3>
           <label class="setting-row"><span><strong data-i18n="background_music">Background music</strong></span><input type="checkbox" data-setting-toggle="musicEnabled"></label>
           <label class="setting-row"><span><strong data-i18n="sound_effects">Sound effects</strong><small data-i18n="settings_desc_sound_fx">Turn sound effects for in-game interactions on or off.</small></span><input type="checkbox" data-setting-toggle="soundEnabled"></label>
           <label class="setting-row"><span><strong data-i18n="vibration_label">Vibration</strong><small data-i18n="settings_desc_vibration">Turn app-triggered vibration during interactions on or off.</small></span><input type="checkbox" data-setting-toggle="vibrationEnabled"></label>
+          <label class="setting-field"><span id="masterVolumeLabel">Master volume · 100%</span><input type="range" min="0" max="1" step="0.01" data-setting-value="volume"></label>
+          <label class="setting-field"><span id="sfxVolumeLabel">Sound effects volume · 100%</span><input type="range" min="0" max="1" step="0.01" data-setting-value="sfxVolume"></label>
+        </div>
+        <div class="settings-group"><h3>Notifications</h3>
+          <label class="setting-row"><span><strong>Game reminders</strong><small>Allow scheduled game notifications.</small></span><input type="checkbox" data-setting-toggle="notificationsEnabled"></label>
+          <label class="setting-field"><span>Reminder frequency</span><select data-setting-value="notificationIntervalHours"><option value="12">12 hours</option><option value="24">24 hours</option><option value="48">48 hours</option></select></label>
+          <label class="setting-row"><span><strong>Reminder notifications</strong></span><input type="checkbox" data-setting-toggle="notificationRemindersEnabled"></label>
+          <label class="setting-row"><span><strong>Progression milestones</strong></span><input type="checkbox" data-setting-toggle="notificationProgressionEnabled"></label>
+          <label class="setting-row"><span><strong>Game events</strong></span><input type="checkbox" data-setting-toggle="notificationEventsEnabled"></label>
+        </div>
+        <div class="settings-group"><h3>Accessibility</h3>
           <label class="setting-row"><span><strong data-i18n="reduced_motion_label">Reduced motion</strong><small data-i18n="reduced_motion_description">Soften or disable expressive screen transitions</small></span><input type="checkbox" data-setting-toggle="reducedMotion"></label>
           <label class="setting-row"><span><strong data-i18n="reduce_flashes_label">Reduce flashes</strong><small data-i18n="settings_desc_reduce_flashes">Reduce flashes and sudden visual changes for greater visual comfort.</small></span><input type="checkbox" data-setting-toggle="reduceFlashes"></label>
         </div>
-        <p class="catalog-intro" id="settingsStatus" role="status" aria-live="polite"></p>
+        <p class="catalog-intro" id="settingsStatus" role="status" aria-live="polite">Settings sync with the Android game.</p>
       </section>
     </div>
     <div class="screen" id="screen-prestige" role="tabpanel" aria-labelledby="tab-prestige" data-screen="prestige" hidden>

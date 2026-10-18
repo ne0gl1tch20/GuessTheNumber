@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.BuildConfig
 import android.net.Uri
 import android.util.Log
 import android.webkit.WebResourceRequest
@@ -108,6 +109,7 @@ fun ProductionWebPlayScreen(
             val upgradeDefinitions = configRepository.loadUpgrades()
             val shopDefinitions = configRepository.loadShopItems()
             val talentDefinitions = configRepository.loadTalents()
+            val minigameDefinitions = configRepository.loadMinigames()
             val assetLoader = WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
                 .build()
@@ -187,14 +189,42 @@ fun ProductionWebPlayScreen(
                                                     if (key != null && value != null) {
                                                         val settings = readState().settings
                                                         val updated = when (key) {
-                                                            "musicEnabled" -> settings.copy(musicEnabled = value)
-                                                            "soundEnabled" -> settings.copy(soundEnabled = value)
-                                                            "vibrationEnabled" -> settings.copy(vibrationEnabled = value)
-                                                            "reducedMotion" -> settings.copy(reducedMotion = value)
-                                                            "reduceFlashes" -> settings.copy(reduceFlashes = value)
-                                                            else -> settings
+                                                            "musicEnabled" -> settings.copy(musicEnabled = value.toBoolean())
+                                                            "soundEnabled" -> settings.copy(soundEnabled = value.toBoolean())
+                                                            "vibrationEnabled" -> settings.copy(vibrationEnabled = value.toBoolean())
+                                                            "notificationsEnabled" -> settings.copy(notificationsEnabled = value.toBoolean())
+                                                            "notificationRemindersEnabled" -> settings.copy(notificationRemindersEnabled = value.toBoolean())
+                                                            "notificationProgressionEnabled" -> settings.copy(notificationProgressionEnabled = value.toBoolean())
+                                                            "notificationEventsEnabled" -> settings.copy(notificationEventsEnabled = value.toBoolean())
+                                                            "notificationIntervalHours" -> settings.copy(notificationIntervalHours = value.toLong())
+                                                            "themeMode" -> settings.copy(themeMode = value)
+                                                            "numberNotation" -> settings.copy(numberNotation = value)
+                                                            "locale" -> {
+                                                                if (!LocaleManager.supportedLocales.any { it.tag == value }) throw IllegalArgumentException("Unsupported locale")
+                                                                settings.copy(locale = value)
+                                                            }
+                                                            "reducedMotion" -> settings.copy(reducedMotion = value.toBoolean())
+                                                            "reduceFlashes" -> settings.copy(reduceFlashes = value.toBoolean())
+                                                            "volume" -> settings.copy(volume = value.toFloat())
+                                                            "sfxVolume" -> settings.copy(sfxVolume = value.toFloat())
+                                                            "themePreset" -> {
+                                                                val colors = when (value) {
+                                                                    "Neon" -> listOf("#7C4DFF", "#00BCD4", "#00C853")
+                                                                    "Sunset" -> listOf("#FF4081", "#FF9800", "#FFC107")
+                                                                    "Ocean" -> listOf("#2196F3", "#00BCD4", "#3F51B5")
+                                                                    "Forest" -> listOf("#4CAF50", "#009688", "#8BC34A")
+                                                                    else -> null
+                                                                }
+                                                                if (colors == null) settings.copy(themePreset = "Custom")
+                                                                else settings.copy(themePreset = value, customPrimaryColor = colors[0], customSecondaryColor = colors[1], customTertiaryColor = colors[2])
+                                                            }
+                                                            "customPrimaryColor" -> settings.copy(themePreset = "Custom", customPrimaryColor = value)
+                                                            "customSecondaryColor" -> settings.copy(themePreset = "Custom", customSecondaryColor = value)
+                                                            "customTertiaryColor" -> settings.copy(themePreset = "Custom", customTertiaryColor = value)
+                                                            else -> throw IllegalArgumentException("Unsupported setting")
                                                         }
                                                         updateSettings(updated)
+                                                        if (key == "locale") androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags(value))
                                                     }
                                                 }
                                                 "update_multiplier" -> parsed.multiplier?.let(updateMultiplier)
@@ -338,6 +368,7 @@ fun ProductionWebPlayScreen(
                                                 .put("requirement", if (!canUnlock) "Unlock ${talent.requiredParentId} first" else if (!affordable) "Need ${talent.cost} Prestige" else "Ready to unlock"))
                                         }
                                         val viewState = JSONObject()
+                                        .put("debugBuild", BuildConfig.DEBUG)
                                             .put("buyMultiplier", game.buyMultiplier)
                                             .put("prestigeRequirement", progressionEngine.calculatePrestigeRequirement(game.prestigeCount).format())
                                             .put("prestigeReward", progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount).format())
@@ -345,10 +376,36 @@ fun ProductionWebPlayScreen(
                                             .put("ultraRequirement", progressionEngine.calculateUltraRequirement(game.ultraCount).format())
                                             .put("ultraReward", progressionEngine.calculateUltraReward(game.money, game.ultraCount).format())
                                             .put("canUltra", game.money >= progressionEngine.calculateUltraRequirement(game.ultraCount) && game.prestige >= BigNumber(1_000) && progressionEngine.calculateUltraReward(game.money, game.ultraCount) > BigNumber.ZERO)
-                                            .put("settings", JSONObject().put("musicEnabled", game.settings.musicEnabled).put("soundEnabled", game.settings.soundEnabled).put("vibrationEnabled", game.settings.vibrationEnabled).put("reducedMotion", game.settings.reducedMotion).put("reduceFlashes", game.settings.reduceFlashes))
+                                            .put("settings", JSONObject()
+                                                .put("musicEnabled", game.settings.musicEnabled)
+                                                .put("soundEnabled", game.settings.soundEnabled)
+                                                .put("vibrationEnabled", game.settings.vibrationEnabled)
+                                                .put("notificationsEnabled", game.settings.notificationsEnabled)
+                                                .put("notificationRemindersEnabled", game.settings.notificationRemindersEnabled)
+                                                .put("notificationProgressionEnabled", game.settings.notificationProgressionEnabled)
+                                                .put("notificationEventsEnabled", game.settings.notificationEventsEnabled)
+                                                .put("notificationIntervalHours", game.settings.notificationIntervalHours)
+                                                .put("themeMode", game.settings.themeMode)
+                                                .put("numberNotation", game.settings.numberNotation)
+                                                .put("locale", game.settings.locale)
+                                                .put("locales", org.json.JSONArray().apply { LocaleManager.supportedLocales.forEach { put(JSONObject().put("tag", it.tag).put("name", it.displayName)) } })
+                                                .put("reducedMotion", game.settings.reducedMotion)
+                                                .put("volume", game.settings.volume.toDouble())
+                                                .put("sfxVolume", game.settings.sfxVolume.toDouble())
+                                                .put("reduceFlashes", game.settings.reduceFlashes)
+                                                .put("themePreset", game.settings.themePreset)
+                                                .put("customPrimaryColor", game.settings.customPrimaryColor)
+                                                .put("customSecondaryColor", game.settings.customSecondaryColor)
+                                                .put("customTertiaryColor", game.settings.customTertiaryColor))
                                             .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry").forEach { key -> put(key, localeManager.getString(key)) } })
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
+                                            .put("minigames", org.json.JSONArray().apply {
+                                                minigameDefinitions.forEach { minigame ->
+                                                    put(JSONObject().put("id", minigame.id).put("name", minigame.name)
+                                                        .put("description", minigame.description).put("rewardMultiplier", minigame.rewardMultiplier))
+                                                }
+                                            })
                                             .put("rangeMin", (result?.rangeMin ?: game.currentRangeMin).toString())
                                             .put("rangeMax", (result?.rangeMax ?: game.currentRangeMax).toString())
                                             .put("attempts", result?.attempts ?: game.attempts)

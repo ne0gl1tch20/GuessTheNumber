@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.BuildConfig
 import android.net.Uri
 import org.json.JSONObject
 
@@ -12,7 +13,7 @@ internal object WebUiBridgeProtocol {
     private val worldActions = setOf("unlock", "boss")
     private val buyMultipliers = setOf("1", "10", "100", "MAX")
     private val relicActions = setOf("equip", "unequip")
-    private val settingKeys = setOf("musicEnabled", "soundEnabled", "vibrationEnabled", "reducedMotion", "reduceFlashes")
+    private val settingKeys = setOf("musicEnabled", "soundEnabled", "vibrationEnabled", "notificationsEnabled", "notificationRemindersEnabled", "notificationProgressionEnabled", "notificationEventsEnabled", "notificationIntervalHours", "themeMode", "numberNotation", "locale", "reducedMotion", "volume", "sfxVolume", "reduceFlashes", "themePreset", "customPrimaryColor", "customSecondaryColor", "customTertiaryColor")
     private val mutatorIds = setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")
 
     sealed interface ParseResult {
@@ -30,7 +31,7 @@ internal object WebUiBridgeProtocol {
             val relicId: String? = null,
             val relicAction: String? = null,
             val settingKey: String? = null,
-            val settingValue: Boolean? = null,
+            val settingValue: String? = null,
             val mutatorId: String? = null,
             val mutatorActive: Boolean? = null,
             val arcadeGameId: String? = null,
@@ -88,7 +89,7 @@ internal object WebUiBridgeProtocol {
             "navigate" -> {
                 if (request.length() != 4 || !request.has("route")) return ParseResult.Invalid("invalid_request", id)
                 val route = request.opt("route") as? String ?: return ParseResult.Invalid("invalid_route", id)
-                if (route !in navigationRoutes) return ParseResult.Invalid("invalid_route", id)
+                if (route !in navigationRoutes && !(BuildConfig.DEBUG && route == "dev_settings")) return ParseResult.Invalid("invalid_route", id)
                 ParseResult.Valid(id, type, route = route)
             }
             "world_action" -> {
@@ -142,9 +143,20 @@ internal object WebUiBridgeProtocol {
                 if (request.length() != 5) return ParseResult.Invalid("invalid_request", id)
                 val key = request.opt("key") as? String ?: return ParseResult.Invalid("invalid_setting", id)
                 val value = request.opt("value") as? String ?: return ParseResult.Invalid("invalid_setting_value", id)
-                if (key !in settingKeys) ParseResult.Invalid("invalid_setting", id)
-                else if (value !in setOf("true", "false")) ParseResult.Invalid("invalid_setting_value", id)
-                else ParseResult.Valid(id, type, settingKey = key, settingValue = value == "true")
+                if (key !in settingKeys) return ParseResult.Invalid("invalid_setting", id)
+                val valid = when (key) {
+                    "musicEnabled", "soundEnabled", "vibrationEnabled", "notificationsEnabled", "notificationRemindersEnabled", "notificationProgressionEnabled", "notificationEventsEnabled", "reducedMotion", "reduceFlashes" -> value in setOf("true", "false")
+                    "themeMode" -> value in setOf("System", "Dark", "Light", "AMOLED")
+                    "numberNotation" -> value in setOf("Standard", "Scientific", "Engineering")
+                    "locale" -> value.matches(Regex("[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?"))
+                    "notificationIntervalHours" -> value in setOf("12", "24", "48")
+                    "volume", "sfxVolume" -> value.toFloatOrNull()?.let { it in 0f..1f } == true
+                    "themePreset" -> value in setOf("Neon", "Sunset", "Ocean", "Forest", "Custom")
+                    "customPrimaryColor", "customSecondaryColor", "customTertiaryColor" -> value.matches(Regex("#[0-9A-Fa-f]{6}"))
+                    else -> false
+                }
+                if (!valid) ParseResult.Invalid("invalid_setting_value", id)
+                else ParseResult.Valid(id, type, settingKey = key, settingValue = value)
             }
             "update_multiplier" -> {
                 if (request.length() != 4) ParseResult.Invalid("invalid_request", id)

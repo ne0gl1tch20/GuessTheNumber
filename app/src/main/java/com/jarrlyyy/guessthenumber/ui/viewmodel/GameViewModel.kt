@@ -147,7 +147,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         // background jobs until the user has acknowledged the previous crash.
         if (!_hasPreviousCrash.value) {
             loadGame()
-            startAutoSave()
             startPlaytimeTimer()
             startRandomEvents()
             startAutoClicker()
@@ -165,6 +164,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             val anySaveCheck = saveManager.hasAnyValidSave()
             withContext(Dispatchers.Main) { _hasAnySave.value = anySaveCheck }
+            if (anySaveCheck && !saveManager.getSlotMetadata(targetSlot).isEmpty) startAutoSave()
 
             saveManager.migrateTutorialCompletionToGlobal()
 
@@ -288,6 +288,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     )
                     _activeSlot.value = slot
                     _hasAnySave.value = true
+                    startAutoSave()
                     _gameState.value = freshState
                     guessingBot.reset(freshState.currentRangeMin, freshState.currentRangeMax)
                     lastIncomeMeasurement = freshState.money
@@ -863,6 +864,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 saveManager.setActiveSlot(1)
                 saveManager.saveGame(fresh, 1)
                 _activeSlot.value = 1
+                _hasAnySave.value = true
+                startAutoSave()
                 _gameState.value = fresh
                 guessingBot.reset(fresh.currentRangeMin, fresh.currentRangeMax)
                 lastIncomeMeasurement = fresh.money
@@ -1593,9 +1596,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun saveGameAsync() {
+        if (!_hasAnySave.value) return
         viewModelScope.launch(Dispatchers.IO) {
             slotOperationMutex.withLock {
                 val slot = _activeSlot.value
+                if (saveManager.getSlotMetadata(slot).isEmpty) return@withLock
                 val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
                 GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_ASYNC_BEGIN", "Persisting game state for slot=$slot.")
                 if (saveManager.saveGame(state, slot)) {
@@ -1609,11 +1614,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun startAutoSave() {
+        if (saveJob?.isActive == true) return
         saveJob = viewModelScope.launch(Dispatchers.IO) {
             while (true) {
                 delay(30000)
                 slotOperationMutex.withLock {
                     val slot = _activeSlot.value
+                    if (saveManager.getSlotMetadata(slot).isEmpty) return@withLock
                     val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
                     if (saveManager.saveGame(state, slot)) {
                         WidgetRefresh.request(getApplication<Application>())

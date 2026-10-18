@@ -164,3 +164,40 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 button { touch-action: manipulation; }
 @media (max-width: 480px) { .more-menu { grid-template-columns: repeat(2, minmax(0, 1fr)); } .screen-nav { width: calc(100% - 16px); gap: 3px; padding: 6px 4px; } .screen-nav button b { font-size: 8px; letter-spacing: -.02em; } }
 @media (min-width: 720px) { .app { padding-bottom: calc(120px + env(safe-area-inset-bottom)); } }
+
+
+/* Dedicated More screen: roomy cards replace the floating menu. */
+.more-screen{grid-template-columns:minmax(0,1fr);gap:16px;padding-bottom:24px;scroll-margin-top:16px}
+.more-heading{padding:22px;grid-column:1}
+.more-heading h2{margin:7px 0;font-size:clamp(25px,5vw,34px);letter-spacing:-.035em}
+.more-heading p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.more-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;grid-column:1}
+.more-link-card{display:flex;align-items:center;gap:13px;min-width:0;min-height:78px;padding:15px;border:1px solid var(--line);border-radius:18px;background:var(--surface-soft);color:var(--text);text-align:left;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.more-link-card:active{transform:scale(.985)}
+.more-link-card>span:first-child{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:13px;background:rgba(155,124,255,.12);font-size:21px}
+.more-link-card>span:nth-child(2){display:grid;gap:5px;min-width:0;flex:1}
+.more-link-card b{font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+.more-link-card small{color:var(--muted);font-size:11px;line-height:1.4}
+.more-link-card>strong{color:var(--muted);font-size:23px;font-weight:500}
+@media(max-width:520px){.more-screen{gap:12px}.more-heading{padding:18px}.more-links{grid-template-columns:minmax(0,1fr);gap:9px}.more-link-card{min-height:70px;padding:12px}.more-link-card>span:first-child{flex-basis:40px;width:40px;height:40px}}
+@media(prefers-reduced-motion:reduce){.more-link-card{transition:none}.more-link-card:active{transform:none}}
+
+/* Keep debug-only navigation hidden even when card layout styles are active. */
+.more-link-card[hidden]{display:none!important}
+
+/* Settings controls mirror persisted Kotlin GameSettings. */
+.settings-group{display:grid;gap:10px;margin:18px 0;padding-top:15px;border-top:1px solid var(--line,rgba(255,255,255,.12))}
+.settings-group h3{margin:0 0 2px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#9ca3af)}
+.setting-field{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid var(--line,rgba(255,255,255,.12));border-radius:15px;background:rgba(255,255,255,.035);font-size:13px}
+.setting-field>span{min-width:0}
+.setting-field select{max-width:58%;min-width:0;padding:9px 10px;border:1px solid var(--line,rgba(255,255,255,.2));border-radius:10px;background:#141a2b;color:var(--text,#f4f5ff)}
+.setting-field input[type="color"]{width:46px;height:36px;padding:2px;border:1px solid var(--line,rgba(255,255,255,.2));border-radius:9px;background:transparent}
+.setting-field input[type="range"]{width:48%;accent-color:var(--accent2)}
+.setting-field:focus-within,.setting-field select:focus-visible,.setting-field input:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+
+:root[data-theme-mode="Light"]{--bg:#f3f5fb;--panel:#ffffff;--panel2:#e8edf8;--line:rgba(31,42,70,.16);--text:#172038;--muted:#56617c;--gold:#946200;--good:#087b49;--danger:#b72e55}
+:root[data-theme-mode="Light"] body{background:linear-gradient(180deg,#f8f9ff 0%,#edf1fa 100%)}
+:root[data-theme-mode="Light"] .card{background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(239,243,252,.98));box-shadow:0 12px 30px rgba(35,49,83,.1)}
+:root[data-theme-mode="Light"] .setting-field select{background:#fff;color:var(--text)}
+:root.settings-amoled,:root.settings-amoled body{--bg:#000;--panel:#000;--panel2:#080808;background:#000}
+:root.settings-amoled .card{background:linear-gradient(145deg,#050505,#000)}
