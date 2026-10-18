@@ -289,9 +289,9 @@
         <div class="settings-group"><h3>Appearance</h3>
           <label class="setting-field"><span>Theme mode</span><select data-setting-value="themeMode"><option>System</option><option>Dark</option><option>Light</option><option>AMOLED</option></select></label>
           <label class="setting-field"><span>Theme preset</span><select data-setting-value="themePreset"><option>Neon</option><option>Sunset</option><option>Ocean</option><option>Forest</option><option>Custom</option></select></label>
-          <label class="setting-field"><span>Primary color</span><input type="color" data-setting-value="customPrimaryColor" value="#7C4DFF"></label>
-          <label class="setting-field"><span>Secondary color</span><input type="color" data-setting-value="customSecondaryColor" value="#00BCD4"></label>
-          <label class="setting-field"><span>Tertiary color</span><input type="color" data-setting-value="customTertiaryColor" value="#00C853"></label>
+          <label class="setting-field"><span>Primary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_primary" data-color-key="customPrimaryColor"><i id="customPrimaryColorSwatch" aria-hidden="true"></i><strong id="customPrimaryColorValue">#7C4DFF</strong><span>Choose</span></button></label>
+          <label class="setting-field"><span>Secondary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_secondary" data-color-key="customSecondaryColor"><i id="customSecondaryColorSwatch" aria-hidden="true"></i><strong id="customSecondaryColorValue">#00BCD4</strong><span>Choose</span></button></label>
+          <label class="setting-field"><span>Tertiary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_tertiary" data-color-key="customTertiaryColor"><i id="customTertiaryColorSwatch" aria-hidden="true"></i><strong id="customTertiaryColorValue">#00C853</strong><span>Choose</span></button></label>
         </div>
         <div class="settings-group"><h3>Audio &amp; Haptics</h3>
           <label class="setting-row"><span><strong data-i18n="background_music">Background music</strong></span><input type="checkbox" data-setting-toggle="musicEnabled"></label>
@@ -366,6 +366,13 @@
           <article class="stat-card"><span data-i18n="inspector_nebula_earned">Nebula earned</span><strong id="statNebulaEarned">0</strong></article>
           <article class="stat-card"><span data-i18n="stats_total_playtime">Play time</span><strong id="statPlaytime">0m</strong></article>
           <article class="stat-card"><span data-i18n="inspector_arcade_played">Arcade games</span><strong id="statArcadePlayed">0</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_current_streak">Current Streak</span><strong id="statCurrentStreak">0</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_best_streak">Best Streak</span><strong id="statBestStreak">0</strong></article>
+          <article class="stat-card"><span data-i18n="loot_title">Loot</span><strong id="statLootDrops">0</strong></article>
+          <article class="stat-card"><span data-i18n="loot_opened_count">Opened: %d</span><strong id="statChestsOpened">0</strong></article>
+          <article class="stat-card"><span data-i18n="worlds_boss_count">Bosses: %d</span><strong id="statBossVictories">0</strong></article>
+          <article class="stat-card"><span data-i18n="rift_best_tier">Best cleared tier: %d</span><strong id="statRiftBestTier">0</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_arcade_best_scores">Arcade Best Scores</span><strong id="statArcadeBestScores">—</strong></article>
         </div>
         <section class="stats-visual card" aria-label="Visual statistics"><div class="stats-visual-head"><div><span class="eyebrow">AT A GLANCE</span><h3>Run performance</h3></div><span class="panel-chip" id="statsSummaryChip">0% ACCURACY</span></div><div class="stats-visual-grid"><div class="accuracy-visual" id="statAccuracyRing" role="img" aria-label="Guess accuracy"><div><strong id="statAccuracyVisual">0%</strong><span>ACCURACY</span></div></div><div class="stats-bars"><div class="stats-bar-row"><div><span>Correct guesses</span><strong id="statsCorrectRatio">0</strong></div><div class="stats-bar-track"><span id="statsCorrectBar"></span></div></div><div class="stats-bar-row"><div><span>Failed guesses</span><strong id="statsFailedRatio">0</strong></div><div class="stats-bar-track"><span id="statsFailedBar"></span></div></div><div class="stats-bar-row"><div><span>Money earned</span><strong id="statsMoneyVisual">0</strong></div><div class="stats-bar-track"><span id="statsMoneyBar"></span></div></div></div></div></section>
       </section>
