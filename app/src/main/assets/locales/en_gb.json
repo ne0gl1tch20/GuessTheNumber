@@ -327,7 +327,7 @@
   "playing_music_toast": "Playing background music...",
   "select_audio_first_toast": "Please select an audio file first!",
   "stopped_music_toast": "Stopped background music",
-  "arcade_title": "Arcade Minigames • Expressive",
+  "arcade_title": "Arcade Minigames",
   "play_minigame_format": "Play %s",
   "quick_guess_title": "Quick Guess Minigame",
   "time_left_format": "Time left: %ds",

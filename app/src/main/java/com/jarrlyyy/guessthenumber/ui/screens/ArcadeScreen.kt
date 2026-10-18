@@ -40,7 +40,7 @@ fun ArcadeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(locale.getString("arcade_title", "Arcade Minigames • Expressive")) },
+                title = { Text(locale.getString("arcade_title", "Arcade Minigames")) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
