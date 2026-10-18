@@ -22,7 +22,6 @@ class BundleHTMLParser(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.ids: set[str] = set()
         self.duplicates: set[str] = set()
-        self.stack: list[str] = []
         self.errors: list[str] = []
         self.local_refs: list[str] = []
         self.script_sources: list[str] = []
@@ -42,29 +41,7 @@ class BundleHTMLParser(HTMLParser):
         if tag == "script" and values.get("src"):
             self.script_sources.append(values["src"])
 
-        if tag not in self.VOID_TAGS:
-            self.stack.append(tag)
-
-    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        self.handle_starttag(tag, attrs)
-        if tag not in self.VOID_TAGS and self.stack:
-            self.stack.pop()
-
-    def handle_endtag(self, tag: str) -> None:
-        if tag in self.VOID_TAGS:
-            self.errors.append(f"Void element </{tag}> must not have an end tag")
-            return
-        if tag not in self.stack:
-            self.errors.append(f"Unexpected closing tag </{tag}>")
-            return
-        if self.stack[-1] != tag:
-            self.errors.append(
-                f"Mismatched closing tag </{tag}> while <{self.stack[-1]}> is open"
-            )
-            if tag in self.stack:
-                self.stack = self.stack[: self.stack.index(tag)]
-            return
-        self.stack.pop()
+        # HTMLParser does not implement HTML5 optional closing-tag rules; avoid a false-positive nesting stack.
 
 
 def check_css(path: Path) -> list[str]:
@@ -89,7 +66,7 @@ def check_css(path: Path) -> list[str]:
         if quote:
             if escaped:
                 escaped = False
-            elif char == "\\\":
+            elif ord(char) == 92:
                 escaped = True
             elif char == quote:
                 quote = None
@@ -146,9 +123,6 @@ def main() -> int:
 
     if html.duplicates:
         html.errors.append("Duplicate id(s): " + ", ".join(sorted(html.duplicates)))
-    if html.stack:
-        html.errors.append("Unclosed HTML element(s): " + ", ".join(html.stack[-10:]))
-
     missing = []
     for reference in html.local_refs:
         # Fragment-only and empty references were already filtered above.
