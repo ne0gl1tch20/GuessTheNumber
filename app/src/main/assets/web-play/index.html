@@ -4,41 +4,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>Numberverse</title>
+  <title>Guess The Number</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="app">
     <header class="topbar">
       <div class="brand-lockup">
-        <img class="brand-logo" src="icons/numberverse.svg" alt="Numberverse logo">
+        <img class="brand-logo" src="icons/guess-the-number.svg" alt="Guess The Number logo">
         <div>
-          <h1>Numberverse</h1>
-          <p class="brand-tagline">The engine decides. The interface celebrates</p>
+          <h1>Guess The Number</h1>
         </div>
       </div>
       <div class="live-pill"><span class="live-dot"></span><span id="statusLabel">ONLINE</span></div>
     </header>
 
     <nav class="screen-nav" aria-label="Game sections" role="tablist">
-      <button type="button" role="tab" id="tab-play" aria-controls="screen-play" aria-selected="true" data-screen-target="play"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-6h6v6"/></svg></span><b>Play</b></button>
-      <button type="button" role="tab" id="tab-worlds" aria-controls="screen-worlds" aria-selected="false" data-screen-target="worlds" tabindex="-1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></span><b>Worlds</b></button>
-      <button type="button" role="tab" id="tab-rewards" aria-controls="screen-rewards" aria-selected="false" data-screen-target="rewards" tabindex="-1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v9H4v-9M2 7h20v5H2z"/><path d="M12 7v14M12 7H7.5a2.5 2.5 0 1 1 2.5-2.5V7ZM12 7h4.5A2.5 2.5 0 1 0 14 4.5V7Z"/></svg></span><b>Rewards</b></button>
-      <button type="button" role="tab" id="tab-journey" aria-controls="screen-journey" aria-selected="false" data-screen-target="journey" tabindex="-1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/><path d="M15 7h4v4"/></svg></span><b>Journey</b></button>
-      <button type="button" role="tab" id="tab-upgrades" aria-controls="screen-upgrades" aria-selected="false" data-screen-target="upgrades" tabindex="-1"><span class="nav-icon" aria-hidden="true">⬆</span><b>Upgrades</b></button>
-      <button type="button" role="tab" id="tab-shop" aria-controls="screen-shop" aria-selected="false" data-screen-target="shop" tabindex="-1"><span class="nav-icon" aria-hidden="true">✦</span><b>Shop</b></button>
-      <button type="button" role="tab" id="tab-homebase" aria-controls="screen-homebase" aria-selected="false" data-screen-target="homebase" tabindex="-1"><span class="nav-icon" aria-hidden="true">⌂</span><b>Home Base</b></button>
-      <button type="button" role="tab" id="tab-relics" aria-controls="screen-relics" aria-selected="false" data-screen-target="relics" tabindex="-1"><span class="nav-icon" aria-hidden="true">✧</span><b>Relics</b></button>
-      <button type="button" role="tab" id="tab-codex" aria-controls="screen-codex" aria-selected="false" data-screen-target="codex" tabindex="-1"><span class="nav-icon" aria-hidden="true">▤</span><b>Codex</b></button>
-      <button type="button" role="tab" id="tab-settings" aria-controls="screen-settings" aria-selected="false" data-screen-target="settings" tabindex="-1"><span class="nav-icon" aria-hidden="true">⚙</span><b>Settings</b></button>
-      <button type="button" role="tab" id="tab-prestige" aria-controls="screen-prestige" aria-selected="false" data-screen-target="prestige" tabindex="-1"><span class="nav-icon" aria-hidden="true">✧</span><b>Prestige</b></button>
-      <button type="button" role="tab" id="tab-ultra" aria-controls="screen-ultra" aria-selected="false" data-screen-target="ultra" tabindex="-1"><span class="nav-icon" aria-hidden="true">✦</span><b>Ultra</b></button>
-      <button type="button" role="tab" id="tab-talent" aria-controls="screen-talent" aria-selected="false" data-screen-target="talent" tabindex="-1"><span class="nav-icon" aria-hidden="true">⌘</span><b>Talents</b></button>
-      <button type="button" role="tab" id="tab-mutators" aria-controls="screen-mutators" aria-selected="false" data-screen-target="mutators" tabindex="-1"><span class="nav-icon" aria-hidden="true">◈</span><b>Mutators</b></button>
-      <button type="button" role="tab" id="tab-stats" aria-controls="screen-stats" aria-selected="false" data-screen-target="stats" tabindex="-1"><span class="nav-icon" aria-hidden="true">▤</span><b data-i18n="stats">Stats</b></button>
+      <button type="button" role="tab" id="tab-worlds" aria-controls="screen-worlds" aria-selected="false" data-screen-target="worlds" tabindex="-1"><span class="nav-icon" aria-hidden="true">◈</span><b>Beyond the Numbers</b></button>
       <button type="button" role="tab" id="tab-arcade" aria-controls="screen-arcade" aria-selected="false" data-screen-target="arcade" tabindex="-1"><span class="nav-icon" aria-hidden="true">🎮</span><b data-i18n="arcade">Arcade</b></button>
-      <button type="button" role="tab" id="tab-stake" aria-controls="screen-stake" aria-selected="false" data-screen-target="stake" tabindex="-1"><span class="nav-icon" aria-hidden="true">★</span><b data-i18n="staking_flip_button">Lucky Stake</b></button>
+      <button type="button" role="tab" id="tab-play" aria-controls="screen-play" aria-selected="true" data-screen-target="play"><span class="nav-icon" aria-hidden="true">▶</span><b>Play</b></button>
+      <button type="button" role="tab" id="tab-upgrades" aria-controls="screen-upgrades" aria-selected="false" data-screen-target="upgrades" tabindex="-1"><span class="nav-icon" aria-hidden="true">⬆</span><b>Upgrades</b></button>
+      <button type="button" id="tab-more" aria-controls="moreMenu" aria-expanded="false" aria-haspopup="true"><span class="nav-icon" aria-hidden="true">☰</span><b>More</b></button>
     </nav>
+    <div class="more-menu" id="moreMenu" aria-label="More game sections" hidden>
+      <button type="button" id="more-rewards" data-screen-target="rewards" tabindex="-1"><span>🏆</span><b>Rewards</b></button>
+      <button type="button" id="more-journey" data-screen-target="journey" tabindex="-1"><span>◷</span><b>Journey</b></button>
+      <button type="button" id="more-shop" data-screen-target="shop" tabindex="-1"><span>✦</span><b>Shop</b></button>
+      <button type="button" id="more-homebase" data-screen-target="homebase" tabindex="-1"><span>⌂</span><b>Home Base</b></button>
+      <button type="button" id="more-relics" data-screen-target="relics" tabindex="-1"><span>✧</span><b>Relics</b></button>
+      <button type="button" id="more-codex" data-screen-target="codex" tabindex="-1"><span>▤</span><b>Codex</b></button>
+      <button type="button" id="more-settings" data-screen-target="settings" tabindex="-1"><span>⚙</span><b>Settings</b></button>
+      <button type="button" id="more-prestige" data-screen-target="prestige" tabindex="-1"><span>✧</span><b>Prestige</b></button>
+      <button type="button" id="more-ultra" data-screen-target="ultra" tabindex="-1"><span>✦</span><b>Ultra</b></button>
+      <button type="button" id="more-talents" data-screen-target="talent" tabindex="-1"><span>⌘</span><b>Talents</b></button>
+      <button type="button" id="more-mutators" data-screen-target="mutators" tabindex="-1"><span>◈</span><b>Mutators</b></button>
+      <button type="button" id="more-stats" data-screen-target="stats" tabindex="-1"><span>▤</span><b data-i18n="stats">Stats</b></button>
+      <button type="button" id="more-stake" data-screen-target="stake" tabindex="-1"><span>★</span><b data-i18n="staking_flip_button">Lucky Stake</b></button>
+    </div>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
       <div class="hero-glow"></div>

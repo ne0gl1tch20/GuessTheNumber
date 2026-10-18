@@ -6,8 +6,8 @@ The Android player-facing UI is migrating to the shared HTML/CSS/JS surface. Kot
 
 ## Locked direction
 
-- **Numberverse** is the player-facing brand.
-- **The engine decides. The interface celebrates.** is the UI architecture tagline.
+- **Guess The Number** is the player-facing brand.
+- No player-facing architecture tagline is used.
 - Shared HTML/CSS/JS is the canonical visual layer for player-facing game screens that need Android/Windows parity.
 - Android WebView hosts the same web bundle rather than maintaining a second visual implementation in Compose.
 - The Kotlin bridge is the only authority for mutations and persisted state.

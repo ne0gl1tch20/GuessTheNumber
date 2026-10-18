@@ -4,8 +4,8 @@ The Android player-facing UI is now treated as an HTML/CSS/JS-first product surf
 
 ## Locked rules
 
-- **Numberverse** is the player-facing brand.
-- **The engine decides. The interface celebrates.** is the architecture tagline.
+- **Guess The Number** is the player-facing brand.
+- No player-facing architecture tagline is used.
 - Player-facing Android screens use the shared web bundle as the canonical visual implementation.
 - Kotlin/KMP remains authoritative for game rules, progression, economy, rewards, saves, validation and mutations.
 - Compose remains only for native/system surfaces and a reversible fallback while a route is being migrated and verified.

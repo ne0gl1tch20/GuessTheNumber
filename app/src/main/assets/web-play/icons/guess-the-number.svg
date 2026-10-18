@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" role="img" aria-labelledby="title">
-  <title id="title">Numberverse</title>
+  <title id="title">Guess The Number</title>
   <defs>
     <linearGradient id="core" x1="9" y1="8" x2="39" y2="40" gradientUnits="userSpaceOnUse">
       <stop stop-color="#B9A5FF"/>
