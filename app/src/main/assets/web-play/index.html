@@ -33,6 +33,8 @@
       <button type="button" role="tab" id="tab-settings" aria-controls="screen-settings" aria-selected="false" data-screen-target="settings" tabindex="-1"><span class="nav-icon" aria-hidden="true">⚙</span><b>Settings</b></button>
       <button type="button" role="tab" id="tab-prestige" aria-controls="screen-prestige" aria-selected="false" data-screen-target="prestige" tabindex="-1"><span class="nav-icon" aria-hidden="true">✧</span><b>Prestige</b></button>
       <button type="button" role="tab" id="tab-ultra" aria-controls="screen-ultra" aria-selected="false" data-screen-target="ultra" tabindex="-1"><span class="nav-icon" aria-hidden="true">✦</span><b>Ultra</b></button>
+      <button type="button" role="tab" id="tab-talent" aria-controls="screen-talent" aria-selected="false" data-screen-target="talent" tabindex="-1"><span class="nav-icon" aria-hidden="true">⌘</span><b>Talents</b></button>
+      <button type="button" role="tab" id="tab-mutators" aria-controls="screen-mutators" aria-selected="false" data-screen-target="mutators" tabindex="-1"><span class="nav-icon" aria-hidden="true">◈</span><b>Mutators</b></button>
     </nav>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
@@ -262,6 +264,20 @@
         <p class="catalog-intro">Ultra requires at least 1,000 Prestige and enough Money. It resets Prestige and regular upgrades for permanent Ultra progress.</p>
         <button type="button" class="world-action-button" id="ultraResetButton" data-bridge-action="ultra_reset">Ultra reset</button>
         <p class="catalog-intro" id="ultraStatus" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+    <div class="screen" id="screen-talent" role="tabpanel" aria-labelledby="tab-talent" data-screen="talent" hidden>
+      <section class="card catalog-panel">
+        <div class="panel-title"><span class="panel-glyph">⌘</span><div><span class="eyebrow">PERMANENT PROGRESSION</span><h2>Talent Web</h2></div><span class="panel-chip" id="talentCount">0 / 6 UNLOCKED</span></div>
+        <p class="catalog-intro">Spend Prestige to unlock permanent talents. Prerequisites and costs are checked by Kotlin against the bundled talent catalog.</p>
+        <div class="catalog-list" id="talentList"><p class="catalog-empty">Syncing talents…</p></div>
+      </section>
+    </div>
+    <div class="screen" id="screen-mutators" role="tabpanel" aria-labelledby="tab-mutators" data-screen="mutators" hidden>
+      <section class="card catalog-panel">
+        <div class="panel-title"><span class="panel-glyph">◈</span><div><span class="eyebrow">CUSTOMIZE YOUR RUN</span><h2>Mutators</h2></div><span class="panel-chip" id="mutatorCount">0 ACTIVE</span></div>
+        <p class="catalog-intro">Toggle challenge rules to change the current run. The engine recalculates the range and target when a mutator changes.</p>
+        <div class="catalog-list" id="mutatorList"><p class="catalog-empty">Syncing mutators…</p></div>
       </section>
     </div>
   </main>
