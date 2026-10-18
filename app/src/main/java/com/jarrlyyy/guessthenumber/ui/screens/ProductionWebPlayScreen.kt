@@ -184,7 +184,7 @@ fun ProductionWebPlayScreen(
                                                         context.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${context.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                                                         replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("status", "permission_required").put("message", localeManager.getString("update_permission_required", "Allow this app to install updates, then return and tap Install again.")).toString())
                                                     } else updateScope.launch {
-                                                        val installResult = withContext(Dispatchers.IO) { ApkUpdateInstaller(context).install(update.downloadUrl, requireChecksum = BuildConfig.UPDATE_CHANNEL == "debug") }
+                                                        val installResult = withContext(Dispatchers.IO) { ApkUpdateInstaller(context).install(update.downloadUrl, requireChecksum = BuildConfig.UPDATE_CHANNEL == "debug", expectedCommitSha = update.expectedCommitSha) }
                                                         val response = JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result")
                                                         if (installResult.isSuccess) {
                                                             response.put("status", "install_started").put("message", localeManager.getString("update_install_started", "Installation started. Confirm the Android installer prompt."))
