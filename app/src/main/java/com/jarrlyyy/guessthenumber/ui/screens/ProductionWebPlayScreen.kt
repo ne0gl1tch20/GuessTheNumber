@@ -2,6 +2,8 @@ package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.BuildConfig
 import android.net.Uri
+import android.content.Intent
+import android.provider.Settings
 import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -21,6 +23,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.jarrlyyy.guessthenumber.data.repository.UpdateChannelChecker
+import com.jarrlyyy.guessthenumber.data.repository.ApkUpdateInstaller
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -69,6 +77,9 @@ fun ProductionWebPlayScreen(
     onSettleStake: (String) -> Boolean
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val updateScope = rememberCoroutineScope()
+    var latestAvailableUpdate by remember { mutableStateOf<UpdateChannelChecker.AvailableUpdate?>(null) }
     val progressionEngine = remember { GameEngine() }
     val currentGameState by rememberUpdatedState(state)
     val currentIncome by rememberUpdatedState(incomePerSecond)
@@ -145,6 +156,54 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        if (parsed.type in setOf("check_updates", "install_update", "open_update_page")) {
+                                            when (parsed.type) {
+                                                "check_updates" -> updateScope.launch {
+                                                    val response = JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("installedVersion", BuildConfig.VERSION_NAME).put("installedVersionCode", BuildConfig.VERSION_CODE).put("channel", BuildConfig.UPDATE_CHANNEL)
+                                                    when (val updateResult = UpdateChannelChecker.check()) {
+                                                        is UpdateChannelChecker.Result.Available -> {
+                                                            latestAvailableUpdate = updateResult.update
+                                                            response.put("status", "available").put("title", updateResult.update.title).put("details", updateResult.update.details).put("message", localeManager.getString("update_available", "An update is available."))
+                                                        }
+                                                        UpdateChannelChecker.Result.UpToDate -> {
+                                                            latestAvailableUpdate = null
+                                                            response.put("status", "up_to_date").put("message", localeManager.getString("update_up_to_date", "You're up to date."))
+                                                        }
+                                                        UpdateChannelChecker.Result.Unavailable -> {
+                                                            latestAvailableUpdate = null
+                                                            response.put("status", "unavailable").put("message", localeManager.getString("update_unavailable", "Couldn't check for updates. Try again later."))
+                                                        }
+                                                    }
+                                                    replyProxy.postMessage(response.toString())
+                                                }
+                                                "install_update" -> {
+                                                    val update = latestAvailableUpdate
+                                                    if (update == null) {
+                                                        replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("status", "unavailable").put("message", localeManager.getString("update_unavailable", "Check for updates first.")).toString())
+                                                    } else if (!context.packageManager.canRequestPackageInstalls()) {
+                                                        context.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${context.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                                                        replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("status", "permission_required").put("message", localeManager.getString("update_permission_required", "Allow this app to install updates, then return and tap Install again.")).toString())
+                                                    } else updateScope.launch {
+                                                        val installResult = withContext(Dispatchers.IO) { ApkUpdateInstaller(context).install(update.downloadUrl, requireChecksum = BuildConfig.UPDATE_CHANNEL == "debug") }
+                                                        val response = JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result")
+                                                        if (installResult.isSuccess) {
+                                                            response.put("status", "install_started").put("message", localeManager.getString("update_install_started", "Installation started. Confirm the Android installer prompt."))
+                                                        } else {
+                                                            response.put("status", "install_failed").put("message", localeManager.getString("update_install_failed", "Update failed: %s", installResult.exceptionOrNull()?.message ?: "unknown error"))
+                                                        }
+                                                        replyProxy.postMessage(response.toString())
+                                                    }
+                                                }
+                                                "open_update_page" -> {
+                                                    val url = latestAvailableUpdate?.url
+                                                    if (url != null && Uri.parse(url).let { it.scheme == "https" && it.host == "github.com" }) {
+                                                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                                                        replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("status", "page_opened").put("message", localeManager.getString("update_open", "Opened update page.")).toString())
+                                                    } else replyProxy.postMessage(errorResponse(parsed.id, "update_page_unavailable"))
+                                                }
+                                            }
+                                            return@post
+                                        }
                                         val beforeAction = try {
                                             readState()
                                         } catch (exception: Exception) {
@@ -384,7 +443,10 @@ fun ProductionWebPlayScreen(
                                                 .put("requirement", if (!canUnlock) "Unlock ${talent.requiredParentId} first" else if (!affordable) "Need ${talent.cost} Prestige" else "Ready to unlock"))
                                         }
                                         val viewState = JSONObject()
-                                        .put("debugBuild", BuildConfig.DEBUG)
+                                        .put("appVersion", BuildConfig.VERSION_NAME)
+                                            .put("appVersionCode", BuildConfig.VERSION_CODE)
+                                            .put("updateChannel", BuildConfig.UPDATE_CHANNEL)
+                                            .put("debugBuild", BuildConfig.DEBUG)
                                             .put("buyMultiplier", game.buyMultiplier)
                                             .put("prestigeRequirement", progressionEngine.calculatePrestigeRequirement(game.prestigeCount).format())
                                             .put("prestigeReward", progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount).format())
@@ -418,7 +480,7 @@ fun ProductionWebPlayScreen(
                                                 .put("customPrimaryColor", game.settings.customPrimaryColor)
                                                 .put("customSecondaryColor", game.settings.customSecondaryColor)
                                                 .put("customTertiaryColor", game.settings.customTertiaryColor))
-                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry").forEach { key -> put(key, localeManager.getString(key)) } })
+                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "about_title", "about_header", "about_description", "about_licenses_title", "about_web_subtitle", "about_installed_version", "about_update_description", "about_update_idle", "about_updates_eyebrow", "about_licenses_eyebrow", "about_licenses_description", "update_channel_label", "update_channel_debug", "update_channel_release", "update_check", "update_checking", "update_available", "update_up_to_date", "update_unavailable", "update_install", "update_open", "update_downloading", "update_install_started", "update_install_failed", "update_permission_required", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry").forEach { key -> put(key, localeManager.getString(key)) } })
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
                                             .put("minigames", org.json.JSONArray().apply {
