@@ -48,6 +48,17 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.core)
                 implementation("net.java.dev.jna:jna:5.17.0")
                 implementation("net.java.dev.jna:jna-platform:5.17.0")
+                implementation("org.json:json:20250517")
+                val javafxPlatform = when {
+                    System.getProperty("os.name").startsWith("Windows", ignoreCase = true) -> "win"
+                    System.getProperty("os.name").startsWith("Mac", ignoreCase = true) -> "mac"
+                    else -> "linux"
+                }
+                implementation("org.openjfx:javafx-base:21.0.6:$javafxPlatform")
+                implementation("org.openjfx:javafx-graphics:21.0.6:$javafxPlatform")
+                implementation("org.openjfx:javafx-controls:21.0.6:$javafxPlatform")
+                implementation("org.openjfx:javafx-web:21.0.6:$javafxPlatform")
+                implementation("org.openjfx:javafx-swing:21.0.6:$javafxPlatform")
             }
         }
         val jvmTest by getting {

@@ -2,15 +2,15 @@
 
 **Owner decision:** Use the same bundled HTML/CSS/JavaScript presentation for player-facing UI on Android and Windows. Kotlin/KMP remains the authority for game state, costs, purchases, progression, rewards, validation and persistence.
 
-**Starting point:** PR #256 merged the Upgrades and Shop route into Android's `app/src/main/assets/web-play/` bundle. Android's `ProductionWebPlayScreen` loads that bundle through Android WebView. The Windows desktop app still renders player screens in Compose Desktop. The Windows host and the full remaining screen migration are not complete.
+**Starting point:** PR #256 merged the Upgrades and Shop route into Android's `app/src/main/assets/web-play/` bundle. Android's `ProductionWebPlayScreen` loads that bundle through Android WebView. A Windows JavaFX WebView host has now been added and is wired into Play, Upgrades and Shop. The remaining player screens and runtime/distribution verification are not complete.
 
 ## Workstream A: Windows shared HTML host
 
 1. Evaluate and select a maintained Windows embedded browser integration. WebView2 is the preferred candidate, but do not claim it is implemented until a buildable host proves it. Document runtime prerequisites, missing-runtime behavior, licensing, MSI distribution and offline operation before changing installer behavior.
-2. Build a small isolated host spike that loads the packaged `web-play/index.html` with network access unnecessary, supports resize/keyboard/focus and reliably disposes browser resources.
-3. Implement the same strict versioned message contract as Android, with exact local-page/origin checks, bounded payloads, request ID deduplication and an explicit action allow-list. Never expose a generic Kotlin method dispatcher or allow JavaScript to mutate saves directly.
+2. **Implemented in this batch:** embed JavaFX WebView in the Compose Desktop shell, unpack the canonical packaged `web-play/` files locally, support resize and cleanup, and load without requiring a network connection.
+3. **Initial bridge implemented:** bounded versioned requests, request ID deduplication and an explicit allow-list for guesses, multiplier selection, upgrade/shop actions, daily quests and chests. Kotlin transactions remain authoritative. Tighten local navigation/origin tests and broaden route actions.
 4. Adapt platform-specific input and lifecycle behavior without maintaining a second HTML/CSS/JS copy.
-5. Add automated bridge and resource tests, then verify the app on Windows. Do not replace the existing Compose routes until the host is stable and the required bridge actions exist.
+5. Add host/bridge automated tests and verify the packaged app on Windows. Play, Upgrades and Shop now use the host; other Compose routes remain until their shared bridge actions are implemented.
 
 ## Workstream B: complete the shared player-facing screens
 

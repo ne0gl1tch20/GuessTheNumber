@@ -400,6 +400,44 @@ object DesktopEconomyTransactions {
         )
     }
 
+    data class DesktopWorldUiState(
+        val id: String, val name: String, val bossName: String,
+        val hp: Int, val damage: Int, val active: Boolean,
+        val unlocked: Boolean, val defeated: Boolean, val canUnlock: Boolean,
+        val canFight: Boolean, val activeBoss: Boolean
+    )
+
+    /** Full safe-to-display world state for the shared HTML UI. */
+    fun worldsForUi(state: GameState): List<DesktopWorldUiState> {
+        val totalUpgradeLevels = state.upgradeLevels.values.sum()
+        return WORLD_REQUIREMENTS.map { world ->
+            val unlocked = world.id in state.unlockedWorldIds
+            val defeated = world.bossId in state.defeatedBossIds
+            val bossReady = world.requiredBossId?.let { it in state.defeatedBossIds } ?: true
+            val canUnlock = !unlocked && bossReady &&
+                state.correctGuesses >= world.requiredCorrectGuesses &&
+                totalUpgradeLevels >= world.requiredUpgradeLevels &&
+                state.prestigeCount >= world.requiredPrestigeCount &&
+                state.ultraCount >= world.requiredUltraCount
+            val canFight = state.endlessRiftActive || (
+                state.correctGuesses >= world.fightCorrectGuesses &&
+                    totalUpgradeLevels >= world.fightUpgradeLevels &&
+                    state.prestigeCount >= world.fightPrestigeCount &&
+                    state.ultraCount >= world.fightUltraCount
+            )
+            val hp = world.bossHp + if (state.endlessRiftActive) {
+                ((state.endlessRiftTier - 1).coerceAtLeast(0) * 2)
+            } else 0
+            DesktopWorldUiState(
+                id = world.id, name = world.name, bossName = world.bossName,
+                hp = hp,
+                damage = (state.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, hp),
+                active = world.id == state.activeWorldId, unlocked = unlocked,
+                defeated = defeated, canUnlock = canUnlock, canFight = canFight,
+                activeBoss = state.activeBossBattleWorldId == world.id
+            )
+        }
+    }
     fun worldProgress(state: GameState): List<DesktopWorldProgress> {
         val totalUpgradeLevels = state.upgradeLevels.values.sum()
         return WORLD_REQUIREMENTS.map { world ->

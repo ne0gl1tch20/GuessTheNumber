@@ -17,9 +17,9 @@ A screen counts as migrated only when its real interactions, localization, loadi
 
 | Surface | Android | Windows | Remaining acceptance work |
 |---|---|---|---|
-| Play / Worlds / Rewards / Journey | Shared HTML route | Compose UI | Host the same bundle on Windows; verify gameplay, localization, keyboard/IME, accessibility and resize behavior on both |
-| Upgrades | Shared HTML route, wired to Kotlin purchase bridge | Compose UI | Verify multipliers, purchase results, max-level/affordability states and save/reload on both |
-| Shop | Shared HTML route, wired to Kotlin purchase/equip bridge | Compose UI | Verify currency, ownership, purchase/equip behavior, error states and save/reload on both |
+| Play / Worlds / Rewards / Journey | Shared HTML route | Shared HTML host for Play; other shared screens remain in the bundle but Windows navigation/parity is incomplete | Wire all intended HTML routes through the desktop bridge and verify localization, keyboard/IME, accessibility and resize behavior |
+| Upgrades | Shared HTML route, wired to Kotlin purchase bridge | Shared HTML route, wired to desktop Kotlin transactions | Verify multipliers, purchase results, max-level/affordability states and save/reload on both |
+| Shop | Shared HTML route, wired to Kotlin purchase/equip bridge | Shared HTML route, wired to desktop Kotlin transactions | Verify currency, ownership, purchase/equip behavior, error states and save/reload on both |
 | Prestige / Ultra / talents | Migration pending or existing native route | Compose UI | Add real shared screens and authoritative transaction actions |
 | World Map / bosses | World presentation and bridge actions in shared bundle | Partial Compose implementation | Add complete shared route coverage and verify battle progression/rewards |
 | Home Base / Relics / Codex / Endgame / Endless Rift | Migration pending | Partial Compose implementations | Build shared routes and bridge-backed state/actions; preserve transaction and unlock rules |
@@ -31,8 +31,8 @@ A screen counts as migrated only when its real interactions, localization, loadi
 
 ## Completion gates
 
-- [ ] One packaged `web-play/` frontend is loaded by both Android and Windows. No separate Windows copy of the UI.
-- [ ] A Windows embedded web host is implemented, selected with documented runtime/distribution behavior, and covered by lifecycle/origin tests.
+- [x] One canonical packaged `web-play/` frontend is loaded by Android and by the Windows host for Play, Upgrades and Shop. No separate Windows copy of the UI.
+- [ ] Expand the Windows host to all intended shared HTML routes; document runtime/distribution behavior and add lifecycle/origin tests.
 - [ ] All player-facing routes listed above have real state, interactions and localized loading/empty/error/locked states.
 - [ ] Host bridges use a strict versioned allow-list. JavaScript cannot directly write saves or decide costs/rewards.
 - [ ] Existing saves, offline behavior, recovery and no-ads/no-analytics/no-accounts requirements are preserved.
@@ -42,4 +42,4 @@ A screen counts as migrated only when its real interactions, localization, loadi
 
 ## Current milestone
 
-PR #256 added Upgrades and Shop to the Android shared HTML route. That does **not** complete the Android migration and does **not** migrate Windows. The next implementation work is tracked in the [cross-platform execution plan](SHARED_WEB_UI_CROSS_PLATFORM_EXECUTION_PLAN.md).
+PR #256 added Upgrades and Shop to Android. The Windows host implementation now renders Play, Upgrades and Shop from the same bundle and routes core gameplay, upgrade/shop transactions, multiplier changes, daily quest claims and loot chest rewards through Kotlin. This is a first migration batch, not full UI parity. Remaining Windows routes, other Android screens, CI and runtime verification are tracked in the [cross-platform execution plan](SHARED_WEB_UI_CROSS_PLATFORM_EXECUTION_PLAN.md).
