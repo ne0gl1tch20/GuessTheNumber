@@ -1,7 +1,7 @@
 ## Unreleased (Shared HTML Play polish)
 
 - 🎨 The shared Play header now uses the canonical `GTN_APP_LOGO.png` artwork, packaged locally for offline use.
-- 🧹 Removed the extra branding tagline and `NUMBERVERSE` label for a cleaner header.
+- 🧹 Removed the extra branding tagline and restored the Guess The Number name for a cleaner header.
 - 🧭 Documented the target to migrate all player-facing Android screens to the same shared HTML/CSS/JavaScript interface in staged, verified route groups. Existing Compose screens are not yet all migrated.
 
 ## Unreleased (Windows Progression Parity)
