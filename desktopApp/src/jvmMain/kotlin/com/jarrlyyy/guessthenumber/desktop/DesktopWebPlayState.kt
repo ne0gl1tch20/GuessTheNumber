@@ -10,6 +10,40 @@ import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import org.json.JSONArray
 import org.json.JSONObject
 
+
+private val webUiStringKeys = listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close")
+private val webUiLocaleFiles = mapOf(
+    "en-US" to "en_us.json", "en-GB" to "en_gb.json", "fil-PH" to "fil_ph.json",
+    "zh-CN" to "zh_cn.json", "zh-TW" to "zh_tw.json", "ja-JP" to "ja.json",
+    "ko-KR" to "ko.json", "es-ES" to "es.json", "fr-FR" to "fr.json",
+    "de-DE" to "de.json", "it-IT" to "it.json", "pt-PT" to "pt_pt.json",
+    "pt-BR" to "pt_br.json", "ru-RU" to "ru.json", "hi-IN" to "hi_in.json",
+    "id-ID" to "id.json", "th-TH" to "th.json", "vi-VN" to "vi.json",
+    "tr-TR" to "tr.json", "pl-PL" to "pl.json", "uk-UA" to "uk.json",
+    "nl-NL" to "nl.json", "ar-SA" to "ar.json"
+)
+
+private fun desktopWebUiStrings(localeTag: String): JSONObject {
+    val file = webUiLocaleFiles[localeTag] ?: "en_us.json"
+    fun read(name: String): JSONObject? = runCatching {
+        DesktopWebPlayState::class.java.getResourceAsStream("/locales/$name")?.bufferedReader(Charsets.UTF_8)?.use {
+            JSONObject(it.readText())
+        }
+    }.getOrNull()
+    val merged = read("en_us.json") ?: JSONObject()
+    if (file != "en_us.json") read(file)?.let { overlay ->
+        val iterator = overlay.keys()
+        while (iterator.hasNext()) {
+            val key = iterator.next()
+            merged.put(key, overlay.get(key))
+        }
+    }
+    return JSONObject().apply {
+        webUiStringKeys.forEach { key -> put(key, merged.optString(key, key)) }
+    }
+}
+
+
 /** Produces only display state; purchase costs and ownership are always revalidated in Kotlin. */
 internal fun desktopWebPlayState(
     game: GameState,
@@ -98,6 +132,7 @@ internal fun desktopWebPlayState(
     }
     return JSONObject()
         .put("initialScreen", initialScreen)
+        .put("uiStrings", desktopWebUiStrings(game.settings.locale))
         .put("buyMultiplier", game.buyMultiplier)
         .put("prestigeRequirement", engine.calculatePrestigeRequirement(game.prestigeCount).format())
         .put("prestigeReward", engine.calculatePrestigeReward(game.money, game.prestigeCount).format())
