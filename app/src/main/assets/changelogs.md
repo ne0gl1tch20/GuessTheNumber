@@ -1,3 +1,11 @@
+## Unreleased (HTML More Hub, changelog and player feedback)
+
+- 📋 Added an in-game Changelog page linked from More, with recent UI, progression and platform changes.
+- 🌐 Added English and Filipino translations for the Changelog page and randomized incorrect-guess messages; other locale overlays use the English fallback until their translations are added.
+- 🎮 Increased the arcade play popup height so it opens as a proper panel instead of a thin horizontal strip.
+- 🔄 Improved the About update button hit target and refreshed HTML strings after state/locale updates; device-level updater interaction still needs verification.
+- 🎵 Added a player-facing HTML Background Music page in More.
+
 ## Unreleased (Shared HTML Play polish)
 
 - 🎨 The shared Play header now uses the canonical `GTN_APP_LOGO.png` artwork, packaged locally for offline use.
