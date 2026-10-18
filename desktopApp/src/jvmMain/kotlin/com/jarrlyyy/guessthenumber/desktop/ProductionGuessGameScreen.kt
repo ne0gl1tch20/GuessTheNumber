@@ -47,6 +47,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.key
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -330,6 +331,7 @@ fun ProductionGuessGameScreen(
         }
 
         if (section.sharedHtmlScreen != null) {
+            key(section) {
             DesktopSharedWebView(
                 onRequest = { raw, reply ->
                     scope.launch {
@@ -569,6 +571,7 @@ fun ProductionGuessGameScreen(
                 },
                 modifier = Modifier.fillMaxSize()
             )
+            }
             return@Card
         }
 
