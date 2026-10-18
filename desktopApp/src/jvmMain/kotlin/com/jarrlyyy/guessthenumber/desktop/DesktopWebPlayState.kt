@@ -2,6 +2,8 @@ package com.jarrlyyy.guessthenumber.desktop
 
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRepository
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopTalentDef
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import org.json.JSONArray
@@ -14,6 +16,7 @@ internal fun desktopWebPlayState(
     accepted: Boolean = true,
     lastGuessStatus: String? = null,
     message: String? = null,
+    talents: List<DesktopTalentDef> = DesktopEconomyRepository().talents(),
     engine: GameEngine = GameEngine()
 ): JSONObject {
     val upgrades = JSONArray()
@@ -38,6 +41,15 @@ internal fun desktopWebPlayState(
             .put("nextCost", cost.format())
             .put("maxed", maxed)
             .put("affordable", !maxed && count > 0 && cost > com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO && game.money >= cost))
+    }
+    val talentsJson = JSONArray()
+    talents.forEach { talent ->
+        val owned = talent.id in game.prestigeShopPurchases
+        val canUnlock = talent.requiredParentId == null || talent.requiredParentId in game.prestigeShopPurchases
+        val affordable = game.prestige >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(talent.cost)
+        talentsJson.put(JSONObject().put("id", talent.id).put("name", talent.name).put("description", talent.description)
+            .put("cost", talent.cost).put("owned", owned).put("canUnlock", canUnlock).put("affordable", affordable)
+            .put("requirement", if (!canUnlock) "Unlock ${talent.requiredParentId} first" else if (!affordable) "Need ${talent.cost} Prestige" else "Ready to unlock"))
     }
     val worlds = JSONArray()
     DesktopEconomyTransactions.worldsForUi(game).forEach { world ->
@@ -89,6 +101,8 @@ internal fun desktopWebPlayState(
         .put("prestigeCount", game.prestigeCount)
         .put("ultraCount", game.ultraCount)
         .put("activeWorldId", game.activeWorldId)
+        .put("talents", talentsJson)
+        .put("activeMutators", JSONArray(game.activeMutators.toList()))
         .put("unlockedWorldCount", game.unlockedWorldIds.size)
         .put("defeatedBossCount", game.defeatedBossIds.size)
         .put("worldBossVictories", game.worldBossVictories)
