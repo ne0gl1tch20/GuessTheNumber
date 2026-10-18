@@ -117,6 +117,15 @@ class WebUiBridgeProtocolTest {
         assertEquals("invalid_request", (extra as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
+
+    @Test
+    fun acceptsOnlyValidTalentAndMutatorActions() {
+        assertEquals(WebUiBridgeProtocol.ParseResult.Valid("talent-1", "buy_talent", itemId = "talent_speed_1"), WebUiBridgeProtocol.parse("""{"version":1,"id":"talent-1","type":"buy_talent","talentId":"talent_speed_1"}"""))
+        assertEquals(WebUiBridgeProtocol.ParseResult.Valid("mutator-1", "set_mutator", mutatorId = "mut_speed", mutatorActive = true), WebUiBridgeProtocol.parse("""{"version":1,"id":"mutator-1","type":"set_mutator","mutatorId":"mut_speed","active":"true"}"""))
+        val unknown = WebUiBridgeProtocol.parse("""{"version":1,"id":"mutator-2","type":"set_mutator","mutatorId":"grant_money","active":"true"}""")
+        assertEquals("invalid_mutator", (unknown as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
     @Test
     fun acceptsIncrementRequest() {
         assertEquals(
