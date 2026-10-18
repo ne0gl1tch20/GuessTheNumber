@@ -37,6 +37,16 @@ internal fun desktopWebPlayState(
             .put("maxed", maxed)
             .put("affordable", !maxed && count > 0 && cost > com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO && game.money >= cost))
     }
+    val worlds = JSONArray()
+    DesktopEconomyTransactions.worldsForUi(game).forEach { world ->
+        worlds.put(JSONObject()
+            .put("id", world.id).put("name", world.name).put("bossName", world.bossName)
+            .put("hp", world.hp).put("damage", world.damage)
+            .put("active", world.active).put("unlocked", world.unlocked)
+            .put("defeated", world.defeated).put("canUnlock", world.canUnlock)
+            .put("canFight", world.canFight).put("activeBoss", world.activeBoss))
+    }
+    val bossStatus = DesktopEconomyTransactions.activeBossBattleStatus(game)
     val shopItems = JSONArray()
     catalog.shopItems.forEach { item ->
         val owned = item.id in game.shopPurchases
@@ -85,10 +95,10 @@ internal fun desktopWebPlayState(
         .put("lootRareChests", game.lootRareChests)
         .put("lootEpicChests", game.lootEpicChests)
         .put("activeBossBattle", game.activeBossBattleWorldId != null)
-        .put("activeBossName", "")
-        .put("activeBossHpTotal", 0)
-        .put("activeBossHpRemaining", 0)
-        .put("worlds", JSONArray())
+        .put("activeBossName", bossStatus?.bossName ?: "")
+        .put("activeBossHpTotal", bossStatus?.hp ?: 0)
+        .put("activeBossHpRemaining", bossStatus?.let { (it.hp - it.damage).coerceAtLeast(0) } ?: 0)
+        .put("worlds", worlds)
         .put("activeBossWorldId", game.activeBossBattleWorldId ?: "")
         .put("endlessRiftActive", game.endlessRiftActive)
         .put("lastRandomEventId", game.lastRandomEventId ?: "")
