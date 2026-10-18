@@ -75,8 +75,6 @@ object UpdateChannelChecker {
         val runNumber = latest.optInt("run_number", 0)
         val commit = latest.optString("head_sha")
         if (runId <= 0L || commit.isBlank()) return Result.Unavailable
-        if (BuildConfig.GIT_COMMIT_SHA != "unknown" && commit == BuildConfig.GIT_COMMIT_SHA) return Result.UpToDate
-
         val artifactResponse = getJson("https://api.github.com/repos/$REPOSITORY/actions/runs/$runId/artifacts")
         val artifacts = artifactResponse.optJSONArray("artifacts") ?: return Result.Unavailable
         val artifact = (0 until artifacts.length())
@@ -89,19 +87,20 @@ object UpdateChannelChecker {
 
         val downloadUrl = artifact.optString("archive_download_url")
         if (downloadUrl.isBlank() || !isGithubUrl(downloadUrl)) return Result.Unavailable
+        if (BuildConfig.GIT_COMMIT_SHA != "unknown" && commit == BuildConfig.GIT_COMMIT_SHA) return Result.UpToDate
         val htmlUrl = latest.optString("html_url", "https://github.com/$REPOSITORY/actions/workflows/$DEBUG_WORKFLOW")
         if (!isGithubUrl(htmlUrl)) return Result.Unavailable
         val buildGradle = getText("https://raw.githubusercontent.com/$REPOSITORY/$commit/app/build.gradle.kts")
-        val versionName = Regex("""versionName\\s*=\\s*"([^"]+)"""").find(buildGradle)?.groupValues?.getOrNull(1)
+        val versionName = Regex("versionName\\\\s*=\\\\s*\\\"([^\\\"]+)\\\"").find(buildGradle)?.groupValues?.getOrNull(1)
             ?: return Result.Unavailable
-        val versionCode = Regex("""versionCode\\s*=\\s*(\\d+)""").find(buildGradle)?.groupValues?.getOrNull(1)
+        val versionCode = Regex("versionCode\\\\s*=\\\\s*(\\\\d+)").find(buildGradle)?.groupValues?.getOrNull(1)
             ?: return Result.Unavailable
         val commitMessage = latest.optJSONObject("head_commit")?.optString("message").orEmpty().take(900)
         return Result.Available(
             AvailableUpdate(
                 title = "v$versionName ($versionCode) · Debug #$runNumber",
                 url = htmlUrl,
-                details = listOf(commitMessage.ifBlank { "Stable Debug APK update" }, "Commit ${commit.take(7)} · ZIP artifact").joinToString("\\n\\n"),
+                details = listOf(commitMessage.ifBlank { "Stable Debug APK update" }, "Commit ${commit.take(7)} · ZIP artifact").joinToString("\n\n"),
                 downloadUrl = downloadUrl,
                 expectedCommitSha = commit
             )
