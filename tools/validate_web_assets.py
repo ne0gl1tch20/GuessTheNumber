@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
@@ -90,7 +89,7 @@ def check_css(path: Path) -> list[str]:
         if quote:
             if escaped:
                 escaped = False
-            elif char == "\\\\":
+            elif char == "\\\":
                 escaped = True
             elif char == quote:
                 quote = None
