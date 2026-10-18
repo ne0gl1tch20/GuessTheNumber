@@ -164,7 +164,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             val anySaveCheck = saveManager.hasAnyValidSave()
             withContext(Dispatchers.Main) { _hasAnySave.value = anySaveCheck }
-            if (anySaveCheck) startAutoSave()
+            if (anySaveCheck && !saveManager.getSlotMetadata(targetSlot).isEmpty) startAutoSave()
 
             saveManager.migrateTutorialCompletionToGlobal()
 
@@ -1600,6 +1600,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             slotOperationMutex.withLock {
                 val slot = _activeSlot.value
+                if (saveManager.getSlotMetadata(slot).isEmpty) return@withLock
                 val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
                 GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_ASYNC_BEGIN", "Persisting game state for slot=$slot.")
                 if (saveManager.saveGame(state, slot)) {
@@ -1619,6 +1620,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 delay(30000)
                 slotOperationMutex.withLock {
                     val slot = _activeSlot.value
+                    if (saveManager.getSlotMetadata(slot).isEmpty) return@withLock
                     val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
                     if (saveManager.saveGame(state, slot)) {
                         WidgetRefresh.request(getApplication<Application>())
