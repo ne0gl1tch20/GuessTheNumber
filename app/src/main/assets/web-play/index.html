@@ -24,23 +24,30 @@
       <button type="button" role="tab" id="tab-arcade" aria-controls="screen-arcade" aria-selected="false" data-screen-target="arcade" tabindex="-1"><span class="nav-icon" aria-hidden="true">🎮</span><b data-i18n="arcade">Arcade</b></button>
       <button type="button" role="tab" id="tab-play" aria-controls="screen-play" aria-selected="true" data-screen-target="play"><span class="nav-icon" aria-hidden="true">▶</span><b>Play</b></button>
       <button type="button" role="tab" id="tab-upgrades" aria-controls="screen-upgrades" aria-selected="false" data-screen-target="upgrades" tabindex="-1"><span class="nav-icon" aria-hidden="true">⬆</span><b>Upgrades</b></button>
-      <button type="button" id="tab-more" aria-controls="moreMenu" aria-expanded="false" aria-haspopup="true"><span class="nav-icon" aria-hidden="true">☰</span><b>More</b></button>
+      <button type="button" role="tab" id="tab-more" aria-controls="screen-more" aria-selected="false" data-screen-target="more" tabindex="-1"><span class="nav-icon" aria-hidden="true">☰</span><b>More</b></button>
     </nav>
-    <div class="more-menu" id="moreMenu" aria-label="More game sections" hidden>
-      <button type="button" id="more-rewards" data-screen-target="rewards" tabindex="-1"><span>🏆</span><b>Rewards</b></button>
-      <button type="button" id="more-journey" data-screen-target="journey" tabindex="-1"><span>◷</span><b>Journey</b></button>
-      <button type="button" id="more-shop" data-screen-target="shop" tabindex="-1"><span>✦</span><b>Shop</b></button>
-      <button type="button" id="more-homebase" data-screen-target="homebase" tabindex="-1"><span>⌂</span><b>Home Base</b></button>
-      <button type="button" id="more-relics" data-screen-target="relics" tabindex="-1"><span>✧</span><b>Relics</b></button>
-      <button type="button" id="more-codex" data-screen-target="codex" tabindex="-1"><span>▤</span><b>Codex</b></button>
-      <button type="button" id="more-settings" data-screen-target="settings" tabindex="-1"><span>⚙</span><b>Settings</b></button>
-      <button type="button" id="more-prestige" data-screen-target="prestige" tabindex="-1"><span>✧</span><b>Prestige</b></button>
-      <button type="button" id="more-ultra" data-screen-target="ultra" tabindex="-1"><span>✦</span><b>Ultra</b></button>
-      <button type="button" id="more-talents" data-screen-target="talent" tabindex="-1"><span>⌘</span><b>Talents</b></button>
-      <button type="button" id="more-mutators" data-screen-target="mutators" tabindex="-1"><span>◈</span><b>Mutators</b></button>
-      <button type="button" id="more-stats" data-screen-target="stats" tabindex="-1"><span>▤</span><b data-i18n="stats">Stats</b></button>
-      <button type="button" id="more-stake" data-screen-target="stake" tabindex="-1"><span>★</span><b data-i18n="staking_flip_button">Lucky Stake</b></button>
-    </div>
+    <section class="screen more-screen" id="screen-more" role="tabpanel" aria-labelledby="tab-more" data-screen="more" hidden>
+      <section class="more-heading card">
+        <span class="eyebrow">YOUR GAME</span>
+        <h2>More</h2>
+        <p>Progress, rewards and settings, all in one place.</p>
+      </section>
+      <section class="more-links" aria-label="More game sections">
+        <button type="button" class="more-link-card" data-screen-target="rewards"><span>🏆</span><span><b>Rewards</b><small>Achievements and daily rewards</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="journey"><span>◷</span><span><b>Journey</b><small>Your run history and progress</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="shop"><span>✦</span><span><b>Shop</b><small>Browse available items</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="homebase"><span>⌂</span><span><b>Home Base</b><small>Build up your base</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="relics"><span>✧</span><span><b>Relics</b><small>Manage your relic collection</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="codex"><span>▤</span><span><b>Codex</b><small>Explore discoveries</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="settings"><span>⚙</span><span><b>Settings</b><small>Customize your experience</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="prestige"><span>✧</span><span><b>Prestige</b><small>Prestige upgrades and resets</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="ultra"><span>✦</span><span><b>Ultra</b><small>Ultra progression</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="talent"><span>⌘</span><span><b>Talents</b><small>Build your talent path</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="mutators"><span>◈</span><span><b>Mutators</b><small>Customize challenge rules</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="stats"><span>▤</span><span><b data-i18n="stats">Stats</b><small>Review your game statistics</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="stake"><span>★</span><span><b data-i18n="staking_flip_button">Lucky Stake</b><small>Try your luck with a stake</small></span><strong aria-hidden="true">›</strong></button>
+      </section>
+    </section>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
       <div class="hero-glow"></div>
