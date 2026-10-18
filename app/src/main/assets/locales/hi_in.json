@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "त्वरित परिचय",
   "more_feature_discovery_step_1": "इस सुविधा के अपने टूल और प्रगति हैं। एक नज़र डालें, फिर चुनें कि आप क्या देखना चाहते हैं।",
   "more_feature_discovery_step_2": "आप जब चाहें More Hub से इस सुविधा पर लौट सकते हैं।",
-  "more_feature_discovery_skip": "छोड़ें और खोलें"
+  "more_feature_discovery_skip": "छोड़ें और खोलें",
+  "game_temporarily_unavailable": "गेम अभी उपलब्ध नहीं है। कृपया इसे फिर से खोलें।",
+  "settings_synced_status": "आपकी प्राथमिकताएँ सहेजी गई हैं।",
+  "stake_invalid_amount": "दाँव के लिए धनात्मक पूर्ण संख्या दर्ज करें।",
+  "stake_flipping_status": "सिक्का उछाला जा रहा है…"
 }

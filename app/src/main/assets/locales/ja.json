@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "クイックツアー",
   "more_feature_discovery_step_1": "この機能には専用のツールと進行状況があります。少し確認して、探索したいものを選びましょう。",
   "more_feature_discovery_step_2": "いつでもMore Hubからこの機能に戻れます。",
-  "more_feature_discovery_skip": "スキップして開く"
+  "more_feature_discovery_skip": "スキップして開く",
+  "game_temporarily_unavailable": "現在ゲームを利用できません。もう一度開いてください。",
+  "settings_synced_status": "設定を保存しました。",
+  "stake_invalid_amount": "賭け金には正の整数を入力してください。",
+  "stake_flipping_status": "コインを投げています…"
 }

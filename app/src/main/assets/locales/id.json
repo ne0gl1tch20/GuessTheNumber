@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Tur singkat",
   "more_feature_discovery_step_1": "Fitur ini memiliki alat dan progresnya sendiri. Lihat sebentar, lalu pilih apa yang ingin dijelajahi.",
   "more_feature_discovery_step_2": "Kamu bisa kembali ke fitur ini dari Hub Lainnya kapan saja.",
-  "more_feature_discovery_skip": "Lewati dan buka"
+  "more_feature_discovery_skip": "Lewati dan buka",
+  "game_temporarily_unavailable": "Game sedang tidak tersedia. Silakan buka kembali.",
+  "settings_synced_status": "Preferensi Anda telah disimpan.",
+  "stake_invalid_amount": "Masukkan taruhan berupa bilangan bulat positif.",
+  "stake_flipping_status": "Koin sedang dilempar…"
 }

@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Hướng dẫn nhanh",
   "more_feature_discovery_step_1": "Tính năng này có công cụ và tiến trình riêng. Hãy xem qua rồi chọn nội dung bạn muốn khám phá.",
   "more_feature_discovery_step_2": "Bạn có thể quay lại tính năng này từ More Hub bất cứ lúc nào.",
-  "more_feature_discovery_skip": "Bỏ qua và mở"
+  "more_feature_discovery_skip": "Bỏ qua và mở",
+  "game_temporarily_unavailable": "Hiện không thể chơi trò chơi. Vui lòng mở lại.",
+  "settings_synced_status": "Tùy chọn của bạn đã được lưu.",
+  "stake_invalid_amount": "Nhập số nguyên dương cho tiền cược.",
+  "stake_flipping_status": "Đang tung đồng xu…"
 }

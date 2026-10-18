@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Краткий обзор",
   "more_feature_discovery_step_1": "У этой функции есть собственные инструменты и прогресс. Осмотритесь и выберите, что хотите изучить.",
   "more_feature_discovery_step_2": "Вы можете в любое время вернуться к этой функции через More Hub.",
-  "more_feature_discovery_skip": "Пропустить и открыть"
+  "more_feature_discovery_skip": "Пропустить и открыть",
+  "game_temporarily_unavailable": "Игра сейчас недоступна. Откройте её снова.",
+  "settings_synced_status": "Ваши настройки сохранены.",
+  "stake_invalid_amount": "Введите положительное целое число для ставки.",
+  "stake_flipping_status": "Подбрасываем монету…"
 }

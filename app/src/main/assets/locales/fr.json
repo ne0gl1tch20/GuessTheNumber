@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Visite guidée",
   "more_feature_discovery_step_1": "Cette fonctionnalité possède ses propres outils et sa propre progression. Jetez-y un œil, puis choisissez ce que vous souhaitez explorer.",
   "more_feature_discovery_step_2": "Vous pouvez revenir à cette fonctionnalité depuis le Hub Plus à tout moment.",
-  "more_feature_discovery_skip": "Ignorer et ouvrir"
+  "more_feature_discovery_skip": "Ignorer et ouvrir",
+  "game_temporarily_unavailable": "Le jeu est indisponible pour le moment. Rouvrez-le.",
+  "settings_synced_status": "Vos préférences sont enregistrées.",
+  "stake_invalid_amount": "Saisissez une mise sous forme de nombre entier positif.",
+  "stake_flipping_status": "Lancement de la pièce…"
 }

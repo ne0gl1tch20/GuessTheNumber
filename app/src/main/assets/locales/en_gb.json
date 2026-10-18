@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Quick tour",
   "more_feature_discovery_step_1": "This feature has its own tools and progress. Take a quick look, then choose what to explore.",
   "more_feature_discovery_step_2": "You can return to this feature from the More Hub whenever you want.",
-  "more_feature_discovery_skip": "Skip and open"
+  "more_feature_discovery_skip": "Skip and open",
+  "game_temporarily_unavailable": "The game is unavailable right now. Please reopen it.",
+  "settings_synced_status": "Your preferences are saved.",
+  "stake_invalid_amount": "Enter a positive whole number for your stake.",
+  "stake_flipping_status": "Flipping…"
 }

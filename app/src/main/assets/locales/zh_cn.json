@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "快速导览",
   "more_feature_discovery_step_1": "此功能有自己的工具和进度。先简单了解一下，再选择想探索的内容。",
   "more_feature_discovery_step_2": "你可以随时从 More Hub 返回此功能。",
-  "more_feature_discovery_skip": "跳过并打开"
+  "more_feature_discovery_skip": "跳过并打开",
+  "game_temporarily_unavailable": "游戏暂时无法使用，请重新打开。",
+  "settings_synced_status": "已保存你的偏好设置。",
+  "stake_invalid_amount": "请输入正整数作为下注金额。",
+  "stake_flipping_status": "正在抛硬币…"
 }

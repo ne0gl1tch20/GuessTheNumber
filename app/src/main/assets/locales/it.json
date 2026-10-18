@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Breve guida",
   "more_feature_discovery_step_1": "Questa funzione ha strumenti e progressi propri. Dai un’occhiata e poi scegli cosa esplorare.",
   "more_feature_discovery_step_2": "Puoi tornare a questa funzione dal More Hub quando vuoi.",
-  "more_feature_discovery_skip": "Salta e apri"
+  "more_feature_discovery_skip": "Salta e apri",
+  "game_temporarily_unavailable": "Il gioco non è disponibile al momento. Riaprilo.",
+  "settings_synced_status": "Le tue preferenze sono salvate.",
+  "stake_invalid_amount": "Inserisci una puntata come numero intero positivo.",
+  "stake_flipping_status": "Lancio della moneta…"
 }

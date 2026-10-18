@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "แนะนำอย่างย่อ",
   "more_feature_discovery_step_1": "ฟีเจอร์นี้มีเครื่องมือและความคืบหน้าของตัวเอง ลองดูคร่าว ๆ แล้วเลือกสิ่งที่ต้องการสำรวจ",
   "more_feature_discovery_step_2": "คุณกลับมาที่ฟีเจอร์นี้จาก More Hub ได้ทุกเมื่อ",
-  "more_feature_discovery_skip": "ข้ามและเปิด"
+  "more_feature_discovery_skip": "ข้ามและเปิด",
+  "game_temporarily_unavailable": "ขณะนี้เกมยังใช้งานไม่ได้ โปรดเปิดเกมอีกครั้ง",
+  "settings_synced_status": "บันทึกการตั้งค่าของคุณแล้ว",
+  "stake_invalid_amount": "ป้อนจำนวนเต็มบวกสำหรับเงินเดิมพัน",
+  "stake_flipping_status": "กำลังโยนเหรียญ…"
 }
