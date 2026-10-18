@@ -1133,7 +1133,7 @@
   "changelog_foundation_title": "Safer updates and app branding",
   "changelog_foundation_update": "Debug updates validate the selected build and APK before installation.",
   "changelog_foundation_icon": "The Android launcher icon is generated from GTN_APP_LOGO.png.",
-  "changelog_foundation_offline": "Core game progression and saves remain offline-first and Kotlin-authoritative.",
+  "changelog_foundation_offline": "Core game progression and saves stay offline-first and work consistently across the app.",
   "incorrect_guess_low_1": "A little higher!",
   "incorrect_guess_low_2": "Try a bigger number.",
   "incorrect_guess_low_3": "Your target is above that!",
