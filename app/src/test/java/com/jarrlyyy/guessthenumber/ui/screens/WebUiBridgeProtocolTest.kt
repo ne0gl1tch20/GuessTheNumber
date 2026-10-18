@@ -108,6 +108,15 @@ class WebUiBridgeProtocolTest {
         assertEquals("invalid_setting_value", (invalidValue as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
+
+    @Test
+    fun acceptsOnlyKnownResetActions() {
+        assertEquals(WebUiBridgeProtocol.ParseResult.Valid("prestige-1", "prestige_reset"), WebUiBridgeProtocol.parse("""{"version":1,"id":"prestige-1","type":"prestige_reset"}"""))
+        assertEquals(WebUiBridgeProtocol.ParseResult.Valid("ultra-1", "ultra_reset"), WebUiBridgeProtocol.parse("""{"version":1,"id":"ultra-1","type":"ultra_reset"}"""))
+        val extra = WebUiBridgeProtocol.parse("""{"version":1,"id":"ultra-2","type":"ultra_reset","reward":999999}""")
+        assertEquals("invalid_request", (extra as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
     @Test
     fun acceptsIncrementRequest() {
         assertEquals(

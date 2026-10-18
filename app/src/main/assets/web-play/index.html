@@ -31,6 +31,8 @@
       <button type="button" role="tab" id="tab-relics" aria-controls="screen-relics" aria-selected="false" data-screen-target="relics" tabindex="-1"><span class="nav-icon" aria-hidden="true">✧</span><b>Relics</b></button>
       <button type="button" role="tab" id="tab-codex" aria-controls="screen-codex" aria-selected="false" data-screen-target="codex" tabindex="-1"><span class="nav-icon" aria-hidden="true">▤</span><b>Codex</b></button>
       <button type="button" role="tab" id="tab-settings" aria-controls="screen-settings" aria-selected="false" data-screen-target="settings" tabindex="-1"><span class="nav-icon" aria-hidden="true">⚙</span><b>Settings</b></button>
+      <button type="button" role="tab" id="tab-prestige" aria-controls="screen-prestige" aria-selected="false" data-screen-target="prestige" tabindex="-1"><span class="nav-icon" aria-hidden="true">✧</span><b>Prestige</b></button>
+      <button type="button" role="tab" id="tab-ultra" aria-controls="screen-ultra" aria-selected="false" data-screen-target="ultra" tabindex="-1"><span class="nav-icon" aria-hidden="true">✦</span><b>Ultra</b></button>
     </nav>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
@@ -242,6 +244,24 @@
           <label class="setting-row"><span><strong>Reduce flashes</strong><small>Reduce celebratory flashes and visual bursts.</small></span><input type="checkbox" data-setting-toggle="reduceFlashes" aria-label="Reduce flashes"></label>
         </div>
         <p class="catalog-intro" id="settingsStatus" role="status" aria-live="polite">Syncing saved preferences…</p>
+      </section>
+    </div>
+    <div class="screen" id="screen-prestige" role="tabpanel" aria-labelledby="tab-prestige" data-screen="prestige" hidden>
+      <section class="card catalog-panel">
+        <div class="panel-title"><span class="panel-glyph">✧</span><div><span class="eyebrow">RESET FOR PERMANENT POWER</span><h2>Prestige</h2></div><span class="panel-chip" id="prestigeCountPanel">0 ASCENSIONS</span></div>
+        <div class="reset-summary"><div><span>Current Prestige</span><strong id="prestigeCurrent">0</strong></div><div><span>Next reward</span><strong id="prestigeReward">0</strong></div><div><span>Money required</span><strong id="prestigeRequirement">0</strong></div></div>
+        <p class="catalog-intro">Prestige resets your regular upgrades and Money, while keeping permanent Prestige progress. Review the reward before resetting.</p>
+        <button type="button" class="world-action-button" id="prestigeResetButton" data-bridge-action="prestige_reset">Prestige reset</button>
+        <p class="catalog-intro" id="prestigeStatus" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+    <div class="screen" id="screen-ultra" role="tabpanel" aria-labelledby="tab-ultra" data-screen="ultra" hidden>
+      <section class="card catalog-panel">
+        <div class="panel-title"><span class="panel-glyph">✦</span><div><span class="eyebrow">ASCEND BEYOND PRESTIGE</span><h2>Ultra</h2></div><span class="panel-chip" id="ultraCountPanel">0 RESETS</span></div>
+        <div class="reset-summary"><div><span>Current Ultra</span><strong id="ultraCurrent">0</strong></div><div><span>Next reward</span><strong id="ultraReward">0</strong></div><div><span>Money required</span><strong id="ultraRequirement">0</strong></div></div>
+        <p class="catalog-intro">Ultra requires at least 1,000 Prestige and enough Money. It resets Prestige and regular upgrades for permanent Ultra progress.</p>
+        <button type="button" class="world-action-button" id="ultraResetButton" data-bridge-action="ultra_reset">Ultra reset</button>
+        <p class="catalog-intro" id="ultraStatus" role="status" aria-live="polite"></p>
       </section>
     </div>
   </main>

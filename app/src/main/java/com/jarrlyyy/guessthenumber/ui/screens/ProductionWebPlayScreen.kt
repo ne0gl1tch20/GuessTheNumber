@@ -23,6 +23,7 @@ import org.json.JSONObject
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GuessSubmissionResult
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
@@ -44,9 +45,12 @@ fun ProductionWebPlayScreen(
     onBuyShopItem: (String, Long) -> Unit,
     onEquipCosmetic: (String) -> Unit,
     onUpdateMultiplier: (String) -> Unit,
-    onUpdateSettings: (GameSettings) -> Unit
+    onUpdateSettings: (GameSettings) -> Unit,
+    onPrestigeReset: () -> Unit,
+    onUltraReset: () -> Unit
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
+    val progressionEngine = remember { GameEngine() }
     val currentGameState by rememberUpdatedState(state)
     val currentIncome by rememberUpdatedState(incomePerSecond)
     val readState by rememberUpdatedState(stateProvider)
@@ -119,6 +123,8 @@ fun ProductionWebPlayScreen(
                                                 "navigate" -> parsed.route?.let(navigateProgression)
                                                 "homebase_upgrade" -> navigateProgression("home_upgrade")
                                                 "codex_reward" -> navigateProgression("claim_codex")
+                                                "prestige_reset" -> onPrestigeReset()
+                                                "ultra_reset" -> onUltraReset()
                                                 "relic_action" -> parsed.relicId?.let { navigateProgression("equip_relic:$it") }
                                                 "world_action" -> if (parsed.worldId != null && parsed.worldAction != null) dispatchWorldAction(parsed.worldId, parsed.worldAction)
                                                 "update_setting" -> {
@@ -262,6 +268,12 @@ fun ProductionWebPlayScreen(
                                         }
                                         val viewState = JSONObject()
                                             .put("buyMultiplier", game.buyMultiplier)
+                                            .put("prestigeRequirement", progressionEngine.calculatePrestigeRequirement(game.prestigeCount).format())
+                                            .put("prestigeReward", progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount).format())
+                                            .put("canPrestige", game.money >= progressionEngine.calculatePrestigeRequirement(game.prestigeCount) && progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount) > BigNumber.ZERO)
+                                            .put("ultraRequirement", progressionEngine.calculateUltraRequirement(game.ultraCount).format())
+                                            .put("ultraReward", progressionEngine.calculateUltraReward(game.money, game.ultraCount).format())
+                                            .put("canUltra", game.money >= progressionEngine.calculateUltraRequirement(game.ultraCount) && game.prestige >= BigNumber(1_000) && progressionEngine.calculateUltraReward(game.money, game.ultraCount) > BigNumber.ZERO)
                                             .put("settings", JSONObject().put("musicEnabled", game.settings.musicEnabled).put("soundEnabled", game.settings.soundEnabled).put("vibrationEnabled", game.settings.vibrationEnabled).put("reducedMotion", game.settings.reducedMotion).put("reduceFlashes", game.settings.reduceFlashes))
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
