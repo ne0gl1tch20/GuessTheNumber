@@ -75,6 +75,10 @@ class DesktopSharedWebAssetsTest {
         keys.forEach { key -> assertTrue("Missing shared UI translation: $key", strings.has(key)) }
         keys.forEach { key -> assertTrue("Settings markup must use $key", html.contains("data-i18n=\"$key\"")) }
         assertFalse(html.contains("Changes apply on both Android and Windows"))
+        val playerCopy = html.lowercase()
+        listOf("kotlin", "javascript", "lua", "scripting language").forEach { term ->
+            assertFalse("Player-facing HTML should not expose implementation jargon: $term", playerCopy.contains(term))
+        }
     }
 
     @Test
