@@ -359,6 +359,7 @@ fun ProductionGuessGameScreen(
                         val expectedKeys = when (type) {
                             "read_state" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest" -> 4
+                            "world_action" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
@@ -438,6 +439,14 @@ fun ProductionGuessGameScreen(
                                     "claim_daily_quest" -> DesktopEconomyTransactions.claimDailyQuest(
                                         before, request.optString("questId"), LocalDate.now().toString()
                                     )
+                                    "world_action" -> {
+                                        val worldId = request.optString("worldId")
+                                        when (request.optString("action")) {
+                                            "unlock" -> DesktopEconomyTransactions.unlockWorld(before, worldId)
+                                            "boss" -> DesktopEconomyTransactions.toggleBossBattle(before, worldId)
+                                            else -> null
+                                        }
+                                    }
                                     "open_loot_chest" -> {
                                         val tier = request.optString("tier")
                                         val available = when (tier) {
