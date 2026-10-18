@@ -85,6 +85,9 @@ class WebUiBridgeProtocolTest {
             WebUiBridgeProtocol.ParseResult.Valid("nav-slots", "navigate", route = "save_slots"),
             WebUiBridgeProtocol.parse("""{"version":1,"id":"nav-slots","type":"navigate","route":"save_slots"}""")
         )
+        assertEquals(WebUiBridgeProtocol.ParseResult.Valid("color-1", "navigate", route = "color_picker_primary"), WebUiBridgeProtocol.parse("""{"version":1,"id":"color-1","type":"navigate","route":"color_picker_primary"}"""))
+        assertEquals(WebUiBridgeProtocol.ParseResult.Valid("color-2", "navigate", route = "color_picker_secondary"), WebUiBridgeProtocol.parse("""{"version":1,"id":"color-2","type":"navigate","route":"color_picker_secondary"}"""))
+        assertEquals(WebUiBridgeProtocol.ParseResult.Valid("color-3", "navigate", route = "color_picker_tertiary"), WebUiBridgeProtocol.parse("""{"version":1,"id":"color-3","type":"navigate","route":"color_picker_tertiary"}"""))
         val debugRoute = WebUiBridgeProtocol.parse("""{"version":1,"id":"nav-2","type":"navigate","route":"dev_settings"}""")
         if (com.jarrlyyy.guessthenumber.BuildConfig.DEBUG) {
             assertEquals(
