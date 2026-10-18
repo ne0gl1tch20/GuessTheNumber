@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "現在ゲームを利用できません。もう一度開いてください。",
   "settings_synced_status": "設定を保存しました。",
   "stake_invalid_amount": "賭け金には正の整数を入力してください。",
-  "stake_flipping_status": "コインを投げています…"
+  "stake_flipping_status": "コインを投げています…",
+  "duration_seconds_format": "%s 秒",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "ラッキーステーク",
+  "minigame_catalog_unavailable": "アーケードは現在利用できません。",
+  "action_in_progress": "処理中…",
+  "action_saving_reward": "報酬を保存中…",
+  "reaction_wait": "待って…",
+  "reaction_tap_now": "今すぐタップ！",
+  "action_failed_retry": "操作を完了できませんでした。もう一度お試しください。"
 }

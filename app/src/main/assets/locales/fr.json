@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "Le jeu est indisponible pour le moment. Rouvrez-le.",
   "settings_synced_status": "Vos préférences sont enregistrées.",
   "stake_invalid_amount": "Saisissez une mise sous forme de nombre entier positif.",
-  "stake_flipping_status": "Lancement de la pièce…"
+  "stake_flipping_status": "Lancement de la pièce…",
+  "duration_seconds_format": "%s s",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Mise chanceuse",
+  "minigame_catalog_unavailable": "L’arcade est indisponible pour le moment.",
+  "action_in_progress": "Traitement…",
+  "action_saving_reward": "Enregistrement de la récompense…",
+  "reaction_wait": "Attendez…",
+  "reaction_tap_now": "Touchez maintenant !",
+  "action_failed_retry": "Action impossible. Réessayez."
 }

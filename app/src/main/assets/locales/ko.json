@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "현재 게임을 사용할 수 없습니다. 다시 열어 주세요.",
   "settings_synced_status": "환경설정이 저장되었습니다.",
   "stake_invalid_amount": "베팅 금액에 양의 정수를 입력하세요.",
-  "stake_flipping_status": "동전을 던지는 중…"
+  "stake_flipping_status": "동전을 던지는 중…",
+  "duration_seconds_format": "%s초",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "행운 베팅",
+  "minigame_catalog_unavailable": "아케이드를 지금 사용할 수 없습니다.",
+  "action_in_progress": "처리 중…",
+  "action_saving_reward": "보상을 저장하는 중…",
+  "reaction_wait": "잠시 기다리세요…",
+  "reaction_tap_now": "지금 탭하세요!",
+  "action_failed_retry": "작업을 완료하지 못했습니다. 다시 시도하세요."
 }

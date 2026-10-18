@@ -1099,5 +1099,15 @@
   "game_temporarily_unavailable": "اللعبة غير متاحة الآن. يُرجى فتحها مجددًا.",
   "settings_synced_status": "تم حفظ تفضيلاتك.",
   "stake_invalid_amount": "أدخل عددًا صحيحًا موجبًا للمبلغ المراهن عليه.",
-  "stake_flipping_status": "جارٍ رمي العملة…"
+  "stake_flipping_status": "جارٍ رمي العملة…",
+  "duration_seconds_format": "%s ث",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "رهان الحظ",
+  "minigame_catalog_unavailable": "الألعاب غير متاحة الآن.",
+  "action_in_progress": "جارٍ التنفيذ…",
+  "action_saving_reward": "جارٍ حفظ المكافأة…",
+  "reaction_wait": "انتظر…",
+  "reaction_tap_now": "اضغط الآن!",
+  "action_failed_retry": "تعذر إكمال الإجراء. حاول مرة أخرى."
 }

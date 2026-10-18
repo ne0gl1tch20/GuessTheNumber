@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "Hiện không thể chơi trò chơi. Vui lòng mở lại.",
   "settings_synced_status": "Tùy chọn của bạn đã được lưu.",
   "stake_invalid_amount": "Nhập số nguyên dương cho tiền cược.",
-  "stake_flipping_status": "Đang tung đồng xu…"
+  "stake_flipping_status": "Đang tung đồng xu…",
+  "duration_seconds_format": "%s giây",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Cược may mắn",
+  "minigame_catalog_unavailable": "Khu trò chơi hiện không khả dụng.",
+  "action_in_progress": "Đang xử lý…",
+  "action_saving_reward": "Đang lưu phần thưởng…",
+  "reaction_wait": "Chờ…",
+  "reaction_tap_now": "Chạm ngay!",
+  "action_failed_retry": "Không thể hoàn tất thao tác. Hãy thử lại."
 }

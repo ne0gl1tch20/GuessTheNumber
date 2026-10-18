@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "Гра зараз недоступна. Відкрийте її знову.",
   "settings_synced_status": "Ваші налаштування збережено.",
   "stake_invalid_amount": "Введіть додатне ціле число для ставки.",
-  "stake_flipping_status": "Підкидаємо монету…"
+  "stake_flipping_status": "Підкидаємо монету…",
+  "duration_seconds_format": "%s с",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Щаслива ставка",
+  "minigame_catalog_unavailable": "Аркада зараз недоступна.",
+  "action_in_progress": "Обробка…",
+  "action_saving_reward": "Збереження нагороди…",
+  "reaction_wait": "Зачекайте…",
+  "reaction_tap_now": "Натисніть зараз!",
+  "action_failed_retry": "Не вдалося виконати дію. Спробуйте ще раз."
 }

@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "गेम अभी उपलब्ध नहीं है। कृपया इसे फिर से खोलें।",
   "settings_synced_status": "आपकी प्राथमिकताएँ सहेजी गई हैं।",
   "stake_invalid_amount": "दाँव के लिए धनात्मक पूर्ण संख्या दर्ज करें।",
-  "stake_flipping_status": "सिक्का उछाला जा रहा है…"
+  "stake_flipping_status": "सिक्का उछाला जा रहा है…",
+  "duration_seconds_format": "%s सेकंड",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "लकी दांव",
+  "minigame_catalog_unavailable": "आर्केड अभी उपलब्ध नहीं है।",
+  "action_in_progress": "काम हो रहा है…",
+  "action_saving_reward": "इनाम सहेजा जा रहा है…",
+  "reaction_wait": "रुकें…",
+  "reaction_tap_now": "अभी टैप करें!",
+  "action_failed_retry": "कार्रवाई पूरी नहीं हुई। फिर कोशिश करें।"
 }

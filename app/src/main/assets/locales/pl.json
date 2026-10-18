@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "Gra jest teraz niedostępna. Otwórz ją ponownie.",
   "settings_synced_status": "Twoje preferencje zostały zapisane.",
   "stake_invalid_amount": "Wpisz dodatnią liczbę całkowitą jako stawkę.",
-  "stake_flipping_status": "Rzut monetą…"
+  "stake_flipping_status": "Rzut monetą…",
+  "duration_seconds_format": "%s s",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Szczęśliwy zakład",
+  "minigame_catalog_unavailable": "Salon gier jest teraz niedostępny.",
+  "action_in_progress": "Przetwarzanie…",
+  "action_saving_reward": "Zapisywanie nagrody…",
+  "reaction_wait": "Czekaj…",
+  "reaction_tap_now": "Dotknij teraz!",
+  "action_failed_retry": "Nie udało się wykonać działania. Spróbuj ponownie."
 }

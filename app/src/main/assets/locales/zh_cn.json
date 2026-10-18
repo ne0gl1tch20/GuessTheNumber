@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "游戏暂时无法使用，请重新打开。",
   "settings_synced_status": "已保存你的偏好设置。",
   "stake_invalid_amount": "请输入正整数作为下注金额。",
-  "stake_flipping_status": "正在抛硬币…"
+  "stake_flipping_status": "正在抛硬币…",
+  "duration_seconds_format": "%s 秒",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "幸运下注",
+  "minigame_catalog_unavailable": "街机目前不可用。",
+  "action_in_progress": "正在处理…",
+  "action_saving_reward": "正在保存奖励…",
+  "reaction_wait": "请稍候…",
+  "reaction_tap_now": "现在点击！",
+  "action_failed_retry": "操作未能完成，请重试。"
 }

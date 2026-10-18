@@ -31,6 +31,9 @@ REQUIRED_SHARED_KEYS = {
     "ultra_achieved_title", "prestige_achieved_title", "settings_custom_theme_color",
     "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime",
     "stats_current_number_range",
+    "duration_seconds_format", "duration_ms_format", "duration_hms_format",
+    "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress",
+    "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry",
     "music_control_previous", "music_control_pause", "music_control_play",
     "music_control_next", "music_control_stop",
 }

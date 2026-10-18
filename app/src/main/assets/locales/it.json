@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "Il gioco non è disponibile al momento. Riaprilo.",
   "settings_synced_status": "Le tue preferenze sono salvate.",
   "stake_invalid_amount": "Inserisci una puntata come numero intero positivo.",
-  "stake_flipping_status": "Lancio della moneta…"
+  "stake_flipping_status": "Lancio della moneta…",
+  "duration_seconds_format": "%s s",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Puntata fortunata",
+  "minigame_catalog_unavailable": "La sala giochi non è disponibile al momento.",
+  "action_in_progress": "Elaborazione…",
+  "action_saving_reward": "Salvataggio della ricompensa…",
+  "reaction_wait": "Attendi…",
+  "reaction_tap_now": "Tocca ora!",
+  "action_failed_retry": "Azione non completata. Riprova."
 }

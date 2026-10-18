@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "Hindi muna magagamit ang laro. Buksan itong muli.",
   "settings_synced_status": "Naka-save ang iyong mga kagustuhan.",
   "stake_invalid_amount": "Maglagay ng positibong buong numero para sa pustang halaga.",
-  "stake_flipping_status": "Inihahagis ang barya…"
+  "stake_flipping_status": "Inihahagis ang barya…",
+  "duration_seconds_format": "%s seg",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Pusta ng Suwerte",
+  "minigame_catalog_unavailable": "Hindi available ang arcade sa ngayon.",
+  "action_in_progress": "Pinoproseso…",
+  "action_saving_reward": "Sine-save ang gantimpala…",
+  "reaction_wait": "Maghintay…",
+  "reaction_tap_now": "Pindutin na!",
+  "action_failed_retry": "Hindi natapos ang pagkilos. Subukang muli."
 }

@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "ขณะนี้เกมยังใช้งานไม่ได้ โปรดเปิดเกมอีกครั้ง",
   "settings_synced_status": "บันทึกการตั้งค่าของคุณแล้ว",
   "stake_invalid_amount": "ป้อนจำนวนเต็มบวกสำหรับเงินเดิมพัน",
-  "stake_flipping_status": "กำลังโยนเหรียญ…"
+  "stake_flipping_status": "กำลังโยนเหรียญ…",
+  "duration_seconds_format": "%s วินาที",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "เดิมพันนำโชค",
+  "minigame_catalog_unavailable": "อาร์เคดไม่พร้อมใช้งานในขณะนี้",
+  "action_in_progress": "กำลังดำเนินการ…",
+  "action_saving_reward": "กำลังบันทึกรางวัล…",
+  "reaction_wait": "รอสักครู่…",
+  "reaction_tap_now": "แตะเลย!",
+  "action_failed_retry": "ดำเนินการไม่สำเร็จ โปรดลองอีกครั้ง"
 }

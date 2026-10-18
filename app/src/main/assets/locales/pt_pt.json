@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "O jogo não está disponível neste momento. Abra-o novamente.",
   "settings_synced_status": "As suas preferências estão guardadas.",
   "stake_invalid_amount": "Introduza um número inteiro positivo para a aposta.",
-  "stake_flipping_status": "A lançar a moeda…"
+  "stake_flipping_status": "A lançar a moeda…",
+  "duration_seconds_format": "%s s",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Aposta da Sorte",
+  "minigame_catalog_unavailable": "O arcade não está disponível neste momento.",
+  "action_in_progress": "A processar…",
+  "action_saving_reward": "A guardar recompensa…",
+  "reaction_wait": "Aguarde…",
+  "reaction_tap_now": "Toque agora!",
+  "action_failed_retry": "Não foi possível concluir a ação. Tente novamente."
 }
