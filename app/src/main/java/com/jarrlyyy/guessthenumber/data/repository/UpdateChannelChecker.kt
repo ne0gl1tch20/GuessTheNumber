@@ -91,9 +91,9 @@ object UpdateChannelChecker {
         val htmlUrl = latest.optString("html_url", "https://github.com/$REPOSITORY/actions/workflows/$DEBUG_WORKFLOW")
         if (!isGithubUrl(htmlUrl)) return Result.Unavailable
         val buildGradle = getText("https://raw.githubusercontent.com/$REPOSITORY/$commit/app/build.gradle.kts")
-        val versionName = Regex("versionName\\\\s*=\\\\s*\\\"([^\\\"]+)\\\"").find(buildGradle)?.groupValues?.getOrNull(1)
+        val versionName = Regex("versionName\\s*=\\s*\"([^\"]+)\"").find(buildGradle)?.groupValues?.getOrNull(1)
             ?: return Result.Unavailable
-        val versionCode = Regex("versionCode\\\\s*=\\\\s*(\\\\d+)").find(buildGradle)?.groupValues?.getOrNull(1)
+        val versionCode = Regex("versionCode\\s*=\\s*(\\d+)").find(buildGradle)?.groupValues?.getOrNull(1)
             ?: return Result.Unavailable
         val commitMessage = latest.optJSONObject("head_commit")?.optString("message").orEmpty().take(900)
         return Result.Available(
