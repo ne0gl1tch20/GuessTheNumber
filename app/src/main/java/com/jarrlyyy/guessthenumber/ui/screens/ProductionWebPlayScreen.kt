@@ -317,7 +317,22 @@ fun ProductionWebPlayScreen(
                                             val canFight = game.endlessRiftActive || (game.correctGuesses >= world.fightCorrectGuesses && totalUpgradeLevels >= world.fightUpgradeCount && game.prestigeCount >= world.fightPrestigeCount && game.ultraCount >= world.fightUltraCount)
                                             val hp = world.hp + if (game.endlessRiftActive) ((game.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
                                             val damage = (game.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, hp)
-                                            worldsJson.put(JSONObject().put("id", world.id).put("name", world.fallback).put("bossId", world.bossId).put("bossName", world.bossFallback).put("hp", hp).put("damage", damage).put("unlocked", unlocked).put("defeated", defeated).put("canUnlock", canUnlock).put("canFight", canFight).put("active", game.activeWorldId == world.id).put("activeBoss", game.activeBossBattleWorldId == world.id))
+                                            worldsJson.put(JSONObject().put("id", world.id).put("name", world.fallback).put("bossId", world.bossId).put("bossName", world.bossFallback).put("hp", hp).put("damage", damage).put("unlocked", unlocked).put("defeated", defeated).put("canUnlock", canUnlock).put("canFight", canFight).put("active", game.activeWorldId == world.id).put("activeBoss", game.activeBossBattleWorldId == world.id)
+                                                .put("unlockRequirements", org.json.JSONArray().apply {
+                                                    world.unlockBossId?.let { requiredBossId ->
+                                                        if (requiredBossId !in game.defeatedBossIds) put("Defeat ${worldDefinitions.firstOrNull { it.bossId == requiredBossId }?.bossFallback ?: requiredBossId}")
+                                                    }
+                                                    if (game.correctGuesses < world.unlockCorrectGuesses) put("Correct guesses: ${game.correctGuesses} / ${world.unlockCorrectGuesses}")
+                                                    if (totalUpgradeLevels < world.unlockUpgradeCount) put("Upgrade levels: $totalUpgradeLevels / ${world.unlockUpgradeCount}")
+                                                    if (game.prestigeCount < world.unlockPrestigeCount) put("Prestige resets: ${game.prestigeCount} / ${world.unlockPrestigeCount}")
+                                                    if (game.ultraCount < world.unlockUltraCount) put("Ultra resets: ${game.ultraCount} / ${world.unlockUltraCount}")
+                                                })
+                                                .put("fightRequirements", org.json.JSONArray().apply {
+                                                    if (game.correctGuesses < world.fightCorrectGuesses) put("Correct guesses: ${game.correctGuesses} / ${world.fightCorrectGuesses}")
+                                                    if (totalUpgradeLevels < world.fightUpgradeCount) put("Upgrade levels: $totalUpgradeLevels / ${world.fightUpgradeCount}")
+                                                    if (game.prestigeCount < world.fightPrestigeCount) put("Prestige resets: ${game.prestigeCount} / ${world.fightPrestigeCount}")
+                                                    if (game.ultraCount < world.fightUltraCount) put("Ultra resets: ${game.ultraCount} / ${world.fightUltraCount}")
+                                                }))
                                         }
                                         val upgradesJson = org.json.JSONArray()
                                         upgradeDefinitions.forEach { upgrade ->
@@ -373,9 +388,14 @@ fun ProductionWebPlayScreen(
                                             .put("prestigeRequirement", progressionEngine.calculatePrestigeRequirement(game.prestigeCount).format())
                                             .put("prestigeReward", progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount).format())
                                             .put("canPrestige", game.money >= progressionEngine.calculatePrestigeRequirement(game.prestigeCount) && progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount) > BigNumber.ZERO)
+                                            .put("prestigeMoneyMet", game.money >= progressionEngine.calculatePrestigeRequirement(game.prestigeCount))
+                                            .put("prestigeRewardPositive", progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount) > BigNumber.ZERO)
                                             .put("ultraRequirement", progressionEngine.calculateUltraRequirement(game.ultraCount).format())
                                             .put("ultraReward", progressionEngine.calculateUltraReward(game.money, game.ultraCount).format())
                                             .put("canUltra", game.money >= progressionEngine.calculateUltraRequirement(game.ultraCount) && game.prestige >= BigNumber(1_000) && progressionEngine.calculateUltraReward(game.money, game.ultraCount) > BigNumber.ZERO)
+                                            .put("ultraMoneyMet", game.money >= progressionEngine.calculateUltraRequirement(game.ultraCount))
+                                            .put("ultraPrestigeMet", game.prestige >= BigNumber(1_000))
+                                            .put("ultraRewardPositive", progressionEngine.calculateUltraReward(game.money, game.ultraCount) > BigNumber.ZERO)
                                             .put("settings", JSONObject()
                                                 .put("musicEnabled", game.settings.musicEnabled)
                                                 .put("soundEnabled", game.settings.soundEnabled)
