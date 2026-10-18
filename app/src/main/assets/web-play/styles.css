@@ -94,7 +94,7 @@ h2{margin:3px 0 0;font-size:17px;letter-spacing:-.035em}.panel-title,.loot-headi
 @media(max-width:520px){.app{padding-bottom:calc(22px + env(safe-area-inset-bottom))}.screen-nav{top:calc(4px + env(safe-area-inset-top));margin-left:-2px;margin-right:-2px;gap:3px;padding:5px}.screen-nav button{min-height:44px;padding:7px 3px;flex-direction:column;gap:1px}.screen-nav button span{font-size:15px}.screen-nav button b{font-size:9px}.screen{grid-template-columns:minmax(0,1fr);gap:11px}#screen-play .hero-card,#screen-play .stats-grid,#screen-play .economy-card,#screen-play .guess-card,#screen-play .quick-actions,#screen-worlds .progression-card,#screen-worlds .world-card,#screen-worlds .boss-card,#screen-rewards .milestones-card,#screen-journey .run-summary-card{grid-column:1}.screen>.card{margin:0}}
 @media(prefers-reduced-motion:reduce){.screen{animation:none}.screen-nav button{transition:none}}
 
-/* Numberverse identity and scalable navigation icon. */
+/* Guess The Number identity and scalable navigation icon. */
 .brand-tagline{margin:3px 0 0;color:var(--muted);font-size:10px;line-height:1.35;letter-spacing:.015em;font-weight:600}
 .screen-nav .nav-icon{display:block;width:19px;height:19px;flex:0 0 19px}
 
