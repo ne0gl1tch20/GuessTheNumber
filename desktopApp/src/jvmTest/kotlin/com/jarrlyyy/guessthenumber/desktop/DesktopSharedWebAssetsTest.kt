@@ -18,6 +18,11 @@ class DesktopSharedWebAssetsTest {
         assertFalse(state.has("targetNumber"))
         assertTrue(state.has("rangeMin"))
         assertTrue(state.has("buyMultiplier"))
+        val worlds = state.getJSONArray("worlds")
+        assertTrue("World screen should use real desktop progression", worlds.length() >= 4)
+        assertTrue(worlds.getJSONObject(0).has("bossName"))
+        assertTrue(worlds.getJSONObject(0).has("canFight"))
+        assertTrue(state.has("activeBossHpTotal"))
     }
 
     @Test
