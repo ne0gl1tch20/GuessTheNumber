@@ -100,8 +100,8 @@ class DesktopSharedWebAssetsTest {
                 assertTrue("Missing $key in locale $locale", strings.optString(key).isNotBlank())
             }
             if (locale != "en_us.json" && locale != "en_gb.json") {
-                assertNotEquals("Background Music", strings.getString("background_music"))
-                assertNotEquals("Sound Effects", strings.getString("sound_effects"))
+                assertTrue("background_music must be translated in $locale", strings.getString("background_music") != "Background Music")
+                assertTrue("sound_effects must be translated in $locale", strings.getString("sound_effects") != "Sound Effects")
             }
         }
     }
