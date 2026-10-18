@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "Het spel is momenteel niet beschikbaar. Open het opnieuw.",
   "settings_synced_status": "Je voorkeuren zijn opgeslagen.",
   "stake_invalid_amount": "Voer een positief geheel getal in als inzet.",
-  "stake_flipping_status": "Munt wordt opgegooid…"
+  "stake_flipping_status": "Munt wordt opgegooid…",
+  "duration_seconds_format": "%s sec",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Geluksinzet",
+  "minigame_catalog_unavailable": "De arcade is nu niet beschikbaar.",
+  "action_in_progress": "Bezig…",
+  "action_saving_reward": "Beloning opslaan…",
+  "reaction_wait": "Wachten…",
+  "reaction_tap_now": "Tik nu!",
+  "action_failed_retry": "De actie is niet voltooid. Probeer het opnieuw."
 }
