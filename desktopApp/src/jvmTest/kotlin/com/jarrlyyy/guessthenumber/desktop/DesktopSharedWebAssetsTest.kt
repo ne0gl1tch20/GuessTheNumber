@@ -28,6 +28,8 @@ class DesktopSharedWebAssetsTest {
         assertTrue(state.has("equippedRelicIds"))
         assertTrue(state.has("codexEntries"))
         assertTrue(state.has("codexRewardClaimed"))
+        assertTrue(state.has("settings"))
+        assertTrue(state.getJSONObject("settings").has("reducedMotion"))
     }
 
     @Test
@@ -42,11 +44,13 @@ class DesktopSharedWebAssetsTest {
         assertTrue(html.contains("id=\"screen-homebase\""))
         assertTrue(html.contains("id=\"screen-relics\""))
         assertTrue(html.contains("id=\"screen-codex\""))
+        assertTrue(html.contains("id=\"screen-settings\""))
         assertTrue(script.contains("buy_upgrade"))
         assertTrue(script.contains("buy_shop_item"))
         assertTrue(script.contains("homebase_upgrade"))
         assertTrue(script.contains("relic_action"))
         assertTrue(script.contains("codex_reward"))
+        assertTrue(script.contains("update_setting"))
         assertTrue(styles.contains(".screen"))
     }
 }
