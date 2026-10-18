@@ -39,6 +39,7 @@
         <button type="button" class="more-link-card" data-screen-target="homebase"><span>⌂</span><span><b>Home Base</b><small>Build up your base</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="relics"><span>✧</span><span><b>Relics</b><small>Manage your relic collection</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="codex"><span>▤</span><span><b>Codex</b><small>Explore discoveries</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="changelog"><span>📋</span><span><b data-i18n="changelog_title">Changelog</b><small data-i18n="changelog_subtitle">See what changed in recent updates</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="about"><span>ⓘ</span><span><b data-i18n="about_title">About</b><small data-i18n="about_licenses">About & Licenses</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-route="save_slots"><span>▣</span><span><b>Save Slots</b><small>Switch or manage saved games</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="music"><span>♫</span><span><b data-i18n="music_player_title">Background Music</b><small data-i18n="music_player_subtitle">Control your background music</small></span><strong aria-hidden="true">›</strong></button>
@@ -65,6 +66,44 @@
         <p class="catalog-intro" id="musicPlayerStatus" role="status" aria-live="polite" data-i18n="music_player_status">Your music preference is saved with your game.</p>
       </section>
     </div>
+    <section class="screen changelog-screen" id="screen-changelog" role="tabpanel" aria-labelledby="tab-more" data-screen="changelog" hidden>
+      <section class="card changelog-heading">
+        <span class="eyebrow" data-i18n="changelog_eyebrow">WHAT'S NEW</span>
+        <h2 data-i18n="changelog_title">Changelog</h2>
+        <p data-i18n="changelog_intro">A quick look at the latest game updates.</p>
+      </section>
+      <section class="changelog-list" aria-label="Game update history">
+        <article class="card changelog-entry">
+          <div class="changelog-entry-top"><span class="changelog-version" data-i18n="changelog_current_badge">Current update</span><span class="changelog-category" data-i18n="changelog_category_ui">UI and gameplay</span></div>
+          <h3 data-i18n="changelog_current_title">A smoother game experience</h3>
+          <ul>
+            <li data-i18n="changelog_current_arcade">Arcade minigames open in a larger, focused popup.</li>
+            <li data-i18n="changelog_current_updates">The About page has a working update-check flow with clearer status feedback.</li>
+            <li data-i18n="changelog_current_locale">Language changes refresh more of the HTML interface.</li>
+            <li data-i18n="changelog_current_music">Background music now has a player-facing page in More.</li>
+            <li data-i18n="changelog_current_feedback">Incorrect guesses can show randomized feedback messages.</li>
+          </ul>
+        </article>
+        <article class="card changelog-entry">
+          <div class="changelog-entry-top"><span class="changelog-version" data-i18n="changelog_progress_badge">Progression update</span><span class="changelog-category" data-i18n="changelog_category_gameplay">Gameplay</span></div>
+          <h3 data-i18n="changelog_progress_title">More ways to track your run</h3>
+          <ul>
+            <li data-i18n="changelog_progress_stats">Expanded stats for streaks, loot, bosses, Endless Rift and arcade records.</li>
+            <li data-i18n="changelog_progress_worlds">World Map navigation and world requirement status improvements.</li>
+            <li data-i18n="changelog_progress_saves">Save Slots are available from the More menu.</li>
+          </ul>
+        </article>
+        <article class="card changelog-entry">
+          <div class="changelog-entry-top"><span class="changelog-version" data-i18n="changelog_foundation_badge">Platform improvements</span><span class="changelog-category" data-i18n="changelog_category_system">System</span></div>
+          <h3 data-i18n="changelog_foundation_title">Safer updates and app branding</h3>
+          <ul>
+            <li data-i18n="changelog_foundation_update">Debug updates validate the selected build and APK before installation.</li>
+            <li data-i18n="changelog_foundation_icon">The Android launcher icon is generated from GTN_APP_LOGO.png.</li>
+            <li data-i18n="changelog_foundation_offline">Core game progression and saves remain offline-first and Kotlin-authoritative.</li>
+          </ul>
+        </article>
+      </section>
+    </section>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
       <div class="hero-glow"></div>
