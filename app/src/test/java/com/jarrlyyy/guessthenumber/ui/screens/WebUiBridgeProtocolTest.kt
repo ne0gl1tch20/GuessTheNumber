@@ -31,6 +31,18 @@ class WebUiBridgeProtocolTest {
             WebUiBridgeProtocol.ParseResult.Valid("req_1", "read_state"),
             WebUiBridgeProtocol.parse("""{"version":1,"id":"req_1","type":"read_state"}""")
         )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("update-1", "check_updates"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"update-1","type":"check_updates"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("update-2", "install_update"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"update-2","type":"install_update"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("update-3", "open_update_page"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"update-3","type":"open_update_page"}""")
+        )
     }
 
 
