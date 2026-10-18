@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "Oyun şu anda kullanılamıyor. Lütfen yeniden açın.",
   "settings_synced_status": "Tercihleriniz kaydedildi.",
   "stake_invalid_amount": "Bahis için pozitif bir tam sayı girin.",
-  "stake_flipping_status": "Para atılıyor…"
+  "stake_flipping_status": "Para atılıyor…",
+  "duration_seconds_format": "%s sn",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Şans Bahsi",
+  "minigame_catalog_unavailable": "Oyun salonu şu anda kullanılamıyor.",
+  "action_in_progress": "İşleniyor…",
+  "action_saving_reward": "Ödül kaydediliyor…",
+  "reaction_wait": "Bekle…",
+  "reaction_tap_now": "Şimdi dokun!",
+  "action_failed_retry": "İşlem tamamlanamadı. Tekrar deneyin."
 }
