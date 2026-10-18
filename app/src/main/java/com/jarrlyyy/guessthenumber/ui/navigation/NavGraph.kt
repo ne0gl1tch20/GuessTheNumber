@@ -189,20 +189,22 @@ fun NavGraph(
                 "Secondary" -> state.settings.customSecondaryColor
                 else -> state.settings.customTertiaryColor
             }
-            ReusableColorPickerDialog(
-                initialHex = current,
-                title = locale.getString("settings_custom_theme_color", "Custom Theme Color"),
-                onDismiss = { colorPickerTarget = null },
-                onApply = { hex ->
-                    val updated = when (target) {
-                        "Primary" -> state.settings.copy(themePreset = "Custom", customPrimaryColor = hex)
-                        "Secondary" -> state.settings.copy(themePreset = "Custom", customSecondaryColor = hex)
-                        else -> state.settings.copy(themePreset = "Custom", customTertiaryColor = hex)
+            CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+                ReusableColorPickerDialog(
+                    initialHex = current,
+                    title = locale.getString("settings_custom_theme_color", "Custom Theme Color"),
+                    onDismiss = { colorPickerTarget = null },
+                    onApply = { hex ->
+                        val updated = when (target) {
+                            "Primary" -> state.settings.copy(themePreset = "Custom", customPrimaryColor = hex)
+                            "Secondary" -> state.settings.copy(themePreset = "Custom", customSecondaryColor = hex)
+                            else -> state.settings.copy(themePreset = "Custom", customTertiaryColor = hex)
+                        }
+                        viewModel.updateSettings(updated)
+                        colorPickerTarget = null
                     }
-                    viewModel.updateSettings(updated)
-                    colorPickerTarget = null
-                }
-            )
+                )
+            }
         }
     }
 
