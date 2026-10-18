@@ -41,6 +41,7 @@
         <button type="button" class="more-link-card" data-screen-target="codex"><span>▤</span><span><b>Codex</b><small>Explore discoveries</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="about"><span>ⓘ</span><span><b data-i18n="about_title">About</b><small data-i18n="about_licenses">About & Licenses</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-route="save_slots"><span>▣</span><span><b>Save Slots</b><small>Switch or manage saved games</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="music"><span>♫</span><span><b data-i18n="music_player_title">Background Music</b><small data-i18n="music_player_subtitle">Control your background music</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="settings"><span>⚙</span><span><b>Settings</b><small>Customize your experience</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="prestige"><span>✧</span><span><b>Prestige</b><small>Prestige upgrades and resets</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="ultra"><span>✦</span><span><b>Ultra</b><small>Ultra progression</small></span><strong aria-hidden="true">›</strong></button>
@@ -51,6 +52,19 @@
         <button type="button" class="more-link-card" data-screen-target="stake"><span>★</span><span><b data-i18n="staking_flip_button">Lucky Stake</b><small>Try your luck with a stake</small></span><strong aria-hidden="true">›</strong></button>
       </section>
     </section>
+    <div class="screen" id="screen-music" role="tabpanel" aria-labelledby="tab-more" data-screen="music" hidden>
+      <section class="card catalog-panel music-player-panel">
+        <div class="panel-title"><span class="panel-glyph">♫</span><div><span class="eyebrow" data-i18n="music_player_eyebrow">AUDIO</span><h2 data-i18n="music_player_title">Background Music</h2></div></div>
+        <p class="catalog-intro" data-i18n="music_player_subtitle">Control your background music without leaving the game.</p>
+        <div class="music-now-playing">
+          <div class="music-art" aria-hidden="true">♫</div>
+          <div><strong data-i18n="music_background_track">Game background music</strong><span data-i18n="music_background_track_desc">Music playback follows your saved audio settings.</span></div>
+        </div>
+        <label class="setting-row music-toggle-row"><span><strong data-i18n="background_music">Background music</strong><small data-i18n="music_player_toggle_desc">Turn background music on or off.</small></span><input type="checkbox" data-setting-toggle="musicEnabled"></label>
+        <label class="setting-field"><span id="musicVolumeLabel" data-i18n="music_volume">Music volume</span><input type="range" min="0" max="1" step="0.01" data-setting-value="volume" id="musicVolume"></label>
+        <p class="catalog-intro" id="musicPlayerStatus" role="status" aria-live="polite" data-i18n="music_player_status">Your music preference is saved with your game.</p>
+      </section>
+    </div>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
       <div class="hero-glow"></div>
