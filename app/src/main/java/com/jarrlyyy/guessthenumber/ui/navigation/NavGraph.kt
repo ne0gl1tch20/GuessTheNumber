@@ -107,7 +107,9 @@ fun NavGraph(
         onPrestigeReset = viewModel::prestigeReset,
         onUltraReset = viewModel::ultraReset,
         onBuyTalent = viewModel::buyTalent,
-        onSetMutatorActive = viewModel::setMutatorActive
+        onSetMutatorActive = viewModel::setMutatorActive,
+        onArcadeReward = viewModel::awardArcadeResult,
+        onSettleStake = viewModel::settleRandomStake
     )
 
     if (initialDestination != null) {
