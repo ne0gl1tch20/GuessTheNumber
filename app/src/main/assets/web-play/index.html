@@ -30,6 +30,7 @@
       <button type="button" role="tab" id="tab-homebase" aria-controls="screen-homebase" aria-selected="false" data-screen-target="homebase" tabindex="-1"><span class="nav-icon" aria-hidden="true">⌂</span><b>Home Base</b></button>
       <button type="button" role="tab" id="tab-relics" aria-controls="screen-relics" aria-selected="false" data-screen-target="relics" tabindex="-1"><span class="nav-icon" aria-hidden="true">✧</span><b>Relics</b></button>
       <button type="button" role="tab" id="tab-codex" aria-controls="screen-codex" aria-selected="false" data-screen-target="codex" tabindex="-1"><span class="nav-icon" aria-hidden="true">▤</span><b>Codex</b></button>
+      <button type="button" role="tab" id="tab-settings" aria-controls="screen-settings" aria-selected="false" data-screen-target="settings" tabindex="-1"><span class="nav-icon" aria-hidden="true">⚙</span><b>Settings</b></button>
     </nav>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
@@ -227,6 +228,20 @@
         <div class="catalog-list" id="codexList"><p class="catalog-empty">Syncing discoveries…</p></div>
         <button type="button" class="world-action-button" id="claimCodexReward" data-bridge-action="codex_reward">Claim 100 Nebula</button>
         <p class="catalog-intro" id="codexRewardStatus"></p>
+      </section>
+    </div>
+    <div class="screen" id="screen-settings" role="tabpanel" aria-labelledby="tab-settings" data-screen="settings" hidden>
+      <section class="card catalog-panel">
+        <div class="panel-title"><span class="panel-glyph">⚙</span><div><span class="eyebrow">MAKE IT YOURS</span><h2>Settings</h2></div></div>
+        <p class="catalog-intro">These preferences are saved with your game. Changes apply on both Android and Windows.</p>
+        <div class="settings-list">
+          <label class="setting-row"><span><strong>Background music</strong><small>Allow the selected music track to play.</small></span><input type="checkbox" data-setting-toggle="musicEnabled" aria-label="Background music"></label>
+          <label class="setting-row"><span><strong>Sound effects</strong><small>Enable game sound effects.</small></span><input type="checkbox" data-setting-toggle="soundEnabled" aria-label="Sound effects"></label>
+          <label class="setting-row"><span><strong>Vibration</strong><small>Allow supported devices to vibrate.</small></span><input type="checkbox" data-setting-toggle="vibrationEnabled" aria-label="Vibration"></label>
+          <label class="setting-row"><span><strong>Reduced motion</strong><small>Reduce movement and animated transitions.</small></span><input type="checkbox" data-setting-toggle="reducedMotion" aria-label="Reduced motion"></label>
+          <label class="setting-row"><span><strong>Reduce flashes</strong><small>Reduce celebratory flashes and visual bursts.</small></span><input type="checkbox" data-setting-toggle="reduceFlashes" aria-label="Reduce flashes"></label>
+        </div>
+        <p class="catalog-intro" id="settingsStatus" role="status" aria-live="polite">Syncing saved preferences…</p>
       </section>
     </div>
   </main>
