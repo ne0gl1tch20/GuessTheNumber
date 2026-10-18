@@ -184,3 +184,13 @@ button { touch-action: manipulation; }
 
 /* Keep debug-only navigation hidden even when card layout styles are active. */
 .more-link-card[hidden]{display:none!important}
+
+/* Settings controls mirror persisted Kotlin GameSettings. */
+.settings-group{display:grid;gap:10px;margin:18px 0;padding-top:15px;border-top:1px solid var(--line,rgba(255,255,255,.12))}
+.settings-group h3{margin:0 0 2px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#9ca3af)}
+.setting-field{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid var(--line,rgba(255,255,255,.12));border-radius:15px;background:rgba(255,255,255,.035);font-size:13px}
+.setting-field>span{min-width:0}
+.setting-field select{max-width:58%;min-width:0;padding:9px 10px;border:1px solid var(--line,rgba(255,255,255,.2));border-radius:10px;background:#141a2b;color:var(--text,#f4f5ff)}
+.setting-field input[type="color"]{width:46px;height:36px;padding:2px;border:1px solid var(--line,rgba(255,255,255,.2));border-radius:9px;background:transparent}
+.setting-field input[type="range"]{width:48%;accent-color:var(--accent2)}
+.setting-field:focus-within,.setting-field select:focus-visible,.setting-field input:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
