@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,8 +15,11 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.screens.CrashRecoveryScreen
 import com.jarrlyyy.guessthenumber.ui.screens.DevSettingsScreen
+import com.jarrlyyy.guessthenumber.ui.screens.ProcessInspectorScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProductionWebPlayScreen
 import com.jarrlyyy.guessthenumber.ui.screens.SaveSlotsScreen
+import com.jarrlyyy.guessthenumber.ui.screens.SharedWebUiPrototypeScreen
+import com.jarrlyyy.guessthenumber.ui.screens.LuaTestingHubScreen
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 
 /**
@@ -74,6 +79,7 @@ fun NavGraph(
 ) {
     val locale = viewModel.localeManager
     var showDevSettings by remember { mutableStateOf(false) }
+    var debugDestination by remember { mutableStateOf<String?>(null) }
     var showSaveSlots by remember { mutableStateOf(false) }
 
     if (!hasAnySave) {
@@ -99,56 +105,74 @@ fun NavGraph(
         return
     }
 
-    if (BuildConfig.DEBUG && showDevSettings) {
-        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-            DevSettingsScreen(
-                state = state,
-                onExecuteCommand = viewModel::executeDevCommand,
-                onImportSave = viewModel::importSave,
-                onUpdateSettings = viewModel::updateSettings,
-                onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
-                onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
-                onGetSaveJson = viewModel::getSaveJson,
-                onApplySaveJson = viewModel::applySaveJson,
-                onNavigate = { destination ->
-                    if (BuildConfig.DEBUG && destination == "dev_settings") showDevSettings = true
-                },
-                onBack = { showDevSettings = false }
-            )
-        }
-        return
-    }
+    Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
+        ProductionWebPlayScreen(
+            state = state,
+            incomePerSecond = incomePerSecond,
+            localeManager = locale,
+            stateProvider = { viewModel.gameState.value },
+            onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
+            onClaimDailyQuest = viewModel::claimDailyQuest,
+            onOpenLootChest = viewModel::openLootChest,
+            onNavigateProgression = { progression ->
+                when {
+                    progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true
+                    progression == "save_slots" -> showSaveSlots = true
+                    progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", "")
+                    progression == "claim_codex" -> viewModel.progressionAction("claim_codex", "")
+                    progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':'))
+                    progression == "world_map" -> debugDestination = "world_map"
+                }
+            },
+            onWorldAction = viewModel::worldProgressAction,
+            onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
+            onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
+            onEquipCosmetic = viewModel::equipCosmetic,
+            onUpdateMultiplier = viewModel::updateBuyMultiplier,
+            onUpdateSettings = viewModel::updateSettings,
+            onPrestigeReset = viewModel::prestigeReset,
+            onUltraReset = viewModel::ultraReset,
+            onBuyTalent = viewModel::buyTalent,
+            onSetMutatorActive = viewModel::setMutatorActive,
+            onArcadeReward = viewModel::awardArcadeResult,
+            onSettleStake = viewModel::settleRandomStake
+        )
 
-    ProductionWebPlayScreen(
-        state = state,
-        incomePerSecond = incomePerSecond,
-        localeManager = locale,
-        stateProvider = { viewModel.gameState.value },
-        onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
-        onClaimDailyQuest = viewModel::claimDailyQuest,
-        onOpenLootChest = viewModel::openLootChest,
-        onNavigateProgression = { progression ->
-            when {
-                progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true
-                progression == "save_slots" -> showSaveSlots = true
-                progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", "")
-                progression == "claim_codex" -> viewModel.progressionAction("claim_codex", "")
-                progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':'))
+        if (BuildConfig.DEBUG && showDevSettings) {
+            CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+                DevSettingsScreen(
+                    state = state,
+                    onExecuteCommand = viewModel::executeDevCommand,
+                    onImportSave = viewModel::importSave,
+                    onUpdateSettings = viewModel::updateSettings,
+                    onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
+                    onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
+                    onGetSaveJson = viewModel::getSaveJson,
+                    onApplySaveJson = viewModel::applySaveJson,
+                    onNavigate = { destination -> debugDestination = destination },
+                    onBack = { showDevSettings = false; debugDestination = null }
+                )
             }
-        },
-        onWorldAction = viewModel::worldProgressAction,
-        onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
-        onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
-        onEquipCosmetic = viewModel::equipCosmetic,
-        onUpdateMultiplier = viewModel::updateBuyMultiplier,
-        onUpdateSettings = viewModel::updateSettings,
-        onPrestigeReset = viewModel::prestigeReset,
-        onUltraReset = viewModel::ultraReset,
-        onBuyTalent = viewModel::buyTalent,
-        onSetMutatorActive = viewModel::setMutatorActive,
-        onArcadeReward = viewModel::awardArcadeResult,
-        onSettleStake = viewModel::settleRandomStake
-    )
+        }
+
+        if (BuildConfig.DEBUG) {
+            when (debugDestination) {
+                "process_inspector" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+                    ProcessInspectorScreen(state = state, onBack = { debugDestination = null })
+                }
+                "web_ui_prototype" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+                    SharedWebUiPrototypeScreen(
+                        state = state,
+                        onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
+                        onBack = { debugDestination = null }
+                    )
+                }
+                "lua_testing_hub" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+                    LuaTestingHubScreen(onBack = { debugDestination = null })
+                }
+            }
+        }
+    }
 
     if (initialDestination != null) {
         onNotificationDestinationHandled()
