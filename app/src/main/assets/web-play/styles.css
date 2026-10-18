@@ -131,3 +131,6 @@ h2{margin:3px 0 0;font-size:17px;letter-spacing:-.035em}.panel-title,.loot-headi
 #relicList .world-action-button,#claimCodexReward,#upgradeHomeBase{min-height:42px}
 #codexProgressFill{transition:width .28s ease}
 @media(max-width:520px){#relicList .catalog-entry{align-items:flex-start;flex-direction:column}#relicList .world-action-button{width:100%}}
+
+/* Shared settings and accessible preference controls */
+.settings-list{display:grid;gap:10px;margin:16px 0}.setting-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 15px;border:1px solid var(--line,rgba(255,255,255,.12));border-radius:15px;background:rgba(255,255,255,.035);cursor:pointer}.setting-row>span{display:grid;gap:4px;min-width:0}.setting-row strong{font-size:14px}.setting-row small{font-size:12px;line-height:1.45;color:var(--muted,#9ca3af)}.setting-row input{width:22px;height:22px;flex:0 0 auto;accent-color:var(--accent2);cursor:pointer}.setting-row input:focus-visible{outline:3px solid var(--accent2);outline-offset:3px}
