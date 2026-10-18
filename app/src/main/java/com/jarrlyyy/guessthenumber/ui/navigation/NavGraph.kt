@@ -13,6 +13,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
+import com.jarrlyyy.guessthenumber.ui.components.ReusableColorPickerDialog
 import com.jarrlyyy.guessthenumber.ui.screens.CrashRecoveryScreen
 import com.jarrlyyy.guessthenumber.ui.screens.DevSettingsScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProcessInspectorScreen
@@ -81,6 +82,7 @@ fun NavGraph(
     var showDevSettings by remember { mutableStateOf(false) }
     var debugDestination by remember { mutableStateOf<String?>(null) }
     var showSaveSlots by remember { mutableStateOf(false) }
+    var colorPickerTarget by remember { mutableStateOf<String?>(null) }
 
     if (!hasAnySave) {
         CompositionLocalProvider(LocalAppLocaleManager provides locale) {
@@ -111,6 +113,9 @@ fun NavGraph(
                 when {
                     progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true
                     progression == "save_slots" -> showSaveSlots = true
+                    progression == "color_picker_primary" -> colorPickerTarget = "Primary"
+                    progression == "color_picker_secondary" -> colorPickerTarget = "Secondary"
+                    progression == "color_picker_tertiary" -> colorPickerTarget = "Tertiary"
                     progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", "")
                     progression == "claim_codex" -> viewModel.progressionAction("claim_codex", "")
                     progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':'))
