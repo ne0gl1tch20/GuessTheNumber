@@ -155,8 +155,9 @@ private class DesktopSharedWebViewController {
             };
             </script>
         """.trimIndent()
-        val patched = original.replaceFirst(Regex("(?i)<head[^>]*>")) { it.value + shim }
-        if (patched == original) throw IOException("Shared web UI index.html has no head element.")
+        val head = Regex("(?i)<head[^>]*>").find(original)
+            ?: throw IOException("Shared web UI index.html has no head element.")
+        val patched = original.replaceRange(head.range, head.value + shim)
         Files.writeString(index, patched)
         return index
     }
