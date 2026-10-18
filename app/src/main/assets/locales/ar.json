@@ -1095,5 +1095,9 @@
   "more_feature_discovery_title": "جولة سريعة",
   "more_feature_discovery_step_1": "تحتوي هذه الميزة على أدوات وتقدم خاصين بها. ألقِ نظرة سريعة ثم اختر ما تريد استكشافه.",
   "more_feature_discovery_step_2": "يمكنك العودة إلى هذه الميزة من More Hub في أي وقت.",
-  "more_feature_discovery_skip": "تخطَّ وافتح"
+  "more_feature_discovery_skip": "تخطَّ وافتح",
+  "game_temporarily_unavailable": "اللعبة غير متاحة الآن. يُرجى فتحها مجددًا.",
+  "settings_synced_status": "تم حفظ تفضيلاتك.",
+  "stake_invalid_amount": "أدخل عددًا صحيحًا موجبًا للمبلغ المراهن عليه.",
+  "stake_flipping_status": "جارٍ رمي العملة…"
 }
