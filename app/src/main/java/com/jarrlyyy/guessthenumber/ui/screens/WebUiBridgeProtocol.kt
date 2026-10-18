@@ -12,6 +12,7 @@ internal object WebUiBridgeProtocol {
     private val worldActions = setOf("unlock", "boss")
     private val buyMultipliers = setOf("1", "10", "100", "MAX")
     private val relicActions = setOf("equip", "unequip")
+    private val settingKeys = setOf("musicEnabled", "soundEnabled", "vibrationEnabled", "reducedMotion", "reduceFlashes")
 
     sealed interface ParseResult {
         data class Valid(
@@ -26,7 +27,9 @@ internal object WebUiBridgeProtocol {
             val itemId: String? = null,
             val multiplier: String? = null,
             val relicId: String? = null,
-            val relicAction: String? = null
+            val relicAction: String? = null,
+            val settingKey: String? = null,
+            val settingValue: Boolean? = null
         ) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
@@ -97,6 +100,14 @@ internal object WebUiBridgeProtocol {
                 if (relicId !in setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")) return ParseResult.Invalid("invalid_relic", id)
                 if (action !in relicActions) return ParseResult.Invalid("invalid_relic_action", id)
                 ParseResult.Valid(id, type, relicId = relicId, relicAction = action)
+            }
+            "update_setting" -> {
+                if (request.length() != 5) return ParseResult.Invalid("invalid_request", id)
+                val key = request.opt("key") as? String ?: return ParseResult.Invalid("invalid_setting", id)
+                val value = request.opt("value") as? String ?: return ParseResult.Invalid("invalid_setting_value", id)
+                if (key !in settingKeys) ParseResult.Invalid("invalid_setting", id)
+                else if (value !in setOf("true", "false")) ParseResult.Invalid("invalid_setting_value", id)
+                else ParseResult.Valid(id, type, settingKey = key, settingValue = value == "true")
             }
             "update_multiplier" -> {
                 if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
