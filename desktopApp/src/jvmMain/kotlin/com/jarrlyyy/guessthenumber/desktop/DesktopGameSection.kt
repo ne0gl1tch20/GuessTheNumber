@@ -22,3 +22,23 @@ enum class DesktopGameSection {
     LUCKY_STAKE,
     ARCADE
 }
+
+
+/** Player-facing destinations already implemented by the canonical shared HTML surface. */
+internal val DesktopGameSection.sharedHtmlScreen: String?
+    get() = when (this) {
+        DesktopGameSection.PLAY -> "play"
+        DesktopGameSection.UPGRADES -> "upgrades"
+        DesktopGameSection.SHOP -> "shop"
+        DesktopGameSection.PRESTIGE -> "prestige"
+        DesktopGameSection.ULTRA -> "ultra"
+        DesktopGameSection.TALENT -> "talent"
+        DesktopGameSection.ACHIEVEMENTS -> "rewards"
+        DesktopGameSection.WORLD_MAP -> "worlds"
+        DesktopGameSection.MUTATORS -> "mutators"
+        DesktopGameSection.RELICS -> "relics"
+        DesktopGameSection.HOME_BASE -> "homebase"
+        DesktopGameSection.CODEX -> "codex"
+        DesktopGameSection.ENDGAME -> "journey"
+        else -> null
+    }

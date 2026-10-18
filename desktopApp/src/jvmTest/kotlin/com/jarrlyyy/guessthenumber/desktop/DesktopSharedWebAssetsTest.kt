@@ -27,6 +27,7 @@ class DesktopSharedWebAssetsTest {
         assertTrue(state.has("canUltra"))
         assertTrue(state.has("talents"))
         assertTrue(state.has("activeMutators"))
+        assertTrue(state.getString("initialScreen") == "play")
         val worlds = state.getJSONArray("worlds")
         assertTrue("World screen should use real desktop progression", worlds.length() >= 4)
         assertTrue(worlds.getJSONObject(0).has("bossName"))
@@ -38,6 +39,25 @@ class DesktopSharedWebAssetsTest {
         assertTrue(state.has("codexRewardClaimed"))
         assertTrue(state.has("settings"))
         assertTrue(state.getJSONObject("settings").has("reducedMotion"))
+    }
+
+    @Test
+    fun desktopDestinationsSelectTheirMatchingSharedHtmlScreen() {
+        assertTrue(DesktopGameSection.PLAY.sharedHtmlScreen == "play")
+        assertTrue(DesktopGameSection.UPGRADES.sharedHtmlScreen == "upgrades")
+        assertTrue(DesktopGameSection.SHOP.sharedHtmlScreen == "shop")
+        assertTrue(DesktopGameSection.PRESTIGE.sharedHtmlScreen == "prestige")
+        assertTrue(DesktopGameSection.ULTRA.sharedHtmlScreen == "ultra")
+        assertTrue(DesktopGameSection.TALENT.sharedHtmlScreen == "talent")
+        assertTrue(DesktopGameSection.ACHIEVEMENTS.sharedHtmlScreen == "rewards")
+        assertTrue(DesktopGameSection.WORLD_MAP.sharedHtmlScreen == "worlds")
+        assertTrue(DesktopGameSection.MUTATORS.sharedHtmlScreen == "mutators")
+        assertTrue(DesktopGameSection.RELICS.sharedHtmlScreen == "relics")
+        assertTrue(DesktopGameSection.HOME_BASE.sharedHtmlScreen == "homebase")
+        assertTrue(DesktopGameSection.CODEX.sharedHtmlScreen == "codex")
+        assertTrue(DesktopGameSection.ENDGAME.sharedHtmlScreen == "journey")
+        assertTrue(DesktopGameSection.STATS.sharedHtmlScreen == null)
+        assertTrue(DesktopGameSection.ARCADE.sharedHtmlScreen == null)
     }
 
     @Test
@@ -67,6 +87,7 @@ class DesktopSharedWebAssetsTest {
         assertTrue(script.contains("ultra_reset"))
         assertTrue(script.contains("buy_talent"))
         assertTrue(script.contains("set_mutator"))
+        assertTrue(script.contains("initialScreenApplied=true"))
         assertTrue(styles.contains(".screen"))
     }
 }
