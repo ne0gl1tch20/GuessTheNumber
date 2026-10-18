@@ -32,7 +32,10 @@ internal object WebUiBridgeProtocol {
             val settingKey: String? = null,
             val settingValue: Boolean? = null,
             val mutatorId: String? = null,
-            val mutatorActive: Boolean? = null
+            val mutatorActive: Boolean? = null,
+            val arcadeGameId: String? = null,
+            val arcadeScore: Int? = null,
+            val stakeAmount: String? = null
         ) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
@@ -119,6 +122,21 @@ internal object WebUiBridgeProtocol {
                 if (mutatorId !in mutatorIds) ParseResult.Invalid("invalid_mutator", id)
                 else if (active !in setOf("true", "false")) ParseResult.Invalid("invalid_mutator_state", id)
                 else ParseResult.Valid(id, type, mutatorId = mutatorId, mutatorActive = active == "true")
+            }
+            "arcade_reward" -> {
+                if (request.length() != 5) return ParseResult.Invalid("invalid_request", id)
+                val gameId = request.opt("gameId") as? String ?: return ParseResult.Invalid("invalid_arcade_game", id)
+                val scoreText = request.opt("score") as? String ?: return ParseResult.Invalid("invalid_arcade_score", id)
+                val score = scoreText.toIntOrNull() ?: return ParseResult.Invalid("invalid_arcade_score", id)
+                if (gameId !in setOf("quick_guess", "reaction_test", "lucky_number", "memory_match", "number_rush")) return ParseResult.Invalid("invalid_arcade_game", id)
+                if (score !in 0..9_999) return ParseResult.Invalid("invalid_arcade_score", id)
+                ParseResult.Valid(id, type, arcadeGameId = gameId, arcadeScore = score)
+            }
+            "settle_stake" -> {
+                if (request.length() != 4) return ParseResult.Invalid("invalid_request", id)
+                val amount = request.opt("amount") as? String ?: return ParseResult.Invalid("invalid_stake", id)
+                if (!amount.matches(Regex("[0-9]{1,18}")) || amount.toLongOrNull()?.let { it > 0L } != true) return ParseResult.Invalid("invalid_stake", id)
+                ParseResult.Valid(id, type, stakeAmount = amount)
             }
             "update_setting" -> {
                 if (request.length() != 5) return ParseResult.Invalid("invalid_request", id)
