@@ -239,14 +239,13 @@
     </div>
     <div class="screen" id="screen-settings" role="tabpanel" aria-labelledby="tab-settings" data-screen="settings" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">⚙</span><div><span class="eyebrow">MAKE IT YOURS</span><h2>Settings</h2></div></div>
-        <p class="catalog-intro">These preferences are saved with your game. Changes apply on both Android and Windows.</p>
+        <div class="panel-title"><span class="panel-glyph">⚙</span><div><span class="eyebrow">MAKE IT YOURS</span><h2 data-i18n="settings">Settings</h2></div></div>
         <div class="settings-list">
-          <label class="setting-row"><span><strong>Background music</strong><small>Allow the selected music track to play.</small></span><input type="checkbox" data-setting-toggle="musicEnabled" aria-label="Background music"></label>
-          <label class="setting-row"><span><strong>Sound effects</strong><small>Enable game sound effects.</small></span><input type="checkbox" data-setting-toggle="soundEnabled" aria-label="Sound effects"></label>
-          <label class="setting-row"><span><strong>Vibration</strong><small>Allow supported devices to vibrate.</small></span><input type="checkbox" data-setting-toggle="vibrationEnabled" aria-label="Vibration"></label>
-          <label class="setting-row"><span><strong>Reduced motion</strong><small>Reduce movement and animated transitions.</small></span><input type="checkbox" data-setting-toggle="reducedMotion" aria-label="Reduced motion"></label>
-          <label class="setting-row"><span><strong>Reduce flashes</strong><small>Reduce celebratory flashes and visual bursts.</small></span><input type="checkbox" data-setting-toggle="reduceFlashes" aria-label="Reduce flashes"></label>
+          <label class="setting-row"><span><strong data-i18n="background_music">Background music</strong></span><input type="checkbox" data-setting-toggle="musicEnabled"></label>
+          <label class="setting-row"><span><strong data-i18n="sound_effects">Sound effects</strong><small data-i18n="settings_desc_sound_fx">Turn sound effects for in-game interactions on or off.</small></span><input type="checkbox" data-setting-toggle="soundEnabled"></label>
+          <label class="setting-row"><span><strong data-i18n="vibration_label">Vibration</strong><small data-i18n="settings_desc_vibration">Turn app-triggered vibration during interactions on or off.</small></span><input type="checkbox" data-setting-toggle="vibrationEnabled"></label>
+          <label class="setting-row"><span><strong data-i18n="reduced_motion_label">Reduced motion</strong><small data-i18n="reduced_motion_description">Soften or disable expressive screen transitions</small></span><input type="checkbox" data-setting-toggle="reducedMotion"></label>
+          <label class="setting-row"><span><strong data-i18n="reduce_flashes_label">Reduce flashes</strong><small data-i18n="settings_desc_reduce_flashes">Reduce flashes and sudden visual changes for greater visual comfort.</small></span><input type="checkbox" data-setting-toggle="reduceFlashes"></label>
         </div>
         <p class="catalog-intro" id="settingsStatus" role="status" aria-live="polite">Syncing saved preferences…</p>
       </section>
