@@ -159,7 +159,7 @@ class ApkUpdateInstaller(private val context: Context) {
     private fun validateApk(apk: File): PackageInfo {
         val info = packageInfoFor(apk)
         require(info.packageName == context.packageName) { "APK package mismatch: ${info.packageName}" }
-        require(info.versionName.isNotBlank()) { "APK version name is missing." }
+        require(!info.versionName.isNullOrBlank()) { "APK version name is missing." }
         val installedVersion = context.packageManager.getPackageInfo(context.packageName, 0)
         require(versionCode(info) >= versionCode(installedVersion)) { "This update is older than the installed version." }
         require(hasMatchingSignature(info)) { "APK signing certificate does not match the installed app." }
