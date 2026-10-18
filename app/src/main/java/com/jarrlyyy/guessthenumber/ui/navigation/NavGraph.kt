@@ -102,7 +102,8 @@ fun NavGraph(
         onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
         onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
         onEquipCosmetic = viewModel::equipCosmetic,
-        onUpdateMultiplier = viewModel::updateBuyMultiplier
+        onUpdateMultiplier = viewModel::updateBuyMultiplier,
+        onUpdateSettings = viewModel::updateSettings
     )
 
     if (initialDestination != null) {
