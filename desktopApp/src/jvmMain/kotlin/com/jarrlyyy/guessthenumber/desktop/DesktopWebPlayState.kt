@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.desktop
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -12,7 +13,8 @@ internal fun desktopWebPlayState(
     catalog: DesktopEconomyCatalog,
     accepted: Boolean = true,
     lastGuessStatus: String? = null,
-    message: String? = null
+    message: String? = null,
+    engine: GameEngine = GameEngine()
 ): JSONObject {
     val upgrades = JSONArray()
     catalog.upgrades.forEach { upgrade ->
@@ -63,6 +65,12 @@ internal fun desktopWebPlayState(
     }
     return JSONObject()
         .put("buyMultiplier", game.buyMultiplier)
+        .put("prestigeRequirement", engine.calculatePrestigeRequirement(game.prestigeCount).format())
+        .put("prestigeReward", engine.calculatePrestigeReward(game.money, game.prestigeCount).format())
+        .put("canPrestige", game.money >= engine.calculatePrestigeRequirement(game.prestigeCount) && engine.calculatePrestigeReward(game.money, game.prestigeCount) > com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO)
+        .put("ultraRequirement", engine.calculateUltraRequirement(game.ultraCount).format())
+        .put("ultraReward", engine.calculateUltraReward(game.money, game.ultraCount).format())
+        .put("canUltra", game.money >= engine.calculateUltraRequirement(game.ultraCount) && game.prestige >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(1_000) && engine.calculateUltraReward(game.money, game.ultraCount) > com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO)
         .put("settings", JSONObject().put("musicEnabled", game.settings.musicEnabled).put("soundEnabled", game.settings.soundEnabled).put("vibrationEnabled", game.settings.vibrationEnabled).put("reducedMotion", game.settings.reducedMotion).put("reduceFlashes", game.settings.reduceFlashes))
         .put("upgrades", upgrades)
         .put("shopItems", shopItems)
