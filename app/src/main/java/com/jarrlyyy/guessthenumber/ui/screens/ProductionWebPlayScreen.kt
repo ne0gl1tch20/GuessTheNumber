@@ -287,9 +287,9 @@ fun ProductionWebPlayScreen(
                                                             androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags(value))
                                                             updateScope.launch {
                                                                 localeManager.loadLocaleForTag(value)
-                                                                webViewRef?.post {
+                                                                webViewRef?.postDelayed({
                                                                     webViewRef?.evaluateJavascript("window.gtnReadState && window.gtnReadState()", null)
-                                                                }
+                                                                }, 120L)
                                                             }
                                                         }
                                                     }
