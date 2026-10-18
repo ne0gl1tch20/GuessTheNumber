@@ -87,6 +87,7 @@ fun NavGraph(
     ProductionWebPlayScreen(
         state = state,
         incomePerSecond = incomePerSecond,
+        localeManager = locale,
         stateProvider = { viewModel.gameState.value },
         onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
         onClaimDailyQuest = viewModel::claimDailyQuest,
