@@ -1098,5 +1098,15 @@
   "game_temporarily_unavailable": "The game is unavailable right now. Please reopen it.",
   "settings_synced_status": "Your preferences are saved.",
   "stake_invalid_amount": "Enter a positive whole number for your stake.",
-  "stake_flipping_status": "Flipping…"
+  "stake_flipping_status": "Flipping…",
+  "duration_seconds_format": "%s sec",
+  "duration_ms_format": "%s:%s",
+  "duration_hms_format": "%s:%s:%s",
+  "lucky_stake_title": "Lucky Stake",
+  "minigame_catalog_unavailable": "The arcade is unavailable right now.",
+  "action_in_progress": "Working…",
+  "action_saving_reward": "Saving reward…",
+  "reaction_wait": "Wait…",
+  "reaction_tap_now": "Tap now!",
+  "action_failed_retry": "That action could not be completed. Try again."
 }
