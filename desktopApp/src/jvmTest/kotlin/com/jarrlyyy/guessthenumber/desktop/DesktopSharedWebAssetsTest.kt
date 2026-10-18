@@ -24,6 +24,10 @@ class DesktopSharedWebAssetsTest {
         assertTrue(worlds.getJSONObject(0).has("bossName"))
         assertTrue(worlds.getJSONObject(0).has("canFight"))
         assertTrue(state.has("activeBossHpTotal"))
+        assertTrue(state.has("relicInventory"))
+        assertTrue(state.has("equippedRelicIds"))
+        assertTrue(state.has("codexEntries"))
+        assertTrue(state.has("codexRewardClaimed"))
     }
 
     @Test
