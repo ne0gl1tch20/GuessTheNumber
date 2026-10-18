@@ -18,6 +18,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -99,6 +100,11 @@ fun ProductionWebPlayScreen(
     val awardArcadeReward by rememberUpdatedState(onArcadeReward)
     val settleStake by rememberUpdatedState(onSettleStake)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    LaunchedEffect(state.settings.customPrimaryColor, state.settings.customSecondaryColor, state.settings.customTertiaryColor) {
+        webViewRef?.postDelayed({
+            webViewRef?.evaluateJavascript("window.gtnReadState && window.gtnReadState()", null)
+        }, 120L)
+    }
     var bridgeErrorDetails by remember { mutableStateOf<String?>(null) }
     val clipboardManager = LocalClipboardManager.current
     fun reportBridgeException(action: String, requestId: String, error: Exception) {
