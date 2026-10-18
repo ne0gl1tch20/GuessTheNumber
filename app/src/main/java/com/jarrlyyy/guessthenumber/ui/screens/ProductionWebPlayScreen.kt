@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.BuildConfig
 import android.net.Uri
 import android.util.Log
 import android.webkit.WebResourceRequest
@@ -339,6 +340,7 @@ fun ProductionWebPlayScreen(
                                                 .put("requirement", if (!canUnlock) "Unlock ${talent.requiredParentId} first" else if (!affordable) "Need ${talent.cost} Prestige" else "Ready to unlock"))
                                         }
                                         val viewState = JSONObject()
+                                        .put("debugBuild", BuildConfig.DEBUG)
                                             .put("buyMultiplier", game.buyMultiplier)
                                             .put("prestigeRequirement", progressionEngine.calculatePrestigeRequirement(game.prestigeCount).format())
                                             .put("prestigeReward", progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount).format())
