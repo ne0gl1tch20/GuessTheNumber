@@ -458,6 +458,40 @@ object DesktopEconomyTransactions {
     }
 
     /** Applies Android's achievement milestones after any persisted gameplay/economy transition. */
+    fun awardMinigameResult(state: GameState, gameId: String, score: Int): EconomyTransaction {
+        if (score < 0) return rejected(state, "Invalid minigame score.")
+        val (nebula, money) = when (gameId) {
+            "quick_guess" -> {
+                if (score > 100) return rejected(state, "Quick Guess score is out of range.")
+                1L to BigNumber(score.toLong() * 500L)
+            }
+            "reaction_test" -> {
+                if (score !in 1..9_999) return rejected(state, "Reaction score is out of range.")
+                1L to BigNumber(2_000)
+            }
+            "lucky_number" -> {
+                if (score != 1) return rejected(state, "Lucky Number did not find the winning box.")
+                1L to BigNumber(5_000)
+            }
+            "memory_match" -> {
+                if (score != 1) return rejected(state, "Memory Match sequence was not completed.")
+                1L to BigNumber(10_000)
+            }
+            "number_rush" -> {
+                if (score != 1) return rejected(state, "Number Rush was not completed.")
+                1L to BigNumber(7_500)
+            }
+            else -> return rejected(state, "That minigame is not in the canonical catalog.")
+        }
+        val bestScores = state.statistics.arcadeBestScores.toMutableMap()
+        bestScores[gameId] = maxOf(bestScores[gameId] ?: 0, score)
+        val tracked = state.copy(statistics = state.statistics.copy(
+            arcadePlayed = state.statistics.arcadePlayed + 1,
+            arcadeBestScores = bestScores
+        ))
+        return awardArcadeReward(tracked, nebula, money)
+    }
+
     fun awardArcadeReward(
         state: GameState,
         nebulaReward: Long,
