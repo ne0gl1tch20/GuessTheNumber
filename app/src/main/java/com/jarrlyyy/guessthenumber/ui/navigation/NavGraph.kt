@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.ui.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,11 +81,13 @@ fun NavGraph(
 ) {
     val locale = viewModel.localeManager
     var showDevSettings by remember { mutableStateOf(false) }
+    var webPlayMounted by remember { mutableStateOf(hasAnySave) }
+    LaunchedEffect(hasAnySave) { if (hasAnySave) webPlayMounted = true }
     var debugDestination by remember { mutableStateOf<String?>(null) }
     var showSaveSlots by remember { mutableStateOf(false) }
     var colorPickerTarget by remember { mutableStateOf<String?>(null) }
 
-    if (!hasAnySave) {
+    if (!webPlayMounted && !showSaveSlots) {
         CompositionLocalProvider(LocalAppLocaleManager provides locale) {
             SaveSlotsScreen(viewModel = viewModel, onNavigateBack = {})
         }
@@ -171,15 +174,8 @@ fun NavGraph(
         }
 
         if (showSaveSlots) {
-            androidx.compose.ui.window.Dialog(
-                onDismissRequest = { showSaveSlots = false },
-                properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
-            ) {
-                Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
-                    CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-                        SaveSlotsScreen(viewModel = viewModel, onNavigateBack = { showSaveSlots = false })
-                    }
-                }
+            CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+                SaveSlotsScreen(viewModel = viewModel, onNavigateBack = { showSaveSlots = false })
             }
         }
 
