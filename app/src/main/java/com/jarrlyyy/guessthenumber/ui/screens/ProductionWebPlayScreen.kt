@@ -21,6 +21,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import org.json.JSONObject
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GuessSubmissionResult
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
@@ -42,7 +43,8 @@ fun ProductionWebPlayScreen(
     onBuyUpgrade: (String, BigNumber) -> Unit,
     onBuyShopItem: (String, Long) -> Unit,
     onEquipCosmetic: (String) -> Unit,
-    onUpdateMultiplier: (String) -> Unit
+    onUpdateMultiplier: (String) -> Unit,
+    onUpdateSettings: (GameSettings) -> Unit
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val currentGameState by rememberUpdatedState(state)
@@ -57,6 +59,7 @@ fun ProductionWebPlayScreen(
     val buyShopItem by rememberUpdatedState(onBuyShopItem)
     val equipCosmetic by rememberUpdatedState(onEquipCosmetic)
     val updateMultiplier by rememberUpdatedState(onUpdateMultiplier)
+    val updateSettings by rememberUpdatedState(onUpdateSettings)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
@@ -118,6 +121,22 @@ fun ProductionWebPlayScreen(
                                                 "codex_reward" -> navigateProgression("claim_codex")
                                                 "relic_action" -> parsed.relicId?.let { navigateProgression("equip_relic:$it") }
                                                 "world_action" -> if (parsed.worldId != null && parsed.worldAction != null) dispatchWorldAction(parsed.worldId, parsed.worldAction)
+                                                "update_setting" -> {
+                                                    val key = parsed.settingKey
+                                                    val value = parsed.settingValue
+                                                    if (key != null && value != null) {
+                                                        val settings = readState().settings
+                                                        val updated = when (key) {
+                                                            "musicEnabled" -> settings.copy(musicEnabled = value)
+                                                            "soundEnabled" -> settings.copy(soundEnabled = value)
+                                                            "vibrationEnabled" -> settings.copy(vibrationEnabled = value)
+                                                            "reducedMotion" -> settings.copy(reducedMotion = value)
+                                                            "reduceFlashes" -> settings.copy(reduceFlashes = value)
+                                                            else -> settings
+                                                        }
+                                                        updateSettings(updated)
+                                                    }
+                                                }
                                                 "update_multiplier" -> parsed.multiplier?.let(updateMultiplier)
                                                 "buy_upgrade" -> parsed.itemId?.let { upgradeId ->
                                                     val upgrade = upgradeDefinitions.firstOrNull { it.id == upgradeId } ?: throw IllegalArgumentException("Unknown upgrade")
@@ -243,6 +262,7 @@ fun ProductionWebPlayScreen(
                                         }
                                         val viewState = JSONObject()
                                             .put("buyMultiplier", game.buyMultiplier)
+                                            .put("settings", JSONObject().put("musicEnabled", game.settings.musicEnabled).put("soundEnabled", game.settings.soundEnabled).put("vibrationEnabled", game.settings.vibrationEnabled).put("reducedMotion", game.settings.reducedMotion).put("reduceFlashes", game.settings.reduceFlashes))
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
                                             .put("rangeMin", (result?.rangeMin ?: game.currentRangeMin).toString())
