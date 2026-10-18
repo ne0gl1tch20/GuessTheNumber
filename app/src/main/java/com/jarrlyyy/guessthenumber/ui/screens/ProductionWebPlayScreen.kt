@@ -160,7 +160,7 @@ fun ProductionWebPlayScreen(
                                             when (parsed.type) {
                                                 "check_updates" -> updateScope.launch {
                                                     val response = JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("installedVersion", BuildConfig.VERSION_NAME).put("installedVersionCode", BuildConfig.VERSION_CODE).put("channel", BuildConfig.UPDATE_CHANNEL)
-                                                    when (val updateResult = UpdateChannelChecker.check()) {
+                                                    when (val updateResult = runCatching { UpdateChannelChecker.check() }.getOrElse { UpdateChannelChecker.Result.Unavailable }) {
                                                         is UpdateChannelChecker.Result.Available -> {
                                                             latestAvailableUpdate = updateResult.update
                                                             response.put("status", "available").put("title", updateResult.update.title).put("details", updateResult.update.details).put("message", localeManager.getString("update_available", "An update is available."))
@@ -283,7 +283,15 @@ fun ProductionWebPlayScreen(
                                                             else -> throw IllegalArgumentException("Unsupported setting")
                                                         }
                                                         updateSettings(updated)
-                                                        if (key == "locale") androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags(value))
+                                                        if (key == "locale") {
+                                                            androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags(value))
+                                                            updateScope.launch {
+                                                                localeManager.loadLocaleForTag(value)
+                                                                webViewRef?.post {
+                                                                    webViewRef?.evaluateJavascript("window.gtnReadState && window.gtnReadState()", null)
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 }
                                                 "update_multiplier" -> parsed.multiplier?.let(updateMultiplier)
@@ -498,6 +506,23 @@ fun ProductionWebPlayScreen(
                                             .put("accepted", result?.accepted ?: actionAccepted)
                                             .put("money", game.money.format())
                                             .put("incomePerSecond", currentIncome.format())
+                                            .put("statistics", JSONObject()
+                                                .put("totalGuesses", game.statistics.totalGuesses)
+                                                .put("correctGuesses", game.statistics.correctGuesses)
+                                                .put("failedGuesses", game.statistics.failedGuesses)
+                                                .put("moneyEarned", game.statistics.moneyEarned.format())
+                                                .put("moneySpent", game.statistics.moneySpent.format())
+                                                .put("prestigesCount", game.statistics.prestigesCount)
+                                                .put("ultrasCount", game.statistics.ultrasCount)
+                                                .put("nebulaEarned", game.statistics.nebulaEarned)
+                                                .put("playtimeSeconds", game.statistics.playtimeSeconds)
+                                                .put("arcadePlayed", game.statistics.arcadePlayed)
+                                                .put("arcadeBestScores", JSONObject().apply { game.statistics.arcadeBestScores.forEach { (gameId, score) -> put(gameId, score) } })
+                                                .put("randomEventsTriggered", game.statistics.randomEventsTriggered)
+                                                .put("lootDropsFound", game.lootDropsFound)
+                                                .put("lootChestsOpened", game.lootChestsOpened)
+                                                .put("worldBossVictories", game.worldBossVictories)
+                                                .put("endlessRiftBestTier", game.endlessRiftBestTier))
 
                                             .put("prestige", game.prestige.format())
                                             .put("ultra", game.ultra.format())
