@@ -357,7 +357,7 @@ fun ProductionGuessGameScreen(
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
-                            "read_state", "homebase_upgrade", "codex_reward" -> 3
+                            "read_state", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest" -> 4
                             "world_action", "relic_action", "update_setting" -> 5
                             else -> -1
@@ -461,6 +461,8 @@ fun ProductionGuessGameScreen(
                                             else -> null
                                         }
                                     }
+                                    "prestige_reset" -> DesktopEconomyTransactions.prestigeReset(before, engine)
+                                    "ultra_reset" -> DesktopEconomyTransactions.ultraReset(before, engine)
                                     "homebase_upgrade" -> DesktopEconomyTransactions.upgradeHomeBase(before)
                                     "codex_reward" -> DesktopEconomyTransactions.claimCodexCompletionReward(before)
                                     "relic_action" -> {
