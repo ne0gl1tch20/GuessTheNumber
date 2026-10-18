@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Guess The Number</title>
+  <defs>
+    <linearGradient id="core" x1="9" y1="8" x2="39" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B9A5FF"/>
+      <stop offset="1" stop-color="#62E8FF"/>
+    </linearGradient>
+  </defs>
+  <rect x="3" y="3" width="42" height="42" rx="14" fill="#11172A" stroke="#FFFFFF" stroke-opacity=".12"/>
+  <ellipse cx="24" cy="24" rx="16" ry="7.5" transform="rotate(-38 24 24)" stroke="url(#core)" stroke-width="2.2"/>
+  <ellipse cx="24" cy="24" rx="16" ry="7.5" transform="rotate(38 24 24)" stroke="url(#core)" stroke-opacity=".6" stroke-width="1.5"/>
+  <circle cx="24" cy="24" r="5" fill="url(#core)"/>
+  <circle cx="36.2" cy="14.1" r="2.2" fill="#FFFFFF"/>
+</svg>
