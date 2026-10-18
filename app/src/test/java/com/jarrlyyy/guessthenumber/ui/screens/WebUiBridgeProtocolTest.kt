@@ -129,15 +129,21 @@ class WebUiBridgeProtocolTest {
     }
 
     @Test
-    fun acceptsOnlyKnownBooleanSettings() {
+    fun acceptsOnlyKnownSettingsWithValidValues() {
         assertEquals(
-            WebUiBridgeProtocol.ParseResult.Valid("setting-1", "update_setting", settingKey = "reducedMotion", settingValue = true),
+            WebUiBridgeProtocol.ParseResult.Valid("setting-1", "update_setting", settingKey = "reducedMotion", settingValue = "true"),
             WebUiBridgeProtocol.parse("""{"version":1,"id":"setting-1","type":"update_setting","key":"reducedMotion","value":"true"}""")
         )
         val unknown = WebUiBridgeProtocol.parse("""{"version":1,"id":"setting-2","type":"update_setting","key":"grantMoney","value":"true"}""")
         assertEquals("invalid_setting", (unknown as WebUiBridgeProtocol.ParseResult.Invalid).error)
         val invalidValue = WebUiBridgeProtocol.parse("""{"version":1,"id":"setting-3","type":"update_setting","key":"soundEnabled","value":"yes"}""")
         assertEquals("invalid_setting_value", (invalidValue as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("setting-4", "update_setting", settingKey = "volume", settingValue = "0.5"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"setting-4","type":"update_setting","key":"volume","value":"0.5"}""")
+        )
+        val invalidVolume = WebUiBridgeProtocol.parse("""{"version":1,"id":"setting-5","type":"update_setting","key":"volume","value":"1.5"}""")
+        assertEquals("invalid_setting_value", (invalidVolume as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
 
