@@ -10,15 +10,18 @@ plugins {
 
 val generatedWebPlayAssets = layout.buildDirectory.dir("generated/webPlayAssets")
 val generatedLauncherIconRes = layout.buildDirectory.dir("generated/launcherIconRes")
+val launcherLogo = rootProject.file("GTN_APP_LOGO.png")
 val prepareWebPlayBrandAsset by tasks.registering(Copy::class) {
-    from(rootProject.file("GTN_APP_LOGO.png"))
+    from(launcherLogo)
     into(generatedWebPlayAssets.map { it.dir("web-play") })
     rename { "gtn-app-logo.png" }
+    doFirst { check(launcherLogo.isFile) { "Missing launcher logo: ${launcherLogo.absolutePath}" } }
 }
 val prepareLauncherIcon by tasks.registering(Copy::class) {
-    from(rootProject.file("GTN_APP_LOGO.png"))
+    from(launcherLogo)
     into(generatedLauncherIconRes.map { it.dir("mipmap-nodpi") })
     rename { "ic_launcher.png" }
+    doFirst { check(launcherLogo.isFile) { "Missing launcher logo: ${launcherLogo.absolutePath}" } }
 }
 
 
