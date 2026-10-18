@@ -123,7 +123,7 @@ private class DesktopSharedWebViewController {
     private fun unpackWebAssets(): Path {
         val root = Files.createTempDirectory("gtn-shared-web-play-")
         root.toFile().deleteOnExit()
-        val files = listOf("index.html", "app.js", "styles.css", "icons/numberverse.svg", "icons/sparkle.svg", "icons/star.svg")
+        val files = listOf("index.html", "app.js", "styles.css", "icons/guess-the-number.svg", "icons/sparkle.svg", "icons/star.svg")
         for (relative in files) {
             val resource = "/web-play/$relative"
             val input = javaClass.getResourceAsStream(resource)
