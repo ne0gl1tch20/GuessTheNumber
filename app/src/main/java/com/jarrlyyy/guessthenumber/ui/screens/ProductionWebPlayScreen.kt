@@ -92,7 +92,7 @@ fun ProductionWebPlayScreen(
     fun reportBridgeException(action: String, requestId: String, error: Exception) {
         Log.e("GTNWebBridge", "Bridge request failed: action=$action requestId=$requestId", error)
         val trace = Log.getStackTraceString(error).take(12000)
-        bridgeErrorDetails = "Guess The Number bridge error\nAction: $action\nRequest ID: $requestId\nException: \${error.javaClass.name}: \${error.message ?: "(no message)"}\n\nJava/Kotlin stack trace:\n$trace"
+        bridgeErrorDetails = "Guess The Number bridge error\nAction: $action\nRequest ID: $requestId\nException: ${error.javaClass.name}: ${error.message ?: "(no message)"}\n\nJava/Kotlin stack trace:\n$trace"
     }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
@@ -143,7 +143,13 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
-                                        val beforeAction = readState()
+                                        val beforeAction = try {
+                                            readState()
+                                        } catch (exception: Exception) {
+                                            reportBridgeException(parsed.type, parsed.id, exception)
+                                            replyProxy.postMessage(errorResponse(parsed.id, "state_read_failed"))
+                                            return@post
+                                        }
                                         val result = if (parsed.type == "submit_guess" && parsed.guess != null) try { submitGuess(parsed.guess) } catch (exception: Exception) { reportBridgeException(parsed.type, parsed.id, exception); null } else null
                                         if (parsed.type == "submit_guess" && result == null) { replyProxy.postMessage(errorResponse(parsed.id, "guess_processing_failed")); return@post }
                                         try {
@@ -240,7 +246,13 @@ fun ProductionWebPlayScreen(
                                             reportBridgeException(parsed.type, parsed.id, exception)
                                             replyProxy.postMessage(errorResponse(parsed.id, "action_processing_failed")); return@post
                                         }
-                                        val game = readState()
+                                        val game = try {
+                                            readState()
+                                        } catch (exception: Exception) {
+                                            reportBridgeException(parsed.type, parsed.id, exception)
+                                            replyProxy.postMessage(errorResponse(parsed.id, "state_read_failed"))
+                                            return@post
+                                        }
                                         val actionAccepted = when (parsed.type) {
                                             "claim_daily_quest" -> parsed.questId != null && parsed.questId in game.claimedDailyQuests && parsed.questId !in beforeAction.claimedDailyQuests
                                             "open_loot_chest" -> when (parsed.tier) {
