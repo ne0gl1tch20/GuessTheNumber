@@ -98,13 +98,6 @@ fun NavGraph(
         return
     }
 
-    if (showSaveSlots) {
-        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-            SaveSlotsScreen(viewModel = viewModel, onNavigateBack = { showSaveSlots = false })
-        }
-        return
-    }
-
     Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
         ProductionWebPlayScreen(
             state = state,
@@ -169,6 +162,12 @@ fun NavGraph(
                 "lua_testing_hub" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) {
                     LuaTestingHubScreen(onBack = { debugDestination = null })
                 }
+            }
+        }
+
+        if (showSaveSlots) {
+            CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+                SaveSlotsScreen(viewModel = viewModel, onNavigateBack = { showSaveSlots = false })
             }
         }
     }
