@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Kısa tanıtım",
   "more_feature_discovery_step_1": "Bu özelliğin kendine ait araçları ve ilerlemesi var. Kısaca göz atıp keşfetmek istediğini seç.",
   "more_feature_discovery_step_2": "İstediğin zaman More Hub üzerinden bu özelliğe dönebilirsin.",
-  "more_feature_discovery_skip": "Atla ve aç"
+  "more_feature_discovery_skip": "Atla ve aç",
+  "game_temporarily_unavailable": "Oyun şu anda kullanılamıyor. Lütfen yeniden açın.",
+  "settings_synced_status": "Tercihleriniz kaydedildi.",
+  "stake_invalid_amount": "Bahis için pozitif bir tam sayı girin.",
+  "stake_flipping_status": "Para atılıyor…"
 }
