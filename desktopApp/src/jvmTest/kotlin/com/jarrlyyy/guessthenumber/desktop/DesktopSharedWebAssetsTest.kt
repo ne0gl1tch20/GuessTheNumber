@@ -25,6 +25,8 @@ class DesktopSharedWebAssetsTest {
         assertTrue(state.has("ultraRequirement"))
         assertTrue(state.has("ultraReward"))
         assertTrue(state.has("canUltra"))
+        assertTrue(state.has("talents"))
+        assertTrue(state.has("activeMutators"))
         val worlds = state.getJSONArray("worlds")
         assertTrue("World screen should use real desktop progression", worlds.length() >= 4)
         assertTrue(worlds.getJSONObject(0).has("bossName"))
@@ -53,6 +55,8 @@ class DesktopSharedWebAssetsTest {
         assertTrue(html.contains("id=\"screen-settings\""))
         assertTrue(html.contains("id=\"screen-prestige\""))
         assertTrue(html.contains("id=\"screen-ultra\""))
+        assertTrue(html.contains("id=\"screen-talent\""))
+        assertTrue(html.contains("id=\"screen-mutators\""))
         assertTrue(script.contains("buy_upgrade"))
         assertTrue(script.contains("buy_shop_item"))
         assertTrue(script.contains("homebase_upgrade"))
@@ -61,6 +65,8 @@ class DesktopSharedWebAssetsTest {
         assertTrue(script.contains("update_setting"))
         assertTrue(script.contains("prestige_reset"))
         assertTrue(script.contains("ultra_reset"))
+        assertTrue(script.contains("buy_talent"))
+        assertTrue(script.contains("set_mutator"))
         assertTrue(styles.contains(".screen"))
     }
 }

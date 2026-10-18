@@ -47,7 +47,9 @@ fun ProductionWebPlayScreen(
     onUpdateMultiplier: (String) -> Unit,
     onUpdateSettings: (GameSettings) -> Unit,
     onPrestigeReset: () -> Unit,
-    onUltraReset: () -> Unit
+    onUltraReset: () -> Unit,
+    onBuyTalent: (String, Long) -> Unit,
+    onSetMutatorActive: (String, Boolean) -> Unit
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val progressionEngine = remember { GameEngine() }
@@ -64,6 +66,8 @@ fun ProductionWebPlayScreen(
     val equipCosmetic by rememberUpdatedState(onEquipCosmetic)
     val updateMultiplier by rememberUpdatedState(onUpdateMultiplier)
     val updateSettings by rememberUpdatedState(onUpdateSettings)
+    val buyTalent by rememberUpdatedState(onBuyTalent)
+    val setMutatorActive by rememberUpdatedState(onSetMutatorActive)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
@@ -78,6 +82,7 @@ fun ProductionWebPlayScreen(
             val configRepository = JsonConfigRepository(context)
             val upgradeDefinitions = configRepository.loadUpgrades()
             val shopDefinitions = configRepository.loadShopItems()
+            val talentDefinitions = configRepository.loadTalents()
             val assetLoader = WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
                 .build()
@@ -125,6 +130,11 @@ fun ProductionWebPlayScreen(
                                                 "codex_reward" -> navigateProgression("claim_codex")
                                                 "prestige_reset" -> onPrestigeReset()
                                                 "ultra_reset" -> onUltraReset()
+                                                "buy_talent" -> parsed.itemId?.let { talentId ->
+                                                    val talent = talentDefinitions.firstOrNull { it.id == talentId } ?: throw IllegalArgumentException("Unknown talent")
+                                                    buyTalent(talent.id, talent.cost)
+                                                }
+                                                "set_mutator" -> if (parsed.mutatorId != null && parsed.mutatorActive != null) setMutatorActive(parsed.mutatorId, parsed.mutatorActive)
                                                 "relic_action" -> parsed.relicId?.let { navigateProgression("equip_relic:$it") }
                                                 "world_action" -> if (parsed.worldId != null && parsed.worldAction != null) dispatchWorldAction(parsed.worldId, parsed.worldAction)
                                                 "update_setting" -> {
@@ -266,6 +276,15 @@ fun ProductionWebPlayScreen(
                                                 .put("owned", owned).put("equipped", game.equippedCosmeticId == item.id)
                                                 .put("affordable", game.nebula >= BigNumber(item.nebulaCost)))
                                         }
+                                        val talentsJson = org.json.JSONArray()
+                                        talentDefinitions.forEach { talent ->
+                                            val owned = talent.id in game.prestigeShopPurchases
+                                            val canUnlock = talent.requiredParentId == null || talent.requiredParentId in game.prestigeShopPurchases
+                                            val affordable = game.prestige >= BigNumber(talent.cost)
+                                            talentsJson.put(JSONObject().put("id", talent.id).put("name", talent.name).put("description", talent.description)
+                                                .put("cost", talent.cost).put("owned", owned).put("canUnlock", canUnlock).put("affordable", affordable)
+                                                .put("requirement", if (!canUnlock) "Unlock ${talent.requiredParentId} first" else if (!affordable) "Need ${talent.cost} Prestige" else "Ready to unlock"))
+                                        }
                                         val viewState = JSONObject()
                                             .put("buyMultiplier", game.buyMultiplier)
                                             .put("prestigeRequirement", progressionEngine.calculatePrestigeRequirement(game.prestigeCount).format())
@@ -293,6 +312,8 @@ fun ProductionWebPlayScreen(
                                             .put("prestigeCount", game.prestigeCount)
                                             .put("ultraCount", game.ultraCount)
                                             .put("activeWorldId", game.activeWorldId)
+                                            .put("talents", talentsJson)
+                                            .put("activeMutators", org.json.JSONArray(game.activeMutators.toList()))
                                             .put("unlockedWorldCount", game.unlockedWorldIds.size)
                                             .put("defeatedBossCount", game.defeatedBossIds.size)
                                             .put("worldBossVictories", game.worldBossVictories)

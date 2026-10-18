@@ -139,3 +139,6 @@ h2{margin:3px 0 0;font-size:17px;letter-spacing:-.035em}.panel-title,.loot-headi
 
 /* Shared prestige and ultra reset summaries */
 .reset-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:16px 0}.reset-summary>div{display:grid;gap:7px;padding:14px;border:1px solid var(--line,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.035);min-width:0}.reset-summary span{font-size:11px;color:var(--muted,#9ca3af)}.reset-summary strong{font-size:clamp(15px,3vw,21px);overflow-wrap:anywhere}
+
+/* Shared Talent Web and Mutator controls */
+#talentList .catalog-item,#mutatorList .catalog-item{align-items:flex-start}#talentList .catalog-copy,#mutatorList .catalog-copy{min-width:0;flex:1}#talentList .catalog-meta,#mutatorList .catalog-meta{overflow-wrap:anywhere}.mutator-active{border-color:rgba(98,232,255,.48);background:rgba(98,232,255,.07)}

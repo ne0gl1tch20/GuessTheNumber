@@ -13,6 +13,7 @@ internal object WebUiBridgeProtocol {
     private val buyMultipliers = setOf("1", "10", "100", "MAX")
     private val relicActions = setOf("equip", "unequip")
     private val settingKeys = setOf("musicEnabled", "soundEnabled", "vibrationEnabled", "reducedMotion", "reduceFlashes")
+    private val mutatorIds = setOf("mut_hardcore", "mut_speed", "mut_blind", "mut_tax")
 
     sealed interface ParseResult {
         data class Valid(
@@ -29,7 +30,9 @@ internal object WebUiBridgeProtocol {
             val relicId: String? = null,
             val relicAction: String? = null,
             val settingKey: String? = null,
-            val settingValue: Boolean? = null
+            val settingValue: Boolean? = null,
+            val mutatorId: String? = null,
+            val mutatorActive: Boolean? = null
         ) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
@@ -100,6 +103,22 @@ internal object WebUiBridgeProtocol {
                 if (relicId !in setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")) return ParseResult.Invalid("invalid_relic", id)
                 if (action !in relicActions) return ParseResult.Invalid("invalid_relic_action", id)
                 ParseResult.Valid(id, type, relicId = relicId, relicAction = action)
+            }
+            "buy_talent" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val talentId = request.opt("talentId") as? String ?: return ParseResult.Invalid("invalid_talent", id)
+                    if (!talentId.matches(Regex("talent_[A-Za-z0-9_-]{1,48}"))) ParseResult.Invalid("invalid_talent", id)
+                    else ParseResult.Valid(id, type, itemId = talentId)
+                }
+            }
+            "set_mutator" -> {
+                if (request.length() != 5) return ParseResult.Invalid("invalid_request", id)
+                val mutatorId = request.opt("mutatorId") as? String ?: return ParseResult.Invalid("invalid_mutator", id)
+                val active = request.opt("active") as? String ?: return ParseResult.Invalid("invalid_mutator_state", id)
+                if (mutatorId !in mutatorIds) ParseResult.Invalid("invalid_mutator", id)
+                else if (active !in setOf("true", "false")) ParseResult.Invalid("invalid_mutator_state", id)
+                else ParseResult.Valid(id, type, mutatorId = mutatorId, mutatorActive = active == "true")
             }
             "update_setting" -> {
                 if (request.length() != 5) return ParseResult.Invalid("invalid_request", id)
