@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.desktop
 
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertFalse
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import org.junit.Test
 
