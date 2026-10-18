@@ -26,7 +26,7 @@ private val webUiLocaleFiles = mapOf(
 private fun desktopWebUiStrings(localeTag: String): JSONObject {
     val file = webUiLocaleFiles[localeTag] ?: "en_us.json"
     fun read(name: String): JSONObject? = runCatching {
-        DesktopWebPlayState::class.java.getResourceAsStream("/locales/$name")?.bufferedReader(Charsets.UTF_8)?.use {
+        Thread.currentThread().contextClassLoader.getResourceAsStream("locales/$name")?.bufferedReader(Charsets.UTF_8)?.use {
             JSONObject(it.readText())
         }
     }.getOrNull()
