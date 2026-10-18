@@ -358,8 +358,8 @@ fun ProductionGuessGameScreen(
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
                             "read_state", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
-                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest" -> 4
-                            "world_action", "relic_action", "update_setting" -> 5
+                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent" -> 4
+                            "world_action", "relic_action", "update_setting", "set_mutator" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
@@ -420,6 +420,17 @@ fun ProductionGuessGameScreen(
                                 message = "The game is still loading or saving."
                             } else {
                                 val transaction = when (type) {
+                                    "buy_talent" -> {
+                                        val id = request.optString("talentId")
+                                        val talent = talentCatalog?.firstOrNull { it.id == id }
+                                        if (talent == null) null else DesktopEconomyTransactions.buyTalent(before, talent.id, talent.cost, talent.requiredParentId)
+                                    }
+                                    "set_mutator" -> {
+                                        val id = request.optString("mutatorId")
+                                        val rawActive = request.optString("active")
+                                        if (rawActive != "true" && rawActive != "false") null
+                                        else DesktopEconomyTransactions.setMutatorActive(before, id, rawActive == "true", engine)
+                                    }
                                     "update_setting" -> {
                                         val key = request.optString("key")
                                         val rawValue = request.optString("value")
@@ -541,7 +552,7 @@ fun ProductionGuessGameScreen(
                         }
                         val visibleState = nextState ?: state
                         val payload = if (visibleState != null && catalog != null) {
-                            desktopWebPlayState(visibleState, catalog, accepted, guessStatus, message)
+                            desktopWebPlayState(visibleState, catalog, accepted, guessStatus, message, talentCatalog.orEmpty(), engine)
                         } else org.json.JSONObject().put("accepted", false).put("message", "Loading game…")
                         reply(org.json.JSONObject().put("version", 1).put("id", requestId)
                             .put("type", "state").put("state", payload).toString())
