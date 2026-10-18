@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Короткий огляд",
   "more_feature_discovery_step_1": "Ця функція має власні інструменти та прогрес. Озирніться, а потім виберіть, що дослідити.",
   "more_feature_discovery_step_2": "Ви можете будь-коли повернутися до цієї функції через More Hub.",
-  "more_feature_discovery_skip": "Пропустити й відкрити"
+  "more_feature_discovery_skip": "Пропустити й відкрити",
+  "game_temporarily_unavailable": "Гра зараз недоступна. Відкрийте її знову.",
+  "settings_synced_status": "Ваші налаштування збережено.",
+  "stake_invalid_amount": "Введіть додатне ціле число для ставки.",
+  "stake_flipping_status": "Підкидаємо монету…"
 }
