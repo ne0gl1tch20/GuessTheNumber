@@ -49,7 +49,9 @@ fun ProductionWebPlayScreen(
     onPrestigeReset: () -> Unit,
     onUltraReset: () -> Unit,
     onBuyTalent: (String, Long) -> Unit,
-    onSetMutatorActive: (String, Boolean) -> Unit
+    onSetMutatorActive: (String, Boolean) -> Unit,
+    onArcadeReward: (String, Int) -> Boolean,
+    onSettleStake: (String) -> Boolean
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val progressionEngine = remember { GameEngine() }
@@ -68,6 +70,8 @@ fun ProductionWebPlayScreen(
     val updateSettings by rememberUpdatedState(onUpdateSettings)
     val buyTalent by rememberUpdatedState(onBuyTalent)
     val setMutatorActive by rememberUpdatedState(onSetMutatorActive)
+    val awardArcadeReward by rememberUpdatedState(onArcadeReward)
+    val settleStake by rememberUpdatedState(onSettleStake)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
@@ -137,6 +141,19 @@ fun ProductionWebPlayScreen(
                                                 "set_mutator" -> if (parsed.mutatorId != null && parsed.mutatorActive != null) setMutatorActive(parsed.mutatorId, parsed.mutatorActive)
                                                 "relic_action" -> parsed.relicId?.let { navigateProgression("equip_relic:$it") }
                                                 "world_action" -> if (parsed.worldId != null && parsed.worldAction != null) dispatchWorldAction(parsed.worldId, parsed.worldAction)
+                                                "arcade_reward" -> {
+                                                    val gameId = parsed.arcadeGameId
+                                                    val score = parsed.arcadeScore
+                                                    if (gameId == null || score == null || !awardArcadeReward(gameId, score)) {
+                                                        throw IllegalArgumentException("Arcade reward was rejected.")
+                                                    }
+                                                }
+                                                "settle_stake" -> {
+                                                    val amount = parsed.stakeAmount
+                                                    if (amount == null || !settleStake(amount)) {
+                                                        throw IllegalArgumentException("Lucky Stake was rejected.")
+                                                    }
+                                                }
                                                 "update_setting" -> {
                                                     val key = parsed.settingKey
                                                     val value = parsed.settingValue
