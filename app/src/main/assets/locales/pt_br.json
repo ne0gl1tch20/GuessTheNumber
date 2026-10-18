@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Visita rápida",
   "more_feature_discovery_step_1": "Este recurso tem ferramentas e progresso próprios. Dê uma olhada e escolha o que deseja explorar.",
   "more_feature_discovery_step_2": "Você pode voltar a este recurso pelo More Hub quando quiser.",
-  "more_feature_discovery_skip": "Pular e abrir"
+  "more_feature_discovery_skip": "Pular e abrir",
+  "game_temporarily_unavailable": "O jogo está indisponível no momento. Abra-o novamente.",
+  "settings_synced_status": "Suas preferências foram salvas.",
+  "stake_invalid_amount": "Digite um número inteiro positivo para a aposta.",
+  "stake_flipping_status": "Jogando a moeda…"
 }
