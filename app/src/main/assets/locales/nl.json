@@ -1094,5 +1094,9 @@
   "more_feature_discovery_title": "Korte rondleiding",
   "more_feature_discovery_step_1": "Deze functie heeft eigen hulpmiddelen en voortgang. Bekijk ze kort en kies daarna wat je wilt verkennen.",
   "more_feature_discovery_step_2": "Je kunt altijd via de More Hub terugkeren naar deze functie.",
-  "more_feature_discovery_skip": "Overslaan en openen"
+  "more_feature_discovery_skip": "Overslaan en openen",
+  "game_temporarily_unavailable": "Het spel is momenteel niet beschikbaar. Open het opnieuw.",
+  "settings_synced_status": "Je voorkeuren zijn opgeslagen.",
+  "stake_invalid_amount": "Voer een positief geheel getal in als inzet.",
+  "stake_flipping_status": "Munt wordt opgegooid…"
 }
