@@ -121,7 +121,6 @@ fun NavGraph(
                     progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", "")
                     progression == "claim_codex" -> viewModel.progressionAction("claim_codex", "")
                     progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':'))
-                    progression == "world_map" -> debugDestination = "world_map"
                 }
             },
             onWorldAction = viewModel::worldProgressAction,
