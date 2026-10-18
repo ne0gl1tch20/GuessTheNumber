@@ -10,6 +10,22 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class WebUiBridgeProtocolTest {
     @Test
+    fun acceptsOnlyAllowlistedTalentAndMutatorActions() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("talent-1", "buy_talent", itemId = "talent_speed_1"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"talent-1","type":"buy_talent","talentId":"talent_speed_1"}""")
+        )
+        val unknownTalent = WebUiBridgeProtocol.parse("""{"version":1,"id":"talent-2","type":"buy_talent","talentId":"grant_infinite_money"}""")
+        assertEquals("invalid_talent", (unknownTalent as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("mutator-1", "set_mutator", mutatorId = "mut_speed", mutatorActive = true),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"mutator-1","type":"set_mutator","mutatorId":"mut_speed","active":"true"}""")
+        )
+        val unknownMutator = WebUiBridgeProtocol.parse("""{"version":1,"id":"mutator-2","type":"set_mutator","mutatorId":"grant_money","active":"true"}""")
+        assertEquals("invalid_mutator", (unknownMutator as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
     fun acceptsReadStateRequest() {
         assertEquals(
             WebUiBridgeProtocol.ParseResult.Valid("req_1", "read_state"),
