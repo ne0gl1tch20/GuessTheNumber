@@ -63,6 +63,42 @@ class DesktopSharedWebAssetsTest {
     }
 
     @Test
+    fun sharedSettingsUseLocalizedLabelsAndDescriptions() {
+        val html = asset("web-play/index.html")
+        val state = desktopWebPlayState(GameState(), DesktopEconomyCatalog.load())
+        val strings = state.getJSONObject("uiStrings")
+        val keys = listOf(
+            "settings", "background_music", "sound_effects", "vibration_label",
+            "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx",
+            "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes"
+        )
+        keys.forEach { key -> assertTrue("Missing shared UI translation: $key", strings.has(key)) }
+        keys.forEach { key -> assertTrue("Settings markup must use $key", html.contains("data-i18n=\"$key\"")) }
+        assertFalse(html.contains("Changes apply on both Android and Windows"))
+    }
+
+    @Test
+    fun everySupportedLocaleContainsSharedSettingsTranslations() {
+        val locales = listOf(
+            "ar.json", "de.json", "en_gb.json", "en_us.json", "es.json", "fil_ph.json",
+            "fr.json", "hi_in.json", "id.json", "it.json", "ja.json", "ko.json", "nl.json",
+            "pl.json", "pt_br.json", "pt_pt.json", "ru.json", "th.json", "tr.json",
+            "uk.json", "vi.json", "zh_cn.json", "zh_tw.json"
+        )
+        val keys = listOf(
+            "settings", "background_music", "sound_effects", "vibration_label",
+            "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx",
+            "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes"
+        )
+        locales.forEach { locale ->
+            val strings = org.json.JSONObject(asset("locales/$locale"))
+            keys.forEach { key ->
+                assertTrue("Missing $key in locale $locale", strings.optString(key).isNotBlank())
+            }
+        }
+    }
+
+    @Test
     fun canonicalAndroidWebPlayBundleIsAvailableOnDesktopClasspath() {
         val html = asset("web-play/index.html")
         val script = asset("web-play/app.js")
