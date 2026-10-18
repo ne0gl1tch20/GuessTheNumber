@@ -860,6 +860,21 @@ class DesktopEconomyTransactionsTest {
     }
 
     @Test
+    fun arcadeRewardRecordsBestScoreAndRejectsInvalidResults() {
+        val initial = GameState()
+        val reward = DesktopEconomyTransactions.awardMinigameResult(initial, "memory_match", 1)
+        assertTrue(reward.accepted)
+        assertEquals(1L, reward.state.statistics.arcadePlayed)
+        assertEquals(1, reward.state.statistics.arcadeBestScores["memory_match"])
+        assertTrue(reward.state.money > BigNumber.ZERO)
+        assertTrue(reward.state.nebula > BigNumber.ZERO)
+
+        val invalid = DesktopEconomyTransactions.awardMinigameResult(initial, "quick_guess", 101)
+        assertFalse(invalid.accepted)
+        assertEquals(initial, invalid.state)
+    }
+
+    @Test
     fun luckyStakeSettlementMatchesAndroidMoneyAndStatisticsRules() {
         val initial = GameState(money = BigNumber(100))
         val won = DesktopEconomyTransactions.settleStake(initial, BigNumber(10), BigNumber(25), true)
