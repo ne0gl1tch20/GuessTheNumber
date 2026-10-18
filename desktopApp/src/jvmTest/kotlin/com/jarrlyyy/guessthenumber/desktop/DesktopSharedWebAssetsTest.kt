@@ -56,8 +56,10 @@ class DesktopSharedWebAssetsTest {
         assertTrue(DesktopGameSection.HOME_BASE.sharedHtmlScreen == "homebase")
         assertTrue(DesktopGameSection.CODEX.sharedHtmlScreen == "codex")
         assertTrue(DesktopGameSection.ENDGAME.sharedHtmlScreen == "journey")
-        assertTrue(DesktopGameSection.STATS.sharedHtmlScreen == null)
-        assertTrue(DesktopGameSection.ARCADE.sharedHtmlScreen == null)
+        assertTrue(DesktopGameSection.STATS.sharedHtmlScreen == "stats")
+        assertTrue(DesktopGameSection.ARCADE.sharedHtmlScreen == "arcade")
+        assertTrue(DesktopGameSection.LUCKY_STAKE.sharedHtmlScreen == "stake")
+        assertTrue(DesktopGameSection.SETTINGS.sharedHtmlScreen == "settings")
     }
 
     @Test

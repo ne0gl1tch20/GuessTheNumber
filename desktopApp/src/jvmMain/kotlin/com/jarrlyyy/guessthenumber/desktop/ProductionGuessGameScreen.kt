@@ -357,8 +357,8 @@ fun ProductionGuessGameScreen(
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
                             "read_state", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
-                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent" -> 4
-                            "world_action", "relic_action", "update_setting", "set_mutator" -> 5
+                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
+                            "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
@@ -429,6 +429,25 @@ fun ProductionGuessGameScreen(
                                         val rawActive = request.optString("active")
                                         if (rawActive != "true" && rawActive != "false") null
                                         else DesktopEconomyTransactions.setMutatorActive(before, id, rawActive == "true", engine)
+                                    }
+                                    "arcade_reward" -> {
+                                        val gameId = request.optString("gameId")
+                                        val score = request.optString("score").toIntOrNull() ?: -1
+                                        DesktopEconomyTransactions.awardMinigameResult(before, gameId, score)
+                                    }
+                                    "settle_stake" -> {
+                                        val amountText = request.optString("amount")
+                                        val stake = amountText.takeIf { it.matches(Regex("[0-9]{1,18}")) }
+                                            ?.let { runCatching { BigNumber(it) }.getOrNull() }
+                                        if (stake == null) null else {
+                                            val won = Random.nextBoolean()
+                                            DesktopEconomyTransactions.settleStake(
+                                                before,
+                                                stake,
+                                                if (won) stake * BigNumber(2) else BigNumber.ZERO,
+                                                won
+                                            )
+                                        }
                                     }
                                     "update_setting" -> {
                                         val key = request.optString("key")

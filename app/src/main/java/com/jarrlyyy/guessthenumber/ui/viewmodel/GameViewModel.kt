@@ -1463,6 +1463,53 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         )
 
 
+    fun awardArcadeResult(gameId: String, score: Int): Boolean {
+        val (nebulaReward, moneyReward) = when (gameId) {
+            "quick_guess" -> {
+                if (score !in 0..100) return false
+                1L to BigNumber(score.toLong() * 500L)
+            }
+            "reaction_test" -> {
+                if (score !in 1..9_999) return false
+                1L to BigNumber(2_000)
+            }
+            "lucky_number" -> {
+                if (score != 1) return false
+                1L to BigNumber(5_000)
+            }
+            "memory_match" -> {
+                if (score != 1) return false
+                1L to BigNumber(10_000)
+            }
+            "number_rush" -> {
+                if (score != 1) return false
+                1L to BigNumber(7_500)
+            }
+            else -> return false
+        }
+        val state = _gameState.value
+        val bestScores = state.statistics.arcadeBestScores.toMutableMap()
+        bestScores[gameId] = maxOf(bestScores[gameId] ?: 0, score)
+        _gameState.value = state.copy(
+            statistics = state.statistics.copy(
+                arcadePlayed = state.statistics.arcadePlayed + 1,
+                arcadeBestScores = bestScores
+            )
+        )
+        earnMinigameReward(nebulaReward, moneyReward)
+        return true
+    }
+
+    fun settleRandomStake(amountText: String): Boolean {
+        if (!amountText.matches(Regex("[0-9]{1,18}"))) return false
+        val stakeAmount = runCatching { BigNumber(amountText) }.getOrNull() ?: return false
+        val state = _gameState.value
+        if (stakeAmount <= BigNumber.ZERO || state.money < stakeAmount) return false
+        val won = Random.nextBoolean()
+        settleStake(stakeAmount, if (won) stakeAmount * BigNumber(2) else BigNumber.ZERO, won)
+        return true
+    }
+
     fun earnMinigameReward(nebulaReward: Long, moneyReward: BigNumber) {
         val state = _gameState.value
         val finalNebulaReward = gameEngine.calculateNebulaReward(state, nebulaReward)

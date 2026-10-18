@@ -27,6 +27,7 @@ import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GuessSubmissionResult
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
+import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 
 private const val WEB_UI_ORIGIN = "https://appassets.androidplatform.net"
 private const val WEB_UI_PATH = "/assets/web-play/"
@@ -35,6 +36,7 @@ private const val WEB_UI_PATH = "/assets/web-play/"
 fun ProductionWebPlayScreen(
     state: GameState,
     incomePerSecond: BigNumber,
+    localeManager: LocaleManager,
     stateProvider: () -> GameState,
     onSubmitGuess: (Long) -> GuessSubmissionResult,
     onClaimDailyQuest: (String) -> Unit,
@@ -49,7 +51,9 @@ fun ProductionWebPlayScreen(
     onPrestigeReset: () -> Unit,
     onUltraReset: () -> Unit,
     onBuyTalent: (String, Long) -> Unit,
-    onSetMutatorActive: (String, Boolean) -> Unit
+    onSetMutatorActive: (String, Boolean) -> Unit,
+    onArcadeReward: (String, Int) -> Boolean,
+    onSettleStake: (String) -> Boolean
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val progressionEngine = remember { GameEngine() }
@@ -68,6 +72,8 @@ fun ProductionWebPlayScreen(
     val updateSettings by rememberUpdatedState(onUpdateSettings)
     val buyTalent by rememberUpdatedState(onBuyTalent)
     val setMutatorActive by rememberUpdatedState(onSetMutatorActive)
+    val awardArcadeReward by rememberUpdatedState(onArcadeReward)
+    val settleStake by rememberUpdatedState(onSettleStake)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
@@ -137,6 +143,19 @@ fun ProductionWebPlayScreen(
                                                 "set_mutator" -> if (parsed.mutatorId != null && parsed.mutatorActive != null) setMutatorActive(parsed.mutatorId, parsed.mutatorActive)
                                                 "relic_action" -> parsed.relicId?.let { navigateProgression("equip_relic:$it") }
                                                 "world_action" -> if (parsed.worldId != null && parsed.worldAction != null) dispatchWorldAction(parsed.worldId, parsed.worldAction)
+                                                "arcade_reward" -> {
+                                                    val gameId = parsed.arcadeGameId
+                                                    val score = parsed.arcadeScore
+                                                    if (gameId == null || score == null || !awardArcadeReward(gameId, score)) {
+                                                        throw IllegalArgumentException("Arcade reward was rejected.")
+                                                    }
+                                                }
+                                                "settle_stake" -> {
+                                                    val amount = parsed.stakeAmount
+                                                    if (amount == null || !settleStake(amount)) {
+                                                        throw IllegalArgumentException("Lucky Stake was rejected.")
+                                                    }
+                                                }
                                                 "update_setting" -> {
                                                     val key = parsed.settingKey
                                                     val value = parsed.settingValue
@@ -294,6 +313,7 @@ fun ProductionWebPlayScreen(
                                             .put("ultraReward", progressionEngine.calculateUltraReward(game.money, game.ultraCount).format())
                                             .put("canUltra", game.money >= progressionEngine.calculateUltraRequirement(game.ultraCount) && game.prestige >= BigNumber(1_000) && progressionEngine.calculateUltraReward(game.money, game.ultraCount) > BigNumber.ZERO)
                                             .put("settings", JSONObject().put("musicEnabled", game.settings.musicEnabled).put("soundEnabled", game.settings.soundEnabled).put("vibrationEnabled", game.settings.vibrationEnabled).put("reducedMotion", game.settings.reducedMotion).put("reduceFlashes", game.settings.reduceFlashes))
+                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active").forEach { key -> put(key, localeManager.getString(key)) } })
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
                                             .put("rangeMin", (result?.rangeMin ?: game.currentRangeMin).toString())

@@ -113,6 +113,22 @@ class WebUiBridgeProtocolTest {
 
 
     @Test
+    fun validatesArcadeRewardsAndLuckyStakeAmounts() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("arcade-1", "arcade_reward", arcadeGameId = "memory_match", arcadeScore = 1),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"arcade-1","type":"arcade_reward","gameId":"memory_match","score":"1"}""")
+        )
+        val unknownGame = WebUiBridgeProtocol.parse("""{"version":1,"id":"arcade-2","type":"arcade_reward","gameId":"grant_money","score":"1"}""")
+        assertEquals("invalid_arcade_game", (unknownGame as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("stake-1", "settle_stake", stakeAmount = "500"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"stake-1","type":"settle_stake","amount":"500"}""")
+        )
+        val invalidStake = WebUiBridgeProtocol.parse("""{"version":1,"id":"stake-2","type":"settle_stake","amount":"-500"}""")
+        assertEquals("invalid_stake", (invalidStake as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
     fun acceptsOnlyKnownBooleanSettings() {
         assertEquals(
             WebUiBridgeProtocol.ParseResult.Valid("setting-1", "update_setting", settingKey = "reducedMotion", settingValue = true),

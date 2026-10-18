@@ -87,6 +87,7 @@ fun NavGraph(
     ProductionWebPlayScreen(
         state = state,
         incomePerSecond = incomePerSecond,
+        localeManager = locale,
         stateProvider = { viewModel.gameState.value },
         onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
         onClaimDailyQuest = viewModel::claimDailyQuest,
@@ -107,7 +108,9 @@ fun NavGraph(
         onPrestigeReset = viewModel::prestigeReset,
         onUltraReset = viewModel::ultraReset,
         onBuyTalent = viewModel::buyTalent,
-        onSetMutatorActive = viewModel::setMutatorActive
+        onSetMutatorActive = viewModel::setMutatorActive,
+        onArcadeReward = viewModel::awardArcadeResult,
+        onSettleStake = viewModel::settleRandomStake
     )
 
     if (initialDestination != null) {

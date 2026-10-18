@@ -33,6 +33,7 @@ internal val DesktopGameSection.sharedHtmlScreen: String?
         DesktopGameSection.PRESTIGE -> "prestige"
         DesktopGameSection.ULTRA -> "ultra"
         DesktopGameSection.TALENT -> "talent"
+        DesktopGameSection.SETTINGS -> "settings"
         DesktopGameSection.ACHIEVEMENTS -> "rewards"
         DesktopGameSection.WORLD_MAP -> "worlds"
         DesktopGameSection.MUTATORS -> "mutators"
@@ -40,5 +41,8 @@ internal val DesktopGameSection.sharedHtmlScreen: String?
         DesktopGameSection.HOME_BASE -> "homebase"
         DesktopGameSection.CODEX -> "codex"
         DesktopGameSection.ENDGAME -> "journey"
+        DesktopGameSection.STATS -> "stats"
+        DesktopGameSection.ARCADE -> "arcade"
+        DesktopGameSection.LUCKY_STAKE -> "stake"
         else -> null
     }
