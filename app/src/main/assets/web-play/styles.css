@@ -164,3 +164,20 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 button { touch-action: manipulation; }
 @media (max-width: 480px) { .more-menu { grid-template-columns: repeat(2, minmax(0, 1fr)); } .screen-nav { width: calc(100% - 16px); gap: 3px; padding: 6px 4px; } .screen-nav button b { font-size: 8px; letter-spacing: -.02em; } }
 @media (min-width: 720px) { .app { padding-bottom: calc(120px + env(safe-area-inset-bottom)); } }
+
+
+/* Dedicated More screen: roomy cards replace the floating menu. */
+.more-screen{grid-template-columns:minmax(0,1fr);gap:16px;padding-bottom:24px;scroll-margin-top:16px}
+.more-heading{padding:22px;grid-column:1}
+.more-heading h2{margin:7px 0;font-size:clamp(25px,5vw,34px);letter-spacing:-.035em}
+.more-heading p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.more-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;grid-column:1}
+.more-link-card{display:flex;align-items:center;gap:13px;min-width:0;min-height:78px;padding:15px;border:1px solid var(--line);border-radius:18px;background:var(--surface-soft);color:var(--text);text-align:left;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.more-link-card:active{transform:scale(.985)}
+.more-link-card>span:first-child{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:13px;background:rgba(155,124,255,.12);font-size:21px}
+.more-link-card>span:nth-child(2){display:grid;gap:5px;min-width:0;flex:1}
+.more-link-card b{font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+.more-link-card small{color:var(--muted);font-size:11px;line-height:1.4}
+.more-link-card>strong{color:var(--muted);font-size:23px;font-weight:500}
+@media(max-width:520px){.more-screen{gap:12px}.more-heading{padding:18px}.more-links{grid-template-columns:minmax(0,1fr);gap:9px}.more-link-card{min-height:70px;padding:12px}.more-link-card>span:first-child{flex-basis:40px;width:40px;height:40px}}
+@media(prefers-reduced-motion:reduce){.more-link-card{transition:none}.more-link-card:active{transform:none}}
