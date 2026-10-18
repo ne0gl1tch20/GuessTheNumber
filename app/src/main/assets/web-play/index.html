@@ -39,7 +39,7 @@
         <button type="button" class="more-link-card" data-screen-target="homebase"><span>⌂</span><span><b>Home Base</b><small>Build up your base</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="relics"><span>✧</span><span><b>Relics</b><small>Manage your relic collection</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="codex"><span>▤</span><span><b>Codex</b><small>Explore discoveries</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="about"><span>ⓘ</span><span><b data-i18n="about_title">About</b><small data-i18n="about_web_subtitle">Version details and updates</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="about"><span>ⓘ</span><span><b data-i18n="about_title">About</b><small data-i18n="about_licenses">About & Licenses</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-route="save_slots"><span>▣</span><span><b>Save Slots</b><small>Switch or manage saved games</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="settings"><span>⚙</span><span><b>Settings</b><small>Customize your experience</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="prestige"><span>✧</span><span><b>Prestige</b><small>Prestige upgrades and resets</small></span><strong aria-hidden="true">›</strong></button>
@@ -257,15 +257,14 @@
         <h2 data-i18n="about_title">About & Open Source Licenses</h2>
         <p data-i18n="about_description">A guessing game with deep progression and offline play.</p>
         <div class="about-version-grid">
-          <div><span data-i18n="about_installed_version">Installed version</span><strong id="aboutInstalledVersion">—</strong></div>
-          <div><span data-i18n="update_channel_label">Update channel</span><strong id="aboutUpdateChannel">—</strong></div>
+          <div><strong id="aboutInstalledVersion">—</strong></div>
+          <div><span id="aboutUpdateChannelLabel">Update channel</span><strong id="aboutUpdateChannel">—</strong></div>
         </div>
       </section>
       <section class="about-updater card" aria-labelledby="aboutUpdateHeading">
-        <div class="panel-title"><span class="panel-glyph">↻</span><div><span class="eyebrow" data-i18n="about_updates_eyebrow">APP UPDATER</span><h2 id="aboutUpdateHeading" data-i18n="update_check">Check for updates</h2></div><span class="panel-chip" id="aboutUpdateBadge">READY</span></div>
-        <p class="about-update-copy" data-i18n="about_update_description">Check the update channel for a compatible version. Installing is always your choice.</p>
+        <div class="panel-title"><span class="panel-glyph">↻</span><div><h2 id="aboutUpdateHeading" data-i18n="update_check">Check for updates</h2></div><span class="panel-chip" id="aboutUpdateBadge">READY</span></div>
         <button type="button" class="primary-action" id="aboutCheckUpdates" data-bridge-action="check_updates" data-i18n="update_check">Check for updates</button>
-        <div id="aboutUpdateStatus" class="about-update-status" role="status" aria-live="polite" data-i18n="about_update_idle">No update check has been run yet.</div>
+        <div id="aboutUpdateStatus" class="about-update-status" role="status" aria-live="polite"></div>
         <div id="aboutAvailableUpdate" class="about-available-update" hidden>
           <span class="eyebrow" data-i18n="update_available">Update available</span>
           <h3 id="aboutAvailableVersion">—</h3>
@@ -275,9 +274,8 @@
         </div>
       </section>
       <section class="about-licenses card">
-        <span class="eyebrow" data-i18n="about_licenses_eyebrow">CREDITS</span>
+        <span class="eyebrow" data-i18n="about_licenses">CREDITS</span>
         <h2 data-i18n="about_licenses_title">Open-source libraries</h2>
-        <p data-i18n="about_licenses_description">GuessTheNumber uses open-source libraries. License notices are included with the app.</p>
         <div class="about-license-list"><div><strong>Jetpack Compose</strong><span>Apache License 2.0</span></div><div><strong>Material 3</strong><span>Apache License 2.0</span></div><div><strong>Kotlin Coroutines</strong><span>Apache License 2.0</span></div><div><strong>LuaJ</strong><span>MIT License</span></div></div>
       </section>
     </div>
