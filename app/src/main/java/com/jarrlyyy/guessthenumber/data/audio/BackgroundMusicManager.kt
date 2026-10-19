@@ -44,6 +44,7 @@ class BackgroundMusicManager private constructor(context: Context) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var mediaPlayer: MediaPlayer? = null
     private var progressJob: Job? = null
+    @Volatile private var playbackVolume = 1f
     private var queueIndex = 0
     private var skipRepeatOnceAfterQueueRemoval = false
     private val _library = MutableStateFlow(loadLibrary())
@@ -302,7 +303,7 @@ class BackgroundMusicManager private constructor(context: Context) {
         if (!File(path).exists()) { track?.let { removeTrack(it.id) }; stop(); return }
         try {
             mediaPlayer?.release()
-            mediaPlayer = MediaPlayer().apply { setDataSource(path); setOnCompletionListener { advance() }; prepare(); start() }
+            mediaPlayer = MediaPlayer().apply { setDataSource(path); setOnCompletionListener { advance() }; setVolume(playbackVolume, playbackVolume); prepare(); start() }
             _currentPath.value = path
             _currentTrackId.value = track?.id
             preferences.edit().putString("current_track", track?.id).apply()
@@ -336,6 +337,7 @@ class BackgroundMusicManager private constructor(context: Context) {
 
     fun pause() { runCatching { mediaPlayer?.pause(); _isPlaying.value = false } }
     fun stop() { runCatching { mediaPlayer?.stop(); mediaPlayer?.release() }; mediaPlayer = null; _isPlaying.value = false; _currentPosition.value = 0; stopPlaybackService() }
+    fun setVolume(value: Float) { playbackVolume = value.coerceIn(0f, 1f); runCatching { mediaPlayer?.setVolume(playbackVolume, playbackVolume) } }
     fun seekTo(position: Int) { runCatching { mediaPlayer?.seekTo(position.coerceAtLeast(0)); _currentPosition.value = position.coerceAtLeast(0) } }
 
     fun release() {
