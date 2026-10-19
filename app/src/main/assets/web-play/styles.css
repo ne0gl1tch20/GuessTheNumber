@@ -267,3 +267,5 @@ body.arcade-modal-open{overflow:hidden}body.arcade-modal-open::before{content:""
 @media(max-width:420px){.music-list-item{align-items:flex-start;flex-direction:column}.music-row-actions{justify-content:flex-start;width:100%}.music-playlist-form{flex-wrap:wrap}.music-playlist-form button{width:100%}}
 
 .about-license-list small{display:block;color:var(--muted);font-size:12px;line-height:1.4;margin-top:3px}
+
+.more-link-card>.more-link-icon{display:block;width:40px;height:40px;flex:0 0 40px;padding:8px;border-radius:12px}
