@@ -171,6 +171,20 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        if (parsed.type == "music_state") {
+                                            val musicState = JSONObject()
+                                                .put("library", org.json.JSONArray().apply { musicManager.library.value.forEach { track -> put(JSONObject().put("id", track.id).put("title", track.title).put("artist", track.artist).put("album", track.album).put("duration", track.duration)) } })
+                                                .put("queue", org.json.JSONArray(musicManager.queue.value))
+                                                .put("playlists", JSONObject().apply { musicManager.playlists.value.forEach { (name, ids) -> put(name, org.json.JSONArray(ids)) } })
+                                                .put("currentTrackId", musicManager.currentTrackId.value ?: "")
+                                                .put("currentPosition", musicManager.currentPosition.value)
+                                                .put("duration", musicManager.duration.value)
+                                                .put("isPlaying", musicManager.isPlaying.value)
+                                                .put("shuffle", musicManager.shuffle.value)
+                                                .put("repeatMode", musicManager.repeatMode.value.name)
+                                            replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "music_state").put("musicPlayer", musicState).toString())
+                                            return@post
+                                        }
                                         if (parsed.type in setOf("check_updates", "install_update", "open_update_page")) {
                                             when (parsed.type) {
                                                 "check_updates" -> updateScope.launch {
