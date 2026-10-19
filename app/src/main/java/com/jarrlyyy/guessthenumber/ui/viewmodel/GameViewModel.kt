@@ -28,6 +28,7 @@ import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.DailyRewardPolicy
 import com.jarrlyyy.guessthenumber.domain.model.LiveOpsClaimDefinition
 import com.jarrlyyy.guessthenumber.domain.model.LiveOpsClaimPolicy
 import com.jarrlyyy.guessthenumber.domain.model.RandomEventEngine
@@ -1402,6 +1403,26 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
         GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "LOOT_CHEST_OPENED", "Opened $tier loot chest.")
         saveGameAsync()
+    }
+
+    fun claimDailyReward(): Boolean {
+        val state = _gameState.value
+        val today = LocalDate.now().toString()
+        if (state.lastDailyRewardDate == today) return false
+
+        val streak = DailyRewardPolicy.nextStreak(state.lastDailyRewardDate, state.dailyRewardStreak, today)
+        val baseReward = DailyRewardPolicy.rewardForStreak(streak)
+        val multiplier = if ("nebula_boost" in state.shopPurchases) 2L else 1L
+        val reward = baseReward * multiplier
+        _gameState.value = state.copy(
+            nebula = state.nebula + BigNumber(reward),
+            lastDailyRewardDate = today,
+            dailyRewardStreak = streak,
+            statistics = state.statistics.copy(nebulaEarned = state.statistics.nebulaEarned + reward)
+        )
+        saveGameAsync()
+        GameLogger.log(LogLevel.INFO, LoggerCategory.GAME, "DAILY_REWARD_CLAIM", "Claimed daily reward day $streak for $reward Nebula.")
+        return true
     }
 
     fun claimDailyQuest(questId: String) {
