@@ -107,6 +107,7 @@ fun NavGraph(
     Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
         ProductionWebPlayScreen(
             state = state,
+            dailyRewardTestRequest = dailyRewardTestRequest,
             incomePerSecond = incomePerSecond,
             localeManager = locale,
             stateProvider = { viewModel.gameState.value },
