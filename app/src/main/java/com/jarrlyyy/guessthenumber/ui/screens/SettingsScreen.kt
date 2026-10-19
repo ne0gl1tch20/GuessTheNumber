@@ -553,7 +553,7 @@ fun SettingsScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(localizedText("Reset All Game Data"))
+                    Text(locale.getString("reset_everything_label", "Reset Everything"))
                 }
             }
         }
@@ -585,10 +585,10 @@ fun SettingsScreen(
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
-            title = { Text(localizedText("Confirm Data Reset")) },
+            title = { Text(locale.getString("confirm_data_reset_title", "Confirm Data Reset")) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(localizedText("Are you sure you want to reset all progress? This action is irreversible."))
+                    Text(locale.getString("reset_data_warning", "Are you sure you want to reset all progress? This action is irreversible."))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -597,7 +597,7 @@ fun SettingsScreen(
                             checked = confirmResetCheck,
                             onCheckedChange = { confirmResetCheck = it }
                         )
-                        Text(localizedText("I understand this will erase all my progress"), fontSize = 14.sp)
+                        Text(locale.getString("reset_data_acknowledgement", "I understand this will erase all my progress"), fontSize = 14.sp)
                     }
                 }
             },
@@ -611,7 +611,7 @@ fun SettingsScreen(
                     enabled = confirmResetCheck,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text(localizedText("Reset Everything"))
+                    Text(locale.getString("reset_everything_label", "Reset Everything"))
                 }
             },
             dismissButton = {
