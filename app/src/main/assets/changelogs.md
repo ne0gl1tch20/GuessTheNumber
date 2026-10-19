@@ -1,4 +1,5 @@
 ## Unreleased (HTML More Hub, changelog and player feedback)
+- 📋 **Canonical changelog content**: The shared HTML changelog now reads this Markdown file and formats its headings, bold text, code and lists instead of duplicating release notes in HTML.
 
 - 📋 Added an in-game Changelog page linked from More, with recent UI, progression and platform changes.
 - 🌐 Added English and Filipino translations for the Changelog page and randomized incorrect-guess messages; other locale overlays use the English fallback until their translations are added.
