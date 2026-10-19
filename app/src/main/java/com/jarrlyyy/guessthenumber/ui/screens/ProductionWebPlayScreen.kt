@@ -270,6 +270,8 @@ fun ProductionWebPlayScreen(
                                                         "play_track" -> musicManager.playTrack(parsed.musicTrackId ?: throw IllegalArgumentException("Missing track"))
                                                         "enqueue" -> musicManager.enqueue(parsed.musicTrackId ?: throw IllegalArgumentException("Missing track"))
                                                         "remove_track" -> musicManager.removeTrack(parsed.musicTrackId ?: throw IllegalArgumentException("Missing track"))
+                                                        "add_to_playlist" -> if (!musicManager.addToPlaylist(parsed.musicName ?: throw IllegalArgumentException("Missing playlist"), parsed.musicTrackId ?: throw IllegalArgumentException("Missing track"))) throw IllegalArgumentException("Could not add track to playlist")
+                                                        "remove_from_playlist" -> musicManager.removeFromPlaylist(parsed.musicName ?: throw IllegalArgumentException("Missing playlist"), parsed.musicTrackId ?: throw IllegalArgumentException("Missing track"))
                                                         "clear_queue" -> musicManager.clearQueue()
                                                         "remove_queue" -> musicManager.removeFromQueue(parsed.musicIndex ?: throw IllegalArgumentException("Missing queue index"))
                                                         "move_queue" -> musicManager.moveQueue(parsed.musicIndex ?: throw IllegalArgumentException("Missing queue index"), parsed.musicToIndex ?: throw IllegalArgumentException("Missing destination index"))
