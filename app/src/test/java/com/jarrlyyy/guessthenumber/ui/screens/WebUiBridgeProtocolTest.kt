@@ -327,4 +327,16 @@ class WebUiBridgeProtocolTest {
         }
     }
 
+    @Test
+    fun validatesMusicPlayerActionsAndRejectsUnknownCommands() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("music-1", "music_action", musicAction = "play_track", musicTrackId = "track_123_4567"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"music-1","type":"music_action","action":"play_track","trackId":"track_123_4567"}""")
+        )
+        val invalid = WebUiBridgeProtocol.parse("""{"version":1,"id":"music-2","type":"music_action","action":"grant_rewards"}""")
+        assertEquals("invalid_music_action", (invalid as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        val extra = WebUiBridgeProtocol.parse("""{"version":1,"id":"music-3","type":"music_action","action":"play","unexpected":true}""")
+        assertEquals("invalid_request", (extra as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
 }
