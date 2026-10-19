@@ -17,9 +17,12 @@ val prepareWebPlayBrandAsset by tasks.registering(Copy::class) {
     rename { "gtn-app-logo.png" }
 }
 val prepareLauncherIcon by tasks.registering(Copy::class) {
+    doFirst {
+        check(launcherLogo.isFile) { "Required launcher logo is missing: ${launcherLogo.absolutePath}" }
+    }
     from(launcherLogo)
-    into(generatedLauncherIconRes.map { it.dir("mipmap-nodpi") })
-    rename { "ic_launcher.png" }
+    into(generatedLauncherIconRes.map { it.dir("drawable-nodpi") })
+    rename { "gtn_app_logo.png" }
 }
 
 
