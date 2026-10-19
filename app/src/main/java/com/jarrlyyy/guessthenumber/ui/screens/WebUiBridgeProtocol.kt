@@ -149,19 +149,19 @@ internal object WebUiBridgeProtocol {
                 val allowedFields = setOf("version", "id", "type", "action", "trackId", "index", "toIndex", "position", "name")
                 if (request.keys().asSequence().any { it !in allowedFields }) return ParseResult.Invalid("invalid_request", id)
                 val action = request.opt("action") as? String ?: return ParseResult.Invalid("invalid_music_action", id)
-                val actions = setOf("import", "play", "pause", "stop", "next", "previous", "shuffle", "repeat", "play_track", "enqueue", "remove_track", "clear_queue", "remove_queue", "move_queue", "create_playlist", "delete_playlist", "play_playlist", "seek")
+                val actions = setOf("import", "play", "pause", "stop", "next", "previous", "shuffle", "repeat", "play_track", "enqueue", "remove_track", "add_to_playlist", "remove_from_playlist", "clear_queue", "remove_queue", "move_queue", "create_playlist", "delete_playlist", "play_playlist", "seek")
                 if (action !in actions) return ParseResult.Invalid("invalid_music_action", id)
                 val trackId = request.opt("trackId") as? String
                 val index = if (request.has("index")) request.optInt("index", -1) else null
                 val toIndex = if (request.has("toIndex")) request.optInt("toIndex", -1) else null
                 val position = if (request.has("position")) request.optInt("position", -1) else null
                 val name = request.opt("name") as? String
-                if (action in setOf("play_track", "enqueue", "remove_track") && (trackId == null || !trackId.matches(Regex("track_[A-Za-z0-9_-]{1,64}")))) return ParseResult.Invalid("invalid_music_track", id)
+                if (action in setOf("play_track", "enqueue", "remove_track", "add_to_playlist", "remove_from_playlist") && (trackId == null || !trackId.matches(Regex("track_[A-Za-z0-9_-]{1,64}")))) return ParseResult.Invalid("invalid_music_track", id)
                 if (action in setOf("remove_queue", "move_queue") && (index == null || index !in 0..1000)) return ParseResult.Invalid("invalid_music_index", id)
                 if (action == "move_queue" && (toIndex == null || toIndex !in 0..1000)) return ParseResult.Invalid("invalid_music_index", id)
                 if (action == "seek" && (position == null || position !in 0..86_400_000)) return ParseResult.Invalid("invalid_music_position", id)
-                if (action in setOf("create_playlist", "delete_playlist", "play_playlist") && (name == null || name.trim().length !in 1..60 || name.any { it.isISOControl() })) return ParseResult.Invalid("invalid_music_playlist", id)
-                val extraCount = listOfNotNull(trackId.takeIf { action in setOf("play_track", "enqueue", "remove_track") }, index.takeIf { action in setOf("remove_queue", "move_queue") }, toIndex.takeIf { action == "move_queue" }, position.takeIf { action == "seek" }, name.takeIf { action in setOf("create_playlist", "delete_playlist", "play_playlist") }).size
+                if (action in setOf("create_playlist", "delete_playlist", "play_playlist", "add_to_playlist", "remove_from_playlist") && (name == null || name.trim().length !in 1..60 || name.any { it.isISOControl() })) return ParseResult.Invalid("invalid_music_playlist", id)
+                val extraCount = listOfNotNull(trackId.takeIf { action in setOf("play_track", "enqueue", "remove_track") }, index.takeIf { action in setOf("remove_queue", "move_queue") }, toIndex.takeIf { action == "move_queue" }, position.takeIf { action == "seek" }, name.takeIf { action in setOf("create_playlist", "delete_playlist", "play_playlist", "add_to_playlist", "remove_from_playlist") }).size
                 if (request.length() != 4 + extraCount) return ParseResult.Invalid("invalid_request", id)
                 ParseResult.Valid(id, type, musicAction = action, musicTrackId = trackId, musicIndex = index, musicToIndex = toIndex, musicPosition = position, musicName = name?.trim())
             }
