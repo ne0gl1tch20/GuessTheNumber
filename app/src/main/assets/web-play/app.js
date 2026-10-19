@@ -233,4 +233,14 @@ if(host&&typeof host.postMessage==='function'){host.onmessage=event=>receive(eve
 $('musicSeek')?.addEventListener('change',event=>send('music_action',{action:'seek',position:Number(event.currentTarget.value)}));
 $('musicPlaylistForm')?.addEventListener('submit',event=>{event.preventDefault();const input=$('musicPlaylistName'),name=input?.value.trim();if(name&&send('music_action',{action:'create_playlist',name}))input.value='';});
 $('aboutCheckUpdates')?.addEventListener('click',()=>{setText($('aboutUpdateStatus'),uiText('update_checking','Checking for updates…'));setText($('aboutUpdateBadge'),uiText('update_checking','Checking for updates…'));send('check_updates')});$('aboutInstallUpdate')?.addEventListener('click',()=>{setText($('aboutUpdateStatus'),uiText('update_downloading','Downloading and preparing update…'));send('install_update')});$('aboutOpenUpdate')?.addEventListener('click',()=>send('open_update_page'));$('stakeFlip')?.addEventListener('click',()=>{const amount=$('stakeAmount')?.value?.trim()||'';if(!/^[0-9]{1,18}$/.test(amount)||Number(amount)<=0){setText($('stakeStatus'),uiText('stake_invalid_amount','Enter a positive whole number for your stake.'));return}if(send('settle_stake',{amount})){setText($('stakeStatus'),uiText('stake_flipping_status','Flipping…'));$('stakeFlip').disabled=true}});window.setInterval(updateLivePlaytime,1000);window.setInterval(()=>{if(host&&document.visibilityState==='visible'&&!pending)send('read_state')},15000);window.setInterval(()=>{if(host&&document.visibilityState==='visible'&&!pending&&document.querySelector('[data-screen="music"]:not([hidden])'))send('music_state')},1000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){const elapsed=Math.max(0,Math.floor((Date.now()-statsPlaytimeAnchor)/1000));statsPlaytimeBase+=elapsed;statsPlaytimeAnchor=Date.now();updateLivePlaytime()}else{statsPlaytimeAnchor=Date.now();updateLivePlaytime();if(host&&!pending)send('read_state')}});send('read_state')}else{el.status.textContent='OFFLINE';el.micro.textContent=uiText('game_temporarily_unavailable','The game is unavailable right now. Please reopen it.')}
+
+// Debug-only host trigger used by the in-app /testdailyrewards command.
+window.gtnShowDailyRewardTest = function () {
+ const overlay = document.getElementById("dailyRewardOverlay");
+ if (!overlay) return false;
+ overlay.hidden = false;
+ const claim = document.getElementById("dailyRewardClaim");
+ if (claim) claim.focus({ preventScroll: true });
+ return true;
+};
 })();
