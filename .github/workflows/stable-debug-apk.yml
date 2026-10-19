@@ -26,6 +26,8 @@ jobs:
       - name: Validate All JSON Assets
         run: python3 tools/validate_json_assets.py
       - name: Audit Repository Localization Surface
+        run: python3 tools/audit_localization_surface.py
+      - name: Audit Hardcoded UI Strings
         run: python3 tools/validate_hardcoded_strings.py
       - name: Fast Kotlin Preflight Check
         run: python3 tools/preflight_compile_check.py
