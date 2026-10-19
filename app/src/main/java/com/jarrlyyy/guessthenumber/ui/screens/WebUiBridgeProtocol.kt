@@ -9,7 +9,7 @@ internal object WebUiBridgeProtocol {
     const val MAX_MESSAGE_LENGTH = 512
     private val dailyQuestIds = setOf("daily_guesses_10", "daily_correct_5", "daily_streak_5", "daily_upgrades_3")
     private val lootTiers = setOf("common", "rare", "epic")
-    private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements")
+    private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements", "save_slots", "color_picker_primary", "color_picker_secondary", "color_picker_tertiary")
     private val worldActions = setOf("unlock", "boss")
     private val buyMultipliers = setOf("1", "10", "100", "MAX")
     private val relicActions = setOf("equip", "unequip")
@@ -36,7 +36,13 @@ internal object WebUiBridgeProtocol {
             val mutatorActive: Boolean? = null,
             val arcadeGameId: String? = null,
             val arcadeScore: Int? = null,
-            val stakeAmount: String? = null
+            val stakeAmount: String? = null,
+            val musicAction: String? = null,
+            val musicTrackId: String? = null,
+            val musicIndex: Int? = null,
+            val musicToIndex: Int? = null,
+            val musicPosition: Int? = null,
+            val musicName: String? = null
         ) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
@@ -65,7 +71,7 @@ internal object WebUiBridgeProtocol {
         val validId = rawId is String && id.matches(Regex("[A-Za-z0-9_-]{1,48}"))
         if (rawVersion !is Int || rawVersion != 1 || !validId || rawType !is String) return ParseResult.Invalid("invalid_request", id)
         return when (type) {
-            "read_state", "increment_counter", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" ->
+            "read_state", "read_changelog", "music_state", "increment_counter", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset", "check_updates", "install_update", "open_update_page" ->
                 if (request.length() != 3) ParseResult.Invalid("invalid_request", id) else ParseResult.Valid(id, type)
             "submit_guess" -> {
                 if (request.length() != 4 || !request.has("guess")) return ParseResult.Invalid("invalid_request", id)
@@ -138,6 +144,26 @@ internal object WebUiBridgeProtocol {
                 val amount = request.opt("amount") as? String ?: return ParseResult.Invalid("invalid_stake", id)
                 if (!amount.matches(Regex("[0-9]{1,18}")) || amount.toLongOrNull()?.let { it > 0L } != true) return ParseResult.Invalid("invalid_stake", id)
                 ParseResult.Valid(id, type, stakeAmount = amount)
+            }
+            "music_action" -> {
+                val allowedFields = setOf("version", "id", "type", "action", "trackId", "index", "toIndex", "position", "name")
+                if (request.keys().asSequence().any { it !in allowedFields }) return ParseResult.Invalid("invalid_request", id)
+                val action = request.opt("action") as? String ?: return ParseResult.Invalid("invalid_music_action", id)
+                val actions = setOf("import", "play", "pause", "stop", "next", "previous", "shuffle", "repeat", "play_track", "enqueue", "remove_track", "add_to_playlist", "remove_from_playlist", "clear_queue", "remove_queue", "move_queue", "create_playlist", "delete_playlist", "play_playlist", "seek")
+                if (action !in actions) return ParseResult.Invalid("invalid_music_action", id)
+                val trackId = request.opt("trackId") as? String
+                val index = if (request.has("index")) request.optInt("index", -1) else null
+                val toIndex = if (request.has("toIndex")) request.optInt("toIndex", -1) else null
+                val position = if (request.has("position")) request.optInt("position", -1) else null
+                val name = request.opt("name") as? String
+                if (action in setOf("play_track", "enqueue", "remove_track", "add_to_playlist", "remove_from_playlist") && (trackId == null || !trackId.matches(Regex("track_[A-Za-z0-9_-]{1,64}")))) return ParseResult.Invalid("invalid_music_track", id)
+                if (action in setOf("remove_queue", "move_queue") && (index == null || index !in 0..1000)) return ParseResult.Invalid("invalid_music_index", id)
+                if (action == "move_queue" && (toIndex == null || toIndex !in 0..1000)) return ParseResult.Invalid("invalid_music_index", id)
+                if (action == "seek" && (position == null || position !in 0..86_400_000)) return ParseResult.Invalid("invalid_music_position", id)
+                if (action in setOf("create_playlist", "delete_playlist", "play_playlist", "add_to_playlist", "remove_from_playlist") && (name == null || name.trim().length !in 1..60 || name.any { it.isISOControl() })) return ParseResult.Invalid("invalid_music_playlist", id)
+                val extraCount = listOfNotNull(trackId.takeIf { action in setOf("play_track", "enqueue", "remove_track", "add_to_playlist", "remove_from_playlist") }, index.takeIf { action in setOf("remove_queue", "move_queue") }, toIndex.takeIf { action == "move_queue" }, position.takeIf { action == "seek" }, name.takeIf { action in setOf("create_playlist", "delete_playlist", "play_playlist", "add_to_playlist", "remove_from_playlist") }).size
+                if (request.length() != 4 + extraCount) return ParseResult.Invalid("invalid_request", id)
+                ParseResult.Valid(id, type, musicAction = action, musicTrackId = trackId, musicIndex = index, musicToIndex = toIndex, musicPosition = position, musicName = name?.trim())
             }
             "update_setting" -> {
                 if (request.length() != 5) return ParseResult.Invalid("invalid_request", id)

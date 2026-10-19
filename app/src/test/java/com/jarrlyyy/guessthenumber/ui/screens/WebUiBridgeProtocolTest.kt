@@ -31,6 +31,18 @@ class WebUiBridgeProtocolTest {
             WebUiBridgeProtocol.ParseResult.Valid("req_1", "read_state"),
             WebUiBridgeProtocol.parse("""{"version":1,"id":"req_1","type":"read_state"}""")
         )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("update-1", "check_updates"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"update-1","type":"check_updates"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("update-2", "install_update"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"update-2","type":"install_update"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("update-3", "open_update_page"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"update-3","type":"open_update_page"}""")
+        )
     }
 
 
@@ -69,6 +81,13 @@ class WebUiBridgeProtocolTest {
             WebUiBridgeProtocol.ParseResult.Valid("nav-1", "navigate", route = "world_map"),
             WebUiBridgeProtocol.parse("""{"version":1,"id":"nav-1","type":"navigate","route":"world_map"}""")
         )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("nav-slots", "navigate", route = "save_slots"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"nav-slots","type":"navigate","route":"save_slots"}""")
+        )
+        assertEquals(WebUiBridgeProtocol.ParseResult.Valid("color-1", "navigate", route = "color_picker_primary"), WebUiBridgeProtocol.parse("""{"version":1,"id":"color-1","type":"navigate","route":"color_picker_primary"}"""))
+        assertEquals(WebUiBridgeProtocol.ParseResult.Valid("color-2", "navigate", route = "color_picker_secondary"), WebUiBridgeProtocol.parse("""{"version":1,"id":"color-2","type":"navigate","route":"color_picker_secondary"}"""))
+        assertEquals(WebUiBridgeProtocol.ParseResult.Valid("color-3", "navigate", route = "color_picker_tertiary"), WebUiBridgeProtocol.parse("""{"version":1,"id":"color-3","type":"navigate","route":"color_picker_tertiary"}"""))
         val debugRoute = WebUiBridgeProtocol.parse("""{"version":1,"id":"nav-2","type":"navigate","route":"dev_settings"}""")
         if (com.jarrlyyy.guessthenumber.BuildConfig.DEBUG) {
             assertEquals(
@@ -306,6 +325,30 @@ class WebUiBridgeProtocolTest {
         } catch (_: IllegalArgumentException) {
             // Expected: a zero-sized replay window cannot enforce uniqueness.
         }
+    }
+
+    @Test
+    fun validatesMusicPlayerActionsAndRejectsUnknownCommands() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("music-1", "music_action", musicAction = "play_track", musicTrackId = "track_123_4567"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"music-1","type":"music_action","action":"play_track","trackId":"track_123_4567"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("music-playlist", "music_action", musicAction = "add_to_playlist", musicTrackId = "track_123_4567", musicName = "Road Trip"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"music-playlist","type":"music_action","action":"add_to_playlist","trackId":"track_123_4567","name":"Road Trip"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("music-state", "music_state"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"music-state","type":"music_state"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("changelog-1", "read_changelog"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"changelog-1","type":"read_changelog"}""")
+        )
+        val invalid = WebUiBridgeProtocol.parse("""{"version":1,"id":"music-2","type":"music_action","action":"grant_rewards"}""")
+        assertEquals("invalid_music_action", (invalid as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        val extra = WebUiBridgeProtocol.parse("""{"version":1,"id":"music-3","type":"music_action","action":"play","unexpected":true}""")
+        assertEquals("invalid_request", (extra as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
 }

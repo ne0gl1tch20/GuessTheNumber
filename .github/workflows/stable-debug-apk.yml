@@ -60,7 +60,12 @@ jobs:
           mkdir -p "$RUNNER_TEMP/gtn-debug"
           cp app/build/outputs/apk/debug/*.apk "$RUNNER_TEMP/gtn-debug/GuessTheNumber-debug.apk"
           cd "$RUNNER_TEMP/gtn-debug"
-          zip -q "$GITHUB_WORKSPACE/GuessTheNumber-debug.zip" GuessTheNumber-debug.apk
+          sha256sum GuessTheNumber-debug.apk > SHA256SUMS
+          version_code="$(grep -E '^[[:space:]]*versionCode = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *//')"
+          version_name="$(grep -E '^[[:space:]]*versionName = "' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= "//; s/"$//')"
+          test -n "$version_code" && test -n "$version_name"
+          printf '{"packageName":"com.jarrlyyy.guessthenumber","versionName":"%s","versionCode":%s,"commit":"%s"}\n' "$version_name" "$version_code" "$GITHUB_SHA" > update-manifest.json
+          zip -q "$GITHUB_WORKSPACE/GuessTheNumber-debug.zip" GuessTheNumber-debug.apk SHA256SUMS update-manifest.json
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
@@ -72,6 +77,15 @@ jobs:
         with:
           name: GuessTheNumber-debug.zip
           path: GuessTheNumber-debug.zip
+          if-no-files-found: error
+      - name: Upload stable update artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GuessTheNumber-debug
+          path: |
+            ${{ runner.temp }}/gtn-debug/GuessTheNumber-debug.apk
+            ${{ runner.temp }}/gtn-debug/SHA256SUMS
+            ${{ runner.temp }}/gtn-debug/update-manifest.json
           if-no-files-found: error
       - name: Publish debug-latest release asset
         env:
