@@ -172,6 +172,17 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        if (parsed.type == "read_changelog") {
+                                            val markdown = try {
+                                                context.assets.open("changelogs.md").bufferedReader(Charsets.UTF_8).use { it.readText() }
+                                            } catch (_: Exception) {
+                                                replyProxy.postMessage(errorResponse(parsed.id, "changelog_unavailable"))
+                                                return@post
+                                            }
+                                            replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id)
+                                                .put("type", "changelog").put("content", markdown).toString())
+                                            return@post
+                                        }
                                         if (parsed.type == "music_state") {
                                             val musicState = JSONObject()
                                                 .put("library", org.json.JSONArray().apply { musicManager.library.value.forEach { track -> put(JSONObject().put("id", track.id).put("title", track.title).put("artist", track.artist).put("album", track.album).put("duration", track.duration)) } })
