@@ -2,7 +2,6 @@ package com.jarrlyyy.guessthenumber.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -21,9 +20,39 @@ import com.jarrlyyy.guessthenumber.data.repository.ApkUpdateInstaller
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import com.jarrlyyy.guessthenumber.BuildConfig
 
 data class OpenSourceLibrary(val name: String, val license: String, val author: String)
+
+@Composable
+private fun UpdateMarkdown(details: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        details.lines().forEach { rawLine ->
+            val line = rawLine.trim()
+            when {
+                line.startsWith("### ") -> Text(parseMarkdownInline(line.removePrefix("### ")), style = MaterialTheme.typography.titleSmall)
+                line.startsWith("## ") -> Text(parseMarkdownInline(line.removePrefix("## ")), style = MaterialTheme.typography.titleMedium)
+                line.startsWith("# ") -> Text(parseMarkdownInline(line.removePrefix("# ")), style = MaterialTheme.typography.titleLarge)
+                line.startsWith("- ") || line.startsWith("* ") -> {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("•", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        Text(parseMarkdownInline(line.drop(2)), style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+                line.matches(Regex("\\d+[.)]\\s+.*")) -> {
+                    val match = Regex("^(\\d+)[.)]\\s+(.*)$").matchEntire(line)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("${match?.groupValues?.getOrNull(1) ?: "•"}.", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        Text(parseMarkdownInline(match?.groupValues?.getOrNull(2) ?: line), style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+                line.isBlank() -> Spacer(Modifier.height(2.dp))
+                else -> Text(parseMarkdownInline(line), style = MaterialTheme.typography.bodySmall)
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,7 +120,7 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                         }
                         availableUpdate?.let { update ->
                             Text(update.title, style = MaterialTheme.typography.titleSmall)
-                            if (update.details.isNotBlank()) Text(update.details, style = MaterialTheme.typography.bodySmall)
+                            if (update.details.isNotBlank()) UpdateMarkdown(update.details)
                             Button(onClick = {
                                 if (!context.packageManager.canRequestPackageInstalls()) {
                                     context.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${context.packageName}")))
@@ -100,7 +129,13 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                                     scope.launch {
                                         installingUpdate = true
                                         updateMessage = locale.getString("update_downloading", "Downloading and preparing update…")
-                                        val result = withContext(Dispatchers.IO) { ApkUpdateInstaller(context).install(update.downloadUrl) }
+                                        val result = withContext(Dispatchers.IO) {
+                                            ApkUpdateInstaller(context).install(
+                                                update.downloadUrl,
+                                                requireChecksum = update.requireChecksum,
+                                                expectedCommitSha = update.expectedCommitSha
+                                            )
+                                        }
                                         installingUpdate = false
                                         updateMessage = result.fold(
                                             {
