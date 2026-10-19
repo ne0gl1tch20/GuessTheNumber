@@ -150,7 +150,7 @@ function renderRewardPopups(s){
   setText($('dailyRewardTitle'),uiText('daily_reward_title','Daily Nebula Reward'));
   setText($('dailyRewardSubtitle'),uiText('daily_reward_subtitle',"Claim today's reward and keep your streak alive."));
   setText($('dailyRewardAmount'),'+ '+String(s.dailyRewardAmount??'5')+' Nebula');
-  const streak=Number(s.dailyRewardStreak||0), nextDay=streak>=7?1:streak+1;
+  const nextDay=Number(s.dailyRewardNextStreak??(Number(s.dailyRewardStreak||0)>=7?1:Number(s.dailyRewardStreak||0)+1));
   setText($('dailyRewardStreak'),uiText('daily_reward_streak','Day %s streak').replace(/%s/g,String(nextDay)));
   setText($('dailyRewardClaim'),uiText('daily_reward_claim','Claim reward'));
  }
