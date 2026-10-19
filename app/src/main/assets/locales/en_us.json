@@ -1145,5 +1145,11 @@
   "music_background_track_desc": "Music playback follows your saved audio settings.",
   "music_player_toggle_desc": "Turn background music on or off.",
   "music_player_status": "Your music preference is saved with your game.",
-  "master_volume": "Master volume"
+  "master_volume": "Master volume",
+  "daily_reward_title": "Daily Nebula Reward",
+  "daily_reward_subtitle": "Claim today's reward and keep your streak alive.",
+  "daily_reward_claim": "Claim reward",
+  "daily_reward_streak": "Day %s streak",
+  "daily_reward_claimed": "Today's reward is already claimed.",
+  "offline_gains_amount": "+%s Money"
 }
