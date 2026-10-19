@@ -57,6 +57,20 @@ class WebUiBridgeProtocolTest {
     }
 
     @Test
+    fun acceptsDailyRewardAndOfflineDismissActionsWithoutExtraFields() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("daily-reward-1", "claim_daily_reward"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"daily-reward-1","type":"claim_daily_reward"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("offline-dismiss-1", "dismiss_offline_gains"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"offline-dismiss-1","type":"dismiss_offline_gains"}""")
+        )
+        val extra = WebUiBridgeProtocol.parse("""{"version":1,"id":"daily-reward-2","type":"claim_daily_reward","amount":"999999"}""")
+        assertEquals("invalid_request", (extra as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
     fun acceptsOnlyKnownLootTiers() {
         assertEquals(
             WebUiBridgeProtocol.ParseResult.Valid("chest-1", "open_loot_chest", tier = "rare"),
