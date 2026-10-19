@@ -60,6 +60,7 @@ private const val WEB_UI_PATH = "/assets/web-play/"
 @Composable
 fun ProductionWebPlayScreen(
     state: GameState,
+    dailyRewardTestRequest: Int = 0,
     incomePerSecond: BigNumber,
     localeManager: LocaleManager,
     stateProvider: () -> GameState,
@@ -134,6 +135,14 @@ fun ProductionWebPlayScreen(
 
     DisposableEffect(Unit) {
         onDispose { webViewRef?.let { it.stopLoading(); it.destroy() } }
+    }
+
+    LaunchedEffect(dailyRewardTestRequest) {
+        if (dailyRewardTestRequest > 0) {
+            webViewRef?.postDelayed({
+                webViewRef?.evaluateJavascript("window.gtnShowDailyRewardTest && window.gtnShowDailyRewardTest()", null)
+            }, 150L)
+        }
     }
 
     AndroidView(
