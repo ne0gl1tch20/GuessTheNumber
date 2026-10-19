@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.Instant
 
 /** Channel-aware update discovery. It only returns a verified source URL; installation is handled separately. */
 object UpdateChannelChecker {
@@ -19,14 +20,23 @@ object UpdateChannelChecker {
     sealed interface Result {
         data class Available(val update: AvailableUpdate) : Result
         data object UpToDate : Result
-        data object Unavailable : Result
+        data class Unavailable(val diagnostics: String) : Result
     }
 
     suspend fun check(): Result = withContext(Dispatchers.IO) {
         try {
             if (BuildConfig.UPDATE_CHANNEL == "debug") checkDebug() else checkRelease()
-        } catch (_: Exception) {
-            Result.Unavailable
+        } catch (error: Exception) {
+            Result.Unavailable(
+                buildString {
+                    appendLine("Update check failed")
+                    appendLine("Time: ${Instant.now()}")
+                    appendLine("Channel: ${BuildConfig.UPDATE_CHANNEL}")
+                    appendLine("App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+                    appendLine("Failure: ${error.javaClass.name}")
+                    appendLine("Message: ${error.message ?: "(no message)"}")
+                }.trim()
+            )
         }
     }
 
@@ -39,9 +49,9 @@ object UpdateChannelChecker {
         val asset = (0 until (assets?.length() ?: 0))
             .mapNotNull { assets?.optJSONObject(it) }
             .firstOrNull { it.optString("name").endsWith(".apk", ignoreCase = true) || it.optString("name").endsWith(".zip", ignoreCase = true) }
-            ?: return Result.Unavailable
+            ?: return Result.Unavailable("The debug-latest release did not contain the expected GuessTheNumber-debug.zip asset.")("Release lookup succeeded, but no APK or ZIP asset was found in the latest release.")
         val downloadUrl = asset.optString("browser_download_url")
-        if (downloadUrl.isBlank()) return Result.Unavailable
+        if (downloadUrl.isBlank()) return Result.Unavailable("The debug ZIP asset had an empty download URL.")("The release asset had an empty download URL.")
 
         return Result.Available(
             AvailableUpdate(
@@ -55,7 +65,7 @@ object UpdateChannelChecker {
 
     private fun checkDebug(): Result {
         val release = getJson("https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/releases/tags/debug-latest")
-        val assets = release.optJSONArray("assets") ?: return Result.Unavailable
+        val assets = release.optJSONArray("assets") ?: return Result.Unavailable("The debug-latest release response did not contain an assets array.")
         val asset = (0 until assets.length())
             .mapNotNull { assets.optJSONObject(it) }
             .firstOrNull { it.optString("name") == "GuessTheNumber-debug.zip" }
@@ -85,7 +95,7 @@ object UpdateChannelChecker {
         connection.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
         connection.setRequestProperty("User-Agent", "GuessTheNumber-UpdateChecker")
         return try {
-            if (connection.responseCode !in 200..299) error("Update endpoint returned ${connection.responseCode}")
+            if (connection.responseCode !in 200..299) error("GET $address returned HTTP ${connection.responseCode}")
             connection.inputStream.bufferedReader(Charsets.UTF_8).use { JSONObject(it.readText()) }
         } finally {
             connection.disconnect()
