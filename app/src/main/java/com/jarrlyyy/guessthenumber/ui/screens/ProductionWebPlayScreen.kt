@@ -105,6 +105,7 @@ fun ProductionWebPlayScreen(
     val settleStake by rememberUpdatedState(onSettleStake)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val musicManager = remember { BackgroundMusicManager(context.applicationContext) }
+    LaunchedEffect(state.settings.volume) { musicManager.setVolume(state.settings.volume) }
     val musicPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) runCatching { musicManager.importTrack(uri)?.let { musicManager.playTrack(it.id) } }
         webViewRef?.post { webViewRef?.evaluateJavascript("window.gtnReadState && window.gtnReadState()", null) }
