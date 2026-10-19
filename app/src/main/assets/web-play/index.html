@@ -55,18 +55,29 @@
     </section>
     <div class="screen" id="screen-music" role="tabpanel" aria-labelledby="tab-more" data-screen="music" hidden>
       <section class="card catalog-panel music-player-panel">
-        <div class="panel-title"><span class="panel-glyph">♫</span><div><span class="eyebrow" data-i18n="music_player_eyebrow">AUDIO</span><h2 data-i18n="music_player_title">Background Music</h2></div></div>
-        <p class="catalog-intro" data-i18n="music_player_subtitle">Control your background music without leaving the game.</p>
-        <div class="music-now-playing">
-          <div class="music-art" aria-hidden="true">♫</div>
-          <div><strong data-i18n="music_background_track">Game background music</strong><span data-i18n="music_background_track_desc">Music playback follows your saved audio settings.</span></div>
+        <div class="panel-title"><span class="panel-glyph">♫</span><div><span class="eyebrow" data-i18n="music_player_eyebrow">AUDIO</span><h2 data-i18n="music_player_title">Offline Music Player</h2></div></div>
+        <p class="catalog-intro" data-i18n="music_player_subtitle">Play music stored on this device, manage your queue and organize playlists.</p>
+        <div class="music-now-playing"><div class="music-art" id="musicArt" aria-hidden="true">♫</div><div class="music-track-copy"><strong id="musicCurrentTitle" data-i18n="music_no_track">No track selected</strong><span id="musicCurrentArtist">Add audio from this device to get started.</span><small id="musicTime">0:00 / 0:00</small></div></div>
+        <input class="music-seek" id="musicSeek" type="range" min="0" max="0" value="0" aria-label="Seek music playback">
+        <div class="music-controls">
+          <button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="previous" aria-label="Previous track">|◀</button>
+          <button type="button" class="primary-action music-control" data-bridge-action="music" data-music-action="play" id="musicPlayPause">▶ Play</button>
+          <button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="next" aria-label="Next track">▶|</button>
+          <button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="stop" aria-label="Stop playback">■</button>
+        </div>
+        <div class="music-controls music-options">
+          <button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="shuffle" id="musicShuffle">Shuffle: Off</button>
+          <button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="repeat" id="musicRepeat">Repeat: Off</button>
+          <button type="button" class="primary-action music-control" data-bridge-action="music" data-music-action="import" data-i18n="music_add_audio">Add audio</button>
         </div>
         <label class="setting-row music-toggle-row"><span><strong data-i18n="background_music">Background music</strong><small data-i18n="music_player_toggle_desc">Turn background music on or off.</small></span><input type="checkbox" data-setting-toggle="musicEnabled"></label>
-        <label class="setting-field"><span id="musicVolumeLabel">Master volume</span><input type="range" min="0" max="1" step="0.01" data-setting-value="volume" id="musicVolume"></label>
+        <label class="setting-field"><span data-i18n="master_volume">Master volume</span><input type="range" min="0" max="1" step="0.01" data-setting-value="volume" id="musicVolume"></label>
         <p class="catalog-intro" id="musicPlayerStatus" role="status" aria-live="polite" data-i18n="music_player_status">Your music preference is saved with your game.</p>
       </section>
-    </div>
-    <section class="screen changelog-screen" id="screen-changelog" role="tabpanel" aria-labelledby="tab-more" data-screen="changelog" hidden>
+      <section class="card catalog-panel music-library-panel"><h3 data-i18n="music_library">Library</h3><div id="musicLibrary" class="music-list"><p class="catalog-empty">Loading music library…</p></div></section>
+      <section class="card catalog-panel music-library-panel"><div class="music-section-heading"><h3 data-i18n="music_queue">Queue</h3><button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="clear_queue" data-i18n="clear">Clear</button></div><div id="musicQueue" class="music-list"><p class="catalog-empty">Loading queue…</p></div></section>
+      <section class="card catalog-panel music-library-panel"><h3 data-i18n="music_playlists">Playlists</h3><form id="musicPlaylistForm" class="music-playlist-form"><input id="musicPlaylistName" maxlength="60" required data-i18n-placeholder="music_playlist_name" placeholder="Playlist name"><button class="primary-action" type="submit" data-i18n="music_create_playlist">Create</button></form><div id="musicPlaylists" class="music-list"></div></section>
+    </div><section class="screen changelog-screen" id="screen-changelog" role="tabpanel" aria-labelledby="tab-more" data-screen="changelog" hidden>
       <section class="card changelog-heading">
         <span class="eyebrow" data-i18n="changelog_eyebrow">WHAT'S NEW</span>
         <h2 data-i18n="changelog_title">Changelog</h2>
