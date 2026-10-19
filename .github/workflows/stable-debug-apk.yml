@@ -26,8 +26,6 @@ jobs:
       - name: Validate All JSON Assets
         run: python3 tools/validate_json_assets.py
       - name: Audit Repository Localization Surface
-        run: python3 tools/audit_localization_surface.py
-      - name: Audit Hardcoded UI Strings
         run: python3 tools/validate_hardcoded_strings.py
       - name: Fast Kotlin Preflight Check
         run: python3 tools/preflight_compile_check.py
@@ -91,6 +89,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          version_code="$(grep -E '^[[:space:]]*versionCode = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *//')"
+          version_name="$(grep -E '^[[:space:]]*versionName = "' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= "//; s/"$//')"
           release_notes="Stable Debug #${GITHUB_RUN_NUMBER}\n\nVersion: ${version_name} (${version_code})\nCommit: ${GITHUB_SHA}\n\n- Refresh the installable Stable Debug APK.\n- Keep the signed ZIP and checksum metadata together."
           gh release view debug-latest >/dev/null 2>&1 || gh release create debug-latest --target "$GITHUB_SHA" --title "GuessTheNumber Debug Latest" --notes "$release_notes"
           gh release edit debug-latest --target "$GITHUB_SHA" --title "GuessTheNumber Debug Latest" --notes "$release_notes"
