@@ -232,3 +232,5 @@ body.arcade-modal-open{overflow:hidden}body.arcade-modal-open::before{content:""
 .music-playlist-form{display:flex;gap:8px}
 .music-playlist-form input{min-width:0;flex:1;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text)}
 @media(max-width:420px){.music-list-item{align-items:flex-start;flex-direction:column}.music-row-actions{justify-content:flex-start;width:100%}.music-playlist-form{flex-wrap:wrap}.music-playlist-form button{width:100%}}
+
+.about-license-list small{display:block;color:var(--muted);font-size:12px;line-height:1.4;margin-top:3px}
