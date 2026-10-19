@@ -83,6 +83,21 @@ class DesktopSharedWebAssetsTest {
     }
 
     @Test
+    fun sharedHtmlChangelogLoadsTheCanonicalMarkdownAsset() {
+        val html = asset("web-play/index.html")
+        val script = asset("web-play/app.js")
+        val markdown = asset("changelogs.md")
+
+        assertTrue(html.contains("connect-src 'self'"))
+        assertTrue(html.contains("id=\"changelogContent\""))
+        assertFalse(html.contains("changelog_current_title"))
+        assertTrue(script.contains("fetch('../changelogs.md'"))
+        assertTrue(script.contains("renderChangelogMarkdown"))
+        assertTrue(markdown.contains("# Changelog"))
+        assertTrue(markdown.contains("## Unreleased"))
+    }
+
+    @Test
     fun everySupportedLocaleContainsSharedSettingsTranslations() {
         val locales = listOf(
             "ar.json", "de.json", "en_gb.json", "en_us.json", "es.json", "fil_ph.json",
