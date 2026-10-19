@@ -214,6 +214,12 @@ fun ProductionWebPlayScreen(
                                                             latestAvailableUpdate = null
                                                             response.put("status", "unavailable").put("message", activeLocaleManager.getString("update_unavailable", "Couldn't check for updates. Try again later."))
                                                         }
+                                                        is UpdateChannelChecker.Result.Failed -> {
+                                                            latestAvailableUpdate = null
+                                                            response.put("status", "unavailable")
+                                                                .put("message", activeLocaleManager.getString("update_unavailable", "Couldn't check for updates. Try again later."))
+                                                                .put("diagnostics", updateResult.diagnostics)
+                                                        }
                                                     }
                                                     replyProxy.postMessage(response.toString())
                                                 }
