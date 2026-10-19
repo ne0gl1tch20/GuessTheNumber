@@ -49,9 +49,9 @@ object UpdateChannelChecker {
         val asset = (0 until (assets?.length() ?: 0))
             .mapNotNull { assets?.optJSONObject(it) }
             .firstOrNull { it.optString("name").endsWith(".apk", ignoreCase = true) || it.optString("name").endsWith(".zip", ignoreCase = true) }
-            ?: return Result.Unavailable("The debug-latest release did not contain the expected GuessTheNumber-debug.zip asset.")("Release lookup succeeded, but no APK or ZIP asset was found in the latest release.")
+            ?: return Result.Unavailable("Release lookup succeeded, but no APK or ZIP asset was found in the latest release.")
         val downloadUrl = asset.optString("browser_download_url")
-        if (downloadUrl.isBlank()) return Result.Unavailable("The debug ZIP asset had an empty download URL.")("The release asset had an empty download URL.")
+        if (downloadUrl.isBlank()) return Result.Unavailable("The release asset had an empty download URL.")
 
         return Result.Available(
             AvailableUpdate(
@@ -69,9 +69,9 @@ object UpdateChannelChecker {
         val asset = (0 until assets.length())
             .mapNotNull { assets.optJSONObject(it) }
             .firstOrNull { it.optString("name") == "GuessTheNumber-debug.zip" }
-            ?: return Result.Unavailable
+            ?: return Result.Unavailable("The debug-latest release did not contain GuessTheNumber-debug.zip.")
         val downloadUrl = asset.optString("browser_download_url")
-        if (downloadUrl.isBlank()) return Result.Unavailable
+        if (downloadUrl.isBlank()) return Result.Unavailable("The debug ZIP asset had an empty download URL.")
 
         val latestTag = release.optString("target_commitish")
         if (latestTag.isNotBlank() && BuildConfig.GIT_COMMIT_SHA != "unknown" && latestTag == BuildConfig.GIT_COMMIT_SHA) return Result.UpToDate
