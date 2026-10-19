@@ -82,8 +82,8 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                             OutlinedButton(
                                 onClick = { clipboardManager.setText(AnnotatedString(logs)) },
                                 modifier = Modifier.fillMaxWidth()
-                            ) { Text("Copy update error logs") }
-                            Text("These diagnostic logs include the failure reason, app version and time. They do not include account tokens.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            ) { Text(locale.getString("update_copy_error_logs", "Copy update error logs")) }
+                            Text(locale.getString("update_error_logs_description", "These diagnostic logs include the failure reason, app version and time. They do not include account tokens."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         availableUpdate?.let { update ->
                             Text(update.title, style = MaterialTheme.typography.titleSmall)
