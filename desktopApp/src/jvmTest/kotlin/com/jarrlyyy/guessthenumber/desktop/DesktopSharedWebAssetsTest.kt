@@ -88,10 +88,10 @@ class DesktopSharedWebAssetsTest {
         val script = asset("web-play/app.js")
         val markdown = asset("changelogs.md")
 
-        assertTrue(html.contains("connect-src 'self'"))
+        assertTrue(html.contains("connect-src 'none'"))
         assertTrue(html.contains("id=\"changelogContent\""))
         assertFalse(html.contains("changelog_current_title"))
-        assertTrue(script.contains("fetch('../changelogs.md'"))
+        assertTrue(script.contains("send('read_changelog')"))
         assertTrue(script.contains("renderChangelogMarkdown"))
         assertTrue(markdown.contains("# Changelog"))
         assertTrue(markdown.contains("## Unreleased"))
