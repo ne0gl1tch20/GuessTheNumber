@@ -36,6 +36,7 @@ object CommandParser {
 object CommandRegistry {
     val commands = listOf(
         DevCommandDefinition("/help", "/help", "Show all developer commands"),
+        DevCommandDefinition("/testdailyrewards", "/testdailyrewards", "Open the daily reward popup in the HTML game"),
         DevCommandDefinition("/give", "/give <currency> <amount>", "Add currency", listOf("/give money ", "/give prestige ", "/give ultra ", "/give nebula ", "/give all ")),
         DevCommandDefinition("/set", "/set <currency> <amount>", "Set a currency amount", listOf("/set money ", "/set prestige ", "/set ultra ", "/set nebula ")),
         DevCommandDefinition("/reset", "/reset <progression|prestige|ultra|all>", "Reset selected progression", listOf("/reset progression", "/reset prestige", "/reset ultra", "/reset all")),
