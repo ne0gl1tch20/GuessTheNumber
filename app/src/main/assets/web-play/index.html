@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Guess The Number</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -83,37 +83,9 @@
         <h2 data-i18n="changelog_title">Changelog</h2>
         <p data-i18n="changelog_intro">A quick look at the latest game updates.</p>
       </section>
-      <section class="changelog-list" aria-label="Game update history">
-        <article class="card changelog-entry">
-          <div class="changelog-entry-top"><span class="changelog-version" data-i18n="changelog_current_badge">Current update</span><span class="changelog-category" data-i18n="changelog_category_ui">UI and gameplay</span></div>
-          <h3 data-i18n="changelog_current_title">A smoother game experience</h3>
-          <ul>
-            <li data-i18n="changelog_current_arcade">Arcade minigames open in a larger, focused popup.</li>
-            <li data-i18n="changelog_current_updates">The About page has a working update-check flow with clearer status feedback.</li>
-            <li data-i18n="changelog_current_locale">Language changes refresh more of the HTML interface.</li>
-            <li data-i18n="changelog_current_music">Background music now has a player-facing page in More.</li>
-            <li data-i18n="changelog_current_feedback">Incorrect guesses can show randomized feedback messages.</li>
-          </ul>
-        </article>
-        <article class="card changelog-entry">
-          <div class="changelog-entry-top"><span class="changelog-version" data-i18n="changelog_progress_badge">Progression update</span><span class="changelog-category" data-i18n="changelog_category_gameplay">Gameplay</span></div>
-          <h3 data-i18n="changelog_progress_title">More ways to track your run</h3>
-          <ul>
-            <li data-i18n="changelog_progress_stats">Expanded stats for streaks, loot, bosses, Endless Rift and arcade records.</li>
-            <li data-i18n="changelog_progress_worlds">World Map navigation and world requirement status improvements.</li>
-            <li data-i18n="changelog_progress_saves">Save Slots are available from the More menu.</li>
-          </ul>
-        </article>
-        <article class="card changelog-entry">
-          <div class="changelog-entry-top"><span class="changelog-version" data-i18n="changelog_foundation_badge">Platform improvements</span><span class="changelog-category" data-i18n="changelog_category_system">System</span></div>
-          <h3 data-i18n="changelog_foundation_title">Safer updates and app branding</h3>
-          <ul>
-            <li data-i18n="changelog_foundation_update">Debug updates validate the selected build and APK before installation.</li>
-            <li data-i18n="changelog_foundation_icon">The Android launcher icon is generated from GTN_APP_LOGO.png.</li>
-            <li data-i18n="changelog_foundation_offline">Core game progression and saves stay offline-first and work consistently across the app.</li>
-          </ul>
-        </article>
-      </section>
+      <section class="changelog-list" id="changelogContent" aria-label="Game update history" aria-live="polite">
+        <p class="changelog-loading" data-i18n="changelog_loading">Loading changelog…</p>
+      </section>      </section>
     </section>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="hero-card card">
