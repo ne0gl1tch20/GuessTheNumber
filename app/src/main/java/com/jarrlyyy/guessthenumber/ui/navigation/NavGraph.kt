@@ -147,7 +147,16 @@ fun NavGraph(
             CompositionLocalProvider(LocalAppLocaleManager provides locale) {
                 DevSettingsScreen(
                     state = state,
-                    onExecuteCommand = viewModel::executeDevCommand,
+                    onExecuteCommand = { command ->
+                        if (command.trim().equals("/testdailyrewards", ignoreCase = true)) {
+                            showDevSettings = false
+                            debugDestination = null
+                            dailyRewardTestRequest++
+                            "Opening the daily reward popup in the HTML game."
+                        } else {
+                            viewModel.executeDevCommand(command)
+                        }
+                    },
                     onImportSave = viewModel::importSave,
                     onUpdateSettings = viewModel::updateSettings,
                     onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
