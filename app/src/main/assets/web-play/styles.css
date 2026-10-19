@@ -213,3 +213,22 @@ body.arcade-modal-open{overflow:hidden}body.arcade-modal-open::before{content:""
 
 /* In-app changelog */
 .changelog-screen{display:grid;gap:14px}.changelog-heading{border-radius:26px;padding:22px}.changelog-heading h2{margin:7px 0;font-size:28px;letter-spacing:-.04em}.changelog-heading p{margin:0;color:var(--muted);line-height:1.55;font-size:13px}.changelog-list{display:grid;gap:12px}.changelog-entry{border-radius:22px;padding:18px}.changelog-entry-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.changelog-version,.changelog-category{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}.changelog-version{color:var(--accent2);background:rgba(98,232,255,.1);border:1px solid rgba(98,232,255,.2);border-radius:999px;padding:6px 9px}.changelog-category{color:var(--muted)}.changelog-entry h3{margin:13px 0 9px;font-size:17px;letter-spacing:-.02em}.changelog-entry ul{margin:0;padding-left:20px;display:grid;gap:9px;color:#c5cce2;font-size:13px;line-height:1.55}.changelog-entry li::marker{color:var(--accent2)}
+
+/* Native-backed offline music player controls */
+.music-player-panel,.music-library-panel{display:grid;gap:14px}
+.music-track-copy,.music-list-copy{display:grid;gap:4px;min-width:0}
+.music-track-copy strong,.music-list-copy strong{overflow-wrap:anywhere}
+.music-track-copy span,.music-track-copy small,.music-list-copy small{color:var(--muted);font-size:12px}
+.music-seek{width:100%;accent-color:var(--accent)}
+.music-controls,.music-row-actions{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.music-controls>*{flex:1 1 auto}
+.music-options>*{font-size:12px}
+.music-library-panel h3{margin:0}
+.music-section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.music-list{display:grid;gap:9px}
+.music-list-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.music-row-actions{justify-content:flex-end}
+.music-row-actions .catalog-button{padding:8px 10px;font-size:12px}
+.music-playlist-form{display:flex;gap:8px}
+.music-playlist-form input{min-width:0;flex:1;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text)}
+@media(max-width:420px){.music-list-item{align-items:flex-start;flex-direction:column}.music-row-actions{justify-content:flex-start;width:100%}.music-playlist-form{flex-wrap:wrap}.music-playlist-form button{width:100%}}
