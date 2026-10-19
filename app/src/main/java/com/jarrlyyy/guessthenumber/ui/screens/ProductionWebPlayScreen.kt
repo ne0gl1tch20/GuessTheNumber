@@ -122,6 +122,8 @@ fun ProductionWebPlayScreen(
         }, 120L)
     }
     var bridgeErrorDetails by remember { mutableStateOf<String?>(null) }
+    var offlineRewardDismissed by remember { mutableStateOf(false) }
+    LaunchedEffect(offlineGains) { if (offlineGains != null) offlineRewardDismissed = false }
     val clipboardManager = LocalClipboardManager.current
     fun reportBridgeException(action: String, requestId: String, error: Exception) {
         Log.e("GTNWebBridge", "Bridge request failed: action=$action requestId=$requestId", error)
@@ -270,7 +272,7 @@ fun ProductionWebPlayScreen(
                                             when (parsed.type) {
                                                 "claim_daily_quest" -> parsed.questId?.let(claimDailyQuest)
                                                  "claim_daily_reward" -> claimDailyReward()
-                                                 "dismiss_offline_gains" -> dismissOfflineGains()
+                                                 "dismiss_offline_gains" -> { dismissOfflineGains(); offlineRewardDismissed = true }
                                                 "open_loot_chest" -> parsed.tier?.let(openLootChest)
                                                 "navigate" -> parsed.route?.let(navigateProgression)
                                                 "homebase_upgrade" -> navigateProgression("home_upgrade")
@@ -585,7 +587,7 @@ fun ProductionWebPlayScreen(
                                             .put("streak", result?.streak ?: game.streak)
                                             .put("bestStreak", result?.bestStreak ?: game.bestStreak)
                                             .put("accepted", result?.accepted ?: actionAccepted)
-                                             .put("offlineGains", currentOfflineGains?.format() ?: "")
+                                             .put("offlineGains", if (offlineRewardDismissed) "" else currentOfflineGains?.format() ?: "")
                                              .put("dailyRewardAvailable", game.lastDailyRewardDate != java.time.LocalDate.now().toString())
                                              .put("dailyRewardStreak", game.dailyRewardStreak)
                                              .put("dailyRewardAmount", (com.jarrlyyy.guessthenumber.domain.model.DailyRewardPolicy.nextReward(game.lastDailyRewardDate, game.dailyRewardStreak, java.time.LocalDate.now().toString()) * if ("nebula_boost" in game.shopPurchases) 2L else 1L).toString())
