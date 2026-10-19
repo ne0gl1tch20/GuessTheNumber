@@ -341,6 +341,10 @@ class WebUiBridgeProtocolTest {
             WebUiBridgeProtocol.ParseResult.Valid("music-state", "music_state"),
             WebUiBridgeProtocol.parse("""{"version":1,"id":"music-state","type":"music_state"}""")
         )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("changelog-1", "read_changelog"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"changelog-1","type":"read_changelog"}""")
+        )
         val invalid = WebUiBridgeProtocol.parse("""{"version":1,"id":"music-2","type":"music_action","action":"grant_rewards"}""")
         assertEquals("invalid_music_action", (invalid as WebUiBridgeProtocol.ParseResult.Invalid).error)
         val extra = WebUiBridgeProtocol.parse("""{"version":1,"id":"music-3","type":"music_action","action":"play","unexpected":true}""")
