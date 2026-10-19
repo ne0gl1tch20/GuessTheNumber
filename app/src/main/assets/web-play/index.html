@@ -27,6 +27,9 @@
     <symbol id="icon-crown" viewBox="0 0 24 24"><path d="m3 7 5 4 4-7 4 7 5-4-2 12H5L3 7Zm2 15h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
     <symbol id="icon-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5m-18 5 9 5 9-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
     <symbol id="icon-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M5.5 9A7 7 0 0 1 18 6l2 2M4 16l2 2a7 7 0 0 0 12.5-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-box" viewBox="0 0 24 24"><path d="m3 7 9-4 9 4-9 4-9-4Zm0 0v10l9 4 9-4V7M12 11v10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </svg>
   <main class="app">
     <header class="topbar">
@@ -164,13 +167,13 @@
     </section>
 
 <section class="quick-actions">
-      <button class="action-card" id="beyondButton" type="button"><span class="action-icon">◈</span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong>›</strong></button>
+      <button class="action-card" id="beyondButton" type="button"><span class="action-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong>›</strong></button>
       <button class="action-card" id="questButton" type="button"><span class="action-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong>›</strong></button>
     </section>
     </div>
     <div class="screen" id="screen-worlds" role="tabpanel" aria-labelledby="tab-worlds" data-screen="worlds" hidden>
 <section class="progression-card card" id="progressionPanel" aria-label="Beyond the Numbers progression">
-      <div class="panel-title"><span class="panel-glyph">◈</span><div><span class="eyebrow">BEYOND THE NUMBERS</span><h2>Your universe</h2></div><span class="panel-chip" id="worldCount">1 WORLD</span></div>
+      <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><div><span class="eyebrow">BEYOND THE NUMBERS</span><h2>Your universe</h2></div><span class="panel-chip" id="worldCount">1 WORLD</span></div>
       <div class="currency-grid">
         <article class="currency-tile prestige-tile"><span><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg> PRESTIGE</span><strong id="prestige">0</strong><small id="prestigeCount">0 ascensions</small></article>
         <article class="currency-tile ultra-tile"><span>⬡ ULTRA</span><strong id="ultra">0</strong><small id="ultraCount">0 ultra resets</small></article>
@@ -195,14 +198,14 @@
       <div class="boss-art" aria-hidden="true">♜</div><div class="boss-content"><span class="eyebrow">ENCOUNTER IN PROGRESS</span><h2 id="bossName">Boss encounter</h2><p>Correct guesses deal damage. Keep your run going.</p><div class="boss-health-row"><span>HEALTH</span><strong id="bossHealthText">0 / 0 HP</strong></div><div class="boss-health-track"><div id="bossHealthFill" class="boss-health-fill"></div></div></div><span class="boss-live">ACTIVE</span>
     </section>
 <section class="world-card card" id="worldPanel" aria-label="Worlds and boss encounters">
-      <div class="panel-title"><span class="panel-glyph world-glyph">♜</span><div><span class="eyebrow">WORLD EXPEDITION</span><h2>Worlds & bosses</h2></div><span class="panel-chip" id="worldBossStatus">READY</span></div>
+      <div class="panel-title"><span class="panel-glyph world-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg></span><div><span class="eyebrow">WORLD EXPEDITION</span><h2>Worlds & bosses</h2></div><span class="panel-chip" id="worldBossStatus">READY</span></div>
       <p class="world-intro">Unlock new realms and challenge their guardians. Boss rules and rewards are handled by the game engine.</p>
       <div class="world-list" id="worldList"><div class="world-empty">Syncing your world map…</div></div>
     </section>
     </div>
     <div class="screen" id="screen-rewards" role="tabpanel" aria-labelledby="tab-rewards" data-screen="rewards" hidden>
 <section class="milestones-card card" aria-label="Achievement progress">
-      <div class="panel-title"><span class="panel-glyph milestone-glyph">🏆</span><div><span class="eyebrow">PERSONAL MILESTONES</span><h2>Achievement progress</h2></div><span class="panel-chip">3 GOALS</span></div>
+      <div class="panel-title"><span class="panel-glyph milestone-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-trophy"></use></svg></span><div><span class="eyebrow">PERSONAL MILESTONES</span><h2>Achievement progress</h2></div><span class="panel-chip">3 GOALS</span></div>
       <article class="milestone-row">
         <div class="milestone-copy"><div><strong>Getting the hang of it</strong><span id="achievementCorrectStatus" class="milestone-status">IN PROGRESS</span></div><small>Land 10 correct guesses</small></div>
         <div class="milestone-progress"><div class="milestone-track"><span id="achievementCorrectFill"></span></div><small id="achievementCorrectText">0 / 10</small></div>
@@ -229,14 +232,14 @@
       <div class="quest-foot"><span class="quest-pulse"></span><span id="questMessage">Every guess builds your run.</span></div>
     </section>
 <section class="loot-card card" aria-label="Loot inventory">
-      <div class="loot-heading"><span class="panel-glyph loot-glyph">◇</span><div><span class="eyebrow">LOOT INVENTORY</span><h2>Ready to open</h2></div></div>
-      <div class="loot-items"><div><span class="loot-icon common">□</span><span><strong id="commonChests">0</strong><small>Common</small></span><button class="chest-open" data-bridge-action="chest" data-tier="common" type="button">Open</button></div><div><span class="loot-icon rare">◆</span><span><strong id="rareChests">0</strong><small>Rare</small></span><button class="chest-open" data-bridge-action="chest" data-tier="rare" type="button">Open</button></div><div><span class="loot-icon epic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg></span><span><strong id="epicChests">0</strong><small>Epic</small></span><button class="chest-open" data-bridge-action="chest" data-tier="epic" type="button">Open</button></div></div>
+      <div class="loot-heading"><span class="panel-glyph loot-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><div><span class="eyebrow">LOOT INVENTORY</span><h2>Ready to open</h2></div></div>
+      <div class="loot-items"><div><span class="loot-icon common"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-box"></use></svg></span><span><strong id="commonChests">0</strong><small>Common</small></span><button class="chest-open" data-bridge-action="chest" data-tier="common" type="button">Open</button></div><div><span class="loot-icon rare"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><span><strong id="rareChests">0</strong><small>Rare</small></span><button class="chest-open" data-bridge-action="chest" data-tier="rare" type="button">Open</button></div><div><span class="loot-icon epic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg></span><span><strong id="epicChests">0</strong><small>Epic</small></span><button class="chest-open" data-bridge-action="chest" data-tier="epic" type="button">Open</button></div></div>
       <p class="loot-note">Your inventory is synced from the game engine.</p>
     </section>
     </div>
     <div class="screen" id="screen-journey" role="tabpanel" aria-labelledby="tab-journey" data-screen="journey" hidden>
 <section class="run-summary-card card" aria-label="Run summary">
-      <div class="panel-title"><span class="panel-glyph summary-glyph">◷</span><div><span class="eyebrow">YOUR JOURNEY</span><h2>Run summary</h2></div></div>
+      <div class="panel-title"><span class="panel-glyph summary-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-clock"></use></svg></span><div><span class="eyebrow">YOUR JOURNEY</span><h2>Run summary</h2></div></div>
       <div class="summary-grid">
         <div><span>RANDOM EVENTS</span><strong id="summaryEvents">0</strong></div>
         <div><span>CHESTS FOUND</span><strong id="summaryDrops">0</strong></div>
@@ -250,7 +253,7 @@
       <div class="event-footnote"><span>EVENTS TRIGGERED</span><strong id="eventCount">0</strong></div>
     </section>
 <section class="strategy-card card" id="strategyPanel" aria-label="Math Strategy Lab">
-      <div class="panel-title"><span class="panel-glyph strategy-glyph">⌁</span><div><span class="eyebrow">THINK LIKE A PLAYER</span><h2>Math Strategy Lab</h2></div><span class="panel-chip">OPTIONAL</span></div>
+      <div class="panel-title"><span class="panel-glyph strategy-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><div><span class="eyebrow">THINK LIKE A PLAYER</span><h2>Math Strategy Lab</h2></div><span class="panel-chip">OPTIONAL</span></div>
       <p class="strategy-intro">Use the current range to plan your next guess. These are hints only; the game engine still decides the result.</p>
       <div class="strategy-grid">
         <div><span>RANGE WIDTH</span><strong id="strategyWidth">—</strong></div>
@@ -263,7 +266,7 @@
     </div>
     <div class="screen" id="screen-upgrades" role="tabpanel" aria-labelledby="tab-upgrades" data-screen="upgrades" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">⬆</span><div><span class="eyebrow">POWER UP</span><h2>Upgrades</h2></div><span class="panel-chip" id="upgradeCount">0 UPGRADES</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-arrow-up"></use></svg></span><div><span class="eyebrow">POWER UP</span><h2>Upgrades</h2></div><span class="panel-chip" id="upgradeCount">0 UPGRADES</span></div>
         <p class="catalog-intro">Upgrade costs and purchase checks come from the game engine.</p>
         <div class="multiplier-row" aria-label="Purchase quantity">
           <span>BUY AMOUNT</span>
@@ -274,7 +277,7 @@
     </div>
     <div class="screen" id="screen-shop" role="tabpanel" aria-labelledby="tab-shop" data-screen="shop" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">✦</span><div><span class="eyebrow">COSMIC MARKET</span><h2>Shop</h2></div><span class="panel-chip" id="shopCurrency">NEBULA</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><div><span class="eyebrow">COSMIC MARKET</span><h2>Shop</h2></div><span class="panel-chip" id="shopCurrency">NEBULA</span></div>
         <p class="catalog-intro">Spend Nebula on useful items and cosmetics. Owned cosmetics can be equipped here.</p>
         <div class="catalog-list" id="shopList"><p class="catalog-empty">Syncing shop…</p></div>
       </section>
@@ -282,7 +285,7 @@
 
     <div class="screen" id="screen-homebase" role="tabpanel" aria-labelledby="tab-homebase" data-screen="homebase" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">⌂</span><div><span class="eyebrow">YOUR SANCTUARY</span><h2>Home Base</h2></div><span class="panel-chip" id="homeBaseLevelPanel">LEVEL 0</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-home"></use></svg></span><div><span class="eyebrow">YOUR SANCTUARY</span><h2>Home Base</h2></div><span class="panel-chip" id="homeBaseLevelPanel">LEVEL 0</span></div>
         <p class="catalog-intro">Restore your sanctuary to boost the rewards earned from correct guesses.</p>
         <div class="homebase-summary"><strong id="homeBaseBonus">0% reward bonus</strong><span id="homeBaseCost">Next level: 50,000 Money</span></div>
         <button type="button" class="world-action-button" id="upgradeHomeBase" data-bridge-action="homebase_upgrade">Restore next level</button>
@@ -291,14 +294,14 @@
     </div>
     <div class="screen" id="screen-relics" role="tabpanel" aria-labelledby="tab-relics" data-screen="relics" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">✧</span><div><span class="eyebrow">BOSS TROPHIES</span><h2>Relics</h2></div><span class="panel-chip" id="relicCount">0 / 4 EQUIPPED</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-crown"></use></svg></span><div><span class="eyebrow">BOSS TROPHIES</span><h2>Relics</h2></div><span class="panel-chip" id="relicCount">0 / 4 EQUIPPED</span></div>
         <p class="catalog-intro">Relics are earned by defeating bosses. Equip up to four for lasting bonuses.</p>
         <div class="catalog-list" id="relicList"><p class="catalog-empty">Syncing relic collection…</p></div>
       </section>
     </div>
     <div class="screen" id="screen-codex" role="tabpanel" aria-labelledby="tab-codex" data-screen="codex" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">▤</span><div><span class="eyebrow">DISCOVERY LOG</span><h2>Explorer's Codex</h2></div><span class="panel-chip" id="codexCount">0 / 12</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-book"></use></svg></span><div><span class="eyebrow">DISCOVERY LOG</span><h2>Explorer's Codex</h2></div><span class="panel-chip" id="codexCount">0 / 12</span></div>
         <div class="progress-track"><div class="progress-fill" id="codexProgressFill"></div></div>
         <p class="catalog-intro">Explore worlds, defeat their bosses and uncover hidden places.</p>
         <div class="catalog-list" id="codexList"><p class="catalog-empty">Syncing discoveries…</p></div>
@@ -318,7 +321,7 @@
         </div>
       </section>
       <section class="about-updater card" aria-labelledby="aboutUpdateHeading">
-        <div class="panel-title"><span class="panel-glyph">↻</span><div><h2 id="aboutUpdateHeading" data-i18n="update_check">Check for updates</h2></div><span class="panel-chip" id="aboutUpdateBadge">—</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-refresh"></use></svg></span><div><h2 id="aboutUpdateHeading" data-i18n="update_check">Check for updates</h2></div><span class="panel-chip" id="aboutUpdateBadge">—</span></div>
         <button type="button" class="primary-action" id="aboutCheckUpdates" data-bridge-action="check_updates" data-i18n="update_check">Check for updates</button>
         <div id="aboutUpdateStatus" class="about-update-status" role="status" aria-live="polite"></div>
         <div id="aboutAvailableUpdate" class="about-available-update" hidden>
@@ -345,7 +348,7 @@
     </div>
     <div class="screen" id="screen-settings" role="tabpanel" aria-labelledby="tab-settings" data-screen="settings" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">⚙</span><div><span class="eyebrow" data-i18n="game_preferences">Game Preferences</span><h2 data-i18n="settings">Settings</h2></div></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-settings"></use></svg></span><div><span class="eyebrow" data-i18n="game_preferences">Game Preferences</span><h2 data-i18n="settings">Settings</h2></div></div>
         <div class="settings-group"><h3>Language &amp; Numbers</h3>
           <label class="setting-field"><span>Language</span><select data-setting-value="locale" id="settingLocale"><option value="en-US">English</option></select></label>
           <label class="setting-field"><span>Number notation</span><select data-setting-value="numberNotation"><option>Standard</option><option>Scientific</option><option>Engineering</option></select></label>
@@ -380,7 +383,7 @@
     </div>
     <div class="screen" id="screen-prestige" role="tabpanel" aria-labelledby="tab-prestige" data-screen="prestige" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">✧</span><div><span class="eyebrow">RESET FOR PERMANENT POWER</span><h2>Prestige</h2></div><span class="panel-chip" id="prestigeCountPanel">0 ASCENSIONS</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-crown"></use></svg></span><div><span class="eyebrow">RESET FOR PERMANENT POWER</span><h2>Prestige</h2></div><span class="panel-chip" id="prestigeCountPanel">0 ASCENSIONS</span></div>
         <div class="reset-summary"><div><span>Current Prestige</span><strong id="prestigeCurrent">0</strong></div><div><span>Next reward</span><strong id="prestigeReward">0</strong></div><div><span>Money required</span><strong id="prestigeRequirement">0</strong></div></div>
         <div class="requirement-panel"><h3>Prestige requirements</h3><div class="requirement-row" id="prestigeMoneyRequirementRow"><span>Current Money</span><strong id="prestigeCurrentMoney">0</strong><span class="requirement-state" id="prestigeMoneyState">Checking…</span></div><div class="requirement-row" id="prestigeRewardRequirementRow"><span>Next reward</span><strong id="prestigeRewardDetail">0</strong><span class="requirement-state" id="prestigeRewardState">Checking…</span></div><p id="prestigeNextReset" class="requirement-note"></p></div>
         <div class="reset-effects"><h3>What resets?</h3><ul><li>Regular Money and upgrade levels reset.</li><li>The guessing range returns to its starting range.</li><li>Prestige currency and Prestige progression remain.</li></ul></div>
@@ -391,7 +394,7 @@
     </div>
     <div class="screen" id="screen-ultra" role="tabpanel" aria-labelledby="tab-ultra" data-screen="ultra" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">✦</span><div><span class="eyebrow">ASCEND BEYOND PRESTIGE</span><h2>Ultra</h2></div><span class="panel-chip" id="ultraCountPanel">0 RESETS</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><div><span class="eyebrow">ASCEND BEYOND PRESTIGE</span><h2>Ultra</h2></div><span class="panel-chip" id="ultraCountPanel">0 RESETS</span></div>
         <div class="reset-summary"><div><span>Current Ultra</span><strong id="ultraCurrent">0</strong></div><div><span>Next reward</span><strong id="ultraReward">0</strong></div><div><span>Money required</span><strong id="ultraRequirement">0</strong></div></div>
         <div class="requirement-panel"><h3>Ultra requirements</h3><div class="requirement-row" id="ultraMoneyRequirementRow"><span>Current Money</span><strong id="ultraCurrentMoney">0</strong><span class="requirement-state" id="ultraMoneyState">Checking…</span></div><div class="requirement-row" id="ultraPrestigeRequirementRow"><span>Prestige balance needed</span><strong>1,000</strong><span class="requirement-state" id="ultraPrestigeState">Checking…</span></div><div class="requirement-row" id="ultraRewardRequirementRow"><span>Next reward</span><strong id="ultraRewardDetail">0</strong><span class="requirement-state" id="ultraRewardState">Checking…</span></div><p id="ultraNextReset" class="requirement-note"></p></div>
         <div class="reset-effects"><h3>What resets?</h3><ul><li>Regular Money and Prestige balance reset.</li><li>Regular and Prestige upgrade levels reset.</li><li>Ultra currency and Ultra progression remain.</li><li>At least 1,000 Prestige and enough Money are required.</li></ul></div>
@@ -402,21 +405,21 @@
     </div>
     <div class="screen" id="screen-talent" role="tabpanel" aria-labelledby="tab-talent" data-screen="talent" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">⌘</span><div><span class="eyebrow">PERMANENT PROGRESSION</span><h2>Talent Web</h2></div><span class="panel-chip" id="talentCount">0 / 6 UNLOCKED</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg></span><div><span class="eyebrow">PERMANENT PROGRESSION</span><h2>Talent Web</h2></div><span class="panel-chip" id="talentCount">0 / 6 UNLOCKED</span></div>
         <p class="catalog-intro">Spend Prestige to unlock permanent talents. Each talent has its own requirements and cost.</p>
         <div class="catalog-list" id="talentList"><p class="catalog-empty">Syncing talents…</p></div>
       </section>
     </div>
     <div class="screen" id="screen-mutators" role="tabpanel" aria-labelledby="tab-mutators" data-screen="mutators" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">◈</span><div><span class="eyebrow">CUSTOMIZE YOUR RUN</span><h2>Mutators</h2></div><span class="panel-chip" id="mutatorCount">0 ACTIVE</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><div><span class="eyebrow">CUSTOMIZE YOUR RUN</span><h2>Mutators</h2></div><span class="panel-chip" id="mutatorCount">0 ACTIVE</span></div>
         <p class="catalog-intro">Toggle challenge rules to change the current run. The engine recalculates the range and target when a mutator changes.</p>
         <div class="catalog-list" id="mutatorList"><p class="catalog-empty">Syncing mutators…</p></div>
       </section>
     </div>
     <div class="screen" id="screen-stats" role="tabpanel" aria-labelledby="tab-stats" data-screen="stats" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">▤</span><div><span class="eyebrow" data-i18n="stats">YOUR PROGRESS</span><h2 data-i18n="statistics">Statistics</h2></div></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-book"></use></svg></span><div><span class="eyebrow" data-i18n="stats">YOUR PROGRESS</span><h2 data-i18n="statistics">Statistics</h2></div></div>
         
         <div class="stats-grid">
           <article class="stat-card"><span data-i18n="stats_total_guesses">Total guesses</span><strong id="statTotalGuesses">0</strong></article>
@@ -443,7 +446,7 @@
     </div>
     <div class="screen" id="screen-arcade" role="tabpanel" aria-labelledby="tab-arcade" data-screen="arcade" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph">🎮</span><div><span class="eyebrow" data-i18n="arcade">QUICK CHALLENGES</span><h2 data-i18n="arcade_title">Arcade</h2></div><span class="panel-chip" id="arcadePlayedCount">0 PLAYED</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-gamepad"></use></svg></span><div><span class="eyebrow" data-i18n="arcade">QUICK CHALLENGES</span><h2 data-i18n="arcade_title">Arcade</h2></div><span class="panel-chip" id="arcadePlayedCount">0 PLAYED</span></div>
         
         <div class="catalog-list" id="arcadeList"><p class="catalog-empty" data-i18n="loading_save_data">Loading minigames…</p></div>
         <div class="arcade-game card" id="arcadeGame" hidden>
