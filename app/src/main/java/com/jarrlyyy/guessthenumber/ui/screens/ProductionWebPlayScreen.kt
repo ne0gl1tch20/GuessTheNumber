@@ -591,6 +591,7 @@ fun ProductionWebPlayScreen(
                                              .put("dailyRewardAvailable", game.lastDailyRewardDate != java.time.LocalDate.now().toString())
                                              .put("dailyRewardStreak", game.dailyRewardStreak)
                                              .put("dailyRewardAmount", (com.jarrlyyy.guessthenumber.domain.model.DailyRewardPolicy.nextReward(game.lastDailyRewardDate, game.dailyRewardStreak, java.time.LocalDate.now().toString()) * if ("nebula_boost" in game.shopPurchases) 2L else 1L).toString())
+                                             .put("dailyRewardNextStreak", com.jarrlyyy.guessthenumber.domain.model.DailyRewardPolicy.nextStreak(game.lastDailyRewardDate, game.dailyRewardStreak, java.time.LocalDate.now().toString()))
                                              .put("dailyRewardLastClaimDate", game.lastDailyRewardDate)
                                              .put("incorrectGuessMessages", JSONObject().apply {
                                                  put("tooLow", org.json.JSONArray().apply {
