@@ -356,13 +356,26 @@ fun ProductionGuessGameScreen(
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
-                            "read_state", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
+                            "read_state", "read_changelog", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
                             "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
                             sendError("unknown_action")
+                            return@launch
+                        }
+                        if (type == "read_changelog") {
+                            val markdown = runCatching {
+                                val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("changelogs.md")
+                                    ?: error("The bundled changelog could not be found.")
+                                stream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+                            }.getOrElse {
+                                sendError("changelog_unavailable")
+                                return@launch
+                            }
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "changelog").put("content", markdown).toString())
                             return@launch
                         }
                         var accepted = true

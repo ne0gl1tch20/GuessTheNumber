@@ -67,7 +67,11 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                                 when (val result = UpdateChannelChecker.check()) {
                                     is UpdateChannelChecker.Result.Available -> { availableUpdate = result.update; updateMessage = locale.getString("update_available", "An update is available.") }
                                     UpdateChannelChecker.Result.UpToDate -> updateMessage = locale.getString("update_up_to_date", "You're up to date.")
-                                    is UpdateChannelChecker.Result.Unavailable -> {
+                                    UpdateChannelChecker.Result.Unavailable -> {
+                                        updateMessage = locale.getString("update_unavailable", "Couldn't check for updates. Try again later.")
+                                        updateErrorLogs = "Update check did not find a usable update source.\nChannel: ${BuildConfig.UPDATE_CHANNEL}\nApp version: $versionName ($versionCode)"
+                                    }
+                                    is UpdateChannelChecker.Result.Failed -> {
                                         updateMessage = locale.getString("update_unavailable", "Couldn't check for updates. Try again later.")
                                         updateErrorLogs = result.diagnostics
                                     }
@@ -110,7 +114,8 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                                                     appendLine("Channel: ${BuildConfig.UPDATE_CHANNEL}")
                                                     appendLine("Failure: ${error.javaClass.name}")
                                                     appendLine("Message: ${error.message ?: "(no message)"}")
-                                                    error.stackTraceToString().take(8000).let { appendLine(); append(it) }
+                                                    appendLine()
+                                                    append(error.stackTraceToString().take(8000))
                                                 }
                                                 locale.getString("update_install_failed", "Update failed: %s", error.message ?: "unknown error")
                                             }

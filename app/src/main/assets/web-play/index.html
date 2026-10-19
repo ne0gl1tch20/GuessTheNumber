@@ -28,25 +28,63 @@
     </nav>
     <section class="screen more-screen" id="screen-more" role="tabpanel" aria-labelledby="tab-more" data-screen="more" hidden>
       <section class="more-heading card">
-        <span class="eyebrow">YOUR GAME</span>
-        <h2>More</h2>
-        <p>Progress, rewards and settings, all in one place.</p>
+        <span class="eyebrow" data-i18n="your_game">YOUR GAME</span>
+        <h2 data-i18n="more">More</h2>
+        <p data-i18n="more_subtitle">Progress, rewards and settings, all in one place.</p>
       </section>
       <section class="more-links" aria-label="More game sections">
-        <button type="button" class="more-link-card" data-screen-target="rewards"><span>🏆</span><span><b>Rewards</b><small>Achievements and daily rewards</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="journey"><span>◷</span><span><b>Journey</b><small>Your run history and progress</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="shop"><span>✦</span><span><b>Shop</b><small>Browse available items</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="homebase"><span>⌂</span><span><b>Home Base</b><small>Build up your base</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="relics"><span>✧</span><span><b>Relics</b><small>Manage your relic collection</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="codex"><span>▤</span><span><b>Codex</b><small>Explore discoveries</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="settings"><span>⚙</span><span><b>Settings</b><small>Customize your experience</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="prestige"><span>✧</span><span><b>Prestige</b><small>Prestige upgrades and resets</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="ultra"><span>✦</span><span><b>Ultra</b><small>Ultra progression</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="talent"><span>⌘</span><span><b>Talents</b><small>Build your talent path</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="mutators"><span>◈</span><span><b>Mutators</b><small>Customize challenge rules</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="rewards"><span>🏆</span><span><b data-i18n="rewards">Rewards</b><small data-i18n="rewards_subtitle">Achievements and daily rewards</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="journey"><span>◷</span><span><b data-i18n="journey">Journey</b><small data-i18n="journey_subtitle">Your run history and progress</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="shop"><span>✦</span><span><b data-i18n="shop">Shop</b><small data-i18n="shop_subtitle">Browse available items</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="homebase"><span>⌂</span><span><b data-i18n="home_base">Home Base</b><small data-i18n="home_base_subtitle">Build up your base</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="relics"><span>✧</span><span><b data-i18n="relics">Relics</b><small data-i18n="relics_subtitle">Manage your relic collection</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="codex"><span>▤</span><span><b data-i18n="codex">Codex</b><small data-i18n="codex_subtitle">Explore discoveries</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="changelog"><span>📋</span><span><b data-i18n="changelog_title">Changelog</b><small data-i18n="changelog_subtitle">See what changed in recent updates</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="about"><span>ⓘ</span><span><b data-i18n="about_title">About</b><small data-i18n="about_licenses">About & Licenses</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-route="save_slots"><span>▣</span><span><b data-i18n="save_slots">Save Slots</b><small data-i18n="save_slots_subtitle">Switch or manage saved games</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="music"><span>♫</span><span><b data-i18n="music_player_title">Background Music</b><small data-i18n="music_player_subtitle">Control your background music</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="settings"><span>⚙</span><span><b data-i18n="settings">Settings</b><small data-i18n="settings_subtitle">Customize your experience</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="prestige"><span>✧</span><span><b data-i18n="prestige">Prestige</b><small data-i18n="prestige_subtitle">Prestige upgrades and resets</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="ultra"><span>✦</span><span><b data-i18n="ultra">Ultra</b><small data-i18n="ultra_subtitle">Ultra progression</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="talent"><span>⌘</span><span><b data-i18n="talents">Talents</b><small data-i18n="talents_subtitle">Build your talent path</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="mutators"><span>◈</span><span><b data-i18n="mutators">Mutators</b><small data-i18n="mutators_subtitle">Customize challenge rules</small></span><strong aria-hidden="true">›</strong></button>
         <button type="button" class="more-link-card" data-screen-target="stats"><span>▤</span><span><b data-i18n="stats">Stats</b><small>Review your game statistics</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" id="more-dev-settings" data-screen-target="dev_settings" hidden><span>🔧</span><span><b>Dev Settings</b><small>Developer console and diagnostics</small></span><strong aria-hidden="true">›</strong></button>
-        <button type="button" class="more-link-card" data-screen-target="stake"><span>★</span><span><b data-i18n="staking_flip_button">Lucky Stake</b><small>Try your luck with a stake</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" id="more-dev-settings" data-screen-target="dev_settings" hidden><span>🔧</span><span><b data-i18n="dev_settings">Dev Settings</b><small data-i18n="dev_settings_subtitle">Developer console and diagnostics</small></span><strong aria-hidden="true">›</strong></button>
+        <button type="button" class="more-link-card" data-screen-target="stake"><span>★</span><span><b data-i18n="staking_flip_button">Lucky Stake</b><small data-i18n="lucky_stake_subtitle">Try your luck with a stake</small></span><strong aria-hidden="true">›</strong></button>
+      </section>
+    </section>
+    <div class="screen" id="screen-music" role="tabpanel" aria-labelledby="tab-more" data-screen="music" hidden>
+      <section class="card catalog-panel music-player-panel">
+        <div class="panel-title"><span class="panel-glyph">♫</span><div><span class="eyebrow" data-i18n="music_player_eyebrow">AUDIO</span><h2 data-i18n="music_player_title">Offline Music Player</h2></div></div>
+        <p class="catalog-intro" data-i18n="music_player_subtitle">Play music stored on this device, manage your queue and organize playlists.</p>
+        <div class="music-now-playing"><div class="music-art" id="musicArt" aria-hidden="true">♫</div><div class="music-track-copy"><strong id="musicCurrentTitle" data-i18n="music_no_track">No track selected</strong><span id="musicCurrentArtist">Add audio from this device to get started.</span><small id="musicTime">0:00 / 0:00</small></div></div>
+        <input class="music-seek" id="musicSeek" type="range" min="0" max="0" value="0" aria-label="Seek music playback">
+        <div class="music-controls">
+          <button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="previous" aria-label="Previous track">|◀</button>
+          <button type="button" class="primary-action music-control" data-bridge-action="music" data-music-action="play" id="musicPlayPause">▶ Play</button>
+          <button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="next" aria-label="Next track">▶|</button>
+          <button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="stop" aria-label="Stop playback">■</button>
+        </div>
+        <div class="music-controls music-options">
+          <button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="shuffle" id="musicShuffle">Shuffle: Off</button>
+          <button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="repeat" id="musicRepeat">Repeat: Off</button>
+          <button type="button" class="primary-action music-control" data-bridge-action="music" data-music-action="import" data-i18n="music_add_audio">Add audio</button>
+        </div>
+        <label class="setting-row music-toggle-row"><span><strong data-i18n="background_music">Background music</strong><small data-i18n="music_player_toggle_desc">Turn background music on or off.</small></span><input type="checkbox" data-setting-toggle="musicEnabled"></label>
+        <label class="setting-field"><span data-i18n="master_volume">Master volume</span><input type="range" min="0" max="1" step="0.01" data-setting-value="volume" id="musicVolume"></label>
+        <p class="catalog-intro" id="musicPlayerStatus" role="status" aria-live="polite" data-i18n="music_player_status">Your music preference is saved with your game.</p>
+      </section>
+      <section class="card catalog-panel music-library-panel"><h3 data-i18n="music_library">Library</h3><div id="musicLibrary" class="music-list"><p class="catalog-empty">Loading music library…</p></div></section>
+      <section class="card catalog-panel music-library-panel"><div class="music-section-heading"><h3 data-i18n="music_queue">Queue</h3><button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="clear_queue" data-i18n="clear">Clear</button></div><div id="musicQueue" class="music-list"><p class="catalog-empty">Loading queue…</p></div></section>
+      <section class="card catalog-panel music-library-panel"><h3 data-i18n="music_playlists">Playlists</h3><form id="musicPlaylistForm" class="music-playlist-form"><input id="musicPlaylistName" maxlength="60" required data-i18n-placeholder="music_playlist_name" placeholder="Playlist name"><button class="primary-action" type="submit" data-i18n="music_create_playlist">Create</button></form><div id="musicPlaylists" class="music-list"></div></section>
+    </div><section class="screen changelog-screen" id="screen-changelog" role="tabpanel" aria-labelledby="tab-more" data-screen="changelog" hidden>
+      <section class="card changelog-heading">
+        <span class="eyebrow" data-i18n="changelog_eyebrow">WHAT'S NEW</span>
+        <h2 data-i18n="changelog_title">Changelog</h2>
+        <p data-i18n="changelog_intro">A quick look at the latest game updates.</p>
+      </section>
+      <section class="changelog-list" id="changelogContent" aria-label="Game update history" aria-live="polite">
+        <p class="changelog-loading" data-i18n="changelog_loading">Loading changelog…</p>
       </section>
     </section>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
@@ -59,6 +97,25 @@
         <div class="feedback" id="feedback" role="status" aria-live="polite" aria-atomic="true">Make your move.</div>
       </div>
       <div class="sparkle-field" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    </section>
+<section class="guess-card card">
+      <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
+      <form id="guessForm" autocomplete="off">
+        <div class="input-shell">
+          <input id="guessInput" type="text" inputmode="numeric" pattern="-?[0-9]+" maxlength="20" placeholder="Enter a number" aria-label="Your guess">
+          <button id="guessButton" type="submit" aria-label="Guess"><svg class="guess-submit-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M4 12h15M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </form>
+      <p id="actionStatus" class="action-status" role="status" aria-live="polite" aria-atomic="true">Ready when you are.</p>
+      <div class="guess-tools" aria-label="Quick guess helpers">
+        <span class="guess-tools-label">QUICK PICK</span>
+        <div class="guess-tool-buttons">
+          <button type="button" data-guess-pick="min" aria-label="Use lower end of range">LOW END</button>
+          <button type="button" data-guess-pick="mid" aria-label="Use midpoint of range">MIDPOINT</button>
+          <button type="button" data-guess-pick="max" aria-label="Use upper end of range">HIGH END</button>
+          <button type="button" data-guess-pick="clear" aria-label="Clear guess input">CLEAR</button>
+        </div>
+      </div>
     </section>
 <section class="stats-grid" aria-label="Run statistics">
       <article class="stat-card card">
@@ -85,25 +142,7 @@
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
       <div class="progress-caption"><span>RUN MOMENTUM</span><span id="bestStreak">BEST 0</span></div>
     </section>
-<section class="guess-card card">
-      <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
-      <form id="guessForm" autocomplete="off">
-        <div class="input-shell">
-          <input id="guessInput" type="text" inputmode="numeric" pattern="-?[0-9]+" maxlength="20" placeholder="Enter a number" aria-label="Your guess">
-          <button id="guessButton" type="submit" aria-label="Guess"><svg class="guess-submit-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M4 12h15M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div>
-      </form>
-      <p id="actionStatus" class="action-status" role="status" aria-live="polite" aria-atomic="true">Ready when you are.</p>
-      <div class="guess-tools" aria-label="Quick guess helpers">
-        <span class="guess-tools-label">QUICK PICK</span>
-        <div class="guess-tool-buttons">
-          <button type="button" data-guess-pick="min" aria-label="Use lower end of range">LOW END</button>
-          <button type="button" data-guess-pick="mid" aria-label="Use midpoint of range">MIDPOINT</button>
-          <button type="button" data-guess-pick="max" aria-label="Use upper end of range">HIGH END</button>
-          <button type="button" data-guess-pick="clear" aria-label="Clear guess input">CLEAR</button>
-        </div>
-      </div>
-    </section>
+
 <section class="quick-actions">
       <button class="action-card" id="beyondButton" type="button"><span class="action-icon">◈</span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong>›</strong></button>
       <button class="action-card" id="questButton" type="button"><span class="action-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong>›</strong></button>
@@ -247,6 +286,43 @@
         <p class="catalog-intro" id="codexRewardStatus"></p>
       </section>
     </div>
+    <div class="screen" id="screen-about" role="tabpanel" aria-labelledby="tab-more" data-screen="about" hidden>
+      <section class="about-hero card">
+        <span class="about-mark" aria-hidden="true">ⓘ</span>
+        <span class="eyebrow" data-i18n="about_header">GUESS THE NUMBER</span>
+        <h2 data-i18n="about_title">About & Open Source Licenses</h2>
+        <p data-i18n="about_description">A guessing game with deep progression and offline play.</p>
+        <div class="about-version-grid">
+          <div><strong id="aboutInstalledVersion">—</strong></div>
+          <div><span id="aboutUpdateChannelLabel">Update channel</span><strong id="aboutUpdateChannel">—</strong></div>
+        </div>
+      </section>
+      <section class="about-updater card" aria-labelledby="aboutUpdateHeading">
+        <div class="panel-title"><span class="panel-glyph">↻</span><div><h2 id="aboutUpdateHeading" data-i18n="update_check">Check for updates</h2></div><span class="panel-chip" id="aboutUpdateBadge">—</span></div>
+        <button type="button" class="primary-action" id="aboutCheckUpdates" data-bridge-action="check_updates" data-i18n="update_check">Check for updates</button>
+        <div id="aboutUpdateStatus" class="about-update-status" role="status" aria-live="polite"></div>
+        <div id="aboutAvailableUpdate" class="about-available-update" hidden>
+          <span class="eyebrow" data-i18n="update_available">Update available</span>
+          <h3 id="aboutAvailableVersion">—</h3>
+          <p id="aboutReleaseNotes"></p>
+          <button type="button" class="primary-action" id="aboutInstallUpdate" data-bridge-action="install_update" data-i18n="update_install" disabled>Install update</button>
+          <button type="button" class="secondary-action" id="aboutOpenUpdate" data-bridge-action="open_update_page" data-i18n="update_open" disabled>Open update page</button>
+        </div>
+      </section>
+      <section class="about-licenses card">
+        <span class="eyebrow" data-i18n="about_licenses">CREDITS</span>
+        <h2 data-i18n="about_licenses_title">Open-source libraries</h2>
+        <div class="about-license-list">
+          <div><strong>Jetpack Compose</strong><span>Apache 2.0</span><small>Google / Android Open Source Project</small></div>
+          <div><strong>Material 3</strong><span>Apache 2.0</span><small>Google</small></div>
+          <div><strong>Kotlinx Serialization</strong><span>Apache 2.0</span><small>JetBrains</small></div>
+          <div><strong>Kotlinx Coroutines</strong><span>Apache 2.0</span><small>JetBrains</small></div>
+          <div><strong>DataStore Preferences</strong><span>Apache 2.0</span><small>Google</small></div>
+          <div><strong>Navigation Compose</strong><span>Apache 2.0</span><small>Google</small></div>
+          <div><strong>LuaJ</strong><span>MIT</span><small>LuaJ project; James Roseborough and Ian Farmer</small></div>
+        </div>
+      </section>
+    </div>
     <div class="screen" id="screen-settings" role="tabpanel" aria-labelledby="tab-settings" data-screen="settings" hidden>
       <section class="card catalog-panel">
         <div class="panel-title"><span class="panel-glyph">⚙</span><div><span class="eyebrow" data-i18n="game_preferences">Game Preferences</span><h2 data-i18n="settings">Settings</h2></div></div>
@@ -257,9 +333,9 @@
         <div class="settings-group"><h3>Appearance</h3>
           <label class="setting-field"><span>Theme mode</span><select data-setting-value="themeMode"><option>System</option><option>Dark</option><option>Light</option><option>AMOLED</option></select></label>
           <label class="setting-field"><span>Theme preset</span><select data-setting-value="themePreset"><option>Neon</option><option>Sunset</option><option>Ocean</option><option>Forest</option><option>Custom</option></select></label>
-          <label class="setting-field"><span>Primary color</span><input type="color" data-setting-value="customPrimaryColor" value="#7C4DFF"></label>
-          <label class="setting-field"><span>Secondary color</span><input type="color" data-setting-value="customSecondaryColor" value="#00BCD4"></label>
-          <label class="setting-field"><span>Tertiary color</span><input type="color" data-setting-value="customTertiaryColor" value="#00C853"></label>
+          <label class="setting-field"><span>Primary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_primary" data-color-key="customPrimaryColor"><i id="customPrimaryColorSwatch" aria-hidden="true"></i><strong id="customPrimaryColorValue">#7C4DFF</strong><span>Choose</span></button></label>
+          <label class="setting-field"><span>Secondary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_secondary" data-color-key="customSecondaryColor"><i id="customSecondaryColorSwatch" aria-hidden="true"></i><strong id="customSecondaryColorValue">#00BCD4</strong><span>Choose</span></button></label>
+          <label class="setting-field"><span>Tertiary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_tertiary" data-color-key="customTertiaryColor"><i id="customTertiaryColorSwatch" aria-hidden="true"></i><strong id="customTertiaryColorValue">#00C853</strong><span>Choose</span></button></label>
         </div>
         <div class="settings-group"><h3>Audio &amp; Haptics</h3>
           <label class="setting-row"><span><strong data-i18n="background_music">Background music</strong></span><input type="checkbox" data-setting-toggle="musicEnabled"></label>
@@ -286,6 +362,8 @@
       <section class="card catalog-panel">
         <div class="panel-title"><span class="panel-glyph">✧</span><div><span class="eyebrow">RESET FOR PERMANENT POWER</span><h2>Prestige</h2></div><span class="panel-chip" id="prestigeCountPanel">0 ASCENSIONS</span></div>
         <div class="reset-summary"><div><span>Current Prestige</span><strong id="prestigeCurrent">0</strong></div><div><span>Next reward</span><strong id="prestigeReward">0</strong></div><div><span>Money required</span><strong id="prestigeRequirement">0</strong></div></div>
+        <div class="requirement-panel"><h3>Prestige requirements</h3><div class="requirement-row" id="prestigeMoneyRequirementRow"><span>Current Money</span><strong id="prestigeCurrentMoney">0</strong><span class="requirement-state" id="prestigeMoneyState">Checking…</span></div><div class="requirement-row" id="prestigeRewardRequirementRow"><span>Next reward</span><strong id="prestigeRewardDetail">0</strong><span class="requirement-state" id="prestigeRewardState">Checking…</span></div><p id="prestigeNextReset" class="requirement-note"></p></div>
+        <div class="reset-effects"><h3>What resets?</h3><ul><li>Regular Money and upgrade levels reset.</li><li>The guessing range returns to its starting range.</li><li>Prestige currency and Prestige progression remain.</li></ul></div>
         <p class="catalog-intro">Prestige resets your regular upgrades and Money, while keeping permanent Prestige progress. Review the reward before resetting.</p>
         <button type="button" class="world-action-button" id="prestigeResetButton" data-bridge-action="prestige_reset">Prestige reset</button>
         <p class="catalog-intro" id="prestigeStatus" role="status" aria-live="polite"></p>
@@ -295,6 +373,8 @@
       <section class="card catalog-panel">
         <div class="panel-title"><span class="panel-glyph">✦</span><div><span class="eyebrow">ASCEND BEYOND PRESTIGE</span><h2>Ultra</h2></div><span class="panel-chip" id="ultraCountPanel">0 RESETS</span></div>
         <div class="reset-summary"><div><span>Current Ultra</span><strong id="ultraCurrent">0</strong></div><div><span>Next reward</span><strong id="ultraReward">0</strong></div><div><span>Money required</span><strong id="ultraRequirement">0</strong></div></div>
+        <div class="requirement-panel"><h3>Ultra requirements</h3><div class="requirement-row" id="ultraMoneyRequirementRow"><span>Current Money</span><strong id="ultraCurrentMoney">0</strong><span class="requirement-state" id="ultraMoneyState">Checking…</span></div><div class="requirement-row" id="ultraPrestigeRequirementRow"><span>Prestige balance needed</span><strong>1,000</strong><span class="requirement-state" id="ultraPrestigeState">Checking…</span></div><div class="requirement-row" id="ultraRewardRequirementRow"><span>Next reward</span><strong id="ultraRewardDetail">0</strong><span class="requirement-state" id="ultraRewardState">Checking…</span></div><p id="ultraNextReset" class="requirement-note"></p></div>
+        <div class="reset-effects"><h3>What resets?</h3><ul><li>Regular Money and Prestige balance reset.</li><li>Regular and Prestige upgrade levels reset.</li><li>Ultra currency and Ultra progression remain.</li><li>At least 1,000 Prestige and enough Money are required.</li></ul></div>
         <p class="catalog-intro">Ultra requires at least 1,000 Prestige and enough Money. It resets Prestige and regular upgrades for permanent Ultra progress.</p>
         <button type="button" class="world-action-button" id="ultraResetButton" data-bridge-action="ultra_reset">Ultra reset</button>
         <p class="catalog-intro" id="ultraStatus" role="status" aria-live="polite"></p>
@@ -330,7 +410,15 @@
           <article class="stat-card"><span data-i18n="inspector_nebula_earned">Nebula earned</span><strong id="statNebulaEarned">0</strong></article>
           <article class="stat-card"><span data-i18n="stats_total_playtime">Play time</span><strong id="statPlaytime">0m</strong></article>
           <article class="stat-card"><span data-i18n="inspector_arcade_played">Arcade games</span><strong id="statArcadePlayed">0</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_current_streak">Current Streak</span><strong id="statCurrentStreak">0</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_best_streak">Best Streak</span><strong id="statBestStreak">0</strong></article>
+          <article class="stat-card"><span data-i18n="loot_title">Loot</span><strong id="statLootDrops">0</strong></article>
+          <article class="stat-card"><span data-i18n="loot_opened_count">Opened: %d</span><strong id="statChestsOpened">0</strong></article>
+          <article class="stat-card"><span data-i18n="worlds_boss_count">Bosses: %d</span><strong id="statBossVictories">0</strong></article>
+          <article class="stat-card"><span data-i18n="rift_best_tier">Best cleared tier: %d</span><strong id="statRiftBestTier">0</strong></article>
+          <article class="stat-card"><span data-i18n="inspector_arcade_best_scores">Arcade Best Scores</span><strong id="statArcadeBestScores">—</strong></article>
         </div>
+        <section class="stats-visual card" aria-label="Visual statistics"><div class="stats-visual-head"><div><span class="eyebrow">AT A GLANCE</span><h3>Run performance</h3></div><span class="panel-chip" id="statsSummaryChip">0% ACCURACY</span></div><div class="stats-visual-grid"><div class="accuracy-visual" id="statAccuracyRing" role="img" aria-label="Guess accuracy"><div><strong id="statAccuracyVisual">0%</strong><span>ACCURACY</span></div></div><div class="stats-bars"><div class="stats-bar-row"><div><span>Correct guesses</span><strong id="statsCorrectRatio">0</strong></div><div class="stats-bar-track"><span id="statsCorrectBar"></span></div></div><div class="stats-bar-row"><div><span>Failed guesses</span><strong id="statsFailedRatio">0</strong></div><div class="stats-bar-track"><span id="statsFailedBar"></span></div></div><div class="stats-bar-row"><div><span>Money earned</span><strong id="statsMoneyVisual">0</strong></div><div class="stats-bar-track"><span id="statsMoneyBar"></span></div></div></div></div></section>
       </section>
     </div>
     <div class="screen" id="screen-arcade" role="tabpanel" aria-labelledby="tab-arcade" data-screen="arcade" hidden>

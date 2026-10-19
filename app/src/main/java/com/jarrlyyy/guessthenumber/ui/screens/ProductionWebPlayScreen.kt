@@ -2,6 +2,8 @@ package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.BuildConfig
 import android.net.Uri
+import android.content.Intent
+import android.provider.Settings
 import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -15,12 +17,21 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.jarrlyyy.guessthenumber.data.repository.UpdateChannelChecker
+import com.jarrlyyy.guessthenumber.data.repository.ApkUpdateInstaller
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -41,6 +52,7 @@ import com.jarrlyyy.guessthenumber.ui.viewmodel.GuessSubmissionResult
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
+import com.jarrlyyy.guessthenumber.data.audio.BackgroundMusicManager
 
 private const val WEB_UI_ORIGIN = "https://appassets.androidplatform.net"
 private const val WEB_UI_PATH = "/assets/web-play/"
@@ -69,8 +81,12 @@ fun ProductionWebPlayScreen(
     onSettleStake: (String) -> Boolean
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val updateScope = rememberCoroutineScope()
+    var latestAvailableUpdate by remember { mutableStateOf<UpdateChannelChecker.AvailableUpdate?>(null) }
     val progressionEngine = remember { GameEngine() }
     val currentGameState by rememberUpdatedState(state)
+    val activeLocaleManager by rememberUpdatedState(localeManager)
     val currentIncome by rememberUpdatedState(incomePerSecond)
     val readState by rememberUpdatedState(stateProvider)
     val submitGuess by rememberUpdatedState(onSubmitGuess)
@@ -88,6 +104,17 @@ fun ProductionWebPlayScreen(
     val awardArcadeReward by rememberUpdatedState(onArcadeReward)
     val settleStake by rememberUpdatedState(onSettleStake)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    val musicManager = remember { BackgroundMusicManager(context.applicationContext) }
+    LaunchedEffect(state.settings.volume) { musicManager.setVolume(state.settings.volume) }
+    val musicPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) runCatching { musicManager.importTrack(uri)?.let { musicManager.playTrack(it.id) } }
+        webViewRef?.post { webViewRef?.evaluateJavascript("window.gtnReadState && window.gtnReadState()", null) }
+    }
+    LaunchedEffect(state.settings.customPrimaryColor, state.settings.customSecondaryColor, state.settings.customTertiaryColor) {
+        webViewRef?.postDelayed({
+            webViewRef?.evaluateJavascript("window.gtnReadState && window.gtnReadState()", null)
+        }, 120L)
+    }
     var bridgeErrorDetails by remember { mutableStateOf<String?>(null) }
     val clipboardManager = LocalClipboardManager.current
     fun reportBridgeException(action: String, requestId: String, error: Exception) {
@@ -145,6 +172,79 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        if (parsed.type == "read_changelog") {
+                                            val markdown = try {
+                                                context.assets.open("changelogs.md").bufferedReader(Charsets.UTF_8).use { it.readText() }
+                                            } catch (_: Exception) {
+                                                replyProxy.postMessage(errorResponse(parsed.id, "changelog_unavailable"))
+                                                return@post
+                                            }
+                                            replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id)
+                                                .put("type", "changelog").put("content", markdown).toString())
+                                            return@post
+                                        }
+                                        if (parsed.type == "music_state") {
+                                            val musicState = JSONObject()
+                                                .put("library", org.json.JSONArray().apply { musicManager.library.value.forEach { track -> put(JSONObject().put("id", track.id).put("title", track.title).put("artist", track.artist).put("album", track.album).put("duration", track.duration)) } })
+                                                .put("queue", org.json.JSONArray(musicManager.queue.value))
+                                                .put("playlists", JSONObject().apply { musicManager.playlists.value.forEach { (name, ids) -> put(name, org.json.JSONArray(ids)) } })
+                                                .put("currentTrackId", musicManager.currentTrackId.value ?: "")
+                                                .put("currentPosition", musicManager.currentPosition.value)
+                                                .put("duration", musicManager.duration.value)
+                                                .put("isPlaying", musicManager.isPlaying.value)
+                                                .put("shuffle", musicManager.shuffle.value)
+                                                .put("repeatMode", musicManager.repeatMode.value.name)
+                                            replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "music_state").put("musicPlayer", musicState).toString())
+                                            return@post
+                                        }
+                                        if (parsed.type in setOf("check_updates", "install_update", "open_update_page")) {
+                                            when (parsed.type) {
+                                                "check_updates" -> updateScope.launch {
+                                                    val response = JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("installedVersion", BuildConfig.VERSION_NAME).put("installedVersionCode", BuildConfig.VERSION_CODE).put("channel", BuildConfig.UPDATE_CHANNEL)
+                                                    when (val updateResult = runCatching { UpdateChannelChecker.check() }.getOrElse { UpdateChannelChecker.Result.Unavailable }) {
+                                                        is UpdateChannelChecker.Result.Available -> {
+                                                            latestAvailableUpdate = updateResult.update
+                                                            response.put("status", "available").put("title", updateResult.update.title).put("details", updateResult.update.details).put("message", activeLocaleManager.getString("update_available", "An update is available."))
+                                                        }
+                                                        UpdateChannelChecker.Result.UpToDate -> {
+                                                            latestAvailableUpdate = null
+                                                            response.put("status", "up_to_date").put("message", activeLocaleManager.getString("update_up_to_date", "You're up to date."))
+                                                        }
+                                                        UpdateChannelChecker.Result.Unavailable -> {
+                                                            latestAvailableUpdate = null
+                                                            response.put("status", "unavailable").put("message", activeLocaleManager.getString("update_unavailable", "Couldn't check for updates. Try again later."))
+                                                        }
+                                                    }
+                                                    replyProxy.postMessage(response.toString())
+                                                }
+                                                "install_update" -> {
+                                                    val update = latestAvailableUpdate
+                                                    if (update == null) {
+                                                        replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("status", "unavailable").put("message", activeLocaleManager.getString("update_unavailable", "Check for updates first.")).toString())
+                                                    } else if (!context.packageManager.canRequestPackageInstalls()) {
+                                                        context.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${context.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                                                        replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("status", "permission_required").put("message", activeLocaleManager.getString("update_permission_required", "Allow this app to install updates, then return and tap Install again.")).toString())
+                                                    } else updateScope.launch {
+                                                        val installResult = withContext(Dispatchers.IO) { ApkUpdateInstaller(context).install(update.downloadUrl, requireChecksum = BuildConfig.UPDATE_CHANNEL == "debug", expectedCommitSha = update.expectedCommitSha) }
+                                                        val response = JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result")
+                                                        if (installResult.isSuccess) {
+                                                            response.put("status", "install_started").put("message", activeLocaleManager.getString("update_install_started", "Installation started. Confirm the Android installer prompt."))
+                                                        } else {
+                                                            response.put("status", "install_failed").put("message", activeLocaleManager.getString("update_install_failed", "Update failed: %s", installResult.exceptionOrNull()?.message ?: "unknown error"))
+                                                        }
+                                                        replyProxy.postMessage(response.toString())
+                                                    }
+                                                }
+                                                "open_update_page" -> {
+                                                    val url = latestAvailableUpdate?.url
+                                                    if (url != null && Uri.parse(url).let { it.scheme == "https" && it.host == "github.com" }) {
+                                                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                                                        replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("status", "page_opened").put("message", activeLocaleManager.getString("update_open", "Opened update page.")).toString())
+                                                    } else replyProxy.postMessage(errorResponse(parsed.id, "update_page_unavailable"))
+                                                }
+                                            }
+                                            return@post
+                                        }
                                         val beforeAction = try {
                                             readState()
                                         } catch (exception: Exception) {
@@ -181,6 +281,31 @@ fun ProductionWebPlayScreen(
                                                     val amount = parsed.stakeAmount
                                                     if (amount == null || !settleStake(amount)) {
                                                         throw IllegalArgumentException("Lucky Stake was rejected.")
+                                                    }
+                                                }
+                                                "music_action" -> {
+                                                    when (parsed.musicAction) {
+                                                        "import" -> musicPicker.launch(arrayOf("audio/*"))
+                                                        "play" -> musicManager.play()
+                                                        "pause" -> musicManager.pause()
+                                                        "stop" -> musicManager.stop()
+                                                        "next" -> musicManager.next()
+                                                        "previous" -> musicManager.previous()
+                                                        "shuffle" -> musicManager.setShuffle(!musicManager.shuffle.value)
+                                                        "repeat" -> musicManager.setRepeatMode(BackgroundMusicManager.RepeatMode.entries[(musicManager.repeatMode.value.ordinal + 1) % BackgroundMusicManager.RepeatMode.entries.size])
+                                                        "play_track" -> musicManager.playTrack(parsed.musicTrackId ?: throw IllegalArgumentException("Missing track"))
+                                                        "enqueue" -> musicManager.enqueue(parsed.musicTrackId ?: throw IllegalArgumentException("Missing track"))
+                                                        "remove_track" -> musicManager.removeTrack(parsed.musicTrackId ?: throw IllegalArgumentException("Missing track"))
+                                                        "add_to_playlist" -> if (!musicManager.addToPlaylist(parsed.musicName ?: throw IllegalArgumentException("Missing playlist"), parsed.musicTrackId ?: throw IllegalArgumentException("Missing track"))) throw IllegalArgumentException("Could not add track to playlist")
+                                                        "remove_from_playlist" -> musicManager.removeFromPlaylist(parsed.musicName ?: throw IllegalArgumentException("Missing playlist"), parsed.musicTrackId ?: throw IllegalArgumentException("Missing track"))
+                                                        "clear_queue" -> musicManager.clearQueue()
+                                                        "remove_queue" -> musicManager.removeFromQueue(parsed.musicIndex ?: throw IllegalArgumentException("Missing queue index"))
+                                                        "move_queue" -> musicManager.moveQueue(parsed.musicIndex ?: throw IllegalArgumentException("Missing queue index"), parsed.musicToIndex ?: throw IllegalArgumentException("Missing destination index"))
+                                                        "create_playlist" -> if (!musicManager.createPlaylist(parsed.musicName ?: "")) throw IllegalArgumentException("Playlist name is invalid or already used")
+                                                        "delete_playlist" -> musicManager.deletePlaylist(parsed.musicName ?: throw IllegalArgumentException("Missing playlist name"))
+                                                        "play_playlist" -> musicManager.playQueue(musicManager.playlists.value[parsed.musicName] ?: throw IllegalArgumentException("Playlist not found"))
+                                                        "seek" -> musicManager.seekTo(parsed.musicPosition ?: throw IllegalArgumentException("Missing playback position"))
+                                                        else -> throw IllegalArgumentException("Unsupported music action")
                                                     }
                                                 }
                                                 "update_setting" -> {
@@ -224,7 +349,15 @@ fun ProductionWebPlayScreen(
                                                             else -> throw IllegalArgumentException("Unsupported setting")
                                                         }
                                                         updateSettings(updated)
-                                                        if (key == "locale") androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags(value))
+                                                        if (key == "locale") {
+                                                            androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags(value))
+                                                            updateScope.launch {
+                                                                activeLocaleManager.loadLocaleForTag(value)
+                                                                webViewRef?.postDelayed({
+                                                                    webViewRef?.evaluateJavascript("window.gtnReadState && window.gtnReadState()", null)
+                                                                }, 120L)
+                                                            }
+                                                        }
                                                     }
                                                 }
                                                 "update_multiplier" -> parsed.multiplier?.let(updateMultiplier)
@@ -313,11 +446,27 @@ fun ProductionWebPlayScreen(
                                         worldDefinitions.forEach { world ->
                                             val unlocked = world.id in game.unlockedWorldIds
                                             val defeated = world.bossId in game.defeatedBossIds && !game.endlessRiftActive
-                                            val canUnlock = world.unlockBossId?.let { requiredBossId -> requiredBossId in game.defeatedBossIds && game.correctGuesses >= world.unlockCorrectGuesses && totalUpgradeLevels >= world.unlockUpgradeCount && game.prestigeCount >= world.unlockPrestigeCount && game.ultraCount >= world.unlockUltraCount } ?: true
+                                            val requiredBossDefeated = world.unlockBossId?.let { it in game.defeatedBossIds } ?: true
+                                            val canUnlock = requiredBossDefeated && game.correctGuesses >= world.unlockCorrectGuesses && totalUpgradeLevels >= world.unlockUpgradeCount && game.prestigeCount >= world.unlockPrestigeCount && game.ultraCount >= world.unlockUltraCount
                                             val canFight = game.endlessRiftActive || (game.correctGuesses >= world.fightCorrectGuesses && totalUpgradeLevels >= world.fightUpgradeCount && game.prestigeCount >= world.fightPrestigeCount && game.ultraCount >= world.fightUltraCount)
                                             val hp = world.hp + if (game.endlessRiftActive) ((game.endlessRiftTier - 1).coerceAtLeast(0) * 2) else 0
                                             val damage = (game.bossBattleProgress[world.bossId] ?: 0).coerceIn(0, hp)
-                                            worldsJson.put(JSONObject().put("id", world.id).put("name", world.fallback).put("bossId", world.bossId).put("bossName", world.bossFallback).put("hp", hp).put("damage", damage).put("unlocked", unlocked).put("defeated", defeated).put("canUnlock", canUnlock).put("canFight", canFight).put("active", game.activeWorldId == world.id).put("activeBoss", game.activeBossBattleWorldId == world.id))
+                                            worldsJson.put(JSONObject().put("id", world.id).put("name", world.fallback).put("bossId", world.bossId).put("bossName", world.bossFallback).put("hp", hp).put("damage", damage).put("unlocked", unlocked).put("defeated", defeated).put("canUnlock", canUnlock).put("canFight", canFight).put("active", game.activeWorldId == world.id).put("activeBoss", game.activeBossBattleWorldId == world.id)
+                                                .put("unlockRequirements", org.json.JSONArray().apply {
+                                                    world.unlockBossId?.let { requiredBossId ->
+                                                        if (requiredBossId !in game.defeatedBossIds) put("Defeat ${worldDefinitions.firstOrNull { it.bossId == requiredBossId }?.bossFallback ?: requiredBossId}")
+                                                    }
+                                                    if (game.correctGuesses < world.unlockCorrectGuesses) put("Correct guesses: ${game.correctGuesses} / ${world.unlockCorrectGuesses}")
+                                                    if (totalUpgradeLevels < world.unlockUpgradeCount) put("Upgrade levels: $totalUpgradeLevels / ${world.unlockUpgradeCount}")
+                                                    if (game.prestigeCount < world.unlockPrestigeCount) put("Prestige resets: ${game.prestigeCount} / ${world.unlockPrestigeCount}")
+                                                    if (game.ultraCount < world.unlockUltraCount) put("Ultra resets: ${game.ultraCount} / ${world.unlockUltraCount}")
+                                                })
+                                                .put("fightRequirements", org.json.JSONArray().apply {
+                                                    if (game.correctGuesses < world.fightCorrectGuesses) put("Correct guesses: ${game.correctGuesses} / ${world.fightCorrectGuesses}")
+                                                    if (totalUpgradeLevels < world.fightUpgradeCount) put("Upgrade levels: $totalUpgradeLevels / ${world.fightUpgradeCount}")
+                                                    if (game.prestigeCount < world.fightPrestigeCount) put("Prestige resets: ${game.prestigeCount} / ${world.fightPrestigeCount}")
+                                                    if (game.ultraCount < world.fightUltraCount) put("Ultra resets: ${game.ultraCount} / ${world.fightUltraCount}")
+                                                }))
                                         }
                                         val upgradesJson = org.json.JSONArray()
                                         upgradeDefinitions.forEach { upgrade ->
@@ -368,14 +517,22 @@ fun ProductionWebPlayScreen(
                                                 .put("requirement", if (!canUnlock) "Unlock ${talent.requiredParentId} first" else if (!affordable) "Need ${talent.cost} Prestige" else "Ready to unlock"))
                                         }
                                         val viewState = JSONObject()
-                                        .put("debugBuild", BuildConfig.DEBUG)
+                                        .put("appVersion", BuildConfig.VERSION_NAME)
+                                            .put("appVersionCode", BuildConfig.VERSION_CODE)
+                                            .put("updateChannel", BuildConfig.UPDATE_CHANNEL)
+                                            .put("debugBuild", BuildConfig.DEBUG)
                                             .put("buyMultiplier", game.buyMultiplier)
                                             .put("prestigeRequirement", progressionEngine.calculatePrestigeRequirement(game.prestigeCount).format())
                                             .put("prestigeReward", progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount).format())
                                             .put("canPrestige", game.money >= progressionEngine.calculatePrestigeRequirement(game.prestigeCount) && progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount) > BigNumber.ZERO)
+                                            .put("prestigeMoneyMet", game.money >= progressionEngine.calculatePrestigeRequirement(game.prestigeCount))
+                                            .put("prestigeRewardPositive", progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount) > BigNumber.ZERO)
                                             .put("ultraRequirement", progressionEngine.calculateUltraRequirement(game.ultraCount).format())
                                             .put("ultraReward", progressionEngine.calculateUltraReward(game.money, game.ultraCount).format())
                                             .put("canUltra", game.money >= progressionEngine.calculateUltraRequirement(game.ultraCount) && game.prestige >= BigNumber(1_000) && progressionEngine.calculateUltraReward(game.money, game.ultraCount) > BigNumber.ZERO)
+                                            .put("ultraMoneyMet", game.money >= progressionEngine.calculateUltraRequirement(game.ultraCount))
+                                            .put("ultraPrestigeMet", game.prestige >= BigNumber(1_000))
+                                            .put("ultraRewardPositive", progressionEngine.calculateUltraReward(game.money, game.ultraCount) > BigNumber.ZERO)
                                             .put("settings", JSONObject()
                                                 .put("musicEnabled", game.settings.musicEnabled)
                                                 .put("soundEnabled", game.settings.soundEnabled)
@@ -397,7 +554,7 @@ fun ProductionWebPlayScreen(
                                                 .put("customPrimaryColor", game.settings.customPrimaryColor)
                                                 .put("customSecondaryColor", game.settings.customSecondaryColor)
                                                 .put("customTertiaryColor", game.settings.customTertiaryColor))
-                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry").forEach { key -> put(key, localeManager.getString(key)) } })
+                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "incorrect_guess_low_1", "incorrect_guess_low_2", "incorrect_guess_low_3", "incorrect_guess_high_1", "incorrect_guess_high_2", "incorrect_guess_high_3", "changelog_title", "changelog_subtitle", "changelog_eyebrow", "changelog_intro", "changelog_current_badge", "changelog_category_ui", "changelog_current_title", "changelog_current_arcade", "changelog_current_updates", "changelog_current_locale", "changelog_current_music", "changelog_current_feedback", "changelog_progress_badge", "changelog_category_gameplay", "changelog_progress_title", "changelog_progress_stats", "changelog_progress_worlds", "changelog_progress_saves", "changelog_foundation_badge", "changelog_category_system", "changelog_foundation_title", "changelog_foundation_update", "changelog_foundation_icon", "changelog_foundation_offline", "music_player_title", "music_player_subtitle", "music_player_eyebrow", "music_background_track", "music_background_track_desc", "music_player_toggle_desc", "music_player_status", "master_volume", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "about_title", "about_licenses", "about_header", "about_version_format", "about_description", "about_licenses_title", "about_web_subtitle", "about_installed_version", "about_update_description", "about_update_idle", "about_updates_eyebrow", "about_licenses_eyebrow", "about_licenses_description", "about_library_author_format", "about_library_license_format", "update_channel_label", "update_channel_debug", "update_channel_release", "update_check", "update_checking", "update_available", "update_up_to_date", "update_unavailable", "update_install", "update_open", "update_downloading", "update_install_started", "update_install_failed", "update_permission_required", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry", "rift_best_tier", "loot_title", "loot_opened_count", "worlds_boss_count", "inspector_arcade_best_scores", "your_game", "more", "more_subtitle", "rewards", "rewards_subtitle", "journey", "journey_subtitle", "shop", "shop_subtitle", "home_base", "home_base_subtitle", "relics", "relics_subtitle", "codex", "codex_subtitle", "save_slots", "save_slots_subtitle", "settings_subtitle", "prestige", "prestige_subtitle", "ultra", "ultra_subtitle", "talents", "talents_subtitle", "mutators", "mutators_subtitle", "dev_settings", "dev_settings_subtitle", "lucky_stake_subtitle", "music_no_track", "music_add_audio", "music_add_to_playlist", "music_play", "music_pause", "music_shuffle", "music_repeat", "music_repeat_off", "music_repeat_one", "music_repeat_all", "music_enqueue", "music_remove", "music_move_up", "music_move_down", "music_delete_playlist", "music_empty_library", "music_empty_queue", "music_empty_playlists", "music_queue", "music_library", "music_playlists", "music_queue_position", "music_playlist_tracks", "music_playlist_name", "music_create_playlist", "on", "off").forEach { key -> put(key, activeLocaleManager.getString(key)) } })
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
                                             .put("minigames", org.json.JSONArray().apply {
@@ -415,6 +572,23 @@ fun ProductionWebPlayScreen(
                                             .put("accepted", result?.accepted ?: actionAccepted)
                                             .put("money", game.money.format())
                                             .put("incomePerSecond", currentIncome.format())
+                                            .put("statistics", JSONObject()
+                                                .put("totalGuesses", game.statistics.totalGuesses)
+                                                .put("correctGuesses", game.statistics.correctGuesses)
+                                                .put("failedGuesses", game.statistics.failedGuesses)
+                                                .put("moneyEarned", game.statistics.moneyEarned.format())
+                                                .put("moneySpent", game.statistics.moneySpent.format())
+                                                .put("prestigesCount", game.statistics.prestigesCount)
+                                                .put("ultrasCount", game.statistics.ultrasCount)
+                                                .put("nebulaEarned", game.statistics.nebulaEarned)
+                                                .put("playtimeSeconds", game.statistics.playtimeSeconds)
+                                                .put("arcadePlayed", game.statistics.arcadePlayed)
+                                                .put("arcadeBestScores", JSONObject().apply { game.statistics.arcadeBestScores.forEach { (gameId, score) -> put(gameId, score) } })
+                                                .put("randomEventsTriggered", game.statistics.randomEventsTriggered)
+                                                .put("lootDropsFound", game.lootDropsFound)
+                                                .put("lootChestsOpened", game.lootChestsOpened)
+                                                .put("worldBossVictories", game.worldBossVictories)
+                                                .put("endlessRiftBestTier", game.endlessRiftBestTier))
 
                                             .put("prestige", game.prestige.format())
                                             .put("ultra", game.ultra.format())
@@ -459,6 +633,16 @@ fun ProductionWebPlayScreen(
                                             .put("achievementStreakUnlocked", game.bestStreak >= 5)
                                             .put("achievementMoneyProgress", (game.money.value.toDouble() / 1_000_000.0).coerceIn(0.0, 1.0))
                                             .put("achievementMoneyUnlocked", game.money >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(1_000_000))
+                                        viewState.put("musicPlayer", JSONObject()
+                                            .put("library", org.json.JSONArray().apply { musicManager.library.value.forEach { track -> put(JSONObject().put("id", track.id).put("title", track.title).put("artist", track.artist).put("album", track.album).put("duration", track.duration)) } })
+                                            .put("queue", org.json.JSONArray(musicManager.queue.value))
+                                            .put("playlists", JSONObject().apply { musicManager.playlists.value.forEach { (name, ids) -> put(name, org.json.JSONArray(ids)) } })
+                                            .put("currentTrackId", musicManager.currentTrackId.value ?: "")
+                                            .put("currentPosition", musicManager.currentPosition.value)
+                                            .put("duration", musicManager.duration.value)
+                                            .put("isPlaying", musicManager.isPlaying.value)
+                                            .put("shuffle", musicManager.shuffle.value)
+                                            .put("repeatMode", musicManager.repeatMode.value.name))
                                         if (result != null) viewState.put("lastGuessStatus", result.status ?: "rate_limited")
                                         replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "state").put("state", viewState).toString())
                                         } catch (exception: Exception) {
