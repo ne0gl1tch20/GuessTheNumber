@@ -337,6 +337,10 @@ class WebUiBridgeProtocolTest {
             WebUiBridgeProtocol.ParseResult.Valid("music-playlist", "music_action", musicAction = "add_to_playlist", musicTrackId = "track_123_4567", musicName = "Road Trip"),
             WebUiBridgeProtocol.parse("""{"version":1,"id":"music-playlist","type":"music_action","action":"add_to_playlist","trackId":"track_123_4567","name":"Road Trip"}""")
         )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("music-state", "music_state"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"music-state","type":"music_state"}""")
+        )
         val invalid = WebUiBridgeProtocol.parse("""{"version":1,"id":"music-2","type":"music_action","action":"grant_rewards"}""")
         assertEquals("invalid_music_action", (invalid as WebUiBridgeProtocol.ParseResult.Invalid).error)
         val extra = WebUiBridgeProtocol.parse("""{"version":1,"id":"music-3","type":"music_action","action":"play","unexpected":true}""")
