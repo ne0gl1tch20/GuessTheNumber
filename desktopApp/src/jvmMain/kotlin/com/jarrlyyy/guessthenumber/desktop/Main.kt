@@ -283,8 +283,11 @@ fun main() = application {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ) {
-                        TextButton(onClick = { editingPlayerProfile = true }) {
-                            Text("${desktopAvatarEmoji(playerProfile?.avatarId ?: "star")}  ${playerProfile?.username.orEmpty()} · Profile")
+                        playerProfile?.let { profile ->
+                            DesktopPlayerProfileButton(
+                                profile = profile,
+                                onClick = { editingPlayerProfile = true }
+                            )
                         }
                     }
                     if (shellState.message != null) {
