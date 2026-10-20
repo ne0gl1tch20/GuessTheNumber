@@ -367,7 +367,7 @@ fun ProductionGuessGameScreen(
                             return@launch
                         }
                         if (type == "read_onboarding_state") {
-                            val onboardingPrefs = java.util.prefs.Preferences.userNodeForPackage(ProductionGuessGameScreen::class.java).node("web-play-onboarding")
+                            val onboardingPrefs = java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding")
                             val firstLaunchAlreadySeen = onboardingPrefs.getBoolean("daily_reward_first_launch_seen", false)
                             if (!firstLaunchAlreadySeen) onboardingPrefs.putBoolean("daily_reward_first_launch_seen", true)
                             val tutorialCompleted = onboardingPrefs.getBoolean("nimmy_tutorial_completed", false)
@@ -378,8 +378,7 @@ fun ProductionGuessGameScreen(
                             return@launch
                         }
                         if (type == "complete_nimmy_tutorial") {
-                            java.util.prefs.Preferences.userNodeForPackage(ProductionGuessGameScreen::class.java)
-                                .node("web-play-onboarding").putBoolean("nimmy_tutorial_completed", true)
+                            java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding").putBoolean("nimmy_tutorial_completed", true)
                             reply(org.json.JSONObject().put("version", 1).put("id", requestId)
                                 .put("type", "onboarding_saved").toString())
                             return@launch
