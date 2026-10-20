@@ -11,6 +11,11 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Require master branch
+        if: github.ref != 'refs/heads/master'
+        run: |
+          echo 'Stable Debug APK must be dispatched from master so the published APK matches the current launcher resources.'
+          exit 1
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -19,6 +24,12 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: gradle
+      - name: Validate Launcher Logo
+        run: |
+          test -s GTN_APP_LOGO.png
+          grep -q 'rename { "gtn_app_logo.png" }' app/build.gradle.kts
+          grep -q '@drawable/gtn_app_logo' app/src/main/res/mipmap-anydpi/ic_launcher.xml
+          grep -q '@drawable/gtn_app_logo' app/src/main/res/mipmap-anydpi/ic_launcher_round.xml
       - name: Validate Localizations
         run: python3 tools/validate_locales.py
       - name: Validate Version Metadata
