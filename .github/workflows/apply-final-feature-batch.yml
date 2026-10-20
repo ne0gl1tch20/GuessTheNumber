@@ -1,0 +1,129 @@
+name: Apply final feature batch
+
+on:
+  push:
+    branches:
+      - feature/html-economy-tutorial-reset
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply feature batch
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re
+          R=Path('.')
+          def rw(path, fn):
+              p=R/path; s=p.read_text(); ns=fn(s); p.write_text(ns); return ns
+          def once(path, old, new):
+              def f(s):
+                  if old not in s: raise SystemExit(f'Missing {path}: {old[:140]}')
+                  return s.replace(old,new,1)
+              return rw(path,f)
+
+          # ---------- HTML ----------
+          p=R/'app/src/main/assets/web-play/index.html'; s=p.read_text()
+          if 'id="dailyRewardPageClaim"' not in s:
+              marker='<div class="screen" id="screen-rewards"'
+              pos=s.find(marker); end=s.find('>',pos)+1
+              if pos<0 or end<=0: raise SystemExit('Rewards screen marker missing')
+              card='''\n    <section class="daily-rewards-page card" aria-label="Daily Nebula rewards"><div class="panel-title"><span class="eyebrow">DAILY LOGIN</span><h2 data-i18n="daily_reward_title">Daily Nebula Reward</h2><span class="panel-chip" id="dailyRewardPageStatus">READY</span></div><p id="dailyRewardPageSubtitle" data-i18n="daily_reward_subtitle">Claim today's reward and keep your streak alive.</p><div class="daily-reward-page-main"><strong class="reward-amount" id="dailyRewardPageAmount">+5 Nebula</strong><p class="reward-streak" id="dailyRewardPageStreak">Day 1 streak</p></div><div id="dailyRewardPageSchedule" class="daily-reward-schedule"></div><p id="dailyRewardPageMessage" class="catalog-intro" role="status" aria-live="polite"></p><button type="button" class="primary-action reward-claim" id="dailyRewardPageClaim">Claim reward</button></section>\n'''
+              s=s[:end]+card+s[end:]
+          if 'id="dailyRewardClose"' not in s:
+              s=s.replace('<button type="button" class="primary-action reward-claim" id="dailyRewardClaim">Claim reward</button>','<button type="button" class="primary-action reward-claim" id="dailyRewardClaim">Claim reward</button><button type="button" class="secondary-action reward-close" id="dailyRewardClose">Close</button>',1)
+          for id_,label in [('upgradeCurrencyBalance','Nebula'),('shopCurrencyBalance','Nebula'),('prestigeUpgradeCurrencyBalance','Prestige'),('prestigeShopCurrencyBalance','Prestige'),('ultraUpgradeCurrencyBalance','Ultra'),('ultraShopCurrencyBalance','Ultra')]:
+              if id_ not in s:
+                  target={'upgradeCurrencyBalance':'upgradeList','shopCurrencyBalance':'shopList','prestigeUpgradeCurrencyBalance':'prestigeUpgradeList','prestigeShopCurrencyBalance':'prestigeShopList','ultraUpgradeCurrencyBalance':'ultraUpgradeList','ultraShopCurrencyBalance':'ultraShopList'}[id_]
+                  marker=f'id="{target}"'; pos=s.find(marker)
+                  if pos<0: raise SystemExit(f'Missing catalog {target}')
+                  line=f'<div class="catalog-currency-balance" id="{id_}" aria-live="polite">{label}: <strong>0</strong></div>\n        '
+                  s=s[:pos]+line+s[pos:]
+          if 'id="resetEverythingButton"' not in s:
+              marker='id="rerunNimmyButton"'; pos=s.find(marker); end=s.find('</button>',pos)
+              if pos<0 or end<0: raise SystemExit('Rerun Nimmy control missing')
+              end+=len('</button>')
+              reset='''\n      <section class="settings-danger card" aria-labelledby="resetEverythingTitle"><div class="panel-title"><span class="eyebrow">DATA</span><h3 id="resetEverythingTitle" data-i18n="reset_everything_label">Reset Everything</h3></div><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><button type="button" class="world-action-button" id="resetEverythingButton" data-bridge-action="reset_everything" data-i18n="reset_everything_label">Reset Everything</button></section>'''
+              s=s[:end]+reset+s[end:]
+          if 'id="resetEverythingDialog"' not in s:
+              dialog='''<section id="resetEverythingDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetEverythingDialogTitle"><div class="nimmy-tutorial-backdrop" aria-hidden="true"></div><div class="nimmy-dialog card reset-dialog"><span class="eyebrow">DATA RESET</span><h2 id="resetEverythingDialogTitle" data-i18n="confirm_data_reset_title">Confirm Data Reset</h2><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><p id="resetMathPrompt" class="reset-math-prompt"></p><p id="resetTimerText" class="catalog-intro">Wait 45s before confirming.</p><label class="reset-check-row"><input type="checkbox" id="resetAcknowledgement"><span data-i18n="reset_data_acknowledgement">I understand this will erase all my progress</span></label><input id="resetMathAnswer" class="stake-input" inputmode="numeric" autocomplete="off"><div class="nimmy-actions"><button type="button" class="secondary-action" id="resetCancelButton">Cancel</button><button type="button" class="primary-action" id="resetConfirmButton" disabled>Confirm reset</button></div></div></section>\n'''
+              s=s.replace('<section id="nimmyTutorial"',dialog+'<section id="nimmyTutorial"',1)
+          p.write_text(s)
+
+          # ---------- shared JS ----------
+          p=R/'app/src/main/assets/web-play/app.js'; s=p.read_text()
+          profile_old="avatar.textContent=icons[m.avatarId]||'⭐'"
+          profile_new="avatar.replaceChildren();if(m.avatarId==='custom'&&typeof m.customAvatarData==='string'&&m.customAvatarData.startsWith('data:image/')){const image=document.createElement('img');image.src=m.customAvatarData;image.alt='';image.className='player-profile-custom-avatar';avatar.appendChild(image)}else avatar.textContent=icons[m.avatarId]||'⭐'"
+          if 'player-profile-custom-avatar' not in s: s=s.replace(profile_old,profile_new,1)
+
+          helper="""\nfunction updateCurrencyBalances(s){const values=[['upgradeCurrencyBalance','Nebula',s.nebula],['shopCurrencyBalance','Nebula',s.nebula],['prestigeUpgradeCurrencyBalance','Prestige',s.prestige],['prestigeShopCurrencyBalance','Prestige',s.prestige],['ultraUpgradeCurrencyBalance','Ultra',s.ultra],['ultraShopCurrencyBalance','Ultra',s.ultra]];values.forEach(([id,label,value])=>{const n=$(id);if(n)n.innerHTML=label+': <strong>'+String(value??0)+'</strong>'})}\nfunction renderDailyRewardPage(s){const available=!!s.dailyRewardAvailable;setText($('dailyRewardPageAmount'),'+ '+String(s.dailyRewardAmount??'5')+' Nebula');setText($('dailyRewardPageStreak'),uiText('daily_reward_streak','Day %s streak').replace('%s',String(s.dailyRewardStreak||1)));const msg=$('dailyRewardPageMessage'),button=$('dailyRewardPageClaim'),status=$('dailyRewardPageStatus');if(status)status.textContent=available?'READY':'CLAIMED';if(msg)msg.textContent=available?uiText('daily_reward_subtitle','Claim today\\'s reward and keep your streak alive.'):uiText('daily_reward_claimed','Today\\'s reward is already claimed. Come back tomorrow to claim again.');if(button){button.disabled=!!pending||!available;button.textContent=available?uiText('daily_reward_claim','Claim reward'):uiText('daily_reward_claimed','Come back tomorrow')}}\nlet featureTutorialId=null,featureTutorialSteps=[];const featureTutorialTargets={rewards:['#dailyRewardPageClaim','#dailyRewardPageSchedule'],journey:['#screen-journey','#screen-journey .catalog-list'],upgrades:['#upgradeList','#upgradeCurrencyBalance'],shop:['#shopList','#shopCurrencyBalance'],homebase:['#screen-homebase','#upgradeHomeBase'],relics:['#screen-relics','#relicList'],codex:['#screen-codex','#codexList'],settings:['#rerunNimmyButton','#resetEverythingButton'],prestige:['#prestigeUpgradeList','#prestigeShopList'],ultra:['#ultraUpgradeList','#ultraShopList'],talent:['#screen-talent','#talentList'],mutators:['#screen-mutators','#mutatorList'],stats:['#screen-stats','#screen-stats'],arcade:['#screen-arcade','#arcadeList'],stake:['#stakeFlip','#stakeAmount'],about:['#screen-about','#aboutCheckUpdates'],music:['#musicPlayPause','#musicLibrary'],changelog:['#screen-changelog','#changelogContent']};\nfunction startFeatureTutorial(id){if(!id||featureTutorialId||!lastState)return;const targets=(featureTutorialTargets[id]||[]).filter(x=>document.querySelector(x));if(!targets.length)return;featureTutorialId=id;featureTutorialSteps=targets.map((target,i)=>({target,title:i?'nimmy_step_upgrades_title':'nimmy_step_more_title',body:i?'nimmy_step_upgrades_body':'nimmy_step_more_body'}));nimmyStepIndex=0;nimmyTutorialStarted=true;$('nimmyTutorial').hidden=false;renderFeatureTutorialStep()}\nfunction renderFeatureTutorialStep(){const step=featureTutorialSteps[nimmyStepIndex];if(!step)return;setText($('nimmyName'),uiText('nimmy_name','Nimmy'));setText($('nimmyStep'),uiText('nimmy_step_counter','Step %s of %s').replace('%s',String(nimmyStepIndex+1)).replace('%s',String(featureTutorialSteps.length)));setText($('nimmyTitle'),uiText(step.title,'Nimmy tour'));setText($('nimmyBody'),uiText(step.body,'Nimmy is showing you this feature.'));setText($('nimmyNext'),nimmyStepIndex===featureTutorialSteps.length-1?uiText('nimmy_finish','Let’s go!'):uiText('nimmy_next','Next'));updateNimmySpotlight()}\nfunction finishFeatureTutorial(){const id=featureTutorialId;featureTutorialId=null;featureTutorialSteps=[];nimmyTutorialStarted=false;$('nimmyTutorial').hidden=true;if(id&&host)send('complete_feature_tutorial',{featureId:id})}\nlet resetChallenge=null,resetReadyAt=0,resetTimer=null;function makeResetChallenge(){const ops=['+','-','*','/'],terms=2+Math.floor(Math.random()*2),nums=Array.from({length:terms},()=>10+Math.floor(Math.random()*90));let value=nums[0],expr=String(nums[0]);for(let i=1;i<terms;i++){const op=ops[Math.floor(Math.random()*ops.length)];let n=op==='/'?1+Math.floor(Math.random()*9):nums[i];if(op==='+')value+=n;else if(op==='-')value-=n;else if(op==='*')value*=n;else value=Math.trunc(value/n);expr+=' '+op+' '+n}return {expr,value}}\nfunction openResetDialog(){resetChallenge=makeResetChallenge();resetReadyAt=Date.now()+45000;$('resetEverythingDialog').hidden=false;$('resetMathPrompt').textContent=resetChallenge.expr+' = ?';$('resetMathAnswer').value='';$('resetAcknowledgement').checked=false;const tick=()=>{const left=Math.max(0,resetReadyAt-Date.now());$('resetTimerText').textContent=left?'Wait '+Math.ceil(left/1000)+'s before confirming.':'You may confirm the reset.';$('resetConfirmButton').disabled=left>0||!$('resetAcknowledgement').checked||Number($('resetMathAnswer').value)!==resetChallenge.value;if(!left){clearInterval(resetTimer);resetTimer=null}};clearInterval(resetTimer);resetTimer=setInterval(tick,250);tick()}function closeResetDialog(){$('resetEverythingDialog').hidden=true;clearInterval(resetTimer);resetTimer=null}\n"""
+          if 'function updateCurrencyBalances' not in s: s=s.replace('function receive(raw){',helper+'function receive(raw){',1)
+          if 'renderDailyRewardPage(s);updateCurrencyBalances(s);' not in s: s=s.replace('render(m.state);applyAuxiliaryTranslations();','render(m.state);updateCurrencyBalances(m.state);renderDailyRewardPage(m.state);applyAuxiliaryTranslations();',1)
+          oldact="if(el.actionStatus)el.actionStatus.textContent='Opened '+labels[next]+'.';if(next==='more')"
+          newact="if(el.actionStatus)el.actionStatus.textContent='Opened '+labels[next]+'.';if(next!=='more'&&next!=='play'&&next!=='worlds'&&host&&!pending){featureTutorialId=next;window.setTimeout(()=>send('read_feature_tutorial',{featureId:next}),120)}if(next==='more')"
+          if oldact in s: s=s.replace(oldact,newact,1)
+          oldnext="$('nimmyNext')?.addEventListener('click',()=>{if(!nimmyTutorialStarted)return;if(nimmyStepIndex>=nimmySteps.length-1){finishNimmyTutorial();return}nimmyStepIndex++;renderNimmyStep()});"
+          newnext="$('nimmyNext')?.addEventListener('click',()=>{if(!nimmyTutorialStarted)return;const steps=featureTutorialId?featureTutorialSteps:nimmySteps;if(nimmyStepIndex>=steps.length-1){featureTutorialId?finishFeatureTutorial():finishNimmyTutorial();return}nimmyStepIndex++;featureTutorialId?renderFeatureTutorialStep():renderNimmyStep()});"
+          if oldnext in s: s=s.replace(oldnext,newnext,1)
+          s=s.replace("$('nimmySkip')?.addEventListener('click',finishNimmyTutorial);","$('nimmySkip')?.addEventListener('click',()=>featureTutorialId?finishFeatureTutorial():finishNimmyTutorial);")
+          if "m.type==='feature_tutorial_state'" not in s:
+              s=s.replace("if(m.type==='onboarding_state'){suppressDailyRewardThisSession=!m.dailyRewardFirstLaunchSeen;nimmyShouldShowTutorial=!m.nimmyTutorialCompleted;send('read_state');return}","if(m.type==='onboarding_state'){suppressDailyRewardThisSession=!m.dailyRewardFirstLaunchSeen;nimmyShouldShowTutorial=!m.nimmyTutorialCompleted;send('read_state');return}if(m.type==='feature_tutorial_state'){if(!m.completed)startFeatureTutorial(String(m.featureId||featureTutorialId||''));return}",1)
+          # Reset button listeners.
+          if 'resetEverythingButton' not in s:
+              s=s.replace("$('rerunNimmyButton')?.addEventListener", "$('resetEverythingButton')?.addEventListener('click',openResetDialog);$('resetCancelButton')?.addEventListener('click',closeResetDialog);$('resetAcknowledgement')?.addEventListener('change',()=>document.getElementById('resetMathAnswer')?.dispatchEvent(new Event('input')));$('resetMathAnswer')?.addEventListener('input',()=>{if(resetChallenge)$('resetConfirmButton').disabled=Date.now()<resetReadyAt||!$('resetAcknowledgement').checked||Number($('resetMathAnswer').value)!==resetChallenge.value});$('resetConfirmButton')?.addEventListener('click',()=>{if(!$('resetConfirmButton').disabled){closeResetDialog();send('reset_everything')}});$('dailyRewardClose')?.addEventListener('click',()=>{$('dailyRewardOverlay').hidden=true});$('dailyRewardPageClaim')?.addEventListener('click',()=>{if(lastState?.dailyRewardAvailable)send('claim_daily_reward')});$('rerunNimmyButton')?.addEventListener",1)
+          p.write_text(s)
+
+          # ---------- Android protocol ----------
+          p=R/'app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/WebUiBridgeProtocol.kt'; s=p.read_text()
+          if '"read_feature_tutorial", "complete_feature_tutorial"' not in s:
+              s=s.replace('"read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial",','"read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "read_feature_tutorial", "complete_feature_tutorial", "reset_everything",',1)
+              s=s.replace('            "submit_guess" -> {','            "read_feature_tutorial", "complete_feature_tutorial" -> {\n                if (request.length() != 4 || !request.has("featureId")) return ParseResult.Invalid("invalid_request", id)\n                val featureId = request.optString("featureId")\n                if (!featureId.matches(Regex("[A-Za-z0-9_-]{1,48}"))) return ParseResult.Invalid("invalid_feature", id)\n                ParseResult.Valid(id, type, itemId = featureId)\n            }\n            "submit_guess" -> {',1)
+          p.write_text(s)
+
+          # ---------- Android host ----------
+          p=R/'app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/ProductionWebPlayScreen.kt'; s=p.read_text()
+          if 'parsed.type == "read_feature_tutorial"' not in s:
+              marker='                                        if (parsed.type == "read_onboarding_state") {'
+              handler='''                                        if (parsed.type == "read_feature_tutorial" || parsed.type == "complete_feature_tutorial") {\n                                            val featureId = parsed.itemId.orEmpty()\n                                            val prefs = context.applicationContext.getSharedPreferences("web_play_onboarding", android.content.Context.MODE_PRIVATE)\n                                            if (parsed.type == "complete_feature_tutorial") { prefs.edit().putBoolean("nimmy_feature_$featureId", true).apply() }\n                                            else replyProxy.postMessage(JSONObject().put("version",1).put("id",parsed.id).put("type","feature_tutorial_state").put("featureId",featureId).put("completed",prefs.getBoolean("nimmy_feature_$featureId",false)).toString())\n                                            return@post\n                                        }\n                                        if (parsed.type == "reset_everything") {\n                                            onResetData(); replyProxy.postMessage(JSONObject().put("version",1).put("id",parsed.id).put("type","state").put("state",JSONObject().put("accepted",true)).toString())\n                                            webViewRef?.postDelayed({ context.packageManager.getLaunchIntentForPackage(context.packageName)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)?.let(context::startActivity) },1600L)\n                                            return@post\n                                        }\n'''
+              s=s.replace(marker,handler+marker,1)
+          if 'customAvatarData' not in s:
+              s=s.replace('.put("avatarId", storedProfile?.avatarId ?: "star")','.put("avatarId", storedProfile?.avatarId ?: "star")\n                                                    .put("customAvatarData", if (storedProfile?.avatarId == "custom" && !storedProfile.customAvatarPath.isNullOrBlank()) runCatching { val file=java.io.File(storedProfile.customAvatarPath); val mime=when(file.extension.lowercase()){"png"->"image/png";"webp"->"image/webp";else->"image/jpeg"}; "data:$mime;base64,"+android.util.Base64.encodeToString(file.readBytes(),android.util.Base64.NO_WRAP) }.getOrNull() else null)',1)
+          p.write_text(s)
+
+          # ---------- Windows host ----------
+          p=R/'desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/ProductionGuessGameScreen.kt'; s=p.read_text()
+          if '"read_feature_tutorial", "complete_feature_tutorial"' not in s:
+              s=s.replace('"read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "navigate",','"read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "read_feature_tutorial", "complete_feature_tutorial", "reset_everything", "navigate",',1)
+          if 'type == "read_feature_tutorial"' not in s:
+              marker='                        if (type == "read_onboarding_state") {'
+              handler='''                        if (type == "read_feature_tutorial" || type == "complete_feature_tutorial") {\n                            val featureId=request.optString("featureId"); val prefs=java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding")\n                            if(type=="complete_feature_tutorial") { prefs.putBoolean("nimmy_feature_$featureId",true); prefs.flush() } else reply(org.json.JSONObject().put("version",1).put("id",requestId).put("type","feature_tutorial_state").put("featureId",featureId).put("completed",prefs.getBoolean("nimmy_feature_$featureId",false)).toString())\n                            return@launch\n                        }\n                        if (type == "reset_everything") { resetAllGameData(); reply(org.json.JSONObject().put("version",1).put("id",requestId).put("type","state").put("state",org.json.JSONObject().put("accepted",true)).toString()); delay(1800); kotlin.system.exitProcess(0); return@launch }\n'''
+              s=s.replace(marker,handler+marker,1)
+          if 'customAvatarData' not in s:
+              s=s.replace('.put("avatarId", profile?.avatarId ?: "star")','.put("avatarId", profile?.avatarId ?: "star")\n                                .put("customAvatarData", if (profile?.avatarId == "custom" && !profile.customAvatarPath.isNullOrBlank()) runCatching { val file=java.io.File(profile.customAvatarPath); val mime=when(file.extension.lowercase()){"png"->"image/png";"webp"->"image/webp";else->"image/jpeg"}; "data:$mime;base64,"+java.util.Base64.getEncoder().encodeToString(file.readBytes()) }.getOrNull() else null)',1)
+          p.write_text(s)
+
+          # ---------- CSS + locale ----------
+          p=R/'app/src/main/assets/web-play/styles.css'; s=p.read_text()
+          if '.catalog-currency-balance' not in s: s+='\n.catalog-currency-balance{display:flex;justify-content:flex-end;gap:.35rem;margin:.5rem 0;color:var(--muted);font-size:.85rem}.player-profile-custom-avatar{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}.reset-dialog{max-width:520px}.reset-check-row{display:flex;gap:.6rem;align-items:center;margin:.75rem 0}.reset-math-prompt{font-size:1.4rem;font-weight:700}.reward-close{margin-top:.5rem}.daily-rewards-page{margin-bottom:1rem}.daily-reward-page-main{display:flex;justify-content:space-between;align-items:center;gap:1rem}\n'
+          p.write_text(s)
+          for f in (R/'app/src/main/assets/locales').glob('*.json'):
+              d=json.loads(f.read_text()); d.setdefault('daily_reward_claimed',"Today's reward is already claimed. Come back tomorrow to claim again."); f.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+
+          # Remove temporary updater workflows after the source changes are committed.
+          for wf in ['.github/workflows/apply-html-feature-update.yml','.github/workflows/repair-feature-updater.yml','.github/workflows/apply-final-feature-batch.yml']:
+              q=R/wf
+              if q.exists(): q.unlink()
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m "Polish web economy rewards tutorials and reset safeguards"
+          git push origin HEAD:feature/html-economy-tutorial-reset
