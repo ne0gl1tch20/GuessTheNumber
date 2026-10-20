@@ -116,8 +116,8 @@ object UpdateChannelChecker {
         val alreadyCurrent = when (commitOrder) {
             "ahead", "identical" -> true // installed commit is at least as new as the release
             "behind" -> false // the release commit is newer than the installed commit
-            else -> remoteBuildNumber != null && installedBuildNumber > 0L &&
-                remoteBuildNumber <= installedBuildNumber
+            else -> remoteBuildNumber != null &&
+                isStableDebugBuildCurrent(remoteBuildNumber, installedBuildNumber)
         }
         if (alreadyCurrent) return Result.UpToDate
 
