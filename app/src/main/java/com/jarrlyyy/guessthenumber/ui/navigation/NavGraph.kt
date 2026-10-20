@@ -25,6 +25,7 @@ import com.jarrlyyy.guessthenumber.ui.screens.SaveSlotsScreen
 import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfile
 import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileScreen
 import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileStore
+import com.jarrlyyy.guessthenumber.ui.screens.loadPlayerAvatar
 import com.jarrlyyy.guessthenumber.ui.screens.SharedWebUiPrototypeScreen
 import com.jarrlyyy.guessthenumber.ui.screens.LuaTestingHubScreen
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
@@ -33,8 +34,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.unit.dp
@@ -281,9 +280,7 @@ fun NavGraph(
                     "sun" -> "☀️"; "flower" -> "🌸"; "lightning" -> "⚡"; else -> "⭐"
                 }
                 val customAvatar = remember(playerProfile?.customAvatarPath) {
-                    playerProfile?.customAvatarPath?.let { path ->
-                        runCatching { BitmapFactory.decodeFile(path)?.asImageBitmap() }.getOrNull()
-                    }
+                    loadPlayerAvatar(playerProfile?.customAvatarPath)
                 }
                 if (playerProfile?.avatarId == "custom" && customAvatar != null) {
                     Image(
