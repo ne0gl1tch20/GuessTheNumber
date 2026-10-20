@@ -177,6 +177,10 @@ object UpdateChannelChecker {
         }
     }
 
+
+    internal fun isStableDebugBuildCurrent(remoteBuildNumber: Long, installedBuildNumber: Long): Boolean =
+        installedBuildNumber > 0L && remoteBuildNumber <= installedBuildNumber
+
     internal fun compareVersions(left: String, right: String): Int {
         fun parts(value: String): List<Int> = Regex("\\d+").findAll(value).take(4).map { it.value.toIntOrNull() ?: 0 }.toList()
         val a = parts(left)
