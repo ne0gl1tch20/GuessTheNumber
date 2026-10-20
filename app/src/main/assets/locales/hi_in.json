@@ -1151,5 +1151,21 @@
   "daily_reward_claim": "इनाम लें",
   "daily_reward_streak": "दिन %s की स्ट्रीक",
   "daily_reward_claimed": "आज का इनाम पहले ही लिया जा चुका है।",
-  "offline_gains_amount": "+%s पैसे"
+  "offline_gains_amount": "+%s पैसे",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "चरण %s / %s",
+  "nimmy_step_guess_title": "चलो संख्या का अनुमान लगाएँ!",
+  "nimmy_step_guess_body": "यहाँ पूरी संख्या लिखें। मैं संकेत समझने में आपकी मदद करूँगी।",
+  "nimmy_step_submit_title": "तैयार? कोशिश करें!",
+  "nimmy_step_submit_body": "अपना अनुमान भेजने के लिए तीर दबाएँ। संकेत संख्या की सीमा कम करने में मदद करेंगे।",
+  "nimmy_step_upgrades_title": "खेल को बेहतर बनाएँ!",
+  "nimmy_step_upgrades_body": "अपनी बारी को मज़बूत करने और ज़्यादा कमाने के लिए अपग्रेड खोलें।",
+  "nimmy_step_more_title": "आइए और देखें!",
+  "nimmy_step_more_body": "इनाम, आँकड़े और सेटिंग्स More में हैं। अब आप खेलने के लिए तैयार हैं!",
+  "nimmy_next": "आगे",
+  "nimmy_skip": "ट्यूटोरियल छोड़ें",
+  "nimmy_finish": "चलें!",
+  "nimmy_settings_heading": "सहायता और ट्यूटोरियल",
+  "nimmy_settings_description": "फिर से सीखना चाहते हैं? Nimmy आपको खेल दोबारा दिखाएगी।",
+  "nimmy_rerun_button": "Nimmy ट्यूटोरियल फिर चलाएँ"
 }

@@ -9,7 +9,7 @@ internal object WebUiBridgeProtocol {
     const val MAX_MESSAGE_LENGTH = 512
     private val dailyQuestIds = setOf("daily_guesses_10", "daily_correct_5", "daily_streak_5", "daily_upgrades_3")
     private val lootTiers = setOf("common", "rare", "epic")
-    private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements", "save_slots", "color_picker_primary", "color_picker_secondary", "color_picker_tertiary")
+    private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements", "save_slots", "player_profile", "color_picker_primary", "color_picker_secondary", "color_picker_tertiary")
     private val worldActions = setOf("unlock", "boss")
     private val buyMultipliers = setOf("1", "10", "100", "MAX")
     private val relicActions = setOf("equip", "unequip")
@@ -71,7 +71,7 @@ internal object WebUiBridgeProtocol {
         val validId = rawId is String && id.matches(Regex("[A-Za-z0-9_-]{1,48}"))
         if (rawVersion !is Int || rawVersion != 1 || !validId || rawType !is String) return ParseResult.Invalid("invalid_request", id)
         return when (type) {
-            "read_state", "read_changelog", "music_state", "increment_counter", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset", "check_updates", "install_update", "open_update_page", "claim_daily_reward", "dismiss_offline_gains" ->
+            "read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "music_state", "increment_counter", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset", "check_updates", "install_update", "open_update_page", "claim_daily_reward", "dismiss_offline_gains" ->
                 if (request.length() != 3) ParseResult.Invalid("invalid_request", id) else ParseResult.Valid(id, type)
             "submit_guess" -> {
                 if (request.length() != 4 || !request.has("guess")) return ParseResult.Invalid("invalid_request", id)
@@ -190,6 +190,22 @@ internal object WebUiBridgeProtocol {
                     val multiplier = request.opt("multiplier") as? String ?: return ParseResult.Invalid("invalid_multiplier", id)
                     if (multiplier !in buyMultipliers) ParseResult.Invalid("invalid_multiplier", id)
                     else ParseResult.Valid(id, type, multiplier = multiplier)
+                }
+            }
+            "buy_prestige_upgrade", "buy_ultra_upgrade" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val itemId = request.opt("upgradeId") as? String ?: return ParseResult.Invalid("invalid_upgrade", id)
+                    if (!itemId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) ParseResult.Invalid("invalid_upgrade", id)
+                    else ParseResult.Valid(id, type, itemId = itemId)
+                }
+            }
+            "buy_prestige_shop_item", "buy_ultra_shop_item" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val itemId = request.opt("itemId") as? String ?: return ParseResult.Invalid("invalid_shop_item", id)
+                    if (!itemId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) ParseResult.Invalid("invalid_shop_item", id)
+                    else ParseResult.Valid(id, type, itemId = itemId)
                 }
             }
             "buy_upgrade" -> {

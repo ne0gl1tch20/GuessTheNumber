@@ -1151,5 +1151,21 @@
   "daily_reward_claim": "Odbierz nagrodę",
   "daily_reward_streak": "Seria: dzień %s",
   "daily_reward_claimed": "Dzisiejsza nagroda została już odebrana.",
-  "offline_gains_amount": "+%s pieniędzy"
+  "offline_gains_amount": "+%s pieniędzy",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "Krok %s z %s",
+  "nimmy_step_guess_title": "Zgadnijmy liczbę!",
+  "nimmy_step_guess_body": "Wpisz tutaj liczbę całkowitą. Pomogę Ci zrozumieć wskazówki.",
+  "nimmy_step_submit_title": "Gotowy? Spróbuj!",
+  "nimmy_step_submit_body": "Naciśnij strzałkę, aby wysłać odpowiedź. Wskazówki pomogą zawęzić zakres.",
+  "nimmy_step_upgrades_title": "Wzmocnij grę!",
+  "nimmy_step_upgrades_body": "Otwórz Ulepszenia, aby wzmocnić rozgrywkę i zdobywać więcej.",
+  "nimmy_step_more_title": "Poznajmy grę!",
+  "nimmy_step_more_body": "Nagrody, statystyki i ustawienia znajdziesz w sekcji Więcej. Możesz już grać!",
+  "nimmy_next": "Dalej",
+  "nimmy_skip": "Pomiń samouczek",
+  "nimmy_finish": "Zaczynamy!",
+  "nimmy_settings_heading": "Pomoc i samouczek",
+  "nimmy_settings_description": "Chcesz sobie przypomnieć? Nimmy ponownie pokaże Ci grę.",
+  "nimmy_rerun_button": "Uruchom samouczek Nimmy ponownie"
 }

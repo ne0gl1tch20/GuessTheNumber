@@ -11,7 +11,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 
-private val webUiStringKeys = listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry")
+private val webUiStringKeys = listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "nimmy_settings_heading", "nimmy_settings_description", "nimmy_rerun_button", "game_preferences", "background_music", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry")
 private val webUiLocaleFiles = mapOf(
     "en-US" to "en_us.json", "en-GB" to "en_gb.json", "fil-PH" to "fil_ph.json",
     "zh-CN" to "zh_cn.json", "zh-TW" to "zh_tw.json", "ja-JP" to "ja.json",
@@ -78,6 +78,37 @@ internal fun desktopWebPlayState(
             .put("nextCost", cost.format())
             .put("maxed", maxed)
             .put("affordable", !maxed && count > 0 && cost > com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO && game.money >= cost))
+    }
+    val progressionRepository = DesktopEconomyRepository()
+    val prestigeUpgradesJson = JSONArray()
+    progressionRepository.prestigeUpgrades().forEach { upgrade ->
+        val level = game.prestigeUpgradeLevels[upgrade.id] ?: 0
+        val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+        val maxed = level >= upgrade.maxLevel
+        prestigeUpgradesJson.put(JSONObject().put("id", upgrade.id).put("name", upgrade.name).put("description", upgrade.description)
+            .put("level", level).put("maxLevel", upgrade.maxLevel).put("nextCost", cost.format())
+            .put("maxed", maxed).put("affordable", !maxed && game.prestige >= cost))
+    }
+    val ultraUpgradesJson = JSONArray()
+    progressionRepository.ultraUpgrades().forEach { upgrade ->
+        val level = game.ultraUpgradeLevels[upgrade.id] ?: 0
+        val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
+        val maxed = level >= upgrade.maxLevel
+        ultraUpgradesJson.put(JSONObject().put("id", upgrade.id).put("name", upgrade.name).put("description", upgrade.description)
+            .put("level", level).put("maxLevel", upgrade.maxLevel).put("nextCost", cost.format())
+            .put("maxed", maxed).put("affordable", !maxed && game.ultra >= cost))
+    }
+    val prestigeShopJson = JSONArray()
+    progressionRepository.prestigeShopItems().forEach { item ->
+        val owned = item.id in game.prestigeShopPurchases
+        prestigeShopJson.put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
+            .put("cost", item.cost).put("owned", owned).put("affordable", !owned && game.prestige >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(item.cost)))
+    }
+    val ultraShopJson = JSONArray()
+    progressionRepository.ultraShopItems().forEach { item ->
+        val owned = item.id in game.ultraShopPurchases
+        ultraShopJson.put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
+            .put("cost", item.cost).put("owned", owned).put("affordable", !owned && game.ultra >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(item.cost)))
     }
     val talentsJson = JSONArray()
     talents.forEach { talent ->
@@ -147,6 +178,10 @@ internal fun desktopWebPlayState(
         .put("bestStreak", game.bestStreak)
         .put("upgrades", upgrades)
         .put("shopItems", shopItems)
+        .put("prestigeUpgrades", prestigeUpgradesJson)
+        .put("prestigeShopItems", prestigeShopJson)
+        .put("ultraUpgrades", ultraUpgradesJson)
+        .put("ultraShopItems", ultraShopJson)
         .put("rangeMin", game.currentRangeMin.toString())
         .put("rangeMax", game.currentRangeMax.toString())
         .put("attempts", game.attempts)

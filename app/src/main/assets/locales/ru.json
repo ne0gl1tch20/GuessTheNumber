@@ -1151,5 +1151,21 @@
   "daily_reward_claim": "Забрать награду",
   "daily_reward_streak": "Серия: день %s",
   "daily_reward_claimed": "Сегодняшняя награда уже получена.",
-  "offline_gains_amount": "+%s денег"
+  "offline_gains_amount": "+%s денег",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "Шаг %s из %s",
+  "nimmy_step_guess_title": "Давай угадаем число!",
+  "nimmy_step_guess_body": "Введи целое число. Я помогу разобраться в подсказках.",
+  "nimmy_step_submit_title": "Готов? Попробуй!",
+  "nimmy_step_submit_body": "Нажми стрелку, чтобы отправить ответ. Подсказки помогут сузить диапазон.",
+  "nimmy_step_upgrades_title": "Усиль игру!",
+  "nimmy_step_upgrades_body": "Открой улучшения, чтобы усилить игру и получать больше наград.",
+  "nimmy_step_more_title": "Давай осмотримся!",
+  "nimmy_step_more_body": "Награды, статистика и настройки находятся в разделе «Ещё». Можно играть!",
+  "nimmy_next": "Далее",
+  "nimmy_skip": "Пропустить обучение",
+  "nimmy_finish": "Вперёд!",
+  "nimmy_settings_heading": "Помощь и обучение",
+  "nimmy_settings_description": "Хотите повторить? Nimmy снова покажет, как играть.",
+  "nimmy_rerun_button": "Повторить обучение Nimmy"
 }

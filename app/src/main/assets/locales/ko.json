@@ -1151,5 +1151,21 @@
   "daily_reward_claim": "보상 받기",
   "daily_reward_streak": "연속 기록 %s일 차",
   "daily_reward_claimed": "오늘의 보상은 이미 받았습니다.",
-  "offline_gains_amount": "+%s 머니"
+  "offline_gains_amount": "+%s 머니",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "%s단계 / %s",
+  "nimmy_step_guess_title": "숫자를 맞혀 봐요!",
+  "nimmy_step_guess_body": "여기에 정수를 입력하세요. 힌트를 이해하도록 도와줄게요.",
+  "nimmy_step_submit_title": "준비됐나요? 도전해 봐요!",
+  "nimmy_step_submit_body": "화살표를 눌러 추측을 제출하세요. 힌트로 범위를 좁힐 수 있어요.",
+  "nimmy_step_upgrades_title": "게임을 강화해요!",
+  "nimmy_step_upgrades_body": "업그레이드를 열어 플레이를 강화하고 더 많이 획득하세요.",
+  "nimmy_step_more_title": "더 둘러봐요!",
+  "nimmy_step_more_body": "보상, 통계, 설정은 더 보기에서 찾을 수 있어요. 이제 플레이할 준비가 됐어요!",
+  "nimmy_next": "다음",
+  "nimmy_skip": "튜토리얼 건너뛰기",
+  "nimmy_finish": "시작해요!",
+  "nimmy_settings_heading": "도움말 및 튜토리얼",
+  "nimmy_settings_description": "다시 확인하고 싶나요? Nimmy가 게임을 다시 안내해 줄게요.",
+  "nimmy_rerun_button": "Nimmy 튜토리얼 다시 보기"
 }

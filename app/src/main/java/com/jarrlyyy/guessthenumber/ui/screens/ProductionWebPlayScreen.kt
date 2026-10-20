@@ -29,6 +29,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import com.jarrlyyy.guessthenumber.data.repository.UpdateChannelChecker
 import com.jarrlyyy.guessthenumber.data.repository.ApkUpdateInstaller
@@ -74,6 +75,10 @@ fun ProductionWebPlayScreen(
     onWorldAction: (String, String) -> Unit,
     onBuyUpgrade: (String, BigNumber) -> Unit,
     onBuyShopItem: (String, Long) -> Unit,
+    onBuyPrestigeUpgrade: (String, BigNumber) -> Unit,
+    onBuyPrestigeShopItem: (String, Long) -> Unit,
+    onBuyUltraUpgrade: (String, BigNumber) -> Unit,
+    onBuyUltraShopItem: (String, Long) -> Unit,
     onEquipCosmetic: (String) -> Unit,
     onUpdateMultiplier: (String) -> Unit,
     onUpdateSettings: (GameSettings) -> Unit,
@@ -103,6 +108,10 @@ fun ProductionWebPlayScreen(
     val dispatchWorldAction by rememberUpdatedState(onWorldAction)
     val buyUpgrade by rememberUpdatedState(onBuyUpgrade)
     val buyShopItem by rememberUpdatedState(onBuyShopItem)
+    val buyPrestigeUpgrade by rememberUpdatedState(onBuyPrestigeUpgrade)
+    val buyPrestigeShopItem by rememberUpdatedState(onBuyPrestigeShopItem)
+    val buyUltraUpgrade by rememberUpdatedState(onBuyUltraUpgrade)
+    val buyUltraShopItem by rememberUpdatedState(onBuyUltraShopItem)
     val equipCosmetic by rememberUpdatedState(onEquipCosmetic)
     val updateMultiplier by rememberUpdatedState(onUpdateMultiplier)
     val updateSettings by rememberUpdatedState(onUpdateSettings)
@@ -152,6 +161,10 @@ fun ProductionWebPlayScreen(
             val configRepository = JsonConfigRepository(context)
             val upgradeDefinitions = configRepository.loadUpgrades()
             val shopDefinitions = configRepository.loadShopItems()
+            val prestigeUpgradeDefinitions = configRepository.loadPrestigeUpgrades()
+            val prestigeShopDefinitions = configRepository.loadPrestigeShopItems()
+            val ultraUpgradeDefinitions = configRepository.loadUltraUpgrades()
+            val ultraShopDefinitions = configRepository.loadUltraShopItems()
             val talentDefinitions = configRepository.loadTalents()
             val minigameDefinitions = configRepository.loadMinigames()
             val assetLoader = WebViewAssetLoader.Builder()
@@ -189,6 +202,39 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        if (parsed.type == "read_onboarding_state") {
+                                            val onboardingPrefs = context.applicationContext.getSharedPreferences("web_play_onboarding", android.content.Context.MODE_PRIVATE)
+                                            val firstLaunchAlreadySeen = onboardingPrefs.getBoolean("daily_reward_first_launch_seen", false)
+                                            if (!firstLaunchAlreadySeen) onboardingPrefs.edit().putBoolean("daily_reward_first_launch_seen", true).apply()
+                                            val tutorialCompleted = onboardingPrefs.getBoolean("nimmy_tutorial_completed", false)
+                                            replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id)
+                                                .put("type", "onboarding_state")
+                                                .put("dailyRewardFirstLaunchSeen", firstLaunchAlreadySeen)
+                                                .put("nimmyTutorialCompleted", tutorialCompleted).toString())
+                                            return@post
+                                        }
+                                        if (parsed.type == "complete_nimmy_tutorial") {
+                                            context.applicationContext.getSharedPreferences("web_play_onboarding", android.content.Context.MODE_PRIVATE)
+                                                .edit().putBoolean("nimmy_tutorial_completed", true).apply()
+                                            replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id)
+                                                .put("type", "onboarding_saved").toString())
+                                            return@post
+                                        }
+                                        if (parsed.type == "read_profile") {
+                                            updateScope.launch {
+                                                val storedProfile = runCatching {
+                                                    PlayerProfileStore(context.applicationContext).profile.first()
+                                                }.getOrNull()
+                                                val response = JSONObject().put("version", 1).put("id", parsed.id)
+                                                    .put("type", "profile_state")
+                                                    .put("username", storedProfile?.username.orEmpty())
+                                                    .put("bio", storedProfile?.bio.orEmpty())
+                                                    .put("avatarId", storedProfile?.avatarId ?: "star")
+                                                    .put("setupComplete", storedProfile?.setupComplete == true)
+                                                replyProxy.postMessage(response.toString())
+                                            }
+                                            return@post
+                                        }
                                         if (parsed.type == "read_changelog") {
                                             val markdown = try {
                                                 context.assets.open("changelogs.md").bufferedReader(Charsets.UTF_8).use { it.readText() }
@@ -414,6 +460,22 @@ fun ProductionWebPlayScreen(
                                                     if (game.money < total) throw IllegalArgumentException("Cannot afford upgrade")
                                                     buyUpgrade(upgradeId, total)
                                                 }
+                                                "buy_prestige_upgrade" -> parsed.itemId?.let { id ->
+                                                    val upgrade = prestigeUpgradeDefinitions.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Unknown Prestige upgrade")
+                                                    buyPrestigeUpgrade(id, BigNumber(upgrade.baseCost))
+                                                }
+                                                "buy_prestige_shop_item" -> parsed.itemId?.let { id ->
+                                                    val item = prestigeShopDefinitions.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Unknown Prestige shop item")
+                                                    buyPrestigeShopItem(id, item.cost)
+                                                }
+                                                "buy_ultra_upgrade" -> parsed.itemId?.let { id ->
+                                                    val upgrade = ultraUpgradeDefinitions.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Unknown Ultra upgrade")
+                                                    buyUltraUpgrade(id, BigNumber(upgrade.baseCost))
+                                                }
+                                                "buy_ultra_shop_item" -> parsed.itemId?.let { id ->
+                                                    val item = ultraShopDefinitions.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Unknown Ultra shop item")
+                                                    buyUltraShopItem(id, item.cost)
+                                                }
                                                 "buy_shop_item" -> parsed.itemId?.let { itemId ->
                                                     val item = shopDefinitions.firstOrNull { it.id == itemId } ?: throw IllegalArgumentException("Unknown shop item")
                                                     val game = readState()
@@ -533,6 +595,33 @@ fun ProductionWebPlayScreen(
                                                 .put("owned", owned).put("equipped", game.equippedCosmeticId == item.id)
                                                 .put("affordable", game.nebula >= BigNumber(item.nebulaCost)))
                                         }
+                                        fun progressionUpgradeJson(definitions: List<com.jarrlyyy.guessthenumber.domain.model.UpgradeDef>, levels: Map<String, Int>, currency: BigNumber): org.json.JSONArray =
+                                            org.json.JSONArray().apply {
+                                                definitions.forEach { upgrade ->
+                                                    val level = levels[upgrade.id] ?: 0
+                                                    val maxed = level >= upgrade.maxLevel
+                                                    val cost = BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(level)
+                                                    put(JSONObject().put("id", upgrade.id).put("name", upgrade.name).put("description", upgrade.description)
+                                                        .put("level", level).put("maxLevel", upgrade.maxLevel).put("nextCost", cost.format())
+                                                        .put("maxed", maxed).put("affordable", !maxed && currency >= cost))
+                                                }
+                                            }
+                                        val prestigeUpgradesJson = progressionUpgradeJson(prestigeUpgradeDefinitions, game.prestigeUpgradeLevels, game.prestige)
+                                        val ultraUpgradesJson = progressionUpgradeJson(ultraUpgradeDefinitions, game.ultraUpgradeLevels, game.ultra)
+                                        val prestigeShopJson = org.json.JSONArray().apply {
+                                            prestigeShopDefinitions.forEach { item ->
+                                                val owned = item.id in game.prestigeShopPurchases
+                                                put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
+                                                    .put("cost", item.cost).put("owned", owned).put("affordable", !owned && game.prestige >= BigNumber(item.cost)))
+                                            }
+                                        }
+                                        val ultraShopJson = org.json.JSONArray().apply {
+                                            ultraShopDefinitions.forEach { item ->
+                                                val owned = item.id in game.ultraShopPurchases
+                                                put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
+                                                    .put("cost", item.cost).put("owned", owned).put("affordable", !owned && game.ultra >= BigNumber(item.cost)))
+                                            }
+                                        }
                                         val talentsJson = org.json.JSONArray()
                                         talentDefinitions.forEach { talent ->
                                             val owned = talent.id in game.prestigeShopPurchases
@@ -580,12 +669,16 @@ fun ProductionWebPlayScreen(
                                                 .put("customPrimaryColor", game.settings.customPrimaryColor)
                                                 .put("customSecondaryColor", game.settings.customSecondaryColor)
                                                 .put("customTertiaryColor", game.settings.customTertiaryColor))
-                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "incorrect_guess_low_1", "incorrect_guess_low_2", "incorrect_guess_low_3", "incorrect_guess_high_1", "incorrect_guess_high_2", "incorrect_guess_high_3", "daily_reward_title", "daily_reward_subtitle", "daily_reward_claim", "daily_reward_streak", "daily_reward_claimed", "offline_gains_amount", "welcome_back_title", "offline_gains_text", "collect", "changelog_title", "changelog_subtitle", "changelog_eyebrow", "changelog_intro", "changelog_current_badge", "changelog_category_ui", "changelog_current_title", "changelog_current_arcade", "changelog_current_updates", "changelog_current_locale", "changelog_current_music", "changelog_current_feedback", "changelog_progress_badge", "changelog_category_gameplay", "changelog_progress_title", "changelog_progress_stats", "changelog_progress_worlds", "changelog_progress_saves", "changelog_foundation_badge", "changelog_category_system", "changelog_foundation_title", "changelog_foundation_update", "changelog_foundation_icon", "changelog_foundation_offline", "music_player_title", "music_player_subtitle", "music_player_eyebrow", "music_background_track", "music_background_track_desc", "music_player_toggle_desc", "music_player_status", "master_volume", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "about_title", "about_licenses", "about_header", "about_version_format", "about_description", "about_licenses_title", "about_web_subtitle", "about_installed_version", "about_update_description", "about_update_idle", "about_updates_eyebrow", "about_licenses_eyebrow", "about_licenses_description", "about_library_author_format", "about_library_license_format", "update_channel_label", "update_channel_debug", "update_channel_release", "update_check", "update_checking", "update_available", "update_up_to_date", "update_unavailable", "update_install", "update_open", "update_downloading", "update_install_started", "update_install_failed", "update_permission_required", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry", "rift_best_tier", "loot_title", "loot_opened_count", "worlds_boss_count", "inspector_arcade_best_scores", "your_game", "more", "more_subtitle", "rewards", "rewards_subtitle", "journey", "journey_subtitle", "shop", "shop_subtitle", "home_base", "home_base_subtitle", "relics", "relics_subtitle", "codex", "codex_subtitle", "save_slots", "save_slots_subtitle", "settings_subtitle", "prestige", "prestige_subtitle", "ultra", "ultra_subtitle", "talents", "talents_subtitle", "mutators", "mutators_subtitle", "dev_settings", "dev_settings_subtitle", "lucky_stake_subtitle", "music_no_track", "music_add_audio", "music_add_to_playlist", "music_play", "music_pause", "music_shuffle", "music_repeat", "music_repeat_off", "music_repeat_one", "music_repeat_all", "music_enqueue", "music_remove", "music_move_up", "music_move_down", "music_delete_playlist", "music_empty_library", "music_empty_queue", "music_empty_playlists", "music_queue", "music_library", "music_playlists", "music_queue_position", "music_playlist_tracks", "music_playlist_name", "music_create_playlist", "on", "off").forEach { key -> put(key, activeLocaleManager.getString(key)) }; (0..29).forEach { index ->
+                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "incorrect_guess_low_1", "incorrect_guess_low_2", "incorrect_guess_low_3", "incorrect_guess_high_1", "incorrect_guess_high_2", "incorrect_guess_high_3", "daily_reward_title", "daily_reward_subtitle", "daily_reward_claim", "daily_reward_streak", "daily_reward_claimed", "offline_gains_amount", "welcome_back_title", "offline_gains_text", "collect", "changelog_title", "changelog_subtitle", "changelog_eyebrow", "changelog_intro", "changelog_current_badge", "changelog_category_ui", "changelog_current_title", "changelog_current_arcade", "changelog_current_updates", "changelog_current_locale", "changelog_current_music", "changelog_current_feedback", "changelog_progress_badge", "changelog_category_gameplay", "changelog_progress_title", "changelog_progress_stats", "changelog_progress_worlds", "changelog_progress_saves", "changelog_foundation_badge", "changelog_category_system", "changelog_foundation_title", "changelog_foundation_update", "changelog_foundation_icon", "changelog_foundation_offline", "music_player_title", "music_player_subtitle", "music_player_eyebrow", "music_background_track", "music_background_track_desc", "music_player_toggle_desc", "music_player_status", "master_volume", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "about_title", "about_licenses", "about_header", "about_version_format", "about_description", "about_licenses_title", "about_web_subtitle", "about_installed_version", "about_update_description", "about_update_idle", "about_updates_eyebrow", "about_licenses_eyebrow", "about_licenses_description", "about_library_author_format", "about_library_license_format", "update_channel_label", "update_channel_debug", "update_channel_release", "update_check", "update_checking", "update_available", "update_up_to_date", "update_unavailable", "update_install", "update_open", "update_downloading", "update_install_started", "update_install_failed", "update_permission_required", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry", "rift_best_tier", "loot_title", "loot_opened_count", "worlds_boss_count", "inspector_arcade_best_scores", "your_game", "more", "more_subtitle", "rewards", "rewards_subtitle", "journey", "journey_subtitle", "shop", "shop_subtitle", "home_base", "home_base_subtitle", "relics", "relics_subtitle", "codex", "codex_subtitle", "save_slots", "save_slots_subtitle", "settings_subtitle", "prestige", "prestige_subtitle", "ultra", "ultra_subtitle", "talents", "talents_subtitle", "mutators", "mutators_subtitle", "dev_settings", "dev_settings_subtitle", "lucky_stake_subtitle", "music_no_track", "music_add_audio", "music_add_to_playlist", "music_play", "music_pause", "music_shuffle", "music_repeat", "music_repeat_off", "nimmy_name", "nimmy_settings_heading", "nimmy_settings_description", "nimmy_rerun_button", "nimmy_step_counter", "nimmy_step_guess_title", "nimmy_step_guess_body", "nimmy_step_submit_title", "nimmy_step_submit_body", "nimmy_step_upgrades_title", "nimmy_step_upgrades_body", "nimmy_step_more_title", "nimmy_step_more_body", "nimmy_next", "nimmy_skip", "nimmy_finish", "music_repeat_one", "music_repeat_all", "music_enqueue", "music_remove", "music_move_up", "music_move_down", "music_delete_playlist", "music_empty_library", "music_empty_queue", "music_empty_playlists", "music_queue", "music_library", "music_playlists", "music_queue_position", "music_playlist_tracks", "music_playlist_name", "music_create_playlist", "on", "off").forEach { key -> put(key, activeLocaleManager.getString(key)) }; (0..29).forEach { index ->
                                                 put("feedback_toolow_$index", activeLocaleManager.getString("feedback_toolow_$index"))
                                                 put("feedback_toohigh_$index", activeLocaleManager.getString("feedback_toohigh_$index"))
                                             } })
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
+                                            .put("prestigeUpgrades", prestigeUpgradesJson)
+                                            .put("prestigeShopItems", prestigeShopJson)
+                                            .put("ultraUpgrades", ultraUpgradesJson)
+                                            .put("ultraShopItems", ultraShopJson)
                                             .put("minigames", org.json.JSONArray().apply {
                                                 minigameDefinitions.forEach { minigame ->
                                                     put(JSONObject().put("id", minigame.id).put("name", minigame.name)

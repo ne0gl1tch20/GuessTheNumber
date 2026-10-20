@@ -1,9 +1,11 @@
 package com.jarrlyyy.guessthenumber.ui.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,9 +22,22 @@ import com.jarrlyyy.guessthenumber.ui.screens.DevSettingsScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProcessInspectorScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProductionWebPlayScreen
 import com.jarrlyyy.guessthenumber.ui.screens.SaveSlotsScreen
+import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfile
+import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileScreen
+import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileStore
+import com.jarrlyyy.guessthenumber.ui.screens.loadPlayerAvatar
 import com.jarrlyyy.guessthenumber.ui.screens.SharedWebUiPrototypeScreen
 import com.jarrlyyy.guessthenumber.ui.screens.LuaTestingHubScreen
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
+import kotlinx.coroutines.flow.first
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.unit.dp
 
 /**
  * Player-facing navigation is owned by the shared HTML surface.
@@ -80,6 +95,16 @@ fun NavGraph(
     onNotificationDestinationHandled: () -> Unit = {}
 ) {
     val locale = viewModel.localeManager
+    val appContext = androidx.compose.ui.platform.LocalContext.current.applicationContext
+    val profileStore = remember(appContext) { PlayerProfileStore(appContext) }
+    val playerProfile by profileStore.profile.collectAsState(initial = null)
+    var profileLoaded by remember { mutableStateOf(false) }
+    var showPlayerProfile by remember { mutableStateOf(false) }
+    var editingPlayerProfile by remember { mutableStateOf(false) }
+    LaunchedEffect(profileStore) {
+        profileStore.profile.first()
+        profileLoaded = true
+    }
     var showDevSettings by remember { mutableStateOf(false) }
     var dailyRewardTestRequest by remember { mutableStateOf(0) }
     var webPlayMounted by remember { mutableStateOf(hasAnySave) }
@@ -87,6 +112,25 @@ fun NavGraph(
     var debugDestination by remember { mutableStateOf<String?>(null) }
     var showSaveSlots by remember { mutableStateOf(false) }
     var colorPickerTarget by remember { mutableStateOf<String?>(null) }
+
+    if (!profileLoaded) {
+        Box(modifier = androidx.compose.ui.Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+            androidx.compose.material3.CircularProgressIndicator()
+        }
+        return
+    }
+
+    if (playerProfile?.setupComplete != true) {
+        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+            PlayerProfileScreen(
+                profile = playerProfile,
+                firstLaunch = true,
+                store = profileStore,
+                onBack = {}
+            )
+        }
+        return
+    }
 
     if (!webPlayMounted && !showSaveSlots) {
         CompositionLocalProvider(LocalAppLocaleManager provides locale) {
@@ -121,6 +165,7 @@ fun NavGraph(
                 when {
                     progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true
                     progression == "save_slots" -> showSaveSlots = true
+                    progression == "player_profile" -> { showPlayerProfile = true; editingPlayerProfile = false }
                     progression == "color_picker_primary" -> colorPickerTarget = "Primary"
                     progression == "color_picker_secondary" -> colorPickerTarget = "Secondary"
                     progression == "color_picker_tertiary" -> colorPickerTarget = "Tertiary"
@@ -132,6 +177,10 @@ fun NavGraph(
             onWorldAction = viewModel::worldProgressAction,
             onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
             onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
+            onBuyPrestigeUpgrade = viewModel::buyPrestigeUpgrade,
+            onBuyPrestigeShopItem = viewModel::buyPrestigeShopItem,
+            onBuyUltraUpgrade = viewModel::buyUltraUpgrade,
+            onBuyUltraShopItem = viewModel::buyUltraShopItem,
             onEquipCosmetic = viewModel::equipCosmetic,
             onUpdateMultiplier = viewModel::updateBuyMultiplier,
             onUpdateSettings = viewModel::updateSettings,
@@ -216,6 +265,20 @@ fun NavGraph(
                 )
             }
         }
+
+    if (showPlayerProfile) {
+        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+            PlayerProfileScreen(
+                profile = playerProfile,
+                firstLaunch = false,
+                store = profileStore,
+                viewOnly = !editingPlayerProfile,
+                onEdit = { editingPlayerProfile = true },
+                onBack = { showPlayerProfile = false; editingPlayerProfile = false }
+            )
+        }
+    }
+
     }
 
     if (initialDestination != null) {

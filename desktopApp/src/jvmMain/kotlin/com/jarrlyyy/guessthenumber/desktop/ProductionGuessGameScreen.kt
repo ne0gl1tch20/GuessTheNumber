@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.DesktopGuessingBot
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRepository
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRules
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import com.jarrlyyy.guessthenumber.desktop.economy.EconomyTransaction
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveStore
@@ -91,6 +92,7 @@ fun ProductionGuessGameScreen(
     navigationPosition: DesktopNavigationPosition = DesktopNavigationPosition.LEFT,
     onNavigationPositionChange: (DesktopNavigationPosition) -> Unit = {},
     onOpenParityDestination: (DesktopDestination) -> Unit = {},
+    onOpenPlayerProfile: () -> Unit = {},
     onThemeSettingsLoaded: (
         themeMode: String,
         primaryHex: String,
@@ -356,13 +358,50 @@ fun ProductionGuessGameScreen(
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
-                            "read_state", "read_changelog", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
+                            "read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "navigate", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
                             "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
                             sendError("unknown_action")
+                            return@launch
+                        }
+                        if (type == "read_onboarding_state") {
+                            val onboardingPrefs = java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding")
+                            val firstLaunchAlreadySeen = onboardingPrefs.getBoolean("daily_reward_first_launch_seen", false)
+                            if (!firstLaunchAlreadySeen) onboardingPrefs.putBoolean("daily_reward_first_launch_seen", true)
+                            val tutorialCompleted = onboardingPrefs.getBoolean("nimmy_tutorial_completed", false)
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "onboarding_state")
+                                .put("dailyRewardFirstLaunchSeen", firstLaunchAlreadySeen)
+                                .put("nimmyTutorialCompleted", tutorialCompleted).toString())
+                            return@launch
+                        }
+                        if (type == "complete_nimmy_tutorial") {
+                            java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding").putBoolean("nimmy_tutorial_completed", true)
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "onboarding_saved").toString())
+                            return@launch
+                        }
+                        if (type == "read_profile") {
+                            val profile = DesktopPlayerProfileStore.load()
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "profile_state")
+                                .put("username", profile?.username.orEmpty())
+                                .put("bio", profile?.bio.orEmpty())
+                                .put("avatarId", profile?.avatarId ?: "star")
+                                .put("setupComplete", profile?.setupComplete == true).toString())
+                            return@launch
+                        }
+                        if (type == "navigate" && request.optString("route") == "player_profile") {
+                            onOpenPlayerProfile()
+                            val visibleState = state
+                            val payload = if (visibleState != null && catalog != null) {
+                                desktopWebPlayState(visibleState, catalog, true, webLastGuessStatus, "Opening player profile.", talentCatalog.orEmpty(), engine, section.sharedHtmlScreen ?: "play")
+                            } else org.json.JSONObject().put("accepted", true).put("message", "Opening player profile.")
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "state").put("state", payload).toString())
                             return@launch
                         }
                         if (type == "read_changelog") {
@@ -481,6 +520,26 @@ fun ProductionGuessGameScreen(
                                         val id = request.optString("upgradeId")
                                         val upgrade = catalog.upgrades.firstOrNull { it.id == id }
                                         if (upgrade == null) null else DesktopEconomyTransactions.buyUpgrade(before, upgrade)
+                                    }
+                                    "buy_prestige_upgrade" -> {
+                                        val id = request.optString("upgradeId")
+                                        val upgrade = DesktopEconomyRepository().prestigeUpgrades().firstOrNull { it.id == id }
+                                        if (upgrade == null) null else DesktopEconomyTransactions.buyPrestigeUpgrade(before, upgrade)
+                                    }
+                                    "buy_ultra_upgrade" -> {
+                                        val id = request.optString("upgradeId")
+                                        val upgrade = DesktopEconomyRepository().ultraUpgrades().firstOrNull { it.id == id }
+                                        if (upgrade == null) null else DesktopEconomyTransactions.buyUltraUpgrade(before, upgrade)
+                                    }
+                                    "buy_prestige_shop_item" -> {
+                                        val id = request.optString("itemId")
+                                        val item = DesktopEconomyRepository().prestigeShopItems().firstOrNull { it.id == id }
+                                        if (item == null) null else DesktopEconomyRules.buyPrestigeShopItem(before, item)?.let { EconomyTransaction(it, true, "Purchased Prestige shop item.") }
+                                    }
+                                    "buy_ultra_shop_item" -> {
+                                        val id = request.optString("itemId")
+                                        val item = DesktopEconomyRepository().ultraShopItems().firstOrNull { it.id == id }
+                                        if (item == null) null else DesktopEconomyRules.buyUltraShopItem(before, item)?.let { EconomyTransaction(it, true, "Purchased Ultra shop item.") }
                                     }
                                     "buy_shop_item" -> {
                                         val id = request.optString("itemId")

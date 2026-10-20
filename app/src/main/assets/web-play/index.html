@@ -53,11 +53,7 @@
       <button type="button" role="tab" id="tab-more" aria-controls="screen-more" aria-selected="false" data-screen-target="more" tabindex="-1"><svg class="ui-icon nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-menu"></use></svg><b>More</b></button>
     </nav>
     <section class="screen more-screen" id="screen-more" role="tabpanel" aria-labelledby="tab-more" data-screen="more" hidden>
-      <section class="more-heading card">
-        <span class="eyebrow" data-i18n="your_game">YOUR GAME</span>
-        <h2 data-i18n="more">More</h2>
-        <p data-i18n="more_subtitle">Progress, rewards and settings, all in one place.</p>
-      </section>
+      <button type="button" class="more-heading card more-link-card player-profile-entry" data-route="player_profile" aria-label="Open player profile"><span class="player-profile-entry-avatar" id="playerProfileCardAvatar" aria-hidden="true">⭐</span><span><b id="playerProfileCardName">Player profile</b><small id="playerProfileCardDescription">View your username and bio, then edit your profile.</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
       <section class="more-links" aria-label="More game sections">
         <button type="button" class="more-link-card" data-screen-target="rewards"><svg class="ui-icon more-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-trophy"></use></svg><span><b data-i18n="rewards">Rewards</b><small data-i18n="rewards_subtitle">Achievements and daily rewards</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
         <button type="button" class="more-link-card" data-screen-target="journey"><svg class="ui-icon more-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-clock"></use></svg><span><b data-i18n="journey">Journey</b><small data-i18n="journey_subtitle">Your run history and progress</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
@@ -381,6 +377,11 @@
           <label class="setting-row"><span><strong data-i18n="reduced_motion_label">Reduced motion</strong><small data-i18n="reduced_motion_description">Soften or disable expressive screen transitions</small></span><input type="checkbox" data-setting-toggle="reducedMotion"></label>
           <label class="setting-row"><span><strong data-i18n="reduce_flashes_label">Reduce flashes</strong><small data-i18n="settings_desc_reduce_flashes">Reduce flashes and sudden visual changes for greater visual comfort.</small></span><input type="checkbox" data-setting-toggle="reduceFlashes"></label>
         </div>
+        <div class="settings-group tutorial-settings">
+          <h3 data-i18n="nimmy_settings_heading">Help &amp; tutorial</h3>
+          <p class="catalog-intro" data-i18n="nimmy_settings_description">Want a refresher? Nimmy can show you around again.</p>
+          <button type="button" class="primary-action" id="rerunNimmyButton" data-i18n="nimmy_rerun_button">Rerun Nimmy tutorial</button>
+        </div>
         <p class="catalog-intro" id="settingsStatus" role="status" aria-live="polite">Settings sync with the Android game.</p>
       </section>
     </div>
@@ -391,6 +392,16 @@
         <div class="requirement-panel"><h3>Prestige requirements</h3><div class="requirement-row" id="prestigeMoneyRequirementRow"><span>Current Money</span><strong id="prestigeCurrentMoney">0</strong><span class="requirement-state" id="prestigeMoneyState">Checking…</span></div><div class="requirement-row" id="prestigeRewardRequirementRow"><span>Next reward</span><strong id="prestigeRewardDetail">0</strong><span class="requirement-state" id="prestigeRewardState">Checking…</span></div><p id="prestigeNextReset" class="requirement-note"></p></div>
         <div class="reset-effects"><h3>What resets?</h3><ul><li>Regular Money and upgrade levels reset.</li><li>The guessing range returns to its starting range.</li><li>Prestige currency and Prestige progression remain.</li></ul></div>
         <p class="catalog-intro">Prestige resets your regular upgrades and Money, while keeping permanent Prestige progress. Review the reward before resetting.</p>
+        <section class="progression-catalog-section">
+          <h3 data-i18n="prestige_upgrade_tree_title">Prestige upgrades</h3>
+          <p class="catalog-intro" data-i18n="prestige_html_upgrades_desc">Spend Prestige to buy permanent upgrades.</p>
+          <div class="catalog-list" id="prestigeUpgradeList"><p class="catalog-empty">Loading Prestige upgrades…</p></div>
+        </section>
+        <section class="progression-catalog-section">
+          <h3 data-i18n="prestige_shop_title">Prestige Shop</h3>
+          <p class="catalog-intro" data-i18n="prestige_html_shop_desc">Spend Prestige on one-time shop items.</p>
+          <div class="catalog-list" id="prestigeShopList"><p class="catalog-empty">Loading Prestige shop…</p></div>
+        </section>
         <button type="button" class="world-action-button" id="prestigeResetButton" data-bridge-action="prestige_reset">Prestige reset</button>
         <p class="catalog-intro" id="prestigeStatus" role="status" aria-live="polite"></p>
       </section>
@@ -402,6 +413,16 @@
         <div class="requirement-panel"><h3>Ultra requirements</h3><div class="requirement-row" id="ultraMoneyRequirementRow"><span>Current Money</span><strong id="ultraCurrentMoney">0</strong><span class="requirement-state" id="ultraMoneyState">Checking…</span></div><div class="requirement-row" id="ultraPrestigeRequirementRow"><span>Prestige balance needed</span><strong>1,000</strong><span class="requirement-state" id="ultraPrestigeState">Checking…</span></div><div class="requirement-row" id="ultraRewardRequirementRow"><span>Next reward</span><strong id="ultraRewardDetail">0</strong><span class="requirement-state" id="ultraRewardState">Checking…</span></div><p id="ultraNextReset" class="requirement-note"></p></div>
         <div class="reset-effects"><h3>What resets?</h3><ul><li>Regular Money and Prestige balance reset.</li><li>Regular and Prestige upgrade levels reset.</li><li>Ultra currency and Ultra progression remain.</li><li>At least 1,000 Prestige and enough Money are required.</li></ul></div>
         <p class="catalog-intro">Ultra requires at least 1,000 Prestige and enough Money. It resets Prestige and regular upgrades for permanent Ultra progress.</p>
+        <section class="progression-catalog-section">
+          <h3 data-i18n="ultra_upgrade_tree_title">Ultra upgrades</h3>
+          <p class="catalog-intro" data-i18n="ultra_html_upgrades_desc">Spend Ultra to buy permanent upgrades.</p>
+          <div class="catalog-list" id="ultraUpgradeList"><p class="catalog-empty">Loading Ultra upgrades…</p></div>
+        </section>
+        <section class="progression-catalog-section">
+          <h3 data-i18n="ultra_shop_title">Ultra Shop</h3>
+          <p class="catalog-intro" data-i18n="ultra_html_shop_desc">Spend Ultra on one-time shop items.</p>
+          <div class="catalog-list" id="ultraShopList"><p class="catalog-empty">Loading Ultra shop…</p></div>
+        </section>
         <button type="button" class="world-action-button" id="ultraResetButton" data-bridge-action="ultra_reset">Ultra reset</button>
         <p class="catalog-intro" id="ultraStatus" role="status" aria-live="polite"></p>
       </section>
@@ -497,6 +518,22 @@
       <p class="reward-streak" id="dailyRewardStreak">Day 1 streak</p>
       <div id="dailyRewardSchedule" class="daily-reward-schedule" aria-label="Upcoming daily rewards"></div>
       <button type="button" class="primary-action reward-claim" id="dailyRewardClaim">Claim reward</button>
+    </div>
+  </section>
+  <section id="nimmyTutorial" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="nimmyTitle" aria-describedby="nimmyBody">
+    <div class="nimmy-tutorial-backdrop" aria-hidden="true"></div>
+    <div id="nimmySpotlight" class="nimmy-spotlight" aria-hidden="true"></div>
+    <div id="nimmyDialog" class="nimmy-dialog">
+      <div class="nimmy-guide-row">
+        <span class="nimmy-mascot" aria-hidden="true"><span class="nimmy-eyes">••</span><span class="nimmy-smile">⌣</span></span>
+        <span class="nimmy-guide-copy"><strong id="nimmyName">Nimmy</strong><small id="nimmyStep">Step 1 of 4</small></span>
+      </div>
+      <h2 id="nimmyTitle">Hi, I'm Nimmy!</h2>
+      <p id="nimmyBody">I'll help you get started. Let's make your first guess.</p>
+      <div class="nimmy-actions">
+        <button type="button" id="nimmySkip" class="nimmy-skip">Skip tour</button>
+        <button type="button" id="nimmyNext" class="primary-action">Next</button>
+      </div>
     </div>
   </section>
   <div id="toast" class="toast" role="status"></div>

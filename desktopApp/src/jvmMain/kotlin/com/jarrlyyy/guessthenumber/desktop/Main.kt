@@ -75,6 +75,7 @@ import com.jarrlyyy.guessthenumber.desktop.update.WindowsBuildVersion
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugInstaller
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdate
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdateClient
+import androidx.compose.material3.TextButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -196,6 +197,9 @@ fun main() = application {
         var tertiaryHex by remember { mutableStateOf("#00C853") }
         var reducedMotion by remember { mutableStateOf(false) }
         var navigationPosition by remember { mutableStateOf(DesktopNavigationPosition.load()) }
+        var playerProfile by remember { mutableStateOf(DesktopPlayerProfileStore.load()) }
+        var editingPlayerProfile by remember { mutableStateOf(false) }
+        var viewingPlayerProfile by remember { mutableStateOf(false) }
 
         DesktopTheme(
             window = window,
@@ -240,6 +244,21 @@ fun main() = application {
                 shellFocusRequester.requestFocus()
             }
 
+            if (playerProfile?.setupComplete != true || editingPlayerProfile || viewingPlayerProfile) {
+                DesktopPlayerProfileScreen(
+                    profile = playerProfile,
+                    viewOnly = viewingPlayerProfile && !editingPlayerProfile,
+                    onEdit = { viewingPlayerProfile = false; editingPlayerProfile = true },
+                    onSave = { savedProfile ->
+                        runCatching { DesktopPlayerProfileStore.save(savedProfile) }
+                            .onSuccess {
+                                playerProfile = savedProfile
+                                editingPlayerProfile = false
+                            }
+                    },
+                    onCancel = { editingPlayerProfile = false; viewingPlayerProfile = false }
+                )
+            } else {
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
@@ -375,6 +394,7 @@ fun main() = application {
                                         DesktopNavigationPosition.save(selected)
                                     },
                                     onOpenParityDestination = { shell.navigate(it) },
+                                    onOpenPlayerProfile = { viewingPlayerProfile = true; editingPlayerProfile = false },
                                     onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
                                     onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
                                         themeMode = mode
@@ -486,6 +506,7 @@ fun main() = application {
                         DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
                     }
                 }
+            }
             }
         }
     }

@@ -1151,5 +1151,21 @@
   "daily_reward_claim": "領取獎勵",
   "daily_reward_streak": "連續第 %s 天",
   "daily_reward_claimed": "今天的獎勵已經領取。",
-  "offline_gains_amount": "+%s 金錢"
+  "offline_gains_amount": "+%s 金錢",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "第 %s 步，共 %s 步",
+  "nimmy_step_guess_title": "來猜個數字吧！",
+  "nimmy_step_guess_body": "在這裡輸入整數。我會幫你理解提示。",
+  "nimmy_step_submit_title": "準備好了嗎？試試看！",
+  "nimmy_step_submit_body": "點擊箭頭提交猜測。提示能幫你縮小數字範圍。",
+  "nimmy_step_upgrades_title": "強化遊戲！",
+  "nimmy_step_upgrades_body": "開啟升級，強化每輪遊戲並賺取更多獎勵。",
+  "nimmy_step_more_title": "繼續探索！",
+  "nimmy_step_more_body": "獎勵、統計和設定都在「更多」裡。現在可以開始玩囉！",
+  "nimmy_next": "下一步",
+  "nimmy_skip": "略過教學",
+  "nimmy_finish": "出發！",
+  "nimmy_settings_heading": "說明與教學",
+  "nimmy_settings_description": "想複習一下嗎？Nimmy 可以再次帶你熟悉遊戲。",
+  "nimmy_rerun_button": "重新播放 Nimmy 教學"
 }

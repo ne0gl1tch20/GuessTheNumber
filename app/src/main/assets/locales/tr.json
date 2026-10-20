@@ -1151,5 +1151,21 @@
   "daily_reward_claim": "Ödülü al",
   "daily_reward_streak": "%s. gün serisi",
   "daily_reward_claimed": "Bugünün ödülü zaten alındı.",
-  "offline_gains_amount": "+%s Para"
+  "offline_gains_amount": "+%s Para",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "%s / %s. adım",
+  "nimmy_step_guess_title": "Hadi sayı tahmin edelim!",
+  "nimmy_step_guess_body": "Buraya bir tam sayı gir. İpuçlarını anlamana yardım edeceğim.",
+  "nimmy_step_submit_title": "Hazır mısın? Deneyelim!",
+  "nimmy_step_submit_body": "Tahminini göndermek için oka dokun. İpuçları aralığı daraltmana yardım eder.",
+  "nimmy_step_upgrades_title": "Oyunu güçlendir!",
+  "nimmy_step_upgrades_body": "Turlarını güçlendirmek ve daha fazla kazanmak için Yükseltmeler'i aç.",
+  "nimmy_step_more_title": "Keşfedelim!",
+  "nimmy_step_more_body": "Ödüller, istatistikler ve ayarlar Daha Fazla bölümünde. Artık oynayabilirsin!",
+  "nimmy_next": "İleri",
+  "nimmy_skip": "Turu atla",
+  "nimmy_finish": "Hadi başlayalım!",
+  "nimmy_settings_heading": "Yardım ve eğitim",
+  "nimmy_settings_description": "Tekrar gözden geçirmek ister misin? Nimmy oyunu yeniden anlatabilir.",
+  "nimmy_rerun_button": "Nimmy eğitimini yeniden başlat"
 }

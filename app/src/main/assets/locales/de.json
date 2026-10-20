@@ -1151,5 +1151,21 @@
   "daily_reward_claim": "Belohnung abholen",
   "daily_reward_streak": "Serie: Tag %s",
   "daily_reward_claimed": "Die heutige Belohnung wurde bereits abgeholt.",
-  "offline_gains_amount": "+%s Geld"
+  "offline_gains_amount": "+%s Geld",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "Schritt %s von %s",
+  "nimmy_step_guess_title": "Versuchen wir es mit einem Tipp!",
+  "nimmy_step_guess_body": "Gib hier eine ganze Zahl ein. Ich helfe dir, die Hinweise zu verstehen.",
+  "nimmy_step_submit_title": "Bereit? Probier’s aus!",
+  "nimmy_step_submit_body": "Tippe auf den Pfeil, um deinen Tipp abzusenden. Die Hinweise grenzen den Zahlenbereich ein.",
+  "nimmy_step_upgrades_title": "Werde stärker!",
+  "nimmy_step_upgrades_body": "Öffne Verbesserungen, um deine Runden zu stärken und mehr zu verdienen.",
+  "nimmy_step_more_title": "Schauen wir uns um!",
+  "nimmy_step_more_body": "Belohnungen, Statistiken und Einstellungen findest du unter Mehr. Los geht’s!",
+  "nimmy_next": "Weiter",
+  "nimmy_skip": "Tutorial überspringen",
+  "nimmy_finish": "Los geht’s!",
+  "nimmy_settings_heading": "Hilfe und Tutorial",
+  "nimmy_settings_description": "Möchtest du eine Auffrischung? Nimmy führt dich erneut durch das Spiel.",
+  "nimmy_rerun_button": "Nimmy-Tutorial erneut starten"
 }

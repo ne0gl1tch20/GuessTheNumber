@@ -1151,5 +1151,21 @@
   "daily_reward_claim": "Ambil hadiah",
   "daily_reward_streak": "Streak hari ke-%s",
   "daily_reward_claimed": "Hadiah hari ini sudah diambil.",
-  "offline_gains_amount": "+%s Uang"
+  "offline_gains_amount": "+%s Uang",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "Langkah %s dari %s",
+  "nimmy_step_guess_title": "Ayo tebak angka!",
+  "nimmy_step_guess_body": "Masukkan bilangan bulat di sini. Aku akan membantumu memahami petunjuk.",
+  "nimmy_step_submit_title": "Siap? Coba sekarang!",
+  "nimmy_step_submit_body": "Ketuk panah untuk mengirim tebakan. Petunjuk akan membantumu mempersempit rentang.",
+  "nimmy_step_upgrades_title": "Tingkatkan permainan!",
+  "nimmy_step_upgrades_body": "Buka Peningkatan untuk memperkuat permainan dan mendapatkan lebih banyak.",
+  "nimmy_step_more_title": "Ayo jelajahi!",
+  "nimmy_step_more_body": "Hadiah, statistik, dan pengaturan ada di Lainnya. Kamu siap bermain!",
+  "nimmy_next": "Berikutnya",
+  "nimmy_skip": "Lewati tutorial",
+  "nimmy_finish": "Ayo mulai!",
+  "nimmy_settings_heading": "Bantuan & tutorial",
+  "nimmy_settings_description": "Ingin mengulang? Nimmy bisa memandu permainan lagi.",
+  "nimmy_rerun_button": "Ulangi tutorial Nimmy"
 }
