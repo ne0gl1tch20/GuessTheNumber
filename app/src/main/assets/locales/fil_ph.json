@@ -1164,5 +1164,8 @@
   "nimmy_step_more_body": "Nasa Higit Pa ang mga reward, stats at setting. Handa ka nang maglaro!",
   "nimmy_next": "Susunod",
   "nimmy_skip": "Laktawan ang gabay",
-  "nimmy_finish": "Tara na!"
+  "nimmy_finish": "Tara na!",
+  "nimmy_settings_heading": "Tulong at tutorial",
+  "nimmy_settings_description": "Gusto mo ng paalala? Ipapakita ulit ni Nimmy ang laro.",
+  "nimmy_rerun_button": "Ulitin ang tutorial ni Nimmy"
 }
