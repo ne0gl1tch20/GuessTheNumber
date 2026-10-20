@@ -238,10 +238,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 GameLogger.configureVerbose(finalState.settings.verboseLogging)
                 GameLogger.log(LogLevel.DEBUG, LoggerCategory.STATE, "STATE_READY", "Loaded slot=$targetSlot with guesses=${finalState.attempts}, upgrades=${finalState.upgradeLevels.size}, activeWorld=${finalState.activeWorldId}.")
                 if (effectiveSanitized.dailyQuestDate != finalState.dailyQuestDate) saveGameAsync()
-                _isLoadingSave.value = false
                 if (timeTravelDetected) {
-                    _showTimeTravelPopup.value = true
                     _timeTravelSeconds.value = timeDiffSeconds
+                    _showTimeTravelPopup.value = true
+                    // Keep the native save-loading screen visible until the warning is acknowledged.
+                } else {
+                    _isLoadingSave.value = false
                 }
                 if (isNewVersion && !timeTravelDetected) {
                     _showChangelogPopup.value = true
@@ -1567,6 +1569,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun dismissTimeTravelPopup() {
         _showTimeTravelPopup.value = false
+        // The warning is shown over the save-loading screen before the HTML UI is mounted.
+        _isLoadingSave.value = false
     }
 
     fun claimLiveOpsEventReward(eventId: String) {
