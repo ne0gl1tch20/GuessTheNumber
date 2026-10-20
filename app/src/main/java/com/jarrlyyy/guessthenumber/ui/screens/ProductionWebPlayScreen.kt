@@ -190,6 +190,24 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        if (parsed.type == "read_onboarding_state") {
+                                            val onboardingPrefs = context.applicationContext.getSharedPreferences("web_play_onboarding", android.content.Context.MODE_PRIVATE)
+                                            val firstLaunchAlreadySeen = onboardingPrefs.getBoolean("daily_reward_first_launch_seen", false)
+                                            if (!firstLaunchAlreadySeen) onboardingPrefs.edit().putBoolean("daily_reward_first_launch_seen", true).apply()
+                                            val tutorialCompleted = onboardingPrefs.getBoolean("nimmy_tutorial_completed", false)
+                                            replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id)
+                                                .put("type", "onboarding_state")
+                                                .put("dailyRewardFirstLaunchSeen", firstLaunchAlreadySeen)
+                                                .put("nimmyTutorialCompleted", tutorialCompleted).toString())
+                                            return@post
+                                        }
+                                        if (parsed.type == "complete_nimmy_tutorial") {
+                                            context.applicationContext.getSharedPreferences("web_play_onboarding", android.content.Context.MODE_PRIVATE)
+                                                .edit().putBoolean("nimmy_tutorial_completed", true).apply()
+                                            replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id)
+                                                .put("type", "onboarding_saved").toString())
+                                            return@post
+                                        }
                                         if (parsed.type == "read_profile") {
                                             updateScope.launch {
                                                 val storedProfile = runCatching {
