@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -253,7 +254,6 @@ fun NavGraph(
                 )
             }
         }
-    }
 
     if (webPlayMounted && !showSaveSlots) {
         androidx.compose.material3.Surface(
@@ -295,6 +295,8 @@ fun NavGraph(
                 onBack = { showPlayerProfile = false }
             )
         }
+    }
+
     }
 
     if (initialDestination != null) {
