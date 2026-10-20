@@ -104,7 +104,6 @@ internal fun DesktopPlayerProfileButton(
             runCatching {
                 SkiaImage.makeFromEncoded(File(profile.customAvatarPath.orEmpty()).readBytes())
                     .toComposeImageBitmap()
-            }
             }.getOrNull()
         } else null
     }
