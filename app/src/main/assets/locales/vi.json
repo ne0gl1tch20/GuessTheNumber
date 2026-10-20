@@ -1164,5 +1164,8 @@
   "nimmy_step_more_body": "Phần Thêm có phần thưởng, thống kê và cài đặt. Bạn sẵn sàng chơi rồi!",
   "nimmy_next": "Tiếp theo",
   "nimmy_skip": "Bỏ qua hướng dẫn",
-  "nimmy_finish": "Bắt đầu thôi!"
+  "nimmy_finish": "Bắt đầu thôi!",
+  "nimmy_settings_heading": "Trợ giúp và hướng dẫn",
+  "nimmy_settings_description": "Muốn xem lại? Nimmy có thể hướng dẫn bạn lần nữa.",
+  "nimmy_rerun_button": "Chạy lại hướng dẫn Nimmy"
 }
