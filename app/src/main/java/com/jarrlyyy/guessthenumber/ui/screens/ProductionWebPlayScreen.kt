@@ -8,6 +8,7 @@ import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.WebChromeClient
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
@@ -55,6 +56,21 @@ import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.audio.BackgroundMusicManager
 
+/** Debug-only WebView console shared with Developer Settings. */
+object WebViewDebugConsole {
+    val entries = androidx.compose.runtime.mutableStateListOf<String>()
+    var evaluator: ((String) -> Unit)? = null
+    fun add(message: String) {
+        val timestamp = java.text.SimpleDateFormat("HH:mm:ss.SSS", java.util.Locale.US).format(java.util.Date())
+        entries.add("[$timestamp] $message")
+        while (entries.size > 300) entries.removeAt(0)
+    }
+    fun clear() = entries.clear()
+    fun runJavascript(source: String) {
+        val activeEvaluator = evaluator
+        if (activeEvaluator == null) add("WARN: WebView is not currently attached") else activeEvaluator(source)
+    }
+}
 private const val WEB_UI_ORIGIN = "https://appassets.androidplatform.net"
 private const val WEB_UI_PATH = "/assets/web-play/"
 
@@ -138,13 +154,17 @@ fun ProductionWebPlayScreen(
     val clipboardManager = LocalClipboardManager.current
     fun reportBridgeException(action: String, requestId: String, error: Exception) {
         Log.e("GTNWebBridge", "Bridge request failed: action=$action requestId=$requestId", error)
+        if (BuildConfig.DEBUG) WebViewDebugConsole.add("Kotlin bridge error ($action/$requestId): ${error.javaClass.simpleName}: ${error.message}")
         val trace = Log.getStackTraceString(error).take(12000)
         bridgeErrorDetails = "Guess The Number bridge error\nAction: $action\nRequest ID: $requestId\nException: ${error.javaClass.name}: ${error.message ?: "(no message)"}\n\nJava/Kotlin stack trace:\n$trace"
     }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
     DisposableEffect(Unit) {
-        onDispose { webViewRef?.let { it.stopLoading(); it.destroy() } }
+        onDispose {
+            WebViewDebugConsole.evaluator = null
+            webViewRef?.let { it.stopLoading(); it.destroy() }
+        }
     }
 
     LaunchedEffect(dailyRewardTestRequest) {
@@ -173,6 +193,13 @@ fun ProductionWebPlayScreen(
                 .build()
             WebView(context).apply {
                 webViewRef = this
+                if (BuildConfig.DEBUG) {
+                    WebView.setWebContentsDebuggingEnabled(true)
+                    WebViewDebugConsole.evaluator = { source ->
+                        post { evaluateJavascript(source) { result -> WebViewDebugConsole.add("JS result: $result") } }
+                    }
+                    WebViewDebugConsole.add("WebView attached; Chrome DevTools debugging enabled")
+                }
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = false
                 settings.allowFileAccess = false
@@ -185,6 +212,12 @@ fun ProductionWebPlayScreen(
                 settings.safeBrowsingEnabled = true
                 settings.builtInZoomControls = false
                 settings.displayZoomControls = false
+                webChromeClient = object : WebChromeClient() {
+                    override fun onConsoleMessage(message: android.webkit.ConsoleMessage): Boolean {
+                        if (BuildConfig.DEBUG) WebViewDebugConsole.add("${message.messageLevel()}: ${message.message()} (${message.sourceId()}:${message.lineNumber()})")
+                        return true
+                    }
+                }
                 webViewClient = object : WebViewClient() {
                     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest) = assetLoader.shouldInterceptRequest(request.url)
                     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -199,6 +232,7 @@ fun ProductionWebPlayScreen(
                                 if (!WebUiBridgeProtocol.isAllowedSource(isMainFrame, sourceOrigin, view.url, "${WEB_UI_PATH}index.html")) {
                                     replyProxy.postMessage(errorResponse("", "origin_not_allowed")); return@post
                                 }
+                                if (BuildConfig.DEBUG) WebViewDebugConsole.add("Bridge <- ${message.data.orEmpty().take(1000)}")
                                 when (val parsed = WebUiBridgeProtocol.parse(message.data ?: "")) {
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
