@@ -495,6 +495,22 @@
       <button type="button" class="primary-action reward-claim" id="dailyRewardClaim">Claim reward</button>
     </div>
   </section>
+  <section id="nimmyTutorial" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="nimmyTitle" aria-describedby="nimmyBody">
+    <div class="nimmy-tutorial-backdrop" aria-hidden="true"></div>
+    <div id="nimmySpotlight" class="nimmy-spotlight" aria-hidden="true"></div>
+    <div id="nimmyDialog" class="nimmy-dialog">
+      <div class="nimmy-guide-row">
+        <span class="nimmy-mascot" aria-hidden="true"><span class="nimmy-eyes">••</span><span class="nimmy-smile">⌣</span></span>
+        <span class="nimmy-guide-copy"><strong id="nimmyName">Nimmy</strong><small id="nimmyStep">Step 1 of 4</small></span>
+      </div>
+      <h2 id="nimmyTitle">Hi, I'm Nimmy!</h2>
+      <p id="nimmyBody">I'll help you get started. Let's make your first guess.</p>
+      <div class="nimmy-actions">
+        <button type="button" id="nimmySkip" class="nimmy-skip">Skip tour</button>
+        <button type="button" id="nimmyNext" class="primary-action">Next</button>
+      </div>
+    </div>
+  </section>
   <div id="toast" class="toast" role="status"></div>
   <script src="app.js"></script>
 </body>
