@@ -75,6 +75,10 @@ fun ProductionWebPlayScreen(
     onWorldAction: (String, String) -> Unit,
     onBuyUpgrade: (String, BigNumber) -> Unit,
     onBuyShopItem: (String, Long) -> Unit,
+    onBuyPrestigeUpgrade: (String, BigNumber) -> Unit,
+    onBuyPrestigeShopItem: (String, Long) -> Unit,
+    onBuyUltraUpgrade: (String, BigNumber) -> Unit,
+    onBuyUltraShopItem: (String, Long) -> Unit,
     onEquipCosmetic: (String) -> Unit,
     onUpdateMultiplier: (String) -> Unit,
     onUpdateSettings: (GameSettings) -> Unit,
@@ -104,6 +108,10 @@ fun ProductionWebPlayScreen(
     val dispatchWorldAction by rememberUpdatedState(onWorldAction)
     val buyUpgrade by rememberUpdatedState(onBuyUpgrade)
     val buyShopItem by rememberUpdatedState(onBuyShopItem)
+    val buyPrestigeUpgrade by rememberUpdatedState(onBuyPrestigeUpgrade)
+    val buyPrestigeShopItem by rememberUpdatedState(onBuyPrestigeShopItem)
+    val buyUltraUpgrade by rememberUpdatedState(onBuyUltraUpgrade)
+    val buyUltraShopItem by rememberUpdatedState(onBuyUltraShopItem)
     val equipCosmetic by rememberUpdatedState(onEquipCosmetic)
     val updateMultiplier by rememberUpdatedState(onUpdateMultiplier)
     val updateSettings by rememberUpdatedState(onUpdateSettings)
@@ -153,6 +161,10 @@ fun ProductionWebPlayScreen(
             val configRepository = JsonConfigRepository(context)
             val upgradeDefinitions = configRepository.loadUpgrades()
             val shopDefinitions = configRepository.loadShopItems()
+            val prestigeUpgradeDefinitions = configRepository.loadPrestigeUpgrades()
+            val prestigeShopDefinitions = configRepository.loadPrestigeShopItems()
+            val ultraUpgradeDefinitions = configRepository.loadUltraUpgrades()
+            val ultraShopDefinitions = configRepository.loadUltraShopItems()
             val talentDefinitions = configRepository.loadTalents()
             val minigameDefinitions = configRepository.loadMinigames()
             val assetLoader = WebViewAssetLoader.Builder()
@@ -448,6 +460,22 @@ fun ProductionWebPlayScreen(
                                                     if (game.money < total) throw IllegalArgumentException("Cannot afford upgrade")
                                                     buyUpgrade(upgradeId, total)
                                                 }
+                                                "buy_prestige_upgrade" -> parsed.itemId?.let { id ->
+                                                    val upgrade = prestigeUpgradeDefinitions.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Unknown Prestige upgrade")
+                                                    buyPrestigeUpgrade(id, BigNumber(upgrade.baseCost))
+                                                }
+                                                "buy_prestige_shop_item" -> parsed.itemId?.let { id ->
+                                                    val item = prestigeShopDefinitions.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Unknown Prestige shop item")
+                                                    buyPrestigeShopItem(id, item.cost)
+                                                }
+                                                "buy_ultra_upgrade" -> parsed.itemId?.let { id ->
+                                                    val upgrade = ultraUpgradeDefinitions.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Unknown Ultra upgrade")
+                                                    buyUltraUpgrade(id, BigNumber(upgrade.baseCost))
+                                                }
+                                                "buy_ultra_shop_item" -> parsed.itemId?.let { id ->
+                                                    val item = ultraShopDefinitions.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Unknown Ultra shop item")
+                                                    buyUltraShopItem(id, item.cost)
+                                                }
                                                 "buy_shop_item" -> parsed.itemId?.let { itemId ->
                                                     val item = shopDefinitions.firstOrNull { it.id == itemId } ?: throw IllegalArgumentException("Unknown shop item")
                                                     val game = readState()
@@ -567,6 +595,33 @@ fun ProductionWebPlayScreen(
                                                 .put("owned", owned).put("equipped", game.equippedCosmeticId == item.id)
                                                 .put("affordable", game.nebula >= BigNumber(item.nebulaCost)))
                                         }
+                                        fun progressionUpgradeJson(definitions: List<com.jarrlyyy.guessthenumber.domain.model.UpgradeDef>, levels: Map<String, Int>, currency: BigNumber): org.json.JSONArray =
+                                            org.json.JSONArray().apply {
+                                                definitions.forEach { upgrade ->
+                                                    val level = levels[upgrade.id] ?: 0
+                                                    val maxed = level >= upgrade.maxLevel
+                                                    val cost = BigNumber(upgrade.baseCost) * BigNumber(upgrade.costMultiplier).pow(level)
+                                                    put(JSONObject().put("id", upgrade.id).put("name", upgrade.name).put("description", upgrade.description)
+                                                        .put("level", level).put("maxLevel", upgrade.maxLevel).put("nextCost", cost.format())
+                                                        .put("maxed", maxed).put("affordable", !maxed && currency >= cost))
+                                                }
+                                            }
+                                        val prestigeUpgradesJson = progressionUpgradeJson(prestigeUpgradeDefinitions, game.prestigeUpgradeLevels, game.prestige)
+                                        val ultraUpgradesJson = progressionUpgradeJson(ultraUpgradeDefinitions, game.ultraUpgradeLevels, game.ultra)
+                                        val prestigeShopJson = org.json.JSONArray().apply {
+                                            prestigeShopDefinitions.forEach { item ->
+                                                val owned = item.id in game.prestigeShopPurchases
+                                                put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
+                                                    .put("cost", item.cost).put("owned", owned).put("affordable", !owned && game.prestige >= BigNumber(item.cost)))
+                                            }
+                                        }
+                                        val ultraShopJson = org.json.JSONArray().apply {
+                                            ultraShopDefinitions.forEach { item ->
+                                                val owned = item.id in game.ultraShopPurchases
+                                                put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
+                                                    .put("cost", item.cost).put("owned", owned).put("affordable", !owned && game.ultra >= BigNumber(item.cost)))
+                                            }
+                                        }
                                         val talentsJson = org.json.JSONArray()
                                         talentDefinitions.forEach { talent ->
                                             val owned = talent.id in game.prestigeShopPurchases
@@ -620,6 +675,10 @@ fun ProductionWebPlayScreen(
                                             } })
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
+                                            .put("prestigeUpgrades", prestigeUpgradesJson)
+                                            .put("prestigeShopItems", prestigeShopJson)
+                                            .put("ultraUpgrades", ultraUpgradesJson)
+                                            .put("ultraShopItems", ultraShopJson)
                                             .put("minigames", org.json.JSONArray().apply {
                                                 minigameDefinitions.forEach { minigame ->
                                                     put(JSONObject().put("id", minigame.id).put("name", minigame.name)
