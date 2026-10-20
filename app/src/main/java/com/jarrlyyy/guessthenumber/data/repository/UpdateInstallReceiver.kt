@@ -1,6 +1,5 @@
 package com.jarrlyyy.guessthenumber.data.repository
 
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -13,6 +12,7 @@ class UpdateInstallReceiver : BroadcastReceiver() {
     companion object {
         const val ACTION_RESULT = "com.jarrlyyy.guessthenumber.UPDATE_INSTALL_RESULT"
         private const val TAG = "GTNUpdateInstaller"
+        private const val EXTRA_LEGACY_STATUS = "android.content.pm.extra.LEGACY_STATUS"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -57,7 +57,7 @@ class UpdateInstallReceiver : BroadcastReceiver() {
             }
 
             else -> {
-                val legacyStatus = intent.getIntExtra(PackageInstaller.EXTRA_LEGACY_STATUS, Int.MIN_VALUE)
+                val legacyStatus = intent.getIntExtra(EXTRA_LEGACY_STATUS, Int.MIN_VALUE)
                 val reason = message ?: "No status message supplied by Android"
                 Log.e(
                     TAG,
