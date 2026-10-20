@@ -124,7 +124,7 @@ object UpdateChannelChecker {
         // When ancestry cannot be checked, retain the legacy version-code guard.
         if (commitOrder == null && versionCode < BuildConfig.VERSION_CODE) return Result.UpToDate
         if (commitOrder == null && remoteBuildNumber == null &&
-            versionCode == BuildConfig.VERSION_CODE &&
+            versionCode == BuildConfig.VERSION_CODE.toLong() &&
             installedCommit != "unknown" && targetCommit.equals(installedCommit, ignoreCase = true)
         ) return Result.UpToDate
 
