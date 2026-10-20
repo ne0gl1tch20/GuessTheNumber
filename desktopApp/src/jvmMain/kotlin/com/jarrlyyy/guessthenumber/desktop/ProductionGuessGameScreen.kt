@@ -357,13 +357,31 @@ fun ProductionGuessGameScreen(
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
-                            "read_state", "read_changelog", "read_profile", "navigate", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
+                            "read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "navigate", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
                             "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
                             sendError("unknown_action")
+                            return@launch
+                        }
+                        if (type == "read_onboarding_state") {
+                            val onboardingPrefs = java.util.prefs.Preferences.userNodeForPackage(ProductionGuessGameScreen::class.java).node("web-play-onboarding")
+                            val firstLaunchAlreadySeen = onboardingPrefs.getBoolean("daily_reward_first_launch_seen", false)
+                            if (!firstLaunchAlreadySeen) onboardingPrefs.putBoolean("daily_reward_first_launch_seen", true)
+                            val tutorialCompleted = onboardingPrefs.getBoolean("nimmy_tutorial_completed", false)
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "onboarding_state")
+                                .put("dailyRewardFirstLaunchSeen", firstLaunchAlreadySeen)
+                                .put("nimmyTutorialCompleted", tutorialCompleted).toString())
+                            return@launch
+                        }
+                        if (type == "complete_nimmy_tutorial") {
+                            java.util.prefs.Preferences.userNodeForPackage(ProductionGuessGameScreen::class.java)
+                                .node("web-play-onboarding").putBoolean("nimmy_tutorial_completed", true)
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "onboarding_saved").toString())
                             return@launch
                         }
                         if (type == "read_profile") {
