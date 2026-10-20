@@ -11,11 +11,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Require master branch
-        if: github.ref != 'refs/heads/master'
-        run: |
-          echo 'Stable Debug APK must be dispatched from master so the published APK matches the current launcher resources.'
-          exit 1
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -99,6 +94,7 @@ jobs:
             ${{ runner.temp }}/gtn-debug/update-manifest.json
           if-no-files-found: error
       - name: Publish debug-latest release asset
+        if: github.ref == 'refs/heads/master'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
