@@ -20,6 +20,19 @@ class LocaleManagerTest {
         LocaleManager.supportedLocales.forEach { supported -> manager.loadLocale(supported.fileName); keys.forEach { key -> assertTrue("${supported.tag} is missing settings description: $key", manager.getString(key).isNotBlank()) } }
     }
 
+    @Test fun randomizedGuessFeedbackTranslationsExistInEverySupportedLocale() = runBlocking {
+        val manager = LocaleManager(context)
+        LocaleManager.supportedLocales.forEach { supported ->
+            manager.loadLocale(supported.fileName)
+            (0..29).forEach { index ->
+                val lowKey = "feedback_toolow_$index"
+                val highKey = "feedback_toohigh_$index"
+                assertTrue("${supported.tag} is missing $lowKey", manager.getString(lowKey).isNotBlank() && manager.getString(lowKey) != lowKey)
+                assertTrue("${supported.tag} is missing $highKey", manager.getString(highKey).isNotBlank() && manager.getString(highKey) != highKey)
+            }
+        }
+    }
+
     @Test fun supportedLocalesHaveAssetsAndFallbackKeys() = runBlocking {
         val manager = LocaleManager(context)
         LocaleManager.supportedLocales.forEach { supported -> manager.loadLocale(supported.fileName); assertEquals(supported.tag, manager.getCurrentLocaleTag()); assertEquals("RTL metadata mismatch for ${supported.tag}", supported.rtl, manager.isRtl()); assertTrue(manager.getString("play").isNotBlank()); assertTrue(manager.getString("settings").isNotBlank()); assertTrue(manager.getString("save_slots").isNotBlank()) }
