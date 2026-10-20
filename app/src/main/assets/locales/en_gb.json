@@ -1164,5 +1164,8 @@
   "nimmy_step_more_body": "Rewards, stats and settings live in More. You’re ready to play!",
   "nimmy_next": "Next",
   "nimmy_skip": "Skip tour",
-  "nimmy_finish": "Let’s go!"
+  "nimmy_finish": "Let’s go!",
+  "nimmy_settings_heading": "Help & tutorial",
+  "nimmy_settings_description": "Want a refresher? Nimmy can show you around again.",
+  "nimmy_rerun_button": "Rerun Nimmy tutorial"
 }
