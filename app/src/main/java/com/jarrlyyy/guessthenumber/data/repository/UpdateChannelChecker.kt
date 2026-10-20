@@ -99,7 +99,36 @@ object UpdateChannelChecker {
         }
 
         val body = release.optString("body").trim()
-        val title = Regex("(?m)^Stable Debug #\\d+").find(body)?.value ?: "Stable Debug"
+        val remoteBuildNumber = Regex("(?m)^Stable Debug #(\\d+)").find(body)
+            ?.groupValues?.getOrNull(1)?.toLongOrNull()
+        val installedCommit = BuildConfig.GIT_COMMIT_SHA
+        val installedBuildNumber = BuildConfig.STABLE_DEBUG_BUILD_NUMBER.toLong()
+
+        // Commit ancestry handles already-installed builds such as #55 that were
+        // published before the build number was embedded in BuildConfig.
+        val commitOrder = if (installedCommit.matches(Regex("[a-fA-F0-9]{40}"))) {
+            runCatching {
+                getJson("https://api.github.com/repos/$REPOSITORY/compare/$targetCommit...$installedCommit")
+                    .optString("status")
+            }.getOrNull()
+        } else null
+
+        val alreadyCurrent = when (commitOrder) {
+            "ahead", "identical" -> true // installed commit is at least as new as the release
+            "behind" -> false // the release commit is newer than the installed commit
+            else -> remoteBuildNumber != null &&
+                isStableDebugBuildCurrent(remoteBuildNumber, installedBuildNumber)
+        }
+        if (alreadyCurrent) return Result.UpToDate
+
+        // When ancestry cannot be checked, retain the legacy version-code guard.
+        if (commitOrder == null && versionCode < BuildConfig.VERSION_CODE) return Result.UpToDate
+        if (commitOrder == null && remoteBuildNumber == null &&
+            versionCode == BuildConfig.VERSION_CODE.toLong() &&
+            installedCommit != "unknown" && targetCommit.equals(installedCommit, ignoreCase = true)
+        ) return Result.UpToDate
+
+        val title = remoteBuildNumber?.let { "Stable Debug #$it" } ?: "Stable Debug"
         val details = if (body.isNotBlank()) body.take(1200) else "Stable Debug v$versionName ($versionCode)"
         return Result.Available(
             AvailableUpdate(
@@ -147,6 +176,10 @@ object UpdateChannelChecker {
             connection.disconnect()
         }
     }
+
+
+    internal fun isStableDebugBuildCurrent(remoteBuildNumber: Long, installedBuildNumber: Long): Boolean =
+        installedBuildNumber > 0L && remoteBuildNumber <= installedBuildNumber
 
     internal fun compareVersions(left: String, right: String): Int {
         fun parts(value: String): List<Int> = Regex("\\d+").findAll(value).take(4).map { it.value.toIntOrNull() ?: 0 }.toList()

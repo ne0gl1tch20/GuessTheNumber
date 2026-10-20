@@ -49,6 +49,8 @@ android {
         buildConfigField("String", "LIVEOPS_PUBLIC_KEY_BASE64", "\"$liveOpsPublicKey\"")
         val buildCommitSha = System.getenv("GITHUB_SHA") ?: "unknown"
         buildConfigField("String", "GIT_COMMIT_SHA", "\"$buildCommitSha\"")
+        val stableDebugBuildNumber = System.getenv("GITHUB_RUN_NUMBER")?.toLongOrNull() ?: 0L
+        buildConfigField("long", "STABLE_DEBUG_BUILD_NUMBER", "$stableDebugBuildNumber")
         applicationId = "com.jarrlyyy.guessthenumber"
         minSdk = 26
         targetSdk = 35
