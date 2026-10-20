@@ -97,6 +97,37 @@ internal fun desktopAvatarEmoji(id: String): String =
     desktopAvatarPresets.firstOrNull { it.first == id }?.second ?: "⭐"
 
 @Composable
+internal fun DesktopPlayerProfileButton(
+    profile: DesktopPlayerProfile,
+    onClick: () -> Unit
+) {
+    val avatarImage = remember(profile.customAvatarPath, profile.avatarId) {
+        if (profile.avatarId == "custom" && !profile.customAvatarPath.isNullOrBlank()) {
+            runCatching {
+                ImageIO.read(File(profile.customAvatarPath))?.let { source ->
+                    val scaled = source.getScaledInstance(64, 64, Image.SCALE_SMOOTH)
+                    val image = BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB)
+                    val graphics = image.createGraphics()
+                    graphics.drawImage(scaled, 0, 0, null)
+                    graphics.dispose()
+                    image.toComposeImageBitmap()
+                }
+            }.getOrNull()
+        } else null
+    }
+    TextButton(onClick = onClick) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (avatarImage != null) {
+                Image(avatarImage, contentDescription = "Player profile picture", modifier = Modifier.size(28.dp))
+            } else {
+                Text(desktopAvatarEmoji(profile.avatarId))
+            }
+            Text("${profile.username} · Profile")
+        }
+    }
+}
+
+@Composable
 internal fun DesktopPlayerProfileScreen(
     profile: DesktopPlayerProfile?,
     onSave: (DesktopPlayerProfile) -> Unit,
