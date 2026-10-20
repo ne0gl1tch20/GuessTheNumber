@@ -75,8 +75,7 @@ object UpdateChannelChecker {
     /** Uses the public debug-latest release asset instead of private Actions artifact downloads. */
     private fun checkDebugRelease(): Result {
         val release = getJson("https://api.github.com/repos/$REPOSITORY/releases/tags/$DEBUG_RELEASE_TAG")
-        val targetCommit = release.optString("target_commitish")
-        if (!targetCommit.matches(Regex("[a-fA-F0-9]{40}"))) return Result.Unavailable
+        val targetCommit = resolveDebugReleaseCommit(release) ?: return Result.Unavailable
 
         val assets = release.optJSONArray("assets")
         val asset = (0 until (assets?.length() ?: 0))
@@ -140,6 +139,31 @@ object UpdateChannelChecker {
                 requireChecksum = true
             )
         )
+    }
+
+    /**
+     * GitHub's release target_commitish is a branch/commit hint, not guaranteed to be
+     * a commit SHA. Resolve the actual release tag ref when that hint is not a SHA.
+     */
+    private fun resolveDebugReleaseCommit(release: JSONObject): String? {
+        val target = release.optString("target_commitish")
+        if (target.matches(Regex("[a-fA-F0-9]{40}"))) return target
+
+        val tagRef = getJson("https://api.github.com/repos/$REPOSITORY/git/ref/tags/$DEBUG_RELEASE_TAG")
+        val tagObject = tagRef.optJSONObject("object") ?: return null
+        val objectSha = tagObject.optString("sha")
+        if (!objectSha.matches(Regex("[a-fA-F0-9]{40}"))) return null
+
+        return when (tagObject.optString("type")) {
+            "commit" -> objectSha
+            "tag" -> {
+                val annotatedTag = getJson("https://api.github.com/repos/$REPOSITORY/git/tags/$objectSha")
+                val targetObject = annotatedTag.optJSONObject("object") ?: return null
+                targetObject.optString("sha")
+                    .takeIf { targetObject.optString("type") == "commit" && it.matches(Regex("[a-fA-F0-9]{40}")) }
+            }
+            else -> null
+        }
     }
 
     private fun isGithubUrl(address: String): Boolean {
