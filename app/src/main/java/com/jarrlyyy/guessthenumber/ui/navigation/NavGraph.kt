@@ -100,6 +100,7 @@ fun NavGraph(
     val playerProfile by profileStore.profile.collectAsState(initial = null)
     var profileLoaded by remember { mutableStateOf(false) }
     var showPlayerProfile by remember { mutableStateOf(false) }
+    var editingPlayerProfile by remember { mutableStateOf(false) }
     LaunchedEffect(profileStore) {
         profileStore.profile.first()
         profileLoaded = true
@@ -164,6 +165,7 @@ fun NavGraph(
                 when {
                     progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true
                     progression == "save_slots" -> showSaveSlots = true
+                    progression == "player_profile" -> { showPlayerProfile = true; editingPlayerProfile = false }
                     progression == "color_picker_primary" -> colorPickerTarget = "Primary"
                     progression == "color_picker_secondary" -> colorPickerTarget = "Secondary"
                     progression == "color_picker_tertiary" -> colorPickerTarget = "Tertiary"
@@ -260,55 +262,15 @@ fun NavGraph(
             }
         }
 
-    if (webPlayMounted && !showSaveSlots) {
-        androidx.compose.material3.Surface(
-            modifier = androidx.compose.ui.Modifier
-                .align(androidx.compose.ui.Alignment.BottomEnd)
-                .padding(12.dp)
-                .clickable { showPlayerProfile = true },
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-            color = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
-            tonalElevation = 6.dp
-        ) {
-            androidx.compose.foundation.layout.Row(
-                modifier = androidx.compose.ui.Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-            ) {
-                val avatarEmoji = when (playerProfile?.avatarId) {
-                    "cat" -> "🐱"; "fox" -> "🦊"; "dog" -> "🐶"; "robot" -> "🤖"
-                    "ghost" -> "👻"; "dragon" -> "🐉"; "alien" -> "👽"; "rocket" -> "🚀"
-                    "crown" -> "👑"; "gem" -> "💎"; "controller" -> "🎮"; "moon" -> "🌙"
-                    "sun" -> "☀️"; "flower" -> "🌸"; "lightning" -> "⚡"; else -> "⭐"
-                }
-                val customAvatar = remember(playerProfile?.customAvatarPath) {
-                    loadPlayerAvatar(playerProfile?.customAvatarPath)
-                }
-                if (playerProfile?.avatarId == "custom" && customAvatar != null) {
-                    Image(
-                        bitmap = customAvatar,
-                        contentDescription = "Profile picture",
-                        modifier = Modifier.size(28.dp).clip(CircleShape)
-                    )
-                } else {
-                    androidx.compose.material3.Text(avatarEmoji)
-                }
-                androidx.compose.foundation.layout.Spacer(Modifier.width(8.dp))
-                androidx.compose.material3.Text(
-                    playerProfile?.username.orEmpty(),
-                    style = androidx.compose.material3.MaterialTheme.typography.labelLarge,
-                    maxLines = 1
-                )
-            }
-        }
-    }
-
     if (showPlayerProfile) {
         CompositionLocalProvider(LocalAppLocaleManager provides locale) {
             PlayerProfileScreen(
                 profile = playerProfile,
                 firstLaunch = false,
                 store = profileStore,
-                onBack = { showPlayerProfile = false }
+                viewOnly = !editingPlayerProfile,
+                onEdit = { editingPlayerProfile = true },
+                onBack = { showPlayerProfile = false; editingPlayerProfile = false }
             )
         }
     }
