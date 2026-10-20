@@ -91,6 +91,7 @@ fun ProductionGuessGameScreen(
     navigationPosition: DesktopNavigationPosition = DesktopNavigationPosition.LEFT,
     onNavigationPositionChange: (DesktopNavigationPosition) -> Unit = {},
     onOpenParityDestination: (DesktopDestination) -> Unit = {},
+    onOpenPlayerProfile: () -> Unit = {},
     onThemeSettingsLoaded: (
         themeMode: String,
         primaryHex: String,
@@ -356,13 +357,33 @@ fun ProductionGuessGameScreen(
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
-                            "read_state", "read_changelog", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
+                            "read_state", "read_changelog", "read_profile", "navigate", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
                             "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
                             sendError("unknown_action")
+                            return@launch
+                        }
+                        if (type == "read_profile") {
+                            val profile = DesktopPlayerProfileStore.load()
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "profile_state")
+                                .put("username", profile?.username.orEmpty())
+                                .put("bio", profile?.bio.orEmpty())
+                                .put("avatarId", profile?.avatarId ?: "star")
+                                .put("setupComplete", profile?.setupComplete == true).toString())
+                            return@launch
+                        }
+                        if (type == "navigate" && request.optString("route") == "player_profile") {
+                            onOpenPlayerProfile()
+                            val visibleState = state
+                            val payload = if (visibleState != null && catalog != null) {
+                                desktopWebPlayState(visibleState, catalog, true, webLastGuessStatus, "Opening player profile.", talentCatalog.orEmpty(), engine, section.sharedHtmlScreen ?: "play")
+                            } else org.json.JSONObject().put("accepted", true).put("message", "Opening player profile.")
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "state").put("state", payload).toString())
                             return@launch
                         }
                         if (type == "read_changelog") {
