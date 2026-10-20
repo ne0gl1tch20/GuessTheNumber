@@ -91,7 +91,9 @@ fun PlayerProfileScreen(
     profile: PlayerProfile?,
     firstLaunch: Boolean,
     store: PlayerProfileStore,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewOnly: Boolean = false,
+    onEdit: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -111,6 +113,50 @@ fun PlayerProfileScreen(
         }
     }
     val customBitmap = remember(customAvatarPath) { loadPlayerAvatar(customAvatarPath) }
+
+    if (viewOnly && !firstLaunch) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Player profile") },
+                    navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = "Back") } }
+                )
+            }
+        ) { insets ->
+            Column(
+                modifier = Modifier.fillMaxSize().padding(insets).verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp, vertical = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(18.dp)
+            ) {
+                Surface(
+                    modifier = Modifier.size(112.dp).clip(CircleShape),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.secondaryContainer
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        if (customBitmap != null && avatarId == "custom") {
+                            Image(customBitmap, contentDescription = "Profile picture", modifier = Modifier.fillMaxSize().clip(CircleShape))
+                        } else {
+                            Text(avatarPresets.firstOrNull { it.first == avatarId }?.second ?: "⭐", style = MaterialTheme.typography.displayLarge)
+                        }
+                    }
+                }
+                Text(username.ifBlank { "Player" }, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                Text("Offline player profile", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Bio", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        bio.ifBlank { "No bio yet. Add a little introduction about yourself." },
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (bio.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                Button(onClick = onEdit, modifier = Modifier.fillMaxWidth().height(52.dp)) { Text("Edit profile") }
+            }
+        }
+        return
+    }
 
     Scaffold(
         topBar = {
