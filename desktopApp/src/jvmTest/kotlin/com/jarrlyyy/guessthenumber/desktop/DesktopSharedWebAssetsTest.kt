@@ -70,7 +70,7 @@ class DesktopSharedWebAssetsTest {
         val keys = listOf(
             "settings", "game_preferences", "background_music", "sound_effects", "vibration_label",
             "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx",
-            "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes"
+            "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "nimmy_name", "nimmy_step_counter", "nimmy_step_guess_title", "nimmy_step_guess_body", "nimmy_step_submit_title", "nimmy_step_submit_body", "nimmy_step_upgrades_title", "nimmy_step_upgrades_body", "nimmy_step_more_title", "nimmy_step_more_body", "nimmy_next", "nimmy_skip", "nimmy_finish"
         )
         keys.forEach { key -> assertTrue("Missing shared UI translation: $key", strings.has(key)) }
         keys.forEach { key -> assertTrue("Settings markup must use $key", html.contains("data-i18n=\"$key\"")) }
