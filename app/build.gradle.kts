@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
+    id("com.google.gms.google-services")
 }
 
 val generatedWebPlayAssets = layout.buildDirectory.dir("generated/webPlayAssets")
@@ -136,6 +137,8 @@ kotlin {
 
 dependencies {
     implementation(project(":shared"))
+    implementation(platform("com.google.firebase:firebase-bom:35.0.2"))
+    implementation("com.google.firebase:firebase-analytics")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
