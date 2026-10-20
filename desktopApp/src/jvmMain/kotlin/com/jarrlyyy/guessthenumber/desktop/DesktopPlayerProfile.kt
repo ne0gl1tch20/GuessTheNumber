@@ -104,7 +104,7 @@ internal fun DesktopPlayerProfileButton(
     val avatarImage = remember(profile.customAvatarPath, profile.avatarId) {
         if (profile.avatarId == "custom" && !profile.customAvatarPath.isNullOrBlank()) {
             runCatching {
-                ImageIO.read(File(profile.customAvatarPath))?.let { source ->
+                ImageIO.read(File(profile.customAvatarPath.orEmpty()))?.let { source ->
                     val scaled = source.getScaledInstance(64, 64, Image.SCALE_SMOOTH)
                     val image = BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB)
                     val graphics = image.createGraphics()
