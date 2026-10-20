@@ -75,6 +75,7 @@ import com.jarrlyyy.guessthenumber.desktop.update.WindowsBuildVersion
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugInstaller
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdate
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdateClient
+import androidx.compose.material3.TextButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -196,6 +197,8 @@ fun main() = application {
         var tertiaryHex by remember { mutableStateOf("#00C853") }
         var reducedMotion by remember { mutableStateOf(false) }
         var navigationPosition by remember { mutableStateOf(DesktopNavigationPosition.load()) }
+        var playerProfile by remember { mutableStateOf(DesktopPlayerProfileStore.load()) }
+        var editingPlayerProfile by remember { mutableStateOf(false) }
 
         DesktopTheme(
             window = window,
@@ -240,6 +243,19 @@ fun main() = application {
                 shellFocusRequester.requestFocus()
             }
 
+            if (playerProfile?.setupComplete != true || editingPlayerProfile) {
+                DesktopPlayerProfileScreen(
+                    profile = playerProfile,
+                    onSave = { savedProfile ->
+                        runCatching { DesktopPlayerProfileStore.save(savedProfile) }
+                            .onSuccess {
+                                playerProfile = savedProfile
+                                editingPlayerProfile = false
+                            }
+                    },
+                    onCancel = { editingPlayerProfile = false }
+                )
+            } else {
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
@@ -263,6 +279,14 @@ fun main() = application {
                         .focusable(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = { editingPlayerProfile = true }) {
+                            Text("${desktopAvatarEmoji(playerProfile?.avatarId ?: "star")}  ${playerProfile?.username.orEmpty()} · Profile")
+                        }
+                    }
                     if (shellState.message != null) {
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Text(
@@ -486,6 +510,7 @@ fun main() = application {
                         DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
                     }
                 }
+            }
             }
         }
     }
