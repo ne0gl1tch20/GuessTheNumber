@@ -377,6 +377,11 @@
           <label class="setting-row"><span><strong data-i18n="reduced_motion_label">Reduced motion</strong><small data-i18n="reduced_motion_description">Soften or disable expressive screen transitions</small></span><input type="checkbox" data-setting-toggle="reducedMotion"></label>
           <label class="setting-row"><span><strong data-i18n="reduce_flashes_label">Reduce flashes</strong><small data-i18n="settings_desc_reduce_flashes">Reduce flashes and sudden visual changes for greater visual comfort.</small></span><input type="checkbox" data-setting-toggle="reduceFlashes"></label>
         </div>
+        <div class="settings-group tutorial-settings">
+          <h3 data-i18n="nimmy_settings_heading">Help &amp; tutorial</h3>
+          <p class="catalog-intro" data-i18n="nimmy_settings_description">Want a refresher? Nimmy can show you around again.</p>
+          <button type="button" class="primary-action" id="rerunNimmyButton" data-i18n="nimmy_rerun_button">Rerun Nimmy tutorial</button>
+        </div>
         <p class="catalog-intro" id="settingsStatus" role="status" aria-live="polite">Settings sync with the Android game.</p>
       </section>
     </div>
@@ -387,6 +392,16 @@
         <div class="requirement-panel"><h3>Prestige requirements</h3><div class="requirement-row" id="prestigeMoneyRequirementRow"><span>Current Money</span><strong id="prestigeCurrentMoney">0</strong><span class="requirement-state" id="prestigeMoneyState">Checking…</span></div><div class="requirement-row" id="prestigeRewardRequirementRow"><span>Next reward</span><strong id="prestigeRewardDetail">0</strong><span class="requirement-state" id="prestigeRewardState">Checking…</span></div><p id="prestigeNextReset" class="requirement-note"></p></div>
         <div class="reset-effects"><h3>What resets?</h3><ul><li>Regular Money and upgrade levels reset.</li><li>The guessing range returns to its starting range.</li><li>Prestige currency and Prestige progression remain.</li></ul></div>
         <p class="catalog-intro">Prestige resets your regular upgrades and Money, while keeping permanent Prestige progress. Review the reward before resetting.</p>
+        <section class="progression-catalog-section">
+          <h3 data-i18n="prestige_upgrade_tree_title">Prestige upgrades</h3>
+          <p class="catalog-intro" data-i18n="prestige_html_upgrades_desc">Spend Prestige to buy permanent upgrades.</p>
+          <div class="catalog-list" id="prestigeUpgradeList"><p class="catalog-empty">Loading Prestige upgrades…</p></div>
+        </section>
+        <section class="progression-catalog-section">
+          <h3 data-i18n="prestige_shop_title">Prestige Shop</h3>
+          <p class="catalog-intro" data-i18n="prestige_html_shop_desc">Spend Prestige on one-time shop items.</p>
+          <div class="catalog-list" id="prestigeShopList"><p class="catalog-empty">Loading Prestige shop…</p></div>
+        </section>
         <button type="button" class="world-action-button" id="prestigeResetButton" data-bridge-action="prestige_reset">Prestige reset</button>
         <p class="catalog-intro" id="prestigeStatus" role="status" aria-live="polite"></p>
       </section>
@@ -398,6 +413,16 @@
         <div class="requirement-panel"><h3>Ultra requirements</h3><div class="requirement-row" id="ultraMoneyRequirementRow"><span>Current Money</span><strong id="ultraCurrentMoney">0</strong><span class="requirement-state" id="ultraMoneyState">Checking…</span></div><div class="requirement-row" id="ultraPrestigeRequirementRow"><span>Prestige balance needed</span><strong>1,000</strong><span class="requirement-state" id="ultraPrestigeState">Checking…</span></div><div class="requirement-row" id="ultraRewardRequirementRow"><span>Next reward</span><strong id="ultraRewardDetail">0</strong><span class="requirement-state" id="ultraRewardState">Checking…</span></div><p id="ultraNextReset" class="requirement-note"></p></div>
         <div class="reset-effects"><h3>What resets?</h3><ul><li>Regular Money and Prestige balance reset.</li><li>Regular and Prestige upgrade levels reset.</li><li>Ultra currency and Ultra progression remain.</li><li>At least 1,000 Prestige and enough Money are required.</li></ul></div>
         <p class="catalog-intro">Ultra requires at least 1,000 Prestige and enough Money. It resets Prestige and regular upgrades for permanent Ultra progress.</p>
+        <section class="progression-catalog-section">
+          <h3 data-i18n="ultra_upgrade_tree_title">Ultra upgrades</h3>
+          <p class="catalog-intro" data-i18n="ultra_html_upgrades_desc">Spend Ultra to buy permanent upgrades.</p>
+          <div class="catalog-list" id="ultraUpgradeList"><p class="catalog-empty">Loading Ultra upgrades…</p></div>
+        </section>
+        <section class="progression-catalog-section">
+          <h3 data-i18n="ultra_shop_title">Ultra Shop</h3>
+          <p class="catalog-intro" data-i18n="ultra_html_shop_desc">Spend Ultra on one-time shop items.</p>
+          <div class="catalog-list" id="ultraShopList"><p class="catalog-empty">Loading Ultra shop…</p></div>
+        </section>
         <button type="button" class="world-action-button" id="ultraResetButton" data-bridge-action="ultra_reset">Ultra reset</button>
         <p class="catalog-intro" id="ultraStatus" role="status" aria-live="polite"></p>
       </section>
