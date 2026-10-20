@@ -285,3 +285,9 @@ body.arcade-modal-open{overflow:hidden}body.arcade-modal-open::before{content:""
 #dailyRewardOverlay .reward-claim:active{transform:translateY(2px);box-shadow:0 2px 0 #a94f1e}
 @media(max-width:360px){#dailyRewardOverlay .daily-reward-dialog{padding-right:16px;padding-left:16px}#dailyRewardOverlay .daily-reward-art{width:66px;height:66px}}
 @media(prefers-reduced-motion:reduce){#dailyRewardOverlay .daily-reward-dialog{animation:none}}
+
+#dailyRewardOverlay .daily-reward-schedule{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0 16px;text-align:center}
+#dailyRewardOverlay .daily-reward-day{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:9px 4px;border:1px solid #efc66c;border-radius:12px;background:rgba(255,255,255,.7);font-size:11px}
+#dailyRewardOverlay .daily-reward-day span{color:#82502b;font-size:10px;font-weight:700}
+#dailyRewardOverlay .daily-reward-day strong{color:#9b4c16;font-size:12px;overflow-wrap:anywhere}
+#dailyRewardOverlay .daily-reward-day-gift{border:2px solid #e87c23;background:linear-gradient(145deg,#fff5c9,#ffd977);box-shadow:0 3px 0 rgba(190,113,30,.2)}
