@@ -1152,5 +1152,18 @@
   "daily_reward_claim": "احصل على المكافأة",
   "daily_reward_streak": "سلسلة اليوم %s",
   "daily_reward_claimed": "لقد حصلت على مكافأة اليوم بالفعل.",
-  "offline_gains_amount": "+%s مال"
+  "offline_gains_amount": "+%s مال",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "الخطوة %s من %s",
+  "nimmy_step_guess_title": "هيا نخمن رقمًا!",
+  "nimmy_step_guess_body": "أدخل عددًا صحيحًا هنا. سأساعدك على فهم التلميحات.",
+  "nimmy_step_submit_title": "هل أنت مستعد؟ جرّب!",
+  "nimmy_step_submit_body": "اضغط السهم لإرسال تخمينك. ستساعدك التلميحات على تضييق النطاق.",
+  "nimmy_step_upgrades_title": "طوّر لعبتك!",
+  "nimmy_step_upgrades_body": "افتح الترقيات لتقوية جولاتك وكسب المزيد.",
+  "nimmy_step_more_title": "هيا نستكشف!",
+  "nimmy_step_more_body": "ستجد المكافآت والإحصاءات والإعدادات في «المزيد». أنت جاهز للعب!",
+  "nimmy_next": "التالي",
+  "nimmy_skip": "تخطي الجولة التعليمية",
+  "nimmy_finish": "هيا بنا!"
 }
