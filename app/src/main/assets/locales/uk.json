@@ -1151,5 +1151,18 @@
   "daily_reward_claim": "Забрати нагороду",
   "daily_reward_streak": "Серія: день %s",
   "daily_reward_claimed": "Сьогоднішню нагороду вже отримано.",
-  "offline_gains_amount": "+%s грошей"
+  "offline_gains_amount": "+%s грошей",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "Крок %s із %s",
+  "nimmy_step_guess_title": "Спробуймо вгадати число!",
+  "nimmy_step_guess_body": "Введи ціле число. Я допоможу розібратися з підказками.",
+  "nimmy_step_submit_title": "Готовий? Спробуй!",
+  "nimmy_step_submit_body": "Натисни стрілку, щоб надіслати відповідь. Підказки допоможуть звузити діапазон.",
+  "nimmy_step_upgrades_title": "Посиль гру!",
+  "nimmy_step_upgrades_body": "Відкрий покращення, щоб посилити гру та отримувати більше.",
+  "nimmy_step_more_title": "Досліджуймо!",
+  "nimmy_step_more_body": "Нагороди, статистика й налаштування є в розділі «Ще». Можна грати!",
+  "nimmy_next": "Далі",
+  "nimmy_skip": "Пропустити навчання",
+  "nimmy_finish": "Почнімо!"
 }
