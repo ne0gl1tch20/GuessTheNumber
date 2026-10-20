@@ -87,7 +87,8 @@ fun ProductionWebPlayScreen(
     onBuyTalent: (String, Long) -> Unit,
     onSetMutatorActive: (String, Boolean) -> Unit,
     onArcadeReward: (String, Int) -> Boolean,
-    onSettleStake: (String) -> Boolean
+    onSettleStake: (String) -> Boolean,
+    onResetData: () -> Unit
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val context = androidx.compose.ui.platform.LocalContext.current
