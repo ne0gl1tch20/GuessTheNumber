@@ -97,6 +97,7 @@ function renderNimmyStep(){
  setText($('nimmyTitle'),uiText(step.title,step.titleFallback));
  setText($('nimmyBody'),uiText(step.body,step.bodyFallback));
  setText($('nimmyNext'),nimmyStepIndex===nimmySteps.length-1?uiText('nimmy_finish','Let’s go!'):uiText('nimmy_next','Next'));
+ setText($('nimmySkip'),uiText('nimmy_skip','Skip tour'));
  updateNimmySpotlight();
 }
 function startNimmyTutorial(){
