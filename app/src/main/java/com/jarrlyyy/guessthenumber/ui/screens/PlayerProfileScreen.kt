@@ -69,6 +69,17 @@ class PlayerProfileStore(private val context: Context) {
     }.getOrNull()
 }
 
+internal fun loadPlayerAvatar(path: String?): androidx.compose.ui.graphics.ImageBitmap? {
+    if (path.isNullOrBlank()) return null
+    return runCatching {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(path, bounds)
+        var sample = 1
+        while (bounds.outWidth / sample > 512 || bounds.outHeight / sample > 512) sample *= 2
+        BitmapFactory.decodeFile(path, BitmapFactory.Options().apply { inSampleSize = sample })?.asImageBitmap()
+    }.getOrNull()
+}
+
 private val avatarPresets = listOf(
     "star" to "⭐", "cat" to "🐱", "fox" to "🦊", "dog" to "🐶",
     "robot" to "🤖", "ghost" to "👻", "dragon" to "🐉", "alien" to "👽",
@@ -101,9 +112,7 @@ fun PlayerProfileScreen(
             } else error = "Couldn't load that picture. Try another image."
         }
     }
-    val customBitmap = remember(customAvatarPath) {
-        customAvatarPath?.let { path -> runCatching { BitmapFactory.decodeFile(path)?.asImageBitmap() }.getOrNull() }
-    }
+    val customBitmap = remember(customAvatarPath) { loadPlayerAvatar(customAvatarPath) }
 
     Scaffold(
         topBar = {
