@@ -29,6 +29,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import com.jarrlyyy.guessthenumber.data.repository.UpdateChannelChecker
 import com.jarrlyyy.guessthenumber.data.repository.ApkUpdateInstaller
