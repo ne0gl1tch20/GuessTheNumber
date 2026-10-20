@@ -124,8 +124,35 @@ internal fun DesktopPlayerProfileButton(
 internal fun DesktopPlayerProfileScreen(
     profile: DesktopPlayerProfile?,
     onSave: (DesktopPlayerProfile) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    viewOnly: Boolean = false,
+    onEdit: () -> Unit = {}
 ) {
+    if (viewOnly && profile != null) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().padding(24.dp)) {
+                Card(modifier = Modifier.fillMaxWidth().widthIn(max = 680.dp)) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(28.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Player profile", style = MaterialTheme.typography.headlineMedium)
+                        Text(desktopAvatarEmoji(profile.avatarId), style = MaterialTheme.typography.displayLarge)
+                        Text(profile.username, style = MaterialTheme.typography.headlineSmall)
+                        Text("Stored locally on this Windows PC", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text("Bio", style = MaterialTheme.typography.titleMedium)
+                            Text(profile.bio.ifBlank { "No bio yet. Add a little introduction about yourself." }, style = MaterialTheme.typography.bodyLarge)
+                        }
+                        Button(onClick = onEdit, modifier = Modifier.fillMaxWidth()) { Text("Edit profile") }
+                        TextButton(onClick = onCancel) { Text("Back to game") }
+                    }
+                }
+            }
+        }
+        return
+    }
     var username by remember(profile?.profileId) { mutableStateOf(profile?.username.orEmpty()) }
     var bio by remember(profile?.profileId) { mutableStateOf(profile?.bio.orEmpty()) }
     var avatarId by remember(profile?.profileId) { mutableStateOf(profile?.avatarId ?: "star") }
