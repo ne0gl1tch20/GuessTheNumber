@@ -189,6 +189,21 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        if (parsed.type == "read_profile") {
+                                            updateScope.launch {
+                                                val storedProfile = runCatching {
+                                                    PlayerProfileStore(context.applicationContext).profile.first()
+                                                }.getOrNull()
+                                                val response = JSONObject().put("version", 1).put("id", parsed.id)
+                                                    .put("type", "profile_state")
+                                                    .put("username", storedProfile?.username.orEmpty())
+                                                    .put("bio", storedProfile?.bio.orEmpty())
+                                                    .put("avatarId", storedProfile?.avatarId ?: "star")
+                                                    .put("setupComplete", storedProfile?.setupComplete == true)
+                                                replyProxy.postMessage(response.toString())
+                                            }
+                                            return@post
+                                        }
                                         if (parsed.type == "read_changelog") {
                                             val markdown = try {
                                                 context.assets.open("changelogs.md").bufferedReader(Charsets.UTF_8).use { it.readText() }
