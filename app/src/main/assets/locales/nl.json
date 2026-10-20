@@ -1151,5 +1151,18 @@
   "daily_reward_claim": "Beloning claimen",
   "daily_reward_streak": "Reeks: dag %s",
   "daily_reward_claimed": "De beloning van vandaag is al geclaimd.",
-  "offline_gains_amount": "+%s geld"
+  "offline_gains_amount": "+%s geld",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "Stap %s van %s",
+  "nimmy_step_guess_title": "Laten we een getal raden!",
+  "nimmy_step_guess_body": "Vul hier een heel getal in. Ik help je de aanwijzingen te begrijpen.",
+  "nimmy_step_submit_title": "Klaar? Probeer het!",
+  "nimmy_step_submit_body": "Tik op de pijl om je gok in te dienen. De aanwijzingen helpen je het bereik te verkleinen.",
+  "nimmy_step_upgrades_title": "Word sterker!",
+  "nimmy_step_upgrades_body": "Open Upgrades om je rondes sterker te maken en meer te verdienen.",
+  "nimmy_step_more_title": "Laten we op ontdekking gaan!",
+  "nimmy_step_more_body": "Beloningen, statistieken en instellingen staan bij Meer. Je kunt beginnen!",
+  "nimmy_next": "Volgende",
+  "nimmy_skip": "Rondleiding overslaan",
+  "nimmy_finish": "Aan de slag!"
 }
