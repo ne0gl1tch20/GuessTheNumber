@@ -1151,5 +1151,18 @@
   "daily_reward_claim": "Kunin ang reward",
   "daily_reward_streak": "Streak sa ika-%s araw",
   "daily_reward_claimed": "Nakuha mo na ang reward ngayong araw.",
-  "offline_gains_amount": "+%s Money"
+  "offline_gains_amount": "+%s Money",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "Hakbang %s sa %s",
+  "nimmy_step_guess_title": "Subukan nating manghula!",
+  "nimmy_step_guess_body": "Maglagay ng buong numero rito. Tutulungan kitang matuto mula sa mga pahiwatig.",
+  "nimmy_step_submit_title": "Handa na? Subukan mo!",
+  "nimmy_step_submit_body": "Pindutin ang arrow para isumite ang hula. Gamitin ang mga pahiwatig para paliitin ang saklaw.",
+  "nimmy_step_upgrades_title": "Palakasin ang laro!",
+  "nimmy_step_upgrades_body": "Buksan ang Mga Upgrade para mas mapalakas ang laro at mas kumita.",
+  "nimmy_step_more_title": "Tuklasin natin!",
+  "nimmy_step_more_body": "Nasa Higit Pa ang mga reward, stats at setting. Handa ka nang maglaro!",
+  "nimmy_next": "Susunod",
+  "nimmy_skip": "Laktawan ang gabay",
+  "nimmy_finish": "Tara na!"
 }
