@@ -70,7 +70,7 @@ class DesktopSharedWebAssetsTest {
         val keys = listOf(
             "settings", "game_preferences", "background_music", "sound_effects", "vibration_label",
             "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx",
-            "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "nimmy_name", "nimmy_step_counter", "nimmy_step_guess_title", "nimmy_step_guess_body", "nimmy_step_submit_title", "nimmy_step_submit_body", "nimmy_step_upgrades_title", "nimmy_step_upgrades_body", "nimmy_step_more_title", "nimmy_step_more_body", "nimmy_next", "nimmy_skip", "nimmy_finish"
+            "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes"
         )
         keys.forEach { key -> assertTrue("Missing shared UI translation: $key", strings.has(key)) }
         keys.forEach { key -> assertTrue("Settings markup must use $key", html.contains("data-i18n=\"$key\"")) }
@@ -80,6 +80,21 @@ class DesktopSharedWebAssetsTest {
         listOf("kotlin", "javascript", "typescript", "lua", "python", "scripting language").forEach { term ->
             assertFalse("Player-facing shared UI should not expose implementation jargon: $term", playerCopy.contains(term))
         }
+    }
+
+    @Test
+    fun sharedHtmlIncludesLocalizedFirstRunNimmyTutorial() {
+        val html = asset("web-play/index.html")
+        val script = asset("web-play/app.js")
+        val styles = asset("web-play/styles.css")
+
+        assertTrue(html.contains("id=\"nimmyTutorial\""))
+        assertTrue(html.contains("id=\"nimmySpotlight\""))
+        assertTrue(html.contains("id=\"nimmyNext\""))
+        assertTrue(script.contains("send('read_onboarding_state')"))
+        assertTrue(script.contains("send('complete_nimmy_tutorial')"))
+        assertTrue(script.contains("suppressDailyRewardThisSession"))
+        assertTrue(styles.contains(".nimmy-target-highlight"))
     }
 
     @Test
@@ -108,7 +123,7 @@ class DesktopSharedWebAssetsTest {
         val keys = listOf(
             "settings", "game_preferences", "background_music", "sound_effects", "vibration_label",
             "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx",
-            "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes"
+            "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "nimmy_name", "nimmy_step_counter", "nimmy_step_guess_title", "nimmy_step_guess_body", "nimmy_step_submit_title", "nimmy_step_submit_body", "nimmy_step_upgrades_title", "nimmy_step_upgrades_body", "nimmy_step_more_title", "nimmy_step_more_body", "nimmy_next", "nimmy_skip", "nimmy_finish"
         )
         locales.forEach { locale ->
             val strings = org.json.JSONObject(asset("locales/$locale"))
