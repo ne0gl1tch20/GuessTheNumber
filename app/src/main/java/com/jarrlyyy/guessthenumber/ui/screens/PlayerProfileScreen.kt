@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,7 +61,7 @@ class PlayerProfileStore(private val context: Context) {
     }
 
     fun importCustomAvatar(uri: Uri): String? = runCatching {
-        val destination = File(context.filesDir, "player_profile_avatar")
+        val destination = File(context.filesDir, "player_profile_avatar_${java.util.UUID.randomUUID()}.img")
         context.contentResolver.openInputStream(uri)?.use { input ->
             destination.outputStream().use { output -> input.copyTo(output) }
         } ?: return null
@@ -75,6 +76,7 @@ private val avatarPresets = listOf(
     "moon" to "🌙", "sun" to "☀️", "flower" to "🌸", "lightning" to "⚡"
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerProfileScreen(
     profile: PlayerProfile?,
