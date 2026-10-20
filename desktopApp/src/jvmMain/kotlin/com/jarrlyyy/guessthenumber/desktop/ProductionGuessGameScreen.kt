@@ -520,6 +520,26 @@ fun ProductionGuessGameScreen(
                                         val upgrade = catalog.upgrades.firstOrNull { it.id == id }
                                         if (upgrade == null) null else DesktopEconomyTransactions.buyUpgrade(before, upgrade)
                                     }
+                                    "buy_prestige_upgrade" -> {
+                                        val id = request.optString("upgradeId")
+                                        val upgrade = DesktopEconomyRepository().prestigeUpgrades().firstOrNull { it.id == id }
+                                        if (upgrade == null) null else DesktopEconomyTransactions.buyPrestigeUpgrade(before, upgrade)
+                                    }
+                                    "buy_ultra_upgrade" -> {
+                                        val id = request.optString("upgradeId")
+                                        val upgrade = DesktopEconomyRepository().ultraUpgrades().firstOrNull { it.id == id }
+                                        if (upgrade == null) null else DesktopEconomyTransactions.buyUltraUpgrade(before, upgrade)
+                                    }
+                                    "buy_prestige_shop_item" -> {
+                                        val id = request.optString("itemId")
+                                        val item = DesktopEconomyRepository().prestigeShopItems().firstOrNull { it.id == id }
+                                        if (item == null) null else DesktopEconomyRules.buyPrestigeShopItem(before, item)?.let { EconomyTransaction(it, true, "Purchased Prestige shop item.") }
+                                    }
+                                    "buy_ultra_shop_item" -> {
+                                        val id = request.optString("itemId")
+                                        val item = DesktopEconomyRepository().ultraShopItems().firstOrNull { it.id == id }
+                                        if (item == null) null else DesktopEconomyRules.buyUltraShopItem(before, item)?.let { EconomyTransaction(it, true, "Purchased Ultra shop item.") }
+                                    }
                                     "buy_shop_item" -> {
                                         val id = request.optString("itemId")
                                         val item = catalog.shopItems.firstOrNull { it.id == id }
