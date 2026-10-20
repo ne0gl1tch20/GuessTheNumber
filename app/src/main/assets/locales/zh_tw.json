@@ -1164,5 +1164,8 @@
   "nimmy_step_more_body": "獎勵、統計和設定都在「更多」裡。現在可以開始玩囉！",
   "nimmy_next": "下一步",
   "nimmy_skip": "略過教學",
-  "nimmy_finish": "出發！"
+  "nimmy_finish": "出發！",
+  "nimmy_settings_heading": "說明與教學",
+  "nimmy_settings_description": "想複習一下嗎？Nimmy 可以再次帶你熟悉遊戲。",
+  "nimmy_rerun_button": "重新播放 Nimmy 教學"
 }
