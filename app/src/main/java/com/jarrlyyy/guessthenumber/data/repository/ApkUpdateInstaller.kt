@@ -212,8 +212,18 @@ class ApkUpdateInstaller(private val context: Context) {
                     }
                 }
             }
-            val intent = Intent(context, UpdateInstallReceiver::class.java).setAction(UpdateInstallReceiver.ACTION_RESULT)
-            val pending = PendingIntent.getBroadcast(context, sessionId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            val intent = Intent(context, UpdateInstallReceiver::class.java)
+                .setAction(UpdateInstallReceiver.ACTION_RESULT)
+            // PackageInstaller must be able to add its install result to this
+            // callback Intent. An immutable PendingIntent makes session.commit()
+            // fail on Android versions that enforce a mutable status receiver.
+            val pendingFlags = PendingIntent.FLAG_UPDATE_CURRENT or
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    PendingIntent.FLAG_MUTABLE
+                } else {
+                    0
+                }
+            val pending = PendingIntent.getBroadcast(context, sessionId, intent, pendingFlags)
             session.commit(pending.intentSender)
         }
     }
