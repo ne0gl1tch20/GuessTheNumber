@@ -1151,5 +1151,18 @@
   "daily_reward_claim": "Resgatar recompensa",
   "daily_reward_streak": "Sequência do dia %s",
   "daily_reward_claimed": "Você já resgatou a recompensa de hoje.",
-  "offline_gains_amount": "+%s em dinheiro"
+  "offline_gains_amount": "+%s em dinheiro",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "Etapa %s de %s",
+  "nimmy_step_guess_title": "Vamos tentar adivinhar!",
+  "nimmy_step_guess_body": "Digite um número inteiro aqui. Vou ajudar você a entender as dicas.",
+  "nimmy_step_submit_title": "Pronto? Tente aí!",
+  "nimmy_step_submit_body": "Toque na seta para enviar seu palpite. As dicas ajudam a diminuir o intervalo.",
+  "nimmy_step_upgrades_title": "Fique mais forte!",
+  "nimmy_step_upgrades_body": "Abra Melhorias para fortalecer suas partidas e ganhar mais.",
+  "nimmy_step_more_title": "Vamos explorar!",
+  "nimmy_step_more_body": "Recompensas, estatísticas e configurações ficam em Mais. Agora é só jogar!",
+  "nimmy_next": "Próximo",
+  "nimmy_skip": "Pular tutorial",
+  "nimmy_finish": "Vamos lá!"
 }
