@@ -18,8 +18,8 @@ val prepareWebPlayBrandAsset by tasks.registering(Copy::class) {
 }
 val prepareLauncherIcon by tasks.registering(Copy::class) {
     from(launcherLogo)
-    into(generatedLauncherIconRes.map { it.dir("mipmap-nodpi") })
-    rename { "ic_launcher.png" }
+    into(generatedLauncherIconRes.map { it.dir("drawable-nodpi") })
+    rename { "gtn_app_logo.png" }
 }
 
 

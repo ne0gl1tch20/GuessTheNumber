@@ -60,9 +60,13 @@ private const val WEB_UI_PATH = "/assets/web-play/"
 @Composable
 fun ProductionWebPlayScreen(
     state: GameState,
+    dailyRewardTestRequest: Int = 0,
     incomePerSecond: BigNumber,
     localeManager: LocaleManager,
     stateProvider: () -> GameState,
+    offlineGains: BigNumber?,
+    onDismissOfflineGains: () -> Unit,
+    onClaimDailyReward: () -> Boolean,
     onSubmitGuess: (Long) -> GuessSubmissionResult,
     onClaimDailyQuest: (String) -> Unit,
     onOpenLootChest: (String) -> Unit,
@@ -89,6 +93,9 @@ fun ProductionWebPlayScreen(
     val activeLocaleManager by rememberUpdatedState(localeManager)
     val currentIncome by rememberUpdatedState(incomePerSecond)
     val readState by rememberUpdatedState(stateProvider)
+    val currentOfflineGains by rememberUpdatedState(offlineGains)
+    val dismissOfflineGains by rememberUpdatedState(onDismissOfflineGains)
+    val claimDailyReward by rememberUpdatedState(onClaimDailyReward)
     val submitGuess by rememberUpdatedState(onSubmitGuess)
     val claimDailyQuest by rememberUpdatedState(onClaimDailyQuest)
     val openLootChest by rememberUpdatedState(onOpenLootChest)
@@ -116,6 +123,8 @@ fun ProductionWebPlayScreen(
         }, 120L)
     }
     var bridgeErrorDetails by remember { mutableStateOf<String?>(null) }
+    var offlineRewardDismissed by remember { mutableStateOf(false) }
+    LaunchedEffect(offlineGains) { if (offlineGains != null) offlineRewardDismissed = false }
     val clipboardManager = LocalClipboardManager.current
     fun reportBridgeException(action: String, requestId: String, error: Exception) {
         Log.e("GTNWebBridge", "Bridge request failed: action=$action requestId=$requestId", error)
@@ -126,6 +135,14 @@ fun ProductionWebPlayScreen(
 
     DisposableEffect(Unit) {
         onDispose { webViewRef?.let { it.stopLoading(); it.destroy() } }
+    }
+
+    LaunchedEffect(dailyRewardTestRequest) {
+        if (dailyRewardTestRequest > 0) {
+            webViewRef?.postDelayed({
+                webViewRef?.evaluateJavascript("window.gtnShowDailyRewardTest && window.gtnShowDailyRewardTest()", null)
+            }, 150L)
+        }
     }
 
     AndroidView(
@@ -214,6 +231,12 @@ fun ProductionWebPlayScreen(
                                                             latestAvailableUpdate = null
                                                             response.put("status", "unavailable").put("message", activeLocaleManager.getString("update_unavailable", "Couldn't check for updates. Try again later."))
                                                         }
+                                                        is UpdateChannelChecker.Result.Failed -> {
+                                                            latestAvailableUpdate = null
+                                                            response.put("status", "unavailable")
+                                                                .put("message", activeLocaleManager.getString("update_unavailable", "Couldn't check for updates. Try again later."))
+                                                                .put("diagnostics", updateResult.diagnostics)
+                                                        }
                                                     }
                                                     replyProxy.postMessage(response.toString())
                                                 }
@@ -257,6 +280,8 @@ fun ProductionWebPlayScreen(
                                         try {
                                             when (parsed.type) {
                                                 "claim_daily_quest" -> parsed.questId?.let(claimDailyQuest)
+                                                 "claim_daily_reward" -> claimDailyReward()
+                                                 "dismiss_offline_gains" -> { dismissOfflineGains(); offlineRewardDismissed = true }
                                                 "open_loot_chest" -> parsed.tier?.let(openLootChest)
                                                 "navigate" -> parsed.route?.let(navigateProgression)
                                                 "homebase_upgrade" -> navigateProgression("home_upgrade")
@@ -419,6 +444,7 @@ fun ProductionWebPlayScreen(
                                         }
                                         val actionAccepted = when (parsed.type) {
                                             "claim_daily_quest" -> parsed.questId != null && parsed.questId in game.claimedDailyQuests && parsed.questId !in beforeAction.claimedDailyQuests
+                                             "claim_daily_reward" -> game.lastDailyRewardDate != beforeAction.lastDailyRewardDate
                                             "open_loot_chest" -> when (parsed.tier) {
                                                 "common" -> game.lootCommonChests < beforeAction.lootCommonChests
                                                 "rare" -> game.lootRareChests < beforeAction.lootRareChests
@@ -554,7 +580,10 @@ fun ProductionWebPlayScreen(
                                                 .put("customPrimaryColor", game.settings.customPrimaryColor)
                                                 .put("customSecondaryColor", game.settings.customSecondaryColor)
                                                 .put("customTertiaryColor", game.settings.customTertiaryColor))
-                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "incorrect_guess_low_1", "incorrect_guess_low_2", "incorrect_guess_low_3", "incorrect_guess_high_1", "incorrect_guess_high_2", "incorrect_guess_high_3", "changelog_title", "changelog_subtitle", "changelog_eyebrow", "changelog_intro", "changelog_current_badge", "changelog_category_ui", "changelog_current_title", "changelog_current_arcade", "changelog_current_updates", "changelog_current_locale", "changelog_current_music", "changelog_current_feedback", "changelog_progress_badge", "changelog_category_gameplay", "changelog_progress_title", "changelog_progress_stats", "changelog_progress_worlds", "changelog_progress_saves", "changelog_foundation_badge", "changelog_category_system", "changelog_foundation_title", "changelog_foundation_update", "changelog_foundation_icon", "changelog_foundation_offline", "music_player_title", "music_player_subtitle", "music_player_eyebrow", "music_background_track", "music_background_track_desc", "music_player_toggle_desc", "music_player_status", "master_volume", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "about_title", "about_licenses", "about_header", "about_version_format", "about_description", "about_licenses_title", "about_web_subtitle", "about_installed_version", "about_update_description", "about_update_idle", "about_updates_eyebrow", "about_licenses_eyebrow", "about_licenses_description", "about_library_author_format", "about_library_license_format", "update_channel_label", "update_channel_debug", "update_channel_release", "update_check", "update_checking", "update_available", "update_up_to_date", "update_unavailable", "update_install", "update_open", "update_downloading", "update_install_started", "update_install_failed", "update_permission_required", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry", "rift_best_tier", "loot_title", "loot_opened_count", "worlds_boss_count", "inspector_arcade_best_scores", "your_game", "more", "more_subtitle", "rewards", "rewards_subtitle", "journey", "journey_subtitle", "shop", "shop_subtitle", "home_base", "home_base_subtitle", "relics", "relics_subtitle", "codex", "codex_subtitle", "save_slots", "save_slots_subtitle", "settings_subtitle", "prestige", "prestige_subtitle", "ultra", "ultra_subtitle", "talents", "talents_subtitle", "mutators", "mutators_subtitle", "dev_settings", "dev_settings_subtitle", "lucky_stake_subtitle", "music_no_track", "music_add_audio", "music_add_to_playlist", "music_play", "music_pause", "music_shuffle", "music_repeat", "music_repeat_off", "music_repeat_one", "music_repeat_all", "music_enqueue", "music_remove", "music_move_up", "music_move_down", "music_delete_playlist", "music_empty_library", "music_empty_queue", "music_empty_playlists", "music_queue", "music_library", "music_playlists", "music_queue_position", "music_playlist_tracks", "music_playlist_name", "music_create_playlist", "on", "off").forEach { key -> put(key, activeLocaleManager.getString(key)) } })
+                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "incorrect_guess_low_1", "incorrect_guess_low_2", "incorrect_guess_low_3", "incorrect_guess_high_1", "incorrect_guess_high_2", "incorrect_guess_high_3", "daily_reward_title", "daily_reward_subtitle", "daily_reward_claim", "daily_reward_streak", "daily_reward_claimed", "offline_gains_amount", "welcome_back_title", "offline_gains_text", "collect", "changelog_title", "changelog_subtitle", "changelog_eyebrow", "changelog_intro", "changelog_current_badge", "changelog_category_ui", "changelog_current_title", "changelog_current_arcade", "changelog_current_updates", "changelog_current_locale", "changelog_current_music", "changelog_current_feedback", "changelog_progress_badge", "changelog_category_gameplay", "changelog_progress_title", "changelog_progress_stats", "changelog_progress_worlds", "changelog_progress_saves", "changelog_foundation_badge", "changelog_category_system", "changelog_foundation_title", "changelog_foundation_update", "changelog_foundation_icon", "changelog_foundation_offline", "music_player_title", "music_player_subtitle", "music_player_eyebrow", "music_background_track", "music_background_track_desc", "music_player_toggle_desc", "music_player_status", "master_volume", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "about_title", "about_licenses", "about_header", "about_version_format", "about_description", "about_licenses_title", "about_web_subtitle", "about_installed_version", "about_update_description", "about_update_idle", "about_updates_eyebrow", "about_licenses_eyebrow", "about_licenses_description", "about_library_author_format", "about_library_license_format", "update_channel_label", "update_channel_debug", "update_channel_release", "update_check", "update_checking", "update_available", "update_up_to_date", "update_unavailable", "update_install", "update_open", "update_downloading", "update_install_started", "update_install_failed", "update_permission_required", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry", "rift_best_tier", "loot_title", "loot_opened_count", "worlds_boss_count", "inspector_arcade_best_scores", "your_game", "more", "more_subtitle", "rewards", "rewards_subtitle", "journey", "journey_subtitle", "shop", "shop_subtitle", "home_base", "home_base_subtitle", "relics", "relics_subtitle", "codex", "codex_subtitle", "save_slots", "save_slots_subtitle", "settings_subtitle", "prestige", "prestige_subtitle", "ultra", "ultra_subtitle", "talents", "talents_subtitle", "mutators", "mutators_subtitle", "dev_settings", "dev_settings_subtitle", "lucky_stake_subtitle", "music_no_track", "music_add_audio", "music_add_to_playlist", "music_play", "music_pause", "music_shuffle", "music_repeat", "music_repeat_off", "music_repeat_one", "music_repeat_all", "music_enqueue", "music_remove", "music_move_up", "music_move_down", "music_delete_playlist", "music_empty_library", "music_empty_queue", "music_empty_playlists", "music_queue", "music_library", "music_playlists", "music_queue_position", "music_playlist_tracks", "music_playlist_name", "music_create_playlist", "on", "off").forEach { key -> put(key, activeLocaleManager.getString(key)) }; (0..29).forEach { index ->
+                                                put("feedback_toolow_$index", activeLocaleManager.getString("feedback_toolow_$index"))
+                                                put("feedback_toohigh_$index", activeLocaleManager.getString("feedback_toohigh_$index"))
+                                            } })
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
                                             .put("minigames", org.json.JSONArray().apply {
@@ -570,6 +599,28 @@ fun ProductionWebPlayScreen(
                                             .put("streak", result?.streak ?: game.streak)
                                             .put("bestStreak", result?.bestStreak ?: game.bestStreak)
                                             .put("accepted", result?.accepted ?: actionAccepted)
+                                             .put("offlineGains", if (offlineRewardDismissed) "" else currentOfflineGains?.format() ?: "")
+                                             .put("dailyRewardAvailable", game.lastDailyRewardDate != java.time.LocalDate.now().toString())
+                                             .put("dailyRewardStreak", game.dailyRewardStreak)
+                                             .put("dailyRewardAmount", (com.jarrlyyy.guessthenumber.domain.model.DailyRewardPolicy.nextReward(game.lastDailyRewardDate, game.dailyRewardStreak, java.time.LocalDate.now().toString()) * if ("nebula_boost" in game.shopPurchases) 2L else 1L).toString())
+                                             .put("dailyRewardNextStreak", com.jarrlyyy.guessthenumber.domain.model.DailyRewardPolicy.nextStreak(game.lastDailyRewardDate, game.dailyRewardStreak, java.time.LocalDate.now().toString()))
+                                             .put("dailyRewardLastClaimDate", game.lastDailyRewardDate)
+                                             .put("incorrectGuessMessages", JSONObject().apply {
+                                                 put("tooLow", org.json.JSONArray().apply {
+                                                     for (index in 0..29) {
+                                                         val key = "feedback_toolow_$index"
+                                                         val message = activeLocaleManager.getString(key)
+                                                         if (message.isNotBlank() && message != key) put(message)
+                                                     }
+                                                 })
+                                                 put("tooHigh", org.json.JSONArray().apply {
+                                                     for (index in 0..29) {
+                                                         val key = "feedback_toohigh_$index"
+                                                         val message = activeLocaleManager.getString(key)
+                                                         if (message.isNotBlank() && message != key) put(message)
+                                                     }
+                                                 })
+                                             })
                                             .put("money", game.money.format())
                                             .put("incomePerSecond", currentIncome.format())
                                             .put("statistics", JSONObject()

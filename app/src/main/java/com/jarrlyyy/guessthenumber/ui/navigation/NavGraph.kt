@@ -81,6 +81,7 @@ fun NavGraph(
 ) {
     val locale = viewModel.localeManager
     var showDevSettings by remember { mutableStateOf(false) }
+    var dailyRewardTestRequest by remember { mutableStateOf(0) }
     var webPlayMounted by remember { mutableStateOf(hasAnySave) }
     LaunchedEffect(hasAnySave) { if (hasAnySave) webPlayMounted = true }
     var debugDestination by remember { mutableStateOf<String?>(null) }
@@ -106,9 +107,13 @@ fun NavGraph(
     Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
         ProductionWebPlayScreen(
             state = state,
+            dailyRewardTestRequest = dailyRewardTestRequest,
             incomePerSecond = incomePerSecond,
             localeManager = locale,
             stateProvider = { viewModel.gameState.value },
+            offlineGains = offlineGains,
+            onDismissOfflineGains = onDismissOfflineGains,
+            onClaimDailyReward = viewModel::claimDailyReward,
             onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
             onClaimDailyQuest = viewModel::claimDailyQuest,
             onOpenLootChest = viewModel::openLootChest,
@@ -142,7 +147,16 @@ fun NavGraph(
             CompositionLocalProvider(LocalAppLocaleManager provides locale) {
                 DevSettingsScreen(
                     state = state,
-                    onExecuteCommand = viewModel::executeDevCommand,
+                    onExecuteCommand = { command ->
+                        if (command.trim().equals("/testdailyrewards", ignoreCase = true)) {
+                            showDevSettings = false
+                            debugDestination = null
+                            dailyRewardTestRequest++
+                            "Opening the daily reward popup in the HTML game."
+                        } else {
+                            viewModel.executeDevCommand(command)
+                        }
+                    },
                     onImportSave = viewModel::importSave,
                     onUpdateSettings = viewModel::updateSettings,
                     onGetAppPreferencesJson = viewModel::getAppPreferencesJson,

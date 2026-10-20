@@ -10,6 +10,8 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.runtime.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,9 +21,39 @@ import com.jarrlyyy.guessthenumber.data.repository.ApkUpdateInstaller
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import com.jarrlyyy.guessthenumber.BuildConfig
 
 data class OpenSourceLibrary(val name: String, val license: String, val author: String)
+
+@Composable
+private fun UpdateMarkdown(details: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        details.lines().forEach { rawLine ->
+            val line = rawLine.trim()
+            when {
+                line.startsWith("### ") -> Text(parseMarkdownInline(line.removePrefix("### ")), style = MaterialTheme.typography.titleSmall)
+                line.startsWith("## ") -> Text(parseMarkdownInline(line.removePrefix("## ")), style = MaterialTheme.typography.titleMedium)
+                line.startsWith("# ") -> Text(parseMarkdownInline(line.removePrefix("# ")), style = MaterialTheme.typography.titleLarge)
+                line.startsWith("- ") || line.startsWith("* ") -> {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("•", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        Text(parseMarkdownInline(line.drop(2)), style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+                line.matches(Regex("\\d+[.)]\\s+.*")) -> {
+                    val match = Regex("^(\\d+)[.)]\\s+(.*)$").matchEntire(line)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("${match?.groupValues?.getOrNull(1) ?: "•"}.", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        Text(parseMarkdownInline(match?.groupValues?.getOrNull(2) ?: line), style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+                line.isBlank() -> Spacer(Modifier.height(2.dp))
+                else -> Text(parseMarkdownInline(line), style = MaterialTheme.typography.bodySmall)
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,11 +62,13 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
     val versionCode = BuildConfig.VERSION_CODE
     val locale = viewModel.localeManager
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
     var checkingUpdates by remember { mutableStateOf(false) }
     var installingUpdate by remember { mutableStateOf(false) }
     var updateMessage by remember { mutableStateOf<String?>(null) }
     var availableUpdate by remember { mutableStateOf<UpdateChannelChecker.AvailableUpdate?>(null) }
+    var updateErrorLogs by remember { mutableStateOf<String?>(null) }
     val channelLabel = if (BuildConfig.UPDATE_CHANNEL == "debug") locale.getString("update_channel_debug", "Debug channel") else locale.getString("update_channel_release", "Release channel")
     val libraries = listOf(
         OpenSourceLibrary("Jetpack Compose", "Apache 2.0", "Google / Android Open Source Project"),
@@ -59,11 +93,18 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                         Spacer(Modifier.height(8.dp))
                         Button(onClick = {
                             scope.launch {
-                                checkingUpdates = true; updateMessage = null; availableUpdate = null
+                                checkingUpdates = true; updateMessage = null; availableUpdate = null; updateErrorLogs = null
                                 when (val result = UpdateChannelChecker.check()) {
                                     is UpdateChannelChecker.Result.Available -> { availableUpdate = result.update; updateMessage = locale.getString("update_available", "An update is available.") }
                                     UpdateChannelChecker.Result.UpToDate -> updateMessage = locale.getString("update_up_to_date", "You're up to date.")
-                                    UpdateChannelChecker.Result.Unavailable -> updateMessage = locale.getString("update_unavailable", "Couldn't check for updates. Try again later.")
+                                    UpdateChannelChecker.Result.Unavailable -> {
+                                        updateMessage = locale.getString("update_unavailable", "Couldn't check for updates. Try again later.")
+                                        updateErrorLogs = "Update check did not find a usable update source.\nChannel: ${BuildConfig.UPDATE_CHANNEL}\nApp version: $versionName ($versionCode)"
+                                    }
+                                    is UpdateChannelChecker.Result.Failed -> {
+                                        updateMessage = locale.getString("update_unavailable", "Couldn't check for updates. Try again later.")
+                                        updateErrorLogs = result.diagnostics
+                                    }
                                 }
                                 checkingUpdates = false
                             }
@@ -71,9 +112,16 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                             if (checkingUpdates) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp); Spacer(Modifier.width(8.dp)); Text(locale.getString("update_checking", "Checking for updates…")) } else Text(locale.getString("update_check", "Check for updates"))
                         }
                         updateMessage?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                        updateErrorLogs?.let { logs ->
+                            OutlinedButton(
+                                onClick = { clipboardManager.setText(AnnotatedString(logs)) },
+                                modifier = Modifier.fillMaxWidth()
+                            ) { Text(locale.getString("update_copy_error_logs", "Copy update error logs")) }
+                            Text(locale.getString("update_error_logs_description", "These diagnostic logs include the failure reason, app version and time. They do not include account tokens."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                         availableUpdate?.let { update ->
                             Text(update.title, style = MaterialTheme.typography.titleSmall)
-                            if (update.details.isNotBlank()) Text(update.details, style = MaterialTheme.typography.bodySmall)
+                            if (update.details.isNotBlank()) UpdateMarkdown(update.details)
                             Button(onClick = {
                                 if (!context.packageManager.canRequestPackageInstalls()) {
                                     context.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${context.packageName}")))
@@ -82,9 +130,32 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                                     scope.launch {
                                         installingUpdate = true
                                         updateMessage = locale.getString("update_downloading", "Downloading and preparing update…")
-                                        val result = withContext(Dispatchers.IO) { ApkUpdateInstaller(context).install(update.downloadUrl) }
+                                        val result = withContext(Dispatchers.IO) {
+                                            ApkUpdateInstaller(context).install(
+                                                update.downloadUrl,
+                                                requireChecksum = update.requireChecksum,
+                                                expectedCommitSha = update.expectedCommitSha
+                                            )
+                                        }
                                         installingUpdate = false
-                                        updateMessage = result.fold({ locale.getString("update_install_started", "Installation started. Confirm the Android installer prompt.") }, { locale.getString("update_install_failed", "Update failed: %s", it.message ?: "unknown error") })
+                                        updateMessage = result.fold(
+                                            {
+                                                updateErrorLogs = null
+                                                locale.getString("update_install_started", "Installation started. Confirm the Android installer prompt.")
+                                            },
+                                            { error ->
+                                                updateErrorLogs = buildString {
+                                                    appendLine("Update installation failed")
+                                                    appendLine("App version: $versionName ($versionCode)")
+                                                    appendLine("Channel: ${BuildConfig.UPDATE_CHANNEL}")
+                                                    appendLine("Failure: ${error.javaClass.name}")
+                                                    appendLine("Message: ${error.message ?: "(no message)"}")
+                                                    appendLine()
+                                                    append(error.stackTraceToString().take(8000))
+                                                }
+                                                locale.getString("update_install_failed", "Update failed: %s", error.message ?: "unknown error")
+                                            }
+                                        )
                                     }
                                 }
                             }, enabled = !installingUpdate, modifier = Modifier.fillMaxWidth()) {

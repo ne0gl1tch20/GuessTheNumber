@@ -49,6 +49,8 @@ data class GameState(
     val dailyQuestBestStreak: Int = 0,
     val dailyQuestUpgradePurchases: Int = 0,
     val claimedDailyQuests: Set<String> = emptySet(),
+    val lastDailyRewardDate: String = "",
+    val dailyRewardStreak: Int = 0,
     val lootCommonChests: Int = 0,
     val lootRareChests: Int = 0,
     val lootEpicChests: Int = 0,

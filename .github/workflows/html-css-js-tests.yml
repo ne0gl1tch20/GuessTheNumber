@@ -38,3 +38,6 @@ jobs:
 
       - name: Check CSS syntax balance
         run: python tools/validate_web_assets.py --css-only
+
+      - name: Test localized randomized guess feedback
+        run: python tools/test_guess_feedback_localization.py

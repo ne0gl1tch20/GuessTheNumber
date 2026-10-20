@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.Instant
 
 /** Selects the update feed for this build channel; APK installation is handled separately. */
 object UpdateChannelChecker {
@@ -14,24 +15,36 @@ object UpdateChannelChecker {
         val url: String,
         val details: String,
         val downloadUrl: String,
-        val expectedCommitSha: String? = null
+        val expectedCommitSha: String? = null,
+        val requireChecksum: Boolean = false
     )
 
     sealed interface Result {
         data class Available(val update: AvailableUpdate) : Result
         data object UpToDate : Result
         data object Unavailable : Result
+        data class Failed(val diagnostics: String) : Result
     }
 
     private const val REPOSITORY = "ne0gl1tch20/GuessTheNumber"
-    private const val DEBUG_WORKFLOW = "stable-debug-apk.yml"
-    private const val DEBUG_ARTIFACT_NAME = "GuessTheNumber-debug"
+    private const val DEBUG_RELEASE_TAG = "debug-latest"
 
     suspend fun check(): Result = withContext(Dispatchers.IO) {
         try {
-            if (BuildConfig.UPDATE_CHANNEL == "debug") checkDebugArtifact() else checkRelease()
-        } catch (_: Exception) {
-            Result.Unavailable
+            if (BuildConfig.UPDATE_CHANNEL == "debug") checkDebugRelease() else checkRelease()
+        } catch (error: Exception) {
+            Result.Failed(
+                buildString {
+                    appendLine("Update check failed")
+                    appendLine("Time: ${Instant.now()}")
+                    appendLine("Channel: ${BuildConfig.UPDATE_CHANNEL}")
+                    appendLine("App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+                    appendLine("Failure: ${error.javaClass.name}")
+                    appendLine("Message: ${error.message ?: "(no message)"}")
+                    appendLine()
+                    append(error.stackTraceToString().take(8000))
+                }.trim()
+            )
         }
     }
 
@@ -59,50 +72,43 @@ object UpdateChannelChecker {
         )
     }
 
-    /** Uses the latest successful, non-expired Stable Debug APK Actions artifact from master. */
-    private fun checkDebugArtifact(): Result {
-        val workflow = getJson("https://api.github.com/repos/$REPOSITORY/actions/workflows/$DEBUG_WORKFLOW/runs?status=success&per_page=20")
-        val runs = workflow.optJSONArray("workflow_runs") ?: return Result.Unavailable
-        val latest = (0 until runs.length())
-            .mapNotNull { runs.optJSONObject(it) }
-            .firstOrNull {
-                it.optString("conclusion") == "success" &&
-                    it.optString("head_branch") == "master" &&
-                    it.optString("status") == "completed"
-            } ?: return Result.Unavailable
+    /** Uses the public debug-latest release asset instead of private Actions artifact downloads. */
+    private fun checkDebugRelease(): Result {
+        val release = getJson("https://api.github.com/repos/$REPOSITORY/releases/tags/$DEBUG_RELEASE_TAG")
+        val targetCommit = release.optString("target_commitish")
+        if (!targetCommit.matches(Regex("[a-fA-F0-9]{40}"))) return Result.Unavailable
 
-        val runId = latest.optLong("id", -1L)
-        val runNumber = latest.optInt("run_number", 0)
-        val commit = latest.optString("head_sha")
-        if (runId <= 0L || commit.isBlank()) return Result.Unavailable
-        val artifactResponse = getJson("https://api.github.com/repos/$REPOSITORY/actions/runs/$runId/artifacts")
-        val artifacts = artifactResponse.optJSONArray("artifacts") ?: return Result.Unavailable
-        val artifact = (0 until artifacts.length())
-            .mapNotNull { artifacts.optJSONObject(it) }
-            .firstOrNull {
-                it.optString("name") == DEBUG_ARTIFACT_NAME &&
-                    !it.optBoolean("expired", true) &&
-                    it.optLong("size_in_bytes", 0L) > 0L
-            } ?: return Result.Unavailable
+        val assets = release.optJSONArray("assets")
+        val asset = (0 until (assets?.length() ?: 0))
+            .mapNotNull { assets?.optJSONObject(it) }
+            .firstOrNull { it.optString("name") == "GuessTheNumber-debug.zip" }
+            ?: return Result.Unavailable
+        val downloadUrl = asset.optString("browser_download_url")
+        val pageUrl = release.optString("html_url", "https://github.com/$REPOSITORY/releases/tag/$DEBUG_RELEASE_TAG")
+        if (!isGithubUrl(downloadUrl) || !isGithubUrl(pageUrl)) return Result.Unavailable
 
-        val downloadUrl = artifact.optString("archive_download_url")
-        if (downloadUrl.isBlank() || !isGithubUrl(downloadUrl)) return Result.Unavailable
-        if (BuildConfig.GIT_COMMIT_SHA != "unknown" && commit == BuildConfig.GIT_COMMIT_SHA) return Result.UpToDate
-        val htmlUrl = latest.optString("html_url", "https://github.com/$REPOSITORY/actions/workflows/$DEBUG_WORKFLOW")
-        if (!isGithubUrl(htmlUrl)) return Result.Unavailable
-        val buildGradle = getText("https://raw.githubusercontent.com/$REPOSITORY/$commit/app/build.gradle.kts")
+        val buildGradle = getText("https://raw.githubusercontent.com/$REPOSITORY/$targetCommit/app/build.gradle.kts")
         val versionName = Regex("versionName\\s*=\\s*\"([^\"]+)\"").find(buildGradle)?.groupValues?.getOrNull(1)
             ?: return Result.Unavailable
-        val versionCode = Regex("versionCode\\s*=\\s*(\\d+)").find(buildGradle)?.groupValues?.getOrNull(1)
+        val versionCode = Regex("versionCode\\s*=\\s*(\\d+)").find(buildGradle)?.groupValues?.getOrNull(1)?.toLongOrNull()
             ?: return Result.Unavailable
-        val commitMessage = latest.optJSONObject("head_commit")?.optString("message").orEmpty().take(900)
+        val currentVersionCode = BuildConfig.VERSION_CODE.toLong()
+        if (versionCode < currentVersionCode) return Result.UpToDate
+        if (versionCode == currentVersionCode && BuildConfig.GIT_COMMIT_SHA != "unknown" && targetCommit.equals(BuildConfig.GIT_COMMIT_SHA, ignoreCase = true)) {
+            return Result.UpToDate
+        }
+
+        val body = release.optString("body").trim()
+        val title = Regex("(?m)^Stable Debug #\\d+").find(body)?.value ?: "Stable Debug"
+        val details = if (body.isNotBlank()) body.take(1200) else "Stable Debug v$versionName ($versionCode)"
         return Result.Available(
             AvailableUpdate(
-                title = "v$versionName ($versionCode) · Debug #$runNumber",
-                url = htmlUrl,
-                details = listOf(commitMessage.ifBlank { "Stable Debug APK update" }, "Commit ${commit.take(7)} · ZIP artifact").joinToString("\n\n"),
+                title = "$title · v$versionName ($versionCode)",
+                url = pageUrl,
+                details = details,
                 downloadUrl = downloadUrl,
-                expectedCommitSha = commit
+                expectedCommitSha = targetCommit,
+                requireChecksum = true
             )
         )
     }
@@ -119,7 +125,7 @@ object UpdateChannelChecker {
         connection.readTimeout = 7000
         connection.setRequestProperty("User-Agent", "GuessTheNumber-UpdateChecker")
         return try {
-            if (connection.responseCode !in 200..299) error("Version metadata returned ${connection.responseCode}")
+            if (connection.responseCode !in 200..299) error("GET $address returned HTTP ${connection.responseCode} while reading version metadata")
             connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
         } finally {
             connection.disconnect()
@@ -135,7 +141,7 @@ object UpdateChannelChecker {
         connection.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
         connection.setRequestProperty("User-Agent", "GuessTheNumber-UpdateChecker")
         return try {
-            if (connection.responseCode !in 200..299) error("Update endpoint returned ${connection.responseCode}")
+            if (connection.responseCode !in 200..299) error("GET $address returned HTTP ${connection.responseCode}")
             connection.inputStream.bufferedReader(Charsets.UTF_8).use { JSONObject(it.readText()) }
         } finally {
             connection.disconnect()
