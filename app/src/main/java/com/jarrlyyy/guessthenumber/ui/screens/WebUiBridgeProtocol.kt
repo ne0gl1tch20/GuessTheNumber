@@ -192,6 +192,22 @@ internal object WebUiBridgeProtocol {
                     else ParseResult.Valid(id, type, multiplier = multiplier)
                 }
             }
+            "buy_prestige_upgrade", "buy_ultra_upgrade" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val itemId = request.opt("upgradeId") as? String ?: return ParseResult.Invalid("invalid_upgrade", id)
+                    if (!itemId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) ParseResult.Invalid("invalid_upgrade", id)
+                    else ParseResult.Valid(id, type, itemId = itemId)
+                }
+            }
+            "buy_prestige_shop_item", "buy_ultra_shop_item" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val itemId = request.opt("itemId") as? String ?: return ParseResult.Invalid("invalid_shop_item", id)
+                    if (!itemId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) ParseResult.Invalid("invalid_shop_item", id)
+                    else ParseResult.Valid(id, type, itemId = itemId)
+                }
+            }
             "buy_upgrade" -> {
                 if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
                 else {
