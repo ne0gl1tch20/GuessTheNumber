@@ -79,6 +79,37 @@ internal fun desktopWebPlayState(
             .put("maxed", maxed)
             .put("affordable", !maxed && count > 0 && cost > com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO && game.money >= cost))
     }
+    val progressionRepository = DesktopEconomyRepository()
+    val prestigeUpgradesJson = JSONArray()
+    progressionRepository.prestigeUpgrades().forEach { upgrade ->
+        val level = game.prestigeUpgradeLevels[upgrade.id] ?: 0
+        val cost = DesktopEconomyTransactions.nextUpgradeCost(upgrade, level)
+        val maxed = level >= upgrade.maxLevel
+        prestigeUpgradesJson.put(JSONObject().put("id", upgrade.id).put("name", upgrade.name).put("description", upgrade.description)
+            .put("level", level).put("maxLevel", upgrade.maxLevel).put("nextCost", cost.format())
+            .put("maxed", maxed).put("affordable", !maxed && game.prestige >= cost))
+    }
+    val ultraUpgradesJson = JSONArray()
+    progressionRepository.ultraUpgrades().forEach { upgrade ->
+        val level = game.ultraUpgradeLevels[upgrade.id] ?: 0
+        val cost = DesktopEconomyTransactions.nextUpgradeCost(upgrade, level)
+        val maxed = level >= upgrade.maxLevel
+        ultraUpgradesJson.put(JSONObject().put("id", upgrade.id).put("name", upgrade.name).put("description", upgrade.description)
+            .put("level", level).put("maxLevel", upgrade.maxLevel).put("nextCost", cost.format())
+            .put("maxed", maxed).put("affordable", !maxed && game.ultra >= cost))
+    }
+    val prestigeShopJson = JSONArray()
+    progressionRepository.prestigeShopItems().forEach { item ->
+        val owned = item.id in game.prestigeShopPurchases
+        prestigeShopJson.put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
+            .put("cost", item.cost).put("owned", owned).put("affordable", !owned && game.prestige >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(item.cost)))
+    }
+    val ultraShopJson = JSONArray()
+    progressionRepository.ultraShopItems().forEach { item ->
+        val owned = item.id in game.ultraShopPurchases
+        ultraShopJson.put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
+            .put("cost", item.cost).put("owned", owned).put("affordable", !owned && game.ultra >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(item.cost)))
+    }
     val talentsJson = JSONArray()
     talents.forEach { talent ->
         val owned = talent.id in game.prestigeShopPurchases
@@ -147,6 +178,10 @@ internal fun desktopWebPlayState(
         .put("bestStreak", game.bestStreak)
         .put("upgrades", upgrades)
         .put("shopItems", shopItems)
+        .put("prestigeUpgrades", prestigeUpgradesJson)
+        .put("prestigeShopItems", prestigeShopJson)
+        .put("ultraUpgrades", ultraUpgradesJson)
+        .put("ultraShopItems", ultraShopJson)
         .put("rangeMin", game.currentRangeMin.toString())
         .put("rangeMax", game.currentRangeMax.toString())
         .put("attempts", game.attempts)
