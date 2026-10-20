@@ -1164,5 +1164,8 @@
   "nimmy_step_more_body": "Beloningen, statistieken en instellingen staan bij Meer. Je kunt beginnen!",
   "nimmy_next": "Volgende",
   "nimmy_skip": "Rondleiding overslaan",
-  "nimmy_finish": "Aan de slag!"
+  "nimmy_finish": "Aan de slag!",
+  "nimmy_settings_heading": "Hulp en uitleg",
+  "nimmy_settings_description": "Wil je het nog eens zien? Nimmy kan je opnieuw rondleiden.",
+  "nimmy_rerun_button": "Nimmy-tutorial opnieuw starten"
 }
