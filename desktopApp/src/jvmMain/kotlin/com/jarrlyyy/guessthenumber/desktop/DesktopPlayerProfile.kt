@@ -75,9 +75,9 @@ internal object DesktopPlayerProfileStore {
             fileFilter = FileNameExtensionFilter("Image files (PNG, JPG, GIF, BMP)", "png", "jpg", "jpeg", "gif", "bmp")
             isAcceptAllFileFilterUsed = false
         }
-        if (chooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) return null
-        val selected = chooser.selectedFile ?: return null
-        val decoded = ImageIO.read(selected) ?: return null
+        if (chooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) return@runCatching null
+        val selected = chooser.selectedFile ?: return@runCatching null
+        if (ImageIO.read(selected) == null) return@runCatching null
         val profileDirectory = File(System.getProperty("user.home"), ".guessthenumber/profile").apply { mkdirs() }
         val extension = selected.extension.lowercase().takeIf { it in setOf("png", "jpg", "jpeg", "gif", "bmp") } ?: "png"
         val destination = File(profileDirectory, "avatar_${UUID.randomUUID()}.$extension")
