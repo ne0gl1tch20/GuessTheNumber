@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,9 +21,17 @@ import com.jarrlyyy.guessthenumber.ui.screens.DevSettingsScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProcessInspectorScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProductionWebPlayScreen
 import com.jarrlyyy.guessthenumber.ui.screens.SaveSlotsScreen
+import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfile
+import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileScreen
+import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileStore
 import com.jarrlyyy.guessthenumber.ui.screens.SharedWebUiPrototypeScreen
 import com.jarrlyyy.guessthenumber.ui.screens.LuaTestingHubScreen
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
+import kotlinx.coroutines.flow.first
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.unit.dp
 
 /**
  * Player-facing navigation is owned by the shared HTML surface.
@@ -80,6 +89,15 @@ fun NavGraph(
     onNotificationDestinationHandled: () -> Unit = {}
 ) {
     val locale = viewModel.localeManager
+    val appContext = androidx.compose.ui.platform.LocalContext.current.applicationContext
+    val profileStore = remember(appContext) { PlayerProfileStore(appContext) }
+    val playerProfile by profileStore.profile.collectAsState(initial = null)
+    var profileLoaded by remember { mutableStateOf(false) }
+    var showPlayerProfile by remember { mutableStateOf(false) }
+    LaunchedEffect(profileStore) {
+        profileStore.profile.first()
+        profileLoaded = true
+    }
     var showDevSettings by remember { mutableStateOf(false) }
     var dailyRewardTestRequest by remember { mutableStateOf(0) }
     var webPlayMounted by remember { mutableStateOf(hasAnySave) }
@@ -87,6 +105,25 @@ fun NavGraph(
     var debugDestination by remember { mutableStateOf<String?>(null) }
     var showSaveSlots by remember { mutableStateOf(false) }
     var colorPickerTarget by remember { mutableStateOf<String?>(null) }
+
+    if (!profileLoaded) {
+        Box(modifier = androidx.compose.ui.Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+            androidx.compose.material3.CircularProgressIndicator()
+        }
+        return
+    }
+
+    if (playerProfile?.setupComplete != true) {
+        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+            PlayerProfileScreen(
+                profile = playerProfile,
+                firstLaunch = true,
+                store = profileStore,
+                onBack = {}
+            )
+        }
+        return
+    }
 
     if (!webPlayMounted && !showSaveSlots) {
         CompositionLocalProvider(LocalAppLocaleManager provides locale) {
@@ -215,6 +252,48 @@ fun NavGraph(
                     }
                 )
             }
+        }
+    }
+
+    if (webPlayMounted && !showSaveSlots) {
+        androidx.compose.material3.Surface(
+            modifier = androidx.compose.ui.Modifier
+                .align(androidx.compose.ui.Alignment.BottomEnd)
+                .padding(12.dp)
+                .clickable { showPlayerProfile = true },
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
+            color = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+            tonalElevation = 6.dp
+        ) {
+            androidx.compose.foundation.layout.Row(
+                modifier = androidx.compose.ui.Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            ) {
+                val avatarEmoji = when (playerProfile?.avatarId) {
+                    "cat" -> "🐱"; "fox" -> "🦊"; "dog" -> "🐶"; "robot" -> "🤖"
+                    "ghost" -> "👻"; "dragon" -> "🐉"; "alien" -> "👽"; "rocket" -> "🚀"
+                    "crown" -> "👑"; "gem" -> "💎"; "controller" -> "🎮"; "moon" -> "🌙"
+                    "sun" -> "☀️"; "flower" -> "🌸"; "lightning" -> "⚡"; else -> "⭐"
+                }
+                androidx.compose.material3.Text(avatarEmoji)
+                androidx.compose.foundation.layout.Spacer(Modifier.width(8.dp))
+                androidx.compose.material3.Text(
+                    playerProfile?.username.orEmpty(),
+                    style = androidx.compose.material3.MaterialTheme.typography.labelLarge,
+                    maxLines = 1
+                )
+            }
+        }
+    }
+
+    if (showPlayerProfile) {
+        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+            PlayerProfileScreen(
+                profile = playerProfile,
+                firstLaunch = false,
+                store = profileStore,
+                onBack = { showPlayerProfile = false }
+            )
         }
     }
 
