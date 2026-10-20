@@ -30,6 +30,11 @@ import com.jarrlyyy.guessthenumber.ui.screens.LuaTestingHubScreen
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 import kotlinx.coroutines.flow.first
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.unit.dp
@@ -275,7 +280,20 @@ fun NavGraph(
                     "crown" -> "👑"; "gem" -> "💎"; "controller" -> "🎮"; "moon" -> "🌙"
                     "sun" -> "☀️"; "flower" -> "🌸"; "lightning" -> "⚡"; else -> "⭐"
                 }
-                androidx.compose.material3.Text(avatarEmoji)
+                val customAvatar = remember(playerProfile?.customAvatarPath) {
+                    playerProfile?.customAvatarPath?.let { path ->
+                        runCatching { BitmapFactory.decodeFile(path)?.asImageBitmap() }.getOrNull()
+                    }
+                }
+                if (playerProfile?.avatarId == "custom" && customAvatar != null) {
+                    Image(
+                        bitmap = customAvatar,
+                        contentDescription = "Profile picture",
+                        modifier = Modifier.size(28.dp).clip(CircleShape)
+                    )
+                } else {
+                    androidx.compose.material3.Text(avatarEmoji)
+                }
                 androidx.compose.foundation.layout.Spacer(Modifier.width(8.dp))
                 androidx.compose.material3.Text(
                     playerProfile?.username.orEmpty(),
