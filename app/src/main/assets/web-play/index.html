@@ -203,6 +203,8 @@
     </section>
     </div>
     <div class="screen" id="screen-rewards" role="tabpanel" aria-labelledby="tab-rewards" data-screen="rewards" hidden>
+    <section class="daily-rewards-page card" aria-label="Daily Nebula rewards"><div class="panel-title"><span class="eyebrow">DAILY LOGIN</span><h2 data-i18n="daily_reward_title">Daily Nebula Reward</h2><span class="panel-chip" id="dailyRewardPageStatus">READY</span></div><p id="dailyRewardPageSubtitle" data-i18n="daily_reward_subtitle">Claim today's reward and keep your streak alive.</p><div class="daily-reward-page-main"><strong class="reward-amount" id="dailyRewardPageAmount">+5 Nebula</strong><p class="reward-streak" id="dailyRewardPageStreak">Day 1 streak</p></div><div id="dailyRewardPageSchedule" class="daily-reward-schedule"></div><p id="dailyRewardPageMessage" class="catalog-intro" role="status" aria-live="polite"></p><button type="button" class="primary-action reward-claim" id="dailyRewardPageClaim">Claim reward</button></section>
+
 <section class="milestones-card card" aria-label="Achievement progress">
       <div class="panel-title"><span class="panel-glyph milestone-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-trophy"></use></svg></span><div><span class="eyebrow">PERSONAL MILESTONES</span><h2>Achievement progress</h2></div><span class="panel-chip">3 GOALS</span></div>
       <article class="milestone-row">
@@ -271,14 +273,16 @@
           <span>BUY AMOUNT</span>
           <button type="button" data-multiplier="1">×1</button><button type="button" data-multiplier="10">×10</button><button type="button" data-multiplier="100">×100</button><button type="button" data-multiplier="MAX">MAX</button>
         </div>
-        <div class="catalog-list" id="upgradeList"><p class="catalog-empty">Syncing upgrades…</p></div>
+        <div class="catalog-list" <div class="catalog-currency-balance" id="upgradeCurrencyBalance" aria-live="polite">Nebula: <strong>0</strong></div>
+        id="upgradeList"><p class="catalog-empty">Syncing upgrades…</p></div>
       </section>
     </div>
     <div class="screen" id="screen-shop" role="tabpanel" aria-labelledby="tab-shop" data-screen="shop" hidden>
       <section class="card catalog-panel">
         <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><div><span class="eyebrow">COSMIC MARKET</span><h2>Shop</h2></div><span class="panel-chip" id="shopCurrency">NEBULA</span></div>
         <p class="catalog-intro">Spend Nebula on useful items and cosmetics. Owned cosmetics can be equipped here.</p>
-        <div class="catalog-list" id="shopList"><p class="catalog-empty">Syncing shop…</p></div>
+        <div class="catalog-list" <div class="catalog-currency-balance" id="shopCurrencyBalance" aria-live="polite">Nebula: <strong>0</strong></div>
+        id="shopList"><p class="catalog-empty">Syncing shop…</p></div>
       </section>
     </div>
 
@@ -381,6 +385,7 @@
           <h3 data-i18n="nimmy_settings_heading">Help &amp; tutorial</h3>
           <p class="catalog-intro" data-i18n="nimmy_settings_description">Want a refresher? Nimmy can show you around again.</p>
           <button type="button" class="primary-action" id="rerunNimmyButton" data-i18n="nimmy_rerun_button">Rerun Nimmy tutorial</button>
+      <section class="settings-danger card" aria-labelledby="resetEverythingTitle"><div class="panel-title"><span class="eyebrow">DATA</span><h3 id="resetEverythingTitle" data-i18n="reset_everything_label">Reset Everything</h3></div><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><button type="button" class="world-action-button" id="resetEverythingButton" data-bridge-action="reset_everything" data-i18n="reset_everything_label">Reset Everything</button></section>
         </div>
         <p class="catalog-intro" id="settingsStatus" role="status" aria-live="polite">Settings sync with the Android game.</p>
       </section>
@@ -395,12 +400,14 @@
         <section class="progression-catalog-section">
           <h3 data-i18n="prestige_upgrade_tree_title">Prestige upgrades</h3>
           <p class="catalog-intro" data-i18n="prestige_html_upgrades_desc">Spend Prestige to buy permanent upgrades.</p>
-          <div class="catalog-list" id="prestigeUpgradeList"><p class="catalog-empty">Loading Prestige upgrades…</p></div>
+          <div class="catalog-list" <div class="catalog-currency-balance" id="prestigeUpgradeCurrencyBalance" aria-live="polite">Prestige: <strong>0</strong></div>
+        id="prestigeUpgradeList"><p class="catalog-empty">Loading Prestige upgrades…</p></div>
         </section>
         <section class="progression-catalog-section">
           <h3 data-i18n="prestige_shop_title">Prestige Shop</h3>
           <p class="catalog-intro" data-i18n="prestige_html_shop_desc">Spend Prestige on one-time shop items.</p>
-          <div class="catalog-list" id="prestigeShopList"><p class="catalog-empty">Loading Prestige shop…</p></div>
+          <div class="catalog-list" <div class="catalog-currency-balance" id="prestigeShopCurrencyBalance" aria-live="polite">Prestige: <strong>0</strong></div>
+        id="prestigeShopList"><p class="catalog-empty">Loading Prestige shop…</p></div>
         </section>
         <button type="button" class="world-action-button" id="prestigeResetButton" data-bridge-action="prestige_reset">Prestige reset</button>
         <p class="catalog-intro" id="prestigeStatus" role="status" aria-live="polite"></p>
@@ -416,12 +423,14 @@
         <section class="progression-catalog-section">
           <h3 data-i18n="ultra_upgrade_tree_title">Ultra upgrades</h3>
           <p class="catalog-intro" data-i18n="ultra_html_upgrades_desc">Spend Ultra to buy permanent upgrades.</p>
-          <div class="catalog-list" id="ultraUpgradeList"><p class="catalog-empty">Loading Ultra upgrades…</p></div>
+          <div class="catalog-list" <div class="catalog-currency-balance" id="ultraUpgradeCurrencyBalance" aria-live="polite">Ultra: <strong>0</strong></div>
+        id="ultraUpgradeList"><p class="catalog-empty">Loading Ultra upgrades…</p></div>
         </section>
         <section class="progression-catalog-section">
           <h3 data-i18n="ultra_shop_title">Ultra Shop</h3>
           <p class="catalog-intro" data-i18n="ultra_html_shop_desc">Spend Ultra on one-time shop items.</p>
-          <div class="catalog-list" id="ultraShopList"><p class="catalog-empty">Loading Ultra shop…</p></div>
+          <div class="catalog-list" <div class="catalog-currency-balance" id="ultraShopCurrencyBalance" aria-live="polite">Ultra: <strong>0</strong></div>
+        id="ultraShopList"><p class="catalog-empty">Loading Ultra shop…</p></div>
         </section>
         <button type="button" class="world-action-button" id="ultraResetButton" data-bridge-action="ultra_reset">Ultra reset</button>
         <p class="catalog-intro" id="ultraStatus" role="status" aria-live="polite"></p>
@@ -517,10 +526,11 @@
       <strong class="reward-amount" id="dailyRewardAmount">+5 Nebula</strong>
       <p class="reward-streak" id="dailyRewardStreak">Day 1 streak</p>
       <div id="dailyRewardSchedule" class="daily-reward-schedule" aria-label="Upcoming daily rewards"></div>
-      <button type="button" class="primary-action reward-claim" id="dailyRewardClaim">Claim reward</button>
+      <button type="button" class="primary-action reward-claim" id="dailyRewardClaim">Claim reward</button><button type="button" class="secondary-action reward-close" id="dailyRewardClose">Close</button>
     </div>
   </section>
-  <section id="nimmyTutorial" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="nimmyTitle" aria-describedby="nimmyBody">
+  <section id="resetEverythingDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetEverythingDialogTitle"><div class="nimmy-tutorial-backdrop" aria-hidden="true"></div><div class="nimmy-dialog card reset-dialog"><span class="eyebrow">DATA RESET</span><h2 id="resetEverythingDialogTitle" data-i18n="confirm_data_reset_title">Confirm Data Reset</h2><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><p id="resetMathPrompt" class="reset-math-prompt"></p><p id="resetTimerText" class="catalog-intro">Wait 45s before confirming.</p><label class="reset-check-row"><input type="checkbox" id="resetAcknowledgement"><span data-i18n="reset_data_acknowledgement">I understand this will erase all my progress</span></label><input id="resetMathAnswer" class="stake-input" inputmode="numeric" autocomplete="off"><div class="nimmy-actions"><button type="button" class="secondary-action" id="resetCancelButton">Cancel</button><button type="button" class="primary-action" id="resetConfirmButton" disabled>Confirm reset</button></div></div></section>
+<section id="nimmyTutorial" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="nimmyTitle" aria-describedby="nimmyBody">
     <div class="nimmy-tutorial-backdrop" aria-hidden="true"></div>
     <div id="nimmySpotlight" class="nimmy-spotlight" aria-hidden="true"></div>
     <div id="nimmyDialog" class="nimmy-dialog">

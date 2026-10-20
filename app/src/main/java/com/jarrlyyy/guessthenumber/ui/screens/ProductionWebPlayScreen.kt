@@ -202,6 +202,18 @@ fun ProductionWebPlayScreen(
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        if (parsed.type == "read_feature_tutorial" || parsed.type == "complete_feature_tutorial") {
+                                            val featureId = parsed.itemId.orEmpty()
+                                            val prefs = context.applicationContext.getSharedPreferences("web_play_onboarding", android.content.Context.MODE_PRIVATE)
+                                            if (parsed.type == "complete_feature_tutorial") { prefs.edit().putBoolean("nimmy_feature_$featureId", true).apply() }
+                                            else replyProxy.postMessage(JSONObject().put("version",1).put("id",parsed.id).put("type","feature_tutorial_state").put("featureId",featureId).put("completed",prefs.getBoolean("nimmy_feature_$featureId",false)).toString())
+                                            return@post
+                                        }
+                                        if (parsed.type == "reset_everything") {
+                                            onResetData(); replyProxy.postMessage(JSONObject().put("version",1).put("id",parsed.id).put("type","state").put("state",JSONObject().put("accepted",true)).toString())
+                                            webViewRef?.postDelayed({ context.packageManager.getLaunchIntentForPackage(context.packageName)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)?.let(context::startActivity) },1600L)
+                                            return@post
+                                        }
                                         if (parsed.type == "read_onboarding_state") {
                                             val onboardingPrefs = context.applicationContext.getSharedPreferences("web_play_onboarding", android.content.Context.MODE_PRIVATE)
                                             val firstLaunchAlreadySeen = onboardingPrefs.getBoolean("daily_reward_first_launch_seen", false)
@@ -230,6 +242,7 @@ fun ProductionWebPlayScreen(
                                                     .put("username", storedProfile?.username.orEmpty())
                                                     .put("bio", storedProfile?.bio.orEmpty())
                                                     .put("avatarId", storedProfile?.avatarId ?: "star")
+                                                    .put("customAvatarData", if (storedProfile?.avatarId == "custom" && !storedProfile.customAvatarPath.isNullOrBlank()) runCatching { val file=java.io.File(storedProfile.customAvatarPath); val mime=when(file.extension.lowercase()){"png"->"image/png";"webp"->"image/webp";else->"image/jpeg"}; "data:$mime;base64,"+android.util.Base64.encodeToString(file.readBytes(),android.util.Base64.NO_WRAP) }.getOrNull() else null)
                                                     .put("setupComplete", storedProfile?.setupComplete == true)
                                                 replyProxy.postMessage(response.toString())
                                             }
