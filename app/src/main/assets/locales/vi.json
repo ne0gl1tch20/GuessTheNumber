@@ -1151,5 +1151,18 @@
   "daily_reward_claim": "Nhận thưởng",
   "daily_reward_streak": "Chuỗi ngày thứ %s",
   "daily_reward_claimed": "Bạn đã nhận phần thưởng hôm nay rồi.",
-  "offline_gains_amount": "+%s tiền"
+  "offline_gains_amount": "+%s tiền",
+  "nimmy_name": "Nimmy",
+  "nimmy_step_counter": "Bước %s trên %s",
+  "nimmy_step_guess_title": "Cùng đoán số nhé!",
+  "nimmy_step_guess_body": "Nhập một số nguyên ở đây. Mình sẽ giúp bạn hiểu các gợi ý.",
+  "nimmy_step_submit_title": "Sẵn sàng chưa? Thử nhé!",
+  "nimmy_step_submit_body": "Nhấn mũi tên để gửi dự đoán. Gợi ý sẽ giúp bạn thu hẹp khoảng số.",
+  "nimmy_step_upgrades_title": "Nâng cấp trò chơi!",
+  "nimmy_step_upgrades_body": "Mở Nâng cấp để tăng sức mạnh và kiếm được nhiều hơn.",
+  "nimmy_step_more_title": "Cùng khám phá!",
+  "nimmy_step_more_body": "Phần Thêm có phần thưởng, thống kê và cài đặt. Bạn sẵn sàng chơi rồi!",
+  "nimmy_next": "Tiếp theo",
+  "nimmy_skip": "Bỏ qua hướng dẫn",
+  "nimmy_finish": "Bắt đầu thôi!"
 }
