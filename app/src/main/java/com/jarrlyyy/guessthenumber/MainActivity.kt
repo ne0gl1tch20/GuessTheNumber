@@ -6,6 +6,9 @@ import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.jarrlyyy.guessthenumber.ui.components.ExpressiveSaveLoadingScreen
@@ -146,6 +149,28 @@ class MainActivity : ComponentActivity() {
                             onNotificationDestinationHandled = { notificationDestination = null }
                         )
                     }
+                }
+
+                if (showTimeTravelPopup) {
+                    AlertDialog(
+                        onDismissRequest = { viewModel.dismissTimeTravelPopup() },
+                        title = {
+                            Text(locale.getString("time_travel_title", "⏳ Time Travel Detected!"))
+                        },
+                        text = {
+                            Text(
+                                locale.getString(
+                                    "time_travel_text",
+                                    "Your device clock is %d seconds behind the last save. Auto-clicker and passive generation are paused for 24 hours."
+                                ).replace("%d", timeTravelSeconds.toString())
+                            )
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { viewModel.dismissTimeTravelPopup() }) {
+                                Text(locale.getString("understood", "Understood"))
+                            }
+                        }
+                    )
                 }
             }
         }
