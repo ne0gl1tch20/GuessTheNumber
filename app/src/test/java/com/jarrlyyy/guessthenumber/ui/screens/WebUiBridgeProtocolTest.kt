@@ -26,6 +26,22 @@ class WebUiBridgeProtocolTest {
     }
 
     @Test
+    fun acceptsOnboardingStateAndCompletionRequests() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("onboarding-1", "read_onboarding_state"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"onboarding-1","type":"read_onboarding_state"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("onboarding-2", "complete_nimmy_tutorial"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"onboarding-2","type":"complete_nimmy_tutorial"}""")
+        )
+        assertEquals(
+            "invalid_request",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"onboarding-3","type":"complete_nimmy_tutorial","unexpected":true}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+    }
+
+    @Test
     fun acceptsReadStateRequest() {
         assertEquals(
             WebUiBridgeProtocol.ParseResult.Valid("req_1", "read_state"),
