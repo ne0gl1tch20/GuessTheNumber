@@ -1164,5 +1164,8 @@
   "nimmy_step_more_body": "Ricompense, statistiche e impostazioni si trovano in Altro. Ora sei pronto a giocare!",
   "nimmy_next": "Avanti",
   "nimmy_skip": "Salta il tutorial",
-  "nimmy_finish": "Si parte!"
+  "nimmy_finish": "Si parte!",
+  "nimmy_settings_heading": "Aiuto e tutorial",
+  "nimmy_settings_description": "Vuoi ripassare? Nimmy può guidarti di nuovo nel gioco.",
+  "nimmy_rerun_button": "Ripeti il tutorial di Nimmy"
 }
