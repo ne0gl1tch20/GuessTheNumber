@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.jetbrains.skia.Image as SkiaImage
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
