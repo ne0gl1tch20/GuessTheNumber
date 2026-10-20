@@ -158,6 +158,7 @@ fun NavGraph(
             offlineGains = offlineGains,
             onDismissOfflineGains = onDismissOfflineGains,
             onClaimDailyReward = viewModel::claimDailyReward,
+            onResetData = onResetData,
             onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
             onClaimDailyQuest = viewModel::claimDailyQuest,
             onOpenLootChest = viewModel::openLootChest,
