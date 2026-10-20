@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "176794846642",
+    "project_id": "guess-the-number-9ac03",
+    "storage_bucket": "guess-the-number-9ac03.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:176794846642:android:da4a2b7221a3a75002d0ab",
+        "android_client_info": {
+          "package_name": "com.jarrlyyy.guessthenumber"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXwWZRiDbQT39Dftk7kKHT-gNGlXYkUKs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:176794846642:android:68d3590db4b233ac02d0ab",
+        "android_client_info": {
+          "package_name": "com.jarrlyyy.guessthenumber.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXwWZRiDbQT39Dftk7kKHT-gNGlXYkUKs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
