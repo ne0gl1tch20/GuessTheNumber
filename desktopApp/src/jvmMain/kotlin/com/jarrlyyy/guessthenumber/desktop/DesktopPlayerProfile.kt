@@ -28,13 +28,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.toComposeImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.awt.Image
-import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -104,14 +102,9 @@ internal fun DesktopPlayerProfileButton(
     val avatarImage = remember(profile.customAvatarPath, profile.avatarId) {
         if (profile.avatarId == "custom" && !profile.customAvatarPath.isNullOrBlank()) {
             runCatching {
-                ImageIO.read(File(profile.customAvatarPath.orEmpty()))?.let { source ->
-                    val scaled = source.getScaledInstance(64, 64, Image.SCALE_SMOOTH)
-                    val image = BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB)
-                    val graphics = image.createGraphics()
-                    graphics.drawImage(scaled, 0, 0, null)
-                    graphics.dispose()
-                    image.toComposeImageBitmap()
-                }
+                SkiaImage.makeFromEncoded(File(profile.customAvatarPath.orEmpty()).readBytes())
+                    .toComposeImageBitmap()
+            }
             }.getOrNull()
         } else null
     }
@@ -161,14 +154,8 @@ internal fun DesktopPlayerProfileScreen(
                         val avatarImage = remember(customAvatarPath, avatarId) {
                             if (avatarId == "custom" && !customAvatarPath.isNullOrBlank()) {
                                 runCatching {
-                                    ImageIO.read(File(customAvatarPath!!))?.let { source ->
-                                        val scaled = source.getScaledInstance(128, 128, Image.SCALE_SMOOTH)
-                                        val image = BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB)
-                                        val graphics = image.createGraphics()
-                                        graphics.drawImage(scaled, 0, 0, null)
-                                        graphics.dispose()
-                                        image.toComposeImageBitmap()
-                                    }
+                                    SkiaImage.makeFromEncoded(File(customAvatarPath!!).readBytes())
+                                        .toComposeImageBitmap()
                                 }.getOrNull()
                             } else null
                         }
