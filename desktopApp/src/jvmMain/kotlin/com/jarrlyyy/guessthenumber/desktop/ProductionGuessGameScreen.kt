@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.DesktopGuessingBot
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyCatalog
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRepository
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyRules
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import com.jarrlyyy.guessthenumber.desktop.economy.EconomyTransaction
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveStore
