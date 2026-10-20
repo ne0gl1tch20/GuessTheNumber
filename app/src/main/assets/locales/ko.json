@@ -1164,5 +1164,8 @@
   "nimmy_step_more_body": "보상, 통계, 설정은 더 보기에서 찾을 수 있어요. 이제 플레이할 준비가 됐어요!",
   "nimmy_next": "다음",
   "nimmy_skip": "튜토리얼 건너뛰기",
-  "nimmy_finish": "시작해요!"
+  "nimmy_finish": "시작해요!",
+  "nimmy_settings_heading": "도움말 및 튜토리얼",
+  "nimmy_settings_description": "다시 확인하고 싶나요? Nimmy가 게임을 다시 안내해 줄게요.",
+  "nimmy_rerun_button": "Nimmy 튜토리얼 다시 보기"
 }
