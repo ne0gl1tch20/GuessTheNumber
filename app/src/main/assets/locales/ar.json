@@ -1165,5 +1165,8 @@
   "nimmy_step_more_body": "ستجد المكافآت والإحصاءات والإعدادات في «المزيد». أنت جاهز للعب!",
   "nimmy_next": "التالي",
   "nimmy_skip": "تخطي الجولة التعليمية",
-  "nimmy_finish": "هيا بنا!"
+  "nimmy_finish": "هيا بنا!",
+  "nimmy_settings_heading": "المساعدة والشرح",
+  "nimmy_settings_description": "هل تريد المراجعة؟ يمكن لـ Nimmy إرشادك مرة أخرى.",
+  "nimmy_rerun_button": "إعادة تشغيل شرح Nimmy"
 }
