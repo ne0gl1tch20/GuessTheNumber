@@ -8,9 +8,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -127,10 +126,11 @@ fun PlayerProfileScreen(
         }
     ) { insets ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(insets).padding(horizontal = 20.dp)
-                .imePadding(),
+            modifier = Modifier.fillMaxSize().padding(insets).imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Spacer(Modifier.height(4.dp))
             Text(
@@ -157,19 +157,30 @@ fun PlayerProfileScreen(
                 }
             }
             Text("Choose an avatar", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
-                modifier = Modifier.fillMaxWidth().heightIn(max = 170.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            Column(
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(avatarPresets) { (id, emoji) ->
-                    FilterChip(
-                        selected = avatarId == id,
-                        onClick = { avatarId = id; customAvatarPath = null },
-                        label = { Text(emoji, style = MaterialTheme.typography.titleLarge) },
-                        leadingIcon = if (avatarId == id) ({ Icon(Icons.Default.Check, contentDescription = null) }) else null
-                    )
+                avatarPresets.chunked(4).forEach { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        row.forEach { (id, emoji) ->
+                            FilterChip(
+                                selected = avatarId == id,
+                                onClick = { avatarId = id; customAvatarPath = null },
+                                label = {
+                                    Text(
+                                        if (avatarId == id) "✓ $emoji" else emoji,
+                                        style = MaterialTheme.typography.titleLarge
+                                    )
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
+                    }
                 }
             }
             OutlinedButton(onClick = { imagePicker.launch("image/*") }, modifier = Modifier.fillMaxWidth()) {
@@ -188,7 +199,7 @@ fun PlayerProfileScreen(
             OutlinedTextField(
                 value = bio,
                 onValueChange = { bio = it.take(120) },
-                label = { Text("Bio") },
+                label = { Text("Bio (optional)") },
                 placeholder = { Text("A little about you (optional)") },
                 supportingText = { Text("${bio.length}/120") },
                 minLines = 2,
@@ -196,7 +207,6 @@ fun PlayerProfileScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
-            Spacer(Modifier.weight(1f, fill = false))
             Button(
                 onClick = {
                     val cleanName = username.trim()
