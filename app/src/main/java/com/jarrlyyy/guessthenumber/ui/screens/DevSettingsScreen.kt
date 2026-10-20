@@ -69,6 +69,7 @@ fun DevSettingsScreen(
     var luaCommandInput by remember { mutableStateOf("/lua status") }
     var luaCommandOutput by remember { mutableStateOf("") }
     var luaCommandBusy by remember { mutableStateOf(false) }
+    var webViewJsInput by remember { mutableStateOf("document.title") }
     val luaEngine = remember(context) { LuaEngine.get(context) }
     val coroutineScope = rememberCoroutineScope()
 
@@ -110,6 +111,31 @@ fun DevSettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Debug the live HTML game WebView directly on this device.
+            item {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("Android WebView DevTools", style = MaterialTheme.typography.titleLarge)
+                        Text("On-phone JavaScript console and Kotlin bridge logs. Available only in debug builds.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        OutlinedTextField(value = webViewJsInput, onValueChange = { webViewJsInput = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Run JavaScript in game WebView") }, minLines = 2, maxLines = 5)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(onClick = { WebViewDebugConsole.runJavascript(webViewJsInput) }, enabled = webViewJsInput.isNotBlank()) {
+                                Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null); Spacer(modifier = Modifier.width(6.dp)); Text("Run")
+                            }
+                            OutlinedButton(onClick = { WebViewDebugConsole.clear() }) {
+                                Icon(imageVector = Icons.Default.Delete, contentDescription = null); Spacer(modifier = Modifier.width(6.dp)); Text("Clear logs")
+                            }
+                        }
+                        Text("Laptop: enable USB debugging, connect the phone, then open chrome://inspect/#devices in desktop Chrome.", style = MaterialTheme.typography.bodySmall)
+                        Text("Live console · newest 80 entries", style = MaterialTheme.typography.labelLarge)
+                        if (WebViewDebugConsole.entries.isEmpty()) { Text("No WebView messages yet. Open the game screen or trigger a UI action.", color = MaterialTheme.colorScheme.onSurfaceVariant) } else {
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                WebViewDebugConsole.entries.takeLast(80).asReversed().forEach { entry -> Text(text = entry, style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace) }
+                            }
+                        }
+                    }
+                }
+            }
             // Section 0: Process Inspector Navigation Button
             item {
                 Button(
