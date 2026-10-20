@@ -199,6 +199,7 @@ fun main() = application {
         var navigationPosition by remember { mutableStateOf(DesktopNavigationPosition.load()) }
         var playerProfile by remember { mutableStateOf(DesktopPlayerProfileStore.load()) }
         var editingPlayerProfile by remember { mutableStateOf(false) }
+        var viewingPlayerProfile by remember { mutableStateOf(false) }
 
         DesktopTheme(
             window = window,
@@ -243,9 +244,11 @@ fun main() = application {
                 shellFocusRequester.requestFocus()
             }
 
-            if (playerProfile?.setupComplete != true || editingPlayerProfile) {
+            if (playerProfile?.setupComplete != true || editingPlayerProfile || viewingPlayerProfile) {
                 DesktopPlayerProfileScreen(
                     profile = playerProfile,
+                    viewOnly = viewingPlayerProfile && !editingPlayerProfile,
+                    onEdit = { viewingPlayerProfile = false; editingPlayerProfile = true },
                     onSave = { savedProfile ->
                         runCatching { DesktopPlayerProfileStore.save(savedProfile) }
                             .onSuccess {
@@ -253,7 +256,7 @@ fun main() = application {
                                 editingPlayerProfile = false
                             }
                     },
-                    onCancel = { editingPlayerProfile = false }
+                    onCancel = { editingPlayerProfile = false; viewingPlayerProfile = false }
                 )
             } else {
             Surface(
@@ -279,17 +282,6 @@ fun main() = application {
                         .focusable(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        playerProfile?.let { profile ->
-                            DesktopPlayerProfileButton(
-                                profile = profile,
-                                onClick = { editingPlayerProfile = true }
-                            )
-                        }
-                    }
                     if (shellState.message != null) {
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Text(
@@ -402,6 +394,7 @@ fun main() = application {
                                         DesktopNavigationPosition.save(selected)
                                     },
                                     onOpenParityDestination = { shell.navigate(it) },
+                                    onOpenPlayerProfile = { viewingPlayerProfile = true; editingPlayerProfile = false },
                                     onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
                                     onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
                                         themeMode = mode
