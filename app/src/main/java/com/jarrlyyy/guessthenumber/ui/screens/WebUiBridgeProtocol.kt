@@ -9,7 +9,7 @@ internal object WebUiBridgeProtocol {
     const val MAX_MESSAGE_LENGTH = 512
     private val dailyQuestIds = setOf("daily_guesses_10", "daily_correct_5", "daily_streak_5", "daily_upgrades_3")
     private val lootTiers = setOf("common", "rare", "epic")
-    private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements", "save_slots", "color_picker_primary", "color_picker_secondary", "color_picker_tertiary")
+    private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements", "save_slots", "player_profile", "color_picker_primary", "color_picker_secondary", "color_picker_tertiary")
     private val worldActions = setOf("unlock", "boss")
     private val buyMultipliers = setOf("1", "10", "100", "MAX")
     private val relicActions = setOf("equip", "unequip")
