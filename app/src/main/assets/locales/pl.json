@@ -1164,5 +1164,8 @@
   "nimmy_step_more_body": "Nagrody, statystyki i ustawienia znajdziesz w sekcji Więcej. Możesz już grać!",
   "nimmy_next": "Dalej",
   "nimmy_skip": "Pomiń samouczek",
-  "nimmy_finish": "Zaczynamy!"
+  "nimmy_finish": "Zaczynamy!",
+  "nimmy_settings_heading": "Pomoc i samouczek",
+  "nimmy_settings_description": "Chcesz sobie przypomnieć? Nimmy ponownie pokaże Ci grę.",
+  "nimmy_rerun_button": "Uruchom samouczek Nimmy ponownie"
 }
