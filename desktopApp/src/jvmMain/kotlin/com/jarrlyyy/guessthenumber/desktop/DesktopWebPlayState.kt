@@ -83,7 +83,7 @@ internal fun desktopWebPlayState(
     val prestigeUpgradesJson = JSONArray()
     progressionRepository.prestigeUpgrades().forEach { upgrade ->
         val level = game.prestigeUpgradeLevels[upgrade.id] ?: 0
-        val cost = DesktopEconomyTransactions.nextUpgradeCost(upgrade, level)
+        val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
         val maxed = level >= upgrade.maxLevel
         prestigeUpgradesJson.put(JSONObject().put("id", upgrade.id).put("name", upgrade.name).put("description", upgrade.description)
             .put("level", level).put("maxLevel", upgrade.maxLevel).put("nextCost", cost.format())
@@ -92,7 +92,7 @@ internal fun desktopWebPlayState(
     val ultraUpgradesJson = JSONArray()
     progressionRepository.ultraUpgrades().forEach { upgrade ->
         val level = game.ultraUpgradeLevels[upgrade.id] ?: 0
-        val cost = DesktopEconomyTransactions.nextUpgradeCost(upgrade, level)
+        val cost = DesktopEconomyTransactions.upgradeCost(upgrade, level)
         val maxed = level >= upgrade.maxLevel
         ultraUpgradesJson.put(JSONObject().put("id", upgrade.id).put("name", upgrade.name).put("description", upgrade.description)
             .put("level", level).put("maxLevel", upgrade.maxLevel).put("nextCost", cost.format())
