@@ -81,7 +81,7 @@ fun NavGraph(
 ) {
     val locale = viewModel.localeManager
     var showDevSettings by remember { mutableStateOf(false) }
-    var dailyRewardTestRequest by remember { mutableIntStateOf(0) }
+    var dailyRewardTestRequest by remember { mutableStateOf(0) }
     var webPlayMounted by remember { mutableStateOf(hasAnySave) }
     LaunchedEffect(hasAnySave) { if (hasAnySave) webPlayMounted = true }
     var debugDestination by remember { mutableStateOf<String?>(null) }
