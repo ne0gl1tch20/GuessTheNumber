@@ -6,9 +6,9 @@ import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
 
-ROOT = Path(__file__).resolve().parents[2]
-PAGES = [ROOT / "index.html", ROOT / "downloads.html"]
-SPRITE = ROOT / "assets" / "icons.svg"
+WEBSITE = Path(__file__).resolve().parents[1]
+PAGES = [WEBSITE / "index.html", WEBSITE / "downloads.html"]
+SPRITE = WEBSITE / "assets" / "icons.svg"
 REQUIRED = {"arrow-up-right", "arrow-up", "arrow-down", "chevron-up", "sparkles", "rotate-ccw", "target", "trending-up", "trophy", "house", "save", "shield-check", "smartphone", "monitor"}
 
 class Parser(HTMLParser):
