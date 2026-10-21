@@ -9,7 +9,7 @@ object AndroidBackController {
     @Volatile
     private var activity: ComponentActivity? = null
 
-    private const val INSTALL_SCRIPT = """
+    private val INSTALL_SCRIPT = """
         (() => {
           if (window.__gtnAndroidBackInstalled) return;
           const stack = ['play'];
@@ -36,7 +36,6 @@ object AndroidBackController {
     """.trimIndent()
 
     fun install(host: ComponentActivity) {
-        if (activity !== host) installed = false
         activity = host
         val root = host.window.decorView
         fun poll() {
