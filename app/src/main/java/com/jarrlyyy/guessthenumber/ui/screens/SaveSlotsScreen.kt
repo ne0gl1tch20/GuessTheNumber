@@ -66,6 +66,12 @@ fun SaveSlotsScreen(
     var showDuplicateDialog by remember { mutableStateOf<Int?>(null) }
     var showRestoreDialog by remember { mutableStateOf<Int?>(null) }
     var showImportDialog by remember { mutableStateOf(false) }
+    var showResetEverythingDialog by remember { mutableStateOf(false) }
+    var resetEverythingAcknowledged by remember { mutableStateOf(false) }
+    var resetMathAnswer by remember { mutableStateOf("") }
+    var resetChallenge by remember { mutableStateOf(makeResetChallenge()) }
+    var resetReadyAt by remember { mutableLongStateOf(0L) }
+    var resetSecondsRemaining by remember { mutableIntStateOf(45) }
     var importString by remember { mutableStateOf("") }
     var duplicateTarget by remember { mutableStateOf(0) }
     var profileNameDraft by remember { mutableStateOf("") }
@@ -85,6 +91,14 @@ fun SaveSlotsScreen(
 
     LaunchedEffect(Unit) {
         refreshMetadata()
+    }
+
+    LaunchedEffect(showResetEverythingDialog) {
+        while (showResetEverythingDialog) {
+            resetSecondsRemaining = (((resetReadyAt - System.currentTimeMillis()).coerceAtLeast(0L) + 999L) / 1000L).toInt()
+            if (resetSecondsRemaining == 0) break
+            kotlinx.coroutines.delay(250L)
+        }
     }
 
     // Legacy migration dialog prompt
@@ -300,6 +314,65 @@ fun SaveSlotsScreen(
         )
     }
 
+    if (showResetEverythingDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetEverythingDialog = false },
+            title = { Text(locale.getString("confirm_data_reset_title", "Confirm Data Reset")) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(locale.getString("reset_data_warning", "Are you sure you want to reset all progress? This action is irreversible."))
+                    Text(resetChallenge.first, style = MaterialTheme.typography.headlineSmall)
+                    Text(
+                        if (resetSecondsRemaining > 0) locale.getString("reset_wait_seconds_format", "Wait %d seconds before confirming.", resetSecondsRemaining)
+                        else locale.getString("reset_confirm_ready", "You may confirm the reset."),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Checkbox(
+                            checked = resetEverythingAcknowledged,
+                            onCheckedChange = { resetEverythingAcknowledged = it }
+                        )
+                        Text(locale.getString("reset_data_acknowledgement", "I understand this will erase all my progress"))
+                    }
+                    OutlinedTextField(
+                        value = resetMathAnswer,
+                        onValueChange = { value ->
+                            resetMathAnswer = value.filterIndexed { index, char -> char.isDigit() || (index == 0 && char == '-') }.take(12)
+                        },
+                        label = { Text(locale.getString("reset_math_answer_label", "Solve the expression")) },
+                        singleLine = true
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = resetSecondsRemaining == 0 && resetEverythingAcknowledged && resetMathAnswer.toLongOrNull() == resetChallenge.second.toLong(),
+                    onClick = {
+                        viewModel.resetData()
+                        showResetEverythingDialog = false
+                        resetMathAnswer = ""
+                        android.widget.Toast.makeText(
+                            context,
+                            locale.getString("all_game_data_reset_toast", "All game data has been reset."),
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                        scope.launch {
+                            kotlinx.coroutines.delay(500L)
+                            refreshMetadata()
+                        }
+                    }
+                ) {
+                    Text(locale.getString("reset_confirm_button", "Confirm reset"), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetEverythingDialog = false }) {
+                    Text(locale.getString("cancel", "Cancel"))
+                }
+            }
+        )
+    }
+
     if (showImportDialog) {
         AlertDialog(
             onDismissRequest = { showImportDialog = false },
@@ -434,6 +507,37 @@ fun SaveSlotsScreen(
                         locale = locale,
                         reducedMotion = gameState.settings.reducedMotion
                     )
+                }
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f))
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(locale.getString("reset_everything_label", "Reset Everything"), style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            locale.getString("settings_desc_reset_all_data", "This clears saved game progress. An extra confirmation is required before continuing."),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Button(
+                            onClick = {
+                                resetEverythingAcknowledged = false
+                                resetMathAnswer = ""
+                                resetChallenge = makeResetChallenge()
+                                resetReadyAt = System.currentTimeMillis() + 45_000L
+                                resetSecondsRemaining = 45
+                                showResetEverythingDialog = true
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(locale.getString("reset_everything_label", "Reset Everything")) }
+                    }
                 }
             }
         }
@@ -603,4 +707,24 @@ fun SlotCard(
             }
         }
     }
+}
+
+private fun makeResetChallenge(): Pair<String, Int> {
+    val operations = listOf("+", "-", "*", "/")
+    val terms = if (kotlin.random.Random.nextBoolean()) 2 else 3
+    val numbers = List(terms) { kotlin.random.Random.nextInt(10, 100) }
+    var value = numbers.first()
+    var expression = numbers.first().toString()
+    for (index in 1 until terms) {
+        val operation = operations.random()
+        val number = if (operation == "/") kotlin.random.Random.nextInt(1, 10) else numbers[index]
+        value = when (operation) {
+            "+" -> value + number
+            "-" -> value - number
+            "*" -> value * number
+            else -> value / number
+        }
+        expression += " $operation $number"
+    }
+    return expression to value
 }

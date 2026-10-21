@@ -26,6 +26,22 @@ class WebUiBridgeProtocolTest {
     }
 
     @Test
+    fun acceptsFeatureTutorialReadAndCompletionRequests() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("feature-read", "read_feature_tutorial", itemId = "homebase"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"feature-read","type":"read_feature_tutorial","featureId":"homebase"}""")
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("feature-done", "complete_feature_tutorial", itemId = "worlds"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"feature-done","type":"complete_feature_tutorial","featureId":"worlds"}""")
+        )
+        assertEquals(
+            "invalid_feature",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"feature-bad","type":"read_feature_tutorial","featureId":"not valid!"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+    }
+
+    @Test
     fun acceptsOnboardingStateAndCompletionRequests() {
         assertEquals(
             WebUiBridgeProtocol.ParseResult.Valid("onboarding-1", "read_onboarding_state"),

@@ -8,6 +8,7 @@ import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.WebChromeClient
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
@@ -55,6 +56,21 @@ import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.audio.BackgroundMusicManager
 
+/** Debug-only WebView console shared with Developer Settings. */
+object WebViewDebugConsole {
+    val entries = androidx.compose.runtime.mutableStateListOf<String>()
+    var evaluator: ((String) -> Unit)? = null
+    fun add(message: String) {
+        val timestamp = java.text.SimpleDateFormat("HH:mm:ss.SSS", java.util.Locale.US).format(java.util.Date())
+        entries.add("[$timestamp] $message")
+        while (entries.size > 300) entries.removeAt(0)
+    }
+    fun clear() = entries.clear()
+    fun runJavascript(source: String) {
+        val activeEvaluator = evaluator
+        if (activeEvaluator == null) add("WARN: WebView is not currently attached") else activeEvaluator(source)
+    }
+}
 private const val WEB_UI_ORIGIN = "https://appassets.androidplatform.net"
 private const val WEB_UI_PATH = "/assets/web-play/"
 
@@ -87,7 +103,8 @@ fun ProductionWebPlayScreen(
     onBuyTalent: (String, Long) -> Unit,
     onSetMutatorActive: (String, Boolean) -> Unit,
     onArcadeReward: (String, Int) -> Boolean,
-    onSettleStake: (String) -> Boolean
+    onSettleStake: (String) -> Boolean,
+    onResetData: () -> Unit
 ) {
     val requestIds = remember { WebUiRequestIdWindow() }
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -137,13 +154,17 @@ fun ProductionWebPlayScreen(
     val clipboardManager = LocalClipboardManager.current
     fun reportBridgeException(action: String, requestId: String, error: Exception) {
         Log.e("GTNWebBridge", "Bridge request failed: action=$action requestId=$requestId", error)
+        if (BuildConfig.DEBUG) WebViewDebugConsole.add("Kotlin bridge error ($action/$requestId): ${error.javaClass.simpleName}: ${error.message}")
         val trace = Log.getStackTraceString(error).take(12000)
         bridgeErrorDetails = "Guess The Number bridge error\nAction: $action\nRequest ID: $requestId\nException: ${error.javaClass.name}: ${error.message ?: "(no message)"}\n\nJava/Kotlin stack trace:\n$trace"
     }
     val supportsMessageListener = remember { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
 
     DisposableEffect(Unit) {
-        onDispose { webViewRef?.let { it.stopLoading(); it.destroy() } }
+        onDispose {
+            WebViewDebugConsole.evaluator = null
+            webViewRef?.let { it.stopLoading(); it.destroy() }
+        }
     }
 
     LaunchedEffect(dailyRewardTestRequest) {
@@ -172,6 +193,13 @@ fun ProductionWebPlayScreen(
                 .build()
             WebView(context).apply {
                 webViewRef = this
+                if (BuildConfig.DEBUG) {
+                    WebView.setWebContentsDebuggingEnabled(true)
+                    WebViewDebugConsole.evaluator = { source ->
+                        post { evaluateJavascript(source) { result -> WebViewDebugConsole.add("JS result: $result") } }
+                    }
+                    WebViewDebugConsole.add("WebView attached; Chrome DevTools debugging enabled")
+                }
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = false
                 settings.allowFileAccess = false
@@ -184,6 +212,12 @@ fun ProductionWebPlayScreen(
                 settings.safeBrowsingEnabled = true
                 settings.builtInZoomControls = false
                 settings.displayZoomControls = false
+                webChromeClient = object : WebChromeClient() {
+                    override fun onConsoleMessage(message: android.webkit.ConsoleMessage): Boolean {
+                        if (BuildConfig.DEBUG) WebViewDebugConsole.add("${message.messageLevel()}: ${message.message()} (${message.sourceId()}:${message.lineNumber()})")
+                        return true
+                    }
+                }
                 webViewClient = object : WebViewClient() {
                     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest) = assetLoader.shouldInterceptRequest(request.url)
                     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -198,10 +232,24 @@ fun ProductionWebPlayScreen(
                                 if (!WebUiBridgeProtocol.isAllowedSource(isMainFrame, sourceOrigin, view.url, "${WEB_UI_PATH}index.html")) {
                                     replyProxy.postMessage(errorResponse("", "origin_not_allowed")); return@post
                                 }
+                                if (BuildConfig.DEBUG) WebViewDebugConsole.add("Bridge <- ${message.data.orEmpty().take(1000)}")
                                 when (val parsed = WebUiBridgeProtocol.parse(message.data ?: "")) {
                                     is WebUiBridgeProtocol.ParseResult.Invalid -> replyProxy.postMessage(errorResponse(parsed.id, parsed.error))
                                     is WebUiBridgeProtocol.ParseResult.Valid -> {
                                         if (!requestIds.markIfNew(parsed.id)) { replyProxy.postMessage(errorResponse(parsed.id, "duplicate_request")); return@post }
+                                        if (parsed.type == "read_feature_tutorial" || parsed.type == "complete_feature_tutorial") {
+                                            val featureId = parsed.itemId.orEmpty()
+                                            val prefs = context.applicationContext.getSharedPreferences("web_play_onboarding", android.content.Context.MODE_PRIVATE)
+                                            val completed = parsed.type == "complete_feature_tutorial"
+                                            if (completed) prefs.edit().putBoolean("nimmy_feature_$featureId", true).apply()
+                                            replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "feature_tutorial_state").put("featureId", featureId).put("completed", completed || prefs.getBoolean("nimmy_feature_$featureId", false)).toString())
+                                            return@post
+                                        }
+                                        if (parsed.type == "reset_everything") {
+                                            onResetData(); replyProxy.postMessage(JSONObject().put("version",1).put("id",parsed.id).put("type","state").put("state",JSONObject().put("accepted",true)).toString())
+                                            webViewRef?.postDelayed({ context.packageManager.getLaunchIntentForPackage(context.packageName)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)?.let(context::startActivity) },1600L)
+                                            return@post
+                                        }
                                         if (parsed.type == "read_onboarding_state") {
                                             val onboardingPrefs = context.applicationContext.getSharedPreferences("web_play_onboarding", android.content.Context.MODE_PRIVATE)
                                             val firstLaunchAlreadySeen = onboardingPrefs.getBoolean("daily_reward_first_launch_seen", false)
@@ -230,6 +278,7 @@ fun ProductionWebPlayScreen(
                                                     .put("username", storedProfile?.username.orEmpty())
                                                     .put("bio", storedProfile?.bio.orEmpty())
                                                     .put("avatarId", storedProfile?.avatarId ?: "star")
+                                                    .put("customAvatarData", if (storedProfile?.avatarId == "custom" && !storedProfile.customAvatarPath.isNullOrBlank()) runCatching { val file=java.io.File(storedProfile.customAvatarPath); val mime=when(file.extension.lowercase()){"png"->"image/png";"webp"->"image/webp";else->"image/jpeg"}; "data:$mime;base64,"+android.util.Base64.encodeToString(file.readBytes(),android.util.Base64.NO_WRAP) }.getOrNull() else null)
                                                     .put("setupComplete", storedProfile?.setupComplete == true)
                                                 replyProxy.postMessage(response.toString())
                                             }
@@ -669,7 +718,7 @@ fun ProductionWebPlayScreen(
                                                 .put("customPrimaryColor", game.settings.customPrimaryColor)
                                                 .put("customSecondaryColor", game.settings.customSecondaryColor)
                                                 .put("customTertiaryColor", game.settings.customTertiaryColor))
-                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "incorrect_guess_low_1", "incorrect_guess_low_2", "incorrect_guess_low_3", "incorrect_guess_high_1", "incorrect_guess_high_2", "incorrect_guess_high_3", "daily_reward_title", "daily_reward_subtitle", "daily_reward_claim", "daily_reward_streak", "daily_reward_claimed", "offline_gains_amount", "welcome_back_title", "offline_gains_text", "collect", "changelog_title", "changelog_subtitle", "changelog_eyebrow", "changelog_intro", "changelog_current_badge", "changelog_category_ui", "changelog_current_title", "changelog_current_arcade", "changelog_current_updates", "changelog_current_locale", "changelog_current_music", "changelog_current_feedback", "changelog_progress_badge", "changelog_category_gameplay", "changelog_progress_title", "changelog_progress_stats", "changelog_progress_worlds", "changelog_progress_saves", "changelog_foundation_badge", "changelog_category_system", "changelog_foundation_title", "changelog_foundation_update", "changelog_foundation_icon", "changelog_foundation_offline", "music_player_title", "music_player_subtitle", "music_player_eyebrow", "music_background_track", "music_background_track_desc", "music_player_toggle_desc", "music_player_status", "master_volume", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "about_title", "about_licenses", "about_header", "about_version_format", "about_description", "about_licenses_title", "about_web_subtitle", "about_installed_version", "about_update_description", "about_update_idle", "about_updates_eyebrow", "about_licenses_eyebrow", "about_licenses_description", "about_library_author_format", "about_library_license_format", "update_channel_label", "update_channel_debug", "update_channel_release", "update_check", "update_checking", "update_available", "update_up_to_date", "update_unavailable", "update_install", "update_open", "update_downloading", "update_install_started", "update_install_failed", "update_permission_required", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry", "rift_best_tier", "loot_title", "loot_opened_count", "worlds_boss_count", "inspector_arcade_best_scores", "your_game", "more", "more_subtitle", "rewards", "rewards_subtitle", "journey", "journey_subtitle", "shop", "shop_subtitle", "home_base", "home_base_subtitle", "relics", "relics_subtitle", "codex", "codex_subtitle", "save_slots", "save_slots_subtitle", "settings_subtitle", "prestige", "prestige_subtitle", "ultra", "ultra_subtitle", "talents", "talents_subtitle", "mutators", "mutators_subtitle", "dev_settings", "dev_settings_subtitle", "lucky_stake_subtitle", "music_no_track", "music_add_audio", "music_add_to_playlist", "music_play", "music_pause", "music_shuffle", "music_repeat", "music_repeat_off", "nimmy_name", "nimmy_settings_heading", "nimmy_settings_description", "nimmy_rerun_button", "nimmy_step_counter", "nimmy_step_guess_title", "nimmy_step_guess_body", "nimmy_step_submit_title", "nimmy_step_submit_body", "nimmy_step_upgrades_title", "nimmy_step_upgrades_body", "nimmy_step_more_title", "nimmy_step_more_body", "nimmy_next", "nimmy_skip", "nimmy_finish", "music_repeat_one", "music_repeat_all", "music_enqueue", "music_remove", "music_move_up", "music_move_down", "music_delete_playlist", "music_empty_library", "music_empty_queue", "music_empty_playlists", "music_queue", "music_library", "music_playlists", "music_queue_position", "music_playlist_tracks", "music_playlist_name", "music_create_playlist", "on", "off").forEach { key -> put(key, activeLocaleManager.getString(key)) }; (0..29).forEach { index ->
+                                            .put("uiStrings", JSONObject().apply { listOf("stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc", "minigame_lucky_number_name", "minigame_lucky_number_desc", "minigame_memory_match_name", "minigame_memory_match_desc", "minigame_number_rush_name", "minigame_number_rush_desc", "stats_total_guesses", "stats_correct_guesses", "stats_failed_guesses", "stats_prestige_resets", "stats_ultra_resets", "stats_total_playtime", "guessing_precision_heading", "inspector_money_earned", "inspector_money_spent", "inspector_nebula_earned", "inspector_arcade_played", "inspector_current_streak", "inspector_best_streak", "available_money_heading", "multiplier_format", "guess_button", "play_minigame_format", "claim_reward_button", "close_button", "guess_number_target_format", "score_format", "earned_minigame_format", "reaction_test_title", "reaction_time_format", "lucky_number_title", "lucky_number_desc", "jackpot_win_format", "memory_match_title", "memory_correct", "memory_incorrect_format", "number_rush_title", "staking_flip_button", "status_playing", "status_paused", "correct_guess", "too_low", "too_high", "loading_save_data", "cancel", "close", "inspector_money", "inspector_buy_multiplier", "guess_prompt", "duration_seconds_format", "duration_ms_format", "duration_hms_format", "play", "random_event_active", "settings", "game_preferences", "background_music", "incorrect_guess_low_1", "incorrect_guess_low_2", "incorrect_guess_low_3", "incorrect_guess_high_1", "incorrect_guess_high_2", "incorrect_guess_high_3", "daily_reward_title", "daily_reward_subtitle", "daily_reward_claim", "daily_reward_streak", "daily_reward_claimed", "offline_gains_amount", "welcome_back_title", "offline_gains_text", "collect", "changelog_title", "changelog_subtitle", "changelog_eyebrow", "changelog_intro", "changelog_current_badge", "changelog_category_ui", "changelog_current_title", "changelog_current_arcade", "changelog_current_updates", "changelog_current_locale", "changelog_current_music", "changelog_current_feedback", "changelog_progress_badge", "changelog_category_gameplay", "changelog_progress_title", "changelog_progress_stats", "changelog_progress_worlds", "changelog_progress_saves", "changelog_foundation_badge", "changelog_category_system", "changelog_foundation_title", "changelog_foundation_update", "changelog_foundation_icon", "changelog_foundation_offline", "music_player_title", "music_player_subtitle", "music_player_eyebrow", "music_background_track", "music_background_track_desc", "music_player_toggle_desc", "music_player_status", "master_volume", "sound_effects", "vibration_label", "reduced_motion_label", "reduce_flashes_label", "settings_desc_sound_fx", "settings_desc_vibration", "reduced_motion_description", "settings_desc_reduce_flashes", "game_temporarily_unavailable", "settings_synced_status", "about_title", "about_licenses", "about_header", "about_version_format", "about_description", "about_licenses_title", "about_web_subtitle", "about_installed_version", "about_update_description", "about_update_idle", "about_updates_eyebrow", "about_licenses_eyebrow", "about_licenses_description", "about_library_author_format", "about_library_license_format", "update_channel_label", "update_channel_debug", "update_channel_release", "update_check", "update_checking", "update_available", "update_up_to_date", "update_unavailable", "update_install", "update_open", "update_downloading", "update_install_started", "update_install_failed", "update_permission_required", "stake_invalid_amount", "stake_flipping_status", "lucky_stake_title", "minigame_catalog_unavailable", "action_in_progress", "action_saving_reward", "reaction_wait", "reaction_tap_now", "action_failed_retry", "rift_best_tier", "loot_title", "loot_opened_count", "worlds_boss_count", "inspector_arcade_best_scores", "your_game", "more", "more_subtitle", "rewards", "rewards_subtitle", "journey", "journey_subtitle", "shop", "shop_subtitle", "home_base", "home_base_subtitle", "relics", "relics_subtitle", "codex", "codex_subtitle", "save_slots", "save_slots_subtitle", "settings_subtitle", "prestige", "prestige_subtitle", "ultra", "ultra_subtitle", "talents", "talents_subtitle", "mutators", "mutators_subtitle", "dev_settings", "dev_settings_subtitle", "lucky_stake_subtitle", "music_no_track", "music_add_audio", "music_add_to_playlist", "music_play", "music_pause", "music_shuffle", "music_repeat", "music_repeat_off", "nimmy_name", "nimmy_settings_heading", "nimmy_settings_description", "nimmy_rerun_button", "nimmy_step_counter", "nimmy_step_guess_title", "nimmy_step_guess_body", "nimmy_step_submit_title", "nimmy_step_submit_body", "nimmy_step_upgrades_title", "nimmy_step_upgrades_body", "nimmy_step_more_title", "nimmy_step_more_body", "nimmy_tour_arcade_body_1", "nimmy_tour_arcade_body_2", "nimmy_tour_arcade_title_1", "nimmy_tour_arcade_title_2", "nimmy_tour_changelog_body_1", "nimmy_tour_changelog_body_2", "nimmy_tour_changelog_title_1", "nimmy_tour_changelog_title_2", "nimmy_tour_codex_body_1", "nimmy_tour_codex_body_2", "nimmy_tour_codex_title_1", "nimmy_tour_codex_title_2", "nimmy_tour_homebase_body_1", "nimmy_tour_homebase_body_2", "nimmy_tour_homebase_title_1", "nimmy_tour_homebase_title_2", "nimmy_tour_journey_body_1", "nimmy_tour_journey_body_2", "nimmy_tour_journey_title_1", "nimmy_tour_journey_title_2", "nimmy_tour_music_body_1", "nimmy_tour_music_body_2", "nimmy_tour_music_title_1", "nimmy_tour_music_title_2", "nimmy_tour_mutators_body_1", "nimmy_tour_mutators_body_2", "nimmy_tour_mutators_title_1", "nimmy_tour_mutators_title_2", "nimmy_tour_prestige_body_1", "nimmy_tour_prestige_body_2", "nimmy_tour_prestige_title_1", "nimmy_tour_prestige_title_2", "nimmy_tour_relics_body_1", "nimmy_tour_relics_body_2", "nimmy_tour_relics_title_1", "nimmy_tour_relics_title_2", "nimmy_tour_rewards_body_1", "nimmy_tour_rewards_body_2", "nimmy_tour_rewards_title_1", "nimmy_tour_rewards_title_2", "nimmy_tour_shop_body_1", "nimmy_tour_shop_body_2", "nimmy_tour_shop_title_1", "nimmy_tour_shop_title_2", "nimmy_tour_stake_body_1", "nimmy_tour_stake_body_2", "nimmy_tour_stake_title_1", "nimmy_tour_stake_title_2", "nimmy_tour_stats_body_1", "nimmy_tour_stats_body_2", "nimmy_tour_stats_title_1", "nimmy_tour_stats_title_2", "nimmy_tour_talent_body_1", "nimmy_tour_talent_body_2", "nimmy_tour_talent_title_1", "nimmy_tour_talent_title_2", "nimmy_tour_ultra_body_1", "nimmy_tour_ultra_body_2", "nimmy_tour_ultra_title_1", "nimmy_tour_ultra_title_2", "nimmy_tour_upgrades_body_1", "nimmy_tour_upgrades_body_2", "nimmy_tour_upgrades_title_1", "nimmy_tour_upgrades_title_2", "nimmy_tour_worlds_body_1", "nimmy_tour_worlds_body_2", "nimmy_tour_worlds_title_1", "nimmy_tour_worlds_title_2", "nimmy_next", "nimmy_skip", "nimmy_finish", "music_repeat_one", "music_repeat_all", "music_enqueue", "music_remove", "music_move_up", "music_move_down", "music_delete_playlist", "music_empty_library", "music_empty_queue", "music_empty_playlists", "music_queue", "music_library", "music_playlists", "music_queue_position", "music_playlist_tracks", "music_playlist_name", "music_create_playlist", "on", "off").forEach { key -> put(key, activeLocaleManager.getString(key)) }; (0..29).forEach { index ->
                                                 put("feedback_toolow_$index", activeLocaleManager.getString("feedback_toolow_$index"))
                                                 put("feedback_toohigh_$index", activeLocaleManager.getString("feedback_toohigh_$index"))
                                             } })

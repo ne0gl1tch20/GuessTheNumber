@@ -358,7 +358,7 @@ fun ProductionGuessGameScreen(
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
-                            "read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "navigate", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
+                            "read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "read_feature_tutorial", "complete_feature_tutorial", "reset_everything", "navigate", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
                             "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward" -> 5
                             else -> -1
@@ -367,6 +367,12 @@ fun ProductionGuessGameScreen(
                             sendError("unknown_action")
                             return@launch
                         }
+                        if (type == "read_feature_tutorial" || type == "complete_feature_tutorial") {
+                            val featureId=request.optString("featureId"); val prefs=java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding")
+                            if(type=="complete_feature_tutorial") { prefs.putBoolean("nimmy_feature_$featureId",true); prefs.flush() } else reply(org.json.JSONObject().put("version",1).put("id",requestId).put("type","feature_tutorial_state").put("featureId",featureId).put("completed",prefs.getBoolean("nimmy_feature_$featureId",false)).toString())
+                            return@launch
+                        }
+                        if (type == "reset_everything") { resetAllGameData(); reply(org.json.JSONObject().put("version",1).put("id",requestId).put("type","state").put("state",org.json.JSONObject().put("accepted",true)).toString()); delay(1800); kotlin.system.exitProcess(0); return@launch }
                         if (type == "read_onboarding_state") {
                             val onboardingPrefs = java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding")
                             val firstLaunchAlreadySeen = onboardingPrefs.getBoolean("daily_reward_first_launch_seen", false)
@@ -391,6 +397,7 @@ fun ProductionGuessGameScreen(
                                 .put("username", profile?.username.orEmpty())
                                 .put("bio", profile?.bio.orEmpty())
                                 .put("avatarId", profile?.avatarId ?: "star")
+                                .put("customAvatarData", if (profile?.avatarId == "custom" && !profile.customAvatarPath.isNullOrBlank()) runCatching { val file=java.io.File(profile.customAvatarPath); val mime=when(file.extension.lowercase()){"png"->"image/png";"webp"->"image/webp";else->"image/jpeg"}; "data:$mime;base64,"+java.util.Base64.getEncoder().encodeToString(file.readBytes()) }.getOrNull() else null)
                                 .put("setupComplete", profile?.setupComplete == true).toString())
                             return@launch
                         }
