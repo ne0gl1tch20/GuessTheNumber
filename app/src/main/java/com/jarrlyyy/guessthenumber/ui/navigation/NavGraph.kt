@@ -25,7 +25,6 @@ import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileScreen
 import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileStore
 import com.jarrlyyy.guessthenumber.ui.screens.SharedWebUiPrototypeScreen
 import com.jarrlyyy.guessthenumber.ui.screens.LuaTestingHubScreen
-import com.jarrlyyy.guessthenumber.ui.screens.WebViewDebugConsole
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 import kotlinx.coroutines.flow.first
 
@@ -95,6 +94,8 @@ fun NavGraph(
     var debugDestination by remember { mutableStateOf<String?>(null) }
     var showSaveSlots by remember { mutableStateOf(false) }
     var colorPickerTarget by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(hostActivity) { hostActivity?.let(AndroidBackController::install) }
 
     BackHandler {
         when {
