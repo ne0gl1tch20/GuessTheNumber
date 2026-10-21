@@ -240,8 +240,9 @@ fun ProductionWebPlayScreen(
                                         if (parsed.type == "read_feature_tutorial" || parsed.type == "complete_feature_tutorial") {
                                             val featureId = parsed.itemId.orEmpty()
                                             val prefs = context.applicationContext.getSharedPreferences("web_play_onboarding", android.content.Context.MODE_PRIVATE)
-                                            if (parsed.type == "complete_feature_tutorial") { prefs.edit().putBoolean("nimmy_feature_$featureId", true).apply() }
-                                            else replyProxy.postMessage(JSONObject().put("version",1).put("id",parsed.id).put("type","feature_tutorial_state").put("featureId",featureId).put("completed",prefs.getBoolean("nimmy_feature_$featureId",false)).toString())
+                                            val completed = parsed.type == "complete_feature_tutorial"
+                                            if (completed) prefs.edit().putBoolean("nimmy_feature_$featureId", true).apply()
+                                            replyProxy.postMessage(JSONObject().put("version", 1).put("id", parsed.id).put("type", "feature_tutorial_state").put("featureId", featureId).put("completed", completed || prefs.getBoolean("nimmy_feature_$featureId", false)).toString())
                                             return@post
                                         }
                                         if (parsed.type == "reset_everything") {
