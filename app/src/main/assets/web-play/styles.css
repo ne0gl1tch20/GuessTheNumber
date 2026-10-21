@@ -356,3 +356,6 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 }
 
 .catalog-currency-balance{display:flex;justify-content:flex-end;gap:.35rem;margin:.5rem 0;color:var(--muted);font-size:.85rem}.player-profile-custom-avatar{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}.reset-dialog{max-width:520px}.reset-check-row{display:flex;gap:.6rem;align-items:center;margin:.75rem 0}.reset-math-prompt{font-size:1.4rem;font-weight:700}.reward-close{margin-top:.5rem}.daily-rewards-page{margin-bottom:1rem}.daily-reward-page-main{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+
+/* Clear notice for the relocated global reset action. */
+.reset-moved-dialog{max-width:480px}.reset-moved-dialog .nimmy-actions{justify-content:flex-end;flex-wrap:wrap}.reset-moved-dialog #resetMovedOpenSlots{min-width:132px}

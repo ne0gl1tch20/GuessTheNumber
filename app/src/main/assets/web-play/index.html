@@ -385,7 +385,7 @@
           <h3 data-i18n="nimmy_settings_heading">Help &amp; tutorial</h3>
           <p class="catalog-intro" data-i18n="nimmy_settings_description">Want a refresher? Nimmy can show you around again.</p>
           <button type="button" class="primary-action" id="rerunNimmyButton" data-i18n="nimmy_rerun_button">Rerun Nimmy tutorial</button>
-      <section class="settings-danger card" aria-labelledby="resetEverythingTitle"><div class="panel-title"><span class="eyebrow">DATA</span><h3 id="resetEverythingTitle" data-i18n="reset_everything_label">Reset Everything</h3></div><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><button type="button" class="world-action-button" id="resetEverythingButton" data-bridge-action="reset_everything" data-i18n="reset_everything_label">Reset Everything</button></section>
+      <section class="settings-danger card" aria-labelledby="resetEverythingTitle"><div class="panel-title"><span class="eyebrow">DATA</span><h3 id="resetEverythingTitle" data-i18n="reset_everything_label">Reset Everything</h3></div><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><button type="button" class="world-action-button" id="resetEverythingButton" data-i18n="reset_everything_label">Reset Everything</button></section>
         </div>
         <p class="catalog-intro" id="settingsStatus" role="status" aria-live="polite">Settings sync with the Android game.</p>
       </section>
@@ -527,6 +527,18 @@
       <p class="reward-streak" id="dailyRewardStreak">Day 1 streak</p>
       <div id="dailyRewardSchedule" class="daily-reward-schedule" aria-label="Upcoming daily rewards"></div>
       <button type="button" class="primary-action reward-claim" id="dailyRewardClaim">Claim reward</button><button type="button" class="secondary-action reward-close" id="dailyRewardClose">Close</button>
+    </div>
+  </section>
+  <section id="resetMovedDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetMovedTitle" aria-describedby="resetMovedMessage">
+    <div class="nimmy-tutorial-backdrop" aria-hidden="true"></div>
+    <div class="nimmy-dialog card reset-dialog reset-moved-dialog">
+      <span class="eyebrow">SETTINGS</span>
+      <h2 id="resetMovedTitle">Reset Everything has moved</h2>
+      <p id="resetMovedMessage">Please use the Save Slots screen to reset everything. This keeps save-management actions in one place and helps prevent accidental data loss.</p>
+      <div class="nimmy-actions">
+        <button type="button" class="secondary-action" id="resetMovedCancel">Cancel</button>
+        <button type="button" class="primary-action" id="resetMovedOpenSlots">Open Save Slots</button>
+      </div>
     </div>
   </section>
   <section id="resetEverythingDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetEverythingDialogTitle"><div class="nimmy-tutorial-backdrop" aria-hidden="true"></div><div class="nimmy-dialog card reset-dialog"><span class="eyebrow">DATA RESET</span><h2 id="resetEverythingDialogTitle" data-i18n="confirm_data_reset_title">Confirm Data Reset</h2><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><p id="resetMathPrompt" class="reset-math-prompt"></p><p id="resetTimerText" class="catalog-intro">Wait 45s before confirming.</p><label class="reset-check-row"><input type="checkbox" id="resetAcknowledgement"><span data-i18n="reset_data_acknowledgement">I understand this will erase all my progress</span></label><input id="resetMathAnswer" class="stake-input" inputmode="numeric" autocomplete="off"><div class="nimmy-actions"><button type="button" class="secondary-action" id="resetCancelButton">Cancel</button><button type="button" class="primary-action" id="resetConfirmButton" disabled>Confirm reset</button></div></div></section>
