@@ -3,146 +3,70 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#090b17">
-  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png">
-  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png">
-  <meta name="description" content="Discover Guess The Number, an offline-first arcade game, and download official project builds.">
-  <meta property="og:title" content="Guess The Number — One guess becomes a universe">
-  <meta property="og:description" content="Build streaks, stack upgrades, chase cosmic progression, and play your way.">
+  <meta name="theme-color" content="#080b12">
+  <meta name="description" content="Meet Guess The Number: an offline-first number game with streaks, upgrades, challenges and long-term progression.">
+  <meta property="og:title" content="Guess The Number — Think fast. Build your universe.">
+  <meta property="og:description" content="A simple guess grows into a whole progression game. Explore the project and find published builds.">
   <meta property="og:type" content="website">
-  <title>Guess The Number — One guess becomes a universe</title>
-  <style>
-    :root{color-scheme:dark;--bg:#090b17;--panel:#11152a;--ink:#f6f5ff;--muted:#a8aecb;--line:#ffffff19;--mint:#8bffd4;--blue:#8da4ff;--pink:#ff8ed8;--gold:#ffd98c;--radius:26px}
-    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}
-    body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-2;background:radial-gradient(ellipse at 15% 10%,#4a3e9b36,transparent 42%),radial-gradient(ellipse at 88% 32%,#1a9c9a20,transparent 36%),linear-gradient(180deg,#090b17,#0c1021 62%,#090b17)}
-    a{color:inherit}button,a{-webkit-tap-highlight-color:transparent}a:focus-visible,button:focus-visible{outline:3px solid var(--mint);outline-offset:4px}.wrap{width:min(1160px,calc(100% - 40px));margin-inline:auto}
-    .development-banner{position:relative;z-index:10;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 18px;background:linear-gradient(100deg,#ffd98c18,#ff8ed814);border-bottom:1px solid #ffd98c35;color:#e9e1cc;text-align:center;font-size:.88rem}.development-banner strong{color:var(--gold)}.development-banner a{color:var(--mint);font-weight:800;text-decoration:underline;text-underline-offset:3px}.development-banner[hidden]{display:none}@media(max-width:600px){.development-banner{font-size:.8rem;padding:11px 14px}}\n    .topbar{position:sticky;top:0;z-index:20;border-bottom:1px solid #ffffff12;background:#090b17c9;backdrop-filter:blur(18px)}.nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:850;letter-spacing:-.04em}.brand-mark{display:block;width:38px;height:38px;object-fit:contain;border-radius:10px;box-shadow:0 0 32px #8bffd42e}.navlinks{display:flex;align-items:center;gap:25px}.navlinks a{color:var(--muted);font-size:.9rem;text-decoration:none;transition:color .2s}.navlinks a:hover{color:var(--ink)}.pill-link,.button{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid #ffffff1c;border-radius:999px;padding:12px 18px;font-weight:800;text-decoration:none;transition:transform .22s,border-color .22s,box-shadow .22s;background:#ffffff08}.pill-link:hover,.button:hover{transform:translateY(-3px);border-color:#8bffd46b;box-shadow:0 12px 36px #0005}.button.primary{background:var(--mint);color:#101426;border-color:transparent}.button.primary:hover{box-shadow:0 12px 36px #8bffd429}.menu-toggle{display:none}
-    .hero{position:relative;min-height:680px;display:grid;grid-template-columns:1.02fr .98fr;align-items:center;gap:30px;padding-block:78px 72px}.eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--mint);font-size:.78rem;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.live-dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 6px #8bffd419;animation:pulse 2s infinite}.hero h1{font-size:clamp(3.5rem,7.6vw,6.6rem);line-height:.95;letter-spacing:-.085em;margin:23px 0 22px;max-width:720px}.gradient-text{background:linear-gradient(100deg,var(--mint),#b2c0ff 54%,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}.hero-copy{font-size:clamp(1.05rem,1.5vw,1.2rem);color:var(--muted);max-width:560px}.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}.micro-proof{display:flex;flex-wrap:wrap;gap:16px;margin-top:26px;color:#c4c9e0;font-size:.85rem}.micro-proof span{display:flex;align-items:center;gap:7px}.hero-art{min-height:520px;display:grid;place-items:center;position:relative;perspective:1000px}.orbit{position:absolute;width:min(460px,90%);aspect-ratio:1;border:1px solid #a8baff26;border-radius:50%;animation:spin 36s linear infinite}.orbit:before,.orbit:after{content:"";position:absolute;border-radius:50%;background:var(--mint);box-shadow:0 0 25px var(--mint)}.orbit:before{width:9px;height:9px;left:13%;top:22%}.orbit:after{width:6px;height:6px;right:8%;bottom:25%;background:var(--pink);box-shadow:0 0 22px var(--pink)}.orbit.two{width:min(365px,72%);border-style:dashed;animation-direction:reverse;animation-duration:28s}.orbit.two:before{background:var(--gold);box-shadow:0 0 22px var(--gold);left:auto;right:4%;top:30%}.orbit.two:after{left:11%;right:auto;bottom:20%}
-    .phone{position:relative;width:min(285px,75%);padding:10px;border:1px solid #ffffff38;border-radius:38px;background:linear-gradient(145deg,#343954,#101323 35%,#252b43);box-shadow:0 45px 100px #0009,0 0 80px #8da4ff20;transform:rotateY(-9deg) rotateX(3deg);animation:float 6s ease-in-out infinite;z-index:2}.phone-screen{min-height:490px;overflow:hidden;border-radius:29px;background:linear-gradient(160deg,#171b33,#0c1020 70%);padding:20px 16px;position:relative}.phone-screen:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 20%,#8bffd419,transparent 36%);pointer-events:none}.phone-top{display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:#b7bdd8}.tiny-logo{font-weight:900;color:var(--mint);letter-spacing:-.03em}.phone-label{text-align:center;color:#a8aecb;font-size:.67rem;letter-spacing:.18em;margin-top:30px}.number-display{text-align:center;font-size:4.7rem;line-height:1.2;font-weight:900;letter-spacing:-.08em;margin:5px 0;color:white;text-shadow:0 0 35px #8da4ff4d}.range{text-align:center;color:#929bbb;font-size:.74rem}.guess-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:24px}.guess-key{display:grid;place-items:center;min-height:42px;border-radius:12px;background:#ffffff0b;border:1px solid #ffffff0d;color:#e6e8ff;font-weight:750}.guess-key.active{background:var(--mint);color:#0b1720;box-shadow:0 0 28px #8bffd433}.phone-feedback{margin-top:15px;border-radius:15px;padding:11px;background:#8bffd411;border:1px solid #8bffd42b;text-align:center;color:var(--mint);font-size:.77rem;font-weight:800}.phone-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.phone-stat{background:#ffffff08;border:1px solid #ffffff0e;border-radius:13px;padding:10px}.phone-stat small{display:block;color:#969fbe;font-size:.65rem}.phone-stat b{font-size:.9rem}.phone-disclaimer{position:absolute;z-index:5;bottom:1%;left:50%;width:min(340px,90%);transform:translateX(-50%);padding:10px 14px;border:1px solid #ffd98c45;border-radius:14px;background:#111529ed;color:#d8d4c6;text-align:center;font-size:.76rem;line-height:1.45;box-shadow:0 12px 35px #0005;backdrop-filter:blur(12px)}.phone-disclaimer strong{color:var(--gold)}.float-card{position:absolute;z-index:4;padding:13px 16px;border:1px solid #ffffff20;border-radius:18px;background:#141a2be8;box-shadow:0 18px 50px #0005;backdrop-filter:blur(14px);animation:float 5s ease-in-out infinite}.float-card strong{display:block;font-size:1.08rem}.float-card small{color:var(--muted)}.float-card .emoji{font-size:1.15rem;margin-right:6px}.card-streak{top:15%;right:-1%}.card-nebula{bottom:15%;left:-2%;animation-delay:-2s}.spark{position:absolute;color:var(--gold);font-size:1.5rem;animation:twinkle 2.8s ease-in-out infinite}.spark.s1{top:12%;left:12%}.spark.s2{right:11%;bottom:14%;animation-delay:-1s}
-    .ticker{border-block:1px solid var(--line);background:#ffffff04;overflow:hidden}.ticker-track{display:flex;width:max-content;gap:34px;padding:16px 0;animation:marquee 32s linear infinite;color:#c3c9e2;font-weight:800;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}.ticker-track span{display:flex;align-items:center;gap:10px}.ticker-track i{font-style:normal;color:var(--mint)}
-    section{padding-block:100px}.section-head{max-width:680px;margin-bottom:38px}.kicker{color:var(--mint);font-size:.76rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.section-head h2{font-size:clamp(2.3rem,5vw,4rem);line-height:1.03;letter-spacing:-.065em;margin:13px 0}.section-head p{color:var(--muted);font-size:1.05rem;margin:0}.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.feature{position:relative;overflow:hidden;min-height:235px;padding:26px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(145deg,#171c34b8,#101426b8);transition:transform .25s,border-color .25s}.feature:hover{transform:translateY(-7px);border-color:#8bffd44f}.feature:after{content:"";position:absolute;width:150px;height:150px;right:-70px;bottom:-80px;border-radius:50%;background:var(--glow,#8bffd4);filter:blur(65px);opacity:.16;pointer-events:none}.feature-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:#ffffff0b;border:1px solid #ffffff15;font-size:1.4rem}.feature h3{margin:20px 0 8px;font-size:1.18rem;letter-spacing:-.025em}.feature p{color:var(--muted);font-size:.94rem;margin:0}.feature:nth-child(2){--glow:var(--blue)}.feature:nth-child(3){--glow:var(--pink)}.feature:nth-child(4){--glow:var(--gold)}.feature:nth-child(5){--glow:var(--mint)}.feature:nth-child(6){--glow:#b7a0ff}
-    .loop-section{padding-top:45px}.loop-panel{display:grid;grid-template-columns:.8fr 1.2fr;gap:50px;align-items:center;padding:clamp(26px,5vw,56px);border:1px solid #ffffff1a;border-radius:34px;background:radial-gradient(ellipse at 90% 10%,#8da4ff16,transparent 42%),linear-gradient(135deg,#151a30,#0d1120)}.loop-panel h2{font-size:clamp(2.2rem,4.4vw,3.5rem);letter-spacing:-.07em;line-height:1.02;margin:14px 0}.loop-panel p{color:var(--muted)}.loop-steps{display:grid;gap:12px}.step{display:grid;grid-template-columns:46px 1fr;gap:15px;align-items:center;padding:17px;border:1px solid #ffffff12;border-radius:18px;background:#ffffff05;transition:transform .2s,background .2s}.step:hover{transform:translateX(5px);background:#ffffff0a}.step-num{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#8bffd415;color:var(--mint);font-weight:900}.step h3{font-size:1rem;margin:0 0 3px}.step p{font-size:.86rem;margin:0}
-    .privacy{display:grid;grid-template-columns:1fr 1fr;gap:35px;align-items:center}.privacy-card{padding:30px;border:1px solid #8bffd42c;border-radius:28px;background:linear-gradient(145deg,#8bffd40d,#8da4ff0a)}.privacy-card h3{font-size:1.4rem;margin:0 0 14px}.privacy-list{display:grid;gap:12px;list-style:none;padding:0;margin:0}.privacy-list li{display:flex;gap:10px;color:#d7dcef}.check{color:var(--mint);font-weight:900}.install-note{margin-top:20px;padding:17px;border-radius:16px;background:#ffd98c0b;border:1px solid #ffd98c2b;color:#d7d0bd;font-size:.86rem}.install-note strong{color:var(--gold)}.privacy-copy h2{font-size:clamp(2.2rem,4.4vw,3.7rem);letter-spacing:-.065em;line-height:1.03;margin:13px 0}.privacy-copy p{color:var(--muted)}
-    .cta{position:relative;text-align:center;overflow:hidden;padding:70px 26px;border:1px solid #ffffff1b;border-radius:34px;background:radial-gradient(ellipse at 50% 0%,#8bffd41c,transparent 60%),#111529}.cta:before{content:"✦";position:absolute;top:20px;left:12%;font-size:2rem;color:#8da4ff;opacity:.7;animation:twinkle 3s infinite}.cta:after{content:"✧";position:absolute;bottom:20px;right:12%;font-size:2.5rem;color:var(--pink);opacity:.8;animation:twinkle 3s -1s infinite}.cta h2{font-size:clamp(2.5rem,6vw,4.6rem);line-height:1;letter-spacing:-.075em;margin:15px 0}.cta p{max-width:580px;margin:0 auto 26px;color:var(--muted)}.cta-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}.migration-panel{padding:clamp(24px,4vw,42px);border:1px solid #8bffd42b;border-radius:30px;background:radial-gradient(ellipse at 95% 0%,#8da4ff17,transparent 42%),linear-gradient(145deg,#151a30,#0d1120)}.migration-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px}.status-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid #8bffd43d;border-radius:999px;background:#8bffd40d;color:var(--mint);font-size:.78rem;font-weight:850}.status-pill .live-dot{width:7px;height:7px}.migration-top small{color:var(--muted)}.migration-panel h3{font-size:clamp(1.55rem,3vw,2.15rem);letter-spacing:-.045em;line-height:1.12;margin:0 0 12px}.migration-intro{max-width:780px;color:var(--muted);margin:0 0 24px}.migration-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.migration-item{padding:19px;border:1px solid #ffffff14;border-radius:18px;background:#ffffff05}.migration-item .item-state{display:inline-block;margin-bottom:9px;color:var(--mint);font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.migration-item.pending .item-state{color:var(--gold)}.migration-item h4{font-size:1rem;margin:0 0 7px}.migration-item p{color:var(--muted);font-size:.88rem;margin:0}.migration-links{display:flex;gap:11px;flex-wrap:wrap;margin-top:22px}.migration-note{color:var(--muted);font-size:.82rem;margin:18px 0 0}@media(max-width:850px){.migration-grid{grid-template-columns:1fr}} .footer{padding:32px 0 45px;color:var(--muted);font-size:.85rem}.footer-inner{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}.footer-links{display:flex;gap:18px;flex-wrap:wrap}.footer a{text-decoration:none}.footer a:hover{color:var(--mint)}
-    .reveal{opacity:0;transform:translateY(22px);transition:opacity .75s ease,transform .75s cubic-bezier(.2,.7,.2,1)}.reveal.visible{opacity:1;transform:translateY(0)}.delay-1{transition-delay:.1s}.delay-2{transition-delay:.2s}.delay-3{transition-delay:.3s}
-    @keyframes float{0%,100%{translate:0 0}50%{translate:0 -12px}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{0%,100%{box-shadow:0 0 0 5px #8bffd419}50%{box-shadow:0 0 0 10px #8bffd400}}@keyframes twinkle{0%,100%{opacity:.45;transform:scale(.88) rotate(0)}50%{opacity:1;transform:scale(1.12) rotate(18deg)}}@keyframes marquee{to{transform:translateX(-50%)}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
-    @media(max-width:850px){.hero{grid-template-columns:1fr;padding-top:65px;gap:10px}.hero-copy{max-width:650px}.hero-art{min-height:540px}.phone{width:270px}.feature-grid{grid-template-columns:repeat(2,1fr)}.loop-panel{grid-template-columns:1fr;gap:24px}.privacy{grid-template-columns:1fr;gap:22px}.card-streak{right:6%}.card-nebula{left:4%}}
-    @media(max-width:600px){.wrap{width:min(100% - 28px,1160px)}.nav{height:66px}.navlinks{display:none;position:absolute;top:66px;left:0;right:0;padding:18px 20px 22px;background:#0b0e1c;border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;gap:16px}.navlinks.open{display:flex}.navlinks a{padding:6px}.nav>.pill-link{display:none}.menu-toggle{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--line);border-radius:14px;background:#ffffff08;color:white;font-size:1.2rem}.hero{padding-block:56px 38px;min-height:auto}.hero h1{font-size:clamp(3.4rem,16vw,5.2rem)}.hero-art{min-height:465px;margin-top:5px}.phone{width:245px}.phone-screen{min-height:440px;padding:17px 14px}.number-display{font-size:4.2rem}.card-streak{top:12%;right:0}.card-nebula{bottom:10%;left:0}.float-card{padding:10px 12px}.float-card strong{font-size:.94rem}.orbit{width:95%}.orbit.two{width:75%}section{padding-block:72px}.feature-grid{grid-template-columns:1fr}.feature{min-height:195px}.loop-panel{padding:25px 18px}.step{padding:13px}.cta{padding:55px 18px}.footer-inner{align-items:flex-start;flex-direction:column}.micro-proof{gap:10px 15px}}
-  </style>
+  <meta property="og:image" content="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png">
+  <link rel="icon" href="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png">
+  <link rel="stylesheet" href="assets/site.css">
+  <title>Guess The Number — Think fast. Build your universe.</title>
 </head>
 <body>
-<header class="topbar">
-  <nav class="nav wrap" aria-label="Main navigation">
-    <a class="brand" href="#home" aria-label="Guess The Number home"><img class="brand-mark" src="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png" alt="" width="38" height="38"><span>GUESS THE NUMBER</span></a>
-    <div class="navlinks" id="navlinks"><a href="#features">The game</a><a href="#how-it-plays">The loop</a><a href="downloads.html">Downloads</a><a href="#offline">Privacy</a></div>
-    <a class="pill-link" href="downloads.html">Downloads <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navlinks">☰</button>
-  </nav>
-</header>
-<main>
-  <div class="development-banner wrap" id="developmentBanner" role="status" hidden>🚧 <strong>This game is under development.</strong> You can explore the debug builds here: <a href="https://github.com/ne0gl1tch20/GuessTheNumber/actions/workflows/stable-debug-apk.yml" target="_blank" rel="noreferrer">Debug artifacts website ↗</a></div>
-
-  <section class="hero wrap" id="home">
-    <div class="hero-copy-block">
-      <div class="eyebrow"><span class="live-dot"></span> A tiny guess. A whole universe.</div>
-      <h1>Think fast.<br><span class="gradient-text">Level up.</span><br>Go cosmic.</h1>
-      <p class="hero-copy">It starts with one number. Then come the streaks, upgrades, wild events, and that one-more-run feeling. Your next big run is waiting.</p>
-      <div class="hero-actions"><a class="button primary" href="downloads.html">↓ Download the game</a><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber" target="_blank" rel="noreferrer">⌘ Explore the source</a></div>
-      <div class="micro-proof"><span>✦ Offline-first gameplay</span><span>✦ Upgrades & prestige</span><span>✦ Made for curious minds</span></div>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><nav class="nav wrap" aria-label="Main navigation">
+  <a class="brand" href="index.html"><img src="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png" alt=""><span>GUESS THE NUMBER</span></a>
+  <div class="navlinks"><a href="#features">The game</a><a href="#progression">Progression</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber">Source</a><a class="nav-cta" href="downloads.html">Downloads ↗</a></div>
+</nav></header>
+<main id="main">
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <div class="eyebrow">A small guess. A bigger game.</div>
+      <h1>One number.<br><span class="accent">A whole universe.</span></h1>
+      <p class="hero-description">Start with a secret number. Build streaks, earn your way through upgrades and keep finding new goals. Guess The Number turns a tiny arcade idea into a game you can keep growing into.</p>
+      <div class="hero-actions"><a class="button primary" href="downloads.html">Find a build <span aria-hidden="true">↗</span></a><a class="button quiet" href="https://github.com/ne0gl1tch20/GuessTheNumber">Explore the source</a></div>
+      <div class="proofline"><span><b>01</b> Offline-first play</span><span><b>02</b> Progression that stacks</span><span><b>03</b> No ads or accounts</span></div>
     </div>
-    <div class="hero-art" aria-label="Animated illustration of the game interface">
-      <div class="orbit"></div><div class="orbit two"></div><span class="spark s1" aria-hidden="true">✦</span><span class="spark s2" aria-hidden="true">✧</span>
-      <div class="phone"><div class="phone-screen">
-        <div class="phone-top"><span>9:41 ◉</span><span class="tiny-logo">GUESS / PLAY</span><span>▰</span></div>
-        <div class="phone-label">FIND THE NUMBER</div><div class="number-display" id="demoNumber">42</div><div class="range">Choose your next move · Range 1–100</div>
-        <div class="guess-grid" aria-hidden="true"><span class="guess-key">12</span><span class="guess-key">28</span><span class="guess-key">35</span><span class="guess-key">41</span><span class="guess-key active" id="activeGuess">42</span><span class="guess-key">57</span><span class="guess-key">64</span><span class="guess-key">81</span><span class="guess-key">96</span></div>
-        <div class="phone-feedback" id="demoFeedback">✦ PERFECT GUESS! STREAK +1</div>
-        <div class="phone-stats"><div class="phone-stat"><small>STREAK</small><b id="demoStreak">× 12 🔥</b></div><div class="phone-stat"><small>NEBULA</small><b id="demoNebula">+240 ✦</b></div></div>
+    <div class="hero-art" role="img" aria-label="Illustration of the Guess The Number game interface with a number, feedback and player stats">
+      <div class="orbit"></div><div class="orbit inner"></div>
+      <div class="game-preview"><div class="preview-screen">
+        <div class="preview-top"><span>GUESS THE NUMBER</span><span class="preview-tag">YOUR RUN</span></div>
+        <div class="preview-label">Find the secret number</div><p class="preview-number">42</p><div class="preview-range">RANGE&nbsp; 1 — 100</div>
+        <div class="preview-feedback">A little higher ↑</div>
+        <div class="preview-stats"><div class="preview-stat"><strong>08</strong><span>ATTEMPTS</span></div><div class="preview-stat"><strong>12</strong><span>STREAK</span></div><div class="preview-stat"><strong>+24</strong><span>REWARD</span></div></div>
+        <div class="preview-caption">Illustrative UI preview · not a live game</div>
       </div></div>
-      <p class="phone-disclaimer"><strong>Showcase preview only.</strong> This animated phone is an illustration, not the actual in-app UI.</p>
-      <div class="float-card card-streak"><strong><span class="emoji">🔥</span>Streak unlocked</strong><small>Keep the run alive</small></div>
-      <div class="float-card card-nebula"><strong><span class="emoji">✧</span>+240 Nebula</strong><small>Your next upgrade awaits</small></div>
+      <div class="float-chip one"><span class="chip-icon">✦</span><span>Keep the streak<small>Every round moves you forward</small></span></div>
+      <div class="float-chip two"><span class="chip-icon">↗</span><span>Make it yours<small>Upgrade. Explore. Repeat.</small></span></div>
     </div>
   </section>
-  <div class="ticker" aria-hidden="true"><div class="ticker-track"><span><i>✦</i> GUESS</span><span>↗ UPGRADE</span><span><i>✦</i> BUILD A STREAK</span><span>↗ PRESTIGE</span><span><i>✦</i> DISCOVER EVENTS</span><span>↗ GO COSMIC</span><span><i>✦</i> GUESS</span><span>↗ UPGRADE</span><span><i>✦</i> BUILD A STREAK</span><span>↗ PRESTIGE</span><span><i>✦</i> DISCOVER EVENTS</span><span>↗ GO COSMIC</span></div></div>
-  <section id="features" class="wrap">
-    <div class="section-head reveal"><div class="kicker">More than a lucky number</div><h2>Small wins.<br><span class="gradient-text">Big momentum.</span></h2><p>Every guess is a chance to get smarter, build your run, and see what unlocks next.</p></div>
+  <section class="section wrap" id="features">
+    <div class="section-head"><div class="eyebrow">More than a lucky guess</div><h2>The fun is in what comes next.</h2><p class="section-intro">A quick round is only the start. The game is built around making each run feel like progress, whether you have a minute or a longer session.</p></div>
     <div class="feature-grid">
-      <article class="feature reveal"><div class="feature-icon">🎯</div><h3>Read the clues</h3><p>Use higher and lower hints to narrow the range and make each guess count.</p></article>
-      <article class="feature reveal delay-1"><div class="feature-icon">⚡</div><h3>Stack your upgrades</h3><p>Turn your earnings into a stronger run with upgrades and faster progression.</p></article>
-      <article class="feature reveal delay-2"><div class="feature-icon">🔥</div><h3>Keep the streak alive</h3><p>Chain correct guesses, chase milestones, and enjoy the rush of a run on fire.</p></article>
-      <article class="feature reveal"><div class="feature-icon">🌌</div><h3>Reach new layers</h3><p>Prestige, Ultra, and Nebula bring bigger goals as your game grows.</p></article>
-      <article class="feature reveal delay-1"><div class="feature-icon">🎲</div><h3>Expect the unexpected</h3><p>Random events, challenges, and arcade activities keep runs feeling fresh.</p></article>
-      <article class="feature reveal delay-2"><div class="feature-icon">🧩</div><h3>Make it your run</h3><p>Explore achievements, cosmetics, and challenge combinations at your own pace.</p></article>
+      <article class="feature"><div class="feature-icon" aria-hidden="true">◎</div><h3>Read the number</h3><p>Use higher and lower feedback to narrow the range, make smarter guesses and improve your approach over time.</p></article>
+      <article class="feature"><div class="feature-icon" aria-hidden="true">↗</div><h3>Build your engine</h3><p>Earn in-game currency and invest in upgrades, multipliers and progression systems that change how your run grows.</p></article>
+      <article class="feature"><div class="feature-icon" aria-hidden="true">✦</div><h3>Keep chasing goals</h3><p>Streaks, achievements, challenges and longer-term progression give you more to work toward than one correct answer.</p></article>
+      <article class="feature"><div class="feature-icon" aria-hidden="true">⌂</div><h3>Explore beyond the run</h3><p>World progression and arcade-style activities expand the game beyond the core guessing loop as those parts continue to develop.</p></article>
+      <article class="feature"><div class="feature-icon" aria-hidden="true">▤</div><h3>Keep your progress</h3><p>Multiple save slots and recovery tools are part of the project, with game rules and save transactions handled by the Kotlin engine.</p></article>
+      <article class="feature"><div class="feature-icon" aria-hidden="true">◌</div><h3>Play without the noise</h3><p>Designed around offline-first gameplay. No ad network, analytics tracking or account system is part of the current plan.</p></article>
     </div>
   </section>
-  <section class="loop-section wrap" id="how-it-plays">
-    <div class="loop-panel reveal">
-      <div><div class="kicker">The satisfying loop</div><h2>One more guess.<br>One more upgrade.</h2><p>There is no need to rush. Learn the clues, make a move, and build on every little win.</p><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber" target="_blank" rel="noreferrer">See how it's made ↗</a></div>
-      <div class="loop-steps">
-        <div class="step"><div class="step-num">01</div><div><h3>Make your guess</h3><p>Use the range and feedback to think through your next move.</p></div></div>
-        <div class="step"><div class="step-num">02</div><div><h3>Earn, then improve</h3><p>Put rewards toward upgrades that help the next round grow.</p></div></div>
-        <div class="step"><div class="step-num">03</div><div><h3>Unlock a bigger goal</h3><p>Chase milestones and discover new layers of progression.</p></div></div>
+  <section class="section wrap" id="progression">
+    <div class="split">
+      <div><div class="eyebrow">Built in layers</div><h2>A game that grows with you.</h2><p class="section-intro">The core loop stays simple. Around it, the project is growing a larger progression game with upgrades, challenges and worlds to work toward. Some screens and systems are still being built, so the site keeps the current status honest.</p><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber">See development on GitHub ↗</a></div>
+      <div class="progress-panel" aria-label="Project highlights and status">
+        <div class="progress-row"><div><b>Guessing and incremental upgrades</b><small>The core game loop and economy</small></div><span class="status-tag">CORE</span></div>
+        <div class="progress-row"><div><b>Challenges and achievements</b><small>Extra goals between runs</small></div><span class="status-tag">IN GAME</span></div>
+        <div class="progress-row"><div><b>Worlds, bosses and deeper progression</b><small>Broader game systems are still evolving</small></div><span class="status-tag building">GROWING</span></div>
+        <div class="progress-row"><div><b>Shared Android and Windows experience</b><small>Cross-platform UI parity is a work in progress</small></div><span class="status-tag building">IN DEV</span></div>
       </div>
     </div>
   </section>
-  <section id="offline" class="wrap">
-    <div class="privacy">
-      <div class="privacy-copy reveal"><div class="kicker">Your game. Your device.</div><h2>Play first.<br><span class="gradient-text">Stay in control.</span></h2><p>Guess The Number is designed around offline-first play. The core game doesn't need an account or an online match to be a game you can enjoy.</p><p>Check the repository and the permissions of the specific release you choose if you want to inspect how a build behaves.</p></div>
-      <div class="privacy-card reveal delay-1"><h3>Built for a focused game session</h3><ul class="privacy-list"><li><span class="check">✓</span><span>Core guessing and progression designed for offline play</span></li><li><span class="check">✓</span><span>No account needed for the core game</span></li><li><span class="check">✓</span><span>Open-source code you can inspect on GitHub</span></li><li><span class="check">✓</span><span>Releases and source linked directly from the project</span></li></ul>
-        <div class="install-note"><strong>About Android install warnings</strong><br>Android or Google Play Protect may warn about APKs installed outside Google Play. The exact message depends on the device and the app build. Don't blindly bypass a block or ignore a malware warning. Only continue if you can verify the APK came from the project's trusted release page and understand the warning. If you can't verify it, stop and don't install it.</div>
-      </div>
-    </div>
-  </section>
-  <section class="wrap">
-    <div class="cta reveal"><div class="eyebrow"><span class="live-dot"></span> Your next run starts here</div><h2>Ready to go<br><span class="gradient-text">one level further?</span></h2><p>Explore the project, read the release notes, and find the build that fits your device. The next streak is yours to chase.</p><div class="cta-actions"><a class="button primary" href="downloads.html">Get the game ↗</a><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber" target="_blank" rel="noreferrer">View source code</a></div></div>
+  <section class="section wrap">
+    <div class="callout"><div><div class="eyebrow">Come take a look</div><h2>Ready to make a guess?</h2><p>Check the download page for builds that are actually published, or follow the source to see what is being worked on.</p></div><div class="callout-actions"><a class="button primary" href="downloads.html">Browse builds ↗</a><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber">GitHub ↗</a></div></div>
   </section>
 </main>
-<footer class="footer"><div class="footer-inner wrap"><a class="brand" href="#home"><img class="brand-mark" src="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png" alt="" width="38" height="38"><span>GUESS THE NUMBER</span></a><span>Made for the joy of one more run. © <span id="year"></span></span><div class="footer-links"><a href="https://github.com/ne0gl1tch20/GuessTheNumber">GitHub</a><a href="downloads.html">Downloads</a><a href="#offline">Install help</a></div></div></footer>
-<script>
-  // Feature flag: set to false to hide the development notice.
-  const SHOW_DEVELOPMENT_BANNER = true;
-  const developmentBanner = document.getElementById('developmentBanner');
-  developmentBanner.hidden = !SHOW_DEVELOPMENT_BANNER;
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const menuToggle = document.getElementById('menuToggle');
-  const navlinks = document.getElementById('navlinks');
-  menuToggle.addEventListener('click', () => {
-    const open = navlinks.classList.toggle('open');
-    menuToggle.setAttribute('aria-expanded', String(open));
-    menuToggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
-    menuToggle.textContent = open ? '×' : '☰';
-  });
-  navlinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-    navlinks.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); menuToggle.textContent='☰';
-  }));
-  document.getElementById('year').textContent = new Date().getFullYear();
-  const revealItems = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window && !reduceMotion) {
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
-    }), {threshold:.12});
-    revealItems.forEach(item => observer.observe(item));
-  } else revealItems.forEach(item => item.classList.add('visible'));
-  if (!reduceMotion) {
-    const numbers = [42, 67, 24, 81, 35, 56];
-    const feedback = ['✦ PERFECT GUESS! STREAK +1','↗ HIGHER! RANGE UPDATED','✦ STREAK ON FIRE!','🌌 NEW MILESTONE REACHED','⚡ UPGRADE READY'];
-    let index = 0;
-    const demoNumber = document.getElementById('demoNumber');
-    const demoFeedback = document.getElementById('demoFeedback');
-    const demoStreak = document.getElementById('demoStreak');
-    const demoNebula = document.getElementById('demoNebula');
-    const activeGuess = document.getElementById('activeGuess');
-    setInterval(() => {
-      index = (index + 1) % numbers.length;
-      demoNumber.animate([{opacity:.15,transform:'translateY(8px) scale(.94)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:420,easing:'cubic-bezier(.2,.7,.2,1)'});
-      demoNumber.textContent = numbers[index];
-      demoFeedback.textContent = feedback[index % feedback.length];
-      demoStreak.textContent = '× ' + (12 + index) + ' 🔥';
-      demoNebula.textContent = '+' + (240 + index * 35) + ' ✦';
-      activeGuess.textContent = numbers[index];
-    }, 2600);
-  }
-</script>
+<footer class="footer"><div class="wrap footer-row"><span>© Guess The Number · An independent game project.</span><div class="footer-links"><a href="downloads.html">Downloads</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber">Source code</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber/issues">Report a problem</a></div></div></footer>
 </body>
 </html>
