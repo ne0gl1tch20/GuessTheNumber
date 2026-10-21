@@ -139,7 +139,7 @@ def main():
             except Exception as exc: structural_errors.append(f"{relative}: HTML parser error: {exc}")
             structural_errors.extend(audit.errors)
             for line, ref in audit.local_refs:
-                target = (path.parent / ref).resolve()
+                target = (ROOT / ref.lstrip("/")).resolve() if ref.startswith("/") else (path.parent / ref).resolve()
                 try: target.relative_to(ROOT)
                 except ValueError:
                     structural_errors.append(f"{relative}:{line}: local reference escapes repository: {ref}")
@@ -153,7 +153,7 @@ def main():
                 if idm and idm.group(1) in audit.labels: continue
                 if re.search(r"\btype\s*=\s*['\"]hidden", attrs, re.I): continue
                 line = source.count("\n", 0, m.start()) + 1
-                structural_errors.append(f"{relative}:{line}: interactive form control may lack an accessible label")
+                text_findings.append((relative, line, "accessibility: unlabeled form control", m.group(1), line in added.get(relative, set())))
         elif ext == ".css":
             structural_errors.extend(check_css(relative, source))
             for m in CSS_CONTENT_RE.finditer(source):
