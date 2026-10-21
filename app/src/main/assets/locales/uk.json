@@ -1239,5 +1239,7 @@
   "nimmy_tour_changelog_title_1": "Changelog",
   "nimmy_tour_changelog_body_1": "See what's changed in recent updates",
   "nimmy_tour_changelog_title_2": "A quick look at the latest game updates.",
-  "nimmy_tour_changelog_body_2": "Language changes refresh more of the HTML interface."
+  "nimmy_tour_changelog_body_2": "Language changes refresh more of the HTML interface.",
+  "exit_confirmation_title": "Бажаєте вийти?",
+  "exit_app": "Вийти"
 }
