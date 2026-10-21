@@ -9,15 +9,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EXTENSIONS = {".html", ".htm", ".css", ".js", ".mjs", ".cjs"}
 SKIP_PARTS = {".git", "node_modules", "build", "dist", "target", ".gradle", ".idea", "vendor", "third_party", "third-party"}
-TEXT_ATTRS = {"placeholder", "title", "aria-label"}
+TEXT_ATTRS = {"placeholder", "title", "aria-label", "alt", "value"}
 VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
 WORD_RE = re.compile(r"[A-Za-zÀ-ž\u3400-\u9fff\u3040-\u30ff\uac00-\ud7af]{2,}")
 I18N_ATTRS = {"data-i18n", "data-i18n-html", "data-i18n-placeholder", "data-i18n-title", "data-i18n-aria-label", "data-i18n-alt"}
 JS_UI_PATTERNS = [
-    ("DOM text assignment", re.compile(r"\.(?:textContent|innerText|innerHTML)\s*=\s*(['\"])([^'\"\n]{2,})\1")),
-    ("dialog/alert text", re.compile(r"\b(?:alert|confirm|prompt)\s*\(\s*(['\"])([^'\"\n]{2,})\1")),
-    ("placeholder/title assignment", re.compile(r"\.(?:placeholder|title|ariaLabel)\s*=\s*(['\"])([^'\"\n]{2,})\1")),
-    ("DOM label attribute", re.compile(r"\.setAttribute\s*\(\s*['\"](?:aria-label|title|placeholder)['\"]\s*,\s*(['\"])([^'\"\n]{2,})\1")),
+    ("DOM text assignment", re.compile(r"\.(?:textContent|innerText|innerHTML)\s*\+?=\s*(['\"\x60])([^'\"\x60\n]{2,})\1")),
+    ("dialog/alert text", re.compile(r"\b(?:alert|confirm|prompt|showToast|showBanner|showError|showSuccess|showMessage|notify)\s*\(\s*(['\"\x60])([^'\"\x60\n]{2,})\1")),
+    ("placeholder/title assignment", re.compile(r"\.(?:placeholder|title|ariaLabel)\s*=\s*(['\"\x60])([^'\"\x60\n]{2,})\1")),
+    ("DOM label attribute", re.compile(r"\.setAttribute\s*\(\s*['\"](?:aria-label|title|placeholder)['\"]\s*,\s*(['\"\x60])([^'\"\x60\n]{2,})\1")),
 ]
 CSS_CONTENT_RE = re.compile(r"\bcontent\s*:\s*(['\"])(.*?)\1", re.I)
 
