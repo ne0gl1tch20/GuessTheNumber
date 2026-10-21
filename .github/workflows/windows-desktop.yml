@@ -81,6 +81,10 @@ jobs:
         shell: pwsh
         run: python tools/validate_hardcoded_strings.py
 
+      - name: Audit every tracked HTML, CSS and JavaScript file
+        shell: pwsh
+        run: python tools/audit_web_frontend.py --report-file build/reports/web-frontend-audit.txt
+
       - name: Fast Kotlin Preflight Check
         shell: pwsh
         run: python tools/preflight_compile_check.py
