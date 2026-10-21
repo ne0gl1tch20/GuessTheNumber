@@ -30,13 +30,20 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check JavaScript syntax
-        run: node --check app/src/main/assets/web-play/app.js
+      - name: Check syntax of every tracked JavaScript file
+        shell: bash
+        run: |
+          mapfile -t files < <(git ls-files '*.js' '*.mjs' '*.cjs')
+          if [ ${#files[@]} -eq 0 ]; then echo 'No tracked JavaScript files found.'; exit 1; fi
+          for file in "${files[@]}"; do echo "Checking $file"; node --check "$file"; done
 
-      - name: Validate HTML structure and local asset references
+      - name: Audit all tracked HTML, CSS and JavaScript files
+        run: python tools/audit_web_frontend.py --report-file build/reports/web-frontend-audit.txt
+
+      - name: Validate current WebView bundle structure
         run: python tools/validate_web_assets.py
 
-      - name: Check CSS syntax balance
+      - name: Check current WebView CSS structure
         run: python tools/validate_web_assets.py --css-only
 
       - name: Test localized randomized guess feedback
