@@ -210,6 +210,14 @@ jobs:
           "GTN_DEBUG_ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           "GTN_DEBUG_MANIFEST=$env:RUNNER_TEMP/windows-debug-manifest.json" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
+      - name: Upload frontend audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: GuessTheNumber-Web-Frontend-Audit
+          path: build/reports/web-frontend-audit.txt
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Upload Windows installer artifact
         uses: actions/upload-artifact@v4
         with:
