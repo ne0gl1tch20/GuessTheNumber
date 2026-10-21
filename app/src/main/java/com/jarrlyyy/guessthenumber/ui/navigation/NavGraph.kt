@@ -1,7 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -10,40 +10,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.jarrlyyy.guessthenumber.BuildConfig
 import androidx.compose.runtime.CompositionLocalProvider
+import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
-import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.components.ReusableColorPickerDialog
+import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.screens.CrashRecoveryScreen
 import com.jarrlyyy.guessthenumber.ui.screens.DevSettingsScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProcessInspectorScreen
 import com.jarrlyyy.guessthenumber.ui.screens.ProductionWebPlayScreen
 import com.jarrlyyy.guessthenumber.ui.screens.SaveSlotsScreen
-import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfile
 import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileScreen
 import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileStore
-import com.jarrlyyy.guessthenumber.ui.screens.loadPlayerAvatar
 import com.jarrlyyy.guessthenumber.ui.screens.SharedWebUiPrototypeScreen
 import com.jarrlyyy.guessthenumber.ui.screens.LuaTestingHubScreen
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 import kotlinx.coroutines.flow.first
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.size
-import androidx.compose.ui.unit.dp
 
-/**
- * Player-facing navigation is owned by the shared HTML surface.
- * Kotlin remains the authoritative engine, save system and action host.
- * Native Compose is retained only for boot/recovery/system-only surfaces.
- */
 @Composable
 fun NavGraph(
     state: GameState,
@@ -96,15 +81,13 @@ fun NavGraph(
 ) {
     val locale = viewModel.localeManager
     val appContext = androidx.compose.ui.platform.LocalContext.current.applicationContext
+    val hostActivity = androidx.compose.ui.platform.LocalContext.current as? androidx.activity.ComponentActivity
     val profileStore = remember(appContext) { PlayerProfileStore(appContext) }
     val playerProfile by profileStore.profile.collectAsState(initial = null)
     var profileLoaded by remember { mutableStateOf(false) }
     var showPlayerProfile by remember { mutableStateOf(false) }
     var editingPlayerProfile by remember { mutableStateOf(false) }
-    LaunchedEffect(profileStore) {
-        profileStore.profile.first()
-        profileLoaded = true
-    }
+    LaunchedEffect(profileStore) { profileStore.profile.first(); profileLoaded = true }
     var showDevSettings by remember { mutableStateOf(false) }
     var dailyRewardTestRequest by remember { mutableStateOf(0) }
     var webPlayMounted by remember { mutableStateOf(hasAnySave) }
@@ -112,177 +95,70 @@ fun NavGraph(
     var debugDestination by remember { mutableStateOf<String?>(null) }
     var showSaveSlots by remember { mutableStateOf(false) }
     var colorPickerTarget by remember { mutableStateOf<String?>(null) }
+    var showExitConfirmation by remember { mutableStateOf(false) }
 
-    if (!profileLoaded) {
-        Box(modifier = androidx.compose.ui.Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-            androidx.compose.material3.CircularProgressIndicator()
+    LaunchedEffect(hostActivity) { hostActivity?.let(AndroidBackController::install) }
+
+    BackHandler {
+        when {
+            showExitConfirmation -> showExitConfirmation = false
+            colorPickerTarget != null -> colorPickerTarget = null
+            showPlayerProfile -> { showPlayerProfile = false; editingPlayerProfile = false }
+            debugDestination != null -> debugDestination = null
+            showDevSettings -> showDevSettings = false
+            showSaveSlots -> showSaveSlots = false
+            else -> AndroidBackController.handleBack { showExitConfirmation = true }
         }
-        return
     }
 
-    if (playerProfile?.setupComplete != true) {
-        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-            PlayerProfileScreen(
-                profile = playerProfile,
-                firstLaunch = true,
-                store = profileStore,
-                onBack = {}
-            )
-        }
-        return
-    }
-
-    if (!webPlayMounted && !showSaveSlots) {
-        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-            SaveSlotsScreen(viewModel = viewModel, onNavigateBack = {})
-        }
-        return
-    }
-
-    if (hasPreviousCrash) {
-        CrashRecoveryScreen(
-            locale = locale,
-            onDismiss = onDismissCrash,
-            reducedMotion = state.settings.reducedMotion
-        )
-        return
-    }
-
-    Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
-        ProductionWebPlayScreen(
-            state = state,
-            dailyRewardTestRequest = dailyRewardTestRequest,
-            incomePerSecond = incomePerSecond,
-            localeManager = locale,
-            stateProvider = { viewModel.gameState.value },
-            offlineGains = offlineGains,
-            onDismissOfflineGains = onDismissOfflineGains,
-            onClaimDailyReward = viewModel::claimDailyReward,
-            onResetData = onResetData,
-            onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
-            onClaimDailyQuest = viewModel::claimDailyQuest,
-            onOpenLootChest = viewModel::openLootChest,
-            onNavigateProgression = { progression ->
-                when {
-                    progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true
-                    progression == "save_slots" -> showSaveSlots = true
-                    progression == "player_profile" -> { showPlayerProfile = true; editingPlayerProfile = false }
-                    progression == "color_picker_primary" -> colorPickerTarget = "Primary"
-                    progression == "color_picker_secondary" -> colorPickerTarget = "Secondary"
-                    progression == "color_picker_tertiary" -> colorPickerTarget = "Tertiary"
-                    progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", "")
-                    progression == "claim_codex" -> viewModel.progressionAction("claim_codex", "")
-                    progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':'))
+    if (showExitConfirmation) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showExitConfirmation = false },
+            title = {
+                androidx.compose.material3.Text(
+                    locale.getString("exit_confirmation_title", "Do you want to exit?")
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { hostActivity?.finish() }
+                ) {
+                    androidx.compose.material3.Text(locale.getString("exit_app", "Exit"))
                 }
             },
-            onWorldAction = viewModel::worldProgressAction,
-            onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) },
-            onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) },
-            onBuyPrestigeUpgrade = viewModel::buyPrestigeUpgrade,
-            onBuyPrestigeShopItem = viewModel::buyPrestigeShopItem,
-            onBuyUltraUpgrade = viewModel::buyUltraUpgrade,
-            onBuyUltraShopItem = viewModel::buyUltraShopItem,
-            onEquipCosmetic = viewModel::equipCosmetic,
-            onUpdateMultiplier = viewModel::updateBuyMultiplier,
-            onUpdateSettings = viewModel::updateSettings,
-            onPrestigeReset = viewModel::prestigeReset,
-            onUltraReset = viewModel::ultraReset,
-            onBuyTalent = viewModel::buyTalent,
-            onSetMutatorActive = viewModel::setMutatorActive,
-            onArcadeReward = viewModel::awardArcadeResult,
-            onSettleStake = viewModel::settleRandomStake
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { showExitConfirmation = false }
+                ) {
+                    androidx.compose.material3.Text(locale.getString("cancel", "Cancel"))
+                }
+            }
         )
-
-        if (BuildConfig.DEBUG && showDevSettings) {
-            CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-                DevSettingsScreen(
-                    state = state,
-                    onExecuteCommand = { command ->
-                        if (command.trim().equals("/testdailyrewards", ignoreCase = true)) {
-                            showDevSettings = false
-                            debugDestination = null
-                            dailyRewardTestRequest++
-                            "Opening the daily reward popup in the HTML game."
-                        } else {
-                            viewModel.executeDevCommand(command)
-                        }
-                    },
-                    onImportSave = viewModel::importSave,
-                    onUpdateSettings = viewModel::updateSettings,
-                    onGetAppPreferencesJson = viewModel::getAppPreferencesJson,
-                    onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson,
-                    onGetSaveJson = viewModel::getSaveJson,
-                    onApplySaveJson = viewModel::applySaveJson,
-                    onNavigate = { destination -> debugDestination = destination },
-                    onBack = { showDevSettings = false; debugDestination = null }
-                )
-            }
-        }
-
-        if (BuildConfig.DEBUG) {
-            when (debugDestination) {
-                "process_inspector" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-                    ProcessInspectorScreen(state = state, onBack = { debugDestination = null })
-                }
-                "web_ui_prototype" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-                    SharedWebUiPrototypeScreen(
-                        state = state,
-                        onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) },
-                        onBack = { debugDestination = null }
-                    )
-                }
-                "lua_testing_hub" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-                    LuaTestingHubScreen(onBack = { debugDestination = null })
-                }
-            }
-        }
-
-        if (showSaveSlots) {
-            CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-                SaveSlotsScreen(viewModel = viewModel, onNavigateBack = { showSaveSlots = false })
-            }
-        }
-
-        colorPickerTarget?.let { target ->
-            val current = when (target) {
-                "Primary" -> state.settings.customPrimaryColor
-                "Secondary" -> state.settings.customSecondaryColor
-                else -> state.settings.customTertiaryColor
-            }
-            CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-                ReusableColorPickerDialog(
-                    initialHex = current,
-                    title = locale.getString("settings_custom_theme_color", "Custom Theme Color"),
-                    onDismiss = { colorPickerTarget = null },
-                    onApply = { hex ->
-                        val updated = when (target) {
-                            "Primary" -> state.settings.copy(themePreset = "Custom", customPrimaryColor = hex)
-                            "Secondary" -> state.settings.copy(themePreset = "Custom", customSecondaryColor = hex)
-                            else -> state.settings.copy(themePreset = "Custom", customTertiaryColor = hex)
-                        }
-                        viewModel.updateSettings(updated)
-                        colorPickerTarget = null
-                    }
-                )
-            }
-        }
-
-    if (showPlayerProfile) {
-        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-            PlayerProfileScreen(
-                profile = playerProfile,
-                firstLaunch = false,
-                store = profileStore,
-                viewOnly = !editingPlayerProfile,
-                onEdit = { editingPlayerProfile = true },
-                onBack = { showPlayerProfile = false; editingPlayerProfile = false }
-            )
-        }
     }
 
+    if (!profileLoaded) {
+        Box(modifier = androidx.compose.ui.Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) { androidx.compose.material3.CircularProgressIndicator() }
+        return
     }
-
-    if (initialDestination != null) {
-        onNotificationDestinationHandled()
+    if (playerProfile?.setupComplete != true) {
+        CompositionLocalProvider(LocalAppLocaleManager provides locale) { PlayerProfileScreen(profile = playerProfile, firstLaunch = true, store = profileStore, onBack = {}) }
+        return
     }
+    if (!webPlayMounted && !showSaveSlots) {
+        CompositionLocalProvider(LocalAppLocaleManager provides locale) { SaveSlotsScreen(viewModel = viewModel, onNavigateBack = {}) }
+        return
+    }
+    if (hasPreviousCrash) {
+        CrashRecoveryScreen(locale = locale, onDismiss = onDismissCrash, reducedMotion = state.settings.reducedMotion)
+        return
+    }
+    Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
+        ProductionWebPlayScreen(state = state, dailyRewardTestRequest = dailyRewardTestRequest, incomePerSecond = incomePerSecond, localeManager = locale, stateProvider = { viewModel.gameState.value }, offlineGains = offlineGains, onDismissOfflineGains = onDismissOfflineGains, onClaimDailyReward = viewModel::claimDailyReward, onResetData = onResetData, onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) }, onClaimDailyQuest = viewModel::claimDailyQuest, onOpenLootChest = viewModel::openLootChest, onNavigateProgression = { progression -> when { progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true; progression == "save_slots" -> showSaveSlots = true; progression == "player_profile" -> { showPlayerProfile = true; editingPlayerProfile = false }; progression == "color_picker_primary" -> colorPickerTarget = "Primary"; progression == "color_picker_secondary" -> colorPickerTarget = "Secondary"; progression == "color_picker_tertiary" -> colorPickerTarget = "Tertiary"; progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", ""); progression == "claim_codex" -> viewModel.progressionAction("claim_codex", ""); progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':')) } }, onWorldAction = viewModel::worldProgressAction, onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) }, onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) }, onBuyPrestigeUpgrade = viewModel::buyPrestigeUpgrade, onBuyPrestigeShopItem = viewModel::buyPrestigeShopItem, onBuyUltraUpgrade = viewModel::buyUltraUpgrade, onBuyUltraShopItem = viewModel::buyUltraShopItem, onEquipCosmetic = viewModel::equipCosmetic, onUpdateMultiplier = viewModel::updateBuyMultiplier, onUpdateSettings = viewModel::updateSettings, onPrestigeReset = viewModel::prestigeReset, onUltraReset = viewModel::ultraReset, onBuyTalent = viewModel::buyTalent, onSetMutatorActive = viewModel::setMutatorActive, onArcadeReward = viewModel::awardArcadeResult, onSettleStake = viewModel::settleRandomStake)
+        if (BuildConfig.DEBUG && showDevSettings) CompositionLocalProvider(LocalAppLocaleManager provides locale) { DevSettingsScreen(state = state, onExecuteCommand = { command -> if (command.trim().equals("/testdailyrewards", ignoreCase = true)) { showDevSettings = false; debugDestination = null; dailyRewardTestRequest++; "Opening the daily reward popup in the HTML game." } else viewModel.executeDevCommand(command) }, onImportSave = viewModel::importSave, onUpdateSettings = viewModel::updateSettings, onGetAppPreferencesJson = viewModel::getAppPreferencesJson, onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson, onGetSaveJson = viewModel::getSaveJson, onApplySaveJson = viewModel::applySaveJson, onNavigate = { destination -> debugDestination = destination }, onBack = { showDevSettings = false; debugDestination = null }) }
+        if (BuildConfig.DEBUG) when (debugDestination) { "process_inspector" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) { ProcessInspectorScreen(state = state, onBack = { debugDestination = null }) }; "web_ui_prototype" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) { SharedWebUiPrototypeScreen(state = state, onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) }, onBack = { debugDestination = null }) }; "lua_testing_hub" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) { LuaTestingHubScreen(onBack = { debugDestination = null }) } }
+        if (showSaveSlots) CompositionLocalProvider(LocalAppLocaleManager provides locale) { SaveSlotsScreen(viewModel = viewModel, onNavigateBack = { showSaveSlots = false }) }
+        colorPickerTarget?.let { target -> val current = when (target) { "Primary" -> state.settings.customPrimaryColor; "Secondary" -> state.settings.customSecondaryColor; else -> state.settings.customTertiaryColor }; CompositionLocalProvider(LocalAppLocaleManager provides locale) { ReusableColorPickerDialog(initialHex = current, title = locale.getString("settings_custom_theme_color", "Custom Theme Color"), onDismiss = { colorPickerTarget = null }, onApply = { hex -> viewModel.updateSettings(when (target) { "Primary" -> state.settings.copy(themePreset = "Custom", customPrimaryColor = hex); "Secondary" -> state.settings.copy(themePreset = "Custom", customSecondaryColor = hex); else -> state.settings.copy(themePreset = "Custom", customTertiaryColor = hex) }); colorPickerTarget = null }) } }
+        if (showPlayerProfile) CompositionLocalProvider(LocalAppLocaleManager provides locale) { PlayerProfileScreen(profile = playerProfile, firstLaunch = false, store = profileStore, viewOnly = !editingPlayerProfile, onEdit = { editingPlayerProfile = true }, onBack = { showPlayerProfile = false; editingPlayerProfile = false }) }
+    }
+    if (initialDestination != null) onNotificationDestinationHandled()
 }

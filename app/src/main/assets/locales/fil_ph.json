@@ -1239,5 +1239,7 @@
   "nimmy_tour_changelog_title_1": "Mga Pagbabago",
   "nimmy_tour_changelog_body_1": "Tingnan ang mga pagbabago sa mga update",
   "nimmy_tour_changelog_title_2": "Mabilis na tingin sa mga pinakabagong update ng laro.",
-  "nimmy_tour_changelog_body_2": "Mas maraming bahagi ng HTML interface ang nagbabago kapag nagpapalit ng wika."
+  "nimmy_tour_changelog_body_2": "Mas maraming bahagi ng HTML interface ang nagbabago kapag nagpapalit ng wika.",
+  "exit_confirmation_title": "Gusto mo bang lumabas?",
+  "exit_app": "Lumabas"
 }
