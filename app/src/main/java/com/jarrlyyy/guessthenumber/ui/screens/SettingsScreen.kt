@@ -36,8 +36,6 @@ fun SettingsScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    var showResetDialog by remember { mutableStateOf(false) }
-    var confirmResetCheck by remember { mutableStateOf(false) }
     var colorTarget by remember { mutableStateOf<String?>(null) }
 
     val settings = state.settings
@@ -539,23 +537,6 @@ fun SettingsScreen(
                 HorizontalDivider()
             }
 
-            item {
-                Text(localizedText("Save Data Management"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
-            }
-
-            item {
-                Text(locale.getString("settings_desc_reset_all_data", "This clears saved game progress. An extra confirmation is required before continuing."), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Button(
-                    onClick = {
-                        confirmResetCheck = false
-                        showResetDialog = true
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(locale.getString("reset_everything_label", "Reset Everything"))
-                }
-            }
         }
     }
 
@@ -582,45 +563,7 @@ fun SettingsScreen(
         )
     }
 
-    if (showResetDialog) {
-        AlertDialog(
-            onDismissRequest = { showResetDialog = false },
-            title = { Text(locale.getString("confirm_data_reset_title", "Confirm Data Reset")) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(locale.getString("reset_data_warning", "Are you sure you want to reset all progress? This action is irreversible."))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Checkbox(
-                            checked = confirmResetCheck,
-                            onCheckedChange = { confirmResetCheck = it }
-                        )
-                        Text(locale.getString("reset_data_acknowledgement", "I understand this will erase all my progress"), fontSize = 14.sp)
-                    }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        onResetData()
-                        showResetDialog = false
-                        Toast.makeText(context, locale.getString("all_game_data_reset_toast", "All game data has been reset."), Toast.LENGTH_SHORT).show()
-                    },
-                    enabled = confirmResetCheck,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text(locale.getString("reset_everything_label", "Reset Everything"))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) {
-                    Text(localizedText("Cancel"))
-                }
-            }
-        )
-    }
+
 }
 
 
