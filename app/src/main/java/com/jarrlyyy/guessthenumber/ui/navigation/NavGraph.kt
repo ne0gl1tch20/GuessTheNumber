@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.ui.navigation
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
