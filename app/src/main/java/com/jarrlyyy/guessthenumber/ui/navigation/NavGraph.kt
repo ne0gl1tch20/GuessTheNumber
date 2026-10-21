@@ -94,17 +94,19 @@ fun NavGraph(
     var debugDestination by remember { mutableStateOf<String?>(null) }
     var showSaveSlots by remember { mutableStateOf(false) }
     var colorPickerTarget by remember { mutableStateOf<String?>(null) }
+    var showExitConfirmation by remember { mutableStateOf(false) }
 
     LaunchedEffect(hostActivity) { hostActivity?.let(AndroidBackController::install) }
 
     BackHandler {
         when {
+            showExitConfirmation -> showExitConfirmation = false
             colorPickerTarget != null -> colorPickerTarget = null
             showPlayerProfile -> { showPlayerProfile = false; editingPlayerProfile = false }
             debugDestination != null -> debugDestination = null
             showDevSettings -> showDevSettings = false
             showSaveSlots -> showSaveSlots = false
-            else -> AndroidBackController.handleBack { hostActivity?.finish() }
+            else -> AndroidBackController.handleBack { showExitConfirmation = true }
         }
     }
 
@@ -132,5 +134,30 @@ fun NavGraph(
         colorPickerTarget?.let { target -> val current = when (target) { "Primary" -> state.settings.customPrimaryColor; "Secondary" -> state.settings.customSecondaryColor; else -> state.settings.customTertiaryColor }; CompositionLocalProvider(LocalAppLocaleManager provides locale) { ReusableColorPickerDialog(initialHex = current, title = locale.getString("settings_custom_theme_color", "Custom Theme Color"), onDismiss = { colorPickerTarget = null }, onApply = { hex -> viewModel.updateSettings(when (target) { "Primary" -> state.settings.copy(themePreset = "Custom", customPrimaryColor = hex); "Secondary" -> state.settings.copy(themePreset = "Custom", customSecondaryColor = hex); else -> state.settings.copy(themePreset = "Custom", customTertiaryColor = hex) }); colorPickerTarget = null }) } }
         if (showPlayerProfile) CompositionLocalProvider(LocalAppLocaleManager provides locale) { PlayerProfileScreen(profile = playerProfile, firstLaunch = false, store = profileStore, viewOnly = !editingPlayerProfile, onEdit = { editingPlayerProfile = true }, onBack = { showPlayerProfile = false; editingPlayerProfile = false }) }
     }
+    if (showExitConfirmation) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showExitConfirmation = false },
+            title = {
+                androidx.compose.material3.Text(
+                    locale.getString("exit_confirmation_title", "Do you want to exit?")
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { hostActivity?.finish() }
+                ) {
+                    androidx.compose.material3.Text(locale.getString("exit_app", "Exit"))
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { showExitConfirmation = false }
+                ) {
+                    androidx.compose.material3.Text(locale.getString("cancel", "Cancel"))
+                }
+            }
+        )
+    }
+
     if (initialDestination != null) onNotificationDestinationHandled()
 }
