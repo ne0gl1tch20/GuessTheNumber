@@ -14,10 +14,11 @@
   <title>Guess The Number — Think fast. Build your universe.</title>
 </head>
 <body>
+<div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="topbar"><nav class="nav wrap" aria-label="Main navigation">
   <a class="brand" href="index.html"><img src="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png" alt=""><span>GUESS THE NUMBER</span></a>
-  <div class="navlinks"><a href="#features">The game</a><a href="#progression">Progression</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber">Source</a><a class="nav-cta" href="downloads.html">Downloads ↗</a></div>
+  <div class="navlinks"><a href="#try-me">Try it</a><a href="#features">The game</a><a href="#progression">Progression</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber">Source</a><a class="nav-cta" href="downloads.html">Downloads ↗</a></div>
 </nav></header>
 <main id="main">
   <section class="hero wrap">
@@ -41,7 +42,31 @@
       <div class="float-chip two"><span class="chip-icon">↗</span><span>Make it yours<small>Upgrade. Explore. Repeat.</small></span></div>
     </div>
   </section>
-  <section class="section wrap" id="features">
+
+  <section class="section wrap try-section" id="try-me" aria-labelledby="try-title">
+    <div class="try-layout">
+      <div class="try-copy">
+        <div class="eyebrow">Your turn to play</div>
+        <h2 id="try-title">Okay, prove your guessing skills.</h2>
+        <p class="section-intro">A tiny playable demo right here. I picked a secret number between 1 and 100. Can you find it? This is a website mini-game, separate from your saved game progress.</p>
+        <div class="try-tips"><span>↗ Higher / lower hints</span><span>✦ Attempts counter</span><span>↻ New round anytime</span></div>
+      </div>
+      <div class="try-card" id="try-card">
+        <div class="try-card-head"><span class="try-live"><i aria-hidden="true"></i> MINI CHALLENGE</span><span class="try-round" id="try-round">ROUND 01</span></div>
+        <label class="try-label" for="guess-input">What's your guess?</label>
+        <form id="guess-form" class="guess-form">
+          <input id="guess-input" name="guess" type="number" min="1" max="100" inputmode="numeric" placeholder="1–100" autocomplete="off" required aria-describedby="guess-help guess-feedback">
+          <button class="button primary guess-button" type="submit">Guess <span aria-hidden="true">↗</span></button>
+        </form>
+        <div class="guess-range" aria-hidden="true"><span>01</span><div><i id="guess-range-fill"></i></div><span>100</span></div>
+        <p id="guess-help" class="guess-help">Enter a whole number from 1 to 100.</p>
+        <div class="guess-feedback" id="guess-feedback" role="status" aria-live="polite">Your first guess could be the one.</div>
+        <div class="try-stats"><div><strong id="guess-count">0</strong><span>GUESSES</span></div><div><strong id="guess-best">—</strong><span>BEST THIS VISIT</span></div><div><strong id="guess-wins">0</strong><span>WINS</span></div></div>
+        <button type="button" class="try-reset" id="try-reset">↻ Start a new round</button>
+      </div>
+    </div>
+  </section>
+  <section class="section wrap reveal-section" id="features">
     <div class="section-head"><div class="eyebrow">More than a lucky guess</div><h2>The fun is in what comes next.</h2><p class="section-intro">A quick round is only the start. The game is built around making each run feel like progress, whether you have a minute or a longer session.</p></div>
     <div class="feature-grid">
       <article class="feature"><div class="feature-icon" aria-hidden="true">◎</div><h3>Read the number</h3><p>Use higher and lower feedback to narrow the range, make smarter guesses and improve your approach over time.</p></article>
@@ -52,7 +77,7 @@
       <article class="feature"><div class="feature-icon" aria-hidden="true">◌</div><h3>Play without the noise</h3><p>Designed around offline-first gameplay. No ad network, analytics tracking or account system is part of the current plan.</p></article>
     </div>
   </section>
-  <section class="section wrap" id="progression">
+  <section class="section wrap reveal-section" id="progression">
     <div class="split">
       <div><div class="eyebrow">Built in layers</div><h2>A game that grows with you.</h2><p class="section-intro">The core loop stays simple. Around it, the project is growing a larger progression game with upgrades, challenges and worlds to work toward. Some screens and systems are still being built, so the site keeps the current status honest.</p><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber">See development on GitHub ↗</a></div>
       <div class="progress-panel" aria-label="Project highlights and status">
@@ -63,10 +88,112 @@
       </div>
     </div>
   </section>
-  <section class="section wrap">
+  <section class="section wrap reveal-section">
     <div class="callout"><div><div class="eyebrow">Come take a look</div><h2>Ready to make a guess?</h2><p>Check the download page for builds that are actually published, or follow the source to see what is being worked on.</p></div><div class="callout-actions"><a class="button primary" href="downloads.html">Browse builds ↗</a><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber">GitHub ↗</a></div></div>
   </section>
 </main>
 <footer class="footer"><div class="wrap footer-row"><span>© Guess The Number · An independent game project.</span><div class="footer-links"><a href="downloads.html">Downloads</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber">Source code</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber/issues">Report a problem</a></div></div></footer>
+<button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top">↑</button>
+<script>
+(() => {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const progressBar = document.getElementById('scroll-progress-bar');
+  const topButton = document.getElementById('back-to-top');
+  let ticking = false;
+  const updateScrollUI = () => {
+    const root = document.documentElement;
+    const maxScroll = Math.max(1, root.scrollHeight - window.innerHeight);
+    progressBar.style.transform = 'scaleX(' + Math.min(1, window.scrollY / maxScroll) + ')';
+    topButton.classList.toggle('visible', window.scrollY > 520);
+    ticking = false;
+  };
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateScrollUI);
+      ticking = true;
+    }
+  }, {passive:true});
+  updateScrollUI();
+  topButton.addEventListener('click', () => window.scrollTo({top:0, behavior:reduceMotion ? 'auto' : 'smooth'}));
+
+  const revealTargets = document.querySelectorAll('.reveal-section, .feature, .progress-row, .try-card, .try-copy');
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    revealTargets.forEach((item, index) => {
+      item.classList.add('reveal-ready');
+      if (item.classList.contains('feature')) item.style.setProperty('--reveal-delay', (index % 3) * 65 + 'ms');
+    });
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.12, rootMargin:'0px 0px -36px 0px'});
+    revealTargets.forEach(item => observer.observe(item));
+  }
+
+  const form = document.getElementById('guess-form');
+  const input = document.getElementById('guess-input');
+  const feedback = document.getElementById('guess-feedback');
+  const countOutput = document.getElementById('guess-count');
+  const bestOutput = document.getElementById('guess-best');
+  const winsOutput = document.getElementById('guess-wins');
+  const rangeFill = document.getElementById('guess-range-fill');
+  const roundOutput = document.getElementById('try-round');
+  const resetButton = document.getElementById('try-reset');
+  let secret = randomSecret(), attempts = 0, round = 1, wins = 0, best = null, finished = false;
+  function randomSecret() { return Math.floor(Math.random() * 100) + 1; }
+  function updateStats() {
+    countOutput.textContent = attempts;
+    bestOutput.textContent = best === null ? '—' : best;
+    winsOutput.textContent = wins;
+    roundOutput.textContent = 'ROUND ' + String(round).padStart(2, '0');
+  }
+  function say(message, kind) {
+    feedback.textContent = message;
+    feedback.className = 'guess-feedback' + (kind ? ' ' + kind : '');
+  }
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (finished) { say('You got it! Start a new round to play again.', 'success'); return; }
+    const guess = Number(input.value);
+    if (!Number.isInteger(guess) || guess < 1 || guess > 100) {
+      say('Pick a whole number from 1 to 100.', 'warning');
+      input.focus();
+      return;
+    }
+    attempts++;
+    updateStats();
+    if (guess === secret) {
+      finished = true;
+      wins++;
+      if (best === null || attempts < best) best = attempts;
+      updateStats();
+      say('🎉 Nailed it! ' + secret + ' was the number. You found it in ' + attempts + (attempts === 1 ? ' guess!' : ' guesses!'), 'success');
+      rangeFill.style.width = guess + '%';
+      document.getElementById('try-card').classList.add('won');
+      input.disabled = true;
+      form.querySelector('button').disabled = true;
+    } else if (guess < secret) {
+      say(guess + ' is too low. Go higher! ↑', 'hint');
+      rangeFill.style.width = guess + '%';
+    } else {
+      say(guess + ' is too high. Try lower! ↓', 'hint');
+      rangeFill.style.width = guess + '%';
+    }
+    input.select();
+  });
+  resetButton.addEventListener('click', () => {
+    secret = randomSecret(); attempts = 0; round++; finished = false;
+    updateStats(); say('New number picked. Let’s see what you’ve got!', '');
+    rangeFill.style.width = '0%';
+    document.getElementById('try-card').classList.remove('won');
+    input.disabled = false; form.querySelector('button').disabled = false;
+    input.value = ''; input.focus();
+  });
+  updateStats();
+})();
+</script>
 </body>
 </html>
