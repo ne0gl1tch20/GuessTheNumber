@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,7 @@ import com.jarrlyyy.guessthenumber.ui.screens.PlayerProfileStore
 import com.jarrlyyy.guessthenumber.ui.screens.loadPlayerAvatar
 import com.jarrlyyy.guessthenumber.ui.screens.SharedWebUiPrototypeScreen
 import com.jarrlyyy.guessthenumber.ui.screens.LuaTestingHubScreen
+import com.jarrlyyy.guessthenumber.ui.screens.WebViewDebugConsole
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 import kotlinx.coroutines.flow.first
 import androidx.compose.foundation.clickable
@@ -112,6 +114,25 @@ fun NavGraph(
     var debugDestination by remember { mutableStateOf<String?>(null) }
     var showSaveSlots by remember { mutableStateOf(false) }
     var colorPickerTarget by remember { mutableStateOf<String?>(null) }
+
+    BackHandler {
+        when {
+            colorPickerTarget != null -> colorPickerTarget = null
+            showPlayerProfile -> {
+                showPlayerProfile = false
+                editingPlayerProfile = false
+            }
+            debugDestination != null -> debugDestination = null
+            showDevSettings -> showDevSettings = false
+            showSaveSlots -> showSaveSlots = false
+            else -> AndroidBackController.handleBack {
+                // No HTML history remains, so let the Activity perform its normal exit behavior.
+                WebViewDebugConsole.add("Android Back: no WebView history, falling through to Activity")
+                val context = androidx.compose.ui.platform.LocalContext.current
+                (context as? androidx.activity.ComponentActivity)?.finish()
+            }
+        }
+    }
 
     if (!profileLoaded) {
         Box(modifier = androidx.compose.ui.Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
@@ -267,19 +288,18 @@ fun NavGraph(
             }
         }
 
-    if (showPlayerProfile) {
-        CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-            PlayerProfileScreen(
-                profile = playerProfile,
-                firstLaunch = false,
-                store = profileStore,
-                viewOnly = !editingPlayerProfile,
-                onEdit = { editingPlayerProfile = true },
-                onBack = { showPlayerProfile = false; editingPlayerProfile = false }
-            )
+        if (showPlayerProfile) {
+            CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+                PlayerProfileScreen(
+                    profile = playerProfile,
+                    firstLaunch = false,
+                    store = profileStore,
+                    viewOnly = !editingPlayerProfile,
+                    onEdit = { editingPlayerProfile = true },
+                    onBack = { showPlayerProfile = false; editingPlayerProfile = false }
+                )
+            }
         }
-    }
-
     }
 
     if (initialDestination != null) {
