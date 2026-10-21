@@ -86,6 +86,13 @@ jobs:
           name: GuessTheNumber-debug.zip
           path: GuessTheNumber-debug.zip
           if-no-files-found: error
+      - name: Upload frontend audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: GuessTheNumber-Web-Frontend-Audit-${{ github.run_number }}
+          path: build/reports/web-frontend-audit.txt
+          if-no-files-found: error
+
       - name: Upload stable update artifact
         uses: actions/upload-artifact@v4
         with:
