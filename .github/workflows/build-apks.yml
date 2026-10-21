@@ -53,6 +53,9 @@ jobs:
       - name: Audit Hardcoded UI Strings
         run: python3 tools/validate_hardcoded_strings.py
 
+      - name: Audit every tracked HTML, CSS and JavaScript file
+        run: python3 tools/audit_web_frontend.py --report-file build/reports/web-frontend-audit.txt
+
       - name: Fast Kotlin Preflight Check
         run: python3 tools/preflight_compile_check.py
 
