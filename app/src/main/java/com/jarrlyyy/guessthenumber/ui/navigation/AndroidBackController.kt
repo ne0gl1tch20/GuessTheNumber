@@ -41,15 +41,17 @@ object AndroidBackController {
         activity = host
         if (installed) return
         val root = host.window.decorView
-        val listener = object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                val webView = findWebView(root) ?: return
+        fun poll() {
+            if (installed) return
+            val webView = findWebView(root)
+            if (webView != null && webView.progress >= 100) {
                 webView.evaluateJavascript(INSTALL_SCRIPT, null)
                 installed = true
-                root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            } else {
+                root.postDelayed(::poll, 100L)
             }
         }
-        root.viewTreeObserver.addOnGlobalLayoutListener(listener)
+        poll()
     }
 
     fun handleBack(onUnhandled: () -> Unit) {
