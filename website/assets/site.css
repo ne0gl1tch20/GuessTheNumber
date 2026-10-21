@@ -19,3 +19,6 @@ html{scroll-padding-top:100px;scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){.reveal-ready{opacity:1;transform:none;transition:none}.game-preview,.float-chip.one,.float-chip.two{animation:none}.feature,.feature-icon,.try-card,.back-to-top{transition:none}}
 
 @media(max-width:620px){.navlinks a[href="#try-me"]{display:inline-flex}.navlinks a:not(.nav-cta):not([href="#try-me"]){display:none}}
+
+/* Local SVG icon system */
+.icon{display:inline-block;width:1.05em;height:1.05em;flex:none;vertical-align:-.16em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.chip-icon .icon{width:19px;height:19px}.feature-icon .icon{width:23px;height:23px}.platform-icon .icon{width:26px;height:26px}.try-tips .icon{width:15px;height:15px;vertical-align:-.18em}.back-to-top .icon{width:23px;height:23px}.button .icon,.nav-cta .icon,.footer .icon{width:16px;height:16px}.download .icon{width:14px;height:14px;vertical-align:-.17em}.try-tips span{display:inline-flex;align-items:center;gap:6px}
