@@ -362,7 +362,7 @@ fun SaveSlotsScreen(
                         }
                     }
                 ) {
-                    Text(locale.getString("reset_everything_label", "Reset Everything"), color = MaterialTheme.colorScheme.error)
+                    Text(locale.getString("reset_confirm_button", "Confirm reset"), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
