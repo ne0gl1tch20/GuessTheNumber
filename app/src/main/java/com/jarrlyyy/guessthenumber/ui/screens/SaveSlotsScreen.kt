@@ -336,7 +336,9 @@ fun SaveSlotsScreen(
                     }
                     OutlinedTextField(
                         value = resetMathAnswer,
-                        onValueChange = { resetMathAnswer = it.filter(Char::isDigit).take(12) },
+                        onValueChange = { value ->
+                            resetMathAnswer = value.filterIndexed { index, char -> char.isDigit() || (index == 0 && char == '-') }.take(12)
+                        },
                         label = { Text(locale.getString("reset_math_answer_label", "Solve the expression")) },
                         singleLine = true
                     )
