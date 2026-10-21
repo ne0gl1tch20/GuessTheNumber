@@ -120,6 +120,8 @@ def check_css(path, source):
     return errors
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser()
     parser.add_argument("--report-file", help="Write full audit report to this path")
     args = parser.parse_args()
