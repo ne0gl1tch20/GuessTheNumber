@@ -38,6 +38,7 @@ object AndroidBackController {
     """.trimIndent()
 
     fun install(host: ComponentActivity) {
+        if (activity !== host) installed = false
         activity = host
         if (installed) return
         val root = host.window.decorView
