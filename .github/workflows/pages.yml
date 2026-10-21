@@ -1,6 +1,11 @@
 name: Deploy showcase website
 
 on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "website/**"
+      - ".github/workflows/pages.yml"
   push:
     branches: [master]
     paths:
@@ -39,6 +44,7 @@ jobs:
           path: website
 
   deploy:
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
