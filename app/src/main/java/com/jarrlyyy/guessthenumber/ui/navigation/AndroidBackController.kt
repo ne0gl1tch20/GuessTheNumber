@@ -7,8 +7,6 @@ import androidx.activity.ComponentActivity
 
 object AndroidBackController {
     @Volatile
-    private var installed = false
-    @Volatile
     private var activity: ComponentActivity? = null
 
     private const val INSTALL_SCRIPT = """
@@ -40,14 +38,11 @@ object AndroidBackController {
     fun install(host: ComponentActivity) {
         if (activity !== host) installed = false
         activity = host
-        if (installed) return
         val root = host.window.decorView
         fun poll() {
-            if (installed) return
             val webView = findWebView(root)
             if (webView != null && webView.progress >= 100) {
                 webView.evaluateJavascript(INSTALL_SCRIPT, null)
-                installed = true
             } else {
                 root.postDelayed(::poll, 100L)
             }
