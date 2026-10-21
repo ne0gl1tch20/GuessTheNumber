@@ -63,4 +63,5 @@ jobs:
             app/build/reports/androidTests/**
             app/build/outputs/androidTest-results/**
             app/build/outputs/logs/**
+            build/reports/web-frontend-audit.txt
           if-no-files-found: warn
