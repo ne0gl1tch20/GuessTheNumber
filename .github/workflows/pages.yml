@@ -38,6 +38,8 @@ jobs:
           grep -q 'id="main"' website/index.html
           grep -q 'id="android-list"' website/downloads.html
           grep -q 'id="windows-list"' website/downloads.html
+      - name: Validate website HTML, SVG icons and inline JavaScript
+        run: python3 website/tests/test_site.py
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
