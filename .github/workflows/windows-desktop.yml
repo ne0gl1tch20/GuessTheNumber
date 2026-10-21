@@ -81,6 +81,10 @@ jobs:
         shell: pwsh
         run: python tools/validate_hardcoded_strings.py
 
+      - name: Audit every tracked HTML, CSS and JavaScript file
+        shell: pwsh
+        run: python tools/audit_web_frontend.py --report-file build/reports/web-frontend-audit.txt
+
       - name: Fast Kotlin Preflight Check
         shell: pwsh
         run: python tools/preflight_compile_check.py
@@ -205,6 +209,14 @@ jobs:
           Set-Content -Path (Join-Path $env:RUNNER_TEMP "windows-debug-manifest.json") -Value $manifest -Encoding utf8
           "GTN_DEBUG_ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           "GTN_DEBUG_MANIFEST=$env:RUNNER_TEMP/windows-debug-manifest.json" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Upload frontend audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: GuessTheNumber-Web-Frontend-Audit
+          path: build/reports/web-frontend-audit.txt
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Upload Windows installer artifact
         uses: actions/upload-artifact@v4
