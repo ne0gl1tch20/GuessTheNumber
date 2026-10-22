@@ -6,21 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Jarrlyy UI SDK · Component Lab</title>
   <link rel="stylesheet" href="styles/jarrlyy-ui.css">
-  <style>
-    /* Demo-only layout, kept separate from the reusable SDK stylesheet. */
-    body { margin: 0; background: radial-gradient(ellipse at 10% 0, rgba(155,124,255,.16), transparent 42%), var(--jui-bg); color: var(--jui-text); font: 15px/1.5 system-ui, sans-serif; }
-    .lab { width: min(1160px, 100%); margin: auto; padding: clamp(16px, 4vw, 36px); }
-    .lab-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.4rem; }
-    .lab h1 { margin: 0; font-size: clamp(1.8rem, 5vw, 3.2rem); letter-spacing: -.055em; }
-    .lab h2 { margin: 0 0 .8rem; font-size: 1.1rem; }
-    .lab p { line-height: 1.6; }
-    .lab-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 1rem; }
-    .lab-section { display: grid; align-content: start; gap: .8rem; }
-    .lab-wide { grid-column: 1 / -1; }
-    .lab-preview-color { width: 34px; height: 34px; border-radius: 10px; background: var(--jui-preview-color, var(--jui-purple)); }
-    .lab-footer { margin-top: 1.2rem; color: var(--jui-muted); font-size: .8rem; }
-    .lab .jui-dialog { font: inherit; }
-  </style>
+  <link rel="stylesheet" href="styles/demo.css">
 </head>
 <body class="jui-root">
   <main class="lab">
@@ -110,7 +96,7 @@
         <h2>Game HUD, rank and XP</h2>
         <div class="jui-hud"><span class="jui-hud-item">✦ <strong>12,450</strong> Money</span><span class="jui-hud-item">◇ <strong>24</strong> Nebula</span><span class="jui-hud-item">⚡ <strong>Lv. 18</strong></span><span class="jui-badge jui-badge-purple">2× event</span></div>
         <div class="jui-rank"><span class="jui-rank-mark">S</span><span><strong>Starlight Rank</strong><br><small class="jui-muted">Tier 4 · Season reward</small></span></div>
-        <div class="jui-xp"><div class="jui-xp-head"><span>Next level</span><strong>7,200 / 10,000 XP</strong></div><div class="jui-meter" role="progressbar" aria-label="Experience progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72" style="--jui-progress:72%"><span></span></div></div>
+        <div class="jui-xp"><div class="jui-xp-head"><span>Next level</span><strong>7,200 / 10,000 XP</strong></div><div class="jui-meter" role="progressbar" aria-label="Experience progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72" class="lab-xp-meter"><span></span></div></div>
         <div class="jui-stat-grid"><article class="jui-card"><span class="jui-stat-label">Best streak</span><strong class="jui-stat-value">24</strong><span class="jui-badge jui-badge-success">+4 today</span></article><article class="jui-card"><span class="jui-stat-label">Challenges</span><strong class="jui-stat-value">08</strong><span class="jui-stat-label">3 left</span></article></div>
       </section>
 
@@ -143,10 +129,6 @@
     <footer class="lab-footer">Jarrlyy UI SDK · local demo data only · no game saves, rewards or network requests are changed here.</footer>
   </main>
   <script src="components/jarrlyy-ui.js"></script>
-  <script>
-    document.getElementById("volumeRange").addEventListener("input", function () {
-      document.getElementById("volumeValue").textContent = this.value + "%";
-    });
-  </script>
+  <script src="components/demo.js"></script>
 </body>
 </html>
