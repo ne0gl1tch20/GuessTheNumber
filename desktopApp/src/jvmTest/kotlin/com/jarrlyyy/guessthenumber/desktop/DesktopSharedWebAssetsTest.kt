@@ -12,6 +12,25 @@ class DesktopSharedWebAssetsTest {
             ?: error("Shared web UI asset is not packaged for desktop: $path")
 
     @Test
+    fun sharedWebUiFontsArePackagedForOfflineAndroidAndDesktopUse() {
+        val css = asset("web-play/styles.css")
+        assertTrue(css.contains("Manrope"))
+        assertTrue(css.contains("Space Grotesk"))
+        assertTrue(css.contains("JetBrains Mono"))
+        val fontResources = listOf(
+            "fonts/Inter-Italic-VariableFont_opsz,wght.ttf",
+            "fonts/Inter-VariableFont_opsz,wght.ttf",
+            "fonts/JetBrainsMono-Italic-VariableFont_wght.ttf",
+            "fonts/JetBrainsMono-VariableFont_wght.ttf",
+            "fonts/Manrope-VariableFont_wght.ttf",
+            "fonts/SpaceGrotesk-VariableFont_wght.ttf"
+        )
+        fontResources.forEach { path ->
+            assertTrue("Missing packaged font resource: $path", javaClass.classLoader.getResource(path) != null)
+        }
+    }
+
+    @Test
     fun desktopWebStateExposesCatalogsButNotTheSecretTargetNumber() {
         val state = desktopWebPlayState(GameState(targetNumber = 73), DesktopEconomyCatalog.load())
         assertTrue(state.getJSONArray("upgrades").length() > 0)
