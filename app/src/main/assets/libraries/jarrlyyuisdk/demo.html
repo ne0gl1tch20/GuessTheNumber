@@ -243,6 +243,32 @@
 
     </div>
     <button type="button" class="jui-fab" data-jui-action="toast" data-jui-message="Floating action button preview." aria-label="Preview floating action button">+</button>
+
+      <section class="jui-card lab-section">
+        <h2>Motion playground</h2>
+        <p class="jui-muted">Tap a button to replay a motion. Utilities are opt-in, and reduced-motion settings are respected.</p>
+        <div class="jui-row jui-stagger">
+          <span class="jui-chip">Fade</span><span class="jui-chip">Slide</span><span class="jui-chip">Zoom</span><span class="jui-chip">Bounce</span>
+        </div>
+        <div class="jui-row">
+          <button type="button" class="jui-button" data-jui-replay="jui-animate-fade">Fade</button>
+          <button type="button" class="jui-button" data-jui-replay="jui-animate-up">Slide up</button>
+          <button type="button" class="jui-button" data-jui-replay="jui-animate-zoom">Zoom</button>
+          <button type="button" class="jui-button jui-button-primary" data-jui-replay="jui-animate-bounce">Bounce</button>
+          <button type="button" class="jui-button jui-button-danger" data-jui-replay="jui-animate-shake">Shake</button>
+        </div>
+        <div class="jui-card jui-animate-glow" id="motionPreview"><strong>Motion preview ✨</strong><p class="jui-muted">This panel replays your selected animation.</p></div>
+      </section>
+      <section class="jui-card lab-section">
+        <h2>Typography and mini components</h2>
+        <div class="jui-row"><span class="jui-avatar jui-avatar-lg">J</span><span class="jui-avatar">UI</span><span class="jui-avatar jui-avatar-sm">8</span><span class="jui-avatar-group"><span class="jui-avatar">A</span><span class="jui-avatar">B</span><span class="jui-avatar">C</span></span></div>
+        <div class="jui-row"><span class="jui-chip">✦ New</span><span class="jui-chip"><span class="jui-dot jui-dot-success"></span> Online</span><kbd class="jui-kbd">Ctrl</kbd><kbd class="jui-kbd">K</kbd></div>
+        <div class="jui-callout"><strong class="jui-heading">A heading style</strong><p class="jui-caption">Caption text stays readable and quiet.</p></div>
+        <div class="jui-divider-label">Typography presets</div>
+        <div class="jui-row"><button class="jui-button" type="button" data-jui-font-preview="system">System</button><button class="jui-button" type="button" data-jui-font-preview="rounded">Rounded</button><button class="jui-button" type="button" data-jui-font-preview="serif">Serif</button><button class="jui-button" type="button" data-jui-font-preview="mono">Mono</button></div>
+        <div id="fontPreview" class="jui-card"><div class="jui-display">Jarrlyy UI</div><p class="jui-mono">0123456789 · GAME READY</p><p class="jui-muted">Font presets use local system fonts and need no CDN.</p></div>
+      </section>
+
     <footer class="lab-footer">
       <p>Jarrlyy UI SDK · local demo data only · no game saves, rewards or network requests are changed here.</p>
       <details class="lab-credits">
