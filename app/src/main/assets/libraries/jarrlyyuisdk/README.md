@@ -26,7 +26,7 @@ The kit is deliberately namespaced with \`jui-\` classes and \`data-jui-*\` attr
 - Progress/XP meters, level/rank indicators, stat cards and game HUDs
 - Save-slot and achievement cards
 - SVG-backed charts, timers/countdowns and drag/drop file zones
-- Toasts, accessible dialogs, update prompts and feature-tour steps
+- Toasts, accessible dialogs, update-prompt previews and multi-step guided tours
 
 ## JavaScript API
 
@@ -34,7 +34,7 @@ The kit is deliberately namespaced with \`jui-\` classes and \`data-jui-*\` attr
 - \`JarrlyyUI.dialog(title, message, options?)\`
 - \`JarrlyyUI.init()\` (safe to call again for newly inserted markup; existing behavior should not be initialized twice)
 
-Declarative controls are initialized automatically. See \`demo.html\` for working examples.
+The JarrlyyUI.tour(steps, options) helper opens a multi-step accessible tour with Previous, Next, Skip and focus restoration. Declarative controls are initialized automatically. See \`demo.html\` for working examples.
 
 ## Theme and accessibility
 
