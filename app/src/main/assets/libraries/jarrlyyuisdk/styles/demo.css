@@ -1,0 +1,16 @@
+/* Component lab layout only. Reusable component styles live in jarrlyy-ui.css. */
+body { margin: 0; background: radial-gradient(ellipse at 10% 0, rgba(155,124,255,.16), transparent 42%), var(--jui-bg); color: var(--jui-text); font: 15px/1.5 system-ui, sans-serif; }
+.lab { width: min(1160px, 100%); margin: auto; padding: clamp(16px, 4vw, 36px); }
+.lab-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.4rem; }
+.lab h1 { margin: 0; font-size: clamp(1.8rem, 5vw, 3.2rem); letter-spacing: -.055em; }
+.lab h2 { margin: 0 0 .8rem; font-size: 1.1rem; }
+.lab h3 { margin-bottom: .25rem; }
+.lab p { line-height: 1.6; }
+.lab-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 1rem; }
+.lab-section { display: grid; align-content: start; gap: .8rem; }
+.lab-footer { margin-top: 1.2rem; color: var(--jui-muted); font-size: .8rem; }
+.lab .jui-dialog { font: inherit; }
+.lab-xp-meter { --jui-progress: 72%; }
+.lab-preview-color { width: 34px; height: 34px; border-radius: 10px; background: var(--jui-preview-color, var(--jui-purple)); }
+#volumeValue { color: var(--jui-cyan); font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) { .lab-head { align-items: flex-start; } }
