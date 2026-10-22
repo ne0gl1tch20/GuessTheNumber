@@ -75,6 +75,8 @@
     heading.id = "jui-tour-title-" + (++tourSequence);
     const body = doc.createElement("p");
     body.id = heading.id + "-description";
+    body.setAttribute("aria-live", "polite");
+    body.setAttribute("aria-atomic", "true");
     const progress = doc.createElement("p");
     progress.className = "jui-tour-progress";
     progress.setAttribute("aria-live", "polite");
@@ -102,6 +104,9 @@
     };
     dialog.setAttribute("aria-labelledby", heading.id);
     dialog.setAttribute("aria-describedby", body.id);
+    dialog.addEventListener("cancel", () => {
+      if (typeof options.onSkip === "function") options.onSkip();
+    });
     skip.addEventListener("click", () => {
       dialog.close("skip");
       if (typeof options.onSkip === "function") options.onSkip();
