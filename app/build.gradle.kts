@@ -36,6 +36,7 @@ val prepareLauncherIcon by tasks.registering(Copy::class) {
 fun registerBuildInfoTask(taskName: String, environmentName: String, outputDirectory: org.gradle.api.provider.Provider<org.gradle.api.file.Directory>) =
     tasks.register(taskName) {
         outputs.dir(outputDirectory)
+        outputs.upToDateWhen { false }
         doLast {
             fun gitValue(vararg arguments: String): String? = runCatching {
                 val process = ProcessBuilder(*arguments)
