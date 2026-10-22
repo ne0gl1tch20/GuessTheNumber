@@ -67,10 +67,10 @@
   function initContextMenus() {
     $$("[data-jui-menu-toggle]").forEach((button) => {
       if (button.dataset.juiMenuReady) return;
-      button.dataset.juiMenuReady = "true";
       const id = button.getAttribute("aria-controls");
       const menu = id ? doc.getElementById(id) : button.parentElement.querySelector(".jui-menu");
       if (!menu) return;
+      button.dataset.juiMenuReady = "true";
       button.setAttribute("aria-expanded", "false");
       const close = () => { menu.hidden = true; button.setAttribute("aria-expanded", "false"); };
       button.addEventListener("click", (event) => {
@@ -86,18 +86,19 @@
         });
         menu.hidden = !opening;
         button.setAttribute("aria-expanded", String(opening));
-        if (opening) (menu.querySelector("button") || menu).focus({ preventScroll: true });
+        if (opening) (menu.querySelector("button:not(:disabled)") || menu).focus({ preventScroll: true });
       });
       menu.addEventListener("click", (event) => {
         if (event.target.closest("button")) close();
       });
       menu.addEventListener("keydown", (event) => {
-        const items = $('button:not(:disabled)', menu);
+        const items = $("button:not(:disabled)", menu);
         if (!items.length) return;
+        if (event.key === "Tab") { close(); return; }
         const current = items.indexOf(doc.activeElement);
         let next = current;
-        if (event.key === "ArrowDown") next = (current + 1 + items.length) % items.length;
-        else if (event.key === "ArrowUp") next = (current - 1 + items.length) % items.length;
+        if (event.key === "ArrowDown") next = current < 0 ? 0 : (current + 1) % items.length;
+        else if (event.key === "ArrowUp") next = current < 0 ? items.length - 1 : (current - 1 + items.length) % items.length;
         else if (event.key === "Home") next = 0;
         else if (event.key === "End") next = items.length - 1;
         else return;
@@ -125,8 +126,8 @@
         if (count) count.textContent = slides.length ? (index + 1) + " / " + slides.length : "0 / 0";
         $$("[data-jui-carousel-prev], [data-jui-carousel-next]", carousel).forEach((button) => { button.disabled = slides.length < 2; });
       };
-      $("[data-jui-carousel-prev]", carousel)?.addEventListener("click", () => { index = (index + slides.length - 1) % slides.length; render(); });
-      $("[data-jui-carousel-next]", carousel)?.addEventListener("click", () => { index = (index + 1) % slides.length; render(); });
+      $("[data-jui-carousel-prev]", carousel)?.addEventListener("click", () => { if (slides.length < 2) return; index = (index + slides.length - 1) % slides.length; render(); });
+      $("[data-jui-carousel-next]", carousel)?.addEventListener("click", () => { if (slides.length < 2) return; index = (index + 1) % slides.length; render(); });
       render();
     });
   }
@@ -219,21 +220,25 @@
   }
 
   function initTimers() {
-    $$("[data-jui-timer]").forEach((node) => {
+    $("[data-jui-timer]").forEach((node) => {
       if (node.dataset.juiTimerReady) return;
       node.dataset.juiTimerReady = "true";
       let remaining = Math.max(0, Number(node.dataset.juiTimer) || 0);
+      let ended = false;
       const paint = () => {
         const mins = Math.floor(remaining / 60);
         const secs = remaining % 60;
         node.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
         if (remaining <= 0) {
-          node.dispatchEvent(new CustomEvent("jui:timer-end", { bubbles: true }));
+          if (!ended) {
+            ended = true;
+            node.dispatchEvent(new global.CustomEvent("jui:timer-end", { bubbles: true }));
+          }
           return false;
         }
         return true;
       };
-      paint();
+      if (!paint()) return;
       const timer = global.setInterval(() => {
         remaining = Math.max(0, remaining - 1);
         if (!paint()) global.clearInterval(timer);
