@@ -56,5 +56,21 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         self.assertNotIn("<script>", html)
         self.assertNotRegex(html, r"\sstyle\s*=")
 
+    def test_android_developer_settings_can_open_the_sdk_lab(self):
+        screen = ROOT / "app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/JarrlyyUiSdkScreen.kt"
+        nav = ROOT / "app/src/main/java/com/jarrlyyy/guessthenumber/ui/navigation/NavGraph.kt"
+        dev_settings = ROOT / "app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/DevSettingsScreen.kt"
+        screen_text = screen.read_text(encoding="utf-8")
+        nav_text = nav.read_text(encoding="utf-8")
+        dev_text = dev_settings.read_text(encoding="utf-8")
+        self.assertIn('"/assets/libraries/jarrlyyuisdk/"', screen_text)
+        self.assertIn('JUI_DEMO_URL', screen_text)
+        self.assertIn('WebViewAssetLoader', screen_text)
+        self.assertIn('settings.allowFileAccess = false', screen_text)
+        self.assertIn('settings.allowContentAccess = false', screen_text)
+        self.assertNotIn('addJavascriptInterface', screen_text)
+        self.assertIn('"jarrlyy_ui_sdk"', nav_text)
+        self.assertIn('onNavigate("jarrlyy_ui_sdk")', dev_text)
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
