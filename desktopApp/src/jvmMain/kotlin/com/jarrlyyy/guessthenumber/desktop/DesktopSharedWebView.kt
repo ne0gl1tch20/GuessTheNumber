@@ -144,6 +144,23 @@ private class DesktopSharedWebViewController {
             input.use { Files.copy(it, output) }
             output.toFile().deleteOnExit()
         }
+        val fontFiles = listOf(
+            "Inter-Italic-VariableFont_opsz,wght.ttf",
+            "Inter-VariableFont_opsz,wght.ttf",
+            "JetBrainsMono-Italic-VariableFont_wght.ttf",
+            "JetBrainsMono-VariableFont_wght.ttf",
+            "Manrope-VariableFont_wght.ttf",
+            "SpaceGrotesk-VariableFont_wght.ttf"
+        )
+        for (font in fontFiles) {
+            val resource = "/fonts/$font"
+            val input = javaClass.getResourceAsStream(resource)
+                ?: throw IOException("Missing bundled font resource: $resource")
+            val output = root.resolve("fonts").resolve(font)
+            Files.createDirectories(output.parent)
+            input.use { Files.copy(it, output) }
+            output.toFile().deleteOnExit()
+        }
         val index = webRoot.resolve("index.html")
         val original = Files.readString(index)
         val shim = """
