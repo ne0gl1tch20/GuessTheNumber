@@ -5,6 +5,7 @@
   if (!doc) return;
   const $ = (selector, root = doc) => root.querySelector(selector);
   const $$ = (selector, root = doc) => Array.from(root.querySelectorAll(selector));
+  let tourSequence = 0;
 
   function toast(message, duration = 2800) {
     let region = $(".jui-toast-region");
@@ -64,13 +65,90 @@
     return dialog;
   }
 
+  function tour(steps, options = {}) {
+    const normalized = Array.isArray(steps) ? steps.filter((step) => step && (step.title || step.message || step.description)) : [];
+    if (!normalized.length) return null;
+    const previousFocus = doc.activeElement;
+    const dialog = doc.createElement("dialog");
+    dialog.className = "jui-dialog jui-tour-dialog";
+    const heading = doc.createElement("h2");
+    heading.id = "jui-tour-title-" + (++tourSequence);
+    const body = doc.createElement("p");
+    body.id = heading.id + "-description";
+    body.setAttribute("aria-live", "polite");
+    body.setAttribute("aria-atomic", "true");
+    const progress = doc.createElement("p");
+    progress.className = "jui-tour-progress";
+    progress.setAttribute("aria-live", "polite");
+    const actions = doc.createElement("div");
+    actions.className = "jui-dialog-actions";
+    const skip = doc.createElement("button");
+    skip.type = "button";
+    skip.className = "jui-button";
+    skip.textContent = options.skipText || "Skip tour";
+    const previous = doc.createElement("button");
+    previous.type = "button";
+    previous.className = "jui-button";
+    previous.textContent = options.previousText || "Previous";
+    const next = doc.createElement("button");
+    next.type = "button";
+    next.className = "jui-button jui-button-primary";
+    let index = 0;
+    const render = () => {
+      const step = normalized[index];
+      heading.textContent = String(step.title || options.title || "Quick tour");
+      body.textContent = String(step.message || step.description || "");
+      progress.textContent = "Step " + (index + 1) + " of " + normalized.length;
+      previous.disabled = index === 0;
+      next.textContent = index === normalized.length - 1 ? (options.finishText || "Finish") : (options.nextText || "Next");
+    };
+    dialog.setAttribute("aria-labelledby", heading.id);
+    dialog.setAttribute("aria-describedby", body.id);
+    dialog.addEventListener("cancel", () => {
+      if (typeof options.onSkip === "function") options.onSkip();
+    });
+    skip.addEventListener("click", () => {
+      dialog.close("skip");
+      if (typeof options.onSkip === "function") options.onSkip();
+    });
+    previous.addEventListener("click", () => {
+      if (index > 0) index -= 1;
+      render();
+      previous.focus({ preventScroll: true });
+    });
+    next.addEventListener("click", () => {
+      if (index < normalized.length - 1) {
+        index += 1;
+        render();
+        next.focus({ preventScroll: true });
+        return;
+      }
+      dialog.close("complete");
+      if (typeof options.onComplete === "function") options.onComplete();
+    });
+    dialog.append(heading, body, progress, actions);
+    actions.append(skip, previous, next);
+    doc.body.appendChild(dialog);
+    dialog.addEventListener("close", () => {
+      dialog.remove();
+      if (previousFocus && previousFocus.isConnected && typeof previousFocus.focus === "function") {
+        previousFocus.focus({ preventScroll: true });
+      }
+    }, { once: true });
+    render();
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else dialog.setAttribute("open", "");
+    next.focus({ preventScroll: true });
+    return dialog;
+  }
+
   function initContextMenus() {
     $$("[data-jui-menu-toggle]").forEach((button) => {
       if (button.dataset.juiMenuReady) return;
-      button.dataset.juiMenuReady = "true";
       const id = button.getAttribute("aria-controls");
       const menu = id ? doc.getElementById(id) : button.parentElement.querySelector(".jui-menu");
       if (!menu) return;
+      button.dataset.juiMenuReady = "true";
       button.setAttribute("aria-expanded", "false");
       const close = () => { menu.hidden = true; button.setAttribute("aria-expanded", "false"); };
       button.addEventListener("click", (event) => {
@@ -86,18 +164,19 @@
         });
         menu.hidden = !opening;
         button.setAttribute("aria-expanded", String(opening));
-        if (opening) (menu.querySelector("button") || menu).focus({ preventScroll: true });
+        if (opening) (menu.querySelector("button:not(:disabled)") || menu).focus({ preventScroll: true });
       });
       menu.addEventListener("click", (event) => {
         if (event.target.closest("button")) close();
       });
       menu.addEventListener("keydown", (event) => {
-        const items = $('button:not(:disabled)', menu);
+        const items = $$("button:not(:disabled)", menu);
         if (!items.length) return;
+        if (event.key === "Tab") { close(); return; }
         const current = items.indexOf(doc.activeElement);
         let next = current;
-        if (event.key === "ArrowDown") next = (current + 1 + items.length) % items.length;
-        else if (event.key === "ArrowUp") next = (current - 1 + items.length) % items.length;
+        if (event.key === "ArrowDown") next = current < 0 ? 0 : (current + 1) % items.length;
+        else if (event.key === "ArrowUp") next = current < 0 ? items.length - 1 : (current - 1 + items.length) % items.length;
         else if (event.key === "Home") next = 0;
         else if (event.key === "End") next = items.length - 1;
         else return;
@@ -125,8 +204,8 @@
         if (count) count.textContent = slides.length ? (index + 1) + " / " + slides.length : "0 / 0";
         $$("[data-jui-carousel-prev], [data-jui-carousel-next]", carousel).forEach((button) => { button.disabled = slides.length < 2; });
       };
-      $("[data-jui-carousel-prev]", carousel)?.addEventListener("click", () => { index = (index + slides.length - 1) % slides.length; render(); });
-      $("[data-jui-carousel-next]", carousel)?.addEventListener("click", () => { index = (index + 1) % slides.length; render(); });
+      $("[data-jui-carousel-prev]", carousel)?.addEventListener("click", () => { if (slides.length < 2) return; index = (index + slides.length - 1) % slides.length; render(); });
+      $("[data-jui-carousel-next]", carousel)?.addEventListener("click", () => { if (slides.length < 2) return; index = (index + 1) % slides.length; render(); });
       render();
     });
   }
@@ -223,17 +302,21 @@
       if (node.dataset.juiTimerReady) return;
       node.dataset.juiTimerReady = "true";
       let remaining = Math.max(0, Number(node.dataset.juiTimer) || 0);
+      let ended = false;
       const paint = () => {
         const mins = Math.floor(remaining / 60);
         const secs = remaining % 60;
         node.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
         if (remaining <= 0) {
-          node.dispatchEvent(new CustomEvent("jui:timer-end", { bubbles: true }));
+          if (!ended) {
+            ended = true;
+            node.dispatchEvent(new global.CustomEvent("jui:timer-end", { bubbles: true }));
+          }
           return false;
         }
         return true;
       };
-      paint();
+      if (!paint()) return;
       const timer = global.setInterval(() => {
         remaining = Math.max(0, remaining - 1);
         if (!paint()) global.clearInterval(timer);
@@ -271,7 +354,11 @@
         if (action === "toast") toast(button.dataset.juiMessage || "Nice! That component works.");
         if (action === "dialog") makeDialog(button.dataset.juiTitle || "Quick preview", button.dataset.juiMessage || "This dialog is created by the Jarrlyy UI SDK.", { confirmText: button.dataset.juiConfirm || "", onConfirm: () => toast("Confirmed.") });
         if (action === "update") makeDialog("Update available", button.dataset.juiMessage || "A new version is ready. You can review it before updating.", { cancelText: "Not now", confirmText: "Review update", onConfirm: () => toast("Connect this action to the host update flow.") });
-        if (action === "tour") makeDialog("Welcome tour", button.dataset.juiMessage || "This is a reusable feature-tour step. Add target-aware steps from your app.", { cancelText: "Skip tour", confirmText: "Got it", onConfirm: () => toast("Tour step completed.") });
+        if (action === "tour") tour([
+          { title: "Welcome to Jarrlyy UI", message: button.dataset.juiMessage || "Explore the reusable components in this local demo." },
+          { title: "Reusable components", message: "Use buttons, inputs, navigation, game HUDs and feedback components across your app." },
+          { title: "Built for your app", message: "Keep game rules and saved progress in the host app. Use the SDK for presentation and accessible interactions." }
+        ]);
       });
     });
     $$("[data-jui-color-target]").forEach((input) => {
@@ -297,7 +384,7 @@
     initActions();
   }
 
-  global.JarrlyyUI = Object.freeze({ init, toast, dialog: makeDialog });
+  global.JarrlyyUI = Object.freeze({ init, toast, dialog: makeDialog, tour });
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })(window);
