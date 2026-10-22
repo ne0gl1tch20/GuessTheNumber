@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+"""Structural smoke tests for the local Jarrlyy UI SDK and its demo."""
+from pathlib import Path
+import re
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+SDK = ROOT / "app/src/main/assets/libraries/jarrlyyuisdk"
+WEB = ROOT / "app/src/main/assets/web-play"
+
+class JarrlyyUiSdkTests(unittest.TestCase):
+    def test_sdk_files_exist(self):
+        for relative in (
+            "README.md",
+            "styles/jarrlyy-ui.css",
+            "components/jarrlyy-ui.js",
+            "icons/jarrlyy-icons.svg",
+            "demo.html",
+        ):
+            with self.subTest(path=relative):
+                self.assertTrue((SDK / relative).is_file(), f"Missing SDK file: {relative}")
+
+    def test_main_web_bundle_loads_local_sdk(self):
+        html = (WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn('../libraries/jarrlyyuisdk/styles/jarrlyy-ui.css', html)
+        self.assertIn('../libraries/jarrlyyuisdk/components/jarrlyy-ui.js', html)
+
+    def test_demo_references_local_files_only(self):
+        html = (SDK / "demo.html").read_text(encoding="utf-8")
+        self.assertIn('styles/jarrlyy-ui.css', html)
+        self.assertIn('components/jarrlyy-ui.js', html)
+        self.assertIn('icons/jarrlyy-icons.svg#', html)
+        self.assertNotRegex(html, r'''(?:src|href)\s*=\s*["']https?://''')
+
+    def test_interactive_api_and_components_are_present(self):
+        css = (SDK / "styles/jarrlyy-ui.css").read_text(encoding="utf-8")
+        js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
+        demo = (SDK / "demo.html").read_text(encoding="utf-8")
+        for selector in (".jui-button", ".jui-switch", ".jui-table", ".jui-dialog", ".jui-xp", ".jui-slot", ".jui-achievement"):
+            with self.subTest(selector=selector):
+                self.assertIn(selector, css)
+        for feature in ("toast", "dialog", "initContextMenus", "initCarousels", "initPagination", "initTables", "initCharts", "initTimers", "initDropzones"):
+            with self.subTest(feature=feature):
+                self.assertIn(feature, js)
+        for component in ("data-jui-carousel", "data-jui-pagination", "data-jui-chart", "data-jui-timer", "data-jui-dropzone", "type=\\"datetime-local\\""):
+            with self.subTest(component=component):
+                self.assertIn(component, demo)
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
