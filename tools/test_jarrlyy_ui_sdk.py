@@ -108,6 +108,8 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         self.assertIn("function tour(steps, options = {})", js)
         self.assertIn('dialog.setAttribute("aria-labelledby", heading.id)', js)
         self.assertIn('dialog.setAttribute("aria-describedby", body.id)', js)
+        self.assertIn('body.setAttribute("aria-live", "polite")', js)
+        self.assertIn('dialog.addEventListener("cancel", () => {', js)
         self.assertIn('progress.setAttribute("aria-live", "polite")', js)
         self.assertIn('if (typeof options.onComplete === "function") options.onComplete()', js)
         self.assertIn('if (typeof options.onSkip === "function") options.onSkip()', js)
