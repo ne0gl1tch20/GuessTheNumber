@@ -48,6 +48,37 @@ class JarrlyyUiSdkTests(unittest.TestCase):
             with self.subTest(component=component):
                 self.assertIn(component, demo)
 
+    def test_sdk_collection_queries_use_query_selector_all(self):
+        js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
+        # Regression guard: querySelector() returns one node, not a collection.
+        # Any plural initializer accidentally using querySelector() instead of querySelectorAll() will fail here.
+        self.assertEqual([], re.findall(r'(?<!\$)\$\(([^)]*)\)\.forEach', js))
+        for selector in (
+            '[data-jui-menu-toggle]',
+            '.jui-carousel[data-jui-carousel]',
+            '[data-jui-pagination]',
+            '[data-jui-sort-key]',
+            'svg[data-jui-chart]',
+            '[data-jui-timer]',
+            '[data-jui-dropzone]',
+            '[data-jui-action]',
+            '[data-jui-color-target]',
+        ):
+            with self.subTest(selector=selector):
+                self.assertIn('$$("' + selector + '")', js)
+
+    def test_sdk_interactions_and_accessibility_regressions(self):
+        js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
+        css = (SDK / "styles/jarrlyy-ui.css").read_text(encoding="utf-8")
+        self.assertIn('menu.addEventListener("keydown"', js)
+        self.assertIn('items[next].focus({ preventScroll: true })', js)
+        self.assertIn('button.removeAttribute("aria-current")', js)
+        self.assertIn('heading.setAttribute("aria-sort"', js)
+        self.assertIn('previousFocus.focus({ preventScroll: true })', js)
+        self.assertIn(':focus-visible', css)
+        self.assertIn('min-height: 44px', css)
+        self.assertIn('prefers-reduced-motion: reduce', css)
+
     def test_demo_uses_external_assets_under_csp(self):
         html = (SDK / "demo.html").read_text(encoding="utf-8")
         self.assertIn("styles/demo.css", html)

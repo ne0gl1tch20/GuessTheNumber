@@ -17,6 +17,7 @@
 }
 .jui-root { color: var(--jui-text); color-scheme: dark; font: inherit; }
 .jui-root *, .jui-root *::before, .jui-root *::after { box-sizing: border-box; }
+.jui-root :where(button, a, input, select, textarea, [tabindex]):focus-visible { outline: 3px solid var(--jui-cyan); outline-offset: 3px; }
 .jui-card { min-width: 0; padding: 1rem; border: 1px solid var(--jui-border); border-radius: var(--jui-radius); background: linear-gradient(145deg, rgba(155,124,255,.07), transparent 58%), var(--jui-surface); }
 .jui-card > :first-child { margin-top: 0; }
 .jui-card > :last-child { margin-bottom: 0; }
@@ -24,7 +25,7 @@
 .jui-stack { display: grid; gap: .75rem; }
 .jui-muted { color: var(--jui-muted); }
 .jui-eyebrow { margin: 0 0 .35rem; color: var(--jui-cyan); font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.jui-button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: .5rem; padding: .65rem 1rem; border: 1px solid var(--jui-border); border-radius: 12px; background: var(--jui-raised); color: var(--jui-text); font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; transition: transform var(--jui-motion), border-color var(--jui-motion), background var(--jui-motion); }
+.jui-button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: .5rem; padding: .65rem 1rem; border: 1px solid var(--jui-border); border-radius: 12px; background: var(--jui-raised); color: var(--jui-text); font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; transition: transform var(--jui-motion), border-color var(--jui-motion), background var(--jui-motion); }
 .jui-button:hover { border-color: rgba(155,124,255,.7); transform: translateY(-1px); }
 .jui-button:active { transform: translateY(0); }
 .jui-button:focus-visible, .jui-field:focus-visible, .jui-switch input:focus-visible + .jui-switch-track, .jui-icon-button:focus-visible { outline: none; box-shadow: var(--jui-focus); }
@@ -32,7 +33,7 @@
 .jui-button-accent { border-color: rgba(98,232,255,.3); background: rgba(98,232,255,.1); color: var(--jui-cyan); }
 .jui-button-danger { border-color: rgba(255,111,145,.35); color: var(--jui-danger); }
 .jui-button:disabled, .jui-button[aria-disabled="true"] { opacity: .48; cursor: not-allowed; transform: none; }
-.jui-icon-button { display: inline-grid; width: 42px; height: 42px; place-items: center; border: 1px solid var(--jui-border); border-radius: 12px; background: var(--jui-raised); color: var(--jui-text); cursor: pointer; }
+.jui-icon-button { display: inline-grid; width: 44px; height: 44px; place-items: center; border: 1px solid var(--jui-border); border-radius: 12px; background: var(--jui-raised); color: var(--jui-text); cursor: pointer; }
 .jui-badge { display: inline-flex; align-items: center; gap: .35rem; padding: .3rem .6rem; border: 1px solid var(--jui-border); border-radius: 999px; background: rgba(180,190,230,.08); color: var(--jui-muted); font-size: .75rem; font-weight: 800; }
 .jui-badge-purple { border-color: rgba(155,124,255,.35); background: rgba(155,124,255,.12); color: #cbbcff; }
 .jui-badge-cyan { border-color: rgba(98,232,255,.3); background: rgba(98,232,255,.1); color: var(--jui-cyan); }
@@ -71,7 +72,7 @@
 .jui-table tbody tr:hover { background: rgba(98,232,255,.04); }
 .jui-sort { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; font-weight: 800; cursor: pointer; }
 .jui-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .35rem; }
-.jui-page { min-width: 38px; min-height: 38px; border: 1px solid var(--jui-border); border-radius: 10px; background: var(--jui-raised); color: var(--jui-text); cursor: pointer; }
+.jui-page { min-width: 44px; min-height: 44px; border: 1px solid var(--jui-border); border-radius: 10px; background: var(--jui-raised); color: var(--jui-text); cursor: pointer; }
 .jui-page[aria-current="page"] { border-color: var(--jui-purple); background: rgba(155,124,255,.2); }
 .jui-breadcrumbs { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin: 0; padding: 0; list-style: none; color: var(--jui-muted); font-size: .88rem; }
 .jui-breadcrumbs li + li::before { margin-right: .45rem; color: #6e7692; content: "/"; }
@@ -80,7 +81,8 @@
 .jui-menu { position: absolute; z-index: 30; top: calc(100% + .4rem); right: 0; min-width: 190px; padding: .35rem; border: 1px solid var(--jui-border); border-radius: 14px; background: #171b2d; box-shadow: 0 18px 50px rgba(0,0,0,.35); }
 .jui-menu[hidden] { display: none; }
 .jui-menu button { display: block; width: 100%; padding: .7rem .8rem; border: 0; border-radius: 9px; background: transparent; color: var(--jui-text); text-align: left; font: inherit; cursor: pointer; }
-.jui-menu button:hover, .jui-menu button:focus-visible { outline: 0; background: rgba(155,124,255,.14); }
+.jui-menu button:hover { background: rgba(155,124,255,.14); }
+.jui-menu button:focus-visible { outline: 3px solid var(--jui-cyan); outline-offset: -3px; background: rgba(155,124,255,.14); }
 .jui-shortcut { display: inline-flex; gap: .2rem; align-items: center; }
 .jui-shortcut kbd { padding: .15rem .35rem; border: 1px solid var(--jui-border); border-bottom-width: 2px; border-radius: 5px; background: rgba(180,190,230,.08); color: var(--jui-muted); font: 700 .72rem ui-monospace, monospace; }
 .jui-carousel { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: .6rem; }
