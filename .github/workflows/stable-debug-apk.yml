@@ -63,6 +63,13 @@ jobs:
         env:
           GTN_DEBUG_KEYSTORE_PATH: ${{ runner.temp }}/gtn-signing/debug.keystore
         run: ./gradlew assembleDebug --no-daemon
+      - name: Validate embedded APK build metadata
+        run: |
+          version_name="$(grep -E '^[[:space:]]*val appVersionName = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *"//; s/"$//')"
+          version_code="$(grep -E '^[[:space:]]*val appVersionCode = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *//')"
+          apk="$(find app/build/outputs/apk/debug -maxdepth 1 -name '*.apk' -print -quit)"
+          test -n "$apk"
+          python3 tools/validate_apk_info.py "$apk" --env debug --commit "$GITHUB_SHA" --version-name "$version_name" --version-code "$version_code"
       - name: Create installable debug archive
         run: |
           mkdir -p "$RUNNER_TEMP/gtn-debug"
