@@ -1,11 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 import org.gradle.api.tasks.Copy
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 plugins {
     alias(libs.plugins.android.application)
@@ -33,60 +28,21 @@ val prepareLauncherIcon by tasks.registering(Copy::class) {
 }
 
 
-fun registerBuildInfoTask(taskName: String, environmentName: String, outputDirectory: org.gradle.api.provider.Provider<org.gradle.api.file.Directory>) =
-    tasks.register(taskName) {
-        outputs.dir(outputDirectory)
-        outputs.upToDateWhen { false }
-        doLast {
-            fun gitValue(vararg arguments: String): String? = runCatching {
-                val process = ProcessBuilder(*arguments)
-                    .directory(rootProject.projectDir)
-                    .redirectErrorStream(true)
-                    .start()
-                val value = process.inputStream.bufferedReader().use { it.readText().trim() }
-                if (process.waitFor() == 0 && value.isNotBlank()) value else null
-            }.getOrNull()
+val generateDebugBuildInfo = tasks.register<buildlogic.GenerateApkBuildInfo>("generateDebugBuildInfo") {
+    environmentName.set("debug")
+    versionName.set(appVersionName)
+    versionCode.set(appVersionCode)
+    repositoryDirectory.set(rootProject.layout.projectDirectory)
+    outputDirectory.set(generatedDebugBuildInfo)
+}
 
-            val fullCommit = System.getenv("GITHUB_SHA")
-                ?.takeIf { it.matches(Regex("[0-9a-fA-F]{40,64}")) }
-                ?: gitValue("git", "rev-parse", "HEAD")
-            val shortCommit = fullCommit?.take(8) ?: "unknown"
-            val githubRef = System.getenv("GITHUB_REF").orEmpty()
-            val branchCandidate = System.getenv("GITHUB_HEAD_REF")?.takeIf { it.isNotBlank() }
-                ?: (if (githubRef.startsWith("refs/heads/")) System.getenv("GITHUB_REF_NAME") else null)
-                ?: gitValue("git", "branch", "--show-current")
-            val branch = branchCandidate
-                ?.replace(Regex("[^A-Za-z0-9._-]"), "-")
-                ?.trim('-')
-                ?.ifBlank { "unknown" }
-                ?: "unknown"
-            val zone = ZoneId.of("Asia/Manila")
-            val buildInstant = System.getenv("SOURCE_DATE_EPOCH")?.toLongOrNull()
-                ?.let { Instant.ofEpochSecond(it).atZone(zone) }
-                ?: ZonedDateTime.now(zone)
-            val buildDate = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US)
-                .format(buildInstant)
-            val versionName = appVersionName
-            val versionCode = appVersionCode
-            val metadata = listOf(
-                "name: GuessTheNumber-v$versionName-$shortCommit.$branch",
-                "env: $environmentName",
-                "git_commit: $shortCommit",
-                "git_branch: $branch",
-                "version_name: $versionName",
-                "version_code: $versionCode",
-                "build_date: $buildDate"
-            ).joinToString(separator = "\n", postfix = "\n")
-            val outputFile = outputDirectory.get().file("info.txt").asFile
-            outputFile.parentFile.mkdirs()
-            outputFile.writeText(metadata, Charsets.UTF_8)
-            logger.lifecycle("Generated APK metadata at " + outputFile.relativeTo(rootProject.projectDir))
-        }
-    }
-
-val generateDebugBuildInfo = registerBuildInfoTask("generateDebugBuildInfo", "debug", generatedDebugBuildInfo)
-val generateReleaseBuildInfo = registerBuildInfoTask("generateReleaseBuildInfo", "release", generatedReleaseBuildInfo)
-
+val generateReleaseBuildInfo = tasks.register<buildlogic.GenerateApkBuildInfo>("generateReleaseBuildInfo") {
+    environmentName.set("release")
+    versionName.set(appVersionName)
+    versionCode.set(appVersionCode)
+    repositoryDirectory.set(rootProject.layout.projectDirectory)
+    outputDirectory.set(generatedReleaseBuildInfo)
+}
 
 android {
     // Stable project debug signing. CI supplies the keystore through environment variables; local builds can use debug-signing/debug.keystore.
