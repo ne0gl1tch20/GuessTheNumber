@@ -14,3 +14,11 @@ body { margin: 0; background: radial-gradient(ellipse at 10% 0, rgba(155,124,255
 .lab-preview-color { width: 34px; height: 34px; border-radius: 10px; background: var(--jui-preview-color, var(--jui-purple)); }
 #volumeValue { color: var(--jui-cyan); font-variant-numeric: tabular-nums; }
 @media (max-width: 520px) { .lab-head { align-items: flex-start; } }
+.lab-section { animation: jui-motion-enter var(--jui-motion-slow) both; }
+.lab-section:nth-child(2) { animation-delay: 35ms; }
+.lab-section:nth-child(3) { animation-delay: 70ms; }
+.lab-section:nth-child(4) { animation-delay: 105ms; }
+.lab-credits { margin-top: .65rem; padding-top: .65rem; border-top: 1px solid var(--jui-border); }
+.lab-credits summary { color: var(--jui-text); cursor: pointer; font-weight: 700; }
+.lab-credits p { margin: .5rem 0 0; }
+.lab-credits a { color: var(--jui-cyan); text-underline-offset: .18em; }
