@@ -126,5 +126,6 @@
 .jui-switch-group { display: grid; gap: .8rem; padding: .9rem; border: 1px solid var(--jui-border); border-radius: 14px; }
 .jui-switch-group legend { padding: 0 .35rem; color: var(--jui-text); font-weight: 800; }
 .jui-switch-group .jui-switch { justify-content: space-between; min-height: 40px; }
-.jui-switch-group .jui-switch > span:last-child { flex: 1; }
+.jui-switch-group .jui-switch > span:first-child { flex: 1; min-width: 0; }
+.jui-switch-group .jui-switch > span:last-child { flex: 0 0 44px; }
 .jui-switch-group .jui-switch-track { order: 2; }
