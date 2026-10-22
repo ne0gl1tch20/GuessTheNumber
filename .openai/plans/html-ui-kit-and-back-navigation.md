@@ -2,7 +2,7 @@
 
 ## Scope
 
-Build a reusable, host-neutral HTML/CSS/JavaScript UI kit for `app/src/main/assets/web-play/`. GuessTheNumber remains the reference theme, while the components are designed so another local WebView app can reuse them with a different theme.
+Build a reusable, host-neutral HTML/CSS/JavaScript UI kit at `app/src/main/assets/libraries/jarrlyyuisdk/`. The shared web-play bundle consumes it using local relative paths. GuessTheNumber remains the reference theme, while the components are designed so another local WebView app can reuse them with a different theme.
 
 The player-facing web bundle remains the canonical visual layer for Android and Windows. Kotlin/KMP remains authoritative for game state, progression, economy, rewards, saves, validation and side effects.
 
@@ -89,12 +89,17 @@ The player-facing web bundle remains the canonical visual layer for Android and 
 ## Proposed files
 
 ```text
-app/src/main/assets/web-play/ui-kit/
-  ui-kit.css
-  ui-kit.js
-  icons.svg
-  demo.html
+app/src/main/assets/libraries/jarrlyyuisdk/
   README.md
+  styles/
+    jarrlyy-ui.css
+    demo.css
+  components/
+    jarrlyy-ui.js
+    demo.js
+  icons/
+    jarrlyy-icons.svg
+  demo.html
 ```
 
 The first implementation should contain a component gallery in `demo.html` so every control can be exercised independently before it is migrated into gameplay screens.
