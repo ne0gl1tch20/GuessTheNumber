@@ -158,3 +158,100 @@
 .jui-card:hover { border-color: rgba(155,124,255,.32); }
 .jui-button, .jui-icon-button, .jui-badge { transition-duration: var(--jui-motion-fast); }
 .jui-root :where(h1, h2, h3, h4, p, button, input, select, textarea) { font-family: inherit; }
+
+
+/* Jarrlyy UI SDK vNext: motion presets, type helpers and extra building blocks. */
+:root {
+  --jui-ease-standard: cubic-bezier(.2,.8,.2,1);
+  --jui-ease-spring: cubic-bezier(.2,1.35,.45,1);
+  --jui-motion-enter: 360ms var(--jui-ease-standard);
+  --jui-motion-exit: 180ms cubic-bezier(.4,0,1,1);
+  --jui-font-display: var(--jui-font-family);
+  --jui-font-mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+/* Remove the mobile browser's bright tap flash without hiding keyboard focus. */
+.jui-root :where(button, a, input, select, textarea, summary, [role="button"], [tabindex]) {
+  -webkit-tap-highlight-color: transparent;
+}
+.jui-root :where(button, a, input, select, textarea, summary, [role="button"], [tabindex]):focus:not(:focus-visible) {
+  outline: none;
+}
+/* Typography helpers. All stacks are local/system-first and work offline. */
+.jui-font-system { --jui-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.jui-font-rounded { --jui-font-family: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", system-ui, sans-serif; }
+.jui-font-serif { --jui-font-family: Georgia, "Times New Roman", serif; }
+.jui-font-mono { --jui-font-family: var(--jui-font-mono); }
+.jui-display { font-family: var(--jui-font-display); font-size: clamp(2rem, 6vw, 4rem); font-weight: 900; line-height: 1.02; letter-spacing: -.055em; }
+.jui-heading { margin: 0; font-size: clamp(1.25rem, 3vw, 1.8rem); font-weight: 850; line-height: 1.15; letter-spacing: -.035em; }
+.jui-caption { color: var(--jui-muted); font-size: .78rem; line-height: 1.45; }
+.jui-mono { font-family: var(--jui-font-mono); font-variant-numeric: tabular-nums; }
+.jui-balance { text-wrap: balance; }
+.jui-pretty { text-wrap: pretty; }
+/* Small reusable UI pieces. */
+.jui-avatar { display: inline-grid; width: 44px; height: 44px; flex: 0 0 auto; place-items: center; overflow: hidden; border: 1px solid var(--jui-border); border-radius: 50%; background: linear-gradient(145deg, rgba(155,124,255,.35), rgba(98,232,255,.2)); color: var(--jui-text); font-weight: 850; }
+.jui-avatar-sm { width: 32px; height: 32px; font-size: .78rem; }
+.jui-avatar-lg { width: 60px; height: 60px; font-size: 1.15rem; }
+.jui-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.jui-avatar-group { display: inline-flex; align-items: center; padding-left: 8px; }
+.jui-avatar-group > * { margin-left: -8px; border: 2px solid var(--jui-surface); }
+.jui-chip { display: inline-flex; align-items: center; gap: .4rem; min-height: 32px; padding: .3rem .7rem; border: 1px solid var(--jui-border); border-radius: 999px; background: var(--jui-raised); color: var(--jui-text); font-size: .82rem; font-weight: 700; }
+.jui-chip-action { cursor: pointer; transition: transform var(--jui-motion-fast), background var(--jui-motion-fast); }
+.jui-chip-action:hover { background: rgba(155,124,255,.16); transform: translateY(-1px); }
+.jui-kbd { display: inline-flex; min-width: 1.7em; min-height: 1.7em; align-items: center; justify-content: center; padding: .1rem .35rem; border: 1px solid var(--jui-border); border-bottom-width: 2px; border-radius: 6px; background: var(--jui-raised); color: var(--jui-muted); font: 700 .78rem var(--jui-font-mono); }
+.jui-dot { display: inline-block; width: .55rem; height: .55rem; border-radius: 50%; background: var(--jui-cyan); box-shadow: 0 0 0 3px rgba(98,232,255,.12); }
+.jui-dot-success { background: var(--jui-success); box-shadow: 0 0 0 3px rgba(113,230,177,.12); }
+.jui-dot-danger { background: var(--jui-danger); box-shadow: 0 0 0 3px rgba(255,111,145,.12); }
+.jui-divider-label { display: flex; align-items: center; gap: .7rem; color: var(--jui-muted); font-size: .78rem; }
+.jui-divider-label::before, .jui-divider-label::after { height: 1px; flex: 1; background: var(--jui-border); content: ""; }
+.jui-callout { padding: .9rem 1rem; border: 1px solid rgba(98,232,255,.24); border-left: 3px solid var(--jui-cyan); border-radius: 12px; background: rgba(98,232,255,.06); }
+.jui-callout > :first-child { margin-top: 0; }
+.jui-callout > :last-child { margin-bottom: 0; }
+.jui-card-interactive { cursor: pointer; transition: transform var(--jui-motion), border-color var(--jui-motion), box-shadow var(--jui-motion); }
+.jui-card-interactive:hover { transform: translateY(-3px); border-color: rgba(155,124,255,.45); box-shadow: 0 12px 28px rgba(0,0,0,.16); }
+.jui-card-interactive:active { transform: translateY(-1px) scale(.995); }
+/* Opt-in motion classes for screens, lists and game feedback. */
+@keyframes jui-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes jui-slide-up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes jui-slide-down { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes jui-slide-left { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes jui-slide-right { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes jui-zoom-in { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes jui-bounce-in { 0% { opacity: 0; transform: scale(.72); } 65% { opacity: 1; transform: scale(1.045); } 100% { transform: scale(1); } }
+@keyframes jui-wiggle { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+@keyframes jui-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+@keyframes jui-shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-4px); } 40%,80% { transform: translateX(4px); } }
+@keyframes jui-glow { 0%,100% { box-shadow: 0 0 0 rgba(155,124,255,0); } 50% { box-shadow: 0 0 26px rgba(155,124,255,.35); } }
+@keyframes jui-flip-in { from { opacity: 0; transform: perspective(600px) rotateX(-12deg); } to { opacity: 1; transform: perspective(600px) rotateX(0); } }
+@keyframes jui-heartbeat { 0%,40%,80%,100% { transform: scale(1); } 20%,60% { transform: scale(1.08); } }
+.jui-animate-fade { animation: jui-fade-in var(--jui-motion-enter) both; }
+.jui-animate-up { animation: jui-slide-up var(--jui-motion-enter) both; }
+.jui-animate-down { animation: jui-slide-down var(--jui-motion-enter) both; }
+.jui-animate-left { animation: jui-slide-left var(--jui-motion-enter) both; }
+.jui-animate-right { animation: jui-slide-right var(--jui-motion-enter) both; }
+.jui-animate-zoom { animation: jui-zoom-in var(--jui-motion-enter) both; }
+.jui-animate-bounce { animation: jui-bounce-in 480ms var(--jui-ease-spring) both; }
+.jui-animate-wiggle { animation: jui-wiggle 360ms ease-in-out both; }
+.jui-animate-pulse { animation: jui-pulse 1.6s ease-in-out infinite; }
+.jui-animate-shake { animation: jui-shake 320ms ease-in-out both; }
+.jui-animate-glow { animation: jui-glow 1.8s ease-in-out infinite; }
+.jui-animate-flip { animation: jui-flip-in var(--jui-motion-enter) both; }
+.jui-animate-heartbeat { animation: jui-heartbeat 1.3s ease-in-out infinite; }
+.jui-stagger > * { animation: jui-slide-up var(--jui-motion-enter) both; }
+.jui-stagger > *:nth-child(1) { animation-delay: 30ms; }
+.jui-stagger > *:nth-child(2) { animation-delay: 70ms; }
+.jui-stagger > *:nth-child(3) { animation-delay: 110ms; }
+.jui-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.jui-stagger > *:nth-child(5) { animation-delay: 190ms; }
+.jui-stagger > *:nth-child(6) { animation-delay: 230ms; }
+.jui-animate-delay-1 { animation-delay: 80ms; }
+.jui-animate-delay-2 { animation-delay: 160ms; }
+.jui-animate-delay-3 { animation-delay: 240ms; }
+@media (prefers-reduced-motion: reduce) {
+  .jui-root .jui-animate-fade, .jui-root .jui-animate-up, .jui-root .jui-animate-down,
+  .jui-root .jui-animate-left, .jui-root .jui-animate-right, .jui-root .jui-animate-zoom,
+  .jui-root .jui-animate-bounce, .jui-root .jui-animate-wiggle, .jui-root .jui-animate-pulse,
+  .jui-root .jui-animate-shake, .jui-root .jui-animate-glow, .jui-root .jui-animate-flip,
+  .jui-root .jui-animate-heartbeat, .jui-root .jui-stagger > * {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;
+  }
+}
