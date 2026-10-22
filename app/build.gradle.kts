@@ -79,7 +79,7 @@ fun registerBuildInfoTask(taskName: String, environmentName: String, outputDirec
             val outputFile = outputDirectory.get().file("info.txt").asFile
             outputFile.parentFile.mkdirs()
             outputFile.writeText(metadata, Charsets.UTF_8)
-            logger.lifecycle("Generated APK metadata at \${outputFile.relativeTo(rootProject.projectDir)}")
+            logger.lifecycle("Generated APK metadata at " + outputFile.relativeTo(rootProject.projectDir))
         }
     }
 
