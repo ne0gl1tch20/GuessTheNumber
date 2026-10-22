@@ -44,7 +44,7 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         for feature in ("toast", "dialog", "initContextMenus", "initCarousels", "initPagination", "initTables", "initCharts", "initTimers", "initDropzones"):
             with self.subTest(feature=feature):
                 self.assertIn(feature, js)
-        for component in ("data-jui-carousel", "data-jui-pagination", "data-jui-chart", "data-jui-timer", "data-jui-dropzone", "type=\\"datetime-local\\""):
+        for component in ("data-jui-carousel", "data-jui-pagination", "data-jui-chart", "data-jui-timer", "data-jui-dropzone", 'type="datetime-local"'):
             with self.subTest(component=component):
                 self.assertIn(component, demo)
 
