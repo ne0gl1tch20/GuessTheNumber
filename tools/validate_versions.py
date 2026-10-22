@@ -5,8 +5,8 @@ import re, sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 text=(ROOT/"app"/"build.gradle.kts").read_text(encoding="utf-8")
-name=re.search(r'\bversionName\s*=\s*"([^"]+)"',text)
-code=re.search(r"\bversionCode\s*=\s*(\d+)",text)
+name=re.search(r'\bappVersionName\s*=\s*"([^"]+)"',text) or re.search(r'\bversionName\s*=\s*"([^"]+)"',text)
+code=re.search(r"\bappVersionCode\s*=\s*(\d+)",text) or re.search(r"\bversionCode\s*=\s*(\d+)",text)
 if not name or not code:
     print("Version validation FAILED: missing versionName/versionCode")
     raise SystemExit(1)

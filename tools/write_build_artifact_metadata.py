@@ -22,8 +22,8 @@ WRAPPER_PROPERTIES = ROOT / "gradle" / "wrapper" / "gradle-wrapper.properties"
 
 def read_version() -> tuple[str, int]:
     text = APP_GRADLE.read_text(encoding="utf-8")
-    name = re.search(r'(?m)^\s*versionName\s*=\s*"([^"]+)"', text)
-    code = re.search(r"(?m)^\s*versionCode\s*=\s*(\d+)", text)
+    name = re.search(r'(?m)^\s*val\s+appVersionName\s*=\s*"([^"]+)"', text) or re.search(r'(?m)^\s*versionName\s*=\s*"([^"]+)"', text)
+    code = re.search(r"(?m)^\s*val\s+appVersionCode\s*=\s*(\d+)", text) or re.search(r"(?m)^\s*versionCode\s*=\s*(\d+)", text)
     if not name or not code:
         raise ValueError("Could not read versionName/versionCode from app/build.gradle.kts")
     return name.group(1), int(code.group(1))

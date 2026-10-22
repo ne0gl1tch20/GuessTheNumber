@@ -123,17 +123,28 @@ private class DesktopSharedWebViewController {
     private fun unpackWebAssets(): Path {
         val root = Files.createTempDirectory("gtn-shared-web-play-")
         root.toFile().deleteOnExit()
-        val files = listOf("index.html", "app.js", "styles.css", "icons/guess-the-number.svg", "icons/sparkle.svg", "icons/star.svg")
-        for (relative in files) {
-            val resource = "/web-play/$relative"
+        val webRoot = root.resolve("web-play")
+        val files = listOf(
+            "web-play/index.html" to "web-play/index.html",
+            "web-play/app.js" to "web-play/app.js",
+            "web-play/styles.css" to "web-play/styles.css",
+            "web-play/icons/guess-the-number.svg" to "web-play/icons/guess-the-number.svg",
+            "web-play/icons/sparkle.svg" to "web-play/icons/sparkle.svg",
+            "web-play/icons/star.svg" to "web-play/icons/star.svg",
+            "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css" to "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css",
+            "libraries/jarrlyyuisdk/components/jarrlyy-ui.js" to "libraries/jarrlyyuisdk/components/jarrlyy-ui.js",
+            "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg" to "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg"
+        )
+        for ((resourcePath, relativePath) in files) {
+            val resource = "/$resourcePath"
             val input = javaClass.getResourceAsStream(resource)
                 ?: throw IOException("Missing bundled web UI resource: $resource")
-            val output = root.resolve(relative)
+            val output = root.resolve(relativePath)
             Files.createDirectories(output.parent)
             input.use { Files.copy(it, output) }
             output.toFile().deleteOnExit()
         }
-        val index = root.resolve("index.html")
+        val index = webRoot.resolve("index.html")
         val original = Files.readString(index)
         val shim = """
             <script>

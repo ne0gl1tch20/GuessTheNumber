@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Jarrlyy UI SDK · Component Lab</title>
+  <link rel="stylesheet" href="styles/jarrlyy-ui.css">
+  <link rel="stylesheet" href="styles/demo.css">
+</head>
+<body class="jui-root">
+  <main class="lab">
+    <header class="lab-head">
+      <div>
+        <p class="jui-eyebrow">Jarrlyy UI SDK · local component lab</p>
+        <h1>One kit. Lots of game UI. ✨</h1>
+        <p class="jui-muted">Touch-friendly, keyboard-ready and built without a framework or CDN.</p>
+      </div>
+      <span class="jui-badge jui-badge-cyan">Offline ready</span>
+    </header>
+
+    <div class="lab-grid">
+      <section class="jui-card lab-section">
+        <h2>Buttons, badges and tooltips</h2>
+        <div class="jui-row">
+          <button class="jui-button jui-button-primary" data-jui-action="toast" data-jui-message="Button clicked! The SDK is alive.">Primary action</button>
+          <button class="jui-button jui-button-accent" data-jui-action="dialog">Open dialog</button>
+          <button class="jui-icon-button" aria-label="More actions" title="More actions" data-jui-action="toast" data-jui-message="Icon button works."><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/jarrlyy-icons.svg#jui-icon-more"></use></svg></button>
+        </div>
+        <div class="jui-row"><span class="jui-badge jui-badge-purple">EPIC</span><span class="jui-badge jui-badge-cyan">LIVE EVENT</span><span class="jui-badge jui-badge-success">✓ Unlocked</span></div>
+        <p><span class="jui-tooltip" tabindex="0" data-tooltip="Reusable tooltip copy comes from your app's localization.">Hover or focus me</span> <span class="jui-shortcut"><kbd>Ctrl</kbd><kbd>K</kbd></span></p>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Inputs and switches</h2>
+        <div class="jui-field-grid">
+          <label class="jui-field-label">Player name<input class="jui-field" placeholder="Enter a name" autocomplete="off"></label>
+          <label class="jui-field-label">Search<input class="jui-field" type="search" placeholder="Find something…"></label>
+          <label class="jui-field-label">Event date<input class="jui-field" type="date" aria-label="Event date"></label>
+          <label class="jui-field-label">Start time<input class="jui-field" type="time" aria-label="Start time"></label>
+        </div>
+        <label class="jui-switch"><input type="checkbox" checked><span class="jui-switch-track" aria-hidden="true"></span><span>Enable haptics</span></label>
+        <label class="jui-check-row"><input type="checkbox"><span>Show advanced settings</span></label>
+        <label class="jui-field-label">Volume <span id="volumeValue">72%</span><input id="volumeRange" class="jui-range" type="range" min="0" max="100" value="72"></label>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Context menu and drag/drop</h2>
+        <div class="jui-context">
+          <button class="jui-button" data-jui-menu-toggle aria-controls="labContextMenu" aria-expanded="false">Open context menu ▾</button>
+          <div class="jui-menu" id="labContextMenu" hidden>
+            <button type="button" data-jui-action="toast" data-jui-message="Edit selected">Edit</button>
+            <button type="button" data-jui-action="toast" data-jui-message="Duplicate selected">Duplicate</button>
+            <button type="button" data-jui-action="toast" data-jui-message="Delete needs app confirmation">Delete…</button>
+          </div>
+        </div>
+        <div class="jui-dropzone" data-jui-dropzone>
+          <div><strong>Drop a file here</strong><br><span class="jui-muted">Local preview only. Nothing is uploaded.</span>
+            <input type="file" aria-label="Choose a local file">
+            <p data-jui-drop-status aria-live="polite">No file selected</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Breadcrumbs and pagination</h2>
+        <nav aria-label="Demo breadcrumbs"><ol class="jui-breadcrumbs"><li>Home</li><li>Library</li><li aria-current="page">UI components</li></ol></nav>
+        <div data-jui-paginated>
+          <div class="jui-card" data-jui-page-content="1"><strong>Page one</strong><p class="jui-muted">Buttons, inputs and controls.</p></div>
+          <div class="jui-card" data-jui-page-content="2" hidden><strong>Page two</strong><p class="jui-muted">Charts, stats and game components.</p></div>
+          <div class="jui-card" data-jui-page-content="3" hidden><strong>Page three</strong><p class="jui-muted">Feedback, tours and dialogs.</p></div>
+          <nav class="jui-pagination" data-jui-pagination aria-label="Component demo pages">
+            <button class="jui-page" type="button" data-jui-page="1" aria-current="page">1</button>
+            <button class="jui-page" type="button" data-jui-page="2">2</button>
+            <button class="jui-page" type="button" data-jui-page="3">3</button>
+          </nav>
+        </div>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Carousel and feature tour</h2>
+        <div class="jui-carousel" data-jui-carousel aria-label="SDK feature carousel">
+          <button class="jui-icon-button" type="button" data-jui-carousel-prev aria-label="Previous slide"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/jarrlyy-icons.svg#jui-icon-chevron-left"></use></svg></button>
+          <div class="jui-carousel-track">
+            <article class="jui-slide" data-jui-slide><span class="jui-badge jui-badge-purple">01</span><h3>Reusable</h3><p class="jui-muted">Namespaced styles that can be themed per host.</p></article>
+            <article class="jui-slide" data-jui-slide hidden><span class="jui-badge jui-badge-cyan">02</span><h3>Interactive</h3><p class="jui-muted">Native controls plus small declarative behaviors.</p></article>
+            <article class="jui-slide" data-jui-slide hidden><span class="jui-badge jui-badge-success">03</span><h3>Offline-first</h3><p class="jui-muted">Every asset is local and versioned with the app.</p></article>
+            <p class="jui-carousel-count" data-jui-carousel-count aria-live="polite">1 / 3</p>
+          </div>
+          <button class="jui-icon-button" type="button" data-jui-carousel-next aria-label="Next slide"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/jarrlyy-icons.svg#jui-icon-chevron-right"></use></svg></button>
+        </div>
+        <div class="jui-row"><button class="jui-button jui-button-primary" data-jui-action="tour" data-jui-message="This is a demo tour step. Production tours can spotlight a target and store completion in Kotlin.">Try feature tour</button><button class="jui-button" data-jui-action="update" data-jui-message="This is a UI preview only. Let the native host verify and install updates.">Preview update prompt</button></div>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Game HUD, rank and XP</h2>
+        <div class="jui-hud"><span class="jui-hud-item">✦ <strong>12,450</strong> Money</span><span class="jui-hud-item">◇ <strong>24</strong> Nebula</span><span class="jui-hud-item">⚡ <strong>Lv. 18</strong></span><span class="jui-badge jui-badge-purple">2× event</span></div>
+        <div class="jui-rank"><span class="jui-rank-mark">S</span><span><strong>Starlight Rank</strong><br><small class="jui-muted">Tier 4 · Season reward</small></span></div>
+        <div class="jui-xp"><div class="jui-xp-head"><span>Next level</span><strong>7,200 / 10,000 XP</strong></div><div class="jui-meter" role="progressbar" aria-label="Experience progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72" class="lab-xp-meter"><span></span></div></div>
+        <div class="jui-stat-grid"><article class="jui-card"><span class="jui-stat-label">Best streak</span><strong class="jui-stat-value">24</strong><span class="jui-badge jui-badge-success">+4 today</span></article><article class="jui-card"><span class="jui-stat-label">Challenges</span><strong class="jui-stat-value">08</strong><span class="jui-stat-label">3 left</span></article></div>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Save-slot and achievement cards</h2>
+        <article class="jui-card jui-slot"><span class="jui-slot-icon">01</span><div><strong>Crystal run</strong><p>Level 18 · Saved 4 minutes ago</p><span class="jui-badge jui-badge-success">Current slot</span></div><button class="jui-button" data-jui-action="toast" data-jui-message="Slot selected in this demo.">Open</button></article>
+        <article class="jui-card jui-achievement"><span class="jui-achievement-icon"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/jarrlyy-icons.svg#jui-icon-trophy"></use></svg></span><div><strong>Perfect Ten</strong><p>Make ten correct guesses. Progress: 10 / 10.</p><span class="jui-badge jui-badge-success">Unlocked</span></div></article>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Chart, data table and color picker</h2>
+        <svg class="jui-chart" data-jui-chart data-values="8,14,10,22,18,27" data-labels="M,T,W,T,F,S" role="img" aria-label="Sample weekly activity bar chart"></svg>
+        <div class="jui-table-wrap"><table class="jui-table"><thead><tr><th><button class="jui-sort" data-jui-sort-key="name">Event ↕</button></th><th><button class="jui-sort" data-jui-sort-key="points">Points ↕</button></th><th>Status</th></tr></thead><tbody><tr><td>Daily Rush</td><td>240</td><td>Ready</td></tr><tr><td>Crystal Run</td><td>180</td><td>Complete</td></tr><tr><td>Nebula Trial</td><td>520</td><td>Locked</td></tr></tbody></table></div>
+        <label class="jui-field-label">Accent color <span class="jui-row"><span class="lab-preview-color" id="colorPreview"></span><span data-jui-color-value>#9B7CFF</span></span><input class="jui-field" type="color" value="#9b7cff" data-jui-color-target="#colorPreview"></label>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Timer, date and time controls</h2>
+        <div class="jui-row"><span class="jui-badge jui-badge-cyan">Event countdown</span><strong class="jui-stat-value" data-jui-timer="90" aria-live="off">01:30</strong></div>
+        <div class="jui-field-grid"><label class="jui-field-label">Event starts<input class="jui-field" type="datetime-local" aria-label="Event starts"></label><label class="jui-field-label">Reminder time<input class="jui-field" type="time" aria-label="Reminder time"></label></div>
+        <p class="jui-muted">Date/time inputs use the platform's native picker where supported.</p>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Empty state and loading state</h2>
+        <div class="jui-empty"><strong>Nothing here yet</strong><p>New achievements will show up here when unlocked.</p><button class="jui-button" data-jui-action="toast" data-jui-message="Your empty state can link to a real action.">Explore challenges</button></div>
+        <button class="jui-button" disabled>Disabled action</button>
+      </section>
+    </div>
+    <footer class="lab-footer">Jarrlyy UI SDK · local demo data only · no game saves, rewards or network requests are changed here.</footer>
+  </main>
+  <script src="components/jarrlyy-ui.js"></script>
+  <script src="components/demo.js"></script>
+</body>
+</html>

@@ -161,6 +161,18 @@ fun DevSettingsScreen(
                 }
             }
 
+            // Run the actual bundled Jarrlyy UI SDK demo inside the app's local WebView.
+            item {
+                Button(
+                    onClick = { onNavigate("jarrlyy_ui_sdk") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(imageVector = Icons.Default.Widgets, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Jarrlyy UI SDK Component Lab", fontSize = 16.sp)
+                }
+            }
+
             // Keep Lua testing tools separate from the player-facing Activity Hub.
             item {
                 Button(

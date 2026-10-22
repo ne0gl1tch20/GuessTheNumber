@@ -10,6 +10,10 @@ plugins {
 }
 
 val generatedWebPlayAssets = layout.buildDirectory.dir("generated/webPlayAssets")
+val generatedDebugBuildInfo = layout.buildDirectory.dir("generated/buildInfo/debug")
+val generatedReleaseBuildInfo = layout.buildDirectory.dir("generated/buildInfo/release")
+val appVersionName = "3.0.3"
+val appVersionCode = 21
 val generatedLauncherIconRes = layout.buildDirectory.dir("generated/launcherIconRes")
 val launcherLogo = rootProject.file("GTN_APP_LOGO.png")
 val prepareWebPlayBrandAsset by tasks.registering(Copy::class) {
@@ -23,6 +27,22 @@ val prepareLauncherIcon by tasks.registering(Copy::class) {
     rename { "gtn_app_logo.png" }
 }
 
+
+val generateDebugBuildInfo = tasks.register<buildlogic.GenerateApkBuildInfo>("generateDebugBuildInfo") {
+    environmentName.set("debug")
+    versionName.set(appVersionName)
+    versionCode.set(appVersionCode)
+    repositoryDirectory.set(rootProject.layout.projectDirectory)
+    outputDirectory.set(generatedDebugBuildInfo)
+}
+
+val generateReleaseBuildInfo = tasks.register<buildlogic.GenerateApkBuildInfo>("generateReleaseBuildInfo") {
+    environmentName.set("release")
+    versionName.set(appVersionName)
+    versionCode.set(appVersionCode)
+    repositoryDirectory.set(rootProject.layout.projectDirectory)
+    outputDirectory.set(generatedReleaseBuildInfo)
+}
 
 android {
     // Stable project debug signing. CI supplies the keystore through environment variables; local builds can use debug-signing/debug.keystore.
@@ -55,8 +75,8 @@ android {
         applicationId = "com.jarrlyyy.guessthenumber"
         minSdk = 26
         targetSdk = 35
-        versionCode = 21
-        versionName = "3.0.3"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -98,6 +118,8 @@ android {
     }
     // Android's SourceSet API no longer accepts Provider instances directly.
     sourceSets.getByName("main").assets.srcDir(generatedWebPlayAssets.get().asFile)
+    sourceSets.getByName("debug").assets.srcDir(generatedDebugBuildInfo.get().asFile)
+    sourceSets.getByName("release").assets.srcDir(generatedReleaseBuildInfo.get().asFile)
     sourceSets.getByName("main").res.srcDir(generatedLauncherIconRes.get().asFile)
     // Generate the web brand asset and real launcher icon before Android resource processing.
     tasks.matching { it.name == "preBuild" || it.name.endsWith("PreBuild") }
@@ -127,6 +149,13 @@ android {
 
 tasks.named("preBuild").configure {
     dependsOn(prepareWebPlayBrandAsset, prepareLauncherIcon)
+}
+
+tasks.matching { it.name == "preDebugBuild" || it.name == "mergeDebugAssets" }.configureEach {
+    dependsOn(generateDebugBuildInfo)
+}
+tasks.matching { it.name == "preReleaseBuild" || it.name == "mergeReleaseAssets" }.configureEach {
+    dependsOn(generateReleaseBuildInfo)
 }
 
 kotlin {
