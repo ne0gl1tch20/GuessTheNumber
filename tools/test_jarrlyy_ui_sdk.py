@@ -81,7 +81,7 @@ class JarrlyyUiSdkTests(unittest.TestCase):
 
     def test_context_menu_keyboard_navigation_handles_multiple_items(self):
         js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
-        self.assertIn('const items = $("button:not(:disabled)", menu);', js)
+        self.assertIn('const items = $$("button:not(:disabled)", menu);', js)
         self.assertIn('if (event.key === "Tab") { close(); return; }', js)
         self.assertIn('current < 0 ? 0 : (current + 1) % items.length', js)
         self.assertIn('current < 0 ? items.length - 1 : (current - 1 + items.length) % items.length', js)
