@@ -65,7 +65,7 @@
   }
 
   function initContextMenus() {
-    $$("[data-jui-menu-toggle]").forEach((button) => {
+    $$$("[data-jui-menu-toggle]").forEach((button) => {
       if (button.dataset.juiMenuReady) return;
       button.dataset.juiMenuReady = "true";
       const id = button.getAttribute("aria-controls");
@@ -76,7 +76,7 @@
       button.addEventListener("click", (event) => {
         event.stopPropagation();
         const opening = menu.hidden;
-        $$$("[data-jui-menu-toggle]").forEach((other) => {
+        $$$$("[data-jui-menu-toggle]").forEach((other) => {
           const otherId = other.getAttribute("aria-controls");
           const otherMenu = otherId ? doc.getElementById(otherId) : other.parentElement.querySelector(".jui-menu");
           if (otherMenu && otherMenu !== menu) {
@@ -114,7 +114,7 @@
   }
 
   function initCarousels() {
-    $$(".jui-carousel[data-jui-carousel]").forEach((carousel) => {
+    $$$(".jui-carousel[data-jui-carousel]").forEach((carousel) => {
       if (carousel.dataset.juiCarouselReady) return;
       carousel.dataset.juiCarouselReady = "true";
       const slides = $$("[data-jui-slide]", carousel);
@@ -123,7 +123,7 @@
       const render = () => {
         slides.forEach((slide, i) => { slide.hidden = i !== index; slide.setAttribute("aria-hidden", String(i !== index)); });
         if (count) count.textContent = slides.length ? (index + 1) + " / " + slides.length : "0 / 0";
-        $$$("[data-jui-carousel-prev], [data-jui-carousel-next]", carousel).forEach((button) => { button.disabled = slides.length < 2; });
+        $$$$("[data-jui-carousel-prev], [data-jui-carousel-next]", carousel).forEach((button) => { button.disabled = slides.length < 2; });
       };
       $("[data-jui-carousel-prev]", carousel)?.addEventListener("click", () => { index = (index + slides.length - 1) % slides.length; render(); });
       $("[data-jui-carousel-next]", carousel)?.addEventListener("click", () => { index = (index + 1) % slides.length; render(); });
@@ -132,7 +132,7 @@
   }
 
   function initPagination() {
-    $$("[data-jui-pagination]").forEach((root) => {
+    $$$("[data-jui-pagination]").forEach((root) => {
       if (root.dataset.juiPaginationReady) return;
       root.dataset.juiPaginationReady = "true";
       const buttons = $$("[data-jui-page]", root);
@@ -151,7 +151,7 @@
   }
 
   function initTables() {
-    $$("[data-jui-sort-key]").forEach((button) => {
+    $$$("[data-jui-sort-key]").forEach((button) => {
       if (button.dataset.juiSortReady) return;
       button.dataset.juiSortReady = "true";
       button.addEventListener("click", () => {
@@ -174,13 +174,13 @@
           return ascending ? comparison : -comparison;
         });
         rows.forEach((row) => body.appendChild(row));
-        $$$("[data-jui-sort-key]", table).forEach((other) => { if (other !== button) delete other.dataset.juiSortDirection; });
+        $$$$("[data-jui-sort-key]", table).forEach((other) => { if (other !== button) delete other.dataset.juiSortDirection; });
       });
     });
   }
 
   function initCharts() {
-    $$("svg[data-jui-chart]").forEach((svg) => {
+    $$$("svg[data-jui-chart]").forEach((svg) => {
       if (svg.dataset.juiChartReady) return;
       svg.dataset.juiChartReady = "true";
       const values = String(svg.dataset.values || "").split(",").map(Number).filter(Number.isFinite).slice(0, 12);
@@ -213,7 +213,7 @@
   }
 
   function initTimers() {
-    $$$("[data-jui-timer]").forEach((node) => {
+    $$$$("[data-jui-timer]").forEach((node) => {
       if (node.dataset.juiTimerReady) return;
       node.dataset.juiTimerReady = "true";
       let remaining = Math.max(0, Number(node.dataset.juiTimer) || 0);
@@ -236,7 +236,7 @@
   }
 
   function initDropzones() {
-    $$("[data-jui-dropzone]").forEach((zone) => {
+    $$$("[data-jui-dropzone]").forEach((zone) => {
       if (zone.dataset.juiDropzoneReady) return;
       zone.dataset.juiDropzoneReady = "true";
       const input = $("input[type=file]", zone);
@@ -257,7 +257,7 @@
   }
 
   function initActions() {
-    $$("[data-jui-action]").forEach((button) => {
+    $$$("[data-jui-action]").forEach((button) => {
       if (button.dataset.juiActionReady) return;
       button.dataset.juiActionReady = "true";
       button.addEventListener("click", () => {
@@ -268,7 +268,7 @@
         if (action === "tour") makeDialog("Welcome tour", button.dataset.juiMessage || "This is a reusable feature-tour step. Add target-aware steps from your app.", { cancelText: "Skip tour", confirmText: "Got it", onConfirm: () => toast("Tour step completed.") });
       });
     });
-    $$("[data-jui-color-target]").forEach((input) => {
+    $$$("[data-jui-color-target]").forEach((input) => {
       if (input.dataset.juiColorReady) return;
       input.dataset.juiColorReady = "true";
       input.addEventListener("input", () => {
