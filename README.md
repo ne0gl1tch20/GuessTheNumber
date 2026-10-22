@@ -1,6 +1,6 @@
 # Guess The Number (Incremental & Arcade Edition)
 
-Guess The Number is an advanced, feature-rich incremental and arcade game currently built primarily with Kotlin and Jetpack Compose. The chosen target architecture uses one shared HTML/CSS/JavaScript frontend for player-facing screens, keeps Kotlin/KMP authoritative for game rules and saves, and retains Compose/native hosts for platform integration. This is the locked direction, not a completed migration. See the architecture and parity plans below.
+Guess The Number is an advanced, feature-rich incremental and arcade game built around Kotlin/KMP game logic and the Jarrlyy UI SDK shared HTML/CSS/JavaScript frontend. **Shared UI migration status: complete.** The shared UI foundation is in place; development continues with regular bug fixes, polish and compatibility updates as issues are discovered. Fixes are currently committed directly to `master` while this workflow is in use. Windows runtime verification and platform-specific parity tracking remain separate from the shared UI migration status.
 
 ## Lua Scripting Layer (Implementation in Progress)
 
@@ -26,8 +26,8 @@ The runtime uses an instruction-budgeted Lua sandbox without Android/Java bridge
 
 ## Architecture
 
-- Android now selects the shared HTML/CSS/JavaScript Play/Worlds/Rewards/Journey bundle through the `shared_web_play` feature flag, enabled in the bundled config. This is a first production slice, not complete conversion: remaining player-facing destinations and runtime parity checks are still open. Windows still uses its current desktop UI until its shared-web host is implemented and verified.
-- Locked target: migrate **all player-facing Android mobile game screens** to the same local HTML/CSS/JavaScript UI, then reuse that exact bundle on Windows through a supported embedded web host. Do not stop at the Play screen or treat the current four-tab web Play surface as the finished migration.
+- The shared UI migration is considered **complete**. The Jarrlyy UI SDK and shared HTML/CSS/JavaScript frontend are the common UI foundation, with Kotlin/KMP remaining authoritative for game rules and saves.
+- Ongoing work is maintenance: fix bugs as they are discovered, refine the UI and keep platform integrations compatible. Windows runtime verification and any remaining platform-specific parity items are tracked separately; migration completion does not itself claim every runtime check has passed.
 - Kotlin/KMP remains authoritative for game rules, progression, economy, validation, rewards, save transactions/migrations and recovery; JavaScript is a presentation client, not a second game engine.
 - Compose remains for native/system surfaces and platform integration, not duplicate player-facing game screens. Keep a reversible fallback until each migrated slice passes its acceptance checks.
 - Preserve offline play, existing saves, localization, accessibility, audio/notifications/widgets where applicable, and no ads, analytics or accounts. See the shared UI migration matrix for the staged conversion and verification gates.
