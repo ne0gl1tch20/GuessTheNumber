@@ -59,7 +59,9 @@
   }
 
   function initContextMenus() {
-    $$("[data-jui-menu-toggle]").forEach((button) => {
+    $("[data-jui-menu-toggle]").forEach((button) => {
+      if (button.dataset.juiReady) return;
+      button.dataset.juiReady = "true";
       const id = button.getAttribute("aria-controls");
       const menu = id ? doc.getElementById(id) : button.parentElement.querySelector(".jui-menu");
       if (!menu) return;
@@ -93,7 +95,9 @@
   }
 
   function initCarousels() {
-    $$(".jui-carousel[data-jui-carousel]").forEach((carousel) => {
+    $(".jui-carousel[data-jui-carousel]").forEach((carousel) => {
+      if (carousel.dataset.juiReady) return;
+      carousel.dataset.juiReady = "true";
       const slides = $$("[data-jui-slide]", carousel);
       const count = $("[data-jui-carousel-count]", carousel);
       let index = Math.max(0, slides.findIndex((slide) => !slide.hidden));
@@ -109,7 +113,9 @@
   }
 
   function initPagination() {
-    $$("[data-jui-pagination]").forEach((root) => {
+    $("[data-jui-pagination]").forEach((root) => {
+      if (root.dataset.juiReady) return;
+      root.dataset.juiReady = "true";
       const buttons = $$("[data-jui-page]", root);
       const pages = root.closest("[data-jui-paginated]")?.querySelectorAll("[data-jui-page-content]") || [];
       const render = (page) => {
@@ -125,7 +131,9 @@
   }
 
   function initTables() {
-    $$("[data-jui-sort-key]").forEach((button) => {
+    $("[data-jui-sort-key]").forEach((button) => {
+      if (button.dataset.juiReady) return;
+      button.dataset.juiReady = "true";
       button.addEventListener("click", () => {
         const table = button.closest("table");
         const body = table?.tBodies[0];
@@ -150,7 +158,9 @@
   }
 
   function initCharts() {
-    $$("svg[data-jui-chart]").forEach((svg) => {
+    $("svg[data-jui-chart]").forEach((svg) => {
+      if (svg.dataset.juiReady) return;
+      svg.dataset.juiReady = "true";
       const values = String(svg.dataset.values || "").split(",").map(Number).filter(Number.isFinite).slice(0, 12);
       const labels = String(svg.dataset.labels || "").split(",");
       const max = Math.max(1, ...values);
@@ -204,7 +214,9 @@
   }
 
   function initDropzones() {
-    $$("[data-jui-dropzone]").forEach((zone) => {
+    $("[data-jui-dropzone]").forEach((zone) => {
+      if (zone.dataset.juiReady) return;
+      zone.dataset.juiReady = "true";
       const input = $("input[type=file]", zone);
       const status = $("[data-jui-drop-status]", zone);
       const showFiles = (files) => {
@@ -223,7 +235,9 @@
   }
 
   function initActions() {
-    $$("[data-jui-action]").forEach((button) => {
+    $("[data-jui-action]").forEach((button) => {
+      if (button.dataset.juiReady) return;
+      button.dataset.juiReady = "true";
       button.addEventListener("click", () => {
         const action = button.dataset.juiAction;
         if (action === "toast") toast(button.dataset.juiMessage || "Nice! That component works.");
@@ -232,7 +246,9 @@
         if (action === "tour") makeDialog("Welcome tour", button.dataset.juiMessage || "This is a reusable feature-tour step. Add target-aware steps from your app.", { cancelText: "Skip tour", confirmText: "Got it", onConfirm: () => toast("Tour step completed.") });
       });
     });
-    $$("[data-jui-color-target]").forEach((input) => {
+    $("[data-jui-color-target]").forEach((input) => {
+      if (input.dataset.juiReady) return;
+      input.dataset.juiReady = "true";
       input.addEventListener("input", () => {
         const target = $(input.dataset.juiColorTarget);
         if (target) target.style.setProperty("--jui-preview-color", input.value);
