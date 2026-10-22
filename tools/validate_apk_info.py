@@ -47,8 +47,9 @@ def main() -> int:
     if not re.fullmatch(r"[A-Za-z0-9._-]+", values["git_branch"]):
         print("git_branch contains unexpected characters", file=sys.stderr)
         return 1
-    if not values["name"].endswith("." + values["git_branch"]):
-        print("name does not include the metadata branch suffix", file=sys.stderr)
+    expected_name_prefix = f"GuessTheNumber-v{args.version_name}-{args.commit[:8]}."
+    if not values["name"].startswith(expected_name_prefix) or not values["name"].endswith("." + values["git_branch"]):
+        print("name must include the expected app version, commit and branch", file=sys.stderr)
         return 1
     try:
         datetime.strptime(values["build_date"], "%a, %d %b %Y %H:%M:%S %z")
