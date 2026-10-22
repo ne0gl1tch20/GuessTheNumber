@@ -65,7 +65,7 @@
   }
 
   function initContextMenus() {
-    $("[data-jui-menu-toggle]").forEach((button) => {
+    $$("[data-jui-menu-toggle]").forEach((button) => {
       if (button.dataset.juiMenuReady) return;
       button.dataset.juiMenuReady = "true";
       const id = button.getAttribute("aria-controls");
@@ -114,7 +114,7 @@
   }
 
   function initCarousels() {
-    $(".jui-carousel[data-jui-carousel]").forEach((carousel) => {
+    $$(".jui-carousel[data-jui-carousel]").forEach((carousel) => {
       if (carousel.dataset.juiCarouselReady) return;
       carousel.dataset.juiCarouselReady = "true";
       const slides = $$("[data-jui-slide]", carousel);
@@ -132,7 +132,7 @@
   }
 
   function initPagination() {
-    $("[data-jui-pagination]").forEach((root) => {
+    $$("[data-jui-pagination]").forEach((root) => {
       if (root.dataset.juiPaginationReady) return;
       root.dataset.juiPaginationReady = "true";
       const buttons = $$("[data-jui-page]", root);
@@ -151,7 +151,7 @@
   }
 
   function initTables() {
-    $("[data-jui-sort-key]").forEach((button) => {
+    $$("[data-jui-sort-key]").forEach((button) => {
       if (button.dataset.juiSortReady) return;
       button.dataset.juiSortReady = "true";
       button.addEventListener("click", () => {
@@ -180,7 +180,7 @@
   }
 
   function initCharts() {
-    $("svg[data-jui-chart]").forEach((svg) => {
+    $$("svg[data-jui-chart]").forEach((svg) => {
       if (svg.dataset.juiChartReady) return;
       svg.dataset.juiChartReady = "true";
       const values = String(svg.dataset.values || "").split(",").map(Number).filter(Number.isFinite).slice(0, 12);
@@ -236,7 +236,7 @@
   }
 
   function initDropzones() {
-    $("[data-jui-dropzone]").forEach((zone) => {
+    $$("[data-jui-dropzone]").forEach((zone) => {
       if (zone.dataset.juiDropzoneReady) return;
       zone.dataset.juiDropzoneReady = "true";
       const input = $("input[type=file]", zone);
@@ -257,7 +257,7 @@
   }
 
   function initActions() {
-    $("[data-jui-action]").forEach((button) => {
+    $$("[data-jui-action]").forEach((button) => {
       if (button.dataset.juiActionReady) return;
       button.dataset.juiActionReady = "true";
       button.addEventListener("click", () => {
@@ -268,7 +268,7 @@
         if (action === "tour") makeDialog("Welcome tour", button.dataset.juiMessage || "This is a reusable feature-tour step. Add target-aware steps from your app.", { cancelText: "Skip tour", confirmText: "Got it", onConfirm: () => toast("Tour step completed.") });
       });
     });
-    $("[data-jui-color-target]").forEach((input) => {
+    $$("[data-jui-color-target]").forEach((input) => {
       if (input.dataset.juiColorReady) return;
       input.dataset.juiColorReady = "true";
       input.addEventListener("input", () => {
