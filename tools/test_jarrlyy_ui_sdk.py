@@ -18,6 +18,8 @@ class JarrlyyUiSdkTests(unittest.TestCase):
             "styles/demo.css",
             "components/demo.js",
             "demo.html",
+            "styles/jarrlyy-ui-advanced.css",
+            "components/jarrlyy-ui-advanced.js",
         ):
             with self.subTest(path=relative):
                 self.assertTrue((SDK / relative).is_file(), f"Missing SDK file: {relative}")
@@ -146,6 +148,43 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         self.assertNotIn('addJavascriptInterface', screen_text)
         self.assertIn('"jarrlyy_ui_sdk"', nav_text)
         self.assertIn('onNavigate("jarrlyy_ui_sdk")', dev_text)
+
+
+class JarrlyyUiAdvancedTests(unittest.TestCase):
+    def test_advanced_assets_are_present_and_loaded_by_both_hosts(self):
+        for relative in ("styles/jarrlyy-ui-advanced.css", "components/jarrlyy-ui-advanced.js"):
+            with self.subTest(path=relative):
+                self.assertTrue((SDK / relative).is_file())
+        web_html = (WEB / "index.html").read_text(encoding="utf-8")
+        demo_html = (SDK / "demo.html").read_text(encoding="utf-8")
+        self.assertIn("jarrlyy-ui-advanced.css", web_html)
+        self.assertIn("jarrlyy-ui-advanced.js", web_html)
+        self.assertIn("jarrlyy-ui-advanced.css", demo_html)
+        self.assertIn("jarrlyy-ui-advanced.js", demo_html)
+
+    def test_advanced_components_have_real_behaviors_and_accessible_states(self):
+        js = (SDK / "components/jarrlyy-ui-advanced.js").read_text(encoding="utf-8")
+        css = (SDK / "styles/jarrlyy-ui-advanced.css").read_text(encoding="utf-8")
+        demo = (SDK / "demo.html").read_text(encoding="utf-8")
+        for behavior in ("initTabs", "initSegmentedControls", "initRangeGroups", "initOverlays", "initBanners", "setLoading", "setProgress", "jui:tab-change", "jui:range-change"):
+            with self.subTest(behavior=behavior):
+                self.assertIn(behavior, js)
+        for selector in (".jui-tabs", ".jui-segmented", ".jui-range-group", ".jui-bottom-sheet", ".jui-drawer", ".jui-banner-success", ".jui-banner-danger", ".jui-skeleton", ".jui-circular-progress", ".jui-fab"):
+            with self.subTest(selector=selector):
+                self.assertIn(selector, css)
+        for component in ("data-jui-tabs", "data-jui-segmented", "data-jui-range", "data-jui-overlay-open", "data-jui-banner-dismiss", "data-jui-loading-demo", "data-jui-progress-demo"):
+            with self.subTest(component=component):
+                self.assertIn(component, demo)
+
+    def test_advanced_gallery_uses_local_assets_and_no_inline_script_or_style(self):
+        html = (SDK / "demo.html").read_text(encoding="utf-8")
+        self.assertNotRegex(html, r'''(?:src|href)\s*=\s*["']https?://''')
+        self.assertNotIn("<style>", html)
+        self.assertNotIn("<script>", html)
+        self.assertNotRegex(html, r"\sstyle\s*=")
+        self.assertIn("aria-label=", html)
+        self.assertIn("prefers-reduced-motion", (SDK / "styles/jarrlyy-ui-advanced.css").read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

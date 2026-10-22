@@ -1,10 +1,6 @@
 # Jarrlyy UI SDK
 
-A local-first, framework-free HTML/CSS/JavaScript component kit for GuessTheNumber's shared WebView UI and future host apps.
-
-## Location
-
-\`app/src/main/assets/libraries/jarrlyyuisdk/\`
+A local-first, framework-free HTML/CSS/JavaScript component kit for GuessTheNumber's shared Android WebView and Windows desktop web UI, with an optional advanced layer for host apps.
 
 ## Load it
 
@@ -12,34 +8,54 @@ From \`app/src/main/assets/web-play/index.html\`:
 
 \`\`\`html
 <link rel="stylesheet" href="../libraries/jarrlyyuisdk/styles/jarrlyy-ui.css">
+<link rel="stylesheet" href="../libraries/jarrlyyuisdk/styles/jarrlyy-ui-advanced.css">
 <script src="../libraries/jarrlyyuisdk/components/jarrlyy-ui.js"></script>
+<script src="../libraries/jarrlyyuisdk/components/jarrlyy-ui-advanced.js"></script>
 \`\`\`
 
-The kit is deliberately namespaced with \`jui-\` classes and \`data-jui-*\` attributes so it can coexist with the existing game UI. It has no CDN, npm, network, Android or game-state dependency.
+Keep these local assets together. There is no CDN, npm, runtime network request, Android dependency or game-state dependency. CSS classes use the \`jui-\` namespace and declarative controls use \`data-jui-*\` attributes.
 
-## Included component patterns
+## Curated component inventory
 
-- Buttons, icon buttons, badges, cards and tooltips
-- Text/number/password/search fields, native date/time inputs, switches, checkboxes and sliders
-- Context menus and keyboard-shortcut hints
-- Breadcrumbs, carousels, pagination and sortable data tables
-- Progress/XP meters, level/rank indicators, stat cards and game HUDs
-- Save-slot and achievement cards
-- SVG-backed charts, timers/countdowns and drag/drop file zones
-- Toasts, accessible dialogs, update-prompt previews and multi-step guided tours
+- **Actions:** primary, secondary, quiet and destructive buttons, icon buttons, button groups, segmented controls, floating action button patterns, loading and disabled states.
+- **Structure and navigation:** cards, section headers, toolbars, breadcrumbs, tabs, pagination, accordions, context menus, keyboard shortcut hints, responsive grids and dividers.
+- **Forms:** text, number, password, search, date/time and color fields; switches, checkboxes, native select controls, single-value and dual-thumb range sliders.
+- **Feedback and overlays:** tooltips, toasts, status banners, empty states, skeletons, accessible dialogs, confirmation dialogs, native dialog-based drawers and bottom sheets, update prompt previews and guided tours.
+- **Game UI:** HUD rows, currency/reward labels, stat cards, rank/level indicators, progress/XP meters, circular progress, timers/countdowns, save-slot and achievement cards, charts, data tables and carousels.
+- **Utilities:** local SVG icon sprite, theme tokens, reduced-motion handling, and helpers for loading states and progress values.
 
-## JavaScript API
+The gallery at \`demo.html\` demonstrates the components with local, non-persistent sample data. It is a component lab, not a production game screen.
 
+## APIs
+
+Core API:
 - \`JarrlyyUI.toast(message, duration?)\`
 - \`JarrlyyUI.dialog(title, message, options?)\`
-- \`JarrlyyUI.init()\` (safe to call again for newly inserted markup; existing behavior should not be initialized twice)
+- \`JarrlyyUI.tour(steps, options?)\`
+- \`JarrlyyUI.init()\`
 
-The JarrlyyUI.tour(steps, options) helper opens a multi-step accessible tour with Previous, Next, Skip and focus restoration. Declarative controls are initialized automatically. See \`demo.html\` for working examples.
+Advanced API:
+- \`JarrlyyUIAdvanced.init()\` (safe to call again; initialized controls are not bound twice)
+- \`JarrlyyUIAdvanced.setLoading(button, loading, label?)\`
+- \`JarrlyyUIAdvanced.setProgress(element, value)\`
 
-## Theme and accessibility
+Advanced events bubble from their control:
+- \`jui:change\` for segmented controls (\`detail.value\`)
+- \`jui:tab-change\` for tab changes (\`detail.value\`)
+- \`jui:range-change\` for range selection (\`detail.min\`, \`detail.max\`)
+- \`jui:dismiss\` before a banner is removed
 
-Override the \`--jui-*\` custom properties to theme the kit. Components use visible keyboard focus, accessible state, semantic native controls and reduced-motion support. All text supplied by applications should be localized by the host app; the kit does not own GuessTheNumber's translations or authoritative game rules.
+All user-facing text remains owned by the host app and must be localized there. The SDK does not own GuessTheNumber's translations, authoritative gameplay, rewards, saves or economy rules.
+
+## Design and accessibility
+
+- Dark theme by default; add \`data-jui-theme="light"\` to the root for light tokens.
+- Visible keyboard focus and ARIA selected, checked, disabled, busy and progress states.
+- Arrow/Home/End keyboard navigation for tabs and segmented controls.
+- Native HTML controls and dialog semantics where they provide more reliable accessibility than custom replacements.
+- Comfortable touch targets, responsive overlay widths and safe-area-aware floating actions.
+- Reduced-motion support for overlays, loading indicators, skeletons and interactive controls.
 
 ## Build integration
 
-Android APK builds package this directory at \`assets/libraries/jarrlyyuisdk/\`. The Windows shared-web host copies the same local SDK files alongside the shared web bundle. No remote asset requests are needed.
+Android packages this directory under \`assets/libraries/jarrlyyuisdk/\`. The Windows shared-web host ships the same local web bundle. Keep the core and advanced CSS/JS files versioned together.
