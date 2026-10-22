@@ -103,6 +103,17 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         self.assertIn('animation-duration: .01ms !important', reduced_motion)
         self.assertIn('transition-duration: .01ms !important', reduced_motion)
 
+    def test_public_multistep_tour_is_accessible_and_used_by_demo(self):
+        js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
+        self.assertIn("function tour(steps, options = {})", js)
+        self.assertIn('dialog.setAttribute("aria-labelledby", heading.id)', js)
+        self.assertIn('dialog.setAttribute("aria-describedby", body.id)', js)
+        self.assertIn('progress.setAttribute("aria-live", "polite")', js)
+        self.assertIn('if (typeof options.onComplete === "function") options.onComplete()', js)
+        self.assertIn('if (typeof options.onSkip === "function") options.onSkip()', js)
+        self.assertIn('global.JarrlyyUI = Object.freeze({ init, toast, dialog: makeDialog, tour });', js)
+        self.assertIn('if (action === "tour") tour([', js)
+
     def test_player_notifications_use_sdk_toast_with_legacy_fallback(self):
         js = (WEB / "app.js").read_text(encoding="utf-8")
         self.assertIn("window.JarrlyyUI&&typeof window.JarrlyyUI.toast==='function'", js)
