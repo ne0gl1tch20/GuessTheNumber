@@ -1,6 +1,11 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 import org.gradle.api.tasks.Copy
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 plugins {
     alias(libs.plugins.android.application)
@@ -10,6 +15,10 @@ plugins {
 }
 
 val generatedWebPlayAssets = layout.buildDirectory.dir("generated/webPlayAssets")
+val generatedDebugBuildInfo = layout.buildDirectory.dir("generated/buildInfo/debug")
+val generatedReleaseBuildInfo = layout.buildDirectory.dir("generated/buildInfo/release")
+val appVersionName = "3.0.3"
+val appVersionCode = 21
 val generatedLauncherIconRes = layout.buildDirectory.dir("generated/launcherIconRes")
 val launcherLogo = rootProject.file("GTN_APP_LOGO.png")
 val prepareWebPlayBrandAsset by tasks.registering(Copy::class) {
@@ -22,6 +31,60 @@ val prepareLauncherIcon by tasks.registering(Copy::class) {
     into(generatedLauncherIconRes.map { it.dir("drawable-nodpi") })
     rename { "gtn_app_logo.png" }
 }
+
+
+fun registerBuildInfoTask(taskName: String, environmentName: String, outputDirectory: org.gradle.api.provider.Provider<org.gradle.api.file.Directory>) =
+    tasks.register(taskName) {
+        outputs.dir(outputDirectory)
+        doLast {
+            fun gitValue(vararg arguments: String): String? = runCatching {
+                val process = ProcessBuilder(*arguments)
+                    .directory(rootProject.projectDir)
+                    .redirectErrorStream(true)
+                    .start()
+                val value = process.inputStream.bufferedReader().use { it.readText().trim() }
+                if (process.waitFor() == 0 && value.isNotBlank()) value else null
+            }.getOrNull()
+
+            val fullCommit = System.getenv("GITHUB_SHA")
+                ?.takeIf { it.matches(Regex("[0-9a-fA-F]{40,64}")) }
+                ?: gitValue("git", "rev-parse", "HEAD")
+            val shortCommit = fullCommit?.take(8) ?: "unknown"
+            val githubRef = System.getenv("GITHUB_REF").orEmpty()
+            val branchCandidate = System.getenv("GITHUB_HEAD_REF")?.takeIf { it.isNotBlank() }
+                ?: (if (githubRef.startsWith("refs/heads/")) System.getenv("GITHUB_REF_NAME") else null)
+                ?: gitValue("git", "branch", "--show-current")
+            val branch = branchCandidate
+                ?.replace(Regex("[^A-Za-z0-9._-]"), "-")
+                ?.trim('-')
+                ?.ifBlank { "unknown" }
+                ?: "unknown"
+            val zone = ZoneId.of("Asia/Manila")
+            val buildInstant = System.getenv("SOURCE_DATE_EPOCH")?.toLongOrNull()
+                ?.let { Instant.ofEpochSecond(it).atZone(zone) }
+                ?: ZonedDateTime.now(zone)
+            val buildDate = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US)
+                .format(buildInstant)
+            val versionName = appVersionName
+            val versionCode = appVersionCode
+            val metadata = listOf(
+                "name: GuessTheNumber-v$versionName-$shortCommit.$branch",
+                "env: $environmentName",
+                "git_commit: $shortCommit",
+                "git_branch: $branch",
+                "version_name: $versionName",
+                "version_code: $versionCode",
+                "build_date: $buildDate"
+            ).joinToString(separator = "\n", postfix = "\n")
+            val outputFile = outputDirectory.get().file("info.txt").asFile
+            outputFile.parentFile.mkdirs()
+            outputFile.writeText(metadata, Charsets.UTF_8)
+            logger.lifecycle("Generated APK metadata at \${outputFile.relativeTo(rootProject.projectDir)}")
+        }
+    }
+
+val generateDebugBuildInfo = registerBuildInfoTask("generateDebugBuildInfo", "debug", generatedDebugBuildInfo)
+val generateReleaseBuildInfo = registerBuildInfoTask("generateReleaseBuildInfo", "release", generatedReleaseBuildInfo)
 
 
 android {
@@ -55,8 +118,8 @@ android {
         applicationId = "com.jarrlyyy.guessthenumber"
         minSdk = 26
         targetSdk = 35
-        versionCode = 21
-        versionName = "3.0.3"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -98,6 +161,8 @@ android {
     }
     // Android's SourceSet API no longer accepts Provider instances directly.
     sourceSets.getByName("main").assets.srcDir(generatedWebPlayAssets.get().asFile)
+    sourceSets.getByName("debug").assets.srcDir(generatedDebugBuildInfo.get().asFile)
+    sourceSets.getByName("release").assets.srcDir(generatedReleaseBuildInfo.get().asFile)
     sourceSets.getByName("main").res.srcDir(generatedLauncherIconRes.get().asFile)
     // Generate the web brand asset and real launcher icon before Android resource processing.
     tasks.matching { it.name == "preBuild" || it.name.endsWith("PreBuild") }
@@ -127,6 +192,13 @@ android {
 
 tasks.named("preBuild").configure {
     dependsOn(prepareWebPlayBrandAsset, prepareLauncherIcon)
+}
+
+tasks.matching { it.name == "preDebugBuild" || it.name == "mergeDebugAssets" }.configureEach {
+    dependsOn(generateDebugBuildInfo)
+}
+tasks.matching { it.name == "preReleaseBuild" || it.name == "mergeReleaseAssets" }.configureEach {
+    dependsOn(generateReleaseBuildInfo)
 }
 
 kotlin {
