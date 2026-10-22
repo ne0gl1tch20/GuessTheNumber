@@ -9,7 +9,8 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-WEB = ROOT / "app" / "src" / "main" / "assets" / "web-play"
+ASSETS = ROOT / "app" / "src" / "main" / "assets"
+WEB = ASSETS / "web-play"
 
 
 class BundleHTMLParser(HTMLParser):
@@ -127,8 +128,8 @@ def main() -> int:
     for reference in html.local_refs:
         # Fragment-only and empty references were already filtered above.
         target = (WEB / reference).resolve()
-        if not target.is_relative_to(WEB.resolve()):
-            missing.append(f"{reference} (path escapes web bundle)")
+        if not target.is_relative_to(ASSETS.resolve()):
+            missing.append(f"{reference} (path escapes app assets)")
         elif not target.is_file():
             missing.append(f"{reference} (file not found)")
     if missing:
