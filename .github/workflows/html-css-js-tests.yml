@@ -49,5 +49,8 @@ jobs:
       - name: Test Jarrlyy UI SDK and demo assets
         run: python tools/test_jarrlyy_ui_sdk.py
 
+      - name: Smoke-test Jarrlyy UI SDK runtime initialization
+        run: node tools/test_jarrlyy_ui_sdk_runtime.cjs
+
       - name: Test localized randomized guess feedback
         run: python tools/test_guess_feedback_localization.py
