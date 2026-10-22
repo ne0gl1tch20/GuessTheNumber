@@ -77,7 +77,7 @@ jobs:
           cd "$RUNNER_TEMP/gtn-debug"
           sha256sum GuessTheNumber-debug.apk > SHA256SUMS
           version_code="$(grep -E '^[[:space:]]*val appVersionCode = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *//')"
-          version_name="$(grep -E '^[[:space:]]*versionName = "' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= "//; s/"$//')"
+          version_name="$(grep -E '^[[:space:]]*val appVersionName = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *"//; s/"$//')"
           test -n "$version_code" && test -n "$version_name"
           printf '{"packageName":"com.jarrlyyy.guessthenumber.debug","versionName":"%s","versionCode":%s,"commit":"%s"}\n' "$version_name" "$version_code" "$GITHUB_SHA" > update-manifest.json
           zip -q "$GITHUB_WORKSPACE/GuessTheNumber-debug.zip" GuessTheNumber-debug.apk SHA256SUMS update-manifest.json
@@ -115,7 +115,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version_code="$(grep -E '^[[:space:]]*val appVersionCode = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *//')"
-          version_name="$(grep -E '^[[:space:]]*versionName = "' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= "//; s/"$//')"
+          version_name="$(grep -E '^[[:space:]]*val appVersionName = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *"//; s/"$//')"
           release_notes="$(printf 'Stable Debug #%s\n\nVersion: %s (%s)\nCommit: %s\n\n- Refresh the installable Stable Debug APK.\n- Keep the signed ZIP and checksum metadata together.' "$GITHUB_RUN_NUMBER" "$version_name" "$version_code" "$GITHUB_SHA")"
           gh release view debug-latest >/dev/null 2>&1 || gh release create debug-latest --target "$GITHUB_SHA" --title "GuessTheNumber Debug Latest" --notes "$release_notes"
           gh release edit debug-latest --target "$GITHUB_SHA" --title "GuessTheNumber Debug Latest" --notes "$release_notes"
