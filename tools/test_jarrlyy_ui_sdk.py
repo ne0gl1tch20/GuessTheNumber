@@ -79,6 +79,13 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         self.assertIn('min-height: 44px', css)
         self.assertIn('prefers-reduced-motion: reduce', css)
 
+    def test_player_notifications_use_sdk_toast_with_legacy_fallback(self):
+        js = (WEB / "app.js").read_text(encoding="utf-8")
+        self.assertIn("window.JarrlyyUI&&typeof window.JarrlyyUI.toast==='function'", js)
+        self.assertIn("window.JarrlyyUI.toast(message);return", js)
+        self.assertIn("el.toast.textContent=message", js)
+        self.assertIn('role="status"', (WEB / "index.html").read_text(encoding="utf-8"))
+
     def test_demo_uses_external_assets_under_csp(self):
         html = (SDK / "demo.html").read_text(encoding="utf-8")
         self.assertIn("styles/demo.css", html)
