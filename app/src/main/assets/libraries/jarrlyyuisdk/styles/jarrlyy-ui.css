@@ -125,5 +125,14 @@
   .jui-carousel { grid-template-columns: auto minmax(0,1fr) auto; gap: .35rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .jui-root *, .jui-root *::before, .jui-root *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .jui-root *, .jui-root *::before, .jui-root *::after,
+  .jui-toast, .jui-toast::before, .jui-toast::after,
+  .jui-dialog, .jui-dialog::before, .jui-dialog::after,
+  .jui-button, .jui-icon-button, .jui-switch-track, .jui-switch-track::after,
+  .jui-meter > span, .jui-dropzone, .jui-tooltip[data-tooltip]::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
 }
