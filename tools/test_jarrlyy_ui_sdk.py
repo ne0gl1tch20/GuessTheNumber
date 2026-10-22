@@ -15,6 +15,8 @@ class JarrlyyUiSdkTests(unittest.TestCase):
             "styles/jarrlyy-ui.css",
             "components/jarrlyy-ui.js",
             "icons/jarrlyy-icons.svg",
+            "styles/demo.css",
+            "components/demo.js",
             "demo.html",
         ):
             with self.subTest(path=relative):
@@ -45,6 +47,14 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         for component in ("data-jui-carousel", "data-jui-pagination", "data-jui-chart", "data-jui-timer", "data-jui-dropzone", "type=\\"datetime-local\\""):
             with self.subTest(component=component):
                 self.assertIn(component, demo)
+
+    def test_demo_uses_external_assets_under_csp(self):
+        html = (SDK / "demo.html").read_text(encoding="utf-8")
+        self.assertIn("styles/demo.css", html)
+        self.assertIn("components/demo.js", html)
+        self.assertNotIn("<style>", html)
+        self.assertNotIn("<script>", html)
+        self.assertNotRegex(html, r"\sstyle\s*=")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
