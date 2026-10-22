@@ -18,6 +18,8 @@ class JarrlyyUiSdkTests(unittest.TestCase):
             "styles/demo.css",
             "components/demo.js",
             "demo.html",
+            "styles/jarrlyy-ui-advanced.css",
+            "components/jarrlyy-ui-advanced.js",
         ):
             with self.subTest(path=relative):
                 self.assertTrue((SDK / relative).is_file(), f"Missing SDK file: {relative}")
@@ -147,9 +149,6 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         self.assertIn('"jarrlyy_ui_sdk"', nav_text)
         self.assertIn('onNavigate("jarrlyy_ui_sdk")', dev_text)
 
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
-
 
 class JarrlyyUiAdvancedTests(unittest.TestCase):
     def test_advanced_assets_are_present_and_loaded_by_both_hosts(self):
@@ -185,3 +184,7 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertNotRegex(html, r"\sstyle\s*=")
         self.assertIn("aria-label=", html)
         self.assertIn("prefers-reduced-motion", (SDK / "styles/jarrlyy-ui-advanced.css").read_text(encoding="utf-8"))
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

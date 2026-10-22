@@ -126,8 +126,6 @@
         <div class="jui-empty"><strong>Nothing here yet</strong><p>New achievements will show up here when unlocked.</p><button class="jui-button" data-jui-action="toast" data-jui-message="Your empty state can link to a real action.">Explore challenges</button></div>
         <button class="jui-button" disabled>Disabled action</button>
       </section>
-    </div>
-
       <section class="jui-card lab-section">
         <h2>Tabs, segmented controls and button groups</h2>
         <div class="jui-segmented" data-jui-segmented aria-label="Display mode">
@@ -150,6 +148,24 @@
           <section class="jui-tab-panel" id="panel-behavior" data-jui-tab-panel="behavior" hidden><strong>Keyboard and touch</strong><p class="jui-muted">Arrow keys move between tabs and segmented options.</p></section>
           <section class="jui-tab-panel" id="panel-accessibility" data-jui-tab-panel="accessibility" hidden><strong>Visible state</strong><p class="jui-muted">Selected states are exposed with ARIA and focus remains visible.</p></section>
         </div>
+      </section>
+
+
+      <section class="jui-card lab-section">
+        <h2>Toolbar, native select and radio group</h2>
+        <div class="jui-toolbar" role="toolbar" aria-label="Demo actions">
+          <div class="jui-toolbar-group"><strong>Collection</strong><span class="jui-badge jui-badge-cyan">12 items</span></div>
+          <div class="jui-toolbar-group"><button type="button" class="jui-button jui-button-quiet" data-jui-action="toast" data-jui-message="Filter preview.">Filter</button><button type="button" class="jui-button" data-jui-action="toast" data-jui-message="Sort preview.">Sort</button></div>
+        </div>
+        <label class="jui-field-label">Sort collection
+          <select class="jui-field"><option>Recently added</option><option>Highest rarity</option><option>Alphabetical</option></select>
+        </label>
+        <fieldset class="jui-card jui-radio-group">
+          <legend>Reward preference</legend>
+          <label class="jui-check-row"><input type="radio" name="rewardPreference" value="balanced" checked><span>Balanced rewards</span></label>
+          <label class="jui-check-row"><input type="radio" name="rewardPreference" value="cosmetic"><span>Cosmetic rewards</span></label>
+          <label class="jui-check-row"><input type="radio" name="rewardPreference" value="challenge"><span>Challenge rewards</span></label>
+        </fieldset>
       </section>
 
       <section class="jui-card lab-section">
@@ -209,6 +225,8 @@
         <details class="jui-accordion"><summary>Reduced motion and themes</summary><div class="jui-accordion-body">Animations respect the operating system reduced-motion preference. Use data-jui-theme="light" on the root to preview the light token set.</div></details>
       </section>
 
+    </div>
+    <button type="button" class="jui-fab" data-jui-action="toast" data-jui-message="Floating action button preview." aria-label="Preview floating action button">+</button>
     <footer class="lab-footer">Jarrlyy UI SDK · local demo data only · no game saves, rewards or network requests are changed here.</footer>
   </main>
   <script src="components/jarrlyy-ui.js"></script>

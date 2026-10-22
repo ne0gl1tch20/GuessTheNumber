@@ -4,7 +4,7 @@
   --jui-control-radius: 12px;
   --jui-shadow-overlay: 0 24px 80px rgba(0,0,0,.42);
 }
-.jui-root[data-jui-theme="light"], .jui-advanced-root[data-jui-theme="light"] {
+.jui-root[data-jui-theme="light"], .jui-advanced-root[data-jui-theme="light"], body[data-jui-theme="light"] {
   color-scheme: light;
   --jui-bg: #f5f6fc;
   --jui-surface: #fff;
@@ -110,3 +110,7 @@
     animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important;
   }
 }
+
+.jui-radio-group { display: grid; gap: .5rem; padding: .8rem; }
+.jui-radio-group legend { padding: 0 .35rem; color: var(--jui-text); font-weight: 800; }
+.jui-radio-group .jui-check-row { min-height: 36px; }

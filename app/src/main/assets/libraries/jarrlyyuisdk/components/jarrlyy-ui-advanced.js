@@ -117,7 +117,8 @@
         let overlay;
         try { overlay = $(selector); } catch (_) { overlay = null; }
         if (!overlay || overlay.tagName !== "DIALOG") return;
-        overlay.dataset.juiOpener = "true";
+        $("[data-jui-overlay-open][data-jui-last-opener]").forEach((item) => item.removeAttribute("data-jui-last-opener"));
+        button.setAttribute("data-jui-last-opener", "true");
         if (typeof overlay.showModal === "function") overlay.showModal();
         else overlay.setAttribute("open", "");
         const target = $("button:not(:disabled), [href], input:not(:disabled), [tabindex]:not([tabindex='-1'])", overlay);
