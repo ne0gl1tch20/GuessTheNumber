@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="styles/demo.css">
 </head>
 <body class="jui-root">
-  <main class="lab">
+  <main class="lab" id="component-gallery">
     <header class="lab-head">
       <div>
         <p class="jui-eyebrow">Jarrlyy UI SDK · local component lab</p>
@@ -155,7 +155,11 @@
         <h2>Toolbar, native select and radio group</h2>
         <div class="jui-toolbar" role="toolbar" aria-label="Demo actions">
           <div class="jui-toolbar-group"><strong>Collection</strong><span class="jui-badge jui-badge-cyan">12 items</span></div>
-          <div class="jui-toolbar-group"><button type="button" class="jui-button jui-button-quiet" data-jui-action="toast" data-jui-message="Filter preview.">Filter</button><button type="button" class="jui-button" data-jui-action="toast" data-jui-message="Sort preview.">Sort</button></div>
+          <div class="jui-toolbar-group"><button type="button" class="jui-button jui-button-quiet" data-jui-action="toast" data-jui-message="Filter preview.">Filter</button><button type="button" class="jui-button" data-jui-action="toast" data-jui-message="Sort preview.">Sort</button>
+          <div class="jui-split-button">
+            <button type="button" class="jui-button jui-button-primary" data-jui-action="toast" data-jui-message="Primary split action preview.">Apply</button>
+            <details><summary aria-label="More apply options">⌄</summary><div class="jui-split-menu"><button type="button" data-jui-action="toast" data-jui-message="Apply to all preview.">Apply to all</button><button type="button" data-jui-action="toast" data-jui-message="Save as preset preview.">Save as preset</button></div></details>
+          </div></div>
         </div>
         <label class="jui-field-label">Sort collection
           <select class="jui-field"><option>Recently added</option><option>Highest rarity</option><option>Alphabetical</option></select>
@@ -166,6 +170,18 @@
           <label class="jui-check-row"><input type="radio" name="rewardPreference" value="cosmetic"><span>Cosmetic rewards</span></label>
           <label class="jui-check-row"><input type="radio" name="rewardPreference" value="challenge"><span>Challenge rewards</span></label>
         </fieldset>
+      </section>
+
+
+      <section class="jui-card lab-section">
+        <h2>Grouped switches</h2>
+        <fieldset class="jui-switch-group">
+          <legend>Gameplay preferences</legend>
+          <label class="jui-switch"><span>Haptic feedback</span><input type="checkbox" checked><span class="jui-switch-track" aria-hidden="true"></span></label>
+          <label class="jui-switch"><span>Reduced motion</span><input type="checkbox"><span class="jui-switch-track" aria-hidden="true"></span></label>
+          <label class="jui-switch"><span>Compact HUD</span><input type="checkbox"><span class="jui-switch-track" aria-hidden="true"></span></label>
+        </fieldset>
+        <p class="jui-muted">The host app owns persistence and actual settings behavior.</p>
       </section>
 
       <section class="jui-card lab-section">
