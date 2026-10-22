@@ -14,9 +14,16 @@ class DesktopSharedWebAssetsTest {
     @Test
     fun sharedWebUiFontsArePackagedForOfflineAndroidAndDesktopUse() {
         val css = asset("web-play/styles.css")
-        assertTrue(css.contains("Manrope"))
-        assertTrue(css.contains("Space Grotesk"))
-        assertTrue(css.contains("JetBrains Mono"))
+        // Catch both font registration and actual application to the player-facing UI.
+        assertTrue(css.contains("src:url(\"../fonts/Manrope-VariableFont_wght.ttf\")"))
+        assertTrue(css.contains("src:url(\"../fonts/Inter-VariableFont_opsz,wght.ttf\")"))
+        assertTrue(css.contains("src:url(\"../fonts/Inter-Italic-VariableFont_opsz,wght.ttf\")"))
+        assertTrue(css.contains("src:url(\"../fonts/SpaceGrotesk-VariableFont_wght.ttf\")"))
+        assertTrue(css.contains("src:url(\"../fonts/JetBrainsMono-VariableFont_wght.ttf\")"))
+        assertTrue(css.contains("src:url(\"../fonts/JetBrainsMono-Italic-VariableFont_wght.ttf\")"))
+        assertTrue(css.contains("font-family:\"Manrope\",\"Inter\",system-ui,sans-serif"))
+        assertTrue(css.contains("h1,h2,h3,.eyebrow{font-family:\"Space Grotesk\",\"Manrope\",sans-serif}"))
+        assertTrue(css.contains("font-family:\"JetBrains Mono\",\"Manrope\",monospace"))
         val fontResources = listOf(
             "fonts/Inter-Italic-VariableFont_opsz,wght.ttf",
             "fonts/Inter-VariableFont_opsz,wght.ttf",
