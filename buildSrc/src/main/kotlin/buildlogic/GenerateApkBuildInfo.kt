@@ -54,11 +54,11 @@ abstract class GenerateApkBuildInfo : DefaultTask() {
         val branchCandidate = System.getenv("GITHUB_HEAD_REF")?.takeIf { it.isNotBlank() }
             ?: (if (githubRef.startsWith("refs/heads/")) System.getenv("GITHUB_REF_NAME") else null)
             ?: gitValue("git", "branch", "--show-current")
-        val branch = branchCandidate
-            ?.replace(Regex("[^A-Za-z0-9._-]"), "-")
-            ?.trim('-')
-            ?.ifBlank { "unknown" }
-            ?: "unknown"
+        val branch = branchCandidate?.takeIf { it.isNotBlank() } ?: "unknown"
+        val safeBranch = branch
+            .replace(Regex("[^A-Za-z0-9._-]"), "-")
+            .trim('-')
+            .ifBlank { "unknown" }
 
         val zone = ZoneId.of("Asia/Manila")
         val buildInstant = System.getenv("SOURCE_DATE_EPOCH")?.toLongOrNull()
@@ -69,7 +69,7 @@ abstract class GenerateApkBuildInfo : DefaultTask() {
         val version = versionName.get()
         val code = versionCode.get()
         val metadata = listOf(
-            "name: GuessTheNumber-v$version-$shortCommit.$branch",
+            "name: GuessTheNumber-v$version-$shortCommit.$safeBranch",
             "env: " + environmentName.get(),
             "git_commit: $shortCommit",
             "git_branch: $branch",
