@@ -174,7 +174,13 @@
           return ascending ? comparison : -comparison;
         });
         rows.forEach((row) => body.appendChild(row));
-        $$("[data-jui-sort-key]", table).forEach((other) => { if (other !== button) delete other.dataset.juiSortDirection; });
+        $$("[data-jui-sort-key]", table).forEach((other) => {
+          if (other !== button) {
+            delete other.dataset.juiSortDirection;
+            const otherHeading = other.closest("th");
+            if (otherHeading) otherHeading.removeAttribute("aria-sort");
+          }
+        });
       });
     });
   }
