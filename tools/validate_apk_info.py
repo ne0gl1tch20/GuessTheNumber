@@ -44,11 +44,12 @@ def main() -> int:
         if values[key] != value:
             print(f"{key} mismatch: expected {value!r}, found {values[key]!r}", file=sys.stderr)
             return 1
-    if not re.fullmatch(r"[A-Za-z0-9._-]+", values["git_branch"]):
+    if not re.fullmatch(r"[A-Za-z0-9._/-]+", values["git_branch"]):
         print("git_branch contains unexpected characters", file=sys.stderr)
         return 1
+    safe_branch = re.sub(r"[^A-Za-z0-9._-]", "-", values["git_branch"]).strip("-") or "unknown"
     expected_name_prefix = f"GuessTheNumber-v{args.version_name}-{args.commit[:8]}."
-    if not values["name"].startswith(expected_name_prefix) or not values["name"].endswith("." + values["git_branch"]):
+    if not values["name"].startswith(expected_name_prefix) or not values["name"].endswith("." + safe_branch):
         print("name must include the expected app version, commit and branch", file=sys.stderr)
         return 1
     try:
