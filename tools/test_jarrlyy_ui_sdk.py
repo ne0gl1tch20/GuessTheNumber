@@ -51,8 +51,8 @@ class JarrlyyUiSdkTests(unittest.TestCase):
     def test_sdk_collection_queries_use_query_selector_all(self):
         js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
         # Regression guard: querySelector() returns one node, not a collection.
-        # Any plural initializer accidentally using $ instead of $ will fail here.
-        self.assertEqual([], re.findall(r'\$\(([^)]*)\)\.forEach', js))
+        # Any plural initializer accidentally using querySelector() instead of querySelectorAll() will fail here.
+        self.assertEqual([], re.findall(r'(?<!\$)\$\(([^)]*)\)\.forEach', js))
         for selector in (
             '[data-jui-menu-toggle]',
             '.jui-carousel[data-jui-carousel]',
@@ -65,7 +65,7 @@ class JarrlyyUiSdkTests(unittest.TestCase):
             '[data-jui-color-target]',
         ):
             with self.subTest(selector=selector):
-                self.assertIn('$("' + selector + '")', js)
+                self.assertIn('$$("' + selector + '")', js)
 
     def test_sdk_interactions_and_accessibility_regressions(self):
         js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
