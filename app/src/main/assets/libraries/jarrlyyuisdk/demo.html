@@ -6,6 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Jarrlyy UI SDK · Component Lab</title>
   <link rel="stylesheet" href="styles/jarrlyy-ui.css">
+  <link rel="stylesheet" href="styles/jarrlyy-ui-advanced.css">
   <link rel="stylesheet" href="styles/demo.css">
 </head>
 <body class="jui-root">
@@ -126,9 +127,92 @@
         <button class="jui-button" disabled>Disabled action</button>
       </section>
     </div>
+
+      <section class="jui-card lab-section">
+        <h2>Tabs, segmented controls and button groups</h2>
+        <div class="jui-segmented" data-jui-segmented aria-label="Display mode">
+          <button type="button" data-jui-segment="overview" aria-pressed="true">Overview</button>
+          <button type="button" data-jui-segment="details" aria-pressed="false">Details</button>
+          <button type="button" data-jui-segment="history" aria-pressed="false">History</button>
+        </div>
+        <div class="jui-button-group" role="group" aria-label="Text alignment">
+          <button class="jui-button jui-button-quiet" type="button" aria-label="Align left">Left</button>
+          <button class="jui-button jui-button-quiet" type="button" aria-label="Align center">Center</button>
+          <button class="jui-button jui-button-quiet" type="button" aria-label="Align right">Right</button>
+        </div>
+        <div data-jui-tabs>
+          <div class="jui-tabs" role="tablist" aria-label="Component information">
+            <button type="button" role="tab" data-jui-tab="design" aria-selected="true" aria-controls="panel-design">Design</button>
+            <button type="button" role="tab" data-jui-tab="behavior" aria-selected="false" aria-controls="panel-behavior" tabindex="-1">Behavior</button>
+            <button type="button" role="tab" data-jui-tab="accessibility" aria-selected="false" aria-controls="panel-accessibility" tabindex="-1">Accessibility</button>
+          </div>
+          <section class="jui-tab-panel" id="panel-design" data-jui-tab-panel="design"><strong>One visual language</strong><p class="jui-muted">Shared tokens, predictable spacing and deliberate contrast.</p></section>
+          <section class="jui-tab-panel" id="panel-behavior" data-jui-tab-panel="behavior" hidden><strong>Keyboard and touch</strong><p class="jui-muted">Arrow keys move between tabs and segmented options.</p></section>
+          <section class="jui-tab-panel" id="panel-accessibility" data-jui-tab-panel="accessibility" hidden><strong>Visible state</strong><p class="jui-muted">Selected states are exposed with ARIA and focus remains visible.</p></section>
+        </div>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Range selection and circular progress</h2>
+        <div class="jui-range-group" data-jui-range>
+          <div class="jui-range-values"><span>Minimum: <output data-jui-range-value="low">20</output></span><span>Maximum: <output data-jui-range-value="high">80</output></span></div>
+          <div class="jui-range-track">
+            <span class="jui-range-fill" aria-hidden="true"></span>
+            <input type="range" min="0" max="100" value="20" aria-label="Minimum value" data-jui-range-low>
+            <input type="range" min="0" max="100" value="80" aria-label="Maximum value" data-jui-range-high>
+          </div>
+        </div>
+        <div class="jui-row">
+          <div class="jui-circular-progress" data-jui-progress-demo="72" role="progressbar" aria-label="Season progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72"><span class="jui-circular-progress-value">72%</span></div>
+          <div><strong>Season progress</strong><p class="jui-muted">A compact alternative to a full-width meter.</p></div>
+        </div>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Feedback banners and loading states</h2>
+        <div class="jui-banner jui-banner-success" role="status"><span class="jui-banner-icon" aria-hidden="true">✓</span><div><strong class="jui-banner-title">Save complete</strong><p>Your local progress is safely up to date.</p></div><button type="button" class="jui-overlay-close" data-jui-banner-dismiss aria-label="Dismiss success message">×</button></div>
+        <div class="jui-banner jui-banner-danger" role="alert"><span class="jui-banner-icon" aria-hidden="true">!</span><div><strong class="jui-banner-title">Connection unavailable</strong><p>This demo is offline-first. Retry when you're ready.</p></div><button type="button" class="jui-overlay-close" data-jui-banner-dismiss aria-label="Dismiss error message">×</button></div>
+        <div class="jui-skeleton-card" aria-label="Loading profile preview">
+          <span class="jui-skeleton jui-skeleton-title" aria-hidden="true"></span><span class="jui-skeleton jui-skeleton-line" aria-hidden="true"></span><span class="jui-skeleton jui-skeleton-line-short" aria-hidden="true"></span>
+        </div>
+        <button type="button" class="jui-button jui-button-primary" data-jui-loading-demo>Preview loading button</button>
+      </section>
+
+      <section class="jui-card lab-section">
+        <h2>Drawer and bottom sheet</h2>
+        <div class="jui-row">
+          <button type="button" class="jui-button" data-jui-overlay-open="#labDrawer">Open side drawer</button>
+          <button type="button" class="jui-button jui-button-accent" data-jui-overlay-open="#labSheet">Open bottom sheet</button>
+        </div>
+        <p class="jui-muted">Native dialog semantics, Escape handling and focus restoration where supported.</p>
+      </section>
+
+      <dialog id="labDrawer" class="jui-overlay jui-drawer" aria-labelledby="labDrawerTitle">
+        <div class="jui-overlay-content">
+          <header class="jui-overlay-head"><h2 id="labDrawerTitle">Quick navigation</h2><button type="button" class="jui-overlay-close" data-jui-overlay-close aria-label="Close drawer">×</button></header>
+          <nav class="jui-stack" aria-label="Drawer links"><a href="#component-gallery">Component gallery</a><a href="#accessibility-notes">Accessibility notes</a><a href="#design-tokens">Design tokens</a></nav>
+          <p class="jui-muted">A reusable side surface for secondary navigation.</p>
+        </div>
+      </dialog>
+      <dialog id="labSheet" class="jui-overlay jui-bottom-sheet" aria-labelledby="labSheetTitle">
+        <div class="jui-overlay-content">
+          <header class="jui-overlay-head"><h2 id="labSheetTitle">Quick action</h2><button type="button" class="jui-overlay-close" data-jui-overlay-close aria-label="Close bottom sheet">×</button></header>
+          <p class="jui-muted">Bottom sheets work well for focused mobile actions without taking over the whole screen.</p>
+          <div class="jui-overlay-actions"><button type="button" class="jui-button" data-jui-overlay-close>Cancel</button><button type="button" class="jui-button jui-button-primary" data-jui-overlay-close>Done</button></div>
+        </div>
+      </dialog>
+
+      <section class="jui-card lab-section" id="accessibility-notes">
+        <h2>Accordion and accessibility notes</h2>
+        <details class="jui-accordion"><summary>Keyboard behavior</summary><div class="jui-accordion-body">Native buttons, details, inputs and dialogs preserve expected browser keyboard behavior. Tabs and segmented controls add arrow-key navigation.</div></details>
+        <details class="jui-accordion"><summary>Touch targets</summary><div class="jui-accordion-body">Primary controls aim for a minimum 44px target. Dense content may scroll horizontally instead of squeezing labels.</div></details>
+        <details class="jui-accordion"><summary>Reduced motion and themes</summary><div class="jui-accordion-body">Animations respect the operating system reduced-motion preference. Use data-jui-theme="light" on the root to preview the light token set.</div></details>
+      </section>
+
     <footer class="lab-footer">Jarrlyy UI SDK · local demo data only · no game saves, rewards or network requests are changed here.</footer>
   </main>
   <script src="components/jarrlyy-ui.js"></script>
+  <script src="components/jarrlyy-ui-advanced.js"></script>
   <script src="components/demo.js"></script>
 </body>
 </html>
