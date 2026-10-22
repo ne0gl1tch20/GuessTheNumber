@@ -79,6 +79,30 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         self.assertIn('min-height: 44px', css)
         self.assertIn('prefers-reduced-motion: reduce', css)
 
+    def test_context_menu_keyboard_navigation_handles_multiple_items(self):
+        js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
+        self.assertIn('const items = $("button:not(:disabled)", menu);', js)
+        self.assertIn('if (event.key === "Tab") { close(); return; }', js)
+        self.assertIn('current < 0 ? 0 : (current + 1) % items.length', js)
+        self.assertIn('current < 0 ? items.length - 1 : (current - 1 + items.length) % items.length', js)
+        self.assertIn('if (!menu) return;\n      button.dataset.juiMenuReady = "true";', js)
+
+    def test_timer_finishes_once_and_skips_interval_for_zero(self):
+        js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
+        self.assertIn('let ended = false;', js)
+        self.assertIn('if (!ended) {', js)
+        self.assertIn('node.dispatchEvent(new global.CustomEvent("jui:timer-end"', js)
+        self.assertIn('if (!paint()) return;\n      const timer = global.setInterval', js)
+
+    def test_reduced_motion_covers_embedded_sdk_feedback(self):
+        css = (SDK / "styles/jarrlyy-ui.css").read_text(encoding="utf-8")
+        reduced_motion = css.split('@media (prefers-reduced-motion: reduce)', 1)[1]
+        for selector in ('.jui-toast', '.jui-dialog', '.jui-button', '.jui-icon-button', '.jui-tooltip[data-tooltip]::after'):
+            with self.subTest(selector=selector):
+                self.assertIn(selector, reduced_motion)
+        self.assertIn('animation-duration: .01ms !important', reduced_motion)
+        self.assertIn('transition-duration: .01ms !important', reduced_motion)
+
     def test_player_notifications_use_sdk_toast_with_legacy_fallback(self):
         js = (WEB / "app.js").read_text(encoding="utf-8")
         self.assertIn("window.JarrlyyUI&&typeof window.JarrlyyUI.toast==='function'", js)
