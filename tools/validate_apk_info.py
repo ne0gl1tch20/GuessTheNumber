@@ -56,7 +56,7 @@ def main() -> int:
         print("build_date must use 'Tue, 12 Aug 2025 15:16:35 +0800' format", file=sys.stderr)
         return 1
     print("APK assets/info.txt: OK")
-    print(info, end="" if info.endswith("\\n") else "\\n")
+    print(info, end="" if info.endswith("\n") else "\n")
     return 0
 
 if __name__ == "__main__":
