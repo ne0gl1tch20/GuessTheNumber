@@ -35,6 +35,12 @@ jobs:
           test -s website/index.html
           test -s website/downloads.html
           test -s website/assets/site.css
+          test -s website/jarrlyyuisdk/demo.html
+          test -s website/jarrlyyuisdk/components/jarrlyy-ui.js
+          test -s website/jarrlyyuisdk/components/jarrlyy-ui-advanced.js
+          test -s website/jarrlyyuisdk/styles/jarrlyy-ui.css
+          test -s website/jarrlyyuisdk/styles/jarrlyy-ui-advanced.css
+          test -s website/jarrlyyuisdk/icons/jarrlyy-icons.svg
           grep -q 'id="main"' website/index.html
           grep -q 'id="android-list"' website/downloads.html
           grep -q 'id="windows-list"' website/downloads.html

@@ -7,14 +7,14 @@ import tempfile
 import xml.etree.ElementTree as ET
 
 WEBSITE = Path(__file__).resolve().parents[1]
-PAGES = [WEBSITE / "index.html", WEBSITE / "downloads.html"]
+PAGES = [WEBSITE / "index.html", WEBSITE / "downloads.html", WEBSITE / "jarrlyyuisdk" / "demo.html"]
 SPRITE = WEBSITE / "assets" / "icons.svg"
 REQUIRED = {"arrow-up-right", "arrow-up", "arrow-down", "chevron-up", "sparkles", "rotate-ccw", "target", "trending-up", "trophy", "house", "save", "shield-check", "smartphone", "monitor"}
 
 class Parser(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
-        self.ids, self.links, self.icons, self.scripts = [], [], [], []
+        self.ids, self.links, self.icons, self.scripts, self.external_scripts = [], [], [], [], []
         self.active_script = False
         self.script_parts = []
     def handle_starttag(self, tag, attrs):
@@ -23,8 +23,11 @@ class Parser(HTMLParser):
         if tag == "a" and attrs.get("href"): self.links.append(attrs["href"])
         if tag == "use" and attrs.get("href", "").startswith("assets/icons.svg#"):
             self.icons.append(attrs["href"].split("#", 1)[1])
-        if tag == "script" and not attrs.get("src"):
-            self.active_script, self.script_parts = True, []
+        if tag == "script":
+            if attrs.get("src"):
+                self.external_scripts.append(attrs["src"])
+            else:
+                self.active_script, self.script_parts = True, []
     def handle_data(self, data):
         if self.active_script: self.script_parts.append(data)
     def handle_endtag(self, tag):
@@ -46,7 +49,12 @@ for page in PAGES:
     for link in parser.links:
         if link.startswith("#"):
             assert link[1:] in parser.ids, f"{page.name}: broken anchor {link}"
-    assert parser.scripts, f"{page.name}: no inline script found"
+    assert parser.scripts or parser.external_scripts, f"{page.name}: no executable script found"
+    for script_src in parser.external_scripts:
+        if "://" not in script_src and not script_src.startswith("//"):
+            script_path = (page.parent / script_src).resolve()
+            assert script_path.is_file(), f"{page.name}: missing script asset {script_src}"
+            subprocess.run(["node", "--check", str(script_path)], check=True, capture_output=True, text=True)
     for number, script in enumerate(parser.scripts, 1):
         with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8", delete=False) as temp:
             temp.write(script)
