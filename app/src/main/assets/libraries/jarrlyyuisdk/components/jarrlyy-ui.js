@@ -4,7 +4,7 @@
   const doc = global.document;
   if (!doc) return;
   const $ = (selector, root = doc) => root.querySelector(selector);
-  const $ = (selector, root = doc) => Array.from(root.querySelectorAll(selector));
+  const $$ = (selector, root = doc) => Array.from(root.querySelectorAll(selector));
   let tourSequence = 0;
 
   function toast(message, duration = 2800) {
@@ -165,7 +165,7 @@
         if (event.target.closest("button")) close();
       });
       menu.addEventListener("keydown", (event) => {
-        const items = $("button:not(:disabled)", menu);
+        const items = $$("button:not(:disabled)", menu);
         if (!items.length) return;
         if (event.key === "Tab") { close(); return; }
         const current = items.indexOf(doc.activeElement);
@@ -293,7 +293,7 @@
   }
 
   function initTimers() {
-    $("[data-jui-timer]").forEach((node) => {
+    $$("[data-jui-timer]").forEach((node) => {
       if (node.dataset.juiTimerReady) return;
       node.dataset.juiTimerReady = "true";
       let remaining = Math.max(0, Number(node.dataset.juiTimer) || 0);
