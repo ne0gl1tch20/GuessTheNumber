@@ -262,5 +262,19 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn("function tour", sdk_js)
 
 
+    def test_daily_reward_popup_uses_viewport_pinned_scrollable_layout(self):
+        css = (WEB / "styles.css").read_text(encoding="utf-8")
+        # Android WebView can report a stale/tiny vh value. The Daily Rewards
+        # overlay must be pinned by top/bottom edges, and the dialog must scroll
+        # internally instead of inheriting its older overflow:hidden styling.
+        daily_overlay = css.rsplit("#dailyRewardOverlay {", 1)[1].split("}", 1)[0]
+        self.assertIn("top: max(12px, env(safe-area-inset-top));", daily_overlay)
+        self.assertIn("bottom: max(12px, env(safe-area-inset-bottom));", daily_overlay)
+        daily_dialog = css.rsplit("#dailyRewardOverlay .daily-reward-dialog {", 1)[1].split("}", 1)[0]
+        self.assertIn("max-height: 100%;", daily_dialog)
+        self.assertIn("overflow-x: hidden;", daily_dialog)
+        self.assertIn("overflow-y: auto;", daily_dialog)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
