@@ -216,9 +216,18 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         # legacy translate(-50%, -50%) must not shift them out of that grid.
         for dialog_id in ("resetEverythingDialog", "resetMovedDialog"):
             with self.subTest(dialog_id=dialog_id):
-                dialog_rules = css.split(f"#{dialog_id} .nimmy-dialog", 1)[1]
-                self.assertIn("transform: none;", dialog_rules.split("}", 1)[0])
-                self.assertIn("position: relative;", dialog_rules.split("}", 1)[0])
+                dialog_rules = css.split(f"#{dialog_id} .nimmy-dialog", 1)[1].split("}", 1)[0]
+                self.assertIn("transform: none;", dialog_rules)
+                self.assertIn("position: relative;", dialog_rules)
+                self.assertIn("display: block;", dialog_rules)
+                self.assertIn("min-height: min-content;", dialog_rules)
+
+        # The reset redirect overlay must accept input and size itself to the
+        # viewport; the old Nimmy base class has pointer-events disabled.
+        moved_overlay = css.split("#resetMovedDialog {", 1)[1].split("}", 1)[0]
+        self.assertIn("pointer-events: auto;", moved_overlay)
+        self.assertIn("place-items: center;", moved_overlay)
+        self.assertIn("overflow-y: auto;", moved_overlay)
 
 
 
