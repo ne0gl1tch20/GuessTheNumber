@@ -207,6 +207,14 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn("overflow-y: auto", css)
         self.assertIn("backdrop-filter: none;", css)
 
+        # Reset prompts are already centered by the popup-layer grid. Their
+        # legacy translate(-50%, -50%) must not shift them out of that grid.
+        for dialog_id in ("resetEverythingDialog", "resetMovedDialog"):
+            with self.subTest(dialog_id=dialog_id):
+                dialog_rules = css.split(f"#{dialog_id} .nimmy-dialog", 1)[1]
+                self.assertIn("transform: none;", dialog_rules.split("}", 1)[0])
+                self.assertIn("position: relative;", dialog_rules.split("}", 1)[0])
+
 
 
     def test_settings_toggles_use_jarrlyy_sdk_switches(self):
