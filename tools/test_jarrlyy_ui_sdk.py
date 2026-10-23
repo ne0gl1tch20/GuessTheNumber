@@ -186,5 +186,33 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn("prefers-reduced-motion", (SDK / "styles/jarrlyy-ui-advanced.css").read_text(encoding="utf-8"))
 
 
+    def test_nimmy_tutorial_is_unblurred_and_uses_a_sized_popup_box(self):
+        css = (WEB / "styles.css").read_text(encoding="utf-8")
+        nimmy_rules = css.split("/* Popup regression fix: Nimmy is a floating guide", 1)[1]
+        nimmy_rules = nimmy_rules.split("/*", 1)[0]
+        self.assertIn("#nimmyTutorial .nimmy-tutorial-backdrop", nimmy_rules)
+        self.assertIn("backdrop-filter: none !important", nimmy_rules)
+        self.assertIn("width: min(440px, calc(100vw - 24px))", nimmy_rules)
+        self.assertIn("max-height: calc(100dvh - 24px", nimmy_rules)
+        self.assertIn("overflow-y: auto", nimmy_rules)
+        self.assertIn(".nimmy-tutorial:not(#nimmyTutorial) .nimmy-dialog", nimmy_rules)
+        self.assertIn("width: min(520px, calc(100vw - 24px))", nimmy_rules)
+
+
+    def test_settings_toggles_use_jarrlyy_sdk_switches(self):
+        html = (WEB / "index.html").read_text(encoding="utf-8")
+        css = (WEB / "styles.css").read_text(encoding="utf-8")
+        self.assertIn('class="setting-row jui-switch"', html)
+        self.assertIn('class="jui-switch-track" aria-hidden="true"', html)
+        self.assertIn('#screen-settings .setting-row.jui-switch input:checked + .jui-switch-track', css)
+
+    def test_light_theme_overrides_legacy_dark_text_colors(self):
+        css = (WEB / "styles.css").read_text(encoding="utf-8")
+        self.assertIn(':root[data-theme-mode="Light"] body.jui-game-compat', css)
+        self.assertIn('color: var(--text);', css)
+        self.assertIn(':root[data-theme-mode="Light"] .setting-row small', css)
+        self.assertIn('color: var(--muted);', css)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
