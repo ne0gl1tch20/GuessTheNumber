@@ -186,17 +186,27 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn("prefers-reduced-motion", (SDK / "styles/jarrlyy-ui-advanced.css").read_text(encoding="utf-8"))
 
 
-    def test_nimmy_tutorial_is_unblurred_and_uses_a_sized_popup_box(self):
+    def test_game_dialogs_live_in_a_viewport_level_popup_layer(self):
+        html = (WEB / "index.html").read_text(encoding="utf-8")
         css = (WEB / "styles.css").read_text(encoding="utf-8")
-        nimmy_rules = css.split("/* Popup regression fix: Nimmy is a floating guide", 1)[1]
-        nimmy_rules = nimmy_rules.split("/*", 1)[0]
-        self.assertIn("#nimmyTutorial .nimmy-tutorial-backdrop", nimmy_rules)
-        self.assertIn("backdrop-filter: none !important", nimmy_rules)
-        self.assertIn("width: min(440px, calc(100vw - 24px))", nimmy_rules)
-        self.assertIn("max-height: calc(100dvh - 24px", nimmy_rules)
-        self.assertIn("overflow-y: auto", nimmy_rules)
-        self.assertIn(".nimmy-tutorial:not(#nimmyTutorial) .nimmy-dialog", nimmy_rules)
-        self.assertIn("width: min(520px, calc(100vw - 24px))", nimmy_rules)
+        main_end = html.index("</main>")
+        layer_start = html.index('<div id="popupLayer" class="popup-layer"')
+        layer_end = html.index("</div>\n  <div id="toast"', layer_start)
+        self.assertLess(main_end, layer_start)
+        self.assertLess(html.index('id="offlineRewardOverlay"', layer_start), layer_end)
+        self.assertLess(html.index('id="dailyRewardOverlay"', layer_start), layer_end)
+        self.assertLess(html.index('id="resetMovedDialog"', layer_start), layer_end)
+        self.assertLess(html.index('id="resetEverythingDialog"', layer_start), layer_end)
+        self.assertLess(html.index('id="nimmyTutorial"', layer_start), layer_end)
+        self.assertIn(".popup-layer {", css)
+        self.assertIn("position: fixed;", css)
+        self.assertIn("overflow: visible;", css)
+        self.assertIn("#nimmyTutorial .nimmy-dialog", css)
+        self.assertIn("width: min(440px, calc(100vw - 24px))", css)
+        self.assertIn("max-height: calc(100dvh - 24px", css)
+        self.assertIn("overflow-y: auto", css)
+        self.assertIn("backdrop-filter: none;", css)
+
 
 
     def test_settings_toggles_use_jarrlyy_sdk_switches(self):
@@ -223,7 +233,7 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
                 self.assertIn("max-height: calc(100dvh - 24px", css)
                 self.assertIn("overflow-wrap: anywhere", css)
                 self.assertIn("overscroll-behavior: contain", css)
-        self.assertIn("#nimmyTutorial .nimmy-dialog", app_css)
+        self.assertIn(".popup-layer .nimmy-dialog", app_css)
         self.assertIn("body > #arcadeGame.arcade-game:not([hidden])", app_css)
         self.assertIn(".jui-dialog-actions > .jui-button", sdk_css)
         self.assertIn("function makeDialog", sdk_js)
