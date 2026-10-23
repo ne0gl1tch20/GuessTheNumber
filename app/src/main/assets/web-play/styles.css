@@ -945,16 +945,25 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+/* Nimmy is positioned within its viewport-level overlay. Avoid a second
+   fixed-position containing block: Android WebView can collapse/clip this
+   nested fixed dialog while the spotlight is being repositioned. */
 #nimmyTutorial .nimmy-dialog {
-  position: fixed;
-  inset: auto;
-  left: 50%;
+  position: absolute;
+  inset: auto auto auto 50%;
   top: 12px;
+  display: block;
+  height: auto;
+  min-height: min-content;
+  max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   transform: translateX(-50%);
   width: min(440px, calc(100vw - 24px));
   max-width: calc(100vw - 24px);
   padding: clamp(16px, 4vw, 24px);
   margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   pointer-events: auto;
 }
 #resetEverythingDialog .nimmy-dialog,
