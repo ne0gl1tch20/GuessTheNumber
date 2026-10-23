@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,8 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -71,11 +68,17 @@ fun JarrlyyButton(
         onClick = onClick,
         modifier = modifier
             .heightIn(min = 44.dp)
-            .background(
-                brush = Brush.linearGradient(
-                    listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
-                ),
-                shape = shape
+            .then(
+                if (enabled) {
+                    Modifier.background(
+                        brush = Brush.linearGradient(
+                            listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
+                        ),
+                        shape = shape
+                    )
+                } else {
+                    Modifier.background(MaterialTheme.colorScheme.surfaceVariant, shape)
+                }
             ),
         enabled = enabled,
         shape = shape,
