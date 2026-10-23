@@ -298,3 +298,39 @@
   text-align: center;
   box-shadow: 0 12px 35px rgba(0,0,0,.4);
 }
+
+
+/* Standard prompt/dialog sizing for every SDK consumer. The dialog remains the
+   scroll container, preserving access to long messages and wrapped action labels. */
+.jui-dialog {
+  box-sizing: border-box;
+  width: min(520px, calc(100vw - 24px));
+  min-width: 0;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.jui-dialog > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.jui-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.jui-dialog-actions > .jui-button {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+@media (max-height: 520px) {
+  .jui-dialog { padding-block: .75rem; }
+}

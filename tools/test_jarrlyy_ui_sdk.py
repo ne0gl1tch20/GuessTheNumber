@@ -214,5 +214,21 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn('color: var(--muted);', css)
 
 
+    def test_shared_popup_sizing_standard_covers_nimmy_arcade_and_sdk_prompts(self):
+        app_css = (WEB / "styles.css").read_text(encoding="utf-8")
+        sdk_css = (SDK / "styles/jarrlyy-ui.css").read_text(encoding="utf-8")
+        sdk_js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
+        for css, label in ((app_css, "app"), (sdk_css, "sdk")):
+            with self.subTest(stylesheet=label):
+                self.assertIn("max-height: calc(100dvh - 24px", css)
+                self.assertIn("overflow-wrap: anywhere", css)
+                self.assertIn("overscroll-behavior: contain", css)
+        self.assertIn("#nimmyTutorial .nimmy-dialog", app_css)
+        self.assertIn("body > #arcadeGame.arcade-game:not([hidden])", app_css)
+        self.assertIn(".jui-dialog-actions > .jui-button", sdk_css)
+        self.assertIn("function makeDialog", sdk_js)
+        self.assertIn("function tour", sdk_js)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

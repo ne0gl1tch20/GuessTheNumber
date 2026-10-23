@@ -59,3 +59,8 @@ All user-facing text remains owned by the host app and must be localized there. 
 ## Build integration
 
 Android packages this directory under \`assets/libraries/jarrlyyuisdk/\`. The Windows shared-web host ships the same local web bundle. Keep the core and advanced CSS/JS files versioned together.
+
+
+## Popup and prompt sizing standard
+
+Use the SDK's `JarrlyyUI.dialog(title, message, options)` for standard prompts where possible. SDK dialogs use a viewport-aware maximum height and width, scroll internally when content is long, wrap long/localized text, and let action buttons wrap on narrow screens. The game host applies the same containment rules to Nimmy, reset/reward prompts and the Arcade popup so host-specific dialogs do not collapse into clipped strips. Avoid fixed heights and conflicting transforms on modal content; let the overlay center the dialog and let the dialog itself handle overflow. Short landscape screens and safe-area insets are covered by the shared CSS rules.
