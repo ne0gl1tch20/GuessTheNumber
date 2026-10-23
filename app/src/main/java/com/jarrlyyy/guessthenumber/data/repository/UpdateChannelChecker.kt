@@ -92,31 +92,45 @@ object UpdateChannelChecker {
         val versionCode = Regex("versionCode\\s*=\\s*(\\d+)").find(buildGradle)?.groupValues?.getOrNull(1)?.toLongOrNull()
             ?: return Result.Unavailable
         val currentVersionCode = BuildConfig.VERSION_CODE.toLong()
-        if (versionCode < currentVersionCode) return Result.UpToDate
-        if (versionCode == currentVersionCode && BuildConfig.GIT_COMMIT_SHA != "unknown" && targetCommit.equals(BuildConfig.GIT_COMMIT_SHA, ignoreCase = true)) {
-            return Result.UpToDate
-        }
-
         val body = release.optString("body").trim()
         val remoteBuildNumber = Regex("(?m)^Stable Debug #(\\d+)").find(body)
             ?.groupValues?.getOrNull(1)?.toLongOrNull()
         val installedCommit = BuildConfig.GIT_COMMIT_SHA
         val installedBuildNumber = BuildConfig.STABLE_DEBUG_BUILD_NUMBER.toLong()
 
-        // Commit ancestry handles already-installed builds such as #55 that were
-        // published before the build number was embedded in BuildConfig.
-        val commitOrder = if (installedCommit.matches(Regex("[a-fA-F0-9]{40}"))) {
+        if (versionCode < currentVersionCode) return Result.UpToDate
+
+        // When both build numbers are available, they are authoritative: rerunning
+        // the workflow can publish #78 from the same source commit as #77.
+        val hasComparableBuildNumbers = remoteBuildNumber != null && installedBuildNumber > 0L
+        if (!hasComparableBuildNumbers &&
+            versionCode == currentVersionCode &&
+            installedCommit != "unknown" &&
+            targetCommit.equals(installedCommit, ignoreCase = true)
+        ) {
+            return Result.UpToDate
+        }
+
+        // Commit ancestry is the fallback for older installs that predate embedded
+        // build numbers. Do not let an identical commit hide a newer numbered build.
+        val commitOrder = if (!hasComparableBuildNumbers &&
+            installedCommit.matches(Regex("[a-fA-F0-9]{40}"))
+        ) {
             runCatching {
                 getJson("https://api.github.com/repos/$REPOSITORY/compare/$targetCommit...$installedCommit")
                     .optString("status")
             }.getOrNull()
         } else null
 
-        val alreadyCurrent = when (commitOrder) {
-            "ahead", "identical" -> true // installed commit is at least as new as the release
-            "behind" -> false // the release commit is newer than the installed commit
-            else -> remoteBuildNumber != null &&
-                isStableDebugBuildCurrent(remoteBuildNumber, installedBuildNumber)
+        val alreadyCurrent = if (hasComparableBuildNumbers) {
+            isStableDebugBuildCurrent(remoteBuildNumber!!, installedBuildNumber)
+        } else {
+            when (commitOrder) {
+                "ahead", "identical" -> true // installed commit is at least as new as the release
+                "behind" -> false // the release commit is newer than the installed commit
+                else -> remoteBuildNumber != null &&
+                    isStableDebugBuildCurrent(remoteBuildNumber, installedBuildNumber)
+            }
         }
         if (alreadyCurrent) return Result.UpToDate
 
