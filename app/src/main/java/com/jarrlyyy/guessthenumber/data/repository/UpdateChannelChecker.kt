@@ -110,7 +110,7 @@ object UpdateChannelChecker {
             if (!isGithubUrl(downloadUrl) || !isGithubUrl(pageUrl)) continue
 
             val installedBuildNumber = BuildConfig.STABLE_DEBUG_BUILD_NUMBER.toLong()
-            if (installedBuildNumber > 0L && runNumber <= installedBuildNumber) {
+            if (isStableDebugBuildCurrent(runNumber, installedBuildNumber)) {
                 return Result.UpToDate
             }
 
@@ -200,14 +200,6 @@ object UpdateChannelChecker {
     }
 
 
-    internal fun shouldTreatSameCommitAsCurrent(
-        remoteBuildNumber: Long?,
-        installedBuildNumber: Long,
-        sameVersionAndCommit: Boolean
-    ): Boolean {
-        val hasComparableBuildNumbers = remoteBuildNumber != null && installedBuildNumber > 0L
-        return sameVersionAndCommit && !hasComparableBuildNumbers
-    }
 
     internal fun isStableDebugBuildCurrent(remoteBuildNumber: Long, installedBuildNumber: Long): Boolean =
         installedBuildNumber > 0L && remoteBuildNumber <= installedBuildNumber
