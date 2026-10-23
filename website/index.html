@@ -10,15 +10,18 @@
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png">
   <link rel="icon" href="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png">
+  <link rel="stylesheet" href="jarrlyyuisdk/styles/jarrlyy-ui.css">
+  <link rel="stylesheet" href="jarrlyyuisdk/styles/jarrlyy-ui-advanced.css">
   <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="assets/jarrlyy-game-adapter.css">
   <title>Guess The Number — Think fast. Build your universe.</title>
 </head>
-<body>
+<body class="jui-root">
 <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="topbar"><nav class="nav wrap" aria-label="Main navigation">
   <a class="brand" href="index.html"><img src="https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/GTN_APP_LOGO.png" alt=""><span>GUESS THE NUMBER</span></a>
-  <div class="navlinks"><a href="#try-me">Try it</a><a href="#features">The game</a><a href="#progression">Progression</a><a href="jarrlyyuisdk/demo.html">UI SDK Lab</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber">Source</a><a class="nav-cta" href="downloads.html">Downloads <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></a></div>
+  <div class="navlinks"><a href="#try-me">Try it</a><a href="#features">The game</a><a href="#progression">Progression</a><a href="jarrlyyuisdk/demo.html">UI SDK Lab</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber">Source</a><a class="nav-cta jui-button jui-button-primary" href="downloads.html">Downloads <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></a></div>
 </nav></header>
 <main id="main">
   <section class="hero wrap">
@@ -26,7 +29,7 @@
       <div class="eyebrow">A small guess. A bigger game.</div>
       <h1>One number.<br><span class="accent">A whole universe.</span></h1>
       <p class="hero-description">Start with a secret number. Build streaks, earn your way through upgrades and keep finding new goals. Guess The Number turns a tiny arcade idea into a game you can keep growing into.</p>
-      <div class="hero-actions"><a class="button primary" href="downloads.html">Find a build <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></a><a class="button quiet" href="https://github.com/ne0gl1tch20/GuessTheNumber">Explore the source</a></div>
+      <div class="hero-actions"><a class="button primary jui-button jui-button-primary" href="downloads.html">Find a build <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></a><a class="button quiet jui-button jui-button-quiet" href="https://github.com/ne0gl1tch20/GuessTheNumber">Explore the source</a></div>
       <div class="proofline"><span><b>01</b> Offline-first play</span><span><b>02</b> Progression that stacks</span><span><b>03</b> No ads or accounts</span></div>
     </div>
     <div class="hero-art" role="img" aria-label="Illustration of the Guess The Number game interface with a number, feedback and player stats">
@@ -51,45 +54,45 @@
         <p class="section-intro">A tiny playable demo right here. I picked a secret number between 1 and 100. Can you find it? This is a website mini-game, separate from your saved game progress.</p>
         <div class="try-tips"><span><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#trending-up"></use></svg> Higher / lower hints</span><span><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#target"></use></svg> Attempts counter</span><span><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#rotate-ccw"></use></svg> New round anytime</span></div>
       </div>
-      <div class="try-card" id="try-card">
+      <div class="try-card jui-card" id="try-card">
         <div class="try-card-head"><span class="try-live"><i aria-hidden="true"></i> MINI CHALLENGE</span><span class="try-round" id="try-round">ROUND 01</span></div>
         <label class="try-label" for="guess-input">What's your guess?</label>
         <form id="guess-form" class="guess-form">
-          <input id="guess-input" name="guess" type="number" min="1" max="100" inputmode="numeric" placeholder="1–100" autocomplete="off" required aria-describedby="guess-help guess-feedback">
-          <button class="button primary guess-button" type="submit">Guess <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></button>
+          <input class="jui-field" id="guess-input" name="guess" type="number" min="1" max="100" inputmode="numeric" placeholder="1–100" autocomplete="off" required aria-describedby="guess-help guess-feedback">
+          <button class="button primary jui-button jui-button-primary guess-button" type="submit">Guess <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></button>
         </form>
-        <div class="guess-range" aria-hidden="true"><span>01</span><div><i id="guess-range-fill"></i></div><span>100</span></div>
+        <div class="guess-range" aria-hidden="true"><span>01</span><div class="jui-meter"><i id="guess-range-fill"></i></div><span>100</span></div>
         <p id="guess-help" class="guess-help">Enter a whole number from 1 to 100.</p>
-        <div class="guess-feedback" id="guess-feedback" role="status" aria-live="polite">Your first guess could be the one.</div>
-        <div class="try-stats"><div><strong id="guess-count">0</strong><span>GUESSES</span></div><div><strong id="guess-best">—</strong><span>BEST THIS VISIT</span></div><div><strong id="guess-wins">0</strong><span>WINS</span></div></div>
-        <button type="button" class="try-reset" id="try-reset"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#rotate-ccw"></use></svg> Start a new round</button>
+        <div class="guess-feedback jui-card" id="guess-feedback" role="status" aria-live="polite">Your first guess could be the one.</div>
+        <div class="try-stats"><div class="jui-card"><strong id="guess-count">0</strong><span>GUESSES</span></div><div class="jui-card"><strong id="guess-best">—</strong><span>BEST THIS VISIT</span></div><div class="jui-card"><strong id="guess-wins">0</strong><span>WINS</span></div></div>
+        <button type="button" class="try-reset jui-button jui-button-quiet" id="try-reset"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#rotate-ccw"></use></svg> Start a new round</button>
       </div>
     </div>
   </section>
   <section class="section wrap reveal-section" id="features">
     <div class="section-head"><div class="eyebrow">More than a lucky guess</div><h2>The fun is in what comes next.</h2><p class="section-intro">A quick round is only the start. The game is built around making each run feel like progress, whether you have a minute or a longer session.</p></div>
     <div class="feature-grid">
-      <article class="feature"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#target"></use></svg></div><h3>Read the number</h3><p>Use higher and lower feedback to narrow the range, make smarter guesses and improve your approach over time.</p></article>
-      <article class="feature"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#trending-up"></use></svg></div><h3>Build your engine</h3><p>Earn in-game currency and invest in upgrades, multipliers and progression systems that change how your run grows.</p></article>
-      <article class="feature"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#sparkles"></use></svg></div><h3>Keep chasing goals</h3><p>Streaks, achievements, challenges and longer-term progression give you more to work toward than one correct answer.</p></article>
-      <article class="feature"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#house"></use></svg></div><h3>Explore beyond the run</h3><p>World progression and arcade-style activities expand the game beyond the core guessing loop as those parts continue to develop.</p></article>
-      <article class="feature"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#save"></use></svg></div><h3>Keep your progress</h3><p>Multiple save slots and recovery tools are part of the project, with game rules and save transactions handled by the Kotlin engine.</p></article>
-      <article class="feature"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#shield-check"></use></svg></div><h3>Play without the noise</h3><p>Designed around offline-first gameplay. No ad network, analytics tracking or account system is part of the current plan.</p></article>
+      <article class="feature jui-card"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#target"></use></svg></div><h3>Read the number</h3><p>Use higher and lower feedback to narrow the range, make smarter guesses and improve your approach over time.</p></article>
+      <article class="feature jui-card"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#trending-up"></use></svg></div><h3>Build your engine</h3><p>Earn in-game currency and invest in upgrades, multipliers and progression systems that change how your run grows.</p></article>
+      <article class="feature jui-card"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#sparkles"></use></svg></div><h3>Keep chasing goals</h3><p>Streaks, achievements, challenges and longer-term progression give you more to work toward than one correct answer.</p></article>
+      <article class="feature jui-card"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#house"></use></svg></div><h3>Explore beyond the run</h3><p>World progression and arcade-style activities expand the game beyond the core guessing loop as those parts continue to develop.</p></article>
+      <article class="feature jui-card"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#save"></use></svg></div><h3>Keep your progress</h3><p>Multiple save slots and recovery tools are part of the project, with game rules and save transactions handled by the Kotlin engine.</p></article>
+      <article class="feature jui-card"><div class="feature-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#shield-check"></use></svg></div><h3>Play without the noise</h3><p>Designed around offline-first gameplay. No ad network, analytics tracking or account system is part of the current plan.</p></article>
     </div>
   </section>
   <section class="section wrap reveal-section" id="progression">
     <div class="split">
-      <div><div class="eyebrow">Built in layers</div><h2>A game that grows with you.</h2><p class="section-intro">The core loop stays simple. Around it, the project is growing a larger progression game with upgrades, challenges and worlds to work toward. Some screens and systems are still being built, so the site keeps the current status honest.</p><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber">See development on GitHub <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></a></div>
-      <div class="progress-panel" aria-label="Project highlights and status">
-        <div class="progress-row"><div><b>Guessing and incremental upgrades</b><small>The core game loop and economy</small></div><span class="status-tag">CORE</span></div>
-        <div class="progress-row"><div><b>Challenges and achievements</b><small>Extra goals between runs</small></div><span class="status-tag">IN GAME</span></div>
-        <div class="progress-row"><div><b>Worlds, bosses and deeper progression</b><small>Broader game systems are still evolving</small></div><span class="status-tag building">GROWING</span></div>
-        <div class="progress-row"><div><b>Shared Android and Windows experience</b><small>Cross-platform UI parity is a work in progress</small></div><span class="status-tag building">IN DEV</span></div>
+      <div><div class="eyebrow">Built in layers</div><h2>A game that grows with you.</h2><p class="section-intro">The core loop stays simple. Around it, the project is growing a larger progression game with upgrades, challenges and worlds to work toward. Some screens and systems are still being built, so the site keeps the current status honest.</p><a class="button jui-button" href="https://github.com/ne0gl1tch20/GuessTheNumber">See development on GitHub <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></a></div>
+      <div class="progress-panel jui-card" aria-label="Project highlights and status">
+        <div class="progress-row"><div><b>Guessing and incremental upgrades</b><small>The core game loop and economy</small></div><span class="status-tag jui-badge jui-badge-success">CORE</span></div>
+        <div class="progress-row"><div><b>Challenges and achievements</b><small>Extra goals between runs</small></div><span class="status-tag jui-badge jui-badge-success">IN GAME</span></div>
+        <div class="progress-row"><div><b>Worlds, bosses and deeper progression</b><small>Broader game systems are still evolving</small></div><span class="status-tag building jui-badge jui-badge-purple">GROWING</span></div>
+        <div class="progress-row"><div><b>Shared Android and Windows experience</b><small>Cross-platform UI parity is a work in progress</small></div><span class="status-tag building jui-badge jui-badge-purple">IN DEV</span></div>
       </div>
     </div>
   </section>
   <section class="section wrap reveal-section">
-    <div class="callout"><div><div class="eyebrow">Come take a look</div><h2>Ready to make a guess?</h2><p>Check the download page for builds that are actually published, or follow the source to see what is being worked on.</p></div><div class="callout-actions"><a class="button primary" href="downloads.html">Browse builds <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></a><a class="button" href="https://github.com/ne0gl1tch20/GuessTheNumber">GitHub <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></a></div></div>
+    <div class="callout"><div><div class="eyebrow">Come take a look</div><h2>Ready to make a guess?</h2><p>Check the download page for builds that are actually published, or follow the source to see what is being worked on.</p></div><div class="callout-actions"><a class="button primary jui-button-primary jui-button" href="downloads.html">Browse builds <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></a><a class="button jui-button" href="https://github.com/ne0gl1tch20/GuessTheNumber">GitHub <svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#arrow-up-right"></use></svg></a></div></div>
   </section>
 </main>
   <footer class="footer"><div class="wrap footer-row"><span>© Guess The Number · An independent game project. <span class="sdk-credit">Built with Jarrlyy UI SDK.</span></span><div class="footer-links"><a href="downloads.html">Downloads</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber">Source code</a><a href="https://github.com/ne0gl1tch20/GuessTheNumber/issues">Report a problem</a><a href="jarrlyyuisdk/demo.html">Test our component!</a></div></div></footer>
@@ -152,7 +155,7 @@
   }
   function say(message, kind) {
     feedback.textContent = message;
-    feedback.className = 'guess-feedback' + (kind ? ' ' + kind : '');
+    feedback.className = 'guess-feedback jui-card' + (kind ? ' ' + kind : '');
   }
   form.addEventListener('submit', event => {
     event.preventDefault();
@@ -195,5 +198,7 @@
   updateStats();
 })();
 </script>
+<script src="jarrlyyuisdk/components/jarrlyy-ui.js" defer></script>
+<script src="jarrlyyuisdk/components/jarrlyy-ui-advanced.js" defer></script>
 </body>
 </html>
