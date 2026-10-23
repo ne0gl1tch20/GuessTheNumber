@@ -26,7 +26,7 @@ object UpdateChannelChecker {
         data class Failed(val diagnostics: String) : Result
     }
 
-    private data class StableDebugRelease(
+    internal data class StableDebugRelease(
         val runNumber: Long,
         val versionName: String,
         val versionCode: Long,
