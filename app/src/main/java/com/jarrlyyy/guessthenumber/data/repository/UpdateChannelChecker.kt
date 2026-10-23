@@ -100,7 +100,19 @@ object UpdateChannelChecker {
         val metadata = parseStableDebugReleaseMetadata(release.optString("body"))
             ?: return Result.Unavailable
         val installedBuildNumber = BuildConfig.STABLE_DEBUG_BUILD_NUMBER.toLong()
-        if (isStableDebugBuildCurrent(metadata.runNumber, installedBuildNumber)) {
+        // Version metadata must win over the run-number shortcut. The public release tag is
+        // intentionally reused, so a replacement APK can have newer version metadata even
+        // when release-note/build-number metadata is stale.
+        if (
+            isStableDebugReleaseCurrent(
+                remoteVersionName = metadata.versionName,
+                remoteVersionCode = metadata.versionCode,
+                remoteBuildNumber = metadata.runNumber,
+                installedVersionName = BuildConfig.VERSION_NAME,
+                installedVersionCode = BuildConfig.VERSION_CODE.toLong(),
+                installedBuildNumber = installedBuildNumber
+            )
+        ) {
             return Result.UpToDate
         }
         if (installedBuildNumber <= 0L &&
@@ -109,7 +121,6 @@ object UpdateChannelChecker {
         ) {
             return Result.UpToDate
         }
-        if (metadata.versionCode < BuildConfig.VERSION_CODE.toLong()) return Result.UpToDate
 
         val installedCommit = BuildConfig.GIT_COMMIT_SHA
         val commitOrder = if (installedBuildNumber <= 0L &&
@@ -191,6 +202,29 @@ object UpdateChannelChecker {
 
     internal fun isStableDebugBuildCurrent(remoteBuildNumber: Long, installedBuildNumber: Long): Boolean =
         installedBuildNumber > 0L && remoteBuildNumber <= installedBuildNumber
+
+    /**
+     * Compare installable version metadata before build numbers because debug-latest is a
+     * replaceable release. A stale run number must never hide a newer versionCode or
+     * versionName. Run numbers are the tie-breaker only when the installed version matches.
+     */
+    internal fun isStableDebugReleaseCurrent(
+        remoteVersionName: String,
+        remoteVersionCode: Long,
+        remoteBuildNumber: Long,
+        installedVersionName: String,
+        installedVersionCode: Long,
+        installedBuildNumber: Long
+    ): Boolean {
+        if (remoteVersionCode < installedVersionCode) return true
+        if (remoteVersionCode > installedVersionCode) return false
+
+        val versionOrder = compareVersions(remoteVersionName, installedVersionName)
+        if (versionOrder < 0) return true
+        if (versionOrder > 0) return false
+
+        return isStableDebugBuildCurrent(remoteBuildNumber, installedBuildNumber)
+    }
 
     internal fun compareVersions(left: String, right: String): Int {
         fun parts(value: String): List<Int> = Regex("\\d+").findAll(value).take(4).map { it.value.toIntOrNull() ?: 0 }.toList()

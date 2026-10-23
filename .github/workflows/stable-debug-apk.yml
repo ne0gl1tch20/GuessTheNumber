@@ -117,9 +117,14 @@ jobs:
           version_code="$(grep -E '^[[:space:]]*val appVersionCode = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *//')"
           version_name="$(grep -E '^[[:space:]]*val appVersionName = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *"//; s/"$//')"
           release_notes="$(printf 'Stable Debug #%s\n\nVersion: %s (%s)\nCommit: %s\n\n- Refresh the installable Stable Debug APK.\n- Keep the signed ZIP and checksum metadata together.' "$GITHUB_RUN_NUMBER" "$version_name" "$version_code" "$GITHUB_SHA")"
-          gh release view debug-latest >/dev/null 2>&1 || gh release create debug-latest --target "$GITHUB_SHA" --title "GuessTheNumber Debug Latest" --notes "$release_notes"
-          gh release edit debug-latest --target "$GITHUB_SHA" --title "GuessTheNumber Debug Latest" --notes "$release_notes"
+          gh release view debug-latest >/dev/null 2>&1 || gh release create debug-latest --target "$GITHUB_SHA" --title "GuessTheNumber Debug Latest" --notes "Publishing Stable Debug update..."
+          # Publish the archive first and write its matching version/commit metadata last.
+          # This keeps release notes from advertising a new build before its ZIP is uploaded.
           gh release upload debug-latest GuessTheNumber-debug.zip --clobber
+          gh release edit debug-latest --target "$GITHUB_SHA" --title "GuessTheNumber Debug Latest" --notes "$release_notes"
+          # Fail the workflow if the public release metadata did not land as expected.
+          published_notes="$(gh release view debug-latest --json body --jq .body)"
+          test "$published_notes" = "$release_notes"
       - name: Remove signing material
         if: always()
         run: rm -rf "$RUNNER_TEMP/gtn-signing" "$RUNNER_TEMP/gtn-debug"
