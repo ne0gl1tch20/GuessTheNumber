@@ -698,3 +698,53 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 :root[data-theme-mode="Light"] .jui-dialog {
   color: var(--text);
 }
+
+
+/* Popup clipping fix: separate tutorial positioning from centered confirmation dialogs. */
+#nimmyTutorial:not([hidden]) .nimmy-dialog {
+  /* app.js computes top as the dialog's top edge, not its vertical center. */
+  transform: translateX(-50%);
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Reset dialogs live in a full-screen grid, so let that grid center their boxes.
+   Keeping them fixed-positioned made them fight the overlay's layout and could
+   leave only a thin clipped strip visible on some WebViews. */
+#resetEverythingDialog .nimmy-dialog,
+#resetMovedDialog .nimmy-dialog {
+  position: relative;
+  inset: auto;
+  transform: none;
+  width: min(520px, calc(100vw - 24px));
+  max-width: 100%;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+  min-height: 0;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Reward content can grow with localization and must scroll instead of spilling
+   beyond the viewport or being clipped at the top/bottom. */
+.reward-overlay {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.reward-dialog {
+  min-width: 0;
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
