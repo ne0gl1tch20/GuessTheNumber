@@ -1,0 +1,172 @@
+/* Host integration: Guess The Number uses Jarrlyy UI SDK components while keeping its layout and game logic. */
+.jui-root {
+  --jui-bg: var(--bg);
+  --jui-surface: var(--surface);
+  --jui-raised: var(--surface-2);
+  --jui-border: var(--line);
+  --jui-text: var(--ink);
+  --jui-muted: var(--muted);
+  --jui-purple: var(--violet);
+  --jui-cyan: var(--mint);
+  --jui-success: var(--mint);
+  --jui-font-family: var(--body);
+  --jui-radius: var(--radius);
+}
+
+.jui-root .button.jui-button,
+.jui-root .nav-cta.jui-button {
+  min-height: 44px;
+  padding: .65rem 1rem;
+  border-radius: 12px;
+  font-family: var(--jui-font-family);
+  font-weight: 750;
+  transition: transform var(--jui-motion), border-color var(--jui-motion), background var(--jui-motion), box-shadow var(--jui-motion);
+}
+
+.jui-root .button.jui-button-primary,
+.jui-root .nav-cta.jui-button-primary {
+  border-color: transparent;
+  background: linear-gradient(115deg, var(--jui-purple), #6f8cff);
+  color: #fff;
+}
+
+.jui-root .button.jui-button-primary:hover,
+.jui-root .nav-cta.jui-button-primary:hover {
+  border-color: transparent;
+  background: linear-gradient(115deg, #b4a1ff, #86a0ff);
+  box-shadow: 0 12px 32px rgba(111, 140, 255, .2);
+}
+
+.jui-root .button.jui-button-quiet {
+  border-color: var(--jui-border);
+  background: transparent;
+  color: var(--jui-text);
+}
+
+.jui-root .button.jui-button-quiet:hover {
+  background: rgba(155, 124, 255, .1);
+}
+
+.jui-root .try-card.jui-card {
+  border-color: rgba(169, 164, 255, .3);
+  border-radius: 24px;
+  background: radial-gradient(ellipse at 100% 0%, rgba(169,164,255,.12), transparent 48%), var(--jui-surface);
+  box-shadow: 0 24px 70px rgba(0,0,0,.22);
+}
+
+.jui-root .try-card.jui-card.won {
+  border-color: var(--jui-success);
+  box-shadow: 0 0 0 1px rgba(165,245,213,.12), 0 24px 70px rgba(165,245,213,.06);
+}
+
+.jui-root .feature.jui-card {
+  border-color: var(--jui-border);
+  border-radius: var(--jui-radius);
+  background: linear-gradient(145deg, rgba(155,124,255,.07), transparent 58%), var(--jui-surface);
+}
+
+.jui-root .progress-panel.jui-card {
+  border-color: var(--jui-border);
+  border-radius: var(--jui-radius);
+  background: radial-gradient(ellipse at 100% 0%, rgba(169,164,255,.1), transparent 50%), var(--jui-surface);
+}
+
+.jui-root .guess-form .jui-field {
+  min-height: 54px;
+  border-color: var(--jui-border);
+  border-radius: 12px;
+  background: rgba(6,8,18,.55);
+  color: var(--jui-text);
+  font-family: var(--mono);
+}
+
+.jui-root .guess-form .jui-field:focus {
+  border-color: var(--jui-cyan);
+  box-shadow: var(--jui-focus);
+}
+
+.jui-root .guess-range > .jui-meter {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(180,190,230,.12);
+}
+
+.jui-root .guess-range > .jui-meter > i {
+  background: linear-gradient(90deg, var(--jui-purple), var(--jui-cyan));
+}
+
+.jui-root .guess-feedback.jui-card {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  margin-top: 15px;
+  padding: 13px 15px;
+  border-color: var(--jui-border);
+  border-radius: 14px;
+  background: var(--jui-raised);
+  color: var(--jui-muted);
+}
+
+.jui-root .guess-feedback.jui-card.hint {
+  border-color: rgba(165,245,213,.25);
+  background: rgba(165,245,213,.06);
+  color: var(--jui-success);
+}
+
+.jui-root .guess-feedback.jui-card.warning {
+  border-color: rgba(255,217,139,.3);
+  color: #ffd98b;
+}
+
+.jui-root .guess-feedback.jui-card.success {
+  border-color: rgba(165,245,213,.4);
+  background: rgba(165,245,213,.08);
+  color: var(--jui-success);
+}
+
+.jui-root .try-stats > .jui-card {
+  padding: 12px 6px;
+  border-color: var(--jui-border);
+  border-radius: 13px;
+  background: var(--jui-surface);
+}
+
+.jui-root .status-tag.jui-badge {
+  flex: 0 0 auto;
+  padding: .3rem .6rem;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: .66rem;
+  font-weight: 750;
+}
+
+.jui-root .status-tag.building.jui-badge {
+  border-color: rgba(255,217,139,.25);
+  background: rgba(255,217,139,.08);
+  color: #ffd98b;
+}
+
+.jui-root .try-reset.jui-button {
+  display: block;
+  min-height: 40px;
+  margin: 18px auto 0;
+  padding: .55rem .8rem;
+  border-color: transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--jui-muted);
+  font: 700 .83rem var(--body);
+}
+
+.jui-root .try-reset.jui-button:hover {
+  background: rgba(165,245,213,.08);
+  color: var(--jui-cyan);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jui-root .button.jui-button,
+  .jui-root .try-card.jui-card,
+  .jui-root .feature.jui-card {
+    transition-duration: .01ms !important;
+  }
+}
