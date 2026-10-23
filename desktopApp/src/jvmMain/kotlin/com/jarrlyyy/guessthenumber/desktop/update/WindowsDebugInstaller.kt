@@ -7,22 +7,24 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.zip.ZipInputStream
 
 internal class WindowsDebugInstaller {
     fun downloadVerifyAndLaunch(update: WindowsDebugUpdate) {
-        require(update.downloadUrl.startsWith(ARTIFACT_DOWNLOAD_PREFIX) && update.downloadUrl.endsWith("/zip")) {
-            "The debug artifact URL is not from the expected GitHub Actions endpoint."
+        require(update.downloadUrl.startsWith(RELEASE_DOWNLOAD_PREFIX) &&
+            update.downloadUrl.endsWith("/$EXPECTED_ARCHIVE_NAME") &&
+            update.manifestUrl.startsWith(RELEASE_DOWNLOAD_PREFIX) &&
+            update.manifestUrl.endsWith("/$EXPECTED_MANIFEST_NAME")
+        ) {
+            "The Windows Debug URLs are not from the expected public release."
         }
 
         val temporaryDirectory = Files.createTempDirectory("gtn-windows-debug-update-")
         try {
-            val artifactPath = temporaryDirectory.resolve("windows-actions-artifact.zip")
-            val archivePath = temporaryDirectory.resolve("GuessTheNumber-Windows-Desktop.zip")
-            val manifestPath = temporaryDirectory.resolve("windows-debug-manifest.json")
-            downloadArchive(update.downloadUrl, artifactPath)
-            extractArtifactFiles(artifactPath, archivePath, manifestPath)
-            verifyManifest(manifestPath, update)
+            val archivePath = temporaryDirectory.resolve(EXPECTED_ARCHIVE_NAME)
+            val manifestPath = temporaryDirectory.resolve(EXPECTED_MANIFEST_NAME)
+            downloadFile(update.downloadUrl, archivePath, MAX_ARCHIVE_BYTES)
+            downloadFile(update.manifestUrl, manifestPath, MAX_MANIFEST_BYTES)
+            verifyManifest(manifestPath, archivePath, update)
             val msiPath = temporaryDirectory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
             WindowsDebugArchiveValidator.extractExpectedMsi(archivePath, msiPath)
             launchInstallerAndCleanup(msiPath, temporaryDirectory)
@@ -32,99 +34,42 @@ internal class WindowsDebugInstaller {
         }
     }
 
-    private fun verifyManifest(manifestPath: Path, update: WindowsDebugUpdate) {
+    private fun verifyManifest(manifestPath: Path, archivePath: Path, update: WindowsDebugUpdate) {
         val manifest = Json.parseToJsonElement(Files.readString(manifestPath)).jsonObject
         require(manifest["channel"]?.jsonPrimitive?.content == "windows-debug") {
-            "The downloaded artifact is not a Windows Debug build."
+            "The downloaded release asset is not a Windows Debug build."
         }
         require(manifest["version"]?.jsonPrimitive?.content == update.version) {
-            "The Windows Debug artifact version does not match the update check."
+            "The Windows Debug package version does not match the update check."
         }
         require(manifest["runNumber"]?.jsonPrimitive?.content == update.runNumber.toString()) {
-            "The Windows Debug artifact run number does not match."
+            "The Windows Debug run number does not match."
         }
         require(manifest["runAttempt"]?.jsonPrimitive?.content == update.runAttempt.toString()) {
-            "The Windows Debug artifact attempt does not match."
+            "The Windows Debug run attempt does not match."
         }
         require(manifest["tag"]?.jsonPrimitive?.content == update.tagName) {
-            "The Windows Debug artifact tag does not match."
+            "The Windows Debug build tag does not match."
         }
         require(manifest["assetName"]?.jsonPrimitive?.content == EXPECTED_ARCHIVE_NAME) {
-            "The Windows Debug artifact names an unexpected installer archive."
+            "The Windows Debug manifest names an unexpected installer archive."
         }
         val checksum = manifest["sha256"]?.jsonPrimitive?.content
             ?: throw IllegalStateException("The Windows Debug manifest has no SHA-256 checksum.")
-        val archivePath = manifestPath.parent.resolve(EXPECTED_ARCHIVE_NAME)
         WindowsDebugArchiveValidator.verifySha256(archivePath, checksum)
     }
 
-    private fun extractArtifactFiles(artifact: Path, archiveDestination: Path, manifestDestination: Path) {
-        var archiveFound = false
-        var manifestFound = false
-        ZipInputStream(Files.newInputStream(artifact)).use { zip ->
-            while (true) {
-                val entry = zip.nextEntry ?: break
-                val name = entry.name.replace('\\', '/')
-                if (name.startsWith("/") || Regex("^[A-Za-z]:").containsMatchIn(name) ||
-                    name.split('/').any { it == ".." }
-                ) {
-                    throw IllegalStateException("The GitHub Actions artifact contains an unsafe path.")
-                }
-                if (entry.isDirectory) {
-                    zip.closeEntry()
-                    continue
-                }
-                val destination = when (name) {
-                    EXPECTED_ARCHIVE_NAME -> {
-                        if (archiveFound) throw IllegalStateException("The artifact contains duplicate installer archives.")
-                        archiveFound = true
-                        archiveDestination
-                    }
-                    EXPECTED_MANIFEST_NAME -> {
-                        if (manifestFound) throw IllegalStateException("The artifact contains duplicate manifests.")
-                        manifestFound = true
-                        manifestDestination
-                    }
-                    else -> throw IllegalStateException("The GitHub Actions artifact contains an unexpected file.")
-                }
-                val limit = if (name == EXPECTED_MANIFEST_NAME) MAX_MANIFEST_BYTES else MAX_ARCHIVE_BYTES
-                Files.newOutputStream(destination).use { output ->
-                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-                    var total = 0L
-                    while (true) {
-                        val count = zip.read(buffer)
-                        if (count < 0) break
-                        total += count
-                        if (total > limit) {
-                            throw IllegalStateException("A file in the GitHub Actions artifact exceeded the size limit.")
-                        }
-                        output.write(buffer, 0, count)
-                    }
-                }
-                zip.closeEntry()
-            }
-        }
-        if (!archiveFound || !manifestFound ||
-            !Files.isRegularFile(archiveDestination) || Files.size(archiveDestination) == 0L ||
-            !Files.isRegularFile(manifestDestination) || Files.size(manifestDestination) == 0L
-        ) {
-            throw IllegalStateException("The GitHub Actions artifact is missing the installer or manifest.")
-        }
-    }
-
-    private fun downloadArchive(downloadUrl: String, destination: Path) {
-        val connection = URL(downloadUrl).openConnection() as HttpURLConnection
+    private fun downloadFile(address: String, destination: Path, maximumBytes: Long) {
+        val connection = URL(address).openConnection() as HttpURLConnection
         connection.connectTimeout = 10_000
         connection.readTimeout = 30_000
-        connection.setRequestProperty("Accept", "application/vnd.github+json")
         connection.setRequestProperty("User-Agent", "GuessTheNumber-Windows-Debug-Updater")
         try {
             if (connection.responseCode !in 200..299) {
-                throw IllegalStateException("Installer download failed with HTTP ${connection.responseCode}.")
+                throw IllegalStateException("Public release download failed with HTTP ${connection.responseCode}.")
             }
-            val declaredSize = connection.contentLengthLong
-            if (declaredSize > MAX_ARTIFACT_BYTES) {
-                throw IllegalStateException("The GitHub Actions artifact is too large.")
+            if (connection.contentLengthLong > maximumBytes) {
+                throw IllegalStateException("A Windows Debug release asset exceeded the size limit.")
             }
             connection.inputStream.use { input ->
                 Files.newOutputStream(destination).use { output ->
@@ -134,8 +79,8 @@ internal class WindowsDebugInstaller {
                         val count = input.read(buffer)
                         if (count < 0) break
                         total += count
-                        if (total > MAX_ARTIFACT_BYTES) {
-                            throw IllegalStateException("The GitHub Actions artifact exceeded the size limit.")
+                        if (total > maximumBytes) {
+                            throw IllegalStateException("A Windows Debug release asset exceeded the size limit.")
                         }
                         output.write(buffer, 0, count)
                     }
@@ -165,13 +110,8 @@ internal class WindowsDebugInstaller {
         Files.writeString(scriptPath, script)
         try {
             ProcessBuilder(
-                "powershell.exe",
-                "-NoProfile",
-                "-NonInteractive",
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                scriptPath.toAbsolutePath().toString()
+                "powershell.exe", "-NoProfile", "-NonInteractive",
+                "-ExecutionPolicy", "Bypass", "-File", scriptPath.toAbsolutePath().toString()
             ).start()
         } catch (error: Exception) {
             deleteTree(temporaryDirectory)
@@ -191,12 +131,11 @@ internal class WindowsDebugInstaller {
     }
 
     private companion object {
-        const val ARTIFACT_DOWNLOAD_PREFIX =
-            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/"
+        const val RELEASE_DOWNLOAD_PREFIX =
+            "https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/debug-latest/"
         const val EXPECTED_ARCHIVE_NAME = "GuessTheNumber-Windows-Desktop.zip"
         const val EXPECTED_MANIFEST_NAME = "windows-debug-manifest.json"
-        const val MAX_ARTIFACT_BYTES = 350L * 1024 * 1024
-        const val MAX_ARCHIVE_BYTES = 300L * 1024 * 1024
+        const val MAX_ARCHIVE_BYTES = 350L * 1024 * 1024
         const val MAX_MANIFEST_BYTES = 64L * 1024
     }
 }
