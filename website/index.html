@@ -155,7 +155,7 @@
   }
   function say(message, kind) {
     feedback.textContent = message;
-    feedback.className = 'guess-feedback' + (kind ? ' ' + kind : '');
+    feedback.className = 'guess-feedback jui-card' + (kind ? ' ' + kind : '');
   }
   form.addEventListener('submit', event => {
     event.preventDefault();
