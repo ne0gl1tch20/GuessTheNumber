@@ -19,6 +19,77 @@ class UpdateChannelCheckerTest {
     }
 
     @Test
+    fun newerVersionCodeIsAvailableEvenWhenReleaseRunNumberLooksOld() {
+        assertEquals(
+            false,
+            UpdateChannelChecker.isStableDebugReleaseCurrent(
+                remoteVersionName = "3.0.4",
+                remoteVersionCode = 22L,
+                remoteBuildNumber = 87L,
+                installedVersionName = "3.0.3",
+                installedVersionCode = 21L,
+                installedBuildNumber = 88L
+            )
+        )
+    }
+
+    @Test
+    fun newerVersionNameIsAvailableWhenVersionCodeIsReusedAndRunNumberIsStale() {
+        assertEquals(
+            false,
+            UpdateChannelChecker.isStableDebugReleaseCurrent(
+                remoteVersionName = "3.0.4",
+                remoteVersionCode = 21L,
+                remoteBuildNumber = 87L,
+                installedVersionName = "3.0.3",
+                installedVersionCode = 21L,
+                installedBuildNumber = 88L
+            )
+        )
+    }
+
+    @Test
+    fun matchingVersionUsesBuildNumberAsTieBreaker() {
+        assertEquals(
+            true,
+            UpdateChannelChecker.isStableDebugReleaseCurrent(
+                remoteVersionName = "3.0.3",
+                remoteVersionCode = 21L,
+                remoteBuildNumber = 87L,
+                installedVersionName = "3.0.3",
+                installedVersionCode = 21L,
+                installedBuildNumber = 88L
+            )
+        )
+        assertEquals(
+            false,
+            UpdateChannelChecker.isStableDebugReleaseCurrent(
+                remoteVersionName = "3.0.3",
+                remoteVersionCode = 21L,
+                remoteBuildNumber = 89L,
+                installedVersionName = "3.0.3",
+                installedVersionCode = 21L,
+                installedBuildNumber = 88L
+            )
+        )
+    }
+
+    @Test
+    fun olderVersionCodeIsNeverOfferedAsAnUpdate() {
+        assertEquals(
+            true,
+            UpdateChannelChecker.isStableDebugReleaseCurrent(
+                remoteVersionName = "3.9.0",
+                remoteVersionCode = 20L,
+                remoteBuildNumber = 999L,
+                installedVersionName = "3.0.3",
+                installedVersionCode = 21L,
+                installedBuildNumber = 1L
+            )
+        )
+    }
+
+    @Test
     fun parsesStableDebugMetadataFromPublicReleaseNotes() {
         val metadata = UpdateChannelChecker.parseStableDebugReleaseMetadata(
             """
