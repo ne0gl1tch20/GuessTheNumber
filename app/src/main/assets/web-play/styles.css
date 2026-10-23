@@ -366,3 +366,44 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 
 /* Clear notice for the relocated global reset action. */
 .reset-moved-dialog{max-width:480px}.reset-moved-dialog .nimmy-actions{justify-content:flex-end;flex-wrap:wrap}.reset-moved-dialog #resetMovedOpenSlots{min-width:132px}
+
+ 
+/* Targeted post-SDK fixes: compact bottom navigation and a stable Nimmy popup. */
+@media (max-width: 520px) {
+  .app { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+  .screen-nav {
+    bottom: calc(6px + env(safe-area-inset-bottom));
+    gap: 3px;
+    padding: 4px;
+    border-radius: 16px;
+  }
+  .screen-nav button {
+    min-height: 46px;
+    gap: 3px;
+    padding: 4px 2px;
+    border-radius: 12px;
+  }
+  .screen-nav button .nav-icon { width: 20px; height: 20px; }
+  .screen-nav button b { line-height: 1.1; }
+  .screen-nav #tab-play { min-height: 52px; transform: translateY(-3px); }
+}
+.nimmy-dialog {
+  display: block;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 0;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  align-content: initial;
+}
+.nimmy-guide-row { min-height: 46px; }
+.nimmy-guide-copy { flex: 1 1 auto; }
+.nimmy-dialog h2,
+.nimmy-dialog p { overflow-wrap: anywhere; }
+@media (max-width: 360px) {
+  .nimmy-dialog { padding: 15px; width: calc(100vw - 24px); }
+  .nimmy-actions { gap: 6px; }
+  .nimmy-actions button { min-width: 0; }
+}
