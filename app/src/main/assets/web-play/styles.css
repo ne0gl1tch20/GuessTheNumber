@@ -700,126 +700,6 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 }
 
 
-/* Popup clipping fix: separate tutorial positioning from centered confirmation dialogs. */
-#nimmyTutorial:not([hidden]) .nimmy-dialog {
-  /* app.js computes top as the dialog's top edge, not its vertical center. */
-  transform: translateX(-50%);
-  max-height: calc(100vh - 24px);
-  max-height: calc(100dvh - 24px);
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Reset dialogs live in a full-screen grid, so let that grid center their boxes.
-   Keeping them fixed-positioned made them fight the overlay's layout and could
-   leave only a thin clipped strip visible on some WebViews. */
-#resetEverythingDialog .nimmy-dialog,
-#resetMovedDialog .nimmy-dialog {
-  position: relative;
-  inset: auto;
-  transform: none;
-  width: min(520px, calc(100vw - 24px));
-  max-width: 100%;
-  max-height: calc(100vh - 24px);
-  max-height: calc(100dvh - 24px);
-  min-height: 0;
-  margin: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Reward content can grow with localization and must scroll instead of spilling
-   beyond the viewport or being clipped at the top/bottom. */
-.reward-overlay {
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-.reward-dialog {
-  min-width: 0;
-  max-height: calc(100vh - 40px);
-  max-height: calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Popup regression fix: Nimmy is a floating guide, not a blurred modal backdrop. */
-#nimmyTutorial:not([hidden]) {
-  position: fixed;
-  inset: 0;
-  display: block !important;
-  padding: 0;
-  overflow: visible;
-  background: transparent !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  pointer-events: none;
-  z-index: 2147483002;
-}
-#nimmyTutorial .nimmy-tutorial-backdrop {
-  background: transparent !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  pointer-events: none;
-}
-#nimmyTutorial .nimmy-dialog {
-  position: fixed;
-  left: 50%;
-  top: 12px;
-  transform: translateX(-50%);
-  display: block;
-  box-sizing: border-box;
-  width: min(440px, calc(100vw - 24px));
-  max-width: calc(100vw - 24px);
-  height: auto;
-  min-height: 0;
-  max-height: calc(100vh - 24px);
-  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  margin: 0;
-  padding: clamp(16px, 4vw, 24px);
-  overflow-x: hidden;
-  overflow-y: auto;
-  overflow-wrap: anywhere;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  pointer-events: auto;
-}
-.nimmy-tutorial:not(#nimmyTutorial):not([hidden]) {
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  padding: 12px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-.nimmy-tutorial:not(#nimmyTutorial) .nimmy-dialog {
-  position: relative;
-  inset: auto;
-  left: auto;
-  top: auto;
-  transform: none;
-  display: block;
-  box-sizing: border-box;
-  width: min(520px, calc(100vw - 24px));
-  max-width: 100%;
-  height: auto;
-  min-height: 0;
-  max-height: calc(100vh - 24px);
-  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  margin: auto;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overflow-wrap: anywhere;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
 /* Jarrlyy UI SDK integration: native setting checkmarks become accessible slider switches. */
 #screen-settings .setting-row.jui-switch {
   display: flex;
@@ -961,62 +841,139 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 }
 
 
-/* Shared popup sizing standard: Arcade-style prompt sizing without viewport clipping.
-   Keep the dialog itself as the scroll container so headers, prompt text and actions
-   remain reachable on short screens, in landscape, and with long localized strings. */
-:root {
-  --popup-inline-gutter: max(12px, env(safe-area-inset-left));
-  --popup-block-gutter: max(12px, env(safe-area-inset-top));
-  --popup-max-width: 520px;
+/* One viewport-level home for game-owned dialogs.
+   Keep this layer outside .app so page animation, scrolling and card effects
+   cannot become a popup's containing block or clipping ancestor. */
+.popup-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  overflow: visible;
+  pointer-events: none;
+  isolation: isolate;
 }
-#nimmyTutorial .nimmy-dialog,
-.nimmy-tutorial:not(#nimmyTutorial) .nimmy-dialog,
-#resetEverythingDialog .nimmy-dialog,
-#resetMovedDialog .nimmy-dialog,
-.reward-dialog,
-.reset-dialog,
-.confirm-dialog,
-.offline-gains-dialog,
-body > #arcadeGame.arcade-game:not([hidden]),
-.jui-dialog {
+.popup-layer > .reward-overlay,
+.popup-layer > .nimmy-tutorial {
+  position: fixed;
+  inset: 0;
   box-sizing: border-box;
+  max-width: none;
+  max-height: none;
+}
+.popup-layer > .reward-overlay {
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  background: rgba(3,5,14,.82);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.popup-layer > .reward-overlay[hidden] {
+  display: none !important;
+}
+.reward-dialog {
+  box-sizing: border-box;
+  width: min(390px, 100%);
   min-width: 0;
-  max-width: min(var(--popup-max-width), calc(100vw - 24px));
+  max-width: 100%;
   max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin-block: auto;
   overflow-x: hidden;
   overflow-y: auto;
   overflow-wrap: anywhere;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
-#nimmyTutorial .nimmy-dialog {
-  width: min(440px, calc(100vw - 24px));
-  height: auto;
-  min-height: 0;
-  margin-inline: auto;
-}
-.nimmy-tutorial:not(#nimmyTutorial) .nimmy-dialog,
-#resetEverythingDialog .nimmy-dialog,
-#resetMovedDialog .nimmy-dialog {
-  width: min(520px, calc(100vw - 24px));
-  height: auto;
-  min-height: 0;
-}
-.reward-overlay {
+.popup-layer > .nimmy-tutorial:not([hidden]) {
+  z-index: 20;
   display: grid;
   place-items: center;
   padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
   overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  background: rgba(6,8,24,.48);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
-.reward-dialog {
-  width: min(390px, 100%);
-  margin-block: auto;
+.popup-layer > .nimmy-tutorial[hidden] {
+  display: none !important;
+}
+.popup-layer .nimmy-tutorial-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.popup-layer .nimmy-dialog {
+  position: relative;
+  inset: auto;
+  left: auto;
+  top: auto;
+  transform: none;
+  box-sizing: border-box;
+  width: min(520px, 100%);
+  min-width: 0;
+  max-width: 100%;
+  max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+#nimmyTutorial:not([hidden]) {
+  z-index: 30;
+  display: block;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+#nimmyTutorial .nimmy-tutorial-backdrop {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+#nimmyTutorial .nimmy-dialog {
+  position: fixed;
+  inset: auto;
+  left: 50%;
+  top: 12px;
+  transform: translateX(-50%);
+  width: min(440px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  padding: clamp(16px, 4vw, 24px);
+  margin: 0;
+  pointer-events: auto;
+}
+#resetEverythingDialog .nimmy-dialog,
+#resetMovedDialog .nimmy-dialog {
+  width: min(520px, 100%);
 }
 .jui-dialog {
+  box-sizing: border-box;
   width: min(520px, calc(100vw - 24px));
+  min-width: 0;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 .jui-dialog > *,
 .nimmy-dialog > *,
@@ -1030,7 +987,7 @@ body > #arcadeGame.arcade-game:not([hidden]),
   flex-wrap: wrap;
   gap: .5rem;
 }
-.jui-dialog-actions > button,
+.jui-dialog-actions > .jui-button,
 .nimmy-actions > button {
   min-width: 0;
   max-width: 100%;
@@ -1038,14 +995,8 @@ body > #arcadeGame.arcade-game:not([hidden]),
   overflow-wrap: anywhere;
 }
 @media (max-height: 520px) {
-  #nimmyTutorial .nimmy-dialog,
-  .nimmy-tutorial:not(#nimmyTutorial) .nimmy-dialog,
-  #resetEverythingDialog .nimmy-dialog,
-  #resetMovedDialog .nimmy-dialog,
+  .popup-layer .nimmy-dialog,
   .reward-dialog,
-  .reset-dialog,
-  .confirm-dialog,
-  .offline-gains-dialog,
   .jui-dialog {
     padding-block: 12px;
   }
