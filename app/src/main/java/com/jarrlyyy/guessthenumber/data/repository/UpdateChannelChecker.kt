@@ -103,11 +103,10 @@ object UpdateChannelChecker {
         // When both build numbers are available, they are authoritative: rerunning
         // the workflow can publish #78 from the same source commit as #77.
         val hasComparableBuildNumbers = remoteBuildNumber != null && installedBuildNumber > 0L
-        if (!hasComparableBuildNumbers &&
-            versionCode == currentVersionCode &&
+        val sameVersionAndCommit = versionCode == currentVersionCode &&
             installedCommit != "unknown" &&
             targetCommit.equals(installedCommit, ignoreCase = true)
-        ) {
+        if (shouldTreatSameCommitAsCurrent(remoteBuildNumber, installedBuildNumber, sameVersionAndCommit)) {
             return Result.UpToDate
         }
 
@@ -215,6 +214,15 @@ object UpdateChannelChecker {
         }
     }
 
+
+    internal fun shouldTreatSameCommitAsCurrent(
+        remoteBuildNumber: Long?,
+        installedBuildNumber: Long,
+        sameVersionAndCommit: Boolean
+    ): Boolean {
+        val hasComparableBuildNumbers = remoteBuildNumber != null && installedBuildNumber > 0L
+        return sameVersionAndCommit && !hasComparableBuildNumbers
+    }
 
     internal fun isStableDebugBuildCurrent(remoteBuildNumber: Long, installedBuildNumber: Long): Boolean =
         installedBuildNumber > 0L && remoteBuildNumber <= installedBuildNumber
