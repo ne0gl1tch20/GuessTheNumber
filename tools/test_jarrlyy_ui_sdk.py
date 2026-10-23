@@ -115,7 +115,7 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         self.assertIn('progress.setAttribute("aria-live", "polite")', js)
         self.assertIn('if (typeof options.onComplete === "function") options.onComplete()', js)
         self.assertIn('if (typeof options.onSkip === "function") options.onSkip()', js)
-        self.assertIn('global.JarrlyyUI = Object.freeze({ init, toast, dialog: makeDialog, tour });', js)
+        self.assertRegex(js, r'global\.JarrlyyUI = Object\.freeze\(\{ init, (?:enhance, )?toast, dialog: makeDialog, tour \}\);')
         self.assertIn('if (action === "tour") tour([', js)
 
     def test_player_notifications_use_sdk_toast_with_legacy_fallback(self):
