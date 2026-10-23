@@ -392,7 +392,7 @@
     });
     all(".card, .hero-card, .stat-card, .economy-card, .guess-card, .progression-card, .more-link-card").forEach((node) => node.classList.add("jui-card"));
     all("input:not([type=\"checkbox\"]):not([type=\"radio\"]):not([type=\"range\"]):not([type=\"hidden\"]), select, textarea").forEach((node) => node.classList.add("jui-field"));
-    all("label:has(input[type=\"checkbox\"]), label:has(input[type=\"radio\"])").forEach((node) => node.classList.add("jui-check-row"));
+    all("label").forEach((node) => { if (node.querySelector('input[type="checkbox"], input[type="radio"]')) node.classList.add("jui-check-row"); });
     all(".nimmy-dialog, .reward-dialog, .reset-dialog, .offline-gains-dialog, .confirm-dialog").forEach((node) => node.classList.add("jui-dialog"));
     all(".screen-nav").forEach((node) => node.classList.add("jui-tabs"));
   }
