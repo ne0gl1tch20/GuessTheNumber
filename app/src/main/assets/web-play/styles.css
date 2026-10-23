@@ -966,9 +966,21 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
   overflow-y: auto;
   pointer-events: auto;
 }
+/* These reset prompts use the shared popup layer's grid centering.
+   Undo the legacy centered transform, which otherwise shifts the dialog by
+   half its own width and height after the grid has already centered it. */
 #resetEverythingDialog .nimmy-dialog,
 #resetMovedDialog .nimmy-dialog {
+  position: relative;
+  inset: auto;
+  left: auto;
+  top: auto;
+  transform: none;
+  box-sizing: border-box;
   width: min(520px, 100%);
+  max-width: 100%;
+  min-width: 0;
+  margin: auto;
 }
 .jui-dialog {
   box-sizing: border-box;
