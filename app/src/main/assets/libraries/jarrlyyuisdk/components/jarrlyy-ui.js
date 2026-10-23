@@ -373,7 +373,43 @@
     });
   }
 
+
+  // Adopt existing app markup as SDK components without replacing its legacy
+  // classes. App-specific styles can therefore preserve the original visuals.
+  function enhance(root = doc) {
+    if (!root || !root.querySelectorAll) return;
+    const all = (selector) => {
+      const nodes = Array.from(root.querySelectorAll(selector));
+      if (root.matches && root.matches(selector)) nodes.unshift(root);
+      return nodes;
+    };
+    all("button, [role=\"button\"]").forEach((node) => {
+      node.classList.add("jui-button");
+      if (node.matches(".primary-action, .guess-button, .reward-claim")) node.classList.add("jui-button-primary");
+      else if (node.matches(".secondary-action, .nimmy-skip")) node.classList.add("jui-button-secondary");
+      else if (node.matches(".screen-nav button")) node.classList.add("jui-button-quiet");
+      if (node.matches(".more-link-card, .player-profile-entry, .card-interactive")) node.classList.add("jui-card-interactive");
+    });
+    all(".card, .hero-card, .stat-card, .economy-card, .guess-card, .progression-card, .more-link-card").forEach((node) => node.classList.add("jui-card"));
+    all("input:not([type=\"checkbox\"]):not([type=\"radio\"]):not([type=\"range\"]):not([type=\"hidden\"]), select, textarea").forEach((node) => node.classList.add("jui-field"));
+    all("label").forEach((node) => { if (node.querySelector('input[type="checkbox"], input[type="radio"]')) node.classList.add("jui-check-row"); });
+    all(".nimmy-dialog, .reward-dialog, .reset-dialog, .offline-gains-dialog, .confirm-dialog").forEach((node) => node.classList.add("jui-dialog"));
+    all(".screen-nav").forEach((node) => node.classList.add("jui-tabs"));
+  }
+
+  function observeComponents() {
+    enhance(doc);
+    if (!global.MutationObserver || !doc.body) return;
+    const observer = new global.MutationObserver((records) => {
+      records.forEach((record) => record.addedNodes.forEach((node) => {
+        if (node.nodeType === 1) enhance(node);
+      }));
+    });
+    observer.observe(doc.body, { childList: true, subtree: true });
+  }
+
   function init() {
+    observeComponents();
     initContextMenus();
     initCarousels();
     initPagination();
@@ -384,7 +420,7 @@
     initActions();
   }
 
-  global.JarrlyyUI = Object.freeze({ init, toast, dialog: makeDialog, tour });
+  global.JarrlyyUI = Object.freeze({ init, enhance, toast, dialog: makeDialog, tour });
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })(window);

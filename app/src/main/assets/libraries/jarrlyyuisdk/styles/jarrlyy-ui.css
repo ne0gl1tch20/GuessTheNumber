@@ -255,3 +255,46 @@
     animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;
   }
 }
+
+/* Opt-in compatibility theme for GuessTheNumber's existing production UI.
+   These values intentionally match the pre-SDK app palette so migration can happen
+   component-by-component without a visual redesign. */
+.jui-root.jui-game-compat {
+  --jui-bg: #080b16;
+  --jui-surface: #11172a;
+  --jui-raised: #171f36;
+  --jui-border: rgba(255,255,255,.09);
+  --jui-text: #f7f8ff;
+  --jui-muted: #9ba5c4;
+  --jui-purple: #9b7cff;
+  --jui-cyan: #62e8ff;
+  --jui-danger: #ff7195;
+  --jui-success: #63f5a4;
+  --jui-radius: 26px;
+  --jui-radius-sm: 18px;
+  --jui-font-family: "Manrope", "Inter", system-ui, sans-serif;
+  --jui-font-size: 1rem;
+  --jui-line-height: normal;
+}
+
+/* Preserve the game's familiar centered pill while using the SDK toast API. */
+.jui-root.jui-game-compat .jui-toast-region {
+  right: auto;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  left: 50%;
+  width: min(360px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  justify-items: center;
+}
+.jui-root.jui-game-compat .jui-toast {
+  max-width: 100%;
+  padding: 11px 15px;
+  border: 0;
+  border-radius: 999px;
+  background: #edf0ff;
+  color: #15192a;
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+  box-shadow: 0 12px 35px rgba(0,0,0,.4);
+}
