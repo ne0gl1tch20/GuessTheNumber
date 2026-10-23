@@ -207,6 +207,11 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn("overflow-y: auto", css)
         self.assertIn("backdrop-filter: none;", css)
 
+        # Nimmy must stay inside its viewport overlay without a nested fixed box.
+        nimmy_rules = css.split("#nimmyTutorial .nimmy-dialog", 1)[1].split("}", 1)[0]
+        self.assertIn("position: absolute;", nimmy_rules)
+        self.assertIn("transform: translateX(-50%);", nimmy_rules)
+
         # Reset prompts are already centered by the popup-layer grid. Their
         # legacy translate(-50%, -50%) must not shift them out of that grid.
         for dialog_id in ("resetEverythingDialog", "resetMovedDialog"):
