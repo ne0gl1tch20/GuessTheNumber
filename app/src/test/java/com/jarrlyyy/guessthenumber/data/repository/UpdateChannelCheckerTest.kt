@@ -19,6 +19,33 @@ class UpdateChannelCheckerTest {
     }
 
     @Test
+    fun parsesStableDebugMetadataFromPublicReleaseNotes() {
+        val metadata = UpdateChannelChecker.parseStableDebugReleaseMetadata(
+            """
+            Stable Debug #1084
+
+            Version: 3.0.2 (20)
+            Commit: 0123456789abcdef0123456789abcdef01234567
+            """.trimIndent()
+        )
+
+        assertEquals(1084L, metadata?.runNumber)
+        assertEquals("3.0.2", metadata?.versionName)
+        assertEquals(20L, metadata?.versionCode)
+        assertEquals("0123456789abcdef0123456789abcdef01234567", metadata?.commitSha)
+    }
+
+    @Test
+    fun rejectsStableDebugReleaseNotesWithMissingOrInvalidMetadata() {
+        assertEquals(
+            null,
+            UpdateChannelChecker.parseStableDebugReleaseMetadata(
+                "Stable Debug #1084\\nVersion: 3.0.2 (20)\\nCommit: invalid"
+            )
+        )
+    }
+
+    @Test
     fun comparesReleaseVersionsNumerically() {
         assertEquals(1, UpdateChannelChecker.compareVersions("3.0.10", "3.0.2"))
         assertEquals(-1, UpdateChannelChecker.compareVersions("3.1.0", "3.2.0"))
