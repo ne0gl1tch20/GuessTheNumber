@@ -13,23 +13,9 @@ class UpdateChannelCheckerTest {
 
     @Test
     fun newerStableDebugBuildIsNotHiddenByMatchingSourceCommit() {
-        assertEquals(
-            false,
-            UpdateChannelChecker.shouldTreatSameCommitAsCurrent(
-                remoteBuildNumber = 78L,
-                installedBuildNumber = 77L,
-                sameVersionAndCommit = true
-            )
-        )
-        assertEquals(
-            true,
-            UpdateChannelChecker.shouldTreatSameCommitAsCurrent(
-                remoteBuildNumber = 77L,
-                installedBuildNumber = 0L,
-                sameVersionAndCommit = true
-            )
-        )
+        // Run numbers distinguish reruns even when both builds share the same commit.
         assertEquals(false, UpdateChannelChecker.isStableDebugBuildCurrent(78L, 77L))
+        assertEquals(true, UpdateChannelChecker.isStableDebugBuildCurrent(77L, 77L))
     }
 
     @Test
