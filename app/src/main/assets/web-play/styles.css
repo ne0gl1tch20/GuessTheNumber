@@ -515,3 +515,69 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
   .nimmy-actions { gap: 6px; }
   .nimmy-actions button { min-width: 0; }
 }
+
+
+/* Final light-theme pass for legacy screens that still use literal dark-mode colors. */
+:root[data-theme-mode="Light"] .quest-row,
+:root[data-theme-mode="Light"] .guess-tools,
+:root[data-theme-mode="Light"] .world-entry,
+:root[data-theme-mode="Light"] .more-menu {
+  background: var(--panel);
+  border-color: var(--line);
+}
+:root[data-theme-mode="Light"] .more-menu button,
+:root[data-theme-mode="Light"] .guess-tool-buttons button,
+:root[data-theme-mode="Light"] .realm-actions button {
+  background: var(--panel2);
+  border-color: var(--line);
+  color: var(--text);
+}
+:root[data-theme-mode="Light"] :is(
+  .quest-row-copy small, .quest-progress, .realm-actions button span,
+  .world-intro, .event-description, .strategy-intro, .event-footnote,
+  .milestone-copy > small, .milestone-progress > small, .milestone-copy strong,
+  .guess-tools-label, .action-status, .screen-nav button,
+  .brand-tagline, .catalog-meta, .catalog-entry-copy span,
+  .changelog-markdown-list, .music-now-playing, .music-now-playing small,
+  .music-list-item small, .more-menu button small, .more-menu button span,
+  .about-hero > p, .about-update-copy, .about-licenses > p
+) {
+  color: var(--muted);
+}
+:root[data-theme-mode="Light"] .screen-nav {
+  border-color: var(--line);
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 12px 32px rgba(35,49,83,.12);
+}
+:root[data-theme-mode="Light"] .screen-nav button[aria-selected="true"] {
+  color: var(--text);
+}
+:root[data-theme-mode="Light"] .screen-nav #tab-play {
+  color: #fff;
+}
+:root[data-theme-mode="Light"] :is(
+  .panel-glyph, .realm-actions button, .world-glyph, .event-glyph,
+  .milestone-glyph, .summary-glyph, .catalog-button, .multiplier-row button
+) {
+  color: var(--accent);
+}
+:root[data-theme-mode="Light"] .catalog-meta {
+  color: var(--muted);
+}
+:root[data-theme-mode="Light"] .changelog-markdown-list {
+  color: var(--text);
+}
+:root[data-theme-mode="Light"] .nimmy-dialog {
+  background: linear-gradient(145deg,#ffffff,#edf1fa);
+  color: #172038;
+}
+:root[data-theme-mode="Light"] .nimmy-dialog p,
+:root[data-theme-mode="Light"] .nimmy-guide-copy small,
+:root[data-theme-mode="Light"] .nimmy-skip {
+  color: #56617c;
+}
+/* The SDK's root palette is used by toast/dialog controls too. */
+:root[data-theme-mode="Light"] .jui-toast,
+:root[data-theme-mode="Light"] .jui-dialog {
+  color: var(--text);
+}
