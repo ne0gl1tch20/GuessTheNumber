@@ -516,11 +516,16 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 #resetMovedDialog {
   display: grid;
   place-items: center;
-  padding: 12px;
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
   background: rgba(6,8,24,.48);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 #resetEverythingDialog[hidden],
 #resetMovedDialog[hidden] {
@@ -975,12 +980,19 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
   inset: auto;
   left: auto;
   top: auto;
+  display: block;
+  height: auto;
+  min-height: min-content;
   transform: none;
   box-sizing: border-box;
   width: min(520px, 100%);
   max-width: 100%;
   min-width: 0;
+  max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .jui-dialog {
   box-sizing: border-box;
