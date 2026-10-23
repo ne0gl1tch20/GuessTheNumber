@@ -748,3 +748,74 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
+
+/* Popup regression fix: Nimmy is a floating guide, not a blurred modal backdrop. */
+#nimmyTutorial:not([hidden]) {
+  position: fixed;
+  inset: 0;
+  display: block !important;
+  padding: 0;
+  overflow: visible;
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  pointer-events: none;
+  z-index: 2147483002;
+}
+#nimmyTutorial .nimmy-tutorial-backdrop {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  pointer-events: none;
+}
+#nimmyTutorial .nimmy-dialog {
+  position: fixed;
+  left: 50%;
+  top: 12px;
+  transform: translateX(-50%);
+  display: block;
+  box-sizing: border-box;
+  width: min(440px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  height: auto;
+  min-height: 0;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: 0;
+  padding: clamp(16px, 4vw, 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  pointer-events: auto;
+}
+.nimmy-tutorial:not(#nimmyTutorial):not([hidden]) {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.nimmy-tutorial:not(#nimmyTutorial) .nimmy-dialog {
+  position: relative;
+  inset: auto;
+  left: auto;
+  top: auto;
+  transform: none;
+  display: block;
+  box-sizing: border-box;
+  width: min(520px, calc(100vw - 24px));
+  max-width: 100%;
+  height: auto;
+  min-height: 0;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
