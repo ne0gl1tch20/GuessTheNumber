@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,8 +15,8 @@ import androidx.compose.ui.unit.dp
  * Shared, controlled guess-entry UI.
  *
  * Game rules, validation, localization, persistence, and rewards remain owned
- * by the caller. This lets Android and desktop reuse the same interaction
- * component without moving platform-specific game services into commonMain.
+ * by the caller. This uses the Jarrlyy Compose primitives while preserving the
+ * existing action callbacks, labels, enabled states, and component order.
  */
 @Composable
 fun SharedGuessEntryPanel(
@@ -58,13 +57,13 @@ fun SharedGuessEntryPanel(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
         ) {
-            Button(
+            JarrlyyButton(
                 onClick = onSubmitGuess,
                 enabled = !solved && guessText.isNotBlank()
             ) {
                 Text(submitLabel)
             }
-            Button(onClick = onNewGame) {
+            JarrlyySecondaryButton(onClick = onNewGame) {
                 Text(newGameLabel)
             }
         }

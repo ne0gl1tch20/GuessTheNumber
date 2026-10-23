@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,8 +16,8 @@ import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
 /**
  * Shared status-driven feedback container for host-provided, localized feedback.
  *
- * The host owns feedback wording and platform-specific icon assets. This component
- * owns the common status-to-color mapping and feedback-card layout.
+ * Status-to-color behavior and message ownership remain unchanged. The visual
+ * container now uses the same rounded, bordered card primitive as Jarrlyy UI.
  */
 @Composable
 fun SharedGuessFeedbackCard(
@@ -44,21 +42,22 @@ fun SharedGuessFeedbackCard(
         GuessGameStatus.CORRECT -> MaterialTheme.colorScheme.onTertiaryContainer
     }
 
-    Surface(
+    JarrlyyCard(
         modifier = modifier.fillMaxWidth().then(
             if (reducedMotion) Modifier else Modifier.animateContentSize()
         ),
-        shape = MaterialTheme.shapes.large,
-        color = containerColor,
+        containerColor = containerColor,
+        borderColor = contentColor.copy(alpha = 0.22f),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp),
         tonalElevation = if (reducedMotion) 0.dp else 2.dp
     ) {
         Row(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(0.dp),
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             leadingContent(contentColor)
-            Text(
+            androidx.compose.material3.Text(
                 text = message,
                 style = MaterialTheme.typography.titleMedium,
                 color = contentColor,
