@@ -30,17 +30,27 @@ internal class WindowsDebugUpdateClient(
         val runs = getJson(URL(WORKFLOW_RUNS_API)).jsonObject["workflow_runs"]?.jsonArray
             ?: return null
 
-        for (runValue in runs) {
-            val run = runValue as? JsonObject ?: continue
-            if (run["event"]?.jsonPrimitive?.content != "push") continue
-            if (run["head_branch"]?.jsonPrimitive?.content != "master") continue
-            if (run["conclusion"]?.jsonPrimitive?.content != "success") continue
+        // GitHub normally returns runs newest-first, but explicitly sort the candidates
+        // so an older run cannot hide a newer build if the API ordering changes.
+        val eligibleRuns = runs.mapNotNull { it as? JsonObject }
+            .filter { run ->
+                run["event"]?.jsonPrimitive?.content == "push" &&
+                    run["head_branch"]?.jsonPrimitive?.content == "master" &&
+                    run["conclusion"]?.jsonPrimitive?.content == "success"
+            }
+            .sortedByDescending { run ->
+                run["run_number"]?.jsonPrimitive?.content?.toLongOrNull() ?: -1L
+            }
 
+        for (run in eligibleRuns) {
             val runId = run["id"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
             val runNumber = run["run_number"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
             val runAttempt = run["run_attempt"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
             val version = "1.0.$runNumber"
-            if (compareVersions(version, installedVersion) <= 0) return null
+
+            // Skip versions already installed instead of stopping the scan. This keeps
+            // discovery resilient to unordered or partially populated run responses.
+            if (compareVersions(version, installedVersion) <= 0) continue
 
             val artifactsUrl = URL("$ACTIONS_API/runs/$runId/artifacts?per_page=100")
             val artifacts = getJson(artifactsUrl).jsonObject["artifacts"]?.jsonArray
@@ -99,8 +109,10 @@ internal class WindowsDebugUpdateClient(
     private companion object {
         const val ACTIONS_API =
             "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions"
+        // Ask GitHub for successful runs directly and inspect a full page, rather than
+        // letting recent failed runs crowd an eligible build out of the discovery list.
         const val WORKFLOW_RUNS_API =
-            "$ACTIONS_API/workflows/windows-desktop.yml/runs?branch=master&status=completed&per_page=20"
+            "$ACTIONS_API/workflows/windows-desktop.yml/runs?branch=master&status=success&per_page=100"
         const val DEBUG_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug"
         const val ARTIFACT_DOWNLOAD_PREFIX =
             "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/"
