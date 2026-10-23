@@ -388,12 +388,12 @@ body.arcade-modal-open{overflow:hidden}body.arcade-modal-open::before{content:""
   border-radius: 15px;
   color: #fff;
   background: var(--accent);
-  box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 72%, #000);
+  box-shadow: 0 4px 0 rgba(0,0,0,.24);
   font-weight: 900;
 }
 #dailyRewardOverlay .reward-claim:active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 72%, #000);
+  box-shadow: 0 2px 0 rgba(0,0,0,.24);
 }
 #dailyRewardOverlay .daily-reward-schedule {
   display: grid;
