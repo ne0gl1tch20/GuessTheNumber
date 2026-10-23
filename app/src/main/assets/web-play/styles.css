@@ -819,3 +819,143 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
+
+/* Jarrlyy UI SDK integration: native setting checkmarks become accessible slider switches. */
+#screen-settings .setting-row.jui-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+#screen-settings .setting-row.jui-switch > span:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+#screen-settings .setting-row.jui-switch input[type="checkbox"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+#screen-settings .setting-row.jui-switch .jui-switch-track {
+  display: inline-block;
+  position: relative;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 26px;
+  border: 1px solid var(--jui-border);
+  border-radius: 999px;
+  background: var(--panel2);
+  transition: background var(--jui-motion), border-color var(--jui-motion);
+}
+#screen-settings .setting-row.jui-switch .jui-switch-track::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--muted);
+  content: "";
+  transition: transform var(--jui-motion), background var(--jui-motion);
+}
+#screen-settings .setting-row.jui-switch input:checked + .jui-switch-track {
+  border-color: transparent;
+  background: #3988f5;
+}
+#screen-settings .setting-row.jui-switch input:checked + .jui-switch-track::after {
+  transform: translateX(18px);
+  background: #fff;
+}
+#screen-settings .setting-row.jui-switch input:focus-visible + .jui-switch-track {
+  outline: none;
+  box-shadow: var(--jui-focus);
+}
+#screen-settings .setting-row.jui-switch input:disabled + .jui-switch-track {
+  opacity: .5;
+}
+@media (prefers-reduced-motion: reduce) {
+  #screen-settings .setting-row.jui-switch .jui-switch-track,
+  #screen-settings .setting-row.jui-switch .jui-switch-track::after {
+    transition: none;
+  }
+}
+
+/*
+ * Light-theme root cause: the theme variables are switched correctly on <html>,
+ * but many legacy screen rules set dark-mode literal colors/backgrounds instead
+ * of using --text/--muted/--panel. Earlier light-theme overrides covered only a
+ * subset of components. Normalize the remaining common screens to the live palette.
+ */
+:root[data-theme-mode="Light"] body.jui-game-compat {
+  color: var(--text);
+  color-scheme: light;
+}
+:root[data-theme-mode="Light"] .setting-row,
+:root[data-theme-mode="Light"] .setting-field,
+:root[data-theme-mode="Light"] .color-picker-trigger,
+:root[data-theme-mode="Light"] .settings-list .setting-row {
+  color: var(--text);
+  border-color: var(--line);
+  background: var(--panel);
+}
+:root[data-theme-mode="Light"] .setting-row strong,
+:root[data-theme-mode="Light"] .setting-field > span,
+:root[data-theme-mode="Light"] .color-picker-trigger strong {
+  color: var(--text);
+}
+:root[data-theme-mode="Light"] .setting-row small,
+:root[data-theme-mode="Light"] .setting-field small,
+:root[data-theme-mode="Light"] .setting-field > span small {
+  color: var(--muted);
+}
+:root[data-theme-mode="Light"] .setting-field select,
+:root[data-theme-mode="Light"] .setting-field input:not([type="checkbox"]):not([type="range"]),
+:root[data-theme-mode="Light"] .setting-field textarea,
+:root[data-theme-mode="Light"] .input-shell input {
+  color: var(--text);
+  background: var(--panel);
+  border-color: var(--line);
+}
+:root[data-theme-mode="Light"] :is(
+  .eyebrow, .live-pill, .range-label, .feedback, .stat-label, .section-heading,
+  .hint, .microcopy, .progress-caption, .action-card small, .action-card > strong,
+  .panel-chip, .currency-tile > span, .currency-tile small, .realm-copy small,
+  .progression-mini-grid small, .boss-health-row, .catalog-intro, .music-now-playing span,
+  .music-list-item small, .more-link-card small, .about-description, .about-update-copy,
+  .quest-row-copy small, .quest-progress, .world-intro, .event-description,
+  .strategy-intro, .event-footnote, .milestone-copy > small, .milestone-progress > small,
+  .guess-tools-label, .action-status, .brand-tagline, .catalog-meta, .music-now-playing small
+) {
+  color: var(--muted);
+}
+:root[data-theme-mode="Light"] :is(
+  .topbar h1, .range-label strong, .stat-value, .economy-row strong, .action-card b,
+  .panel-title, .loot-heading, .currency-tile strong, .realm-copy strong,
+  .progression-mini-grid strong, .boss-content h2, .quest-row-copy strong,
+  .milestone-copy strong, .catalog-entry-copy strong, .about-hero h2, .about-hero h3,
+  .screen h2, .screen h3
+) {
+  color: var(--text);
+}
+:root[data-theme-mode="Light"] .action-card,
+:root[data-theme-mode="Light"] .quest-row,
+:root[data-theme-mode="Light"] .guess-tools,
+:root[data-theme-mode="Light"] .world-entry,
+:root[data-theme-mode="Light"] .more-menu,
+:root[data-theme-mode="Light"] .more-menu button,
+:root[data-theme-mode="Light"] .guess-tool-buttons button,
+:root[data-theme-mode="Light"] .realm-actions button {
+  background: var(--panel);
+  border-color: var(--line);
+  color: var(--text);
+}
+:root[data-theme-mode="Light"] .progress-track {
+  background: var(--panel2);
+}
+:root[data-theme-mode="Light"] .jui-switch-track {
+  border-color: var(--line);
+}
