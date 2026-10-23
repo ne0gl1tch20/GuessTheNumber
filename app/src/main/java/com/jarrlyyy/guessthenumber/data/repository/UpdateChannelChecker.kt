@@ -27,11 +27,10 @@ object UpdateChannelChecker {
     }
 
     private const val REPOSITORY = "ne0gl1tch20/GuessTheNumber"
-    private const val DEBUG_RELEASE_TAG = "debug-latest"
 
     suspend fun check(): Result = withContext(Dispatchers.IO) {
         try {
-            if (BuildConfig.UPDATE_CHANNEL == "debug") checkDebugRelease() else checkRelease()
+            if (BuildConfig.UPDATE_CHANNEL == "debug") checkDebugArtifact() else checkRelease()
         } catch (error: Exception) {
             Result.Failed(
                 buildString {
@@ -72,111 +71,97 @@ object UpdateChannelChecker {
         )
     }
 
-    /** Uses the public debug-latest release asset instead of private Actions artifact downloads. */
-    private fun checkDebugRelease(): Result {
-        val release = getJson("https://api.github.com/repos/$REPOSITORY/releases/tags/$DEBUG_RELEASE_TAG")
-        val targetCommit = resolveDebugReleaseCommit(release) ?: return Result.Unavailable
-
-        val assets = release.optJSONArray("assets")
-        val asset = (0 until (assets?.length() ?: 0))
-            .mapNotNull { assets?.optJSONObject(it) }
-            .firstOrNull { it.optString("name") == "GuessTheNumber-debug.zip" }
-            ?: return Result.Unavailable
-        val downloadUrl = asset.optString("browser_download_url")
-        val pageUrl = release.optString("html_url", "https://github.com/$REPOSITORY/releases/tag/$DEBUG_RELEASE_TAG")
-        if (!isGithubUrl(downloadUrl) || !isGithubUrl(pageUrl)) return Result.Unavailable
-
-        val buildGradle = getText("https://raw.githubusercontent.com/$REPOSITORY/$targetCommit/app/build.gradle.kts")
-        val versionName = Regex("versionName\\s*=\\s*\"([^\"]+)\"").find(buildGradle)?.groupValues?.getOrNull(1)
-            ?: return Result.Unavailable
-        val versionCode = Regex("versionCode\\s*=\\s*(\\d+)").find(buildGradle)?.groupValues?.getOrNull(1)?.toLongOrNull()
-            ?: return Result.Unavailable
-        val currentVersionCode = BuildConfig.VERSION_CODE.toLong()
-        val body = release.optString("body").trim()
-        val remoteBuildNumber = Regex("(?m)^Stable Debug #(\\d+)").find(body)
-            ?.groupValues?.getOrNull(1)?.toLongOrNull()
-        val installedCommit = BuildConfig.GIT_COMMIT_SHA
-        val installedBuildNumber = BuildConfig.STABLE_DEBUG_BUILD_NUMBER.toLong()
-
-        if (versionCode < currentVersionCode) return Result.UpToDate
-
-        // When both build numbers are available, they are authoritative: rerunning
-        // the workflow can publish #78 from the same source commit as #77.
-        val hasComparableBuildNumbers = remoteBuildNumber != null && installedBuildNumber > 0L
-        val sameVersionAndCommit = versionCode == currentVersionCode &&
-            installedCommit != "unknown" &&
-            targetCommit.equals(installedCommit, ignoreCase = true)
-        if (shouldTreatSameCommitAsCurrent(remoteBuildNumber, installedBuildNumber, sameVersionAndCommit)) {
-            return Result.UpToDate
-        }
-
-        // Commit ancestry is the fallback for older installs that predate embedded
-        // build numbers. Do not let an identical commit hide a newer numbered build.
-        val commitOrder = if (!hasComparableBuildNumbers &&
-            installedCommit.matches(Regex("[a-fA-F0-9]{40}"))
-        ) {
-            runCatching {
-                getJson("https://api.github.com/repos/$REPOSITORY/compare/$targetCommit...$installedCommit")
-                    .optString("status")
-            }.getOrNull()
-        } else null
-
-        val alreadyCurrent = if (hasComparableBuildNumbers) {
-            isStableDebugBuildCurrent(remoteBuildNumber!!, installedBuildNumber)
-        } else {
-            when (commitOrder) {
-                "ahead", "identical" -> true // installed commit is at least as new as the release
-                "behind" -> false // the release commit is newer than the installed commit
-                else -> remoteBuildNumber != null &&
-                    isStableDebugBuildCurrent(remoteBuildNumber, installedBuildNumber)
-            }
-        }
-        if (alreadyCurrent) return Result.UpToDate
-
-        // When ancestry cannot be checked, retain the legacy version-code guard.
-        if (commitOrder == null && versionCode < BuildConfig.VERSION_CODE) return Result.UpToDate
-        if (commitOrder == null && remoteBuildNumber == null &&
-            versionCode == BuildConfig.VERSION_CODE.toLong() &&
-            installedCommit != "unknown" && targetCommit.equals(installedCommit, ignoreCase = true)
-        ) return Result.UpToDate
-
-        val title = remoteBuildNumber?.let { "Stable Debug #$it" } ?: "Stable Debug"
-        val details = if (body.isNotBlank()) body.take(1200) else "Stable Debug v$versionName ($versionCode)"
-        return Result.Available(
-            AvailableUpdate(
-                title = "$title · v$versionName ($versionCode)",
-                url = pageUrl,
-                details = details,
-                downloadUrl = downloadUrl,
-                expectedCommitSha = targetCommit,
-                requireChecksum = true
-            )
+    /** Checks the newest successful Stable Debug workflow artifact, not the master-only Release. */
+    private fun checkDebugArtifact(): Result {
+        val runsResponse = getJson(
+            "https://api.github.com/repos/$REPOSITORY/actions/workflows/stable-debug-apk.yml/runs?status=success&per_page=100"
         )
-    }
-
-    /**
-     * GitHub's release target_commitish is a branch/commit hint, not guaranteed to be
-     * a commit SHA. Resolve the actual release tag ref when that hint is not a SHA.
-     */
-    private fun resolveDebugReleaseCommit(release: JSONObject): String? {
-        val target = release.optString("target_commitish")
-        if (target.matches(Regex("[a-fA-F0-9]{40}"))) return target
-
-        val tagRef = getJson("https://api.github.com/repos/$REPOSITORY/git/ref/tags/$DEBUG_RELEASE_TAG")
-        val tagObject = tagRef.optJSONObject("object") ?: return null
-        val objectSha = tagObject.optString("sha")
-        if (!objectSha.matches(Regex("[a-fA-F0-9]{40}"))) return null
-
-        return when (tagObject.optString("type")) {
-            "commit" -> objectSha
-            "tag" -> {
-                val annotatedTag = getJson("https://api.github.com/repos/$REPOSITORY/git/tags/$objectSha")
-                val targetObject = annotatedTag.optJSONObject("object") ?: return null
-                targetObject.optString("sha")
-                    .takeIf { targetObject.optString("type") == "commit" && it.matches(Regex("[a-fA-F0-9]{40}")) }
+        val runs = runsResponse.optJSONArray("workflow_runs") ?: return Result.Unavailable
+        val successfulRuns = (0 until runs.length())
+            .mapNotNull { runs.optJSONObject(it) }
+            .filter {
+                it.optString("path") == ".github/workflows/stable-debug-apk.yml" &&
+                    it.optString("status") == "completed" &&
+                    it.optString("conclusion") == "success"
             }
-            else -> null
+            .sortedByDescending { it.optLong("run_number", 0L) }
+
+        for (run in successfulRuns) {
+            val runId = run.optLong("id", 0L)
+            val runNumber = run.optLong("run_number", 0L)
+            val targetCommit = run.optString("head_sha")
+            if (runId <= 0L || runNumber <= 0L ||
+                !targetCommit.matches(Regex("[a-fA-F0-9]{40}"))
+            ) continue
+
+            val artifactsResponse = runCatching {
+                getJson("https://api.github.com/repos/$REPOSITORY/actions/runs/$runId/artifacts")
+            }.getOrNull() ?: continue
+            val artifacts = artifactsResponse.optJSONArray("artifacts") ?: continue
+            val artifact = (0 until artifacts.length())
+                .mapNotNull { artifacts.optJSONObject(it) }
+                .firstOrNull {
+                    it.optString("name") == "GuessTheNumber-debug" &&
+                        !it.optBoolean("expired", true)
+                } ?: continue
+
+            val downloadUrl = artifact.optString("archive_download_url")
+            val pageUrl = run.optString("html_url")
+            if (!isGithubUrl(downloadUrl) || !isGithubUrl(pageUrl)) continue
+
+            val installedBuildNumber = BuildConfig.STABLE_DEBUG_BUILD_NUMBER.toLong()
+            if (installedBuildNumber > 0L && runNumber <= installedBuildNumber) {
+                return Result.UpToDate
+            }
+
+            if (installedBuildNumber <= 0L &&
+                BuildConfig.GIT_COMMIT_SHA.matches(Regex("[a-fA-F0-9]{40}")) &&
+                targetCommit.equals(BuildConfig.GIT_COMMIT_SHA, ignoreCase = true)
+            ) {
+                return Result.UpToDate
+            }
+
+            val buildGradle = runCatching {
+                getText("https://raw.githubusercontent.com/$REPOSITORY/$targetCommit/app/build.gradle.kts")
+            }.getOrNull() ?: return Result.Unavailable
+            val versionName = Regex("appVersionName\\s*=\\s*\"([^\"]+)\"")
+                .find(buildGradle)?.groupValues?.getOrNull(1) ?: return Result.Unavailable
+            val versionCode = Regex("appVersionCode\\s*=\\s*(\\d+)")
+                .find(buildGradle)?.groupValues?.getOrNull(1)?.toLongOrNull() ?: return Result.Unavailable
+            if (versionCode < BuildConfig.VERSION_CODE.toLong()) return Result.UpToDate
+
+            val installedCommit = BuildConfig.GIT_COMMIT_SHA
+            val commitOrder = if (installedBuildNumber <= 0L &&
+                installedCommit.matches(Regex("[a-fA-F0-9]{40}"))
+            ) {
+                runCatching {
+                    getJson("https://api.github.com/repos/$REPOSITORY/compare/$targetCommit...$installedCommit")
+                        .optString("status")
+                }.getOrNull()
+            } else null
+            if (installedBuildNumber <= 0L && commitOrder in setOf("ahead", "identical")) {
+                return Result.UpToDate
+            }
+
+            val title = "Stable Debug #$runNumber"
+            val details = buildString {
+                appendLine("Stable Debug #$runNumber")
+                appendLine("Version: $versionName ($versionCode)")
+                append("Commit: $targetCommit")
+            }
+            return Result.Available(
+                AvailableUpdate(
+                    title = "$title · v$versionName ($versionCode)",
+                    url = pageUrl,
+                    details = details,
+                    downloadUrl = downloadUrl,
+                    expectedCommitSha = targetCommit,
+                    requireChecksum = true
+                )
+            )
         }
+
+        return Result.Unavailable
     }
 
     private fun isGithubUrl(address: String): Boolean {
