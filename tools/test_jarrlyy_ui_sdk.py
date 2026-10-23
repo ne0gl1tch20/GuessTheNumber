@@ -191,7 +191,7 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         css = (WEB / "styles.css").read_text(encoding="utf-8")
         main_end = html.index("</main>")
         layer_start = html.index('<div id="popupLayer" class="popup-layer"')
-        layer_end = html.index('</div>\\n  <div id="toast"', layer_start)
+        layer_end = html.index('</div>\n  <div id="toast"', layer_start)
         self.assertLess(main_end, layer_start)
         self.assertLess(html.index('id="offlineRewardOverlay"', layer_start), layer_end)
         self.assertLess(html.index('id="dailyRewardOverlay"', layer_start), layer_end)
