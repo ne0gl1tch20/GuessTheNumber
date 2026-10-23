@@ -368,6 +368,113 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 .reset-moved-dialog{max-width:480px}.reset-moved-dialog .nimmy-actions{justify-content:flex-end;flex-wrap:wrap}.reset-moved-dialog #resetMovedOpenSlots{min-width:132px}
 
  
+
+/* Shared modal treatment: keep every full-screen dialog centered, contained and legible. */
+:root[data-theme-mode="Light"] {
+  --jui-bg: #f3f5fb;
+  --jui-surface: #ffffff;
+  --jui-raised: #e8edf8;
+  --jui-border: rgba(31,42,70,.16);
+  --jui-text: #172038;
+  --jui-muted: #56617c;
+  --jui-purple: #7354db;
+  --jui-cyan: #087e9b;
+  --jui-danger: #b72e55;
+  --jui-success: #087b49;
+}
+.nimmy-tutorial:not([hidden]) {
+  isolation: isolate;
+}
+.nimmy-tutorial-backdrop {
+  background: rgba(6,8,24,.42);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
+#nimmyTutorial .nimmy-tutorial-backdrop {
+  background: rgba(6,8,24,.2);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+#resetEverythingDialog,
+#resetMovedDialog {
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  overflow-y: auto;
+  background: rgba(6,8,24,.48);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+#resetEverythingDialog[hidden],
+#resetMovedDialog[hidden] {
+  display: none !important;
+}
+.nimmy-dialog {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(390px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  color: var(--text, #f7f8ff);
+}
+.nimmy-dialog h2,
+.nimmy-dialog p,
+.nimmy-dialog label,
+.nimmy-dialog .catalog-intro {
+  overflow-wrap: anywhere;
+}
+.nimmy-dialog p { color: var(--muted, #9ba5c4); }
+.nimmy-guide-copy small { color: var(--muted, #9ba5c4); }
+:root[data-theme-mode="Light"] .nimmy-dialog {
+  border-color: rgba(31,42,70,.16);
+  background: linear-gradient(145deg,#ffffff,#edf1fa);
+  color: #172038;
+  box-shadow: 0 18px 60px rgba(35,49,83,.22);
+}
+:root[data-theme-mode="Light"] .nimmy-dialog p,
+:root[data-theme-mode="Light"] .nimmy-guide-copy small {
+  color: #56617c;
+}
+:root[data-theme-mode="Light"] .nimmy-guide-copy strong {
+  color: #7354db;
+}
+:root[data-theme-mode="Light"] .nimmy-skip {
+  color: #56617c;
+}
+/* Fix common fixed-dark text tokens across the game's regular screens. */
+:root[data-theme-mode="Light"] :is(
+  .live-pill, .range-label, .feedback, .stat-label, .section-heading,
+  .hint, .microcopy, .action-card small, .action-card > strong,
+  .panel-chip, .currency-tile > span, .currency-tile small,
+  .realm-copy small, .progression-mini-grid small, .boss-card p,
+  .boss-health-row, .catalog-intro, .setting-field > span,
+  .setting-field small, .music-list-item small, .more-link-card small,
+  .about-description, .nimmy-guide-copy small
+) {
+  color: var(--muted) !important;
+}
+:root[data-theme-mode="Light"] :is(
+  .topbar h1, .stat-value, .economy-row strong, .action-card b,
+  .panel-title, .loot-heading, .currency-tile strong,
+  .realm-copy strong, .progression-mini-grid strong, .boss-content h2,
+  .setting-field, .nimmy-dialog h2
+) {
+  color: var(--text);
+}
+:root[data-theme-mode="Light"] .input-shell input,
+:root[data-theme-mode="Light"] .setting-field select,
+:root[data-theme-mode="Light"] .setting-field input:not([type="checkbox"]):not([type="range"]),
+:root[data-theme-mode="Light"] .setting-field textarea {
+  background: #fff;
+  color: var(--text);
+  border-color: var(--line);
+}
+
 /* Targeted post-SDK fixes: compact bottom navigation and a stable Nimmy popup. */
 @media (max-width: 520px) {
   .app { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
