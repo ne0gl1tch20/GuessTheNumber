@@ -598,7 +598,6 @@ fun PlayScreen(
                             minNumber = sharedPresentation.rangeMin,
                             maxNumber = sharedPresentation.rangeMax,
                             label = locale.getString("play_enter_guess", "Enter your guess"),
-                            shape = MaterialTheme.shapes.medium,
                             keyboardType = KeyboardType.Number,
                             imeAction = androidx.compose.ui.text.input.ImeAction.Default,
                             submitOnEnter = false,
