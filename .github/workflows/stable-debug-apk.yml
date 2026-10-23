@@ -121,11 +121,11 @@ jobs:
       - name: Publish debug-latest release asset
         env:
           GH_TOKEN: ${{ github.token }}
+          SOURCE_REF: ${{ inputs.source_ref }}
         run: |
           version_code="$(grep -E '^[[:space:]]*val appVersionCode = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *//')"
           version_name="$(grep -E '^[[:space:]]*val appVersionName = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *"//; s/"$//')"
-          source_ref="${{ inputs.source_ref }}"
-          release_notes="$(printf 'Stable Debug #%s\n\nVersion: %s (%s)\nSource ref: %s\nCommit: %s\n\n- Refresh the installable Stable Debug APK from the selected source ref.\n- Keep the signed ZIP and checksum metadata together.' "$GITHUB_RUN_NUMBER" "$version_name" "$version_code" "$source_ref" "$SOURCE_SHA")"
+          release_notes="$(printf 'Stable Debug #%s\n\nVersion: %s (%s)\nSource ref: %s\nCommit: %s\n\n- Refresh the installable Stable Debug APK from the selected source ref.\n- Keep the signed ZIP and checksum metadata together.' "$GITHUB_RUN_NUMBER" "$version_name" "$version_code" "$SOURCE_REF" "$SOURCE_SHA")"
           gh release view debug-latest >/dev/null 2>&1 || gh release create debug-latest --target "$SOURCE_SHA" --title "GuessTheNumber Debug Latest" --notes "Publishing Stable Debug update..."
           # Only publish after all validation, tests, lint, and APK packaging have succeeded.
           gh release upload debug-latest GuessTheNumber-debug.zip --clobber
