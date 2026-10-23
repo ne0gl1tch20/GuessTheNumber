@@ -26,11 +26,20 @@ object UpdateChannelChecker {
         data class Failed(val diagnostics: String) : Result
     }
 
+    private data class StableDebugRelease(
+        val runNumber: Long,
+        val versionName: String,
+        val versionCode: Long,
+        val commitSha: String
+    )
+
     private const val REPOSITORY = "ne0gl1tch20/GuessTheNumber"
+    private const val STABLE_DEBUG_TAG = "debug-latest"
+    private const val STABLE_DEBUG_ARCHIVE = "GuessTheNumber-debug.zip"
 
     suspend fun check(): Result = withContext(Dispatchers.IO) {
         try {
-            if (BuildConfig.UPDATE_CHANNEL == "debug") checkDebugArtifact() else checkRelease()
+            if (BuildConfig.UPDATE_CHANNEL == "debug") checkDebugReleaseAsset() else checkRelease()
         } catch (error: Exception) {
             Result.Failed(
                 buildString {
@@ -71,97 +80,78 @@ object UpdateChannelChecker {
         )
     }
 
-    /** Checks the newest successful Stable Debug workflow artifact, not the master-only Release. */
-    private fun checkDebugArtifact(): Result {
-        val runsResponse = getJson(
-            "https://api.github.com/repos/$REPOSITORY/actions/workflows/stable-debug-apk.yml/runs?status=success&per_page=100"
-        )
-        val runs = runsResponse.optJSONArray("workflow_runs") ?: return Result.Unavailable
-        val successfulRuns = (0 until runs.length())
-            .mapNotNull { runs.optJSONObject(it) }
-            .filter {
-                it.optString("path") == ".github/workflows/stable-debug-apk.yml" &&
-                    it.optString("status") == "completed" &&
-                    it.optString("conclusion") == "success"
-            }
-            .sortedByDescending { it.optLong("run_number", 0L) }
+    /**
+     * Stable Debug already publishes a replaceable public ZIP asset on the debug-latest
+     * release. Downloading Actions artifacts through the REST API requires authentication,
+     * so use that public release asset instead and keep validating its embedded checksum
+     * and manifest before installation.
+     */
+    private fun checkDebugReleaseAsset(): Result {
+        val release = getJson("https://api.github.com/repos/$REPOSITORY/releases/tags/$STABLE_DEBUG_TAG")
+        val pageUrl = release.optString("html_url")
+        val assets = release.optJSONArray("assets") ?: return Result.Unavailable
+        val asset = (0 until assets.length())
+            .mapNotNull { assets.optJSONObject(it) }
+            .firstOrNull { it.optString("name") == STABLE_DEBUG_ARCHIVE }
+            ?: return Result.Unavailable
+        val downloadUrl = asset.optString("browser_download_url")
+        if (!isGithubUrl(pageUrl) || !isGithubUrl(downloadUrl)) return Result.Unavailable
 
-        for (run in successfulRuns) {
-            val runId = run.optLong("id", 0L)
-            val runNumber = run.optLong("run_number", 0L)
-            val targetCommit = run.optString("head_sha")
-            if (runId <= 0L || runNumber <= 0L ||
-                !targetCommit.matches(Regex("[a-fA-F0-9]{40}"))
-            ) continue
+        val metadata = parseStableDebugReleaseMetadata(release.optString("body"))
+            ?: return Result.Unavailable
+        val installedBuildNumber = BuildConfig.STABLE_DEBUG_BUILD_NUMBER.toLong()
+        if (isStableDebugBuildCurrent(metadata.runNumber, installedBuildNumber)) {
+            return Result.UpToDate
+        }
+        if (installedBuildNumber <= 0L &&
+            BuildConfig.GIT_COMMIT_SHA.matches(Regex("[a-fA-F0-9]{40}")) &&
+            metadata.commitSha.equals(BuildConfig.GIT_COMMIT_SHA, ignoreCase = true)
+        ) {
+            return Result.UpToDate
+        }
+        if (metadata.versionCode < BuildConfig.VERSION_CODE.toLong()) return Result.UpToDate
 
-            val artifactsResponse = runCatching {
-                getJson("https://api.github.com/repos/$REPOSITORY/actions/runs/$runId/artifacts")
-            }.getOrNull() ?: continue
-            val artifacts = artifactsResponse.optJSONArray("artifacts") ?: continue
-            val artifact = (0 until artifacts.length())
-                .mapNotNull { artifacts.optJSONObject(it) }
-                .firstOrNull {
-                    it.optString("name") == "GuessTheNumber-debug" &&
-                        !it.optBoolean("expired", true)
-                } ?: continue
-
-            val downloadUrl = artifact.optString("archive_download_url")
-            val pageUrl = run.optString("html_url")
-            if (!isGithubUrl(downloadUrl) || !isGithubUrl(pageUrl)) continue
-
-            val installedBuildNumber = BuildConfig.STABLE_DEBUG_BUILD_NUMBER.toLong()
-            if (isStableDebugBuildCurrent(runNumber, installedBuildNumber)) {
-                return Result.UpToDate
-            }
-
-            if (installedBuildNumber <= 0L &&
-                BuildConfig.GIT_COMMIT_SHA.matches(Regex("[a-fA-F0-9]{40}")) &&
-                targetCommit.equals(BuildConfig.GIT_COMMIT_SHA, ignoreCase = true)
-            ) {
-                return Result.UpToDate
-            }
-
-            val buildGradle = runCatching {
-                getText("https://raw.githubusercontent.com/$REPOSITORY/$targetCommit/app/build.gradle.kts")
-            }.getOrNull() ?: return Result.Unavailable
-            val versionName = Regex("appVersionName\\s*=\\s*\"([^\"]+)\"")
-                .find(buildGradle)?.groupValues?.getOrNull(1) ?: return Result.Unavailable
-            val versionCode = Regex("appVersionCode\\s*=\\s*(\\d+)")
-                .find(buildGradle)?.groupValues?.getOrNull(1)?.toLongOrNull() ?: return Result.Unavailable
-            if (versionCode < BuildConfig.VERSION_CODE.toLong()) return Result.UpToDate
-
-            val installedCommit = BuildConfig.GIT_COMMIT_SHA
-            val commitOrder = if (installedBuildNumber <= 0L &&
-                installedCommit.matches(Regex("[a-fA-F0-9]{40}"))
-            ) {
-                runCatching {
-                    getJson("https://api.github.com/repos/$REPOSITORY/compare/$targetCommit...$installedCommit")
-                        .optString("status")
-                }.getOrNull()
-            } else null
-            if (installedBuildNumber <= 0L && commitOrder in setOf("ahead", "identical")) {
-                return Result.UpToDate
-            }
-
-            val title = "Stable Debug #$runNumber"
-            val details = buildString {
-                appendLine("Stable Debug #$runNumber")
-                appendLine("Version: $versionName ($versionCode)")
-                append("Commit: $targetCommit")
-            }
-            return Result.Available(
-                AvailableUpdate(
-                    title = "$title · v$versionName ($versionCode)",
-                    url = pageUrl,
-                    details = details,
-                    downloadUrl = downloadUrl,
-                    expectedCommitSha = targetCommit,
-                    requireChecksum = true
-                )
-            )
+        val installedCommit = BuildConfig.GIT_COMMIT_SHA
+        val commitOrder = if (installedBuildNumber <= 0L &&
+            installedCommit.matches(Regex("[a-fA-F0-9]{40}"))
+        ) {
+            runCatching {
+                getJson("https://api.github.com/repos/$REPOSITORY/compare/${metadata.commitSha}...$installedCommit")
+                    .optString("status")
+            }.getOrNull()
+        } else null
+        if (installedBuildNumber <= 0L && commitOrder in setOf("ahead", "identical")) {
+            return Result.UpToDate
         }
 
-        return Result.Unavailable
+        val details = buildString {
+            appendLine("Stable Debug #${metadata.runNumber}")
+            appendLine("Version: ${metadata.versionName} (${metadata.versionCode})")
+            append("Commit: ${metadata.commitSha}")
+        }
+        return Result.Available(
+            AvailableUpdate(
+                title = "Stable Debug #${metadata.runNumber} · v${metadata.versionName} (${metadata.versionCode})",
+                url = pageUrl,
+                details = details,
+                downloadUrl = downloadUrl,
+                expectedCommitSha = metadata.commitSha,
+                requireChecksum = true
+            )
+        )
+    }
+
+    internal fun parseStableDebugReleaseMetadata(body: String): StableDebugRelease? {
+        val runNumber = Regex("(?m)^Stable Debug #(\\d+)\\s*$")
+            .find(body)?.groupValues?.getOrNull(1)?.toLongOrNull() ?: return null
+        val version = Regex("(?m)^Version: ([^\\s]+) \\((\\d+)\\)\\s*$")
+            .find(body) ?: return null
+        val versionName = version.groupValues[1]
+        val versionCode = version.groupValues[2].toLongOrNull() ?: return null
+        val commitSha = Regex("(?m)^Commit: ([a-fA-F0-9]{40})\\s*$")
+            .find(body)?.groupValues?.getOrNull(1) ?: return null
+        if (versionName.isBlank() || versionCode <= 0L || runNumber <= 0L) return null
+        return StableDebugRelease(runNumber, versionName, versionCode, commitSha)
     }
 
     private fun isGithubUrl(address: String): Boolean {
@@ -198,8 +188,6 @@ object UpdateChannelChecker {
             connection.disconnect()
         }
     }
-
-
 
     internal fun isStableDebugBuildCurrent(remoteBuildNumber: Long, installedBuildNumber: Long): Boolean =
         installedBuildNumber > 0L && remoteBuildNumber <= installedBuildNumber
