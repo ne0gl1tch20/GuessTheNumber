@@ -1034,3 +1034,26 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
     padding-block: 12px;
   }
 }
+
+/* Daily Rewards can hit the same tiny/stale viewport issue as the Arcade
+   popup in Android WebView. Pin the overlay to the fixed containing block
+   instead of trusting 100vh/100dvh, and let the dialog scroll rather than
+   clipping its contents with the theme-specific overflow:hidden rule. */
+#dailyRewardOverlay {
+  position: fixed;
+  inset: auto;
+  top: max(12px, env(safe-area-inset-top));
+  right: 0;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  left: 0;
+  height: auto;
+  max-height: none;
+  padding: 12px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+#dailyRewardOverlay .daily-reward-dialog {
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
