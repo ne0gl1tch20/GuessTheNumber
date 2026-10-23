@@ -186,5 +186,18 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn("prefers-reduced-motion", (SDK / "styles/jarrlyy-ui-advanced.css").read_text(encoding="utf-8"))
 
 
+    def test_nimmy_tutorial_is_unblurred_and_uses_a_sized_popup_box(self):
+        css = (WEB / "styles.css").read_text(encoding="utf-8")
+        nimmy_rules = css.split("/* Popup regression fix: Nimmy is a floating guide", 1)[1]
+        nimmy_rules = nimmy_rules.split("/*", 1)[0]
+        self.assertIn("#nimmyTutorial .nimmy-tutorial-backdrop", nimmy_rules)
+        self.assertIn("backdrop-filter: none !important", nimmy_rules)
+        self.assertIn("width: min(440px, calc(100vw - 24px))", nimmy_rules)
+        self.assertIn("max-height: calc(100dvh - 24px", nimmy_rules)
+        self.assertIn("overflow-y: auto", nimmy_rules)
+        self.assertIn(".nimmy-tutorial:not(#nimmyTutorial) .nimmy-dialog", nimmy_rules)
+        self.assertIn("width: min(520px, calc(100vw - 24px))", nimmy_rules)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
