@@ -1,0 +1,64 @@
+name: Publish Web Play Asset Manifest
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "app/src/main/assets/web-play/**"
+      - "app/src/main/assets/fonts/**"
+      - "app/src/main/assets/locales/**"
+      - "app/src/main/assets/libraries/**"
+      - "tools/generate_web_play_manifest.py"
+      - ".github/workflows/web-play-manifest.yml"
+  pull_request:
+    paths:
+      - "app/src/main/assets/web-play/**"
+      - "app/src/main/assets/fonts/**"
+      - "app/src/main/assets/locales/**"
+      - "app/src/main/assets/libraries/**"
+      - "tools/generate_web_play_manifest.py"
+      - ".github/workflows/web-play-manifest.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: web-play-manifest-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.event.repository.default_branch }}
+          fetch-depth: 0
+      - name: Generate manifest from the selected repository branch
+        run: |
+          python tools/generate_web_play_manifest.py --output web-play-manifest.json --version "$(git rev-parse HEAD)"
+      - name: Verify manifest is valid
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib
+          manifest = json.loads(pathlib.Path("web-play-manifest.json").read_text())
+          assert manifest["schemaVersion"] == 1
+          assert {"web-play/index.html", "web-play/app.js", "web-play/styles.css"} <= {f["path"] for f in manifest["files"]}
+          for entry in manifest["files"]:
+              assert len(entry["sha256"]) == 64
+              assert entry["path"].startswith(("web-play/", "fonts/", "locales/", "libraries/"))
+          print(f"Validated {len(manifest['files'])} assets")
+          PY
+      - name: Publish manifest commit on master
+        if: github.event_name == 'push'
+        run: |
+          if [ -z "$(git status --porcelain -- web-play-manifest.json)" ]; then
+            echo "Manifest already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web-play-manifest.json
+          git commit -m "chore: refresh web-play asset manifest [skip ci]"
+          git push origin HEAD:master
