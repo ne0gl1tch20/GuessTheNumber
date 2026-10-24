@@ -30,6 +30,8 @@ Each package may contain a `trait.json`, Lua logic, JavaScript presentation, CSS
 
 ## Signed manifest
 
+The package-folder layout uses **schema version 2**. Version 1 manifests use the older flat path layout and are rejected rather than interpreted ambiguously.
+
 The HTTPS manifest is a JSON envelope:
 
 ```json
