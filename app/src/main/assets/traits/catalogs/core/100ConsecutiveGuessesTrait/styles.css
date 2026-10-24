@@ -1,0 +1,10 @@
+.trait-package-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+.trait-package-card [data-progress] {
+  font-variant-numeric: tabular-nums;
+}
