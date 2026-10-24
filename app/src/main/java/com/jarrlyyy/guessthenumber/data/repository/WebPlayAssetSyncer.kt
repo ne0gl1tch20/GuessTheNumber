@@ -111,7 +111,9 @@ class WebPlayAssetSyncer(context: Context) {
         }.getOrDefault(false)
     }
 
-    fun activeVersion(): String? = runCatching { activePointer.takeIf { it.isFile }?.readText()?.trim() }.getOrNull()
+    fun activeVersion(): String? = runCatching {
+        activePointer.takeIf { it.isFile }?.readText()?.trim()?.takeIf { it.matches(Regex("[a-f0-9]{7,40}")) }
+    }.getOrNull()
 
     fun pathHandler(assetRoot: String): WebViewAssetLoader.PathHandler = WebViewAssetLoader.PathHandler { path ->
         val safePath = path.trimStart('/')
