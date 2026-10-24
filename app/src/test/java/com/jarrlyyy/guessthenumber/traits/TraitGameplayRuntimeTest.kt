@@ -89,6 +89,43 @@ class TraitGameplayRuntimeTest {
         }
     }
 
+    @Test fun validatedRemoteTraitEffectChangesActualGameplay() {
+        val originalRegistry = ActiveTraitCatalog.current()
+        try {
+            val remote = TraitDefinition(
+                id = "remote_combo_module",
+                titleKey = "trait.remote_combo.title",
+                descriptionKey = "trait.remote_combo.description",
+                category = TraitCategory.GAMEPLAY,
+                effects = setOf(TraitEffect.COMBO_REWARD),
+                activation = TraitActivationConditions(minimumCorrectGuesses = 0L),
+                source = TraitSource.LIVEOPS,
+                catalogId = "community"
+            )
+            ActiveTraitCatalog.install(TraitRegistry(BuiltInTraits.definitions + remote))
+            val before = GameState(
+                money = BigNumber(1_000),
+                currentRangeMin = 1,
+                currentRangeMax = 100,
+                targetNumber = 50,
+                correctGuesses = 0,
+                streak = 5
+            )
+            val after = before.copy(
+                money = BigNumber(1_100),
+                correctGuesses = 1,
+                streak = 6,
+                statistics = before.statistics.copy(moneyEarned = BigNumber(100))
+            )
+            val base = GuessResult(GuessFeedback.CORRECT, BigNumber(100), false, 6, after)
+            val result = TraitGameplayRuntime.apply(before, 50, base, "summer")
+            assertEquals(110.0, result.reward.value.toDouble(), 0.001)
+            assertEquals(1_110.0, result.newState.money.value.toDouble(), 0.001)
+        } finally {
+            ActiveTraitCatalog.install(originalRegistry)
+        }
+    }
+
     @Test fun traitLogicDoesNotRunForOutOfRangeGuess() {
         val before = GameState(currentRangeMin = 1, currentRangeMax = 100, correctGuesses = 100)
         val after = before.copy(attempts = 1)
