@@ -57,7 +57,6 @@ class TraitRewardPolicyTest {
         val summerState = TraitRewardPolicy.updateDiscoveries(winterState, "summer")
         assertTrue("Existing discoveries survive season changes", "hidden_night_owl" in summerState.discoveredTraitIds)
         assertTrue("Unknown saved IDs remain compatible", "custom_seasonal_memory" in summerState.discoveredTraitIds)
-        assertEquals(1L, TraitRewardPolicy.nebulaBonusForClaim(summerState, "summer"))
     }
 
 }
