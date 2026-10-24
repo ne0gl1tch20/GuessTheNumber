@@ -97,7 +97,10 @@ object SaveFixtureLab {
             money = BigNumber(-999)
         )))
         val invalidRange = validate(encode(state.copy(lastSaveTimestamp = state.lastSaveTimestamp.coerceAtLeast(1L), targetNumber = 999L)))
-        val legacy = migrateLegacy(fixture.replaceFirst("lastSavedVersion", "legacyUnknownVersionField"))
+        // Preserve the existing schema fields and add an unknown future field. Replacing a
+        // required field with an unknown one made this fixture invalid for the wrong reason.
+        val legacyFixture = fixture.dropLast(1) + ",\"futureUnknownField\":\"ignored\"}"
+        val legacy = migrateLegacy(legacyFixture)
         val backup = restoreFromBackup("{ broken primary", fixture)
         return listOf(
             Check("Valid current save", current.passed, current.detail),
