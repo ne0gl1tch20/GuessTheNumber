@@ -93,7 +93,9 @@ private fun CoreProcessScreen(state: GameState, onExecuteCommand: (String) -> St
             Button(onClick = {
                 if (input.isNotBlank()) {
                     val command = input.trim()
-                    if (command.substringBefore(' ').lowercase() in setOf("/reset", "/give", "/set", "/timeskip", "/skip", "/moneyprinter", "/unlock", "/unlock_all", "/crash_test", "/konami", "/win", "/completeguess", "/max_upgrades", "/maxupgrades", "/autoclicker", "/setlevel", "/speed", "/test", "/newnumber")) {
+                    // Default-deny command execution: only known read-only commands bypass confirmation.
+                    // New or renamed developer commands are therefore protected automatically.
+                    if (command.startsWith("/") && command.substringBefore(' ').lowercase() !in setOf("/version", "/state", "/inspect", "/stats", "/help")) {
                         pendingCommand = command
                     } else runCommand(command)
                 }
