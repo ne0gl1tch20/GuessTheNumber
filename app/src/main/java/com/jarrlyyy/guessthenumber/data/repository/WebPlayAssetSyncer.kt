@@ -21,6 +21,7 @@ class WebPlayAssetSyncer(context: Context) {
     private val root = File(appContext.filesDir, "web-play-sync")
     private val versions = File(root, "versions")
     private val activePointer = File(root, "active-version")
+    private val badVersionFile = File(root, "bad-version")
     private val syncMutex = PROCESS_MUTEX
 
     data class SyncResult(val changed: Boolean, val version: String?, val message: String)
@@ -33,6 +34,9 @@ class WebPlayAssetSyncer(context: Context) {
             require(manifest.optInt("schemaVersion") == 1) { "Unsupported manifest schema" }
             val version = manifest.getString("version")
             require(version.matches(Regex("[a-f0-9]{7,40}"))) { "Invalid web-play version" }
+            if (runCatching { badVersionFile.readText().trim() }.getOrNull() == version) {
+                return@withContext SyncResult(false, activeVersion(), "Skipped a previously failed web-play version")
+            }
             require(manifest.optInt("minAppVersionCode", Int.MAX_VALUE) <= APP_VERSION_CODE) { "Update requires a newer app" }
             val entries = manifest.getJSONArray("files")
             require(entries.length() in 3..256) { "Invalid manifest file count" }
@@ -100,13 +104,20 @@ class WebPlayAssetSyncer(context: Context) {
 
     fun rollbackToPrevious(): Boolean {
         val current = activeVersion() ?: return false
-        val previous = versions.listFiles()?.filter { it.isDirectory && it.name != current && it.name.matches(Regex("[a-f0-9]{7,40}")) }
-            ?.filter { REQUIRED_FILES.all { path -> File(it, path).isFile && File(it, path).length() > 0L } }
-            ?.maxByOrNull { it.lastModified() } ?: return false
         return runCatching {
-            val temp = File(root, "active-version.rollback.tmp")
-            temp.writeText(previous.name)
-            check(temp.renameTo(activePointer))
+            badVersionFile.writeText(current)
+            val previous = versions.listFiles()?.filter { it.isDirectory && it.name != current && it.name.matches(Regex("[a-f0-9]{7,40}")) }
+                ?.filter { REQUIRED_FILES.all { path -> File(it, path).isFile && File(it, path).length() > 0L } }
+                ?.maxByOrNull { it.lastModified() }
+            if (previous == null) {
+                // First remote activation may have replaced only the bundled fallback.
+                // Clearing the pointer restores the original APK assets immediately.
+                check(activePointer.delete())
+            } else {
+                val temp = File(root, "active-version.rollback.tmp")
+                temp.writeText(previous.name)
+                check(temp.renameTo(activePointer))
+            }
             true
         }.getOrDefault(false)
     }
