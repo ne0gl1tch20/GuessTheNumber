@@ -100,11 +100,23 @@ class TraitRegistryTest {
             assertEquals(definition.activation.minimumBestStreak,
                 rules["activation"]!!.jsonObject["minimumBestStreak"]?.jsonPrimitive?.int ?: 0)
             assertTrue("Unsafe SVG in ${definition.id}", !icon.readText().contains("<script", ignoreCase = true))
-            val locale = json.parseToJsonElement(localeJson.readText()).jsonObject
-            assertEquals(definition.id, locale["id"]!!.jsonPrimitive.content)
-            assertTrue("Missing localized title for ${definition.id}", locale["title"]!!.jsonPrimitive.content.isNotBlank())
-            assertTrue("Missing localized description for ${definition.id}", locale["description"]!!.jsonPrimitive.content.isNotBlank())
-            if (definition.id == "hundred_consecutive_guesses") assertTrue(locale["description"]!!.jsonPrimitive.content.contains("100 consecutive"))
+            val localeDir = java.io.File(folder, "locales")
+            val localeFiles = localeDir.listFiles().orEmpty().filter { it.isFile && it.extension.equals("json", true) }
+            assertTrue("Missing English fallback locale for ${definition.id}", localeFiles.any { it.name == "en.json" })
+            val english = json.parseToJsonElement(localeJson.readText()).jsonObject
+            assertEquals(definition.id, english["id"]!!.jsonPrimitive.content)
+            assertTrue("Missing English title for ${definition.id}", english["title"]!!.jsonPrimitive.content.isNotBlank())
+            assertTrue("Missing English description for ${definition.id}", english["description"]!!.jsonPrimitive.content.isNotBlank())
+            localeFiles.forEach { localeFile ->
+                assertTrue("Invalid locale filename: ${localeFile.name}", localeFile.nameWithoutExtension.matches(Regex("[a-z]{2}(-[A-Z]{2})?")))
+                val localized = json.parseToJsonElement(localeFile.readText()).jsonObject
+                assertEquals("Wrong trait ID in ${localeFile.path}", definition.id, localized["id"]!!.jsonPrimitive.content)
+                listOf("title", "description").forEach { key ->
+                    assertTrue("Missing $key in ${localeFile.path}", !localized[key]!!.jsonPrimitive.content.isBlank())
+                }
+                assertEquals("Locale keys differ in ${localeFile.path}", english.keys, localized.keys)
+            }
+            if (definition.id == "hundred_consecutive_guesses") assertTrue(english["description"]!!.jsonPrimitive.content.contains("100 consecutive"))
         }
         all.map { it.catalogId }.distinct().forEach { catalogId ->
             val indexFile = java.io.File(projectRoot, "app/src/main/assets/traits/catalogs/${catalogId}/catalog.json")
