@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import com.jarrlyyy.guessthenumber.data.repository.UpdateChannelChecker
 import com.jarrlyyy.guessthenumber.data.repository.ApkUpdateInstaller
+import com.jarrlyyy.guessthenumber.data.repository.WebPlayAssetSyncer
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -109,6 +110,7 @@ fun ProductionWebPlayScreen(
     val requestIds = remember { WebUiRequestIdWindow() }
     val context = androidx.compose.ui.platform.LocalContext.current
     val updateScope = rememberCoroutineScope()
+    val webPlayAssetSyncer = remember(context) { WebPlayAssetSyncer(context) }
     var latestAvailableUpdate by remember { mutableStateOf<UpdateChannelChecker.AvailableUpdate?>(null) }
     val progressionEngine = remember { GameEngine() }
     val currentGameState by rememberUpdatedState(state)
@@ -189,6 +191,9 @@ fun ProductionWebPlayScreen(
             val talentDefinitions = configRepository.loadTalents()
             val minigameDefinitions = configRepository.loadMinigames()
             val assetLoader = WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/web-play/", webPlayAssetSyncer.pathHandler("web-play"))
+                .addPathHandler("/assets/fonts/", webPlayAssetSyncer.pathHandler("fonts"))
+                .addPathHandler("/assets/locales/", webPlayAssetSyncer.pathHandler("locales"))
                 .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
                 .build()
             WebView(context).apply {
@@ -852,6 +857,15 @@ fun ProductionWebPlayScreen(
             }
         }
     )
+
+    LaunchedEffect(Unit) {
+        // If startup sync is still running, serialize behind it and refresh only when the active version changes.
+        val versionBefore = webPlayAssetSyncer.activeVersion()
+        webPlayAssetSyncer.sync()
+        if (webPlayAssetSyncer.activeVersion() != versionBefore) {
+            webViewRef?.post { webViewRef?.loadUrl("$WEB_UI_ORIGIN${WEB_UI_PATH}index.html") }
+        }
+    }
 
     bridgeErrorDetails?.let { details ->
         AlertDialog(
