@@ -868,9 +868,6 @@ fun ProductionWebPlayScreen(
                                                     put("feedback_toohigh_$index", activeLocaleManager.getString("feedback_toohigh_$index"))
                                                 }
                                             })
-                                                put("feedback_toolow_$index", activeLocaleManager.getString("feedback_toolow_$index"))
-                                                put("feedback_toohigh_$index", activeLocaleManager.getString("feedback_toohigh_$index"))
-                                            } })
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
                                             .put("prestigeUpgrades", prestigeUpgradesJson)
