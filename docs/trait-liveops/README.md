@@ -5,7 +5,7 @@
 The offline catalog contains **316 validated trait definitions across 30 catalog folders**. Each trait has its own folder with four checked-in package files:
 
 - `trait.json`: stable ID, catalog, category, visibility, effects and display keys
-- `rules.json`: activation thresholds, dependencies, conflicts and allowed effects
+- `rules.json`: activation thresholds (including lifetime correct guesses and best streak), dependencies, conflicts and allowed effects
 - `locales/en.json`: English title and description
 - `icon.svg`: local icon asset
 

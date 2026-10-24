@@ -72,7 +72,7 @@ object BuiltInTraits {
             visibility = TraitVisibility.HIDDEN,
             catalogId = "core",
             packageFolder = "100ConsecutiveGuessesTrait",
-            activation = TraitActivationConditions(minimumPrestige = 0, minimumCorrectGuesses = 250L)),
+            activation = TraitActivationConditions(minimumPrestige = 0, minimumBestStreak = 100)),
         trait("first_hundred", TraitCategory.PROGRESSION, TraitEffect.COSMETIC_BADGE,
             visibility = TraitVisibility.VISIBLE,
             catalogId = "core",

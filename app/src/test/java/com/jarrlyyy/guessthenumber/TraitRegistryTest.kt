@@ -97,6 +97,8 @@ class TraitRegistryTest {
             assertEquals(definition.effects.map { it.name }.toSet(), metadata["effects"]!!.jsonArray.map { it.jsonPrimitive.content }.toSet())
             assertEquals(definition.activation.minimumCorrectGuesses,
                 rules["activation"]!!.jsonObject["minimumCorrectGuesses"]!!.jsonPrimitive.long)
+            assertEquals(definition.activation.minimumBestStreak,
+                rules["activation"]!!.jsonObject["minimumBestStreak"]?.jsonPrimitive?.int ?: 0)
             assertTrue("Unsafe SVG in ${definition.id}", !icon.readText().contains("<script", ignoreCase = true))
             val locale = json.parseToJsonElement(localeJson.readText()).jsonObject
             assertEquals(definition.id, locale["id"]!!.jsonPrimitive.content)

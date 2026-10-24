@@ -4,7 +4,8 @@
   "activation": {
     "minimumLevel": 1,
     "minimumPrestige": 0,
-    "minimumCorrectGuesses": 250
+    "minimumCorrectGuesses": 0,
+    "minimumBestStreak": 100
   },
   "dependencies": [],
   "conflicts": [],

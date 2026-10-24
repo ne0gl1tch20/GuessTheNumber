@@ -69,6 +69,14 @@ class TraitActivationEngineTest {
         assertEquals(setOf("hidden_night_owl"), discovered.discoveredHiddenTraitIds)
     }
 
+    @Test fun hundredConsecutiveGuessesTraitRequiresBestStreakNotLifetimeTotal() {
+        val before = engine.evaluate(TraitActivationContext(GameState(correctGuesses = 10_000, bestStreak = 99)))
+        assertFalse(before.isActive("hundred_consecutive_guesses"))
+        val reached = engine.evaluate(TraitActivationContext(GameState(correctGuesses = 100, bestStreak = 100)))
+        assertTrue(reached.isActive("hundred_consecutive_guesses"))
+        assertTrue(reached.effects.bonusNebulaPerClaim >= 1L)
+    }
+
     @Test fun evaluationDoesNotMutateOrPersistGameState() {
         val state = GameState(correctGuesses = 25)
         val result = engine.evaluate(TraitActivationContext(state))

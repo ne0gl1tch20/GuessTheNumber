@@ -12,7 +12,8 @@ enum class TraitEffect { XP_MULTIPLIER, NEBULA_BONUS, STREAK_PROTECTION, COSMETI
 data class TraitActivationConditions(
     val minimumLevel: Int = 1,
     val minimumPrestige: Int = 0,
-    val minimumCorrectGuesses: Long = 0L
+    val minimumCorrectGuesses: Long = 0L,
+    val minimumBestStreak: Int = 0
 )
 
 data class TraitDefinition(
@@ -67,6 +68,7 @@ object TraitDefinitionValidator {
         require(definition.activation.minimumLevel >= 1) { "Minimum level must be at least 1." }
         require(definition.activation.minimumPrestige >= 0) { "Minimum prestige cannot be negative." }
         require(definition.activation.minimumCorrectGuesses >= 0L) { "Correct guess requirement cannot be negative." }
+        require(definition.activation.minimumBestStreak >= 0) { "Best streak requirement cannot be negative." }
         require(definition.dependencies.size <= TraitDefinition.MAX_DEPENDENCIES) { "Too many dependencies." }
         require(definition.effects.isNotEmpty() && definition.effects.size <= TraitDefinition.MAX_EFFECTS) {
             "Trait must declare a supported effect."
