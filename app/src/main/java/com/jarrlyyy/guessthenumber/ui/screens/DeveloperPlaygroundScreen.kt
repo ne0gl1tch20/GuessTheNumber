@@ -28,7 +28,7 @@ fun DeveloperPlaygroundScreen(state: GameState, onExecuteCommand: (String) -> St
                 "core" -> CoreProcessScreen(state, onExecuteCommand)
                 "web" -> WebProcessScreen(onTestDailyRewards)
                 "tests" -> DeveloperTestSuitesScreen(state, onExecuteCommand)
-                "ui" -> DeveloperUiPlaygroundScreen()
+                "ui" -> DeveloperUiPlaygroundScreen(onTestDailyRewards)
                 "save" -> DeveloperSaveLabScreen(state)
                 "diagnostics" -> DeveloperDiagnosticsScreen(state)
                 "runtime" -> RuntimeInspectorScreen(state) { destination = "hub" }
@@ -158,14 +158,17 @@ private fun DeveloperTestSuitesScreen(state: GameState, onExecuteCommand: (Strin
 }
 
 @Composable
-private fun DeveloperUiPlaygroundScreen() {
+private fun DeveloperUiPlaygroundScreen(onTestDailyRewards: () -> Unit) {
     var selected by remember { mutableStateOf("popup") }
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("UI Playground", style = MaterialTheme.typography.titleLarge) }
         item { Text("Organize popup, tutorial, loading and edge-case scenarios here before wiring feature-specific Web commands.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { Button(onClick = { selected = "popup" }) { Text("Popup scenarios") }; Spacer(Modifier.height(4.dp)); Button(onClick = { selected = "tutorial" }) { Text("Tutorial scenarios") }; Spacer(Modifier.height(4.dp)); Button(onClick = { selected = "edge" }) { Text("Edge-case scenarios") } }
         item { DeveloperPanel("Selected scenario", selected) }
-        item { DeveloperPanel("Acceptance checks", "Box remains fully visible\nCentered correctly\nButtons remain tappable\nLong text does not clip\nDismiss/collect closes correctly\nLocalization remains readable") }
+        item { Button(onClick = { WebViewDebugConsole.runJavascript("window.gtnShowDailyRewardTest && window.gtnShowDailyRewardTest()") }, modifier = Modifier.fillMaxWidth()) { Text("Open daily reward popup in WebView") } }
+        item { OutlinedButton(onClick = { WebViewDebugConsole.runJavascript("JSON.stringify(Array.from(document.querySelectorAll('#popupLayer [role=dialog], #popupLayer .reward-overlay')).map(e => ({id:e.id,hidden:e.hidden,rect:(r=>({x:r.x,y:r.y,width:r.width,height:r.height}))(e.getBoundingClientRect())})))") }, modifier = Modifier.fillMaxWidth()) { Text("Inspect popup bounds") }
+        item { OutlinedButton(onClick = onTestDailyRewards, modifier = Modifier.fillMaxWidth()) { Text("Run native daily-reward test flow") } }
+        item { DeveloperPanel("Acceptance checks", "Popup box remains fully visible\nCentered correctly\nButtons remain tappable\nLong text does not clip\nDismiss/collect closes correctly\nLocalization remains readable") }
     }
 }
 
