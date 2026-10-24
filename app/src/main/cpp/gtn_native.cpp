@@ -48,7 +48,7 @@ jlong adaptiveTarget(
     if (width > 4ULL) {
         const uint64_t edgeBand = std::min(width / 4ULL, pressure * width / 128ULL);
         if (edgeBand > 0ULL && (sample & 1ULL) != 0ULL) {
-            offset = std::min(width - 1ULL, offset + edgeBand);
+            offset = std::min<uint64_t>(width - 1ULL, offset + edgeBand);
         }
     }
 
