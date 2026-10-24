@@ -93,7 +93,7 @@ private fun CoreProcessScreen(state: GameState, onExecuteCommand: (String) -> St
             Button(onClick = {
                 if (input.isNotBlank()) {
                     val command = input.trim()
-                    if (command.substringBefore(' ').lowercase() in setOf("/reset", "/give", "/set", "/timeskip", "/skip", "/moneyprinter", "/unlock", "/unlock_all", "/crash_test", "/konami", "/win", "/completeguess", "/max_upgrades", "/maxupgrades", "/autoclicker", "/setlevel", "/speed")) {
+                    if (command.substringBefore(' ').lowercase() in setOf("/reset", "/give", "/set", "/timeskip", "/skip", "/moneyprinter", "/unlock", "/unlock_all", "/crash_test", "/konami", "/win", "/completeguess", "/max_upgrades", "/maxupgrades", "/autoclicker", "/setlevel", "/speed", "/test", "/newnumber")) {
                         pendingCommand = command
                     } else runCommand(command)
                 }
