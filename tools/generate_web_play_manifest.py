@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "app" / "src" / "main" / "assets"
-INCLUDED_DIRS = ("web-play", "fonts", "locales")
+INCLUDED_DIRS = ("web-play", "fonts", "locales", "libraries")
 REQUIRED = {"web-play/index.html", "web-play/app.js", "web-play/styles.css"}
 
 
