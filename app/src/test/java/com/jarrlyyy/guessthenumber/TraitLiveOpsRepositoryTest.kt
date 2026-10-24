@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber
 
 import com.jarrlyyy.guessthenumber.traits.BuiltInTraits
 import com.jarrlyyy.guessthenumber.traits.RemoteTraitDefinition
+import com.jarrlyyy.guessthenumber.traits.RemoteTraitFile
 import com.jarrlyyy.guessthenumber.traits.TraitLiveOpsPayload
 import com.jarrlyyy.guessthenumber.traits.validateAndMapTraitPayload
 import org.junit.Assert.assertEquals
