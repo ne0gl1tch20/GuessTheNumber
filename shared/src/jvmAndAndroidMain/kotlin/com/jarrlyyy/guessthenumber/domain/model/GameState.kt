@@ -67,6 +67,7 @@ data class GameState(
     val equippedRelicIds: Set<String> = emptySet(),
     val worldMasteryLevels: Map<String, Int> = emptyMap(),
     val discoveredSecretIds: Set<String> = emptySet(),
+    val discoveredTraitIds: Set<String> = emptySet(),
     val codexEntries: Set<String> = emptySet(),
     val homeBaseLevel: Int = 0,
     val activeBossBattleWorldId: String? = null,
