@@ -64,7 +64,8 @@ class TraitExtensionRuntime(
             require(Regex("[a-z][a-z0-9_-]{0,47}").matches(module.id)) { "Invalid module ID." }
             require(module.entrypoint.length <= MAX_PATH_LENGTH &&
                 !module.entrypoint.startsWith("/") &&
-                module.entrypoint.split('/').all { it.isNotBlank() && it != "." && it != ".." }) {
+                !module.entrypoint.contains('\\') &&
+                module.entrypoint.split('/').all { it.matches(Regex("[A-Za-z0-9_-][A-Za-z0-9_.-]*")) }) {
                 "Invalid module entrypoint."
             }
             val source = files[module.entrypoint] ?: error("Missing module entrypoint: ${module.entrypoint}")

@@ -384,7 +384,9 @@ private fun validateTraitAssetPath(trait: RemoteTraitDefinition, path: String): 
     require(Regex("[A-Za-z0-9_-]{1,48}").matches(trait.catalogId)) { "Invalid trait catalog ID." }
     val expectedPrefix = "assets/traits/catalogs/" + trait.catalogId + "/" + trait.folderName + "/"
     require(path.startsWith(expectedPrefix) && path.length <= 240) { "Trait asset path is outside its catalog/trait folder." }
-    require(path.split('/').all { it.isNotBlank() && it != "." && it != ".." }) { "Invalid trait asset path." }
+    require(!path.contains('\\') && path.split('/').all {
+        it.matches(Regex("[A-Za-z0-9_-][A-Za-z0-9_.-]*"))
+    }) { "Invalid trait asset path." }
     require(path.substringAfterLast('.', "").lowercase() in setOf(
         "lua", "json", "js", "css", "html", "svg", "txt", "png", "webp", "ttf", "woff2"
     )) { "Unsupported trait asset extension." }
