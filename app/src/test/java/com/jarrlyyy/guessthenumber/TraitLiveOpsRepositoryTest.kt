@@ -54,7 +54,7 @@ class TraitLiveOpsRepositoryTest {
         assertThrows(IllegalArgumentException::class.java) {
             validateAndMapTraitPayload(payload().copy(schemaVersion = 99), 21)
         }
-        val many = (1..301).map { i -> RemoteTraitDefinition("remote_trait_" + i,
+        val many = (1..181).map { i -> RemoteTraitDefinition("remote_trait_" + i,
             "trait.remote_trait_" + i + ".title", "trait.remote_trait_" + i + ".description",
             "PROGRESSION", effects = listOf("XP_MULTIPLIER")) }
         assertThrows(IllegalArgumentException::class.java) {
