@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.traits
 
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -28,6 +29,9 @@ class TraitActivationBenchmarkTest {
         )
 
         assertTrue("Benchmark should exercise the expanded catalog", registry.size >= 316)
+        assertSame("Sorted catalog view should be cached", registry.all(), registry.all())
+        assertSame("Visible catalog view should be cached", registry.visible(), registry.visible())
+        assertSame("Hidden catalog view should be cached", registry.hidden(), registry.hidden())
 
         repeat(WARMUP_ITERATIONS) { engine.evaluate(context) }
         val expected = engine.evaluate(context).activeTraitIds
