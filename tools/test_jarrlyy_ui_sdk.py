@@ -299,6 +299,12 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
             "else if(completedType==='arcade_reward'){toast('Arcade reward saved! ✨');closeArcade()}",
             app,
         )
+        # Force-hide the popup and its backdrop immediately; Android WebView CSS
+        # must not be able to leave the modal visible after a claim.
+        self.assertIn("panel.style.setProperty('display','none','important')", app)
+        self.assertIn("panel.setAttribute('aria-hidden','true')", app)
+        self.assertIn("panel.style.removeProperty('display')", app)
+        self.assertIn("#arcadeGame[hidden]{display:none!important;visibility:hidden!important;pointer-events:none!important}", (WEB / "styles.css").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
