@@ -22,6 +22,7 @@ import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
 import com.jarrlyyy.guessthenumber.domain.engine.AntiCheatService
 import com.jarrlyyy.guessthenumber.domain.engine.AntiTimeTravelService
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
+import com.jarrlyyy.guessthenumber.domain.engine.OfflineEarningsCalculator
 import com.jarrlyyy.guessthenumber.domain.engine.GuessingBot
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
@@ -213,21 +214,20 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             var finalState = refreshDailyQuestDay(timeCheckedState)
 
             if (!timeTravelDetected && deltaSeconds > 0 && timeCheckedState.autoClickerActive) {
-                val maxOfflineSeconds = 28800L
-                val effectiveSeconds = minOf(deltaSeconds, maxOfflineSeconds)
-                val earningsPerSec = BigNumber(500)
-                val totalOfflineEarnings = earningsPerSec * BigNumber(effectiveSeconds.toDouble())
-                
-                finalState = finalState.copy(
-                    money = finalState.money + totalOfflineEarnings,
-                    statistics = finalState.statistics.copy(
-                        moneyEarned = finalState.statistics.moneyEarned + totalOfflineEarnings
+                val effectiveSeconds = OfflineEarningsCalculator.effectiveSeconds(deltaSeconds)
+                val totalOfflineEarnings = OfflineEarningsCalculator.calculate(timeCheckedState, effectiveSeconds)
+                if (totalOfflineEarnings > BigNumber.ZERO) {
+                    finalState = finalState.copy(
+                        money = finalState.money + totalOfflineEarnings,
+                        statistics = finalState.statistics.copy(
+                            moneyEarned = finalState.statistics.moneyEarned + totalOfflineEarnings
+                        )
                     )
-                )
-                withContext(Dispatchers.Main) {
-                    _offlineGains.value = totalOfflineEarnings
+                    withContext(Dispatchers.Main) {
+                        _offlineGains.value = totalOfflineEarnings
+                    }
+                    GameLogger.log(LogLevel.INFO, LoggerCategory.AUTOCLICKER, "OFFLINE_GAINS", "Earned $totalOfflineEarnings while offline for $effectiveSeconds seconds in slot $targetSlot.")
                 }
-                GameLogger.log(LogLevel.INFO, LoggerCategory.AUTOCLICKER, "OFFLINE_GAINS", "Earned $totalOfflineEarnings while offline for $effectiveSeconds seconds in slot $targetSlot.")
             }
 
             guessingBot.reset(finalState.currentRangeMin, finalState.currentRangeMax)
