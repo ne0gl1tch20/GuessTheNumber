@@ -35,13 +35,45 @@ object SaveFixtureLab {
             state.targetNumber in state.currentRangeMin..state.currentRangeMax &&
             state.attempts >= 0 && state.correctGuesses >= 0 &&
             state.streak >= 0 && state.bestStreak >= 0 &&
+            state.statistics.totalGuesses >= 0 &&
+            state.statistics.correctGuesses >= 0 &&
+            state.statistics.failedGuesses >= 0 &&
             state.statistics.moneyEarned.value >= BigDecimal.ZERO &&
             state.statistics.moneySpent.value >= BigDecimal.ZERO &&
+            state.statistics.prestigesCount >= 0 &&
+            state.statistics.ultrasCount >= 0 &&
+            state.statistics.nebulaEarned >= 0 &&
+            state.statistics.playtimeSeconds >= 0 &&
+            state.statistics.arcadePlayed >= 0 &&
+            state.statistics.randomEventsTriggered >= 0 &&
+            state.statistics.arcadeBestScores.values.all { it >= 0 } &&
             state.upgradeLevels.values.all { it >= 0 } &&
             state.prestigeUpgradeLevels.values.all { it >= 0 } &&
             state.ultraUpgradeLevels.values.all { it >= 0 } &&
+            state.liveOpsClaims.values.all { it >= 0 } &&
+            state.permanentEventBoosts >= 0 &&
+            state.dailyQuestGuesses >= 0 &&
+            state.dailyQuestCorrectGuesses >= 0 &&
+            state.dailyQuestBestStreak >= 0 &&
+            state.dailyQuestUpgradePurchases >= 0 &&
+            state.lootCommonChests >= 0 &&
+            state.lootRareChests >= 0 &&
+            state.lootEpicChests >= 0 &&
+            state.lootDropsFound >= 0 &&
+            state.lootChestsOpened >= 0 &&
+            state.endlessRiftTier >= 0 &&
+            state.endlessRiftBestTier >= 0 &&
             state.lastSaveTimestamp > 0
         return Check("Save invariant validation", valid, if (valid) "Fixture passed core save invariants" else "Rejected by save invariants")
+    }
+
+    /** Simulates SaveManager's primary-then-backup selection without writing either value. */
+    fun restoreFromBackup(primaryRaw: String, backupRaw: String): Check {
+        val primary = validate(primaryRaw)
+        if (primary.passed) return Check("Backup recovery", true, "Valid primary selected; backup was not needed")
+        val backup = validate(backupRaw)
+        if (!backup.passed) return Check("Backup recovery", false, "Primary and backup fixtures are both invalid")
+        return Check("Backup recovery", true, "Invalid primary rejected; valid backup selected in memory")
     }
 
     /** Simulates schema-forward migration in memory using the same tolerant decoder as saves. */
@@ -64,11 +96,15 @@ object SaveFixtureLab {
             lastSaveTimestamp = state.lastSaveTimestamp.coerceAtLeast(1L),
             money = BigNumber(-999)
         )))
+        val invalidRange = validate(encode(state.copy(lastSaveTimestamp = state.lastSaveTimestamp.coerceAtLeast(1L), targetNumber = 999L)))
         val legacy = migrateLegacy(fixture.replaceFirst("lastSavedVersion", "legacyUnknownVersionField"))
+        val backup = restoreFromBackup("{ broken primary", fixture)
         return listOf(
             Check("Valid current save", current.passed, current.detail),
             Check("Corrupted JSON rejected", !corrupted.passed, if (!corrupted.passed) "Malformed fixture safely rejected" else "Malformed fixture was accepted"),
             Check("Negative currency rejected", !negativeCurrency.passed, if (!negativeCurrency.passed) "Negative currency fixture safely rejected" else "Negative currency fixture was accepted"),
+            Check("Invalid target/range rejected", !invalidRange.passed, if (!invalidRange.passed) "Impossible target safely rejected" else "Impossible target was accepted"),
+            backup,
             legacy
         )
     }
