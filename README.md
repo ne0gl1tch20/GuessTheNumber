@@ -1,11 +1,12 @@
-# Guess The Number (Incremental & Arcade Edition)
+# Guess The Number
 
-Guess The Number is an advanced, feature-rich incremental and arcade game built around Kotlin/KMP game logic and the Jarrlyy UI SDK shared HTML/CSS/JavaScript frontend. **Shared UI migration status: complete.** The shared UI foundation is in place; development continues with regular bug fixes, polish and compatibility updates as issues are discovered. Fixes are currently committed directly to `master` while this workflow is in use. Windows runtime verification and platform-specific parity tracking remain separate from the shared UI migration status.
+Guess The Number is anh incremental and arcade game built around Kotlin/KMP game logic and our own UI SDK shared HTML/CSS/JavaScript frontend!
 
-## Lua Scripting Layer (Implementation in Progress)
+## Lua Scripting Layer
 
-The embedded LuaJ runtime and shared Kotlin engine facade support the bundled offline Number Rush activity, and Dev Settings includes typed /lua commands. Kotlin remains authoritative for save data, progression, eligibility and rewards.
+The embedded LuaJ runtime and shared Kotlin engine facade support the bundled offline Number Rush activity, and Dev Settings includes typed /lua commands. Kotlin remains authoritative for save data, progression, eligibility and rewards!
 
+These includes:
 - [Lua implementation roadmap](docs/LUA_SCRIPTING_PLAN.md)
 - [Draft Lua host API contract](docs/LUA_API_DESIGN.md)
 - [GitHub LiveOps bundle delivery plan](docs/LIVEOPS_SCRIPT_BUNDLES_PLAN.md)
