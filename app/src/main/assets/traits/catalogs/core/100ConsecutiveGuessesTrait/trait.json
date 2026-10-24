@@ -1,0 +1,16 @@
+{
+  "id": "100_consecutive_guesses",
+  "catalogId": "core",
+  "display": {
+    "titleKey": "trait.100_consecutive_guesses.title",
+    "descriptionKey": "trait.100_consecutive_guesses.description"
+  },
+  "entryPoints": {
+    "logic": "logic.lua",
+    "presentation": "presentation.js",
+    "styles": "styles.css",
+    "icon": "icon.svg"
+  },
+  "authority": "kotlin",
+  "notes": "Example package metadata. Kotlin must validate progress and activation."
+}
