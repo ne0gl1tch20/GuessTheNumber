@@ -9,7 +9,7 @@ internal object WebUiBridgeProtocol {
     const val MAX_MESSAGE_LENGTH = 512
     private val dailyQuestIds = setOf("daily_guesses_10", "daily_correct_5", "daily_streak_5", "daily_upgrades_3")
     private val lootTiers = setOf("common", "rare", "epic")
-    private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements", "save_slots", "player_profile", "color_picker_primary", "color_picker_secondary", "color_picker_tertiary")
+    private val navigationRoutes = setOf("world_map", "prestige", "ultra", "home_base", "endgame", "relics", "codex", "talent", "mutators", "achievements", "save_slots", "player_profile", "color_picker_primary", "color_picker_secondary", "color_picker_tertiary", "traits")
     private val worldActions = setOf("unlock", "boss")
     private val buyMultipliers = setOf("1", "10", "100", "MAX")
     private val relicActions = setOf("equip", "unequip")
@@ -42,7 +42,9 @@ internal object WebUiBridgeProtocol {
             val musicIndex: Int? = null,
             val musicToIndex: Int? = null,
             val musicPosition: Int? = null,
-            val musicName: String? = null
+            val musicName: String? = null,
+            val traitId: String? = null,
+            val armId: String? = null
         ) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
@@ -103,6 +105,19 @@ internal object WebUiBridgeProtocol {
                 val route = request.opt("route") as? String ?: return ParseResult.Invalid("invalid_route", id)
                 if (route !in navigationRoutes && !(BuildConfig.DEBUG && route == "dev_settings")) return ParseResult.Invalid("invalid_route", id)
                 ParseResult.Valid(id, type, route = route)
+            }
+            "select_trait_arm" -> {
+                if (request.length() != 5 || !request.has("traitId") || !request.has("armId")) return ParseResult.Invalid("invalid_request", id)
+                val traitId = request.opt("traitId") as? String ?: return ParseResult.Invalid("invalid_trait", id)
+                val armId = request.opt("armId") as? String ?: return ParseResult.Invalid("invalid_arm", id)
+                val allowedArms = mapOf(
+                    "combo_momentum" to setOf("steady", "burst"),
+                    "mistake_insurance" to setOf("half_refund", "careful"),
+                    "risk_reward" to setOf("balanced", "high_risk")
+                )
+                if (traitId !in allowedArms) return ParseResult.Invalid("invalid_trait", id)
+                if (armId !in allowedArms.getValue(traitId)) return ParseResult.Invalid("invalid_arm", id)
+                ParseResult.Valid(id, type, traitId = traitId, armId = armId)
             }
             "world_action" -> {
                 if (request.length() != 5 || !request.has("worldId") || !request.has("action")) return ParseResult.Invalid("invalid_request", id)

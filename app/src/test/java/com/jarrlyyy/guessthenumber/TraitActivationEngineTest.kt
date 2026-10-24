@@ -26,7 +26,7 @@ class TraitActivationEngineTest {
 
         val progressed = engine.evaluate(
             TraitActivationContext(
-                GameState(correctGuesses = 25, prestigeCount = 1),
+                GameState(correctGuesses = 50, prestigeCount = 1),
                 playerLevel = 5
             )
         )
