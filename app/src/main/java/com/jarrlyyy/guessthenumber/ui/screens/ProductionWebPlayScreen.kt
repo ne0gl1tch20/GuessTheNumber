@@ -227,12 +227,12 @@ fun ProductionWebPlayScreen(
                 webViewClient = object : WebViewClient() {
                     override fun onPageFinished(view: WebView, url: String) {
                         super.onPageFinished(view, url)
-                        if (url == "$WEB_UI_ORIGIN\${WEB_UI_PATH}index.html") {
+                        if (url == "$WEB_UI_ORIGIN${WEB_UI_PATH}index.html") {
                             view.evaluateJavascript("(typeof window.gtnReadState === 'function')") { result ->
                                 if (result != "true" && !rollbackAttempted) {
                                     rollbackAttempted = true
                                     if (webPlayAssetSyncer.rollbackToPrevious()) {
-                                        view.post { view.loadUrl("$WEB_UI_ORIGIN\${WEB_UI_PATH}index.html") }
+                                        view.post { view.loadUrl("$WEB_UI_ORIGIN${WEB_UI_PATH}index.html") }
                                     }
                                 }
                             }
