@@ -15,10 +15,10 @@ import org.junit.Test
 class TraitRegistryTest {
     @Test fun builtInCatalogLoadsOfflineAndHasVisibleAndHiddenTraits() {
         val registry = BuiltInTraits.registry()
-        assertEquals(8, registry.size)
+        assertEquals(16, registry.size)
         assertNotNull(registry.find("steady_start"))
-        assertEquals(1, registry.hidden().size)
-        assertEquals(7, registry.visible().size)
+        assertEquals(3, registry.hidden().size)
+        assertEquals(13, registry.visible().size)
     }
 
     @Test fun rejectsDuplicateIds() {
