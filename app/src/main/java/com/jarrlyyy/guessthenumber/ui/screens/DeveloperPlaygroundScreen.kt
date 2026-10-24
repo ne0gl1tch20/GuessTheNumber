@@ -169,7 +169,7 @@ private fun DeveloperUiPlaygroundScreen(onTestDailyRewards: () -> Unit) {
         item { Button(onClick = { selected = "popup" }) { Text("Popup scenarios") }; Spacer(Modifier.height(4.dp)); Button(onClick = { selected = "tutorial" }) { Text("Tutorial scenarios") }; Spacer(Modifier.height(4.dp)); Button(onClick = { selected = "edge" }) { Text("Edge-case scenarios") } }
         item { DeveloperPanel("Selected scenario", selected) }
         item { Button(onClick = { WebViewDebugConsole.runJavascript("window.gtnShowDailyRewardTest && window.gtnShowDailyRewardTest()") }, modifier = Modifier.fillMaxWidth()) { Text("Open daily reward popup in WebView") } }
-        item { OutlinedButton(onClick = { WebViewDebugConsole.runJavascript("JSON.stringify(Array.from(document.querySelectorAll('#popupLayer [role=dialog], #popupLayer .reward-overlay')).map(e => ({id:e.id,hidden:e.hidden,rect:(r=>({x:r.x,y:r.y,width:r.width,height:r.height}))(e.getBoundingClientRect())})))") }, modifier = Modifier.fillMaxWidth()) { Text("Inspect popup bounds") }
+        item { OutlinedButton(onClick = { WebViewDebugConsole.runJavascript("Array.from(document.querySelectorAll('#popupLayer .reward-overlay')).map(e=>e.id+':'+e.hidden+':'+e.getBoundingClientRect().width+'x'+e.getBoundingClientRect().height).join(',')") }, modifier = Modifier.fillMaxWidth()) { Text("Inspect popup bounds") }
         item { OutlinedButton(onClick = onTestDailyRewards, modifier = Modifier.fillMaxWidth()) { Text("Run native daily-reward test flow") } }
         item { DeveloperPanel("Acceptance checks", "Popup box remains fully visible\nCentered correctly\nButtons remain tappable\nLong text does not clip\nDismiss/collect closes correctly\nLocalization remains readable") }
     }
