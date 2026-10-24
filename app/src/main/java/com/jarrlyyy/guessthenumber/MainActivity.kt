@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.content.Intent
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.repository.WebPlayAssetSyncer
+import com.jarrlyyy.guessthenumber.traits.TraitLiveOpsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.activity.ComponentActivity
@@ -57,6 +58,10 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 // Start the optional web UI update during save loading; never block save initialization.
                 withContext(Dispatchers.IO) { WebPlayAssetSyncer(applicationContext).sync() }
+            }
+            LaunchedEffect(Unit) {
+                // Refresh signed trait data in the background; offline catalog remains available on failure.
+                withContext(Dispatchers.IO) { TraitLiveOpsRepository(applicationContext).refresh() }
             }
             val state by viewModel.gameState.collectAsState()
             val isLoadingSave by viewModel.isLoadingSave.collectAsState()
