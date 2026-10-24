@@ -70,17 +70,46 @@ private fun DeveloperEntry(title: String, description: String, icon: androidx.co
 
 @Composable
 private fun CoreProcessScreen(state: GameState, onExecuteCommand: (String) -> String) {
-    var input by remember { mutableStateOf("") }; var output by remember { mutableStateOf("") }; var logs by remember { mutableStateOf(listOf<String>()) }
+    var input by remember { mutableStateOf("") }
+    var output by remember { mutableStateOf("") }
+    var logs by remember { mutableStateOf(listOf<String>()) }
+    var pendingCommand by remember { mutableStateOf<String?>(null) }
     val suggestions = remember(input) { CommandAutocomplete.suggest(input) }
+    fun runCommand(command: String) {
+        val result = onExecuteCommand(command)
+        output = result
+        logs = (logs + "${System.currentTimeMillis()}  $command → $result").takeLast(100)
+        GameLogger.log(LogLevel.INFO, LoggerCategory.COMMAND, "DEV_PLAYGROUND", "Core command '$command': $result")
+        input = ""
+    }
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("Native Kotlin / Compose", style = MaterialTheme.typography.titleLarge) }
+        item { Text("Commands execute against the active debug game state. Commands that can alter progress require confirmation.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { OutlinedTextField(input, { input = it }, Modifier.fillMaxWidth(), label = { Text("Core command") }, singleLine = true) }
         if (suggestions.isNotEmpty()) item { Text(suggestions.joinToString("  • ") { it.insertText }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
-        item { Button(onClick = { if (input.isNotBlank()) { val result = onExecuteCommand(input); output = result; logs = (logs + "${System.currentTimeMillis()}  $input → $result").takeLast(100); GameLogger.log(LogLevel.INFO, LoggerCategory.COMMAND, "DEV_PLAYGROUND", "Core command '$input': $result"); input = "" } }) { Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Run") } }
+        item {
+            Button(onClick = {
+                if (input.isNotBlank()) {
+                    val command = input.trim()
+                    if (command.substringBefore(' ').lowercase() in setOf("/reset", "/give", "/set", "/timeskip", "/skip", "/moneyprinter", "/unlock", "/unlock_all", "/crash_test", "/konami", "/win", "/completeguess", "/max_upgrades", "/maxupgrades", "/autoclicker", "/setlevel", "/speed")) {
+                        pendingCommand = command
+                    } else runCommand(command)
+                }
+            }) { Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Run") }
+        }
         item { DeveloperPanel("Core state", "money=${state.money}\nprestige=${state.prestige}\nultra=${state.ultra}\nnebula=${state.nebula}\nautoClicker=${state.autoClickerActive}\nlastSave=${state.lastSaveTimestamp}") }
         item { DeveloperPanel("Last result", output.ifBlank { "No command executed yet." }) }
         item { Text("Core command log", style = MaterialTheme.typography.titleMedium) }
         items(logs.asReversed()) { Text(it, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall) }
+    }
+    pendingCommand?.let { command ->
+        AlertDialog(
+            onDismissRequest = { pendingCommand = null },
+            title = { Text("Confirm developer command") },
+            text = { Text("$command can change gameplay progress or trigger disruptive behavior. Continue?") },
+            confirmButton = { TextButton(onClick = { pendingCommand = null; runCommand(command) }) { Text("Run command") } },
+            dismissButton = { TextButton(onClick = { pendingCommand = null }) { Text("Cancel") } }
+        )
     }
 }
 
@@ -146,7 +175,7 @@ private fun DeveloperSaveLabScreen(state: GameState) {
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("Save Laboratory", style = MaterialTheme.typography.titleLarge) }
         item { Text("Read-only preview only. These scenarios do not alter the active save.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        item { DeveloperPanel("Current save state", "lastSaveTimestamp=\${state.lastSaveTimestamp}\nautoClickerActive=\${state.autoClickerActive}\ntimeTravelPenaltyUntil=\${state.timeTravelPenaltyUntil}") }
+        item { DeveloperPanel("Current save state", "lastSaveTimestamp=${state.lastSaveTimestamp}\nautoClickerActive=\${state.autoClickerActive}\ntimeTravelPenaltyUntil=\${state.timeTravelPenaltyUntil}") }
         item { Text("Offline duration preview", style = MaterialTheme.typography.titleMedium) }
         item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = { simulatedElapsedSeconds = 60L }) { Text("1 min") }
