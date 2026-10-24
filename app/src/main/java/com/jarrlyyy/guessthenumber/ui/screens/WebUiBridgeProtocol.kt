@@ -71,7 +71,7 @@ internal object WebUiBridgeProtocol {
         val validId = rawId is String && id.matches(Regex("[A-Za-z0-9_-]{1,48}"))
         if (rawVersion !is Int || rawVersion != 1 || !validId || rawType !is String) return ParseResult.Invalid("invalid_request", id)
         return when (type) {
-            "read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "reset_everything", "music_state", "increment_counter", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset", "check_updates", "install_update", "open_update_page", "claim_daily_reward", "dismiss_offline_gains" ->
+            "read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "reset_everything", "music_state", "increment_counter", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset", "check_updates", "install_update", "open_update_page", "claim_daily_reward", "dismiss_offline_gains", "open_arcade" ->
                 if (request.length() != 3) ParseResult.Invalid("invalid_request", id) else ParseResult.Valid(id, type)
             "read_feature_tutorial", "complete_feature_tutorial" -> {
                 if (request.length() != 4 || !request.has("featureId")) return ParseResult.Invalid("invalid_request", id)
