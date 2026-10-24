@@ -5,6 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.File
 
 /**
  * Repeatable JVM microbenchmark for the trait activation hot path.
@@ -49,13 +50,24 @@ class TraitActivationBenchmarkTest {
         val evaluationsPerSecond = if (medianNanos == 0L) Long.MAX_VALUE else 1_000_000_000L / medianNanos
 
         assertEquals("Activation results must be deterministic", expected, engine.evaluate(context).activeTraitIds)
-        println(
-            "TRAIT_ACTIVATION_BENCHMARK " +
-                "catalogSize=${registry.size} warmup=$WARMUP_ITERATIONS " +
-                "samples=$SAMPLE_COUNT iterationsPerSample=$ITERATIONS_PER_SAMPLE " +
-                "medianNsPerEvaluation=$medianNanos p95NsPerEvaluation=$p95Nanos " +
-                "medianEvaluationsPerSecond=$evaluationsPerSecond"
-        )
+        val report = buildString {
+            appendLine("TRAIT ACTIVATION PROFILE")
+            appendLine("javaVersion=${System.getProperty("java.version")}")
+            appendLine("vmName=${System.getProperty("java.vm.name")}")
+            appendLine("catalogSize=${registry.size}")
+            appendLine("warmupIterations=$WARMUP_ITERATIONS")
+            appendLine("samples=$SAMPLE_COUNT")
+            appendLine("iterationsPerSample=$ITERATIONS_PER_SAMPLE")
+            appendLine("medianNsPerEvaluation=$medianNanos")
+            appendLine("p95NsPerEvaluation=$p95Nanos")
+            appendLine("medianEvaluationsPerSecond=$evaluationsPerSecond")
+            appendLine("deterministic=true")
+            appendLine("cachedRegistryViews=true")
+        }
+        val reportFile = File("build/reports/trait-activation-benchmark.txt")
+        reportFile.parentFile?.mkdirs()
+        reportFile.writeText(report)
+        println("TRAIT_ACTIVATION_BENCHMARK " + report.replace("\n", " ").trim())
     }
 
     private companion object {
