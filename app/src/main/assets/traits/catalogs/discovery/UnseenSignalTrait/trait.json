@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "unseen_signal",
+  "catalogId": "discovery",
+  "packageFolder": "UnseenSignalTrait",
+  "titleKey": "trait.unseen_signal.title",
+  "descriptionKey": "trait.unseen_signal.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "resilience",
+  "title": "Resilience",
+  "traitCount": 10,
+  "traitIds": [
+    "bounce_back",
+    "calm_after_miss",
+    "hopeful_path",
+    "iron_patience",
+    "keep_going",
+    "patient_return",
+    "resilient_heart",
+    "resilient_start",
+    "second_wind",
+    "steady_recovery"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

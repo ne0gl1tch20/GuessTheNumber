@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "still_point",
+  "catalogId": "focus",
+  "packageFolder": "StillPointTrait",
+  "titleKey": "trait.still_point.title",
+  "descriptionKey": "trait.still_point.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "relic_legend",
+  "catalogId": "relics",
+  "packageFolder": "RelicLegendTrait",
+  "titleKey": "trait.relic_legend.title",
+  "descriptionKey": "trait.relic_legend.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

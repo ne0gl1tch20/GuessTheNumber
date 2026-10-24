@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "clear_mind",
+  "catalogId": "focus",
+  "packageFolder": "ClearMindTrait",
+  "titleKey": "trait.clear_mind.title",
+  "descriptionKey": "trait.clear_mind.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

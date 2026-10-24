@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "highscore_horizon",
+  "catalogId": "arcade",
+  "packageFolder": "HighscoreHorizonTrait",
+  "titleKey": "trait.highscore_horizon.title",
+  "descriptionKey": "trait.highscore_horizon.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

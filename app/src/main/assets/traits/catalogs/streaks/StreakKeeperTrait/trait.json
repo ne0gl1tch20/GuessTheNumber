@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "streak_keeper",
+  "catalogId": "streaks",
+  "packageFolder": "StreakKeeperTrait",
+  "titleKey": "trait.streak_keeper.title",
+  "descriptionKey": "trait.streak_keeper.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

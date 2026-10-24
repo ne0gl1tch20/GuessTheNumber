@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "relic_harmony",
+  "catalogId": "relics",
+  "packageFolder": "RelicHarmonyTrait",
+  "titleKey": "trait.relic_harmony.title",
+  "descriptionKey": "trait.relic_harmony.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "nebula_keeper",
+  "catalogId": "nebula",
+  "packageFolder": "NebulaKeeperTrait",
+  "titleKey": "trait.nebula_keeper.title",
+  "descriptionKey": "trait.nebula_keeper.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

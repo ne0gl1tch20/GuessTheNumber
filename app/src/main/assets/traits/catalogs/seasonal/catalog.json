@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "seasonal",
+  "title": "Seasonal",
+  "traitCount": 10,
+  "traitIds": [
+    "autumn_orbit",
+    "bloom_chaser",
+    "equinox_echo",
+    "frost_whisper",
+    "harvest_glow",
+    "leaflight",
+    "solstice_spark",
+    "spring_orbit",
+    "summer_nova",
+    "winter_cometlight"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

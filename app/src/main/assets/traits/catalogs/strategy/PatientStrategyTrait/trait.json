@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "patient_strategy",
+  "catalogId": "strategy",
+  "packageFolder": "PatientStrategyTrait",
+  "titleKey": "trait.patient_strategy.title",
+  "descriptionKey": "trait.patient_strategy.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

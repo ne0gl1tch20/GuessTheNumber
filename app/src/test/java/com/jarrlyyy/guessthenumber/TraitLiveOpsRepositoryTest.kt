@@ -54,7 +54,7 @@ class TraitLiveOpsRepositoryTest {
         assertThrows(IllegalArgumentException::class.java) {
             validateAndMapTraitPayload(payload().copy(schemaVersion = 99), 21)
         }
-        val many = (1..101).map { i -> RemoteTraitDefinition("remote_trait_" + i,
+        val many = (1..301).map { i -> RemoteTraitDefinition("remote_trait_" + i,
             "trait.remote_trait_" + i + ".title", "trait.remote_trait_" + i + ".description",
             "PROGRESSION", effects = listOf("XP_MULTIPLIER")) }
         assertThrows(IllegalArgumentException::class.java) {
@@ -93,7 +93,7 @@ class TraitLiveOpsRepositoryTest {
     }
 
     @Test fun rejectsTooManyCatalogFolders() {
-        val traits = (1..17).map { i ->
+        val traits = (1..33).map { i ->
             RemoteTraitDefinition("catalog_trait_$i", "trait.catalog_$i.title", "trait.catalog_$i.description",
                 "COLLECTION", effects = listOf("COSMETIC_BADGE"), catalogId = "catalog_$i")
         }

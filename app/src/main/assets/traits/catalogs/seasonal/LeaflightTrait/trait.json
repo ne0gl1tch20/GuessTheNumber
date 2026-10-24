@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "leaflight",
+  "catalogId": "seasonal",
+  "packageFolder": "LeaflightTrait",
+  "titleKey": "trait.leaflight.title",
+  "descriptionKey": "trait.leaflight.description",
+  "category": "SEASONAL",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": "winter",
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "worlds",
+  "title": "Worlds",
+  "traitCount": 10,
+  "traitIds": [
+    "cavern_cartographer",
+    "crystal_roamer",
+    "ember_traveler",
+    "grove_friend",
+    "observatory_guest",
+    "rift_navigator",
+    "summit_watcher",
+    "verdant_wanderer",
+    "world_anchor",
+    "world_hopper"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

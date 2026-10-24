@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "fortune",
+  "title": "Fortune",
+  "traitCount": 10,
+  "traitIds": [
+    "bright_omen",
+    "chance_keeper",
+    "comet_luck",
+    "fortunate_find",
+    "fortune_flicker",
+    "lucky_compass",
+    "lucky_horizon",
+    "lucky_legend",
+    "silver_signal",
+    "star_catcher"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

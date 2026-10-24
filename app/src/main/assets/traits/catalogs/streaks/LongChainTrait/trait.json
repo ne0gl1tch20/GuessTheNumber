@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "long_chain",
+  "catalogId": "streaks",
+  "packageFolder": "LongChainTrait",
+  "titleKey": "trait.long_chain.title",
+  "descriptionKey": "trait.long_chain.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

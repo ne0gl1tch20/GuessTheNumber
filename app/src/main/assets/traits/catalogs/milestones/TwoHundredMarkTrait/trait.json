@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "two_hundred_mark",
+  "catalogId": "milestones",
+  "packageFolder": "TwoHundredMarkTrait",
+  "titleKey": "trait.two_hundred_mark.title",
+  "descriptionKey": "trait.two_hundred_mark.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

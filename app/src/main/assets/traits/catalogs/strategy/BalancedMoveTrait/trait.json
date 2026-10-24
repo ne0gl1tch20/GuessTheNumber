@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "balanced_move",
+  "catalogId": "strategy",
+  "packageFolder": "BalancedMoveTrait",
+  "titleKey": "trait.balanced_move.title",
+  "descriptionKey": "trait.balanced_move.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

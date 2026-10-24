@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "bright_future",
+  "catalogId": "progression",
+  "packageFolder": "BrightFutureTrait",
+  "titleKey": "trait.bright_future.title",
+  "descriptionKey": "trait.bright_future.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

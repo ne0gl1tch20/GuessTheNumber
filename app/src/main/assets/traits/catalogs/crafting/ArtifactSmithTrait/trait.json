@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "artifact_smith",
+  "catalogId": "crafting",
+  "packageFolder": "ArtifactSmithTrait",
+  "titleKey": "trait.artifact_smith.title",
+  "descriptionKey": "trait.artifact_smith.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

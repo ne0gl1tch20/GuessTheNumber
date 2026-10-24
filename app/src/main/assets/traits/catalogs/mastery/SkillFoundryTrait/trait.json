@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "skill_foundry",
+  "catalogId": "mastery",
+  "packageFolder": "SkillFoundryTrait",
+  "titleKey": "trait.skill_foundry.title",
+  "descriptionKey": "trait.skill_foundry.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

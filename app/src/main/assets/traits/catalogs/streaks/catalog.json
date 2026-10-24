@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "streaks",
+  "title": "Streaks",
+  "traitCount": 10,
+  "traitIds": [
+    "chain_reaction",
+    "clean_chain",
+    "consecutive_climber",
+    "long_chain",
+    "rhythm_runner",
+    "steady_sequence",
+    "streak_builder",
+    "streak_keeper",
+    "streak_starter",
+    "unbroken_line"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

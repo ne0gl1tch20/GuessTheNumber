@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "strategic_eye",
+  "catalogId": "strategy",
+  "packageFolder": "StrategicEyeTrait",
+  "titleKey": "trait.strategic_eye.title",
+  "descriptionKey": "trait.strategic_eye.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

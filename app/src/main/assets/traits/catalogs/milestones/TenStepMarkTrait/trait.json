@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "ten_step_mark",
+  "catalogId": "milestones",
+  "packageFolder": "TenStepMarkTrait",
+  "titleKey": "trait.ten_step_mark.title",
+  "descriptionKey": "trait.ten_step_mark.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "cosmic_calendar",
+  "catalogId": "astronomy",
+  "packageFolder": "CosmicCalendarTrait",
+  "titleKey": "trait.cosmic_calendar.title",
+  "descriptionKey": "trait.cosmic_calendar.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

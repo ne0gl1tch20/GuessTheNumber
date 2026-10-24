@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "patient_pulse",
+  "catalogId": "endurance",
+  "packageFolder": "PatientPulseTrait",
+  "titleKey": "trait.patient_pulse.title",
+  "descriptionKey": "trait.patient_pulse.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "roaming_star",
+  "catalogId": "adventure",
+  "packageFolder": "RoamingStarTrait",
+  "titleKey": "trait.roaming_star.title",
+  "descriptionKey": "trait.roaming_star.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

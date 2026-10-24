@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "starforge",
+  "catalogId": "crafting",
+  "packageFolder": "StarforgeTrait",
+  "titleKey": "trait.starforge.title",
+  "descriptionKey": "trait.starforge.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

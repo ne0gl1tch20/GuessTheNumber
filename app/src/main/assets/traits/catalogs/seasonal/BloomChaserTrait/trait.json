@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "bloom_chaser",
+  "catalogId": "seasonal",
+  "packageFolder": "BloomChaserTrait",
+  "titleKey": "trait.bloom_chaser.title",
+  "descriptionKey": "trait.bloom_chaser.description",
+  "category": "SEASONAL",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": "spring",
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

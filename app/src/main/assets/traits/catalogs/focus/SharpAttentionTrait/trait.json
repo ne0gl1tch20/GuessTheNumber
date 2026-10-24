@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "sharp_attention",
+  "catalogId": "focus",
+  "packageFolder": "SharpAttentionTrait",
+  "titleKey": "trait.sharp_attention.title",
+  "descriptionKey": "trait.sharp_attention.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

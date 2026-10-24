@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "extra_spark",
+  "catalogId": "bonus",
+  "packageFolder": "ExtraSparkTrait",
+  "titleKey": "trait.extra_spark.title",
+  "descriptionKey": "trait.extra_spark.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "relic_compass",
+  "catalogId": "relics",
+  "packageFolder": "RelicCompassTrait",
+  "titleKey": "trait.relic_compass.title",
+  "descriptionKey": "trait.relic_compass.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

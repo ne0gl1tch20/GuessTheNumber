@@ -257,8 +257,8 @@ class TraitLiveOpsRepository(
     companion object {
         const val SCHEMA_VERSION = 2
         const val HOST_API_VERSION = 1
-        const val MAX_TRAITS = 100
-        const val MAX_CATALOGS = 16
+        const val MAX_TRAITS = 300
+        const val MAX_CATALOGS = 32
         const val MAX_FILES_PER_TRAIT = 24
         const val MAX_TOTAL_FILES = 500
         const val MAX_TOTAL_BUNDLE_BYTES = 8 * 1024 * 1024
@@ -294,7 +294,9 @@ internal fun validateAndMapTraitPayload(payload: TraitLiveOpsPayload, appVersion
             minHostApiVersion = remote.minHostApiVersion, maxHostApiVersion = remote.maxHostApiVersion,
             activation = TraitActivationConditions(remote.minimumLevel, remote.minimumPrestige, remote.minimumCorrectGuesses),
             dependencies = remote.dependencies.toSet(), conflicts = remote.conflicts.toSet(),
-            effects = remote.effects.mapTo(linkedSetOf()) { TraitEffect.valueOf(it) }, seasonId = remote.seasonId
+            effects = remote.effects.mapTo(linkedSetOf()) { TraitEffect.valueOf(it) }, seasonId = remote.seasonId,
+            catalogId = remote.catalogId,
+            packageFolder = remote.folderName ?: remote.id.split('_').joinToString("") { part -> part.replaceFirstChar { it.uppercase() } } + "Trait"
         )
         TraitDefinitionValidator.validate(definition)
         definition

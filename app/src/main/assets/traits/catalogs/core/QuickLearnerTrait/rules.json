@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "quick_learner",
+  "activation": {
+    "minimumLevel": 3,
+    "minimumPrestige": 0,
+    "minimumCorrectGuesses": 0
+  },
+  "dependencies": [
+    "steady_start"
+  ],
+  "conflicts": [],
+  "effects": [
+    "XP_MULTIPLIER"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

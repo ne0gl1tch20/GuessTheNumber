@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "ancient_emblem",
+  "catalogId": "relics",
+  "packageFolder": "AncientEmblemTrait",
+  "titleKey": "trait.ancient_emblem.title",
+  "descriptionKey": "trait.ancient_emblem.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

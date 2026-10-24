@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "pulse_reader",
+  "catalogId": "rhythm",
+  "packageFolder": "PulseReaderTrait",
+  "titleKey": "trait.pulse_reader.title",
+  "descriptionKey": "trait.pulse_reader.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

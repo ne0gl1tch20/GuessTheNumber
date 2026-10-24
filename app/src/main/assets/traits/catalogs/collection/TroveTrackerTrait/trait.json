@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "trove_tracker",
+  "catalogId": "collection",
+  "packageFolder": "TroveTrackerTrait",
+  "titleKey": "trait.trove_tracker.title",
+  "descriptionKey": "trait.trove_tracker.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

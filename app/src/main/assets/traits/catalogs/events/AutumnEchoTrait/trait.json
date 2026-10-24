@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "autumn_echo",
+  "catalogId": "events",
+  "packageFolder": "AutumnEchoTrait",
+  "titleKey": "trait.autumn_echo.title",
+  "descriptionKey": "trait.autumn_echo.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

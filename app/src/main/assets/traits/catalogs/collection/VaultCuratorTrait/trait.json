@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "vault_curator",
+  "catalogId": "collection",
+  "packageFolder": "VaultCuratorTrait",
+  "titleKey": "trait.vault_curator.title",
+  "descriptionKey": "trait.vault_curator.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

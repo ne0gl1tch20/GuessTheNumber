@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "pocket_museum",
+  "catalogId": "collection",
+  "packageFolder": "PocketMuseumTrait",
+  "titleKey": "trait.pocket_museum.title",
+  "descriptionKey": "trait.pocket_museum.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

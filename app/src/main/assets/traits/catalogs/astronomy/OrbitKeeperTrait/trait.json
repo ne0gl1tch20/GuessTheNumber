@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "orbit_keeper",
+  "catalogId": "astronomy",
+  "packageFolder": "OrbitKeeperTrait",
+  "titleKey": "trait.orbit_keeper.title",
+  "descriptionKey": "trait.orbit_keeper.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "organized_mind",
+  "catalogId": "utility",
+  "packageFolder": "OrganizedMindTrait",
+  "titleKey": "trait.organized_mind.title",
+  "descriptionKey": "trait.organized_mind.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

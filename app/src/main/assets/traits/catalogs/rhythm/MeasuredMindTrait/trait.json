@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "measured_mind",
+  "catalogId": "rhythm",
+  "packageFolder": "MeasuredMindTrait",
+  "titleKey": "trait.measured_mind.title",
+  "descriptionKey": "trait.measured_mind.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "clean_profile",
+  "catalogId": "utility",
+  "packageFolder": "CleanProfileTrait",
+  "titleKey": "trait.clean_profile.title",
+  "descriptionKey": "trait.clean_profile.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

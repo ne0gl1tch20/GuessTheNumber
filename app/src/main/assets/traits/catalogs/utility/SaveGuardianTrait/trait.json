@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "save_guardian",
+  "catalogId": "utility",
+  "packageFolder": "SaveGuardianTrait",
+  "titleKey": "trait.save_guardian.title",
+  "descriptionKey": "trait.save_guardian.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

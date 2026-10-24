@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "logical_route",
+  "catalogId": "strategy",
+  "packageFolder": "LogicalRouteTrait",
+  "titleKey": "trait.logical_route.title",
+  "descriptionKey": "trait.logical_route.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

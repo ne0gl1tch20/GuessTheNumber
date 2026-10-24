@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "keep_going",
+  "catalogId": "resilience",
+  "packageFolder": "KeepGoingTrait",
+  "titleKey": "trait.keep_going.title",
+  "descriptionKey": "trait.keep_going.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "world_hopper",
+  "catalogId": "worlds",
+  "packageFolder": "WorldHopperTrait",
+  "titleKey": "trait.world_hopper.title",
+  "descriptionKey": "trait.world_hopper.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

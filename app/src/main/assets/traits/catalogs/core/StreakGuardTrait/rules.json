@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "streak_guard",
+  "activation": {
+    "minimumLevel": 5,
+    "minimumPrestige": 0,
+    "minimumCorrectGuesses": 0
+  },
+  "dependencies": [],
+  "conflicts": [],
+  "effects": [
+    "STREAK_PROTECTION"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

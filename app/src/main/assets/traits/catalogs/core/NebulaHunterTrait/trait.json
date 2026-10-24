@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "nebula_hunter",
+  "catalogId": "core",
+  "packageFolder": "NebulaHunterTrait",
+  "titleKey": "trait.nebula_hunter.title",
+  "descriptionKey": "trait.nebula_hunter.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

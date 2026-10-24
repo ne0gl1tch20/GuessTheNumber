@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "careful_tactician",
+  "catalogId": "strategy",
+  "packageFolder": "CarefulTacticianTrait",
+  "titleKey": "trait.careful_tactician.title",
+  "descriptionKey": "trait.careful_tactician.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "steady_rhythm",
+  "catalogId": "rhythm",
+  "packageFolder": "SteadyRhythmTrait",
+  "titleKey": "trait.steady_rhythm.title",
+  "descriptionKey": "trait.steady_rhythm.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

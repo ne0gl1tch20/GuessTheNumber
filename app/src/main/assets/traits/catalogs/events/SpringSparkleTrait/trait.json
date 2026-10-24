@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "spring_sparkle",
+  "catalogId": "events",
+  "packageFolder": "SpringSparkleTrait",
+  "titleKey": "trait.spring_sparkle.title",
+  "descriptionKey": "trait.spring_sparkle.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

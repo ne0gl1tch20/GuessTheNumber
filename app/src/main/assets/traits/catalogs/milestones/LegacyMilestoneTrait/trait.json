@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "legacy_milestone",
+  "catalogId": "milestones",
+  "packageFolder": "LegacyMilestoneTrait",
+  "titleKey": "trait.legacy_milestone.title",
+  "descriptionKey": "trait.legacy_milestone.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

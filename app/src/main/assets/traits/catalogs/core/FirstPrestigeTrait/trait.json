@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "first_prestige",
+  "catalogId": "core",
+  "packageFolder": "FirstPrestigeTrait",
+  "titleKey": "trait.first_prestige.title",
+  "descriptionKey": "trait.first_prestige.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "XP_MULTIPLIER"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

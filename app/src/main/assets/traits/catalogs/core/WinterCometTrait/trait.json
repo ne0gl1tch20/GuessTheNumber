@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "winter_comet",
+  "catalogId": "core",
+  "packageFolder": "WinterCometTrait",
+  "titleKey": "trait.winter_comet.title",
+  "descriptionKey": "trait.winter_comet.description",
+  "category": "SEASONAL",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": "winter",
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

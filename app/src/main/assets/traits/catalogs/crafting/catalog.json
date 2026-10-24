@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "crafting",
+  "title": "Crafting",
+  "traitCount": 10,
+  "traitIds": [
+    "artifact_smith",
+    "bright_assembler",
+    "careful_crafter",
+    "cosmic_stitcher",
+    "crafted_path",
+    "fine_detail",
+    "masterwork_mark",
+    "relic_maker",
+    "starforge",
+    "token_weaver"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

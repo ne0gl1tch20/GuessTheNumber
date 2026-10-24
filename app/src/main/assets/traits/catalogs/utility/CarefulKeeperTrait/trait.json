@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "careful_keeper",
+  "catalogId": "utility",
+  "packageFolder": "CarefulKeeperTrait",
+  "titleKey": "trait.careful_keeper.title",
+  "descriptionKey": "trait.careful_keeper.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

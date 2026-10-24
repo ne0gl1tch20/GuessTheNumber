@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "quick_learner",
+  "catalogId": "core",
+  "packageFolder": "QuickLearnerTrait",
+  "titleKey": "trait.quick_learner.title",
+  "descriptionKey": "trait.quick_learner.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "XP_MULTIPLIER"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

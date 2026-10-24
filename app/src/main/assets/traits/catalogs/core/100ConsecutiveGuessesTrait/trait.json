@@ -1,16 +1,22 @@
 {
-  "id": "100_consecutive_guesses",
+  "schemaVersion": 1,
+  "id": "hundred_consecutive_guesses",
   "catalogId": "core",
-  "display": {
-    "titleKey": "trait.100_consecutive_guesses.title",
-    "descriptionKey": "trait.100_consecutive_guesses.description"
-  },
-  "entryPoints": {
-    "logic": "logic.lua",
-    "presentation": "presentation.js",
-    "styles": "styles.css",
-    "icon": "icon.svg"
-  },
-  "authority": "kotlin",
-  "notes": "Example package metadata. Kotlin must validate progress and activation."
+  "packageFolder": "100ConsecutiveGuessesTrait",
+  "titleKey": "trait.hundred_consecutive_guesses.title",
+  "descriptionKey": "trait.hundred_consecutive_guesses.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
 }

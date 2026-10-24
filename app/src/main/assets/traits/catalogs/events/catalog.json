@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "events",
+  "title": "Events",
+  "traitCount": 10,
+  "traitIds": [
+    "autumn_echo",
+    "celebration_glow",
+    "event_explorer",
+    "festival_friend",
+    "seasonal_memory",
+    "special_moment",
+    "spring_sparkle",
+    "summer_breeze",
+    "timekeeper_mark",
+    "winter_lantern"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

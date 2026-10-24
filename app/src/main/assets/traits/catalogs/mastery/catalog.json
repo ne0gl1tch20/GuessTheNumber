@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "mastery",
+  "title": "Mastery",
+  "traitCount": 10,
+  "traitIds": [
+    "deep_practice",
+    "domain_master",
+    "expert_instinct",
+    "grandmaster_mark",
+    "masterful_route",
+    "mastery_beacon",
+    "seasoned_solver",
+    "skill_foundry",
+    "world_expert",
+    "world_student"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

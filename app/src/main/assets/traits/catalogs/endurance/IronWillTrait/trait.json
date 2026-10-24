@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "iron_will",
+  "catalogId": "endurance",
+  "packageFolder": "IronWillTrait",
+  "titleKey": "trait.iron_will.title",
+  "descriptionKey": "trait.iron_will.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

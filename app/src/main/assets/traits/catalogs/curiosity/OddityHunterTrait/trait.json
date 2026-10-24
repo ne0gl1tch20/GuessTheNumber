@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "oddity_hunter",
+  "catalogId": "curiosity",
+  "packageFolder": "OddityHunterTrait",
+  "titleKey": "trait.oddity_hunter.title",
+  "descriptionKey": "trait.oddity_hunter.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

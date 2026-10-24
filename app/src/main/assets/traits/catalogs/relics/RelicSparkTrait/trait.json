@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "relic_spark",
+  "catalogId": "relics",
+  "packageFolder": "RelicSparkTrait",
+  "titleKey": "trait.relic_spark.title",
+  "descriptionKey": "trait.relic_spark.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

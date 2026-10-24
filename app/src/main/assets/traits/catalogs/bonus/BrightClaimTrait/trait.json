@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "bright_claim",
+  "catalogId": "bonus",
+  "packageFolder": "BrightClaimTrait",
+  "titleKey": "trait.bright_claim.title",
+  "descriptionKey": "trait.bright_claim.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

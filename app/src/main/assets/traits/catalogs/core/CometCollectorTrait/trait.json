@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "comet_collector",
+  "catalogId": "core",
+  "packageFolder": "CometCollectorTrait",
+  "titleKey": "trait.comet_collector.title",
+  "descriptionKey": "trait.comet_collector.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

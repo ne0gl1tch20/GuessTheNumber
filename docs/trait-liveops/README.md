@@ -1,114 +1,39 @@
-# Trait LiveOps catalogs and packages
+# Signed Trait LiveOps and Built-in Trait Packages
 
-Traits are organized into **separate catalog folders**, with each trait living in its own folder. A trait package may mix supported formats; it does not have to use every format.
+## Built-in catalog
 
-## Repository layout
+The offline catalog contains **316 validated trait definitions across 30 catalog folders**. Each trait has its own folder with four checked-in package files:
 
-The built-in catalog directory is `app/src/main/assets/traits/catalogs/`. The recommended catalog groups are:
+- `trait.json`: stable ID, catalog, category, visibility, effects and display keys
+- `rules.json`: activation thresholds, dependencies, conflicts and allowed effects
+- `locales/en.json`: English title and description
+- `icon.svg`: local icon asset
 
-```text
-assets/traits/catalogs/
-├── core/
-│   └── 100ConsecutiveGuessesTrait/
-├── gameplay/
-│   └── PrecisionGuessTrait/
-├── challenges/
-│   └── NoHintChallengeTrait/
-├── exploration/
-│   └── NebulaFinderTrait/
-├── seasonal/
-│   └── AutumnEchoTrait/
-├── collection/
-│   └── RareDiscoveryTrait/
-├── experimental/
-│   └── PrototypeTrait/
-└── community/
-    └── CommunitySpotlightTrait/
-```
+Catalog folders contain a `catalog.json` index listing their exact trait IDs. Unit tests compare every package against the Kotlin registry, verify all required files exist, parse the JSON, check the activation thresholds/effects and reject obvious active SVG content. This prevents a folder from counting as a trait unless its definition is present in the authoritative Kotlin registry.
 
-Each package may contain a `trait.json`, Lua logic, JavaScript presentation, CSS, HTML templates, SVG/PNG/WebP icons, fonts, and other explicitly supported assets. These are examples of the layout, not a promise that every example trait is implemented.
+## Authority and execution
 
-## Signed manifest
+Kotlin remains the source of truth for trait eligibility, hidden discoveries, supported effects and reward mutations. The package JSON files are validated content metadata, not arbitrary executable code. Remote Lua/JavaScript/HTML/CSS is **not** executed by this trait catalog. Do not add scripts to a package unless a restricted, tested runtime is implemented for that file type.
 
-The package-folder layout uses **schema version 2**. Version 1 manifests use the older flat path layout and are rejected rather than interpreted ambiguously.
+Current supported effect types are a closed allowlist. Nebula claim bonuses are applied through `TraitRewardPolicy` with the existing cap. Cosmetic badge traits are represented in the activation result. Existing XP/streak effect types remain descriptive until their dedicated gameplay systems consume them.
 
-The HTTPS manifest is a JSON envelope:
+## Remote catalog protocol
 
-```json
-{
-  "payloadBase64": "<base64 of exact UTF-8 payload bytes>",
-  "payloadSha256": "<SHA-256 hex of those exact bytes>",
-  "signatureBase64": "<RSA/SHA-256 signature over those exact bytes>"
-}
-```
+- Signed, versioned JSON manifest; RSA signature over exact payload bytes and SHA-256 payload verification.
+- HTTPS only, strict schema/host/app compatibility, stable IDs, dependency/conflict validation and no built-in ID replacement.
+- Catalog-specific file paths use `assets/traits/catalogs/{catalogId}/{folderName}/...`.
+- Per-file and total bundle limits, file hashes, path boundary checks, staging and active pointer switching.
+- Cached manifests and assets are re-verified before loading. Rollback protection remains enabled.
+- Empty signing configuration fails closed; built-in traits remain available offline when remote updates are unavailable.
 
-The decoded payload includes compatibility and catalog version metadata. Each trait includes a `catalogId`, a `folderName` and a list of files. File paths must start with `assets/traits/catalogs/{catalogId}/{folderName}/`; paths cannot escape their trait package. Every file entry declares its SHA-256 hash and kind.
+## Adding a trait
 
-Example trait entry:
+1. Add a stable ID and declarative definition to `BuiltInTraits.kt`.
+2. Give it a unique catalog ID and package folder.
+3. Add the four package files and update the catalog's `catalog.json` index.
+4. Run the registry/package validation tests and Android unit tests.
+5. Keep rewards and state changes inside Kotlin. Never trust package metadata to award currency directly.
 
-```json
-{
-  "id": "nebula_finder",
-  "titleKey": "trait.nebula_finder.title",
-  "descriptionKey": "trait.nebula_finder.description",
-  "category": "COLLECTION",
-  "catalogId": "exploration",
-  "folderName": "NebulaFinderTrait",
-  "effects": ["COSMETIC_BADGE"],
-  "files": [
-    {
-      "path": "assets/traits/catalogs/exploration/NebulaFinderTrait/logic.lua",
-      "sha256": "<64-character SHA-256 hex>",
-      "kind": "lua"
-    },
-    {
-      "path": "assets/traits/catalogs/exploration/NebulaFinderTrait/presentation.js",
-      "sha256": "<64-character SHA-256 hex>",
-      "kind": "js"
-    },
-    {
-      "path": "assets/traits/catalogs/exploration/NebulaFinderTrait/theme.css",
-      "sha256": "<64-character SHA-256 hex>",
-      "kind": "css"
-    },
-    {
-      "path": "assets/traits/catalogs/exploration/NebulaFinderTrait/icon.svg",
-      "sha256": "<64-character SHA-256 hex>",
-      "kind": "svg"
-    }
-  ]
-}
-```
+## Healthy engagement
 
-Supported package kinds: `lua`, `json`, `js`, `css`, `html`, `svg`, `txt`, `png`, `webp`, `ttf` and `woff2`. Lua files pass through the existing Lua sandbox validator. JSON is parsed before staging. SVG rejects obvious active-content patterns. Other text assets are checked for non-empty UTF-8 content and every asset is hash-verified. **Accepting a file format does not mean the runtime is allowed to execute it**: JavaScript/Lua execution must use a restricted host API and cannot directly write saves or award currency.
-
-## Safety and offline behavior
-
-- HTTPS only, no automatic redirects.
-- RSA signature and SHA-256 checks before package activation.
-- Per-file hashes, strict catalog/trait path boundaries and size/count limits.
-- Staging and verification before the active catalog pointer changes.
-- Built-in IDs cannot be replaced by remote traits.
-- Kotlin remains authoritative for save state, game rules, trait activation, validation and rewards.
-- Failed updates leave the built-in offline catalog usable.
-- Keep the private signing key offline and never commit it.
-- Catalogs should provide optional variety, not FOMO timers, forced check-ins, streak-loss punishment or guilt-based notifications.
-
-## Signing and publishing
-
-1. Keep the RSA private key offline.
-2. Generate the payload JSON and sign its exact bytes:
-
-   ```sh
-   openssl dgst -sha256 -sign trait-liveops-private.pem -out signature.bin payload.json
-   openssl pkey -in trait-liveops-private.pem -pubout -outform DER | base64 -w0 > public-key.der.b64
-   base64 -w0 payload.json > payload.b64
-   sha256sum payload.json
-   base64 -w0 signature.bin > signature.b64
-   ```
-
-3. Publish the envelope and the package files at the paths listed in the manifest over HTTPS.
-4. Configure `traitLiveOpsManifestUrl` and `traitLiveOpsPublicKeyBase64` Gradle properties. An empty public key intentionally disables remote catalog updates.
-5. Increase `catalogVersion` for every release. Check app/host compatibility and run Android, Windows and HTML tests before shipping.
-
-The current loader stages mixed-format package files, but the presence of a JavaScript or HTML file does not automatically grant it access to the Kotlin bridge. Runtime integration must preserve a capability allowlist and keep authoritative game operations in Kotlin.
+Traits are optional gameplay variety and collection milestones. No forced daily check-ins, streak-loss punishment, FOMO timers or guilt notifications are part of this system.

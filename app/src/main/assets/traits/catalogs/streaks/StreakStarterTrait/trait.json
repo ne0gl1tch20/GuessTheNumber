@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "streak_starter",
+  "catalogId": "streaks",
+  "packageFolder": "StreakStarterTrait",
+  "titleKey": "trait.streak_starter.title",
+  "descriptionKey": "trait.streak_starter.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

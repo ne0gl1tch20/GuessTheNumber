@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "pattern_peeker",
+  "catalogId": "curiosity",
+  "packageFolder": "PatternPeekerTrait",
+  "titleKey": "trait.pattern_peeker.title",
+  "descriptionKey": "trait.pattern_peeker.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

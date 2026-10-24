@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "endurance",
+  "title": "Endurance",
+  "traitCount": 10,
+  "traitIds": [
+    "calm_return",
+    "endless_horizon",
+    "iron_will",
+    "long_runner",
+    "marathon_mind",
+    "patient_pulse",
+    "persistent_path",
+    "quiet_grit",
+    "steady_hand",
+    "unbroken_focus"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

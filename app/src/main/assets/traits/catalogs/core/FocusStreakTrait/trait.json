@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "focus_streak",
+  "catalogId": "core",
+  "packageFolder": "FocusStreakTrait",
+  "titleKey": "trait.focus_streak.title",
+  "descriptionKey": "trait.focus_streak.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "STREAK_PROTECTION"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

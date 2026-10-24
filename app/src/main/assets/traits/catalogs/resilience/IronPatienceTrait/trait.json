@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "iron_patience",
+  "catalogId": "resilience",
+  "packageFolder": "IronPatienceTrait",
+  "titleKey": "trait.iron_patience.title",
+  "descriptionKey": "trait.iron_patience.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

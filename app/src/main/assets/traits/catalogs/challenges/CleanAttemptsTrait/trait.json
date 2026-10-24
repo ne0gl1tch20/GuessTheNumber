@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "clean_attempts",
+  "catalogId": "challenges",
+  "packageFolder": "CleanAttemptsTrait",
+  "titleKey": "trait.clean_attempts.title",
+  "descriptionKey": "trait.clean_attempts.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

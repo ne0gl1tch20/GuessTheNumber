@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "rift_walker",
+  "catalogId": "exploration",
+  "packageFolder": "RiftWalkerTrait",
+  "titleKey": "trait.rift_walker.title",
+  "descriptionKey": "trait.rift_walker.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

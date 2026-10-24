@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "comet_luck",
+  "catalogId": "fortune",
+  "packageFolder": "CometLuckTrait",
+  "titleKey": "trait.comet_luck.title",
+  "descriptionKey": "trait.comet_luck.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

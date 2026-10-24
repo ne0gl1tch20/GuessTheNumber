@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "rhythm_runner",
+  "catalogId": "streaks",
+  "packageFolder": "RhythmRunnerTrait",
+  "titleKey": "trait.rhythm_runner.title",
+  "descriptionKey": "trait.rhythm_runner.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

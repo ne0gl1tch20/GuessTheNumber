@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "keeper_of_shards",
+  "catalogId": "relics",
+  "packageFolder": "KeeperOfShardsTrait",
+  "titleKey": "trait.keeper_of_shards.title",
+  "descriptionKey": "trait.keeper_of_shards.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

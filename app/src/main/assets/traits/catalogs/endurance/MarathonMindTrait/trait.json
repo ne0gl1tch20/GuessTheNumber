@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "marathon_mind",
+  "catalogId": "endurance",
+  "packageFolder": "MarathonMindTrait",
+  "titleKey": "trait.marathon_mind.title",
+  "descriptionKey": "trait.marathon_mind.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}
