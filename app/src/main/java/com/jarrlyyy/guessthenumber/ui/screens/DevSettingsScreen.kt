@@ -47,7 +47,7 @@ private const val HTML_VERSION_CHECK_JS = "JSON.stringify({version:document.quer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DevSettingsScreen(
+fun AdvancedDevToolsScreen(
     state: GameState,
     onExecuteCommand: (String) -> String,
     onImportSave: (String, (Boolean) -> Unit) -> Unit,
@@ -683,6 +683,58 @@ fun DevSettingsScreen(
                                     lineHeight = 15.sp
                                 )
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/** Compact entry point. Advanced legacy tools stay available without crowding the main hub. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DevSettingsScreen(
+    onNavigate: (String) -> Unit,
+    onBack: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Developer Settings") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item { Text("Developer & Testing Playground", style = MaterialTheme.typography.headlineSmall) }
+            item { Text("Open the dedicated process screens for debugging, testing, and diagnostics.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            item {
+                Card(onClick = { onNavigate("process_inspector") }, modifier = Modifier.fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Terminal, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Column {
+                            Text("Developer Playground", style = MaterialTheme.typography.titleMedium)
+                            Text("Core Process, Web Process, test suites, UI tools, save lab and diagnostics.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+            }
+            item {
+                Card(onClick = { onNavigate("advanced_dev_tools") }, modifier = Modifier.fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Column {
+                            Text("Advanced Developer Tools", style = MaterialTheme.typography.titleMedium)
+                            Text("Legacy command console, save import/export, Lua tools, and detailed log controls.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
