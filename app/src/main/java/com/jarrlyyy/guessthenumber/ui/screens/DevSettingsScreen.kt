@@ -42,6 +42,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+private const val EXPECTED_HTML_VERSION = "2026.10.24.1"
+private const val HTML_VERSION_CHECK_JS = "JSON.stringify({version:document.querySelector('meta[name=\\\"gtn-html-version\\\"]')?.content||'MISSING',url:location.href})"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DevSettingsScreen(
@@ -111,6 +114,28 @@ fun DevSettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Compare the Kotlin-expected HTML version with the marker in the live WebView.
+            item {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("HTML Version Diagnostics", style = MaterialTheme.typography.titleLarge)
+                        Text("Expected HTML version: $EXPECTED_HTML_VERSION", style = MaterialTheme.typography.bodyMedium)
+                        Text("Check the live WebView marker below. The result is also written to the WebView console logs.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        OutlinedButton(
+                            onClick = {
+                                webViewJsInput = HTML_VERSION_CHECK_JS
+                                WebViewDebugConsole.runJavascript(HTML_VERSION_CHECK_JS)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Check Loaded HTML Version")
+                        }
+                    }
+                }
+            }
+
             // Debug the live HTML game WebView directly on this device.
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
