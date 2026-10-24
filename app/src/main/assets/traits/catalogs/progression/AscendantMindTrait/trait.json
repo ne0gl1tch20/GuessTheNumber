@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "ascendant_mind",
+  "catalogId": "progression",
+  "packageFolder": "AscendantMindTrait",
+  "titleKey": "trait.ascendant_mind.title",
+  "descriptionKey": "trait.ascendant_mind.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

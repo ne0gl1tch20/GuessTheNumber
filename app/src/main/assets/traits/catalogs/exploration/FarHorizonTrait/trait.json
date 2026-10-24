@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "far_horizon",
+  "catalogId": "exploration",
+  "packageFolder": "FarHorizonTrait",
+  "titleKey": "trait.far_horizon.title",
+  "descriptionKey": "trait.far_horizon.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

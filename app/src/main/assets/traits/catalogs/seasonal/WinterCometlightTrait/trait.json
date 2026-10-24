@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "winter_cometlight",
+  "catalogId": "seasonal",
+  "packageFolder": "WinterCometlightTrait",
+  "titleKey": "trait.winter_cometlight.title",
+  "descriptionKey": "trait.winter_cometlight.description",
+  "category": "SEASONAL",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": "winter",
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

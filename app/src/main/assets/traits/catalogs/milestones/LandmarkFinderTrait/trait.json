@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "landmark_finder",
+  "catalogId": "milestones",
+  "packageFolder": "LandmarkFinderTrait",
+  "titleKey": "trait.landmark_finder.title",
+  "descriptionKey": "trait.landmark_finder.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "timekeeper_mark",
+  "catalogId": "events",
+  "packageFolder": "TimekeeperMarkTrait",
+  "titleKey": "trait.timekeeper_mark.title",
+  "descriptionKey": "trait.timekeeper_mark.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

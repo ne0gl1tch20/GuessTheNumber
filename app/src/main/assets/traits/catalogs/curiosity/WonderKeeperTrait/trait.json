@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "wonder_keeper",
+  "catalogId": "curiosity",
+  "packageFolder": "WonderKeeperTrait",
+  "titleKey": "trait.wonder_keeper.title",
+  "descriptionKey": "trait.wonder_keeper.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

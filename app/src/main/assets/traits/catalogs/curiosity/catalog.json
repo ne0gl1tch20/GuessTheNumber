@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "curiosity",
+  "title": "Curiosity",
+  "traitCount": 10,
+  "traitIds": [
+    "curious_mind",
+    "idea_spark",
+    "keen_question",
+    "oddity_hunter",
+    "pattern_peeker",
+    "question_mark",
+    "small_clue",
+    "why_not",
+    "wonder_keeper",
+    "wonder_walker"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

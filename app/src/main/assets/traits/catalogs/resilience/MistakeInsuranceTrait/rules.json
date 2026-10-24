@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "mistake_insurance",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 0,
+    "minimumCorrectGuesses": 50,
+    "minimumBestStreak": 0
+  },
+  "dependencies": [],
+  "conflicts": [],
+  "effects": [
+    "MISS_PENALTY_REDUCTION"
+  ],
+  "seasonId": null,
+  "arms": {
+    "half_refund": {
+      "refundRate": 0.5
+    },
+    "careful": {
+      "refundRate": 0.75
+    }
+  },
+  "note": "Kotlin validates eligibility and applies the gameplay effect. Arms are declarative tuning variants; unsupported or unselected arms do not execute code."
+}

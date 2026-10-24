@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "summer_bloom",
+  "catalogId": "core",
+  "packageFolder": "SummerBloomTrait",
+  "titleKey": "trait.summer_bloom.title",
+  "descriptionKey": "trait.summer_bloom.description",
+  "category": "SEASONAL",
+  "visibility": "VISIBLE",
+  "effects": [
+    "XP_MULTIPLIER"
+  ],
+  "seasonId": "summer",
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

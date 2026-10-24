@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "arcade_ace",
+  "catalogId": "arcade",
+  "packageFolder": "ArcadeAceTrait",
+  "titleKey": "trait.arcade_ace.title",
+  "descriptionKey": "trait.arcade_ace.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

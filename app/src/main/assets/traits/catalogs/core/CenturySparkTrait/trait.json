@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "century_spark",
+  "catalogId": "core",
+  "packageFolder": "CenturySparkTrait",
+  "titleKey": "trait.century_spark.title",
+  "descriptionKey": "trait.century_spark.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

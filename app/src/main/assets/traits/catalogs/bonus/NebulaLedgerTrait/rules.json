@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "nebula_ledger",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 2,
+    "minimumCorrectGuesses": 5300
+  },
+  "dependencies": [],
+  "conflicts": [],
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

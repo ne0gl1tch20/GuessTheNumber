@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "hidden_pattern",
+  "catalogId": "discovery",
+  "packageFolder": "HiddenPatternTrait",
+  "titleKey": "trait.hidden_pattern.title",
+  "descriptionKey": "trait.hidden_pattern.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

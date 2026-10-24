@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "cloud_chaser",
+  "catalogId": "nebula",
+  "packageFolder": "CloudChaserTrait",
+  "titleKey": "trait.cloud_chaser.title",
+  "descriptionKey": "trait.cloud_chaser.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

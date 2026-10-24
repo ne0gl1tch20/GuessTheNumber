@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "chain_reaction",
+  "catalogId": "streaks",
+  "packageFolder": "ChainReactionTrait",
+  "titleKey": "trait.chain_reaction.title",
+  "descriptionKey": "trait.chain_reaction.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

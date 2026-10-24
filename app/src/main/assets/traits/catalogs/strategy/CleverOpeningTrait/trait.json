@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "clever_opening",
+  "catalogId": "strategy",
+  "packageFolder": "CleverOpeningTrait",
+  "titleKey": "trait.clever_opening.title",
+  "descriptionKey": "trait.clever_opening.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "fifty_guess_mark",
+  "catalogId": "milestones",
+  "packageFolder": "FiftyGuessMarkTrait",
+  "titleKey": "trait.fifty_guess_mark.title",
+  "descriptionKey": "trait.fifty_guess_mark.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

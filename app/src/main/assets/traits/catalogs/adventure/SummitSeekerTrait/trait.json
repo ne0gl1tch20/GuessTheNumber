@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "summit_seeker",
+  "catalogId": "adventure",
+  "packageFolder": "SummitSeekerTrait",
+  "titleKey": "trait.summit_seeker.title",
+  "descriptionKey": "trait.summit_seeker.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

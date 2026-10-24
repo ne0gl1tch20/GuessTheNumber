@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "precision",
+  "title": "Precision",
+  "traitCount": 10,
+  "traitIds": [
+    "careful_guess",
+    "clean_hit",
+    "clear_signal",
+    "exact_instinct",
+    "focused_line",
+    "narrow_margin",
+    "perfect_read",
+    "pinpoint_path",
+    "sharp_eye",
+    "true_north"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

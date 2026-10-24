@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "friendly_signal",
+  "catalogId": "community",
+  "packageFolder": "FriendlySignalTrait",
+  "titleKey": "trait.friendly_signal.title",
+  "descriptionKey": "trait.friendly_signal.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

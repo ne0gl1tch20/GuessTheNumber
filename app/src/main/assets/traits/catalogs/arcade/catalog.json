@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "arcade",
+  "title": "Arcade",
+  "traitCount": 10,
+  "traitIds": [
+    "arcade_ace",
+    "bonus_round",
+    "cabinet_legend",
+    "combo_starter",
+    "highscore_horizon",
+    "neon_runner",
+    "perfect_round",
+    "pixel_pioneer",
+    "quickdraw",
+    "score_chaser"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

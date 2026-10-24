@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "astral_haze",
+  "catalogId": "nebula",
+  "packageFolder": "AstralHazeTrait",
+  "titleKey": "trait.astral_haze.title",
+  "descriptionKey": "trait.astral_haze.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

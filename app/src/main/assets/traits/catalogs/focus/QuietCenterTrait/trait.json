@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "quiet_center",
+  "catalogId": "focus",
+  "packageFolder": "QuietCenterTrait",
+  "titleKey": "trait.quiet_center.title",
+  "descriptionKey": "trait.quiet_center.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

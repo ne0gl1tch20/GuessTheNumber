@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "special_moment",
+  "catalogId": "events",
+  "packageFolder": "SpecialMomentTrait",
+  "titleKey": "trait.special_moment.title",
+  "descriptionKey": "trait.special_moment.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

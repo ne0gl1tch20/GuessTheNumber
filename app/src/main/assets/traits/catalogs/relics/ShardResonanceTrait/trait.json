@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "shard_resonance",
+  "catalogId": "relics",
+  "packageFolder": "ShardResonanceTrait",
+  "titleKey": "trait.shard_resonance.title",
+  "descriptionKey": "trait.shard_resonance.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

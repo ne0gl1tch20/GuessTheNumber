@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "frost_whisper",
+  "catalogId": "seasonal",
+  "packageFolder": "FrostWhisperTrait",
+  "titleKey": "trait.frost_whisper.title",
+  "descriptionKey": "trait.frost_whisper.description",
+  "category": "SEASONAL",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": "autumn",
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "streak_guard",
+  "catalogId": "core",
+  "packageFolder": "StreakGuardTrait",
+  "titleKey": "trait.streak_guard.title",
+  "descriptionKey": "trait.streak_guard.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "STREAK_PROTECTION"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

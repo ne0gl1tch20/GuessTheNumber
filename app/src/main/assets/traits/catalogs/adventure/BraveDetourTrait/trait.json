@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "brave_detour",
+  "catalogId": "adventure",
+  "packageFolder": "BraveDetourTrait",
+  "titleKey": "trait.brave_detour.title",
+  "descriptionKey": "trait.brave_detour.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

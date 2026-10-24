@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "crafted_path",
+  "catalogId": "crafting",
+  "packageFolder": "CraftedPathTrait",
+  "titleKey": "trait.crafted_path.title",
+  "descriptionKey": "trait.crafted_path.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

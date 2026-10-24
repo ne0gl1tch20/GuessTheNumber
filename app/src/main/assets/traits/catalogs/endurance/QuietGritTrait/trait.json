@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "quiet_grit",
+  "catalogId": "endurance",
+  "packageFolder": "QuietGritTrait",
+  "titleKey": "trait.quiet_grit.title",
+  "descriptionKey": "trait.quiet_grit.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

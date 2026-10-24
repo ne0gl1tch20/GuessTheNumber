@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "early_bird",
+  "catalogId": "core",
+  "packageFolder": "EarlyBirdTrait",
+  "titleKey": "trait.early_bird.title",
+  "descriptionKey": "trait.early_bird.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

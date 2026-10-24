@@ -13,8 +13,8 @@ class TraitPhase3CatalogTest {
     private val engine = TraitActivationEngine(BuiltInTraits.registry())
 
     @Test fun catalogIsVersionedAndExpanded() {
-        assertEquals(2, BuiltInTraits.CATALOG_VERSION)
-        assertTrue(BuiltInTraits.registry().size >= 16)
+        assertEquals(3, BuiltInTraits.CATALOG_VERSION)
+        assertTrue(BuiltInTraits.registry().size >= 316)
     }
 
     @Test fun progressionAndCollectionChainsFollowMilestones() {

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "perfect_read",
+  "catalogId": "precision",
+  "packageFolder": "PerfectReadTrait",
+  "titleKey": "trait.perfect_read.title",
+  "descriptionKey": "trait.perfect_read.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

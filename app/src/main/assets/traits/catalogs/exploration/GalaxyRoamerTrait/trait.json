@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "galaxy_roamer",
+  "catalogId": "exploration",
+  "packageFolder": "GalaxyRoamerTrait",
+  "titleKey": "trait.galaxy_roamer.title",
+  "descriptionKey": "trait.galaxy_roamer.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

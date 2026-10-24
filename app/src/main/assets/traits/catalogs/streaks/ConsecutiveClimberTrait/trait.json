@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "consecutive_climber",
+  "catalogId": "streaks",
+  "packageFolder": "ConsecutiveClimberTrait",
+  "titleKey": "trait.consecutive_climber.title",
+  "descriptionKey": "trait.consecutive_climber.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

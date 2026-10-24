@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "challenges",
+  "title": "Challenges",
+  "traitCount": 10,
+  "traitIds": [
+    "blind_guess_trial",
+    "careful_cadence",
+    "challenge_veteran",
+    "clean_attempts",
+    "focus_gauntlet",
+    "low_attempt_run",
+    "narrow_window",
+    "no_hint_challenge",
+    "patient_trial",
+    "reverse_logic"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

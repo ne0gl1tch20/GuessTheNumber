@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "lucky_read",
+  "catalogId": "core",
+  "packageFolder": "LuckyReadTrait",
+  "titleKey": "trait.lucky_read.title",
+  "descriptionKey": "trait.lucky_read.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

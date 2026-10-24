@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "grandmaster_mark",
+  "catalogId": "mastery",
+  "packageFolder": "GrandmasterMarkTrait",
+  "titleKey": "trait.grandmaster_mark.title",
+  "descriptionKey": "trait.grandmaster_mark.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

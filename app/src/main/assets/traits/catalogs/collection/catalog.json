@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "collection",
+  "title": "Collection",
+  "traitCount": 10,
+  "traitIds": [
+    "archive_builder",
+    "artifact_keeper",
+    "curious_collector",
+    "lost_token",
+    "pocket_museum",
+    "rare_finder",
+    "relic_sleuth",
+    "shard_gatherer",
+    "trove_tracker",
+    "vault_curator"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

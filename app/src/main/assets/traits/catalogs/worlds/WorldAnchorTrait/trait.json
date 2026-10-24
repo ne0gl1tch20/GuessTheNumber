@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "world_anchor",
+  "catalogId": "worlds",
+  "packageFolder": "WorldAnchorTrait",
+  "titleKey": "trait.world_anchor.title",
+  "descriptionKey": "trait.world_anchor.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

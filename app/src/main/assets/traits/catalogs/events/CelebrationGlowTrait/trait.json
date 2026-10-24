@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "celebration_glow",
+  "catalogId": "events",
+  "packageFolder": "CelebrationGlowTrait",
+  "titleKey": "trait.celebration_glow.title",
+  "descriptionKey": "trait.celebration_glow.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

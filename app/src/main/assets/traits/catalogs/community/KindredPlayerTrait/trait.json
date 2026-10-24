@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "kindred_player",
+  "catalogId": "community",
+  "packageFolder": "KindredPlayerTrait",
+  "titleKey": "trait.kindred_player.title",
+  "descriptionKey": "trait.kindred_player.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "spring_orbit",
+  "catalogId": "seasonal",
+  "packageFolder": "SpringOrbitTrait",
+  "titleKey": "trait.spring_orbit.title",
+  "descriptionKey": "trait.spring_orbit.description",
+  "category": "SEASONAL",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": "spring",
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

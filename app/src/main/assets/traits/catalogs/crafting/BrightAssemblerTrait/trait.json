@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "bright_assembler",
+  "catalogId": "crafting",
+  "packageFolder": "BrightAssemblerTrait",
+  "titleKey": "trait.bright_assembler.title",
+  "descriptionKey": "trait.bright_assembler.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

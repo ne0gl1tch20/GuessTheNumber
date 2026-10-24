@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "cabinet_legend",
+  "catalogId": "arcade",
+  "packageFolder": "CabinetLegendTrait",
+  "titleKey": "trait.cabinet_legend.title",
+  "descriptionKey": "trait.cabinet_legend.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

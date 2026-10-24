@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "unbroken_focus",
+  "catalogId": "endurance",
+  "packageFolder": "UnbrokenFocusTrait",
+  "titleKey": "trait.unbroken_focus.title",
+  "descriptionKey": "trait.unbroken_focus.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

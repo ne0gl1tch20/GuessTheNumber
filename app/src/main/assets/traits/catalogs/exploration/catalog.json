@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "exploration",
+  "title": "Exploration",
+  "traitCount": 10,
+  "traitIds": [
+    "comet_wayfinder",
+    "cosmic_cartographer",
+    "distant_signal",
+    "far_horizon",
+    "galaxy_roamer",
+    "hidden_orbit",
+    "rift_walker",
+    "starlit_route",
+    "startrail_scout",
+    "unknown_frontier"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

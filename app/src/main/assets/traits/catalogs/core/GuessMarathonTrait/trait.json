@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "guess_marathon",
+  "catalogId": "core",
+  "packageFolder": "GuessMarathonTrait",
+  "titleKey": "trait.guess_marathon.title",
+  "descriptionKey": "trait.guess_marathon.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

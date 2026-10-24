@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "focus_master",
+  "catalogId": "focus",
+  "packageFolder": "FocusMasterTrait",
+  "titleKey": "trait.focus_master.title",
+  "descriptionKey": "trait.focus_master.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

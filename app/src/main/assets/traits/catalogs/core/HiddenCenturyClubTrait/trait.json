@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "hidden_century_club",
+  "catalogId": "core",
+  "packageFolder": "HiddenCenturyClubTrait",
+  "titleKey": "trait.hidden_century_club.title",
+  "descriptionKey": "trait.hidden_century_club.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

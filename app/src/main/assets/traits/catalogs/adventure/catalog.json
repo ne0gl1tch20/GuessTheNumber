@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "adventure",
+  "title": "Adventure",
+  "traitCount": 10,
+  "traitIds": [
+    "ancient_trail",
+    "brave_detour",
+    "compass_heart",
+    "hidden_cove",
+    "horizon_hopper",
+    "pathfinder_mark",
+    "roaming_star",
+    "summit_seeker",
+    "trailblazer",
+    "wild_waypoint"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "calm_return",
+  "catalogId": "endurance",
+  "packageFolder": "CalmReturnTrait",
+  "titleKey": "trait.calm_return.title",
+  "descriptionKey": "trait.calm_return.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "unknown_frontier",
+  "catalogId": "exploration",
+  "packageFolder": "UnknownFrontierTrait",
+  "titleKey": "trait.unknown_frontier.title",
+  "descriptionKey": "trait.unknown_frontier.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

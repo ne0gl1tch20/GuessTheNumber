@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "astronomy",
+  "title": "Astronomy",
+  "traitCount": 10,
+  "traitIds": [
+    "celestial_guide",
+    "comet_watch",
+    "constellation_mind",
+    "cosmic_calendar",
+    "eclipse_echo",
+    "lunar_reader",
+    "meteor_tracker",
+    "orbit_keeper",
+    "solar_spark",
+    "stargazer"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

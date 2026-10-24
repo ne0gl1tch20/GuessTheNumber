@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "cadence_builder",
+  "catalogId": "rhythm",
+  "packageFolder": "CadenceBuilderTrait",
+  "titleKey": "trait.cadence_builder.title",
+  "descriptionKey": "trait.cadence_builder.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

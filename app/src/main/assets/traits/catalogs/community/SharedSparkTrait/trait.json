@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "shared_spark",
+  "catalogId": "community",
+  "packageFolder": "SharedSparkTrait",
+  "titleKey": "trait.shared_spark.title",
+  "descriptionKey": "trait.shared_spark.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "focus_gauntlet",
+  "catalogId": "challenges",
+  "packageFolder": "FocusGauntletTrait",
+  "titleKey": "trait.focus_gauntlet.title",
+  "descriptionKey": "trait.focus_gauntlet.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

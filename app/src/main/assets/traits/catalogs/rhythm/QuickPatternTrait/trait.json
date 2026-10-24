@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "quick_pattern",
+  "catalogId": "rhythm",
+  "packageFolder": "QuickPatternTrait",
+  "titleKey": "trait.quick_pattern.title",
+  "descriptionKey": "trait.quick_pattern.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "spring_spark",
+  "catalogId": "core",
+  "packageFolder": "SpringSparkTrait",
+  "titleKey": "trait.spring_spark.title",
+  "descriptionKey": "trait.spring_spark.description",
+  "category": "SEASONAL",
+  "visibility": "VISIBLE",
+  "effects": [
+    "XP_MULTIPLIER"
+  ],
+  "seasonId": "spring",
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

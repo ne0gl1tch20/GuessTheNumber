@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "flowing_guesses",
+  "catalogId": "rhythm",
+  "packageFolder": "FlowingGuessesTrait",
+  "titleKey": "trait.flowing_guesses.title",
+  "descriptionKey": "trait.flowing_guesses.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

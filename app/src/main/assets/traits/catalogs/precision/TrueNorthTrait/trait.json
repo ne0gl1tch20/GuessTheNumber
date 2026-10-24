@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "true_north",
+  "catalogId": "precision",
+  "packageFolder": "TrueNorthTrait",
+  "titleKey": "trait.true_north.title",
+  "descriptionKey": "trait.true_north.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

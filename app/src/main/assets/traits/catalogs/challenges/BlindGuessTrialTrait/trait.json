@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "blind_guess_trial",
+  "catalogId": "challenges",
+  "packageFolder": "BlindGuessTrialTrait",
+  "titleKey": "trait.blind_guess_trial.title",
+  "descriptionKey": "trait.blind_guess_trial.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

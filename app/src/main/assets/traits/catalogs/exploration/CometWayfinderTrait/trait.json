@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "comet_wayfinder",
+  "catalogId": "exploration",
+  "packageFolder": "CometWayfinderTrait",
+  "titleKey": "trait.comet_wayfinder.title",
+  "descriptionKey": "trait.comet_wayfinder.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

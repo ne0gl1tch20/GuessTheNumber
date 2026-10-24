@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "tidy_inventory",
+  "catalogId": "utility",
+  "packageFolder": "TidyInventoryTrait",
+  "titleKey": "trait.tidy_inventory.title",
+  "descriptionKey": "trait.tidy_inventory.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

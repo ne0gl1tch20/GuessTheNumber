@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "focus",
+  "title": "Focus",
+  "traitCount": 10,
+  "traitIds": [
+    "calm_precision",
+    "clear_mind",
+    "deep_concentration",
+    "focus_anchor",
+    "focus_flare",
+    "focus_master",
+    "mindful_guess",
+    "quiet_center",
+    "sharp_attention",
+    "still_point"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

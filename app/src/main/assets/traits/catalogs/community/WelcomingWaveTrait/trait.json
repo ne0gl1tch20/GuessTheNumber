@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "welcoming_wave",
+  "catalogId": "community",
+  "packageFolder": "WelcomingWaveTrait",
+  "titleKey": "trait.welcoming_wave.title",
+  "descriptionKey": "trait.welcoming_wave.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

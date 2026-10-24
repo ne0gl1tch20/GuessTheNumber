@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "deep_concentration",
+  "catalogId": "focus",
+  "packageFolder": "DeepConcentrationTrait",
+  "titleKey": "trait.deep_concentration.title",
+  "descriptionKey": "trait.deep_concentration.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

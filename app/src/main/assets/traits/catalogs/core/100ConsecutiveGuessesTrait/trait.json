@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "hundred_consecutive_guesses",
+  "catalogId": "core",
+  "packageFolder": "100ConsecutiveGuessesTrait",
+  "titleKey": "trait.hundred_consecutive_guesses.title",
+  "descriptionKey": "trait.hundred_consecutive_guesses.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg",
+    "module.json",
+    "logic.lua",
+    "presentation.js"
+  ]
+}

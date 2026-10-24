@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "constellation_mind",
+  "catalogId": "astronomy",
+  "packageFolder": "ConstellationMindTrait",
+  "titleKey": "trait.constellation_mind.title",
+  "descriptionKey": "trait.constellation_mind.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

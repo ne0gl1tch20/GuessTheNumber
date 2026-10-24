@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "solstice_spark",
+  "catalogId": "seasonal",
+  "packageFolder": "SolsticeSparkTrait",
+  "titleKey": "trait.solstice_spark.title",
+  "descriptionKey": "trait.solstice_spark.description",
+  "category": "SEASONAL",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": "summer",
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

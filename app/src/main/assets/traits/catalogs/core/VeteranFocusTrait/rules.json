@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "veteran_focus",
+  "activation": {
+    "minimumLevel": 10,
+    "minimumPrestige": 0,
+    "minimumCorrectGuesses": 100
+  },
+  "dependencies": [
+    "first_prestige"
+  ],
+  "conflicts": [],
+  "effects": [
+    "XP_MULTIPLIER"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

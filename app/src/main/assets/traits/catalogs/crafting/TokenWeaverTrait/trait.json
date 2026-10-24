@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "token_weaver",
+  "catalogId": "crafting",
+  "packageFolder": "TokenWeaverTrait",
+  "titleKey": "trait.token_weaver.title",
+  "descriptionKey": "trait.token_weaver.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

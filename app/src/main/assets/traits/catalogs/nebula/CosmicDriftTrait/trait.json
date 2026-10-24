@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "cosmic_drift",
+  "catalogId": "nebula",
+  "packageFolder": "CosmicDriftTrait",
+  "titleKey": "trait.cosmic_drift.title",
+  "descriptionKey": "trait.cosmic_drift.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

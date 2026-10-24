@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "relic_sleuth",
+  "catalogId": "collection",
+  "packageFolder": "RelicSleuthTrait",
+  "titleKey": "trait.relic_sleuth.title",
+  "descriptionKey": "trait.relic_sleuth.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

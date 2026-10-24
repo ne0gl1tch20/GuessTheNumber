@@ -4,36 +4,43 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import java.time.LocalDate
 
 /**
- * Connects declarative traits to the existing Kotlin-owned save and reward flow.
- * Only the supported Nebula claim bonus is applied in this phase; other effect types
- * remain descriptive until their gameplay systems exist.
+ * Connects validated declarative traits to Kotlin-owned saves and rewards.
+ * Remote data can describe supported effects but cannot mutate state or execute code.
  */
 object TraitRewardPolicy {
     fun updateDiscoveries(
         state: GameState,
-        activeSeasonId: String = currentSeasonId()
+        activeSeasonId: String = currentSeasonId(),
+        registry: TraitRegistry = ActiveTraitCatalog.current()
     ): GameState {
-        val newlyDiscovered = BuiltInTraits.registry().hidden()
-            .filter { trait ->
+        val discovered = state.discoveredTraitIds.toMutableSet()
+        var changed: Boolean
+        do {
+            changed = false
+            registry.hidden().forEach { trait ->
                 val requirements = trait.activation
-                trait.id !in state.discoveredTraitIds &&
+                val eligible = trait.id !in discovered &&
+                    trait.dependencies.all { it in discovered } &&
                     state.prestigeCount >= requirements.minimumPrestige.toLong() &&
                     state.correctGuesses >= requirements.minimumCorrectGuesses &&
+                    state.bestStreak >= requirements.minimumBestStreak &&
                     (trait.category != TraitCategory.SEASONAL || trait.seasonId == activeSeasonId)
+                if (eligible && discovered.add(trait.id)) changed = true
             }
-            .mapTo(sortedSetOf()) { it.id }
+        } while (changed)
 
-        return if (newlyDiscovered.isEmpty()) state
-        else state.copy(discoveredTraitIds = state.discoveredTraitIds + newlyDiscovered)
+        return if (discovered == state.discoveredTraitIds) state
+        else state.copy(discoveredTraitIds = discovered)
     }
 
-    /** Returns a bounded bonus for one daily reward claim without mutating saved state. */
+    /** Returns a bounded bonus for one reward claim without mutating saved state. */
     fun nebulaBonusForClaim(
         state: GameState,
-        activeSeasonId: String = currentSeasonId()
+        activeSeasonId: String = currentSeasonId(),
+        registry: TraitRegistry = ActiveTraitCatalog.current()
     ): Long {
-        val stateWithDiscoveries = updateDiscoveries(state, activeSeasonId)
-        return TraitActivationEngine(BuiltInTraits.registry()).evaluate(
+        val stateWithDiscoveries = updateDiscoveries(state, activeSeasonId, registry)
+        return TraitActivationEngine(registry).evaluate(
             TraitActivationContext(
                 state = stateWithDiscoveries,
                 playerLevel = 1,

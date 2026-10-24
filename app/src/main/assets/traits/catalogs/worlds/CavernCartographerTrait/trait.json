@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "cavern_cartographer",
+  "catalogId": "worlds",
+  "packageFolder": "CavernCartographerTrait",
+  "titleKey": "trait.cavern_cartographer.title",
+  "descriptionKey": "trait.cavern_cartographer.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

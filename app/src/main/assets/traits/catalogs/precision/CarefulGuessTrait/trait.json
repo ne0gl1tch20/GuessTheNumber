@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "careful_guess",
+  "catalogId": "precision",
+  "packageFolder": "CarefulGuessTrait",
+  "titleKey": "trait.careful_guess.title",
+  "descriptionKey": "trait.careful_guess.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

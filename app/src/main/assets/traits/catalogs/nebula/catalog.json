@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "nebula",
+  "title": "Nebula",
+  "traitCount": 10,
+  "traitIds": [
+    "astral_haze",
+    "cloud_chaser",
+    "cosmic_drift",
+    "deep_space_glow",
+    "nebula_keeper",
+    "nebula_lantern",
+    "nebula_surveyor",
+    "nebula_whisper",
+    "stardust_current",
+    "violet_cloud"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

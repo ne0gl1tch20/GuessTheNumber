@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "eclipse_echo",
+  "catalogId": "astronomy",
+  "packageFolder": "EclipseEchoTrait",
+  "titleKey": "trait.eclipse_echo.title",
+  "descriptionKey": "trait.eclipse_echo.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

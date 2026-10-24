@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "steady_milestone",
+  "catalogId": "milestones",
+  "packageFolder": "SteadyMilestoneTrait",
+  "titleKey": "trait.steady_milestone.title",
+  "descriptionKey": "trait.steady_milestone.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

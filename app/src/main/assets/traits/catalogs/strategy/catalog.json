@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "strategy",
+  "title": "Strategy",
+  "traitCount": 11,
+  "traitIds": [
+    "adaptive_plan",
+    "balanced_move",
+    "careful_tactician",
+    "clever_opening",
+    "logical_route",
+    "master_plan",
+    "patient_strategy",
+    "planned_guess",
+    "range_reader",
+    "range_scout",
+    "strategic_eye"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

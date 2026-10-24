@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "nebula_ledger",
+  "catalogId": "bonus",
+  "packageFolder": "NebulaLedgerTrait",
+  "titleKey": "trait.nebula_ledger.title",
+  "descriptionKey": "trait.nebula_ledger.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

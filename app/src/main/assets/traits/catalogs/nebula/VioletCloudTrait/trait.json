@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "violet_cloud",
+  "catalogId": "nebula",
+  "packageFolder": "VioletCloudTrait",
+  "titleKey": "trait.violet_cloud.title",
+  "descriptionKey": "trait.violet_cloud.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

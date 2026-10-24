@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "clean_chain",
+  "catalogId": "streaks",
+  "packageFolder": "CleanChainTrait",
+  "titleKey": "trait.clean_chain.title",
+  "descriptionKey": "trait.clean_chain.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

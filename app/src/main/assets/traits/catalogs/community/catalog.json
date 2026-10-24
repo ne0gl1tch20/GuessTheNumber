@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "community",
+  "title": "Community",
+  "traitCount": 10,
+  "traitIds": [
+    "bright_companion",
+    "common_ground",
+    "community_light",
+    "friendly_signal",
+    "good_sport",
+    "helpful_guide",
+    "kindred_player",
+    "shared_spark",
+    "together_strong",
+    "welcoming_wave"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

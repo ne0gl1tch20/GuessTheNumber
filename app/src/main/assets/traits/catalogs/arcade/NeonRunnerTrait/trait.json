@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "neon_runner",
+  "catalogId": "arcade",
+  "packageFolder": "NeonRunnerTrait",
+  "titleKey": "trait.neon_runner.title",
+  "descriptionKey": "trait.neon_runner.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

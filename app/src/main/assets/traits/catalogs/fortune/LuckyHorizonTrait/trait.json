@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "lucky_horizon",
+  "catalogId": "fortune",
+  "packageFolder": "LuckyHorizonTrait",
+  "titleKey": "trait.lucky_horizon.title",
+  "descriptionKey": "trait.lucky_horizon.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

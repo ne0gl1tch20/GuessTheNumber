@@ -30,6 +30,12 @@ class TraitRewardPolicyTest {
     }
 
     @Test
+    fun hundredConsecutiveGuessesTraitBonusRequiresActualBestStreak() {
+        assertEquals(0L, TraitRewardPolicy.nebulaBonusForClaim(GameState(bestStreak = 99), "summer"))
+        assertEquals(1L, TraitRewardPolicy.nebulaBonusForClaim(GameState(bestStreak = 100), "summer"))
+    }
+
+    @Test
     fun existingDiscoveryIdsArePreserved() {
         val state = GameState(discoveredTraitIds = setOf("custom_trait"))
         val updated = TraitRewardPolicy.updateDiscoveries(state, "summer")

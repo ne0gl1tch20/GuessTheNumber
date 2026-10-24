@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "nebula_saver",
+  "catalogId": "bonus",
+  "packageFolder": "NebulaSaverTrait",
+  "titleKey": "trait.nebula_saver.title",
+  "descriptionKey": "trait.nebula_saver.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

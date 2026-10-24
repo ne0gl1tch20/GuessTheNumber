@@ -96,7 +96,8 @@ class TraitActivationEngine(
         val requirements = trait.activation
         return context.playerLevel >= requirements.minimumLevel &&
             context.state.prestigeCount >= requirements.minimumPrestige.toLong() &&
-            context.state.correctGuesses >= requirements.minimumCorrectGuesses
+            context.state.correctGuesses >= requirements.minimumCorrectGuesses &&
+            context.state.bestStreak >= requirements.minimumBestStreak
     }
 
     companion object {

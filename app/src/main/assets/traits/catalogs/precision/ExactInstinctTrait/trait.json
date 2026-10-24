@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "exact_instinct",
+  "catalogId": "precision",
+  "packageFolder": "ExactInstinctTrait",
+  "titleKey": "trait.exact_instinct.title",
+  "descriptionKey": "trait.exact_instinct.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

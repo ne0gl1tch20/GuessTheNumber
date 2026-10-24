@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "efficient_habit",
+  "catalogId": "utility",
+  "packageFolder": "EfficientHabitTrait",
+  "titleKey": "trait.efficient_habit.title",
+  "descriptionKey": "trait.efficient_habit.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

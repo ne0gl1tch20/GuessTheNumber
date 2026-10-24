@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "cosmic_cartographer",
+  "catalogId": "exploration",
+  "packageFolder": "CosmicCartographerTrait",
+  "titleKey": "trait.cosmic_cartographer.title",
+  "descriptionKey": "trait.cosmic_cartographer.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

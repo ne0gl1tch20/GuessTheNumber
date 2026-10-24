@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "bonus_beacon",
+  "catalogId": "bonus",
+  "packageFolder": "BonusBeaconTrait",
+  "titleKey": "trait.bonus_beacon.title",
+  "descriptionKey": "trait.bonus_beacon.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

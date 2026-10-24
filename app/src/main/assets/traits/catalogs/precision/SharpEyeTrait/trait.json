@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "sharp_eye",
+  "catalogId": "precision",
+  "packageFolder": "SharpEyeTrait",
+  "titleKey": "trait.sharp_eye.title",
+  "descriptionKey": "trait.sharp_eye.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

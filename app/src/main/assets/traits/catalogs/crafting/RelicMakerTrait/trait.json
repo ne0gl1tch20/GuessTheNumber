@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "relic_maker",
+  "catalogId": "crafting",
+  "packageFolder": "RelicMakerTrait",
+  "titleKey": "trait.relic_maker.title",
+  "descriptionKey": "trait.relic_maker.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

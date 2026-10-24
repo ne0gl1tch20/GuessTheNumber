@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "grove_friend",
+  "catalogId": "worlds",
+  "packageFolder": "GroveFriendTrait",
+  "titleKey": "trait.grove_friend.title",
+  "descriptionKey": "trait.grove_friend.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

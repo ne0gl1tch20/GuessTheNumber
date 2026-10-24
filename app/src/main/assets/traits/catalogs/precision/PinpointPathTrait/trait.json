@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "pinpoint_path",
+  "catalogId": "precision",
+  "packageFolder": "PinpointPathTrait",
+  "titleKey": "trait.pinpoint_path.title",
+  "descriptionKey": "trait.pinpoint_path.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

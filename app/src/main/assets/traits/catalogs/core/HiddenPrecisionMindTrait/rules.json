@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "hidden_precision_mind",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 0,
+    "minimumCorrectGuesses": 500
+  },
+  "dependencies": [
+    "hidden_century_club"
+  ],
+  "conflicts": [],
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

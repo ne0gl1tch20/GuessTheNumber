@@ -1,0 +1,6 @@
+{
+  "locale": "en",
+  "id": "streak_guard",
+  "title": "Streak Guard",
+  "description": "Protects your current streak from being reset by a wrong guess after 50 correct guesses."
+}

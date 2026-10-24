@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "score_chaser",
+  "catalogId": "arcade",
+  "packageFolder": "ScoreChaserTrait",
+  "titleKey": "trait.score_chaser.title",
+  "descriptionKey": "trait.score_chaser.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

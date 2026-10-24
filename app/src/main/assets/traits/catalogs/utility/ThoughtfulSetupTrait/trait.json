@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "thoughtful_setup",
+  "catalogId": "utility",
+  "packageFolder": "ThoughtfulSetupTrait",
+  "titleKey": "trait.thoughtful_setup.title",
+  "descriptionKey": "trait.thoughtful_setup.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

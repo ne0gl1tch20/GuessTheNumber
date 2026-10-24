@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "nebula_surveyor",
+  "catalogId": "nebula",
+  "packageFolder": "NebulaSurveyorTrait",
+  "titleKey": "trait.nebula_surveyor.title",
+  "descriptionKey": "trait.nebula_surveyor.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

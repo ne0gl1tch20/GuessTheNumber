@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "hidden_century_club",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 0,
+    "minimumCorrectGuesses": 250
+  },
+  "dependencies": [
+    "hidden_night_owl"
+  ],
+  "conflicts": [],
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}
