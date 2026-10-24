@@ -17,6 +17,7 @@ class WebPlayManifestTest(unittest.TestCase):
             self.assertEqual(digest, digest.lower())
         self.assertEqual(manifest["schemaVersion"], 1)
         self.assertEqual(manifest["version"], "a" * 40)
+        self.assertTrue(any(path.startswith("libraries/jarrlyyuisdk/") for path in by_path))
 
     def test_manifest_hashes_match_repository_bytes(self):
         manifest = build_manifest("b" * 40)
