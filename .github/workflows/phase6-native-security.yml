@@ -1,0 +1,44 @@
+name: Phase 6 Native and Security Validation
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "app/src/main/cpp/**"
+      - "app/src/main/java/com/jarrlyyy/guessthenumber/data/store/SecureSaveTransfer.kt"
+      - "shared/src/jvmAndAndroidMain/kotlin/com/jarrlyyy/guessthenumber/shared/engine/NativeGameplayOptimizer.kt"
+      - "app/build.gradle.kts"
+      - "docs/TRAIT_SYSTEM_ROADMAP.md"
+      - ".github/workflows/phase6-native-security.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase6-native-security-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Build native library and Android tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Build debug APK and run JVM tests
+        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-build-cache --console=plain

@@ -42,14 +42,32 @@ Acceptance criteria:
 
 Latest CI profile (OpenJDK 21, 320 traits, 1,000 warmups, 21 samples × 200 evaluations): median 32,297 ns/evaluation, p95 40,661 ns/evaluation, median throughput 30,962 evaluations/second. Results are diagnostic, not a machine-speed pass/fail threshold. The report is uploaded by the `Trait Runtime Profiling` workflow.
 
-## Phase 6 — Native C++ engine and save-security work: next
+## Phase 6 — Native C++ engine and save-security work: in progress
 
-Phase 6 investigates native code for two real jobs, rather than porting Kotlin wholesale:
+Phase 6 is deliberately narrow: use native code for personalized compute work, while keeping Kotlin authoritative. Do not port the whole game engine just because C++ exists.
 
-- **Personalized gameplay algorithms:** profile and implement only compute-heavy algorithms that benefit from native execution. Difficulty must read the difficulty selected for the active save slot when that slot is created; it must not silently use a global difficulty or leak settings across slots.
-- **Save import/export security:** design a versioned, authenticated encryption format using a vetted cryptographic library. Keep accepting supported legacy-encrypted imports through an explicit compatibility path. Validate and authenticate data before applying it to live state, and use platform key protection where appropriate. C++ by itself is not a security guarantee.
-- **Architecture:** Kotlin remains authoritative for gameplay state, save validation, rewards and migration. Native interfaces must be narrow, bounded, testable and removable.
-- **Proof:** compare representative workloads against the Phase 5 Kotlin/JVM reference profile, including JNI overhead, memory use and maintenance costs. Keep native code only where it provides a measurable benefit or a clearly justified security integration.
+### Native gameplay
+
+- Android now builds a C++20 shared library through CMake/NDK and exposes one narrow JNI function.
+- `NativeGameplayOptimizer` accepts only bounded range, difficulty ID, streak, attempts and a caller-provided seed. It returns a clamped candidate target and has a Kotlin fallback for JVM/desktop or native-load failures.
+- The native algorithm uses the **difficulty stored in the active save state** as an input. It never reads or mutates save files itself, so difficulty remains per-slot rather than global.
+- Phase 6 still needs a representative before/after workload comparison against the Phase 5 Kotlin/JVM reference before the native path can be called performance-proven.
+
+### Save transfer security
+
+- New `GTNSEC2:` versioned transfer envelopes use AES-256-GCM with authenticated data and an Android Keystore-protected non-exportable key.
+- Secure envelopes are authenticated before their payload reaches `SaveManager`.
+- Existing legacy encrypted/plain import remains accepted through an explicit compatibility path.
+- The secure export key is device-bound in this phase because the current transfer UI has no passphrase/key-sharing flow. A future portable export format must add explicit user-controlled key material rather than embedding a secret in the APK.
+- C++ is not used to implement cryptography from scratch. Native code is used for the gameplay algorithm; platform cryptography provides the save-transfer security boundary.
+
+### Phase 6 acceptance
+
+- Android native build and gameplay/security tests pass.
+- No save state or reward authority moves into C++.
+- Native output stays within supplied bounds and deterministic inputs are reproducible.
+- Secure envelope tampering is rejected and legacy imports continue to work.
+- A measured native-vs-Kotlin comparison determines whether the native gameplay path remains enabled as a performance optimization.
 
 ## Phase 7 — Creative mode save data and effects: planned after Phase 6
 
@@ -60,4 +78,4 @@ Phase 6 investigates native code for two real jobs, rather than porting Kotlin w
 
 ## Completion rule
 
-No phase adds features outside its acceptance criteria. Once Phase 5 meets its criteria and Phase 6 is either justified by evidence or explicitly marked not needed, the trait system is complete. New trait content and unrelated features should be handled separately.
+No phase adds features outside its acceptance criteria. Phase 6 is complete only after its security/native tests and measured comparison are green. If the comparison shows Kotlin is already fast enough, the native path may be reduced or removed and Phase 6 can still be considered successful. Phase 7 then handles creative-mode save data and effects separately.

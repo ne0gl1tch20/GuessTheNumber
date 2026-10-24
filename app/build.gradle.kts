@@ -27,7 +27,6 @@ val prepareLauncherIcon by tasks.registering(Copy::class) {
     rename { "gtn_app_logo.png" }
 }
 
-
 val generateDebugBuildInfo = tasks.register<buildlogic.GenerateApkBuildInfo>("generateDebugBuildInfo") {
     environmentName.set("debug")
     versionName.set(appVersionName)
@@ -59,9 +58,6 @@ android {
 
     defaultConfig {
         val liveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl").orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-LiveOps/main/manifest.json").get()
-        // The base64-encoded DER key may be line-wrapped in GitHub Actions secrets.
-        // Remove whitespace before embedding it so generated BuildConfig.java stays valid
-        // and Android's Base64 decoder receives only the encoded key bytes.
         val liveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64")
             .orElse("")
             .get()
@@ -90,6 +86,12 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
         }
     }
 
@@ -125,12 +127,10 @@ android {
             }
         }
     }
-    // Android's SourceSet API no longer accepts Provider instances directly.
     sourceSets.getByName("main").assets.srcDir(generatedWebPlayAssets.get().asFile)
     sourceSets.getByName("debug").assets.srcDir(generatedDebugBuildInfo.get().asFile)
     sourceSets.getByName("release").assets.srcDir(generatedReleaseBuildInfo.get().asFile)
     sourceSets.getByName("main").res.srcDir(generatedLauncherIconRes.get().asFile)
-    // Generate the web brand asset and real launcher icon before Android resource processing.
     tasks.matching { it.name == "preBuild" || it.name.endsWith("PreBuild") }
         .configureEach { dependsOn(prepareWebPlayBrandAsset, prepareLauncherIcon) }
 
