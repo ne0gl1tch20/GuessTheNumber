@@ -163,7 +163,7 @@ function renderAuxiliaryScreens(s){
 function stopArcadeTimers(){if(arcadeTimer!==null){window.clearInterval(arcadeTimer);arcadeTimer=null}if(arcadeTimeout!==null){window.clearTimeout(arcadeTimeout);arcadeTimeout=null}}
 function arcadeArea(){return $('arcadePlayArea')}
 function arcadeStatus(text){setText($('arcadeStatus'),text)}
-function arcadeClaim(score=1){const claim=$('arcadeClaim');if(!claim||!activeArcade)return;claim.disabled=!!pending;claim.textContent=uiText('claim_reward_button','Claim Reward');claim.onclick=()=>{if(!send('arcade_reward',{gameId:activeArcade,score:String(score)}))return;claim.disabled=true;arcadeStatus(uiText('action_saving_reward','Saving reward…'))};claim.disabled=false}
+function arcadeClaim(score=1){const claim=$('arcadeClaim');if(!claim||!activeArcade)return;claim.disabled=!!pending;claim.textContent=uiText('claim_reward_button','Claim Reward');claim.onclick=()=>{if(!send('arcade_reward',{gameId:activeArcade,score:String(score)}))return;closeArcade();claim.disabled=true;arcadeStatus(uiText('action_saving_reward','Saving reward…'))};claim.disabled=false}
 function openArcade(id){
  stopArcadeTimers();activeArcade=id;arcadeScore=0;arcadeTarget=Math.floor(Math.random()*9)+1;arcadeStep=1;arcadePhase='idle';arcadeTimeLeft=10;arcadeReadyAt=0;arcadeSequence=[];arcadeWonBox=Math.floor(Math.random()*3)+1;
  const panel=$('arcadeGame'),area=arcadeArea(),claim=$('arcadeClaim');if(!panel||!area||!claim)return;if(panel.parentElement!==document.body){arcadeHomeParent=panel.parentElement;arcadeHomeNextSibling=panel.nextSibling;document.body.appendChild(panel)}document.body.classList.add('arcade-modal-open');panel.hidden=false;area.replaceChildren();claim.disabled=true;claim.onclick=null;
