@@ -132,7 +132,7 @@ class NativeVsKotlinPerformanceBenchmarkTest {
     private companion object {
         const val WARMUP_ITERATIONS = 2_000
         const val SAMPLE_COUNT = 21
-        const val ITERATIONS_PER_SAMPLE = 100
+        const val ITERATIONS_PER_SAMPLE = 100_000
         const val MIX_INCREMENT = -7046029254386353131L
         const val MIX_MULTIPLIER_A = -4658895280553007687L
         const val MIX_MULTIPLIER_B = -7723592293110705685L
