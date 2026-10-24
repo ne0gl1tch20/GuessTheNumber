@@ -30,6 +30,17 @@ class TraitExtensionRuntimeTest {
         assertEquals(setOf(TraitEffect.COSMETIC_BADGE), yes.requestedEffects)
     }
 
+    @Test fun luaLoggingRequiresDeclaredCapability() {
+        val extension = runtime.validate(
+            """{"schemaVersion":1,"traitId":"remote_streak","modules":[{"id":"logic","type":"LUA","entrypoint":"logic.lua"}]}""",
+            mapOf("logic.lua" to """gtn.log("not allowed"); return { eligible = true }"""),
+            "remote_streak"
+        )
+        assertThrows(org.luaj.vm2.LuaError::class.java) {
+            runtime.evaluateLua(extension, "logic", emptyMap(), emptySet())
+        }
+    }
+
     @Test fun luaCannotRequestUndeclaredEffects() {
         val extension = runtime.validate(
             """{"schemaVersion":1,"traitId":"remote_streak","modules":[{"id":"logic","type":"LUA","entrypoint":"logic.lua"}]}""",

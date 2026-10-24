@@ -118,7 +118,8 @@ class TraitExtensionRuntime(
         val result = LuaSandbox {}.execute(
             "${extension.traitId}_${module.descriptor.id}",
             module.source,
-            snapshot
+            snapshot,
+            module.descriptor.capabilities
         )
         val eligible = result.get("eligible").takeIf { !it.isnil() }?.toboolean() ?: false
         val effectTable = result.get("effects")

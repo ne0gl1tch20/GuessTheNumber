@@ -42,7 +42,12 @@ internal class LuaSandbox(
         compilerGlobals.load(source, scriptId, Globals())
     }
 
-    fun execute(scriptId: String, source: String, input: Map<String, String> = emptyMap()): LuaValue {
+    fun execute(
+        scriptId: String,
+        source: String,
+        input: Map<String, String> = emptyMap(),
+        capabilities: Set<String> = setOf("log", "read_snapshot")
+    ): LuaValue {
         checkSource(source)
 
         var logLines = 0
@@ -72,32 +77,40 @@ internal class LuaSandbox(
         globals.get("package").let { if (!it.isnil()) globals.set("package", LuaValue.NIL) }
         globals.get("table").set("concat", LuaValue.NIL)
 
-        globals.set("print", object : VarArgFunction() {
-            override fun invoke(args: Varargs): Varargs {
-                if (logLines < MAX_LOG_LINES) {
-                    val line = (1..args.narg()).joinToString(" ") { args.arg(it).tojstring() }
-                        .take(MAX_LOG_CHARS)
-                    onLog(line)
-                    logLines++
+        if ("log" in capabilities) {
+            globals.set("print", object : VarArgFunction() {
+                override fun invoke(args: Varargs): Varargs {
+                    if (logLines < MAX_LOG_LINES) {
+                        val line = (1..args.narg()).joinToString(" ") { args.arg(it).tojstring() }
+                            .take(MAX_LOG_CHARS)
+                        onLog(line)
+                        logLines++
+                    }
+                    return LuaValue.NONE
                 }
-                return LuaValue.NONE
-            }
-        })
+            })
+        } else {
+            globals.set("print", LuaValue.NIL)
+        }
 
         val api = LuaValue.tableOf()
-        api.set("log", object : OneArgFunction() {
-            override fun call(arg: LuaValue): LuaValue {
-                if (logLines < MAX_LOG_LINES) {
-                    onLog(arg.tojstring().take(MAX_LOG_CHARS))
-                    logLines++
+        if ("log" in capabilities) {
+            api.set("log", object : OneArgFunction() {
+                override fun call(arg: LuaValue): LuaValue {
+                    if (logLines < MAX_LOG_LINES) {
+                        onLog(arg.tojstring().take(MAX_LOG_CHARS))
+                        logLines++
+                    }
+                    return LuaValue.NIL
                 }
-                return LuaValue.NIL
-            }
-        })
+            })
+        }
         val inputTable = LuaValue.tableOf()
-        input.entries.take(64).forEach { (key, value) ->
-            require(key.matches(Regex("[A-Za-z][A-Za-z0-9_]{0,47}"))) { "Invalid Lua input key." }
-            inputTable.set(key, LuaValue.valueOf(value.take(256)))
+        if ("read_snapshot" in capabilities) {
+            input.entries.take(64).forEach { (key, value) ->
+                require(key.matches(Regex("[A-Za-z][A-Za-z0-9_]{0,47}"))) { "Invalid Lua input key." }
+                inputTable.set(key, LuaValue.valueOf(value.take(256)))
+            }
         }
         api.set("input", inputTable)
         globals.set("gtn", api)

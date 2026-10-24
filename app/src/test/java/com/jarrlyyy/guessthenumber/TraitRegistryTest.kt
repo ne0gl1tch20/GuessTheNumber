@@ -117,6 +117,8 @@ class TraitRegistryTest {
             assertEquals(definition.id, english["id"]!!.jsonPrimitive.content)
             assertTrue("Missing English title for ${definition.id}", english["title"]!!.jsonPrimitive.content.isNotBlank())
             assertTrue("Missing English description for ${definition.id}", english["description"]!!.jsonPrimitive.content.isNotBlank())
+            val localeSources = localeFiles.associate { it.nameWithoutExtension to it.readText() }
+            com.jarrlyyy.guessthenumber.traits.TraitLocaleCatalog().validate(localeSources, definition.id)
             localeFiles.forEach { localeFile ->
                 assertTrue("Invalid locale filename: ${localeFile.name}", localeFile.nameWithoutExtension.matches(Regex("[a-z]{2}(-[A-Z]{2})?")))
                 val localized = json.parseToJsonElement(localeFile.readText()).jsonObject
