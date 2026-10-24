@@ -91,7 +91,7 @@ class WebPlayAssetSyncer(context: Context) {
                 throw error
             }
         } catch (error: Exception) {
-            SyncResult(false, activeVersion(), "Using last working assets (\${error.javaClass.simpleName})")
+            SyncResult(false, activeVersion(), "Using last working assets (${error.javaClass.simpleName})")
         }
     } }
 
@@ -140,7 +140,7 @@ class WebPlayAssetSyncer(context: Context) {
             setRequestProperty("User-Agent", "GuessTheNumber-WebPlaySync")
         }
         try {
-            check(connection.responseCode == HttpURLConnection.HTTP_OK) { "Repository HTTP \${connection.responseCode}" }
+            check(connection.responseCode == HttpURLConnection.HTTP_OK) { "Repository HTTP ${connection.responseCode}" }
             return connection.inputStream.use { stream ->
                 val bytes = stream.readBytes()
                 require(bytes.size <= MAX_DOWNLOAD_BYTES) { "Download exceeds size limit" }
