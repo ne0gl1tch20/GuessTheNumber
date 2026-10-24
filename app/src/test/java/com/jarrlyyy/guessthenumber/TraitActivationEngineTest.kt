@@ -41,20 +41,26 @@ class TraitActivationEngineTest {
         assertFalse(autumn.isActive("winter_comet"))
 
         val winter = engine.evaluate(
-            TraitActivationContext(GameState(), playerLevel = 3, activeSeasonId = "winter")
+            TraitActivationContext(
+                GameState(correctGuesses = 50),
+                playerLevel = 3,
+                activeSeasonId = "winter"
+            )
         )
         assertTrue(winter.isActive("winter_comet"))
         assertFalse(winter.isActive("autumn_glow"))
     }
 
     @Test fun hiddenTraitRequiresDiscoveryAndOnlyThenAppearsInDiscoveredList() {
-        val undiscovered = engine.evaluate(TraitActivationContext(GameState(), playerLevel = 10))
+        val undiscovered = engine.evaluate(
+            TraitActivationContext(GameState(correctGuesses = 100), playerLevel = 10)
+        )
         assertFalse(undiscovered.isActive("hidden_night_owl"))
         assertTrue(undiscovered.discoveredHiddenTraitIds.isEmpty())
 
         val discovered = engine.evaluate(
             TraitActivationContext(
-                GameState(),
+                GameState(correctGuesses = 100),
                 playerLevel = 10,
                 discoveredTraitIds = setOf("hidden_night_owl")
             )

@@ -39,6 +39,7 @@ import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.repository.LiveOpsRepository
 import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
+import com.jarrlyyy.guessthenumber.traits.TraitRewardPolicy
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -761,7 +762,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun applyTalentBonuses(before: GameState, after: GameState, correct: Boolean): GameState {
-        if (!correct) return after
+        if (!correct) return TraitRewardPolicy.updateDiscoveries(after)
         val earned = after.money - before.money
         val eligibleEarnings = if (earned > BigNumber.ZERO) earned else BigNumber.ZERO
         var bonusMoney = BigNumber.ZERO
@@ -803,7 +804,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             (if (before.discoveredSecretIds.size >= 4) 1L else 0L) +
             (if (before.activeWorldId == "ember_summit" && "ashen_vault" in before.discoveredSecretIds) 1L else 0L)
         val finalBonusNebula = if ("nebula_boost" in before.shopPurchases) bonusNebula * 2L else bonusNebula
-        return after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(finalBonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + finalBonusNebula))
+        return TraitRewardPolicy.updateDiscoveries(
+            after.copy(money = after.money + bonusMoney, nebula = after.nebula + BigNumber(finalBonusNebula), statistics = after.statistics.copy(moneyEarned = after.statistics.moneyEarned + bonusMoney, nebulaEarned = after.statistics.nebulaEarned + finalBonusNebula))
+        )
     }
 
     fun buyPrestigeShopItem(itemId: String, cost: Long) {
@@ -1410,14 +1413,15 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun claimDailyReward(): Boolean {
-        val state = _gameState.value
+        val state = TraitRewardPolicy.updateDiscoveries(_gameState.value)
         val today = LocalDate.now().toString()
         if (state.lastDailyRewardDate == today) return false
 
         val streak = DailyRewardPolicy.nextStreak(state.lastDailyRewardDate, state.dailyRewardStreak, today)
         val baseReward = DailyRewardPolicy.rewardForStreak(streak)
         val multiplier = if ("nebula_boost" in state.shopPurchases) 2L else 1L
-        val reward = baseReward * multiplier
+        val traitBonus = TraitRewardPolicy.nebulaBonusForClaim(state)
+        val reward = (baseReward + traitBonus) * multiplier
         _gameState.value = state.copy(
             nebula = state.nebula + BigNumber(reward),
             lastDailyRewardDate = today,
