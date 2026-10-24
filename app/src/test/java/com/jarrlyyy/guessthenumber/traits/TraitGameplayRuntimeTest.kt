@@ -28,7 +28,7 @@ class TraitGameplayRuntimeTest {
         val base = GuessResult(GuessFeedback.CORRECT, BigNumber(100), false, 6, after)
         val result = TraitGameplayRuntime.apply(before, 50, base, "summer")
         assertEquals(135.0, result.reward.value.toDouble(), 0.001)
-        assertEquals(1_235.0, result.newState.money.value.toDouble(), 0.001)
+        assertEquals(1_135.0, result.newState.money.value.toDouble(), 0.001)
         assertEquals(135.0, result.newState.statistics.moneyEarned.value.toDouble(), 0.001)
     }
 
