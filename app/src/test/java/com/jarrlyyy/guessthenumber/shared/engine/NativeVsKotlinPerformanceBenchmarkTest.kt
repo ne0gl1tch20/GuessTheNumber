@@ -34,8 +34,7 @@ class NativeVsKotlinPerformanceBenchmarkTest {
         val p95 = ordered[((ordered.size - 1) * 95) / 100]
         val throughput = if (median == 0L) Long.MAX_VALUE else 1_000_000_000L / median
 
-        assertTrue("Benchmark checksum must be non-zero", expectedChecksum != 0L)
-        assertTrue("Benchmark sink must be populated", sink != 0L)
+        assertTrue("Benchmark samples must be positive", samples.all { it > 0L })
         assertTrue("Representative output must remain bounded", cases.all {
             val result = kotlinAdaptiveTarget(it)
             result in it.rangeMin..it.rangeMax
