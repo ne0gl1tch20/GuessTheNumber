@@ -9,6 +9,8 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.data.logger.GameLogger
@@ -135,7 +137,8 @@ private fun WebProcessScreen(onTestDailyRewards: () -> Unit) {
                     logs = (logs + "${System.currentTimeMillis()} JS → $input").takeLast(100)
                 }
             }) { Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Run") }
-            OutlinedButton(onClick = { logs = emptyList(); WebViewDebugConsole.clear() }) { Text("Clear") }
+            OutlinedButton(onClick = { logs = emptyList() }) { Text("Clear command log") }
+            OutlinedButton(onClick = { WebViewDebugConsole.clear() }) { Text("Clear JS console") }
         } }
         item { DeveloperPanel("Available host command", "/testdailyrewards\n\nOther slash commands are shown as NOT WIRED until their real handlers are implemented. JavaScript expressions can be run directly.") }
         item { Text("Web console", style = MaterialTheme.typography.titleMedium) }
@@ -193,10 +196,26 @@ private fun DeveloperSaveLabScreen(state: GameState) {
 @Composable
 private fun DeveloperDiagnosticsScreen(state: GameState) {
     val logs by GameLogger.logFlow.collectAsState(initial = emptyList())
+    val clipboard = LocalClipboardManager.current
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("Diagnostics", style = MaterialTheme.typography.titleLarge) }
         item { DeveloperPanel("Runtime", "App debug build\nCore state loaded\nHTML console entries=${WebViewDebugConsole.entries.size}\nCore logs=${logs.size}\nCommands registered=${CommandRegistry.commands.size}") }
         item { DeveloperPanel("Game snapshot", "money=${state.money}\nrange=${state.currentRangeMin}..${state.currentRangeMax}\nattempts=${state.attempts}\ncorrect=${state.correctGuesses}\nstreak=${state.streak}") }
+        item { Button(onClick = {
+            val report = buildString {
+                appendLine("GuessTheNumber Developer Diagnostic Report")
+                appendLine("Build: debug")
+                appendLine("HTML console entries: ${WebViewDebugConsole.entries.size}")
+                appendLine("Core logs: ${logs.size}")
+                appendLine("Commands registered: ${CommandRegistry.commands.size}")
+                appendLine("Game snapshot: money=${state.money}, range=${state.currentRangeMin}..${state.currentRangeMax}, attempts=${state.attempts}, streak=${state.streak}")
+                appendLine("\nRecent Core Logs:")
+                appendLine(GameLogger.exportLogs().takeLast(12000))
+                appendLine("\nRecent Web Console:")
+                appendLine(WebViewDebugConsole.entries.takeLast(100).joinToString("\n"))
+            }
+            clipboard.setText(AnnotatedString(report))
+        }, modifier = Modifier.fillMaxWidth()) { Text("Copy diagnostic report") } }
         item { Text("Recent core logs", style = MaterialTheme.typography.titleMedium) }
         items(logs.takeLast(50).asReversed()) { log -> Text("${log.level} ${log.category} ${log.event}: ${log.message}", fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall) }
     }
