@@ -26,7 +26,7 @@ fun DeveloperPlaygroundScreen(state: GameState, onExecuteCommand: (String) -> St
         Box(Modifier.fillMaxSize().padding(padding)) {
             when (destination) {
                 "core" -> CoreProcessScreen(state, onExecuteCommand)
-                "web" -> WebProcessScreen()
+                "web" -> WebProcessScreen(onTestDailyRewards)
                 "tests" -> DeveloperTestSuitesScreen(state, onExecuteCommand)
                 "ui" -> DeveloperUiPlaygroundScreen()
                 "save" -> DeveloperSaveLabScreen(state)
@@ -86,14 +86,14 @@ private fun CoreProcessScreen(state: GameState, onExecuteCommand: (String) -> St
 }
 
 @Composable
-private fun WebProcessScreen() {
+private fun WebProcessScreen(onTestDailyRewards: () -> Unit) {
     var input by remember { mutableStateOf("document.title") }; var logs by remember { mutableStateOf(emptyList<String>()) }
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("HTML / JavaScript / Android WebView", style = MaterialTheme.typography.titleLarge) }
         item { Text("Web commands and logs are isolated from the Core Process. JavaScript execution uses the existing debug WebView console bridge.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { OutlinedTextField(input, { input = it }, Modifier.fillMaxWidth(), label = { Text("JavaScript / Web command") }, minLines = 2) }
         item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { Button(onClick = { WebViewDebugConsole.runJavascript(input); logs = (logs + "${System.currentTimeMillis()}  JS → $input").takeLast(100) }) { Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Run") }; OutlinedButton(onClick = { logs = emptyList(); WebViewDebugConsole.clear() }) { Text("Clear") } } }
-        item { DeveloperPanel("Suggested Web commands", "/testpopup <name>\n/testtutorial <name>\n/testdailyrewards\n/testofflineearnings\n/testbridge\n/testui") }
+        item { DeveloperPanel("Available host command", "/testdailyrewards\n\nOther slash commands are shown as NOT WIRED until their real handlers are implemented. JavaScript expressions can be run directly.") }
         item { Text("Web console", style = MaterialTheme.typography.titleMedium) }
         items(WebViewDebugConsole.entries.takeLast(100).asReversed()) { Text(it, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall) }
         item { Text("Web command log", style = MaterialTheme.typography.titleMedium) }
@@ -126,8 +126,8 @@ private fun DeveloperUiPlaygroundScreen() {
 }
 
 @Composable
-private fun DeveloperSaveLabScreen(state: GameState, onExecuteCommand: (String) -> String) {
-    var result by remember { mutableStateOf("") }
+private fun DeveloperSaveLabScreen(state: GameState) {
+    var simulatedElapsedSeconds by remember { mutableStateOf(3600L) }
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("Save Laboratory", style = MaterialTheme.typography.titleLarge) }
         item { DeveloperPanel("Current save state", "lastSaveTimestamp=${state.lastSaveTimestamp}\nautoClickerActive=${state.autoClickerActive}\ntimeTravelPenaltyUntil=${state.timeTravelPenaltyUntil}") }
