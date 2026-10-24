@@ -122,7 +122,7 @@ private fun WebProcessScreen(onTestDailyRewards: () -> Unit) {
         item { Text("HTML / JavaScript / Android WebView", style = MaterialTheme.typography.titleLarge) }
         item { Text("Web commands and logs are isolated from the Core Process. JavaScript execution uses the existing debug WebView console bridge.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { DeveloperPanel("Bridge connection", if (WebViewDebugConsole.evaluator == null) "WebView evaluator is not attached" else "WebView evaluator attached; JavaScript evaluation is available") }
-        item { OutlinedButton(onClick = { WebViewDebugConsole.runJavascript("JSON.stringify({host:typeof window.gtnHost,dailyRewardTest:typeof window.gtnShowDailyRewardTest,readyState:document.readyState})") }, modifier = Modifier.fillMaxWidth()) { Text("Check Web bridge and page readiness") } }
+        item { OutlinedButton(onClick = { WebViewDebugConsole.runJavascript("typeof window.gtnHost+'|'+typeof window.gtnShowDailyRewardTest+'|'+document.readyState") }, modifier = Modifier.fillMaxWidth()) { Text("Check Web bridge and page readiness") } }
         item { OutlinedTextField(input, { input = it }, Modifier.fillMaxWidth(), label = { Text("JavaScript / Web command") }, minLines = 2) }
         item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = {
