@@ -112,6 +112,9 @@ class TraitExtensionRuntime(
         val module = extension.module(moduleId) ?: error("Unknown extension module.")
         require(module.descriptor.type == "LUA") { "Requested module is not Lua." }
         require(snapshot.size <= MAX_INPUT_FIELDS) { "Trait snapshot has too many fields." }
+        if (snapshot.isNotEmpty()) require("read_snapshot" in module.descriptor.capabilities) {
+            "Lua module did not declare the read_snapshot capability."
+        }
         val result = LuaSandbox {}.execute(
             "${extension.traitId}_${module.descriptor.id}",
             module.source,
