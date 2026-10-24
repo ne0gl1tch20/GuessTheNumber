@@ -43,7 +43,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 private const val EXPECTED_HTML_VERSION = "2026.10.24.1"
-private const val HTML_VERSION_CHECK_JS = "JSON.stringify({version:document.querySelector('meta[name=\\\"gtn-html-version\\\"]')?.content||'MISSING',url:location.href})"
+private const val HTML_VERSION_CHECK_JS = "JSON.stringify({version:document.querySelector('meta[name=gtn-html-version]')?.content||'MISSING',url:location.href})"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
