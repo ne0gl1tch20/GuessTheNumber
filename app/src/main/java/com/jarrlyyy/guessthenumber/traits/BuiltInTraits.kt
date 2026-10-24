@@ -1270,7 +1270,7 @@ object BuiltInTraits {
             visibility = TraitVisibility.VISIBLE,
             seasonId = "winter",
             catalogId = "seasonal",
-            activation = TraitActivationConditions(minimumPrestige = 4, minimumCorrectGuesses = 8300L))
+            activation = TraitActivationConditions(minimumPrestige = 4, minimumCorrectGuesses = 8300L)),
 
         // Gameplay traits use real Kotlin rule effects, not just collection metadata.
         trait("combo_momentum", TraitCategory.GAMEPLAY, TraitEffect.COMBO_REWARD,
