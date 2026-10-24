@@ -116,6 +116,68 @@ class TraitLiveOpsRepositoryTest {
         }
     }
 
+    private fun createScriptPackage(root: java.io.File, localeSource: String, javascriptSource: String): RemoteTraitDefinition {
+        val base = "assets/traits/catalogs/extensions/RemoteScriptTrait/"
+        val moduleManifest = """{"schemaVersion":1,"traitId":"remote_script","modules":[{"id":"logic","type":"LUA","entrypoint":"logic.lua","capabilities":["read_snapshot"]},{"id":"view","type":"JAVASCRIPT","entrypoint":"presentation.js","capabilities":["render_ui"]},{"id":"rules","type":"JSON","entrypoint":"rules.json","capabilities":["read_rules"]}]}"""
+        val contents = mapOf(
+            "module.json" to moduleManifest,
+            "logic.lua" to """return { eligible = tonumber(gtn.input.bestStreak or "0") >= 5, effects = {"COSMETIC_BADGE"} }""",
+            "presentation.js" to javascriptSource,
+            "rules.json" to """{"minimumBestStreak":5,"effects":["COSMETIC_BADGE"]}""",
+            "locales/en.json" to localeSource
+        )
+        contents.forEach { (relative, text) ->
+            val file = java.io.File(root, base + relative)
+            file.parentFile.mkdirs()
+            file.writeText(text)
+        }
+        val files = contents.map { (relative, text) ->
+            val kind = relative.substringAfterLast('.')
+            RemoteTraitFile(base + relative, java.security.MessageDigest.getInstance("SHA-256")
+                .digest(text.toByteArray()).joinToString("") { "%02x".format(it) }, kind)
+        }
+        return RemoteTraitDefinition(
+            "remote_script", "trait.remote_script.title", "trait.remote_script.description",
+            "COLLECTION", effects = listOf("COSMETIC_BADGE"), catalogId = "extensions",
+            folderName = "RemoteScriptTrait", files = files
+        )
+    }
+
+    @Test fun validatesDownloadedMixedModulePackageAndLocaleTogether() {
+        val root = java.nio.file.Files.createTempDirectory("trait-module-test").toFile()
+        try {
+            val trait = createScriptPackage(
+                root,
+                """{"id":"remote_script","title":"Remote Script","description":"A sandboxed extension."}""",
+                "function renderTrait(api) { api.setText('status', 'Ready'); }"
+            )
+            validateTraitPackageContent(root, trait)
+        } finally {
+            root.deleteRecursively()
+        }
+    }
+
+    @Test fun rejectsUnsafeJavascriptAndLocaleIdentityMismatchInDownloadedPackage() {
+        val root = java.nio.file.Files.createTempDirectory("trait-module-invalid-test").toFile()
+        try {
+            val unsafe = createScriptPackage(
+                root,
+                """{"id":"remote_script","title":"Remote Script","description":"A sandboxed extension."}""",
+                "function renderTrait(api) { window.Android.earnReward(); }"
+            )
+            assertThrows(IllegalArgumentException::class.java) { validateTraitPackageContent(root, unsafe) }
+
+            val wrongLocale = createScriptPackage(
+                root,
+                """{"id":"other_trait","title":"Wrong","description":"Wrong identity."}""",
+                "function renderTrait(api) { api.setText('status', 'Ready'); }"
+            )
+            assertThrows(IllegalArgumentException::class.java) { validateTraitPackageContent(root, wrongLocale) }
+        } finally {
+            root.deleteRecursively()
+        }
+    }
+
     @Test fun rejectsTooManyCatalogFolders() {
         val traits = (1..33).map { i ->
             RemoteTraitDefinition("catalog_trait_$i", "trait.catalog_$i.title", "trait.catalog_$i.description",
