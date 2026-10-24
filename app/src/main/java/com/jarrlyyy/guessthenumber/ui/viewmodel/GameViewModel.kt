@@ -463,6 +463,16 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
+    /** Select a validated gameplay arm for an active trait. */
+    fun selectTraitArm(traitId: String, armId: String): Boolean {
+        val updated = runCatching {
+            com.jarrlyyy.guessthenumber.traits.TraitGameplayRuntime.selectArm(_gameState.value, traitId, armId)
+        }.getOrNull() ?: return false
+        _gameState.value = updated
+        saveGameAsync()
+        return true
+    }
+
     private fun processGuessWithTraits(state: GameState, guess: Long) =
         com.jarrlyyy.guessthenumber.traits.TraitGameplayRuntime.apply(
             stateBefore = state,

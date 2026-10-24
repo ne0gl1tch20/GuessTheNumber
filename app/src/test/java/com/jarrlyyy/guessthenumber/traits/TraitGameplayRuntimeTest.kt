@@ -55,6 +55,40 @@ class TraitGameplayRuntimeTest {
         assertEquals(4, result.newState.streak)
     }
 
+    @Test fun selectedComboArmChangesTheActualPayout() {
+        val before = GameState(
+            money = BigNumber(1_000),
+            currentRangeMin = 1,
+            currentRangeMax = 100,
+            targetNumber = 50,
+            correctGuesses = 25,
+            streak = 5
+        )
+        val selected = TraitGameplayRuntime.selectArm(before, "combo_momentum", "burst")
+        val after = selected.copy(
+            money = BigNumber(1_100),
+            correctGuesses = 26,
+            streak = 6,
+            bestStreak = 6,
+            statistics = selected.statistics.copy(moneyEarned = BigNumber(100))
+        )
+        val base = GuessResult(GuessFeedback.CORRECT, BigNumber(100), false, 6, after)
+        val result = TraitGameplayRuntime.apply(selected, 50, base, "summer")
+        assertEquals(115.0, result.reward.value.toDouble(), 0.001)
+        assertEquals("burst", result.newState.selectedTraitArms["combo_momentum"])
+    }
+
+    @Test fun unknownOrLockedArmsAreRejected() {
+        val state = GameState(correctGuesses = 1)
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            TraitGameplayRuntime.selectArm(state, "combo_momentum", "burst")
+        }
+        val unlocked = state.copy(correctGuesses = 25)
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            TraitGameplayRuntime.selectArm(unlocked, "combo_momentum", "not-real")
+        }
+    }
+
     @Test fun traitLogicDoesNotRunForOutOfRangeGuess() {
         val before = GameState(currentRangeMin = 1, currentRangeMax = 100, correctGuesses = 100)
         val after = before.copy(attempts = 1)

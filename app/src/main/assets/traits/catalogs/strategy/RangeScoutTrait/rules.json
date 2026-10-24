@@ -16,10 +16,6 @@
   "arms": {
     "standard": {
       "enabled": true
-    },
-    "precise": {
-      "enabled": true,
-      "minimumRangeWidth": 3
     }
   },
   "note": "Kotlin validates eligibility and applies the gameplay effect. Arms are declarative tuning variants; unsupported or unselected arms do not execute code."
