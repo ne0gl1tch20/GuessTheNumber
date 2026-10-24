@@ -10,10 +10,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
+import kotlinx.serialization.json.int
 
 class TraitRegistryTest {
     @Test fun builtInCatalogLoadsOfflineAndHasVisibleAndHiddenTraits() {
@@ -90,10 +93,23 @@ class TraitRegistryTest {
             assertEquals(definition.id, metadata["id"]!!.jsonPrimitive.content)
             assertEquals(definition.catalogId, metadata["catalogId"]!!.jsonPrimitive.content)
             assertEquals(definition.category.name, metadata["category"]!!.jsonPrimitive.content)
-            assertEquals(definition.effects, metadata["effects"]!!.jsonArray.map { it.jsonPrimitive.content }.toSet())
+            assertEquals(definition.packageFolder, metadata["packageFolder"]!!.jsonPrimitive.content)
+            assertEquals(definition.effects.map { it.name }.toSet(), metadata["effects"]!!.jsonArray.map { it.jsonPrimitive.content }.toSet())
             assertEquals(definition.activation.minimumCorrectGuesses,
                 rules["activation"]!!.jsonObject["minimumCorrectGuesses"]!!.jsonPrimitive.long)
             assertTrue("Unsafe SVG in ${definition.id}", !icon.readText().contains("<script", ignoreCase = true))
+            val locale = json.parseToJsonElement(localeJson.readText()).jsonObject
+            assertEquals(definition.id, locale["id"]!!.jsonPrimitive.content)
+            assertTrue("Missing localized title for ${definition.id}", locale["title"]!!.jsonPrimitive.content.isNotBlank())
+            assertTrue("Missing localized description for ${definition.id}", locale["description"]!!.jsonPrimitive.content.isNotBlank())
+        }
+        all.map { it.catalogId }.distinct().forEach { catalogId ->
+            val indexFile = java.io.File(projectRoot, "app/src/main/assets/traits/catalogs/${catalogId}/catalog.json")
+            assertTrue("Missing catalog index for ${catalogId}", indexFile.isFile)
+            val index = json.parseToJsonElement(indexFile.readText()).jsonObject
+            val expectedIds = all.filter { it.catalogId == catalogId }.map { it.id }.toSet()
+            assertEquals(expectedIds, index["traitIds"]!!.jsonArray.map { it.jsonPrimitive.content }.toSet())
+            assertEquals(expectedIds.size, index["traitCount"]!!.jsonPrimitive.int)
         }
     }
 
