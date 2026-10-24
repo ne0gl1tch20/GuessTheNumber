@@ -16,7 +16,8 @@ class NativeVsKotlinPerformanceBenchmarkTest {
             for (case in cases) kotlinAdaptiveTarget(case)
         }
 
-        val expectedChecksum = cases.sumOf { kotlinAdaptiveTarget(it) }
+        var expectedChecksum = 0L
+        for (case in cases) expectedChecksum = expectedChecksum xor kotlinAdaptiveTarget(case)
         val samples = LongArray(SAMPLE_COUNT)
         repeat(SAMPLE_COUNT) {
             val started = System.nanoTime()
