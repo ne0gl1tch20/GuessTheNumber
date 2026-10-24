@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Base64
 import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.scripting.LuaSandbox
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -139,6 +140,8 @@ class TraitLiveOpsRepository(
             writeVersionAtomically(highestVersionFile, payload.catalogVersion)
             writeVersionAtomically(activePointer, payload.catalogVersion)
             TraitLiveOpsRefreshResult.Updated(payload.catalogVersion, definitions.size)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (error: Exception) {
             TraitLiveOpsRefreshResult.Unavailable(error.message?.take(200) ?: "Trait catalog update unavailable.")
         }
@@ -181,7 +184,23 @@ class TraitLiveOpsRepository(
         verifySignature(bytes, envelope.signatureBase64)
         val payload = json.decodeFromString<TraitLiveOpsPayload>(bytes.toString(Charsets.UTF_8))
         require(payload.catalogVersion == expectedVersion) { "Cached trait catalog version mismatch." }
-        return validateAndMapTraitPayload(payload, BuildConfig.VERSION_CODE)
+        val definitions = validateAndMapTraitPayload(payload, BuildConfig.VERSION_CODE)
+        payload.traits.forEach { trait ->
+            trait.files.forEach { entry ->
+                val relative = validateTraitAssetPath(trait, entry.path)
+                val asset = File(dir, relative)
+                require(asset.canonicalPath.startsWith(dir.canonicalPath + File.separator)) {
+                    "Cached trait asset path escapes catalog directory."
+                }
+                require(asset.isFile && asset.length() <= MAX_FILE_BYTES.toLong()) {
+                    "Cached trait asset is missing or too large."
+                }
+                require(sha256(asset.readBytes()).equals(entry.sha256, ignoreCase = true)) {
+                    "Cached trait asset hash mismatch: ${trait.id}/${relative}."
+                }
+            }
+        }
+        return definitions
     }
 
     private fun verifySignature(payload: ByteArray, signatureBase64: String) {
@@ -193,7 +212,7 @@ class TraitLiveOpsRepository(
         require(verifier.verify(Base64.decode(signatureBase64, Base64.DEFAULT))) { "Trait catalog signature is invalid." }
     }
 
-    private fun readHttps(url: URL): ByteArray {
+    private fun readHttps(url: URL, maxBytes: Int = MAX_MANIFEST_BYTES): ByteArray {
         require(url.protocol == "https") { "HTTPS required." }
         val connection = url.openConnection() as HttpURLConnection
         connection.connectTimeout = CONNECT_TIMEOUT_MS
@@ -205,8 +224,8 @@ class TraitLiveOpsRepository(
             require(connection.responseCode in 200..299) {
                 "Trait manifest request failed (" + connection.responseCode + ")."
             }
-            require(connection.contentLengthLong < 0 || connection.contentLengthLong <= MAX_MANIFEST_BYTES) {
-                "Trait manifest exceeds size limit."
+            require(connection.contentLengthLong < 0 || connection.contentLengthLong <= maxBytes) {
+                "Trait download exceeds size limit."
             }
             return connection.inputStream.use { input ->
                 val output = ByteArrayOutputStream()
@@ -214,7 +233,7 @@ class TraitLiveOpsRepository(
                 while (true) {
                     val count = input.read(buffer)
                     if (count < 0) break
-                    require(output.size() + count <= MAX_MANIFEST_BYTES) { "Trait manifest exceeds size limit." }
+                    require(output.size() + count <= maxBytes) { "Trait download exceeds size limit." }
                     output.write(buffer, 0, count)
                 }
                 output.toByteArray()
