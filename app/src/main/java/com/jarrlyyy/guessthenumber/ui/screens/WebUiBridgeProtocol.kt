@@ -1,5 +1,7 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.traits.TraitGameplayCatalog
+
 import com.jarrlyyy.guessthenumber.BuildConfig
 import android.net.Uri
 import org.json.JSONObject
@@ -110,13 +112,10 @@ internal object WebUiBridgeProtocol {
                 if (request.length() != 5 || !request.has("traitId") || !request.has("armId")) return ParseResult.Invalid("invalid_request", id)
                 val traitId = request.opt("traitId") as? String ?: return ParseResult.Invalid("invalid_trait", id)
                 val armId = request.opt("armId") as? String ?: return ParseResult.Invalid("invalid_arm", id)
-                val allowedArms = mapOf(
-                    "combo_momentum" to setOf("steady", "burst"),
-                    "mistake_insurance" to setOf("half_refund", "careful"),
-                    "risk_reward" to setOf("balanced", "high_risk")
-                )
-                if (traitId !in allowedArms) return ParseResult.Invalid("invalid_trait", id)
-                if (armId !in allowedArms.getValue(traitId)) return ParseResult.Invalid("invalid_arm", id)
+                val trait = TraitGameplayCatalog.find(traitId)
+                    ?: return ParseResult.Invalid("invalid_trait", id)
+                if (trait.arms.isEmpty()) return ParseResult.Invalid("invalid_trait", id)
+                if (!TraitGameplayCatalog.allowsArm(traitId, armId)) return ParseResult.Invalid("invalid_arm", id)
                 ParseResult.Valid(id, type, traitId = traitId, armId = armId)
             }
             "world_action" -> {

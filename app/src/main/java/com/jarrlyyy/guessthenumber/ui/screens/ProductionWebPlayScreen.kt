@@ -57,6 +57,7 @@ import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.audio.BackgroundMusicManager
 import com.jarrlyyy.guessthenumber.traits.BuiltInTraits
+import com.jarrlyyy.guessthenumber.traits.TraitGameplayCatalog
 import com.jarrlyyy.guessthenumber.traits.TraitActivationContext
 import com.jarrlyyy.guessthenumber.traits.TraitActivationEngine
 import com.jarrlyyy.guessthenumber.traits.TraitRewardPolicy
@@ -720,46 +721,25 @@ fun ProductionWebPlayScreen(
                                          val activeGameplayTraitIds = TraitActivationEngine(traitRegistry).evaluate(
                                              TraitActivationContext(game, playerLevel = 1, activeSeasonId = TraitRewardPolicy.currentSeasonId(), discoveredTraitIds = game.discoveredTraitIds)
                                          ).activeTraitIds
-                                         val gameplayTraitOptions = listOf(
-                                             Triple("combo_momentum", "Combo Momentum", "Correct-guess payouts scale with your current streak."),
-                                             Triple("range_scout", "Range Scout", "Wrong guesses narrow the visible search range."),
-                                             Triple("mistake_insurance", "Mistake Insurance", "Refunds part of the normal money penalty after a miss."),
-                                             Triple("risk_reward", "Risk Reward", "Correct guesses pay extra, but wrong guesses cost more."),
-                                             Triple("streak_guard", "Streak Guard", "Keeps your current streak after a wrong guess.")
-                                         )
-                                         val gameplayTraitsJson = org.json.JSONArray()
-                                         gameplayTraitOptions.forEach { (traitId, title, description) ->
-                                             val definition = traitRegistry.find(traitId) ?: return@forEach
-                                             val defaultArm = when (traitId) { "combo_momentum" -> "steady"; "mistake_insurance" -> "half_refund"; "risk_reward" -> "balanced"; else -> "" }
-                                             val armIds = when (traitId) {
-                                                 "combo_momentum" -> listOf("steady", "burst")
-                                                 "mistake_insurance" -> listOf("half_refund", "careful")
-                                                 "risk_reward" -> listOf("balanced", "high_risk")
-                                                 else -> emptyList()
-                                             }
-                                             val armsJson = org.json.JSONArray()
-                                             armIds.forEach { armId ->
-                                                 val label = when (armId) { "steady" -> "Steady"; "burst" -> "Burst"; "half_refund" -> "Half refund"; "careful" -> "Careful"; "balanced" -> "Balanced"; "high_risk" -> "High risk"; else -> armId }
-                                                 val armDescription = when (armId) {
-                                                     "steady" -> "Up to 20% extra based on streak."
-                                                     "burst" -> "Faster scaling, capped at 25% extra."
-                                                     "half_refund" -> "Refund 50% of the miss penalty."
-                                                     "careful" -> "Refund 75% of the miss penalty."
-                                                     "balanced" -> "25% bonus on hits and 10% extra penalty on misses."
-                                                     "high_risk" -> "40% bonus on hits and 20% extra penalty on misses."
-                                                     else -> ""
-                                                 }
-                                                 armsJson.put(JSONObject().put("id", armId).put("label", label).put("description", armDescription))
-                                             }
-                                             gameplayTraitsJson.put(JSONObject()
-                                                 .put("id", traitId)
-                                                 .put("title", activeLocaleManager.getString("trait_${traitId}_title", title))
-                                                 .put("description", activeLocaleManager.getString("trait_${traitId}_description", description))
-                                                 .put("active", traitId in activeGameplayTraitIds)
-                                                 .put("requiredCorrectGuesses", definition.activation.minimumCorrectGuesses)
-                                                 .put("selectedArm", game.selectedTraitArms[traitId] ?: defaultArm)
-                                                 .put("arms", armsJson))
-                                         }
+                                          val gameplayTraitsJson = org.json.JSONArray()
+                                          TraitGameplayCatalog.all.forEach { trait ->
+                                              val definition = traitRegistry.find(trait.id) ?: return@forEach
+                                              val armsJson = org.json.JSONArray()
+                                              trait.arms.forEach { arm ->
+                                                  armsJson.put(JSONObject()
+                                                      .put("id", arm.id)
+                                                      .put("label", activeLocaleManager.getString(arm.labelKey, arm.fallbackLabel))
+                                                      .put("description", activeLocaleManager.getString(arm.descriptionKey, arm.fallbackDescription)))
+                                              }
+                                              gameplayTraitsJson.put(JSONObject()
+                                                  .put("id", trait.id)
+                                                  .put("title", activeLocaleManager.getString("trait_${trait.id}_title", trait.fallbackTitle))
+                                                  .put("description", activeLocaleManager.getString("trait_${trait.id}_description", trait.fallbackDescription))
+                                                  .put("active", trait.id in activeGameplayTraitIds)
+                                                  .put("requiredCorrectGuesses", definition.activation.minimumCorrectGuesses)
+                                                  .put("selectedArm", game.selectedTraitArms[trait.id] ?: trait.defaultArmId.orEmpty())
+                                                  .put("arms", armsJson))
+                                          }
                                          val viewState = JSONObject()
                                         .put("appVersion", BuildConfig.VERSION_NAME)
                                             .put("appVersionCode", BuildConfig.VERSION_CODE)

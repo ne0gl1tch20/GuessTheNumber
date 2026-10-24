@@ -33,8 +33,9 @@ object TraitGameplayRuntime {
 
     /** Validate and persist an arm choice; unknown traits/arms are rejected. */
     fun selectArm(state: GameState, traitId: String, armId: String): GameState {
-        val allowedArms = ARM_CATALOG[traitId] ?: error("Trait has no selectable arms.")
-        require(armId in allowedArms) { "Unsupported arm for $traitId." }
+        val definition = TraitGameplayCatalog.find(traitId) ?: error("Unknown gameplay trait: $traitId.")
+        require(definition.arms.isNotEmpty()) { "Trait has no selectable arms." }
+        require(TraitGameplayCatalog.allowsArm(traitId, armId)) { "Unsupported arm for $traitId." }
         val active = TraitActivationEngine(registry).evaluate(
             TraitActivationContext(
                 state = state,
@@ -47,9 +48,4 @@ object TraitGameplayRuntime {
         return state.copy(selectedTraitArms = state.selectedTraitArms + (traitId to armId))
     }
 
-    private val ARM_CATALOG = mapOf(
-        "combo_momentum" to setOf("steady", "burst"),
-        "mistake_insurance" to setOf("half_refund", "careful"),
-        "risk_reward" to setOf("balanced", "high_risk")
-    )
 }
