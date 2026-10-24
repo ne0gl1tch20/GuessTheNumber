@@ -43,6 +43,7 @@ const mounted = window.GTNTraitExtensionHost.mount({
   container,
   source: 'function renderTrait(api) { api.setText("status", "Ready"); }',
   allowedTextIds: ['status'],
+  capabilities: ['render_ui', 'show_local_message'],
   onLocalMessage: value => localMessages.push(value)
 });
 assert.equal(mounted.frame.attributes.sandbox, 'allow-scripts');
@@ -58,8 +59,19 @@ listeners.get('message')({ source: {}, data: { __gtnTraitExtension: true, operat
 assert.equal(targets.status.textContent, 'Hello');
 listeners.get('message')({ source: mounted.frame.contentWindow, data: { __gtnTraitExtension: true, operation: 'showLocalMessage', value: 'Local only' } });
 assert.deepEqual(localMessages, ['Local only']);
+const restricted = window.GTNTraitExtensionHost.mount({
+  container,
+  source: 'function renderTrait(api) { api.setText("status", "Allowed"); }',
+  allowedTextIds: ['status'],
+  capabilities: ['render_ui']
+});
+assert.doesNotMatch(restricted.frame.srcdoc, /showLocalMessage\(value\)/);
+listeners.get('message')({ source: restricted.frame.contentWindow, data: { __gtnTraitExtension: true, operation: 'showLocalMessage', value: 'Blocked' } });
+assert.deepEqual(localMessages, ['Local only']);
+assert.throws(() => window.GTNTraitExtensionHost.mount({ container, source: 'function renderTrait(api) {}', capabilities: ['award_currency'] }), /Unsupported trait UI capability/);
+restricted.dispose();
 const hostileSource = 'function renderTrait(api) { api.setText("status", "</script><script>window.Android.earnReward()</script>"); }';
-const hostile = window.GTNTraitExtensionHost.mount({ container, source: hostileSource, allowedTextIds: ['status'] });
+const hostile = window.GTNTraitExtensionHost.mount({ container, source: hostileSource, allowedTextIds: ['status'], capabilities: ['render_ui'] });
 assert.doesNotMatch(hostile.frame.srcdoc, /<\/script><script>window\.Android/);
 hostile.dispose();
 mounted.dispose();

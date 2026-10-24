@@ -16,6 +16,13 @@
       throw new TypeError('Trait UI module must expose renderTrait(api) or registerTraitView(api).');
     }
 
+    const supportedCapabilities = new Set(['render_ui', 'show_local_message']);
+    const capabilities = new Set(options.capabilities || []);
+    for (const capability of capabilities) {
+      if (!supportedCapabilities.has(capability)) throw new TypeError('Unsupported trait UI capability: ' + capability);
+    }
+    const canRender = capabilities.has('render_ui');
+    const canShowLocalMessage = capabilities.has('show_local_message');
     const allowedTextIds = new Set((options.allowedTextIds || []).filter(id => ID_PATTERN.test(id)));
     const frame = document.createElement('iframe');
     frame.setAttribute('sandbox', 'allow-scripts');
@@ -30,6 +37,19 @@
       .replace(/</g, '\\u003c')
       .replace(/\u2028/g, '\\u2028')
       .replace(/\u2029/g, '\\u2029');
+    const apiMethods = [];
+    if (canRender) {
+      apiMethods.push(`setText(id, value) {
+        if (typeof id !== 'string' || !/^[a-zA-Z0-9_-]{1,48}$/.test(id)) return;
+        send({ operation: 'setText', id, value: String(value).slice(0, ${MAX_MESSAGE_CHARS}) });
+      }`);
+    }
+    if (canShowLocalMessage) {
+      apiMethods.push(`showLocalMessage(value) {
+        send({ operation: 'showLocalMessage', value: String(value).slice(0, ${MAX_MESSAGE_CHARS}) });
+      }`);
+    }
+
     frame.srcdoc = `<!doctype html>
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
@@ -40,15 +60,7 @@
   'use strict';
   const source = ${sourceLiteral};
   const send = message => parent.postMessage({ __gtnTraitExtension: true, ...message }, '*');
-  const api = Object.freeze({
-    setText(id, value) {
-      if (typeof id !== 'string' || !/^[a-zA-Z0-9_-]{1,48}$/.test(id)) return;
-      send({ operation: 'setText', id, value: String(value).slice(0, ${MAX_MESSAGE_CHARS}) });
-    },
-    showLocalMessage(value) {
-      send({ operation: 'showLocalMessage', value: String(value).slice(0, ${MAX_MESSAGE_CHARS}) });
-    }
-  });
+  const api = Object.freeze({ ${apiMethods.join(',')} });
   try {
     const script = document.createElement('script');
     script.textContent = source;
@@ -65,10 +77,10 @@
       if (event.source !== frame.contentWindow || !event.data ||
           event.data.__gtnTraitExtension !== true) return;
       const message = event.data;
-      if (message.operation === 'setText' && allowedTextIds.has(message.id)) {
+      if (message.operation === 'setText' && canRender && allowedTextIds.has(message.id)) {
         const target = options.container.querySelector('[data-trait-text="' + message.id + '"]');
         if (target) target.textContent = String(message.value || '').slice(0, MAX_MESSAGE_CHARS);
-      } else if (message.operation === 'showLocalMessage' && typeof options.onLocalMessage === 'function') {
+      } else if (message.operation === 'showLocalMessage' && canShowLocalMessage && typeof options.onLocalMessage === 'function') {
         options.onLocalMessage(String(message.value || '').slice(0, MAX_MESSAGE_CHARS));
       }
     };
