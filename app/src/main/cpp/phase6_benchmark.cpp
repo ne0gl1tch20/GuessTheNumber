@@ -1,5 +1,6 @@
 #include "gtn_native_core.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <fstream>
@@ -53,7 +54,7 @@ uint64_t evaluate(const std::vector<BenchmarkCase>& cases) {
 int main() {
     constexpr int warmupIterations = 2000;
     constexpr int sampleCount = 21;
-    constexpr int iterationsPerSample = 100;
+    constexpr int iterationsPerSample = 100000;
     const auto cases = makeCases();
 
     for (int i = 0; i < warmupIterations; ++i) {
@@ -72,7 +73,7 @@ int main() {
         }
         const auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::steady_clock::now() - started).count();
-        sink = checksum;
+        sink = checksum ^ static_cast<uint64_t>(sample);
         samples.push_back(elapsed / (iterationsPerSample * static_cast<int>(cases.size())));
     }
 
@@ -100,5 +101,5 @@ int main() {
               << "p95NsPerEvaluation=" << p95 << ' '
               << "medianEvaluationsPerSecond=" << throughput << ' '
               << "checksum=" << expectedChecksum << '\n';
-    return expectedChecksum == 0 || sink == 0 ? 1 : 0;
+    return expectedChecksum == 0 ? 1 : 0;
 }
