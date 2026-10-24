@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.traits
 import android.content.Context
 import android.util.Base64
 import com.jarrlyyy.guessthenumber.BuildConfig
+import com.jarrlyyy.guessthenumber.scripting.LuaSandbox
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -30,8 +31,12 @@ internal data class RemoteTraitDefinition(
     val minHostApiVersion: Int = 1, val maxHostApiVersion: Int = 1,
     val minimumLevel: Int = 1, val minimumPrestige: Int = 0, val minimumCorrectGuesses: Long = 0L,
     val dependencies: List<String> = emptyList(), val conflicts: List<String> = emptyList(),
-    val effects: List<String>, val seasonId: String? = null
+    val effects: List<String>, val seasonId: String? = null,
+    val folderName: String? = null,
+    val files: List<RemoteTraitFile> = emptyList()
 )
+@Serializable
+internal data class RemoteTraitFile(val path: String, val sha256: String, val kind: String)
 
 /** Process-local snapshot. Replaced only after a verified catalog has been loaded. */
 object ActiveTraitCatalog {
@@ -79,6 +84,39 @@ class TraitLiveOpsRepository(
             staging.deleteRecursively()
             check(staging.mkdirs()) { "Could not create trait catalog staging directory." }
             File(staging, "signed_manifest.json").writeBytes(envelopeBytes)
+            var totalBytes = envelopeBytes.size
+            var totalFiles = 0
+            payload.traits.forEach { trait ->
+                require(trait.files.size <= MAX_FILES_PER_TRAIT) { "Trait ${trait.id} has too many files." }
+                trait.files.forEach { entry ->
+                    totalFiles++
+                    require(totalFiles <= MAX_TOTAL_FILES) { "Trait bundle has too many files." }
+                    val relative = validateTraitAssetPath(trait, entry.path)
+                    val fileUrl = URL(url, relative)
+                    val bytes = readHttps(fileUrl, MAX_FILE_BYTES)
+                    totalBytes += bytes.size
+                    require(totalBytes <= MAX_TOTAL_BUNDLE_BYTES) { "Trait bundle exceeds total size limit." }
+                    require(sha256(bytes).equals(entry.sha256, ignoreCase = true)) {
+                        "Trait file hash mismatch for ${trait.id}/${relative}."
+                    }
+                    if (entry.kind == "lua") {
+                        LuaSandbox {}.validate(trait.id, bytes.toString(Charsets.UTF_8))
+                    } else {
+                        require(entry.kind == "json" && relative.endsWith(".json")) {
+                            "Unsupported trait file type."
+                        }
+                        require(bytes.toString(Charsets.UTF_8).isNotBlank()) { "Trait metadata file is empty." }
+                    }
+                    val output = File(staging, relative)
+                    check(output.canonicalPath.startsWith(staging.canonicalPath + File.separator)) {
+                        "Trait asset path escapes staging directory."
+                    }
+                    check(output.parentFile?.let { it.isDirectory || it.mkdirs() } != false) {
+                        "Could not create trait asset directory."
+                    }
+                    output.writeBytes(bytes)
+                }
+            }
             check(verifyCatalogDirectory(staging, payload.catalogVersion).size == definitions.size) {
                 "Staged catalog verification mismatch."
             }
@@ -189,7 +227,11 @@ class TraitLiveOpsRepository(
         const val SCHEMA_VERSION = 1
         const val HOST_API_VERSION = 1
         const val MAX_TRAITS = 100
+        const val MAX_FILES_PER_TRAIT = 24
+        const val MAX_TOTAL_FILES = 500
+        const val MAX_TOTAL_BUNDLE_BYTES = 8 * 1024 * 1024
         const val MAX_MANIFEST_BYTES = 256 * 1024
+        const val MAX_FILE_BYTES = 128 * 1024
         const val CONNECT_TIMEOUT_MS = 5_000
         const val READ_TIMEOUT_MS = 8_000
     }
@@ -222,6 +264,33 @@ internal fun validateAndMapTraitPayload(payload: TraitLiveOpsPayload, appVersion
         TraitDefinitionValidator.validate(definition)
         definition
     }
+    val allFiles = payload.traits.flatMap { it.files }
+    require(allFiles.map { it.path }.distinct().size == allFiles.size) { "Duplicate trait asset path." }
+    payload.traits.forEach { trait ->
+        require(trait.files.size <= TraitLiveOpsRepository.MAX_FILES_PER_TRAIT) { "Trait has too many files." }
+        if (trait.files.isNotEmpty()) {
+            require(!trait.folderName.isNullOrBlank()) { "Trait files require a folderName." }
+            require(Regex("[A-Za-z0-9_-]{1,80}").matches(trait.folderName)) { "Invalid trait folder name." }
+        }
+        trait.files.forEach { file ->
+            validateTraitAssetPath(trait, file.path)
+            require(file.sha256.matches(Regex("[a-fA-F0-9]{64}"))) { "Invalid SHA-256 for trait asset." }
+            require(file.kind in setOf("lua", "json")) { "Unsupported trait asset kind." }
+            require((file.kind == "lua") == file.path.endsWith(".lua")) { "Trait file extension does not match its kind." }
+            require(file.kind != "json" || file.path.endsWith(".json")) { "Trait JSON files must end in .json." }
+        }
+    }
     TraitRegistry(BuiltInTraits.definitions + definitions)
     return definitions
+}
+
+private fun validateTraitAssetPath(trait: RemoteTraitDefinition, path: String): String {
+    require(!trait.folderName.isNullOrBlank() && Regex("[A-Za-z0-9_-]{1,80}").matches(trait.folderName)) {
+        "Trait asset path requires a valid folderName."
+    }
+    val expectedPrefix = "assets/traits/" + trait.folderName + "/"
+    require(path.startsWith(expectedPrefix) && path.length <= 240) { "Trait asset path is outside its trait folder." }
+    require(path.split('/').all { it.isNotBlank() && it != "." && it != ".." }) { "Invalid trait asset path." }
+    require(path.endsWith(".lua") || path.endsWith(".json")) { "Unsupported trait asset extension." }
+    return path
 }
