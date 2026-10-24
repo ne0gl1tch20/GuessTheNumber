@@ -51,7 +51,7 @@ jobs:
       - name: Publish manifest commit on master
         if: github.event_name == 'push'
         run: |
-          if git diff --quiet -- web-play-manifest.json; then
+          if [ -z "$(git status --porcelain -- web-play-manifest.json)" ]; then
             echo "Manifest already current"
             exit 0
           fi
