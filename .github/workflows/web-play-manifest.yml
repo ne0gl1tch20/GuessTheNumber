@@ -7,6 +7,7 @@ on:
       - "app/src/main/assets/web-play/**"
       - "app/src/main/assets/fonts/**"
       - "app/src/main/assets/locales/**"
+      - "app/src/main/assets/libraries/**"
       - "tools/generate_web_play_manifest.py"
       - ".github/workflows/web-play-manifest.yml"
   pull_request:
@@ -45,7 +46,7 @@ jobs:
           assert {"web-play/index.html", "web-play/app.js", "web-play/styles.css"} <= {f["path"] for f in manifest["files"]}
           for entry in manifest["files"]:
               assert len(entry["sha256"]) == 64
-              assert entry["path"].startswith(("web-play/", "fonts/", "locales/"))
+              assert entry["path"].startswith(("web-play/", "fonts/", "locales/", "libraries/"))
           print(f"Validated {len(manifest['files'])} assets")
           PY
       - name: Publish manifest commit on master
