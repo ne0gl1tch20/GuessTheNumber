@@ -1,0 +1,105 @@
+name: Phase 6 Native vs Kotlin Benchmark
+
+on:
+  pull_request:
+    paths:
+      - 'app/src/main/cpp/**'
+      - 'app/src/test/java/com/jarrlyyy/guessthenumber/shared/engine/NativeVsKotlinPerformanceBenchmarkTest.kt'
+      - '.github/workflows/phase6-native-vs-kotlin-benchmark.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: phase6-native-vs-kotlin-benchmark-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Run Kotlin JVM benchmark
+        run: ./gradlew :app:testDebugUnitTest --tests com.jarrlyyy.guessthenumber.shared.engine.NativeVsKotlinPerformanceBenchmarkTest --no-build-cache --console=plain
+
+      - name: Compile native benchmark
+        run: |
+          mkdir -p app/build/reports
+          g++ -std=c++20 -O3 -Wall -Wextra -Werror \
+            -Iapp/src/main/cpp \
+            app/src/main/cpp/phase6_benchmark.cpp \
+            -o app/build/phase6_native_benchmark
+
+      - name: Run native benchmark
+        run: ./app/build/phase6_native_benchmark
+
+      - name: Compare benchmark outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          kotlin_report="app/build/reports/native-vs-kotlin-kotlin.txt"
+          native_report="app/build/reports/native-vs-kotlin-native.txt"
+          test -s "$kotlin_report"
+          test -s "$native_report"
+
+          kotlin_checksum="$(awk -F= '$1 == "checksum" {print $2}' "$kotlin_report")"
+          native_checksum="$(awk -F= '$1 == "checksum" {print $2}' "$native_report")"
+          test "$kotlin_checksum" = "$native_checksum"
+
+          kotlin_median="$(awk -F= '$1 == "medianNsPerEvaluation" {print $2}' "$kotlin_report")"
+          native_median="$(awk -F= '$1 == "medianNsPerEvaluation" {print $2}' "$native_report")"
+          kotlin_p95="$(awk -F= '$1 == "p95NsPerEvaluation" {print $2}' "$kotlin_report")"
+          native_p95="$(awk -F= '$1 == "p95NsPerEvaluation" {print $2}' "$native_report")"
+          kotlin_tp="$(awk -F= '$1 == "medianEvaluationsPerSecond" {print $2}' "$kotlin_report")"
+          native_tp="$(awk -F= '$1 == "medianEvaluationsPerSecond" {print $2}' "$native_report")"
+
+          python3 - "$kotlin_median" "$native_median" "$kotlin_p95" "$native_p95" "$kotlin_tp" "$native_tp" <<'PY'
+          import sys
+          km, nm, kp, np, kt, nt = map(float, sys.argv[1:])
+          print(f"Kotlin median: {km:.0f} ns/evaluation")
+          print(f"Native median: {nm:.0f} ns/evaluation")
+          print(f"Kotlin p95: {kp:.0f} ns/evaluation")
+          print(f"Native p95: {np:.0f} ns/evaluation")
+          print(f"Kotlin throughput: {kt:.0f} evaluations/s")
+          print(f"Native throughput: {nt:.0f} evaluations/s")
+          print(f"Median speedup: {km / nm:.2f}x")
+          print(f"P95 speedup: {kp / np:.2f}x")
+          print(f"Throughput multiplier: {nt / kt:.2f}x")
+          PY
+
+          {
+            echo "PHASE 6 NATIVE VS KOTLIN PERFORMANCE"
+            echo "benchmarkWorkload=128 deterministic adaptive-target cases"
+            echo "warmupIterations=2000"
+            echo "samples=21"
+            echo "iterationsPerSample=100"
+            cat "$kotlin_report"
+            cat "$native_report"
+            python3 - "$kotlin_median" "$native_median" "$kotlin_p95" "$native_p95" "$kotlin_tp" "$native_tp" <<'PY'
+          import sys
+          km, nm, kp, np, kt, nt = map(float, sys.argv[1:])
+          print(f"medianSpeedup={km / nm:.4f}x")
+          print(f"p95Speedup={kp / np:.4f}x")
+          print(f"throughputMultiplier={nt / kt:.4f}x")
+          PY
+          } > app/build/reports/phase6-native-vs-kotlin-benchmark.txt
+
+      - name: Upload benchmark report
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase6-native-vs-kotlin-benchmark
+          path: app/build/reports/phase6-native-vs-kotlin-benchmark.txt
+          if-no-files-found: error
