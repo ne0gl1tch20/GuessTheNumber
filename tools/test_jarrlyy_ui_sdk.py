@@ -284,6 +284,11 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
             "claim.onclick=()=>{if(!send('arcade_reward',{gameId:activeArcade,score:String(score)}))return;closeArcade();",
             app,
         )
+        # Claim must remain disabled while another bridge request is pending.
+        self.assertIn("claim.disabled=!!pending}", app)
+        self.assertIn("#useMidpoint,[data-multiplier],#arcadeClaim').forEach(button=>{button.disabled=true})", app)
+        # Re-enable the claim button when the unrelated pending request completes.
+        self.assertIn("if(activeArcade&&arcadeClaimButton?.onclick)arcadeClaimButton.disabled=false", app)
         # Keep the response-side close as a harmless fallback on success.
         self.assertIn(
             "else if(completedType==='arcade_reward'){toast('Arcade reward saved! ✨');closeArcade()}",
