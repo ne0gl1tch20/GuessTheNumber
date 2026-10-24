@@ -276,5 +276,19 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn("overflow-y: auto;", daily_dialog)
 
 
+    def test_arcade_popup_closes_only_after_successful_reward_claim(self):
+        app = (WEB / "app.js").read_text(encoding="utf-8")
+        # receive() only reaches this success branch when the Kotlin host
+        # accepts the arcade_reward request. Keep the popup open on failures.
+        self.assertIn(
+            "else if(completedType==='arcade_reward'){toast('Arcade reward saved! ✨');closeArcade()}",
+            app,
+        )
+        self.assertIn(
+            "if(m.state.accepted===false)",
+            app,
+        )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
