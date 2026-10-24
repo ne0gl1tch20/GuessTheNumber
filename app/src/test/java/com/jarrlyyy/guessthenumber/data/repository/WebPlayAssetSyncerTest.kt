@@ -12,7 +12,7 @@ import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class WebPlayAssetSyncerTest {
-    private val context = RuntimeEnvironment.getApplication<Context>()
+    private val context = RuntimeEnvironment.getApplication()
     private val syncer = WebPlayAssetSyncer(context)
 
     @Test
