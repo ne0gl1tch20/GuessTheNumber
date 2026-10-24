@@ -100,11 +100,40 @@ class TraitRegistryTest {
             assertEquals(definition.activation.minimumBestStreak,
                 rules["activation"]!!.jsonObject["minimumBestStreak"]?.jsonPrimitive?.int ?: 0)
             assertTrue("Unsafe SVG in ${definition.id}", !icon.readText().contains("<script", ignoreCase = true))
-            val locale = json.parseToJsonElement(localeJson.readText()).jsonObject
-            assertEquals(definition.id, locale["id"]!!.jsonPrimitive.content)
-            assertTrue("Missing localized title for ${definition.id}", locale["title"]!!.jsonPrimitive.content.isNotBlank())
-            assertTrue("Missing localized description for ${definition.id}", locale["description"]!!.jsonPrimitive.content.isNotBlank())
-            if (definition.id == "hundred_consecutive_guesses") assertTrue(locale["description"]!!.jsonPrimitive.content.contains("100 consecutive"))
+            val localeDir = java.io.File(folder, "locales")
+            val localeFiles = localeDir.listFiles().orEmpty().filter { it.isFile && it.extension.equals("json", true) }
+            assertTrue("Missing English fallback locale for ${definition.id}", localeFiles.any { it.name == "en.json" })
+            val english = json.parseToJsonElement(localeJson.readText()).jsonObject
+            assertEquals(definition.id, english["id"]!!.jsonPrimitive.content)
+            assertTrue("Missing English title for ${definition.id}", english["title"]!!.jsonPrimitive.content.isNotBlank())
+            assertTrue("Missing English description for ${definition.id}", english["description"]!!.jsonPrimitive.content.isNotBlank())
+            localeFiles.forEach { localeFile ->
+                assertTrue("Invalid locale filename: ${localeFile.name}", localeFile.nameWithoutExtension.matches(Regex("[a-z]{2}(-[A-Z]{2})?")))
+                val localized = json.parseToJsonElement(localeFile.readText()).jsonObject
+                assertEquals("Wrong trait ID in ${localeFile.path}", definition.id, localized["id"]!!.jsonPrimitive.content)
+                listOf("title", "description").forEach { key ->
+                    assertTrue("Missing $key in ${localeFile.path}", !localized[key]!!.jsonPrimitive.content.isBlank())
+                }
+                assertEquals("Locale keys differ in ${localeFile.path}", english.keys, localized.keys)
+            }
+            if (definition.id == "hundred_consecutive_guesses") {
+                assertTrue(english["description"]!!.jsonPrimitive.content.contains("100 consecutive"))
+                val moduleFile = java.io.File(folder, "module.json")
+                assertTrue("Missing module manifest for milestone trait", moduleFile.isFile)
+                val moduleSources = mapOf(
+                    "logic.lua" to java.io.File(folder, "logic.lua").readText(),
+                    "presentation.js" to java.io.File(folder, "presentation.js").readText(),
+                    "rules.json" to rulesJson.readText()
+                )
+                val runtime = com.jarrlyyy.guessthenumber.traits.TraitExtensionRuntime()
+                val extension = runtime.validate(moduleFile.readText(), moduleSources, definition.id)
+                val before = runtime.evaluateLua(extension, "logic", mapOf("bestStreak" to "99"), definition.effects)
+                val reached = runtime.evaluateLua(extension, "logic", mapOf("bestStreak" to "100"), definition.effects)
+                assertTrue("Milestone must not activate early", !before.eligible)
+                assertTrue("Milestone should activate at 100", reached.eligible)
+                assertEquals(definition.effects, reached.requestedEffects)
+                assertTrue(runtime.javascriptPresentation(extension, "view").contains("renderTrait"))
+            }
         }
         all.map { it.catalogId }.distinct().forEach { catalogId ->
             val indexFile = java.io.File(projectRoot, "app/src/main/assets/traits/catalogs/${catalogId}/catalog.json")

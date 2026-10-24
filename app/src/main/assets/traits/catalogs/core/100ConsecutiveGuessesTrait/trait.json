@@ -17,6 +17,9 @@
     "trait.json",
     "rules.json",
     "locales/en.json",
-    "icon.svg"
+    "icon.svg",
+    "module.json",
+    "logic.lua",
+    "presentation.js"
   ]
 }
