@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "mindful_guess",
+  "catalogId": "focus",
+  "packageFolder": "MindfulGuessTrait",
+  "titleKey": "trait.mindful_guess.title",
+  "descriptionKey": "trait.mindful_guess.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

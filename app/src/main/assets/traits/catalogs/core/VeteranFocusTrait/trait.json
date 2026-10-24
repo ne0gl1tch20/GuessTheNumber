@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "veteran_focus",
+  "catalogId": "core",
+  "packageFolder": "VeteranFocusTrait",
+  "titleKey": "trait.veteran_focus.title",
+  "descriptionKey": "trait.veteran_focus.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "XP_MULTIPLIER"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

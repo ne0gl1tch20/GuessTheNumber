@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "first_hundred",
+  "catalogId": "core",
+  "packageFolder": "FirstHundredTrait",
+  "titleKey": "trait.first_hundred.title",
+  "descriptionKey": "trait.first_hundred.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

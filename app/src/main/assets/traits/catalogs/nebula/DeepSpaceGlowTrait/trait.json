@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "deep_space_glow",
+  "catalogId": "nebula",
+  "packageFolder": "DeepSpaceGlowTrait",
+  "titleKey": "trait.deep_space_glow.title",
+  "descriptionKey": "trait.deep_space_glow.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

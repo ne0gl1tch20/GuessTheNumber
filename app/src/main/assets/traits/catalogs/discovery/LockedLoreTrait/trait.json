@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "locked_lore",
+  "catalogId": "discovery",
+  "packageFolder": "LockedLoreTrait",
+  "titleKey": "trait.locked_lore.title",
+  "descriptionKey": "trait.locked_lore.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

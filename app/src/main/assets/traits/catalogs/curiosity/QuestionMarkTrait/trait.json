@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "question_mark",
+  "catalogId": "curiosity",
+  "packageFolder": "QuestionMarkTrait",
+  "titleKey": "trait.question_mark.title",
+  "descriptionKey": "trait.question_mark.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

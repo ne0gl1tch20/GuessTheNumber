@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "relic_legend",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 3,
+    "minimumCorrectGuesses": 6100
+  },
+  "dependencies": [],
+  "conflicts": [],
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

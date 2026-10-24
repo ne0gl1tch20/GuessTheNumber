@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "tempo_keeper",
+  "catalogId": "rhythm",
+  "packageFolder": "TempoKeeperTrait",
+  "titleKey": "trait.tempo_keeper.title",
+  "descriptionKey": "trait.tempo_keeper.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

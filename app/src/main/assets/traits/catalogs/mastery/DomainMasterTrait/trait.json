@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "domain_master",
+  "catalogId": "mastery",
+  "packageFolder": "DomainMasterTrait",
+  "titleKey": "trait.domain_master.title",
+  "descriptionKey": "trait.domain_master.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

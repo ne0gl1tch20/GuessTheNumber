@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "rift_navigator",
+  "catalogId": "worlds",
+  "packageFolder": "RiftNavigatorTrait",
+  "titleKey": "trait.rift_navigator.title",
+  "descriptionKey": "trait.rift_navigator.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

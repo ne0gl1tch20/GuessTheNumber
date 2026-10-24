@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "hundred_consecutive_guesses",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 0,
+    "minimumCorrectGuesses": 0,
+    "minimumBestStreak": 100
+  },
+  "dependencies": [],
+  "conflicts": [],
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

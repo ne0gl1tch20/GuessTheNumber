@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "harvest_glow",
+  "catalogId": "seasonal",
+  "packageFolder": "HarvestGlowTrait",
+  "titleKey": "trait.harvest_glow.title",
+  "descriptionKey": "trait.harvest_glow.description",
+  "category": "SEASONAL",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": "winter",
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

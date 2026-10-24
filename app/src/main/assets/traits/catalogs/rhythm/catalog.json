@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "rhythm",
+  "title": "Rhythm",
+  "traitCount": 10,
+  "traitIds": [
+    "cadence_builder",
+    "calm_timing",
+    "flowing_guesses",
+    "measured_mind",
+    "perfect_pace",
+    "pulse_reader",
+    "quick_pattern",
+    "rhythm_scout",
+    "steady_rhythm",
+    "tempo_keeper"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

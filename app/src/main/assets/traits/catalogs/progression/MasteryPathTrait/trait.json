@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "mastery_path",
+  "catalogId": "progression",
+  "packageFolder": "MasteryPathTrait",
+  "titleKey": "trait.mastery_path.title",
+  "descriptionKey": "trait.mastery_path.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

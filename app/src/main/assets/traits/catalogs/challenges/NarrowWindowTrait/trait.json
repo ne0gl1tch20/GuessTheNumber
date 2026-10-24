@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "narrow_window",
+  "catalogId": "challenges",
+  "packageFolder": "NarrowWindowTrait",
+  "titleKey": "trait.narrow_window.title",
+  "descriptionKey": "trait.narrow_window.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

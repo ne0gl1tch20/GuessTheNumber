@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "second_wind",
+  "catalogId": "resilience",
+  "packageFolder": "SecondWindTrait",
+  "titleKey": "trait.second_wind.title",
+  "descriptionKey": "trait.second_wind.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

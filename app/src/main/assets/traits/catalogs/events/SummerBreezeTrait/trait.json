@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "summer_breeze",
+  "catalogId": "events",
+  "packageFolder": "SummerBreezeTrait",
+  "titleKey": "trait.summer_breeze.title",
+  "descriptionKey": "trait.summer_breeze.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "relics",
+  "title": "Relics",
+  "traitCount": 10,
+  "traitIds": [
+    "ancient_emblem",
+    "guardian_trace",
+    "keeper_of_shards",
+    "relic_compass",
+    "relic_harmony",
+    "relic_legend",
+    "relic_spark",
+    "relic_whisper",
+    "sealed_relic",
+    "shard_resonance"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

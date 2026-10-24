@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "sealed_relic",
+  "catalogId": "relics",
+  "packageFolder": "SealedRelicTrait",
+  "titleKey": "trait.sealed_relic.title",
+  "descriptionKey": "trait.sealed_relic.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

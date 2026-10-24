@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "expert_instinct",
+  "catalogId": "mastery",
+  "packageFolder": "ExpertInstinctTrait",
+  "titleKey": "trait.expert_instinct.title",
+  "descriptionKey": "trait.expert_instinct.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

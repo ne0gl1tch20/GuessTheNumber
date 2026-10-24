@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "bonus",
+  "title": "Bonus",
+  "traitCount": 10,
+  "traitIds": [
+    "bonus_beacon",
+    "bonus_bloom",
+    "bright_claim",
+    "claim_crafter",
+    "extra_spark",
+    "generous_orbit",
+    "nebula_ledger",
+    "nebula_saver",
+    "reward_rhythm",
+    "reward_scout"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

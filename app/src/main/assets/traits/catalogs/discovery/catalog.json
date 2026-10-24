@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "discovery",
+  "title": "Discovery",
+  "traitCount": 10,
+  "traitIds": [
+    "hidden_pattern",
+    "locked_lore",
+    "masked_mystery",
+    "moonlit_secret",
+    "quiet_discovery",
+    "secret_keeper",
+    "secret_listener",
+    "silent_reveal",
+    "unknown_answer",
+    "unseen_signal"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "hopeful_path",
+  "catalogId": "resilience",
+  "packageFolder": "HopefulPathTrait",
+  "titleKey": "trait.hopeful_path.title",
+  "descriptionKey": "trait.hopeful_path.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

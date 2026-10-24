@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "masked_mystery",
+  "catalogId": "discovery",
+  "packageFolder": "MaskedMysteryTrait",
+  "titleKey": "trait.masked_mystery.title",
+  "descriptionKey": "trait.masked_mystery.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

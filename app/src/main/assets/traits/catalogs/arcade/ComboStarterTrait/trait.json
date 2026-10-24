@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "combo_starter",
+  "catalogId": "arcade",
+  "packageFolder": "ComboStarterTrait",
+  "titleKey": "trait.combo_starter.title",
+  "descriptionKey": "trait.combo_starter.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

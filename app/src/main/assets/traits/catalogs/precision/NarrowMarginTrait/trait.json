@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "narrow_margin",
+  "catalogId": "precision",
+  "packageFolder": "NarrowMarginTrait",
+  "titleKey": "trait.narrow_margin.title",
+  "descriptionKey": "trait.narrow_margin.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

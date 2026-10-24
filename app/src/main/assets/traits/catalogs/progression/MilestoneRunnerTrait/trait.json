@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "milestone_runner",
+  "catalogId": "progression",
+  "packageFolder": "MilestoneRunnerTrait",
+  "titleKey": "trait.milestone_runner.title",
+  "descriptionKey": "trait.milestone_runner.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

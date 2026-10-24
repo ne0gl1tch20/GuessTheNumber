@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "event_explorer",
+  "catalogId": "events",
+  "packageFolder": "EventExplorerTrait",
+  "titleKey": "trait.event_explorer.title",
+  "descriptionKey": "trait.event_explorer.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

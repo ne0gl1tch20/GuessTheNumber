@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "clean_sweep",
+  "catalogId": "core",
+  "packageFolder": "CleanSweepTrait",
+  "titleKey": "trait.clean_sweep.title",
+  "descriptionKey": "trait.clean_sweep.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

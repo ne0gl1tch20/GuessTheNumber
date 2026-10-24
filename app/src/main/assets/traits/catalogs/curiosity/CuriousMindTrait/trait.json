@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "curious_mind",
+  "catalogId": "curiosity",
+  "packageFolder": "CuriousMindTrait",
+  "titleKey": "trait.curious_mind.title",
+  "descriptionKey": "trait.curious_mind.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

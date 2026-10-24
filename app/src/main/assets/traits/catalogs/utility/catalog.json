@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "utility",
+  "title": "Utility",
+  "traitCount": 10,
+  "traitIds": [
+    "backup_buddy",
+    "careful_keeper",
+    "clean_profile",
+    "efficient_habit",
+    "organized_mind",
+    "save_guardian",
+    "settings_sage",
+    "smart_planner",
+    "thoughtful_setup",
+    "tidy_inventory"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

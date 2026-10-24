@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "low_attempt_run",
+  "catalogId": "challenges",
+  "packageFolder": "LowAttemptRunTrait",
+  "titleKey": "trait.low_attempt_run.title",
+  "descriptionKey": "trait.low_attempt_run.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

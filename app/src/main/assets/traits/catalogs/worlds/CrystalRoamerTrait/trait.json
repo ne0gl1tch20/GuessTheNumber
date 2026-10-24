@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "crystal_roamer",
+  "catalogId": "worlds",
+  "packageFolder": "CrystalRoamerTrait",
+  "titleKey": "trait.crystal_roamer.title",
+  "descriptionKey": "trait.crystal_roamer.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

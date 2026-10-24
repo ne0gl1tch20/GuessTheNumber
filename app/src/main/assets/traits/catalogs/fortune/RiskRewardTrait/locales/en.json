@@ -1,0 +1,6 @@
+{
+  "locale": "en",
+  "id": "risk_reward",
+  "title": "Risk Reward",
+  "description": "Correct guesses pay 25% extra, while wrong guesses cost 10% more of the normal penalty."
+}

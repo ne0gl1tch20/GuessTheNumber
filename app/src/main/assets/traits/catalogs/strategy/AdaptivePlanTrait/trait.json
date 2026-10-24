@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "adaptive_plan",
+  "catalogId": "strategy",
+  "packageFolder": "AdaptivePlanTrait",
+  "titleKey": "trait.adaptive_plan.title",
+  "descriptionKey": "trait.adaptive_plan.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

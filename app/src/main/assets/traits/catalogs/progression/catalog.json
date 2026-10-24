@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "progression",
+  "title": "Progression",
+  "traitCount": 10,
+  "traitIds": [
+    "ascendant_mind",
+    "bright_future",
+    "experience_scholar",
+    "growth_momentum",
+    "level_spark",
+    "mastery_path",
+    "milestone_runner",
+    "rising_legend",
+    "skill_compass",
+    "steady_climb"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

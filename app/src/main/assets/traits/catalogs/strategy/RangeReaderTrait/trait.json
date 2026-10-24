@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "range_reader",
+  "catalogId": "strategy",
+  "packageFolder": "RangeReaderTrait",
+  "titleKey": "trait.range_reader.title",
+  "descriptionKey": "trait.range_reader.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

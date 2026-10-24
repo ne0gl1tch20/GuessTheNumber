@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "world_expert",
+  "catalogId": "mastery",
+  "packageFolder": "WorldExpertTrait",
+  "titleKey": "trait.world_expert.title",
+  "descriptionKey": "trait.world_expert.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

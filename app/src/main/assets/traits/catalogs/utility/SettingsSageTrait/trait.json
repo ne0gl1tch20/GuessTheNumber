@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "settings_sage",
+  "catalogId": "utility",
+  "packageFolder": "SettingsSageTrait",
+  "titleKey": "trait.settings_sage.title",
+  "descriptionKey": "trait.settings_sage.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

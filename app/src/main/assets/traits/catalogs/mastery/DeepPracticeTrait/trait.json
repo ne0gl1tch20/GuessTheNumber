@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "deep_practice",
+  "catalogId": "mastery",
+  "packageFolder": "DeepPracticeTrait",
+  "titleKey": "trait.deep_practice.title",
+  "descriptionKey": "trait.deep_practice.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

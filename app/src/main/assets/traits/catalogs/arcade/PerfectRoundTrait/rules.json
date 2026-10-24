@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "perfect_round",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 1,
+    "minimumCorrectGuesses": 4700
+  },
+  "dependencies": [],
+  "conflicts": [],
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

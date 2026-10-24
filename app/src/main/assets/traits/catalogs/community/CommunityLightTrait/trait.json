@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "community_light",
+  "catalogId": "community",
+  "packageFolder": "CommunityLightTrait",
+  "titleKey": "trait.community_light.title",
+  "descriptionKey": "trait.community_light.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

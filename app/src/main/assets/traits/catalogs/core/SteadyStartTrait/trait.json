@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "steady_start",
+  "catalogId": "core",
+  "packageFolder": "SteadyStartTrait",
+  "titleKey": "trait.steady_start.title",
+  "descriptionKey": "trait.steady_start.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "XP_MULTIPLIER"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

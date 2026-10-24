@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "challenge_veteran",
+  "catalogId": "challenges",
+  "packageFolder": "ChallengeVeteranTrait",
+  "titleKey": "trait.challenge_veteran.title",
+  "descriptionKey": "trait.challenge_veteran.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

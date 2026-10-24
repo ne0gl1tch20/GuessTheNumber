@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "smart_planner",
+  "catalogId": "utility",
+  "packageFolder": "SmartPlannerTrait",
+  "titleKey": "trait.smart_planner.title",
+  "descriptionKey": "trait.smart_planner.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

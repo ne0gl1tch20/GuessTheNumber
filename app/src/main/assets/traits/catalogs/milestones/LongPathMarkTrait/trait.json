@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "long_path_mark",
+  "catalogId": "milestones",
+  "packageFolder": "LongPathMarkTrait",
+  "titleKey": "trait.long_path_mark.title",
+  "descriptionKey": "trait.long_path_mark.description",
+  "category": "PROGRESSION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

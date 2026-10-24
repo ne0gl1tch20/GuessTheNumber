@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "bright_omen",
+  "catalogId": "fortune",
+  "packageFolder": "BrightOmenTrait",
+  "titleKey": "trait.bright_omen.title",
+  "descriptionKey": "trait.bright_omen.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

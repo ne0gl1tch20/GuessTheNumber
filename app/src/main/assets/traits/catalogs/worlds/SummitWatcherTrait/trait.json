@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "summit_watcher",
+  "catalogId": "worlds",
+  "packageFolder": "SummitWatcherTrait",
+  "titleKey": "trait.summit_watcher.title",
+  "descriptionKey": "trait.summit_watcher.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

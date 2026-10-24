@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "endless_horizon",
+  "catalogId": "endurance",
+  "packageFolder": "EndlessHorizonTrait",
+  "titleKey": "trait.endless_horizon.title",
+  "descriptionKey": "trait.endless_horizon.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

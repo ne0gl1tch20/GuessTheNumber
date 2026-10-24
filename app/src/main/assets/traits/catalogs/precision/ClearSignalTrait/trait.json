@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "clear_signal",
+  "catalogId": "precision",
+  "packageFolder": "ClearSignalTrait",
+  "titleKey": "trait.clear_signal.title",
+  "descriptionKey": "trait.clear_signal.description",
+  "category": "GAMEPLAY",
+  "visibility": "HIDDEN",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

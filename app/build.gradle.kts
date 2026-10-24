@@ -68,6 +68,15 @@ android {
             .filterNot(Char::isWhitespace)
         buildConfigField("String", "LIVEOPS_MANIFEST_URL", "\"$liveOpsManifestUrl\"")
         buildConfigField("String", "LIVEOPS_PUBLIC_KEY_BASE64", "\"$liveOpsPublicKey\"")
+        val traitLiveOpsManifestUrl = providers.gradleProperty("traitLiveOpsManifestUrl")
+            .orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-TraitLiveOps/main/manifest.json")
+            .get()
+        val traitLiveOpsPublicKey = providers.gradleProperty("traitLiveOpsPublicKeyBase64")
+            .orElse("")
+            .get()
+            .filterNot(Char::isWhitespace)
+        buildConfigField("String", "TRAIT_LIVEOPS_MANIFEST_URL", "\"$traitLiveOpsManifestUrl\"")
+        buildConfigField("String", "TRAIT_LIVEOPS_PUBLIC_KEY_BASE64", "\"$traitLiveOpsPublicKey\"")
         val buildCommitSha = System.getenv("GITHUB_SHA") ?: "unknown"
         buildConfigField("String", "GIT_COMMIT_SHA", "\"$buildCommitSha\"")
         val stableDebugBuildNumber = System.getenv("GITHUB_RUN_NUMBER")?.toLongOrNull() ?: 0L

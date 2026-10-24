@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "calm_solver",
+  "catalogId": "core",
+  "packageFolder": "CalmSolverTrait",
+  "titleKey": "trait.calm_solver.title",
+  "descriptionKey": "trait.calm_solver.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

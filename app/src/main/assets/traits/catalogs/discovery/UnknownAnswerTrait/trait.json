@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "unknown_answer",
+  "catalogId": "discovery",
+  "packageFolder": "UnknownAnswerTrait",
+  "titleKey": "trait.unknown_answer.title",
+  "descriptionKey": "trait.unknown_answer.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

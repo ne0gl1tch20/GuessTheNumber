@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "quiet_discovery",
+  "catalogId": "discovery",
+  "packageFolder": "QuietDiscoveryTrait",
+  "titleKey": "trait.quiet_discovery.title",
+  "descriptionKey": "trait.quiet_discovery.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

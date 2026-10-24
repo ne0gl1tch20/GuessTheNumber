@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "compass_heart",
+  "catalogId": "adventure",
+  "packageFolder": "CompassHeartTrait",
+  "titleKey": "trait.compass_heart.title",
+  "descriptionKey": "trait.compass_heart.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

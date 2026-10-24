@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "distant_signal",
+  "catalogId": "exploration",
+  "packageFolder": "DistantSignalTrait",
+  "titleKey": "trait.distant_signal.title",
+  "descriptionKey": "trait.distant_signal.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

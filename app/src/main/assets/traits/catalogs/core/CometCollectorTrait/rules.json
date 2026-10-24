@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "comet_collector",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 0,
+    "minimumCorrectGuesses": 150
+  },
+  "dependencies": [
+    "nebula_hunter"
+  ],
+  "conflicts": [],
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

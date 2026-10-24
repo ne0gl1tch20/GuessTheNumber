@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "festival_friend",
+  "catalogId": "events",
+  "packageFolder": "FestivalFriendTrait",
+  "titleKey": "trait.festival_friend.title",
+  "descriptionKey": "trait.festival_friend.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

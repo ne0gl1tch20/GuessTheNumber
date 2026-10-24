@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "focus_anchor",
+  "catalogId": "focus",
+  "packageFolder": "FocusAnchorTrait",
+  "titleKey": "trait.focus_anchor.title",
+  "descriptionKey": "trait.focus_anchor.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

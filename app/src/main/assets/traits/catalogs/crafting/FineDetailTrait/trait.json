@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "fine_detail",
+  "catalogId": "crafting",
+  "packageFolder": "FineDetailTrait",
+  "titleKey": "trait.fine_detail.title",
+  "descriptionKey": "trait.fine_detail.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

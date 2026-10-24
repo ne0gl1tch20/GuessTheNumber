@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "thousand_mark",
+  "catalogId": "milestones",
+  "packageFolder": "ThousandMarkTrait",
+  "titleKey": "trait.thousand_mark.title",
+  "descriptionKey": "trait.thousand_mark.description",
+  "category": "PROGRESSION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

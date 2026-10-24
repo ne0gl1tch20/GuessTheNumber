@@ -7,12 +7,13 @@ package com.jarrlyyy.guessthenumber.traits
 enum class TraitVisibility { VISIBLE, HIDDEN }
 enum class TraitSource { BUILTIN, LIVEOPS }
 enum class TraitCategory { PROGRESSION, GAMEPLAY, COLLECTION, SEASONAL }
-enum class TraitEffect { XP_MULTIPLIER, NEBULA_BONUS, STREAK_PROTECTION, COSMETIC_BADGE }
+enum class TraitEffect { XP_MULTIPLIER, NEBULA_BONUS, STREAK_PROTECTION, COSMETIC_BADGE, COMBO_REWARD, RANGE_HINT, MISS_PENALTY_REDUCTION, RISK_REWARD }
 
 data class TraitActivationConditions(
     val minimumLevel: Int = 1,
     val minimumPrestige: Int = 0,
-    val minimumCorrectGuesses: Long = 0L
+    val minimumCorrectGuesses: Long = 0L,
+    val minimumBestStreak: Int = 0
 )
 
 data class TraitDefinition(
@@ -30,7 +31,9 @@ data class TraitDefinition(
     val dependencies: Set<String> = emptySet(),
     val conflicts: Set<String> = emptySet(),
     val effects: Set<TraitEffect>,
-    val seasonId: String? = null
+    val seasonId: String? = null,
+    val catalogId: String = "core",
+    val packageFolder: String = id.split('_').joinToString("") { part -> part.replaceFirstChar { it.uppercase() } } + "Trait"
 ) {
     companion object {
         const val CURRENT_SCHEMA_VERSION = 1
@@ -65,6 +68,7 @@ object TraitDefinitionValidator {
         require(definition.activation.minimumLevel >= 1) { "Minimum level must be at least 1." }
         require(definition.activation.minimumPrestige >= 0) { "Minimum prestige cannot be negative." }
         require(definition.activation.minimumCorrectGuesses >= 0L) { "Correct guess requirement cannot be negative." }
+        require(definition.activation.minimumBestStreak >= 0) { "Best streak requirement cannot be negative." }
         require(definition.dependencies.size <= TraitDefinition.MAX_DEPENDENCIES) { "Too many dependencies." }
         require(definition.effects.isNotEmpty() && definition.effects.size <= TraitDefinition.MAX_EFFECTS) {
             "Trait must declare a supported effect."
@@ -74,6 +78,8 @@ object TraitDefinitionValidator {
         }
         require(definition.dependencies.all(idPattern::matches)) { "Invalid dependency ID." }
         require(definition.conflicts.all(idPattern::matches)) { "Invalid conflict ID." }
+        require(Regex("[A-Za-z0-9_-]{1,48}").matches(definition.catalogId)) { "Invalid catalog ID for ${definition.id}" }
+        require(Regex("[A-Za-z0-9_.-]{1,80}").matches(definition.packageFolder)) { "Invalid package folder for ${definition.id}" }
         require(definition.seasonId == null || idPattern.matches(definition.seasonId)) {
             "Invalid season ID."
         }

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "why_not",
+  "catalogId": "curiosity",
+  "packageFolder": "WhyNotTrait",
+  "titleKey": "trait.why_not.title",
+  "descriptionKey": "trait.why_not.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

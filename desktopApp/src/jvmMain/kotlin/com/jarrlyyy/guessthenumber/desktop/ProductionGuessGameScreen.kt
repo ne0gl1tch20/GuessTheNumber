@@ -65,6 +65,7 @@ import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
+import com.jarrlyyy.guessthenumber.shared.domain.TraitGameplayRules
 import kotlinx.coroutines.Job
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
 import kotlinx.coroutines.Dispatchers
@@ -360,7 +361,7 @@ fun ProductionGuessGameScreen(
                         val expectedKeys = when (type) {
                             "read_state", "read_changelog", "read_profile", "read_onboarding_state", "complete_nimmy_tutorial", "read_feature_tutorial", "complete_feature_tutorial", "reset_everything", "navigate", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
-                            "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward" -> 5
+                            "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward", "select_trait_arm" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
@@ -439,7 +440,8 @@ fun ProductionGuessGameScreen(
                                 message = "Please wait for the current save to finish."
                             } else {
                                 isSaving = true
-                                val result = engine.processGuess(before, guess)
+                                val rawResult = engine.processGuess(before, guess)
+                                val result = TraitGameplayRules.apply(before, guess, rawResult, TraitGameplayRules.activeGameplayTraitIds(before))
                                 val correct = result.feedback == GuessFeedback.CORRECT
                                 val bonusAdjusted = DesktopEconomyTransactions.applyGuessBonuses(before, result.newState, correct)
                                 val progressed = DesktopEconomyTransactions.recordGuessProgress(
@@ -478,6 +480,19 @@ fun ProductionGuessGameScreen(
                                 message = "The game is still loading or saving."
                             } else {
                                 val transaction = when (type) {
+                                     "select_trait_arm" -> {
+                                         val traitId = request.optString("traitId")
+                                         val armId = request.optString("armId")
+                                         val allowed = mapOf(
+                                             "combo_momentum" to setOf("steady", "burst"),
+                                             "mistake_insurance" to setOf("half_refund", "careful"),
+                                             "risk_reward" to setOf("balanced", "high_risk")
+                                         )
+                                         val active = TraitGameplayRules.activeGameplayTraitIds(before)
+                                         if (traitId !in allowed || armId !in allowed.getValue(traitId) || traitId !in active) null
+                                         else EconomyTransaction(before.copy(selectedTraitArms = before.selectedTraitArms + (traitId to armId)), true, "Gameplay trait variant selected.")
+                                     }
+                                     
                                     "buy_talent" -> {
                                         val id = request.optString("talentId")
                                         val talent = talentCatalog?.firstOrNull { it.id == id }

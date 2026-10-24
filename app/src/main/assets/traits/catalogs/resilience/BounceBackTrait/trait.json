@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "bounce_back",
+  "catalogId": "resilience",
+  "packageFolder": "BounceBackTrait",
+  "titleKey": "trait.bounce_back.title",
+  "descriptionKey": "trait.bounce_back.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "milestones",
+  "title": "Milestones",
+  "traitCount": 10,
+  "traitIds": [
+    "fifty_guess_mark",
+    "five_hundred_mark",
+    "great_distance",
+    "landmark_finder",
+    "legacy_milestone",
+    "long_path_mark",
+    "steady_milestone",
+    "ten_step_mark",
+    "thousand_mark",
+    "two_hundred_mark"
+  ],
+  "authority": "Kotlin",
+  "offlineAvailable": true
+}

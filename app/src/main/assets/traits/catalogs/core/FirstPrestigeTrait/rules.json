@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "first_prestige",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 1,
+    "minimumCorrectGuesses": 0
+  },
+  "dependencies": [],
+  "conflicts": [],
+  "effects": [
+    "XP_MULTIPLIER"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

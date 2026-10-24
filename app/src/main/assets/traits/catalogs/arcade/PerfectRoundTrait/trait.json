@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "perfect_round",
+  "catalogId": "arcade",
+  "packageFolder": "PerfectRoundTrait",
+  "titleKey": "trait.perfect_round.title",
+  "descriptionKey": "trait.perfect_round.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

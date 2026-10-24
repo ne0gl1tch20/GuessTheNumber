@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "together_strong",
+  "catalogId": "community",
+  "packageFolder": "TogetherStrongTrait",
+  "titleKey": "trait.together_strong.title",
+  "descriptionKey": "trait.together_strong.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

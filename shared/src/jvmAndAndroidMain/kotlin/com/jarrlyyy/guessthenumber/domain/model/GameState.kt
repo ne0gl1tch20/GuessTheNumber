@@ -68,6 +68,7 @@ data class GameState(
     val worldMasteryLevels: Map<String, Int> = emptyMap(),
     val discoveredSecretIds: Set<String> = emptySet(),
     val discoveredTraitIds: Set<String> = emptySet(),
+    val selectedTraitArms: Map<String, String> = emptyMap(),
     val codexEntries: Set<String> = emptySet(),
     val homeBaseLevel: Int = 0,
     val activeBossBattleWorldId: String? = null,

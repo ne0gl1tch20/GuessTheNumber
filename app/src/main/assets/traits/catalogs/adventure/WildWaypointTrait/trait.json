@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "wild_waypoint",
+  "catalogId": "adventure",
+  "packageFolder": "WildWaypointTrait",
+  "titleKey": "trait.wild_waypoint.title",
+  "descriptionKey": "trait.wild_waypoint.description",
+  "category": "COLLECTION",
+  "visibility": "HIDDEN",
+  "effects": [
+    "NEBULA_BONUS"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "generous_orbit",
+  "catalogId": "bonus",
+  "packageFolder": "GenerousOrbitTrait",
+  "titleKey": "trait.generous_orbit.title",
+  "descriptionKey": "trait.generous_orbit.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

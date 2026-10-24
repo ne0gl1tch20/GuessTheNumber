@@ -26,6 +26,17 @@ class WebUiBridgeProtocolTest {
     }
 
     @Test
+    fun acceptsOnlyKnownGameplayTraitArms() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid("trait-arm-1", "select_trait_arm", traitId = "combo_momentum", armId = "burst"),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"trait-arm-1","type":"select_trait_arm","traitId":"combo_momentum","armId":"burst"}""")
+        )
+        assertEquals("invalid_trait", (WebUiBridgeProtocol.parse("""{"version":1,"id":"trait-arm-2","type":"select_trait_arm","traitId":"grant_money","armId":"burst"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        assertEquals("invalid_arm", (WebUiBridgeProtocol.parse("""{"version":1,"id":"trait-arm-3","type":"select_trait_arm","traitId":"combo_momentum","armId":"grant_money"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        assertEquals("invalid_request", (WebUiBridgeProtocol.parse("""{"version":1,"id":"trait-arm-4","type":"select_trait_arm","traitId":"combo_momentum","armId":"burst","money":"999999"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
     fun acceptsFeatureTutorialReadAndCompletionRequests() {
         assertEquals(
             WebUiBridgeProtocol.ParseResult.Valid("feature-read", "read_feature_tutorial", itemId = "homebase"),

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "violet_cloud",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 0,
+    "minimumCorrectGuesses": 1200
+  },
+  "dependencies": [],
+  "conflicts": [],
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "note": "Declarative rule data. Kotlin validates eligibility and applies all gameplay effects."
+}

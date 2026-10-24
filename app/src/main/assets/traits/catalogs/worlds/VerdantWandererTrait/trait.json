@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "verdant_wanderer",
+  "catalogId": "worlds",
+  "packageFolder": "VerdantWandererTrait",
+  "titleKey": "trait.verdant_wanderer.title",
+  "descriptionKey": "trait.verdant_wanderer.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

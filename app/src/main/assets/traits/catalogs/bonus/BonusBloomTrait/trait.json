@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "bonus_bloom",
+  "catalogId": "bonus",
+  "packageFolder": "BonusBloomTrait",
+  "titleKey": "trait.bonus_bloom.title",
+  "descriptionKey": "trait.bonus_bloom.description",
+  "category": "COLLECTION",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COSMETIC_BADGE"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}
