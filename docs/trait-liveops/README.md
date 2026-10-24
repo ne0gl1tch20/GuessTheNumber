@@ -11,15 +11,9 @@ The offline catalog contains **316 validated trait definitions across 30 catalog
 
 Catalog folders contain a `catalog.json` index listing their exact trait IDs. Unit tests compare every package against the Kotlin registry, verify all required files exist, parse the JSON, check the activation thresholds/effects and reject obvious active SVG content. This prevents a folder from counting as a trait unless its definition is present in the authoritative Kotlin registry.
 
-## Extension modules
+## Authority and execution
 
-A package may include `module.json` with module IDs, types, relative entrypoints and capabilities. Supported types are `LUA`, `JAVASCRIPT` and `JSON`:
-
-- **Lua logic:** runs in the instruction-budgeted Lua sandbox. It receives a bounded snapshot through `gtn.input` and can return an eligibility decision plus requested effects. Kotlin validates each requested effect against the trait's allowlist.
-- **JSON rules/config:** parsed as data, never evaluated as code.
-- **JavaScript presentation:** must expose `renderTrait(api)` or `registerTraitView(api)`. Validation rejects direct DOM, native bridge, network and dynamic-code access. It is returned as presentation source for a restricted WebView extension host and is never evaluated by Kotlin.
-
-Any remote package containing Lua or JavaScript must include `module.json`. Entry points must be included in the signed file list and hashes. Module count, source length, paths and capabilities are bounded. The built-in `100ConsecutiveGuessesTrait` package demonstrates all three module types.
+Kotlin remains the source of truth for trait eligibility, hidden discoveries, supported effects and reward mutations. The package JSON files are validated content metadata, not arbitrary executable code. Remote Lua/JavaScript/HTML/CSS is **not** executed by this trait catalog. Do not add scripts to a package unless a restricted, tested runtime is implemented for that file type.
 
 Current supported effect types are a closed allowlist. Nebula claim bonuses are applied through `TraitRewardPolicy` with the existing cap. Cosmetic badge traits are represented in the activation result. Existing XP/streak effect types remain descriptive until their dedicated gameplay systems consume them.
 
