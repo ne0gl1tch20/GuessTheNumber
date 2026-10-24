@@ -156,6 +156,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadGame(slot: Int = -1) {
         GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "LOAD_REQUESTED", "Save load requested for slot=$slot (active slot will be used when unspecified).")
+        // A new load must not inherit a previous slot's pending offline-reward popup.
+        _offlineGains.value = null
         _isLoadingSave.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -210,7 +212,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             val deltaSeconds = if (!timeTravelDetected) (System.currentTimeMillis() - effectiveSanitized.lastSaveTimestamp) / 1000L else 0L
             var finalState = refreshDailyQuestDay(timeCheckedState)
 
-            if (!timeTravelDetected && deltaSeconds > 60 && timeCheckedState.autoClickerActive) {
+            if (!timeTravelDetected && deltaSeconds > 0 && timeCheckedState.autoClickerActive) {
                 val maxOfflineSeconds = 28800L
                 val effectiveSeconds = minOf(deltaSeconds, maxOfflineSeconds)
                 val earningsPerSec = BigNumber(500)
