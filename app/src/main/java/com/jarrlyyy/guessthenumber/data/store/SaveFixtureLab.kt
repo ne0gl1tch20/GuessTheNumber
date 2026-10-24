@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.data.store
 
+import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import kotlinx.serialization.decodeFromString
@@ -59,9 +60,10 @@ object SaveFixtureLab {
         val fixture = encode(state.copy(lastSaveTimestamp = state.lastSaveTimestamp.coerceAtLeast(1L)))
         val current = validate(fixture)
         val corrupted = validate("{ definitely not json")
-        val negativeCurrency = validate(
-            fixture.replaceFirst(Regex("\\"money\\":\\s*\\{[^}]*\\}"), "\\"money\\":{\\"value\\":-999}")
-        )
+        val negativeCurrency = validate(encode(state.copy(
+            lastSaveTimestamp = state.lastSaveTimestamp.coerceAtLeast(1L),
+            money = BigNumber(-999)
+        )))
         val legacy = migrateLegacy(fixture.replaceFirst("lastSavedVersion", "legacyUnknownVersionField"))
         return listOf(
             Check("Valid current save", current.passed, current.detail),
