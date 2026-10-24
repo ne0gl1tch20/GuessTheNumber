@@ -31,7 +31,7 @@ class DeveloperPlaygroundSafetyTest {
     @Test
     fun fixtureSuitePassesWithoutTouchingDataStore() {
         val results = SaveFixtureLab.runSafetySuite(GameState(lastSaveTimestamp = 1))
-        assertEquals(4, results.size)
+        assertEquals(6, results.size)
         assertTrue(results.joinToString { "${it.name}: ${it.detail}" }, results.all { it.passed })
     }
 
