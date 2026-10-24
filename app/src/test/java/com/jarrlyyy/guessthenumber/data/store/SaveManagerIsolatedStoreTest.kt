@@ -17,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -45,6 +46,8 @@ class SaveManagerIsolatedStoreTest {
             val legacy = json.encodeToString(GameState(money = BigNumber(1234), lastSaveTimestamp = 1))
             store.edit { it[stringPreferencesKey("game_state_json")] = legacy }
             val manager = SaveManager(context, store)
+            assertFalse(manager.validateSave(json.encodeToString(GameState(money = BigNumber(-1), lastSaveTimestamp = 1))))
+            assertFalse(manager.validateSave("{ malformed"))
 
             assertTrue(manager.migrateLegacySaveToSlot1())
             val migrated = manager.getSaveJson(1)
