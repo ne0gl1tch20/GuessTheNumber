@@ -61,5 +61,5 @@ assert.deepEqual(localMessages, ['Local only']);
 mounted.dispose();
 assert.equal(mounted.frame.removed, true);
 assert.equal(listeners.has('message'), false);
-assert.throws(() => window.GTNTraitExtensionHost.mount({ container, source: 'bad' }), /entrypoint/);
+assert.throws(() => window.GTNTraitExtensionHost.mount({ container, source: 'bad' }), /must expose renderTrait/);
 console.log('Trait extension host sandbox tests passed.');
