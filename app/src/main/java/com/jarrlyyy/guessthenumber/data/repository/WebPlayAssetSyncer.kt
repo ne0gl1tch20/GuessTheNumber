@@ -180,7 +180,7 @@ class WebPlayAssetSyncer(context: Context) {
     private fun isAllowedPath(path: String): Boolean {
         if (path.isBlank() || path.startsWith('/') || path.contains('\\') ||
             path.split('/').any { it == ".." || it.isEmpty() }) return false
-        return path.startsWith("web-play/") || path.startsWith("fonts/") || path.startsWith("locales/")
+        return path.startsWith("web-play/") || path.startsWith("fonts/") || path.startsWith("locales/") || path.startsWith("libraries/")
     }
 
     companion object {
