@@ -40,7 +40,7 @@ class SaveManagerIsolatedStoreTest {
 
     @Test
     fun legacySaveMigrationMovesValidFixtureIntoSlotOne() = runBlocking {
-        val context = RuntimeEnvironment.getApplication<android.app.Application>()
+        val context = RuntimeEnvironment.getApplication()
         val (store, cleanup) = isolatedStore(context)
         try {
             val legacy = json.encodeToString(GameState(money = BigNumber(1234), lastSaveTimestamp = 1))
@@ -63,7 +63,7 @@ class SaveManagerIsolatedStoreTest {
 
     @Test
     fun invalidPrimaryRestoresValidBackupWithoutUsingRealSaveStore() = runBlocking {
-        val context = RuntimeEnvironment.getApplication<Context>()
+        val context = RuntimeEnvironment.getApplication()
         val (store, cleanup) = isolatedStore(context)
         try {
             val validBackup = json.encodeToString(GameState(money = BigNumber(9876), lastSaveTimestamp = 1))
@@ -86,7 +86,7 @@ class SaveManagerIsolatedStoreTest {
 
     @Test
     fun corruptedPrimaryAndBackupSafelyFallBackToFreshState() = runBlocking {
-        val context = RuntimeEnvironment.getApplication<Context>()
+        val context = RuntimeEnvironment.getApplication()
         val (store, cleanup) = isolatedStore(context)
         try {
             store.edit {
