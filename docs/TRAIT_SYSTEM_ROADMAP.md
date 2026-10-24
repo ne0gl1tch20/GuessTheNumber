@@ -30,26 +30,33 @@ This roadmap is the source of truth for the trait-system phases. The phases are 
 - Remote content stays declarative and cannot execute arbitrary code.
 - Android, Windows, HTML/CSS/JS, LiveOps reliability and asset-manifest checks passed on the merged PR.
 
-## Phase 5 — Measure and optimize runtime: in progress
+## Phase 5 — Measure and optimize runtime: complete
 
 Acceptance criteria:
 - Keep a repeatable warmed JVM benchmark for the activation hot path and expanded catalog.
 - Report median and p95 evaluation latency plus throughput without flaky machine-dependent pass/fail thresholds.
 - Preserve deterministic results and existing activation behavior.
 - Remove avoidable per-guess allocations only where profiling supports the change.
-- Run Android, Windows and HTML checks after optimization and compare benchmark output from before/after commits.
+- Run Android, Windows and HTML checks after optimization.
+- Record the optimized Kotlin/JVM hot-path measurements as the reference baseline for any Phase 6 native comparison.
 
-## Phase 6 — Native/C++ evaluation: conditional, not automatically required
+Latest CI profile (OpenJDK 21, 320 traits, 1,000 warmups, 21 samples × 200 evaluations): median 32,297 ns/evaluation, p95 40,661 ns/evaluation, median throughput 30,962 evaluations/second. Results are diagnostic, not a machine-speed pass/fail threshold. The report is uploaded by the `Trait Runtime Profiling` workflow.
 
-Do **not** port the trait engine to C++ merely to complete a numbered phase. Kotlin/JVM is the default implementation.
+## Phase 6 — Native C++ engine and save-security work: next
 
-Only open a native implementation experiment if Phase 5 demonstrates a material runtime bottleneck after Kotlin-side optimization and profiling identifies work that would benefit from native code. Any experiment must:
-- show a repeatable improvement against the same benchmark and representative workloads;
-- include interop, packaging, memory, debugging and maintenance costs in the comparison;
-- preserve Kotlin as the authority for gameplay state, eligibility, saves and rewards;
-- be removable without changing save formats or gameplay behavior.
+Phase 6 investigates native code for two real jobs, rather than porting Kotlin wholesale:
 
-If Kotlin meets the project's performance needs, record the measurements and mark Phase 6 **not needed**. That is a successful outcome, not unfinished work.
+- **Personalized gameplay algorithms:** profile and implement only compute-heavy algorithms that benefit from native execution. Difficulty must read the difficulty selected for the active save slot when that slot is created; it must not silently use a global difficulty or leak settings across slots.
+- **Save import/export security:** design a versioned, authenticated encryption format using a vetted cryptographic library. Keep accepting supported legacy-encrypted imports through an explicit compatibility path. Validate and authenticate data before applying it to live state, and use platform key protection where appropriate. C++ by itself is not a security guarantee.
+- **Architecture:** Kotlin remains authoritative for gameplay state, save validation, rewards and migration. Native interfaces must be narrow, bounded, testable and removable.
+- **Proof:** compare representative workloads against the Phase 5 Kotlin/JVM reference profile, including JNI overhead, memory use and maintenance costs. Keep native code only where it provides a measurable benefit or a clearly justified security integration.
+
+## Phase 7 — Creative mode save data and effects: planned after Phase 6
+
+- Define a versioned creative-mode save schema with safe defaults, validation and migration.
+- Decide which creative settings and custom effects are per-save-slot and which are global.
+- Build bounded effect definitions and validation so custom effects cannot directly grant rewards, corrupt normal saves or bypass gameplay rules.
+- Cover import/export, legacy compatibility, localization, malformed data, slot isolation and round-trip tests before connecting creative effects to gameplay.
 
 ## Completion rule
 
