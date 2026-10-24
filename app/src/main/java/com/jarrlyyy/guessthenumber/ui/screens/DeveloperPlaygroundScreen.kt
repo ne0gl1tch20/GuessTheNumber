@@ -20,7 +20,7 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeveloperPlaygroundScreen(state: GameState, onExecuteCommand: (String) -> String, onBack: () -> Unit) {
+fun DeveloperPlaygroundScreen(state: GameState, onExecuteCommand: (String) -> String, onTestDailyRewards: () -> Unit, onBack: () -> Unit) {
     var destination by remember { mutableStateOf("hub") }
     Scaffold(topBar = { TopAppBar(title = { Text(if (destination == "hub") "Developer Playground" else destinationLabel(destination)) }, navigationIcon = { IconButton(onClick = { if (destination == "hub") onBack() else destination = "hub" }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } }) }) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
@@ -60,7 +60,6 @@ private fun DeveloperHub(onOpen: (String) -> Unit) {
         item { DeveloperEntry("Save Laboratory", "Exercise save/load, offline earnings and recovery scenarios", Icons.Default.Save) { onOpen("save") } }
         item { DeveloperEntry("Runtime Inspector", "Inspect active loops and authoritative runtime state", Icons.Default.Analytics) { onOpen("runtime") } }
         item { DeveloperEntry("Diagnostics", "Build, state, logging and runtime information", Icons.Default.Info) { onOpen("diagnostics") } }
-        item { DeveloperEntry("Runtime Inspector", "Read-only game state and background process overview", Icons.Default.Analytics) { onOpen("inspector") } }
     }
 }
 
@@ -92,7 +91,23 @@ private fun WebProcessScreen(onTestDailyRewards: () -> Unit) {
         item { Text("HTML / JavaScript / Android WebView", style = MaterialTheme.typography.titleLarge) }
         item { Text("Web commands and logs are isolated from the Core Process. JavaScript execution uses the existing debug WebView console bridge.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { OutlinedTextField(input, { input = it }, Modifier.fillMaxWidth(), label = { Text("JavaScript / Web command") }, minLines = 2) }
-        item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { Button(onClick = { WebViewDebugConsole.runJavascript(input); logs = (logs + "${System.currentTimeMillis()}  JS → $input").takeLast(100) }) { Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Run") }; OutlinedButton(onClick = { logs = emptyList(); WebViewDebugConsole.clear() }) { Text("Clear") } } }
+        item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = {
+                val command = input.trim()
+                if (command.startsWith("/")) {
+                    if (command.substringBefore(' ').equals("/testdailyrewards", ignoreCase = true)) {
+                        logs = (logs + "${System.currentTimeMillis()} HOST → /testdailyrewards").takeLast(100)
+                        onTestDailyRewards()
+                    } else {
+                        logs = (logs + "${System.currentTimeMillis()} NOT WIRED → $command (no action taken)").takeLast(100)
+                    }
+                } else {
+                    WebViewDebugConsole.runJavascript(input)
+                    logs = (logs + "${System.currentTimeMillis()} JS → $input").takeLast(100)
+                }
+            }) { Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Run") }
+            OutlinedButton(onClick = { logs = emptyList(); WebViewDebugConsole.clear() }) { Text("Clear") }
+        } }
         item { DeveloperPanel("Available host command", "/testdailyrewards\n\nOther slash commands are shown as NOT WIRED until their real handlers are implemented. JavaScript expressions can be run directly.") }
         item { Text("Web console", style = MaterialTheme.typography.titleMedium) }
         items(WebViewDebugConsole.entries.takeLast(100).asReversed()) { Text(it, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall) }
@@ -104,10 +119,10 @@ private fun WebProcessScreen(onTestDailyRewards: () -> Unit) {
 @Composable
 private fun DeveloperTestSuitesScreen(state: GameState, onExecuteCommand: (String) -> String) {
     var results by remember { mutableStateOf(listOf<String>()) }
-    val suites = listOf("Core sanity" to listOf("/version", "/state", "/stats"), "Recovery" to listOf("/test antitimetravel"), "Gameplay" to listOf("/newnumber", "/autoclicker on"))
+    val suites = listOf("Core read-only smoke checks" to listOf("/version", "/state", "/stats", "/help"))
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Text("Test Suites", style = MaterialTheme.typography.titleLarge) }
-        items(suites) { (name, commands) -> Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(name, style = MaterialTheme.typography.titleMedium); Text(commands.joinToString("  "), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall); Button(onClick = { val suite = commands.map { command -> val result = onExecuteCommand(command); val pass = result.isNotBlank() && !result.startsWith("Unknown command") && !result.startsWith("Invalid command"); "${if (pass) "PASS" else "FAIL"}  $command → $result" }; results = results + suite }) { Text("Run suite") } } } }
+        items(suites) { (name, commands) -> Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(name, style = MaterialTheme.typography.titleMedium); Text(commands.joinToString("  "), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall); Button(onClick = { val suite = commands.map { command -> val result = onExecuteCommand(command); val pass = result.isNotBlank() && !result.startsWith("Unknown command") && !result.startsWith("Invalid command") && !result.startsWith("Developer mode is disabled"); "${if (pass) "PASS" else "FAIL"}  $command → $result" }; results = results + suite }) { Text("Run suite") } } } }
         item { DeveloperPanel("Latest results", results.takeLast(30).joinToString("\n").ifBlank { "No tests run yet." }) }
         item { Text("Web-only commands such as /testdailyrewards remain on the Web Process screen so Core and Web tests stay separated.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
@@ -130,11 +145,16 @@ private fun DeveloperSaveLabScreen(state: GameState) {
     var simulatedElapsedSeconds by remember { mutableStateOf(3600L) }
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("Save Laboratory", style = MaterialTheme.typography.titleLarge) }
-        item { DeveloperPanel("Current save state", "lastSaveTimestamp=${state.lastSaveTimestamp}\nautoClickerActive=${state.autoClickerActive}\ntimeTravelPenaltyUntil=${state.timeTravelPenaltyUntil}") }
-        item { Button(onClick = { result = onExecuteCommand("/timeskip 3600") }) { Text("Simulate 1 hour passive progress") } }
-        item { Button(onClick = { result = onExecuteCommand("/test antitimetravel") }) { Text("Simulate time-travel protection") } }
-        item { DeveloperPanel("Result", result.ifBlank { "No save scenario executed." }) }
-        item { Text("This laboratory operates on the developer playground's isolated state snapshot; real player saves are not overwritten.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { Text("Read-only preview only. These scenarios do not alter the active save.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { DeveloperPanel("Current save state", "lastSaveTimestamp=\${state.lastSaveTimestamp}\nautoClickerActive=\${state.autoClickerActive}\ntimeTravelPenaltyUntil=\${state.timeTravelPenaltyUntil}") }
+        item { Text("Offline duration preview", style = MaterialTheme.typography.titleMedium) }
+        item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick = { simulatedElapsedSeconds = 60L }) { Text("1 min") }
+            OutlinedButton(onClick = { simulatedElapsedSeconds = 3600L }) { Text("1 hour") }
+            OutlinedButton(onClick = { simulatedElapsedSeconds = 28800L }) { Text("8 hours") }
+        } }
+        item { DeveloperPanel("Offline earnings preview", "Elapsed seconds: \${simulatedElapsedSeconds}\nAuto-clicker active: \${state.autoClickerActive}\nEstimated money: \${if (state.autoClickerActive) 500L * simulatedElapsedSeconds else 0L}\nMaximum duration: 28800 seconds") }
+        item { Text("Corrupted-save, migration, and restore tests need isolated fixture storage before they can safely execute.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }
 
