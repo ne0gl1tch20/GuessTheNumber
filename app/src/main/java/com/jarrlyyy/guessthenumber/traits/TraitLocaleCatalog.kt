@@ -37,7 +37,8 @@ class TraitLocaleCatalog(
     fun resolve(localeFiles: Map<String, String>, expectedTraitId: String, requestedLocale: String): TraitLocalizedContent {
         validate(localeFiles, expectedTraitId)
         val parsed = localeFiles.mapValues { (_, source) -> json.parseToJsonElement(source).jsonObject }
-        val normalized = requestedLocale.replace('_', '-')
+        val localeParts = requestedLocale.replace('_', '-').split('-')
+        val normalized = localeParts.first().lowercase() + localeParts.drop(1).joinToString("") { "-" + it.uppercase() }
         val language = normalized.substringBefore('-')
         val chosen = when {
             normalized in parsed -> normalized

@@ -120,7 +120,7 @@ class TraitRegistryTest {
             val localeSources = localeFiles.associate { it.nameWithoutExtension to it.readText() }
             com.jarrlyyy.guessthenumber.traits.TraitLocaleCatalog().validate(localeSources, definition.id)
             localeFiles.forEach { localeFile ->
-                assertTrue("Invalid locale filename: ${localeFile.name}", localeFile.nameWithoutExtension.matches(Regex("[a-z]{2}(-[A-Z]{2})?")))
+                assertTrue("Invalid locale filename: ${localeFile.name}", localeFile.nameWithoutExtension.matches(Regex("[a-z]{2,3}(-[A-Z]{2})?")))
                 val localized = json.parseToJsonElement(localeFile.readText()).jsonObject
                 assertEquals("Wrong trait ID in ${localeFile.path}", definition.id, localized["id"]!!.jsonPrimitive.content)
                 listOf("title", "description").forEach { key ->

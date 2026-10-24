@@ -27,6 +27,10 @@ class TraitLocaleCatalogTest {
         assertEquals("fil", catalog.resolve(mapOf("en" to english, "fil" to filipino), "remote_streak", "fil_PH").locale)
     }
 
+    @Test fun normalizesLocaleLanguageAndRegionCase() {
+        assertEquals("zh-CN", catalog.resolve(mapOf("en" to english, "zh-CN" to chinese), "remote_streak", "ZH_cn").locale)
+    }
+
     @Test fun rejectsMissingEnglishMalformedLocaleMismatchedIdAndMissingFields() {
         assertThrows(IllegalArgumentException::class.java) { catalog.validate(mapOf("fil" to filipino), "remote_streak") }
         assertThrows(IllegalArgumentException::class.java) { catalog.validate(mapOf("en_US" to english), "remote_streak") }
