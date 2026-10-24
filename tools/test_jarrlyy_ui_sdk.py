@@ -278,20 +278,19 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
 
     def test_arcade_popup_closes_when_claim_button_sends_reward(self):
         app = (WEB / "app.js").read_text(encoding="utf-8")
-        # Close immediately after the bridge accepts the send, so the popup
-        # does not depend on a later state response to dismiss itself.
+        # Close before any bridge path can return early; queue failed/busy sends.
         self.assertIn(
-            "claim.onclick=()=>{const reward={gameId:activeArcade,score:String(score)};if(pending){pendingArcadeReward=reward;closeArcade();return}",
+            "claim.onclick=()=>{const reward={gameId:activeArcade,score:String(score)};closeArcade();if(pending){pendingArcadeReward=reward;return}",
             app,
         )
+        self.assertIn("if(!send('arcade_reward',reward)){pendingArcadeReward=reward;window.setTimeout(flushQueuedArcadeReward,0);return}", app)
         # Claim must remain disabled while another bridge request is pending.
         self.assertIn("claim.disabled=!!pending}", app)
         self.assertIn("#useMidpoint,[data-multiplier],#arcadeClaim').forEach(button=>{button.disabled=true})", app)
         # Re-enable the claim button when the unrelated pending request completes.
         self.assertIn("if(activeArcade&&arcadeClaimButton?.onclick)arcadeClaimButton.disabled=false", app)
-        # If another bridge request is pending, close the popup and queue the
-        # reward request instead of silently dropping the claim.
-        self.assertIn("pendingArcadeReward=reward;closeArcade();return", app)
+        # Any unavailable/busy bridge path queues the reward instead of dropping it.
+        self.assertIn("pendingArcadeReward=reward;return", app)
         self.assertIn("function flushQueuedArcadeReward(){if(!pendingArcadeReward||pending)return", app)
         self.assertIn("window.setTimeout(flushQueuedArcadeReward,0)", app)
         # Keep the response-side close as a harmless fallback on success.
