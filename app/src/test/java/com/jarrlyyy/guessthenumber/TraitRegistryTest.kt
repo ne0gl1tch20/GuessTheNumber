@@ -94,6 +94,16 @@ class TraitRegistryTest {
             assertEquals(definition.catalogId, metadata["catalogId"]!!.jsonPrimitive.content)
             assertEquals(definition.category.name, metadata["category"]!!.jsonPrimitive.content)
             assertEquals(definition.packageFolder, metadata["packageFolder"]!!.jsonPrimitive.content)
+            val packageFiles = metadata["packageFiles"]!!.jsonArray.map { it.jsonPrimitive.content }
+            assertEquals("Duplicate package file entry for ${definition.id}", packageFiles.size, packageFiles.distinct().size)
+            packageFiles.forEach { relativePath ->
+                assertTrue("Unsafe package file path for ${definition.id}: $relativePath",
+                    !relativePath.startsWith("/") && relativePath.split('/').all { it.isNotBlank() && it != "." && it != ".." })
+                val packageAsset = java.io.File(folder, relativePath)
+                assertTrue("Missing declared package asset for ${definition.id}: $relativePath", packageAsset.isFile)
+                assertTrue("Package asset escapes trait folder: $relativePath",
+                    packageAsset.canonicalPath.startsWith(folder.canonicalPath + java.io.File.separator))
+            }
             assertEquals(definition.effects.map { it.name }.toSet(), metadata["effects"]!!.jsonArray.map { it.jsonPrimitive.content }.toSet())
             assertEquals(definition.activation.minimumCorrectGuesses,
                 rules["activation"]!!.jsonObject["minimumCorrectGuesses"]!!.jsonPrimitive.long)
