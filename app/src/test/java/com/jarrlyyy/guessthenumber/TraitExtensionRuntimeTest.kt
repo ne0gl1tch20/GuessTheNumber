@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber
 
 import com.jarrlyyy.guessthenumber.traits.TraitEffect
 import com.jarrlyyy.guessthenumber.traits.TraitExtensionRuntime
+import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
