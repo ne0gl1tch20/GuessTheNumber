@@ -136,7 +136,7 @@ class TraitExtensionRuntime(
                 requested += effect
             }
         }
-        return TraitModuleDecision(eligible, requested)
+        return TraitModuleDecision(eligible, if (eligible) requested else emptySet())
     }
 
     fun readJsonModule(extension: ValidatedTraitExtension, moduleId: String): JsonObject {
