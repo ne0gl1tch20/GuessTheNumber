@@ -30,6 +30,25 @@ class TraitExtensionRuntimeTest {
         assertEquals(setOf(TraitEffect.COSMETIC_BADGE), yes.requestedEffects)
     }
 
+    @Test fun luaMustReturnTypedDecisionAndCannotUseTruthyStringsAsBooleans() {
+        val extension = runtime.validate(
+            """{"schemaVersion":1,"traitId":"remote_streak","modules":[{"id":"logic","type":"LUA","entrypoint":"logic.lua"}]}""",
+            mapOf("logic.lua" to """return { eligible = "false", effects = {} }"""),
+            "remote_streak"
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            runtime.evaluateLua(extension, "logic", emptyMap(), emptySet())
+        }
+        val nonTable = runtime.validate(
+            """{"schemaVersion":1,"traitId":"remote_streak","modules":[{"id":"logic","type":"LUA","entrypoint":"logic.lua"}]}""",
+            mapOf("logic.lua" to """return "eligible" """),
+            "remote_streak"
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            runtime.evaluateLua(nonTable, "logic", emptyMap(), emptySet())
+        }
+    }
+
     @Test fun luaLoggingRequiresDeclaredCapability() {
         val extension = runtime.validate(
             """{"schemaVersion":1,"traitId":"remote_streak","modules":[{"id":"logic","type":"LUA","entrypoint":"logic.lua"}]}""",

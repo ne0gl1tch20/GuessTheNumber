@@ -121,7 +121,12 @@ class TraitExtensionRuntime(
             snapshot,
             module.descriptor.capabilities
         )
-        val eligible = result.get("eligible").takeIf { !it.isnil() }?.toboolean() ?: false
+        require(result.istable()) { "Lua module must return a decision table." }
+        val eligibleValue = result.get("eligible")
+        require(eligibleValue.isnil() || eligibleValue.isboolean()) {
+            "Lua module eligibility must be a boolean."
+        }
+        val eligible = !eligibleValue.isnil() && eligibleValue.toboolean()
         val effectTable = result.get("effects")
         val requested = linkedSetOf<TraitEffect>()
         if (!effectTable.isnil()) {
