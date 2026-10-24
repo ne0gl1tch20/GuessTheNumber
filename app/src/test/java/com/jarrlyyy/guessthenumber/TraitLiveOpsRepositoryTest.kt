@@ -15,7 +15,7 @@ class TraitLiveOpsRepositoryTest {
         RemoteTraitDefinition("seasonal_echo", "trait.seasonal_echo.title", "trait.seasonal_echo.description",
             "SEASONAL", seasonId = "autumn", effects = listOf("COSMETIC_BADGE"))
     ), minApp: Int = 1, maxApp: Int = 100) = TraitLiveOpsPayload(
-        schemaVersion = 1, hostApiVersion = 1, minAppVersionCode = minApp,
+        schemaVersion = 2, hostApiVersion = 1, minAppVersionCode = minApp,
         maxAppVersionCode = maxApp, catalogVersion = 1, traits = traits
     )
 
