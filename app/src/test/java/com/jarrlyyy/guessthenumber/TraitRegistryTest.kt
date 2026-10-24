@@ -104,6 +104,7 @@ class TraitRegistryTest {
             assertEquals(definition.id, locale["id"]!!.jsonPrimitive.content)
             assertTrue("Missing localized title for ${definition.id}", locale["title"]!!.jsonPrimitive.content.isNotBlank())
             assertTrue("Missing localized description for ${definition.id}", locale["description"]!!.jsonPrimitive.content.isNotBlank())
+            if (definition.id == "hundred_consecutive_guesses") assertTrue(locale["description"]!!.jsonPrimitive.content.contains("100 consecutive"))
         }
         all.map { it.catalogId }.distinct().forEach { catalogId ->
             val indexFile = java.io.File(projectRoot, "app/src/main/assets/traits/catalogs/${catalogId}/catalog.json")
