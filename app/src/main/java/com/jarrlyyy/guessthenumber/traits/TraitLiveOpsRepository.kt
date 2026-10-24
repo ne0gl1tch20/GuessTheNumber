@@ -32,6 +32,14 @@ internal data class RemoteTraitDefinition(
     val dependencies: List<String> = emptyList(), val conflicts: List<String> = emptyList(),
     val effects: List<String>, val seasonId: String? = null
 )
+
+/** Process-local snapshot. Replaced only after a verified catalog has been loaded. */
+object ActiveTraitCatalog {
+    @Volatile private var active: TraitRegistry = BuiltInTraits.registry()
+    fun current(): TraitRegistry = active
+    fun install(registry: TraitRegistry) { active = registry }
+}
+
 sealed interface TraitLiveOpsRefreshResult {
     data class Updated(val catalogVersion: Int, val traitCount: Int) : TraitLiveOpsRefreshResult
     data class Unchanged(val catalogVersion: Int, val traitCount: Int) : TraitLiveOpsRefreshResult
