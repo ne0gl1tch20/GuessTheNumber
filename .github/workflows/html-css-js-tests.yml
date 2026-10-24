@@ -57,3 +57,6 @@ jobs:
 
       - name: Test sandboxed trait extension host
         run: node tools/test_trait_extension_host.cjs
+
+      - name: Test gameplay trait loadout localization
+        run: python tools/test_trait_loadout_localization.py
