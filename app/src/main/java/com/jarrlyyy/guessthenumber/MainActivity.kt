@@ -3,6 +3,9 @@ package com.jarrlyyy.guessthenumber
 import android.os.Bundle
 import android.content.Intent
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
+import com.jarrlyyy.guessthenumber.data.repository.WebPlayAssetSyncer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -51,6 +54,10 @@ class MainActivity : ComponentActivity() {
         pendingWidgetSaveSlot = intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
             .takeIf { it in 1..MAX_SAVE_SLOTS }
         setContent {
+            LaunchedEffect(Unit) {
+                // Start the optional web UI update during save loading; never block save initialization.
+                withContext(Dispatchers.IO) { WebPlayAssetSyncer(applicationContext).sync() }
+            }
             val state by viewModel.gameState.collectAsState()
             val isLoadingSave by viewModel.isLoadingSave.collectAsState()
             val hasPreviousCrash by viewModel.hasPreviousCrash.collectAsState()
