@@ -1,0 +1,50 @@
+name: Trait Runtime Profiling
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "app/src/main/java/**/traits/**"
+      - "app/src/test/java/**/traits/**"
+      - ".github/workflows/trait-runtime-profiling.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: trait-runtime-profile-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  profile:
+    name: Profile trait activation hot path
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Run warmed trait activation benchmark
+        run: ./gradlew :app:testDebugUnitTest --tests com.jarrlyyy.guessthenumber.traits.TraitActivationBenchmarkTest --no-build-cache --console=plain
+
+      - name: Upload profiling report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trait-activation-profile
+          path: app/build/reports/trait-activation-benchmark.txt
+          if-no-files-found: error
+          retention-days: 30

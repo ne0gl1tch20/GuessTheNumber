@@ -36,7 +36,7 @@ class TraitActivationEngine(
     private val registry: TraitRegistry
 ) {
     fun evaluate(context: TraitActivationContext): TraitActivationResult {
-        val definitions = registry.all().associateBy { it.id }
+        val definitions = registry.byIdSnapshot()
         val eligible = definitions.values
             .filter { trait -> isEligible(trait, context) }
             .sortedBy { it.id }
