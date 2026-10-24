@@ -40,7 +40,7 @@ class SaveManagerIsolatedStoreTest {
 
     @Test
     fun legacySaveMigrationMovesValidFixtureIntoSlotOne() = runBlocking {
-        val context = RuntimeEnvironment.getApplication<Context>()
+        val context = RuntimeEnvironment.getApplication<android.app.Application>()
         val (store, cleanup) = isolatedStore(context)
         try {
             val legacy = json.encodeToString(GameState(money = BigNumber(1234), lastSaveTimestamp = 1))
