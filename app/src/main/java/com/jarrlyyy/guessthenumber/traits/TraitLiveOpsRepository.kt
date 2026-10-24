@@ -257,7 +257,7 @@ class TraitLiveOpsRepository(
     companion object {
         const val SCHEMA_VERSION = 2
         const val HOST_API_VERSION = 1
-        const val MAX_TRAITS = 300
+        const val MAX_TRAITS = 180
         const val MAX_CATALOGS = 32
         const val MAX_FILES_PER_TRAIT = 24
         const val MAX_TOTAL_FILES = 500
