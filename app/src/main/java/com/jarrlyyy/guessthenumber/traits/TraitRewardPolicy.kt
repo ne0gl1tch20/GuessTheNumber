@@ -23,9 +23,6 @@ object TraitRewardPolicy {
                     trait.dependencies.all { it in discovered } &&
                     state.prestigeCount >= requirements.minimumPrestige.toLong() &&
                     state.correctGuesses >= requirements.minimumCorrectGuesses &&
-                    state.correctGuesses >= 0L &&
-                    state.prestigeCount >= 0L &&
-                    state.correctGuesses >= requirements.minimumCorrectGuesses &&
                     (trait.category != TraitCategory.SEASONAL || trait.seasonId == activeSeasonId)
                 if (eligible && discovered.add(trait.id)) changed = true
             }
