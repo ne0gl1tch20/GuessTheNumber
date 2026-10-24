@@ -8,6 +8,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
 import java.net.HttpURLConnection
@@ -90,6 +91,8 @@ class WebPlayAssetSyncer(context: Context) {
                 staging.deleteRecursively()
                 throw error
             }
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
         } catch (error: Exception) {
             SyncResult(false, activeVersion(), "Using last working assets (${error.javaClass.simpleName})")
         }
@@ -141,14 +144,24 @@ class WebPlayAssetSyncer(context: Context) {
         }
         try {
             check(connection.responseCode == HttpURLConnection.HTTP_OK) { "Repository HTTP ${connection.responseCode}" }
-            return connection.inputStream.use { stream ->
-                val bytes = stream.readBytes()
-                require(bytes.size <= MAX_DOWNLOAD_BYTES) { "Download exceeds size limit" }
-                bytes
-            }
+            return connection.inputStream.use(::readBounded)
         } finally {
             connection.disconnect()
         }
+    }
+
+    private fun readBounded(input: InputStream): ByteArray {
+        val output = ByteArrayOutputStream()
+        val buffer = ByteArray(8192)
+        var total = 0
+        while (true) {
+            val count = input.read(buffer)
+            if (count < 0) break
+            total += count
+            require(total <= MAX_DOWNLOAD_BYTES) { "Download exceeds size limit" }
+            output.write(buffer, 0, count)
+        }
+        return output.toByteArray()
     }
 
     private fun isAllowedPath(path: String): Boolean {
