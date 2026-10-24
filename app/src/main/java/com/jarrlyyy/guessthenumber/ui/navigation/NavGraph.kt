@@ -3,7 +3,12 @@ package com.jarrlyyy.guessthenumber.ui.navigation
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -97,11 +102,13 @@ fun NavGraph(
     var showSaveSlots by remember { mutableStateOf(false) }
     var colorPickerTarget by remember { mutableStateOf<String?>(null) }
     var showExitConfirmation by remember { mutableStateOf(false) }
+    var showArcadeDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(hostActivity) { hostActivity?.let(AndroidBackController::install) }
 
     BackHandler {
         when {
+            showArcadeDialog -> showArcadeDialog = false
             showExitConfirmation -> showExitConfirmation = false
             colorPickerTarget != null -> colorPickerTarget = null
             showPlayerProfile -> { showPlayerProfile = false; editingPlayerProfile = false }
@@ -154,12 +161,34 @@ fun NavGraph(
         return
     }
     Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
-        ProductionWebPlayScreen(state = state, dailyRewardTestRequest = dailyRewardTestRequest, incomePerSecond = incomePerSecond, localeManager = locale, stateProvider = { viewModel.gameState.value }, offlineGains = offlineGains, onDismissOfflineGains = onDismissOfflineGains, onClaimDailyReward = viewModel::claimDailyReward, onResetData = onResetData, onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) }, onClaimDailyQuest = viewModel::claimDailyQuest, onOpenLootChest = viewModel::openLootChest, onNavigateProgression = { progression -> when { progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true; progression == "save_slots" -> showSaveSlots = true; progression == "player_profile" -> { showPlayerProfile = true; editingPlayerProfile = false }; progression == "color_picker_primary" -> colorPickerTarget = "Primary"; progression == "color_picker_secondary" -> colorPickerTarget = "Secondary"; progression == "color_picker_tertiary" -> colorPickerTarget = "Tertiary"; progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", ""); progression == "claim_codex" -> viewModel.progressionAction("claim_codex", ""); progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':')) } }, onWorldAction = viewModel::worldProgressAction, onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) }, onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) }, onBuyPrestigeUpgrade = viewModel::buyPrestigeUpgrade, onBuyPrestigeShopItem = viewModel::buyPrestigeShopItem, onBuyUltraUpgrade = viewModel::buyUltraUpgrade, onBuyUltraShopItem = viewModel::buyUltraShopItem, onEquipCosmetic = viewModel::equipCosmetic, onUpdateMultiplier = viewModel::updateBuyMultiplier, onUpdateSettings = viewModel::updateSettings, onPrestigeReset = viewModel::prestigeReset, onUltraReset = viewModel::ultraReset, onBuyTalent = viewModel::buyTalent, onSetMutatorActive = viewModel::setMutatorActive, onArcadeReward = viewModel::awardArcadeResult, onSettleStake = viewModel::settleRandomStake)
+        ProductionWebPlayScreen(state = state, dailyRewardTestRequest = dailyRewardTestRequest, incomePerSecond = incomePerSecond, localeManager = locale, stateProvider = { viewModel.gameState.value }, offlineGains = offlineGains, onDismissOfflineGains = onDismissOfflineGains, onClaimDailyReward = viewModel::claimDailyReward, onResetData = onResetData, onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) }, onClaimDailyQuest = viewModel::claimDailyQuest, onOpenLootChest = viewModel::openLootChest, onNavigateProgression = { progression -> when { progression == "arcade" -> showArcadeDialog = true; progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true; progression == "save_slots" -> showSaveSlots = true; progression == "player_profile" -> { showPlayerProfile = true; editingPlayerProfile = false }; progression == "color_picker_primary" -> colorPickerTarget = "Primary"; progression == "color_picker_secondary" -> colorPickerTarget = "Secondary"; progression == "color_picker_tertiary" -> colorPickerTarget = "Tertiary"; progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", ""); progression == "claim_codex" -> viewModel.progressionAction("claim_codex", ""); progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':')) } }, onWorldAction = viewModel::worldProgressAction, onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) }, onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) }, onBuyPrestigeUpgrade = viewModel::buyPrestigeUpgrade, onBuyPrestigeShopItem = viewModel::buyPrestigeShopItem, onBuyUltraUpgrade = viewModel::buyUltraUpgrade, onBuyUltraShopItem = viewModel::buyUltraShopItem, onEquipCosmetic = viewModel::equipCosmetic, onUpdateMultiplier = viewModel::updateBuyMultiplier, onUpdateSettings = viewModel::updateSettings, onPrestigeReset = viewModel::prestigeReset, onUltraReset = viewModel::ultraReset, onBuyTalent = viewModel::buyTalent, onSetMutatorActive = viewModel::setMutatorActive, onArcadeReward = viewModel::awardArcadeResult, onSettleStake = viewModel::settleRandomStake)
         if (BuildConfig.DEBUG && showDevSettings) CompositionLocalProvider(LocalAppLocaleManager provides locale) { DevSettingsScreen(state = state, onExecuteCommand = { command -> if (command.trim().equals("/testdailyrewards", ignoreCase = true)) { showDevSettings = false; debugDestination = null; dailyRewardTestRequest++; "Opening the daily reward popup in the HTML game." } else viewModel.executeDevCommand(command) }, onImportSave = viewModel::importSave, onUpdateSettings = viewModel::updateSettings, onGetAppPreferencesJson = viewModel::getAppPreferencesJson, onApplyAppPreferencesJson = viewModel::applyAppPreferencesJson, onGetSaveJson = viewModel::getSaveJson, onApplySaveJson = viewModel::applySaveJson, onNavigate = { destination -> debugDestination = destination }, onBack = { showDevSettings = false; debugDestination = null }) }
         if (BuildConfig.DEBUG) when (debugDestination) { "process_inspector" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) { ProcessInspectorScreen(state = state, onBack = { debugDestination = null }) }; "web_ui_prototype" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) { SharedWebUiPrototypeScreen(state = state, onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) }, onBack = { debugDestination = null }) }; "jarrlyy_ui_sdk" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) { JarrlyyUiSdkScreen(onBack = { debugDestination = null }) }; "lua_testing_hub" -> CompositionLocalProvider(LocalAppLocaleManager provides locale) { LuaTestingHubScreen(onBack = { debugDestination = null }) } }
         if (showSaveSlots) CompositionLocalProvider(LocalAppLocaleManager provides locale) { SaveSlotsScreen(viewModel = viewModel, onNavigateBack = { showSaveSlots = false }) }
         colorPickerTarget?.let { target -> val current = when (target) { "Primary" -> state.settings.customPrimaryColor; "Secondary" -> state.settings.customSecondaryColor; else -> state.settings.customTertiaryColor }; CompositionLocalProvider(LocalAppLocaleManager provides locale) { ReusableColorPickerDialog(initialHex = current, title = locale.getString("settings_custom_theme_color", "Custom Theme Color"), onDismiss = { colorPickerTarget = null }, onApply = { hex -> viewModel.updateSettings(when (target) { "Primary" -> state.settings.copy(themePreset = "Custom", customPrimaryColor = hex); "Secondary" -> state.settings.copy(themePreset = "Custom", customSecondaryColor = hex); else -> state.settings.copy(themePreset = "Custom", customTertiaryColor = hex) }); colorPickerTarget = null }) } }
         if (showPlayerProfile) CompositionLocalProvider(LocalAppLocaleManager provides locale) { PlayerProfileScreen(profile = playerProfile, firstLaunch = false, store = profileStore, viewOnly = !editingPlayerProfile, onEdit = { editingPlayerProfile = true }, onBack = { showPlayerProfile = false; editingPlayerProfile = false }) }
+        if (showArcadeDialog) {
+            Dialog(
+                onDismissRequest = { showArcadeDialog = false },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Surface(
+                    modifier = androidx.compose.ui.Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.92f),
+                    shape = androidx.compose.material3.MaterialTheme.shapes.extraLarge,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.surface
+                ) {
+                    CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+                        com.jarrlyyy.guessthenumber.ui.screens.ArcadeScreen(
+                            onEarnReward = onEarnMinigameReward,
+                            onBack = { showArcadeDialog = false },
+                            reducedMotion = state.settings.reducedMotion
+                        )
+                    }
+                }
+            }
+        }
     }
     if (initialDestination != null) onNotificationDestinationHandled()
 }

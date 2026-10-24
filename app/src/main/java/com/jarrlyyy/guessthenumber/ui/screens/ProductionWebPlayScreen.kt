@@ -407,6 +407,7 @@ fun ProductionWebPlayScreen(
                                                  "dismiss_offline_gains" -> { dismissOfflineGains(); offlineRewardDismissed = true }
                                                 "open_loot_chest" -> parsed.tier?.let(openLootChest)
                                                 "navigate" -> parsed.route?.let(navigateProgression)
+                                                "open_arcade" -> navigateProgression("arcade")
                                                 "homebase_upgrade" -> navigateProgression("home_upgrade")
                                                 "codex_reward" -> navigateProgression("claim_codex")
                                                 "prestige_reset" -> onPrestigeReset()
