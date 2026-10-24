@@ -48,7 +48,8 @@ const mounted = window.GTNTraitExtensionHost.mount({
 assert.equal(mounted.frame.attributes.sandbox, 'allow-scripts');
 assert.match(mounted.frame.srcdoc, /Content-Security-Policy/);
 assert.match(mounted.frame.srcdoc, /connect-src 'none'/);
-assert.doesNotMatch(mounted.frame.srcdoc, /function renderTrait\(api\) \{ api\.setText/);
+assert.match(mounted.frame.srcdoc, /const source = "function renderTrait/);
+assert.doesNotMatch(mounted.frame.srcdoc, /<script>function renderTrait/);
 listeners.get('message')({ source: mounted.frame.contentWindow, data: { __gtnTraitExtension: true, operation: 'setText', id: 'status', value: 'Hello' } });
 assert.equal(targets.status.textContent, 'Hello');
 listeners.get('message')({ source: mounted.frame.contentWindow, data: { __gtnTraitExtension: true, operation: 'setText', id: 'unsafe', value: 'Injected' } });
