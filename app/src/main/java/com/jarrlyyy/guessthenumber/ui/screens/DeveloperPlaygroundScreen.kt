@@ -175,14 +175,14 @@ private fun DeveloperSaveLabScreen(state: GameState) {
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("Save Laboratory", style = MaterialTheme.typography.titleLarge) }
         item { Text("Read-only preview only. These scenarios do not alter the active save.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        item { DeveloperPanel("Current save state", "lastSaveTimestamp=${state.lastSaveTimestamp}\nautoClickerActive=\${state.autoClickerActive}\ntimeTravelPenaltyUntil=\${state.timeTravelPenaltyUntil}") }
+        item { DeveloperPanel("Current save state", "lastSaveTimestamp=${state.lastSaveTimestamp}\nautoClickerActive=${state.autoClickerActive}\ntimeTravelPenaltyUntil=${state.timeTravelPenaltyUntil}") }
         item { Text("Offline duration preview", style = MaterialTheme.typography.titleMedium) }
         item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = { simulatedElapsedSeconds = 60L }) { Text("1 min") }
             OutlinedButton(onClick = { simulatedElapsedSeconds = 3600L }) { Text("1 hour") }
             OutlinedButton(onClick = { simulatedElapsedSeconds = 28800L }) { Text("8 hours") }
         } }
-        item { DeveloperPanel("Offline earnings preview", "Elapsed seconds: \${simulatedElapsedSeconds}\nAuto-clicker active: \${state.autoClickerActive}\nEstimated money: \${if (state.autoClickerActive) 500L * simulatedElapsedSeconds else 0L}\nMaximum duration: 28800 seconds") }
+        item { DeveloperPanel("Offline earnings preview", "Elapsed seconds: ${simulatedElapsedSeconds}\nAuto-clicker active: ${state.autoClickerActive}\nEstimated money: ${if (state.autoClickerActive) 500L * simulatedElapsedSeconds else 0L}\nMaximum duration: 28800 seconds") }
         item { Text("Corrupted-save, migration, and restore tests need isolated fixture storage before they can safely execute.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }
