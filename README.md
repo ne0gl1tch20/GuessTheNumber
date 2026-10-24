@@ -1,6 +1,6 @@
 # Guess The Number
 
-Guess The Number is anh incremental and arcade game built around Kotlin/KMP game logic and our own UI SDK shared HTML/CSS/JavaScript frontend!
+Guess The Number is an incremental and arcade game built around Kotlin/KMP game logic and our own UI SDK shared HTML/CSS/JavaScript frontend!
 
 ## Lua Scripting Layer
 
