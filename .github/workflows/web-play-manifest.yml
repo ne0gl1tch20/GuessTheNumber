@@ -15,6 +15,7 @@ on:
       - "app/src/main/assets/web-play/**"
       - "app/src/main/assets/fonts/**"
       - "app/src/main/assets/locales/**"
+      - "app/src/main/assets/libraries/**"
       - "tools/generate_web_play_manifest.py"
       - ".github/workflows/web-play-manifest.yml"
 
