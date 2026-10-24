@@ -195,6 +195,7 @@ fun ProductionWebPlayScreen(
                 .addPathHandler("/assets/web-play/", webPlayAssetSyncer.pathHandler("web-play"))
                 .addPathHandler("/assets/fonts/", webPlayAssetSyncer.pathHandler("fonts"))
                 .addPathHandler("/assets/locales/", webPlayAssetSyncer.pathHandler("locales"))
+                .addPathHandler("/assets/libraries/", webPlayAssetSyncer.pathHandler("libraries"))
                 .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
                 .build()
             WebView(context).apply {
