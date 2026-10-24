@@ -29,6 +29,22 @@ strings = json.loads(LOCALE.read_text(encoding="utf-8"))
 missing = sorted(key for key in required if not strings.get(key))
 assert not missing, f"Missing English fallback strings: {missing}"
 
+# Every shipped locale must provide non-empty trait UI strings. This catches
+# regressions where the screen silently falls back to English after a locale
+# change, while the Kotlin bridge continues to request localized values.
+locale_files = sorted((ROOT / "app/src/main/assets/locales").glob("*.json"))
+assert locale_files, "No locale JSON files found"
+locale_failures = {}
+for locale_file in locale_files:
+    try:
+        locale_strings = json.loads(locale_file.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise AssertionError(f"Invalid locale file {locale_file.name}: {exc}") from exc
+    missing_locale = sorted(key for key in required if not locale_strings.get(key))
+    if missing_locale:
+        locale_failures[locale_file.name] = missing_locale
+assert not locale_failures, f"Missing trait loadout strings by locale: {locale_failures}"
+
 js = WEB_JS.read_text(encoding="utf-8")
 for key in ("traits_summary_format", "traits_empty", "traits_active", "traits_locked_format",
             "traits_choose_variant", "traits_automatic", "traits_unlock_hint", "traits_saving"):
@@ -41,4 +57,4 @@ for key in ("traits_title", "traits_intro", "traits_loading", "traits_footer"):
 host = HOST.read_text(encoding="utf-8")
 for key in required:
     assert f'"{key}"' in host, f"Host does not send localized string {key}"
-print(f"Gameplay trait loadout localization passed ({len(required)} fallback strings).")
+print(f"Gameplay trait loadout localization passed ({len(required)} strings across {len(locale_files)} locales).")
