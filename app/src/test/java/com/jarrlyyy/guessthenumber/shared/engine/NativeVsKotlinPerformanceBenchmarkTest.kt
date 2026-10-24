@@ -1,6 +1,5 @@
 package com.jarrlyyy.guessthenumber.shared.engine
 
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -19,14 +18,14 @@ class NativeVsKotlinPerformanceBenchmarkTest {
 
         val expectedChecksum = cases.sumOf { kotlinAdaptiveTarget(it) }
         val samples = LongArray(SAMPLE_COUNT)
-        repeat(SAMPLE_COUNT) { sample ->
+        repeat(SAMPLE_COUNT) {
             val started = System.nanoTime()
             var checksum = 0L
             repeat(ITERATIONS_PER_SAMPLE) {
                 for (case in cases) checksum = checksum xor kotlinAdaptiveTarget(case)
             }
             sink = checksum
-            samples[sample] = (System.nanoTime() - started) / (ITERATIONS_PER_SAMPLE * cases.size)
+            samples[it] = (System.nanoTime() - started) / (ITERATIONS_PER_SAMPLE * cases.size)
         }
 
         val ordered = samples.sorted()
@@ -36,7 +35,7 @@ class NativeVsKotlinPerformanceBenchmarkTest {
 
         assertTrue("Benchmark checksum must be non-zero", expectedChecksum != 0L)
         assertTrue("Benchmark sink must be populated", sink != 0L)
-        assertEquals("Representative output must remain bounded", true, cases.all {
+        assertTrue("Representative output must remain bounded", cases.all {
             val result = kotlinAdaptiveTarget(it)
             result in it.rangeMin..it.rangeMax
         })
@@ -137,8 +136,8 @@ class NativeVsKotlinPerformanceBenchmarkTest {
         const val MIX_INCREMENT = -7046029254386353131L
         const val MIX_MULTIPLIER_A = -4658895280553007687L
         const val MIX_MULTIPLIER_B = -7723592293110705685L
-        const val STREAK_MULTIPLIER = -2961247017990881901L
-        const val ATTEMPTS_MULTIPLIER = -6506058118627897061L
+        const val STREAK_MULTIPLIER = -2960836687051489901L
+        const val ATTEMPTS_MULTIPLIER = -6511265742569879269L
 
         @Volatile
         var sink = 0L
