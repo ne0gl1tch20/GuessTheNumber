@@ -60,4 +60,45 @@ class TraitLiveOpsRepositoryTest {
             validateAndMapTraitPayload(payload(many), 21)
         }
     }
+    @Test fun acceptsMixedFilesInsideNamedCatalogAndTraitFolder() {
+        val files = listOf(
+            RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/logic.lua", "0".repeat(64), "lua"),
+            RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/presentation.js", "0".repeat(64), "js"),
+            RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/theme.css", "0".repeat(64), "css"),
+            RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/icon.svg", "0".repeat(64), "svg"),
+            RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/config.json", "0".repeat(64), "json")
+        )
+        val trait = RemoteTraitDefinition(
+            "nebula_finder", "trait.nebula_finder.title", "trait.nebula_finder.description",
+            "COLLECTION", effects = listOf("COSMETIC_BADGE"), catalogId = "exploration",
+            folderName = "NebulaFinderTrait", files = files
+        )
+        val result = validateAndMapTraitPayload(payload(listOf(trait)), 21)
+        assertEquals("nebula_finder", result.single().id)
+    }
+
+    @Test fun rejectsTraitFilesOutsideTheirCatalogFolder() {
+        val trait = RemoteTraitDefinition(
+            "unsafe_path", "trait.unsafe_path.title", "trait.unsafe_path.description",
+            "COLLECTION", effects = listOf("COSMETIC_BADGE"), catalogId = "exploration",
+            folderName = "NebulaFinderTrait",
+            files = listOf(RemoteTraitFile(
+                "assets/traits/catalogs/core/NebulaFinderTrait/logic.lua", "0".repeat(64), "lua"
+            ))
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            validateAndMapTraitPayload(payload(listOf(trait)), 21)
+        }
+    }
+
+    @Test fun rejectsTooManyCatalogFolders() {
+        val traits = (1..17).map { i ->
+            RemoteTraitDefinition("catalog_trait_$i", "trait.catalog_$i.title", "trait.catalog_$i.description",
+                "COLLECTION", effects = listOf("COSMETIC_BADGE"), catalogId = "catalog_$i")
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            validateAndMapTraitPayload(payload(traits), 21)
+        }
+    }
+
 }
