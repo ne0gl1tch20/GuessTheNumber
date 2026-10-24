@@ -170,7 +170,7 @@ fun DevSettingsScreen(
                 ) {
                     Icon(imageVector = Icons.Default.Info, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedText("Open Variable & Process Inspector"), fontSize = 16.sp)
+                    Text("Open Developer & Testing Playground", fontSize = 16.sp)
                 }
             }
 
