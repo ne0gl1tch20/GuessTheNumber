@@ -276,16 +276,17 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn("overflow-y: auto;", daily_dialog)
 
 
-    def test_arcade_popup_closes_only_after_successful_reward_claim(self):
+    def test_arcade_popup_closes_when_claim_button_sends_reward(self):
         app = (WEB / "app.js").read_text(encoding="utf-8")
-        # receive() only reaches this success branch when the Kotlin host
-        # accepts the arcade_reward request. Keep the popup open on failures.
+        # Close immediately after the bridge accepts the send, so the popup
+        # does not depend on a later state response to dismiss itself.
         self.assertIn(
-            "else if(completedType==='arcade_reward'){toast('Arcade reward saved! ✨');closeArcade()}",
+            "claim.onclick=()=>{if(!send('arcade_reward',{gameId:activeArcade,score:String(score)}))return;closeArcade();",
             app,
         )
+        # Keep the response-side close as a harmless fallback on success.
         self.assertIn(
-            "if(m.state.accepted===false)",
+            "else if(completedType==='arcade_reward'){toast('Arcade reward saved! ✨');closeArcade()}",
             app,
         )
 
