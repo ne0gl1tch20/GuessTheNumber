@@ -279,7 +279,7 @@ function renderTraitLoadout(s){
   const copy=document.createElement('div');copy.className='catalog-entry-copy';
   const title=document.createElement('strong');title.textContent=String(trait.title||trait.id||'Gameplay trait');
   const description=document.createElement('span');description.textContent=String(trait.description||'');
-  const status=document.createElement('span');status.className='trait-status';status.textContent=trait.active?uiText('traits_active','ACTIVE'):uiText('traits_locked_format','LOCKED · %s correct guesses',Number(trait.requiredCorrectGuesses||0));
+  const status=document.createElement('span');status.className='trait-status';const remainingCorrectGuesses=Math.max(0,Number(trait.requiredCorrectGuesses||0)-Number(s.correctGuesses||0));status.textContent=trait.active?uiText('traits_active','ACTIVE'):uiText('traits_locked_format','LOCKED · %s correct guesses',remainingCorrectGuesses);
   copy.append(title,description,status);card.appendChild(copy);
   const arms=Array.isArray(trait.arms)?trait.arms:[];
   if(arms.length){const label=document.createElement('p');label.className='trait-arm-label';label.textContent=uiText('traits_choose_variant','Choose a gameplay variant');card.appendChild(label);const list=document.createElement('div');list.className='trait-arm-list';
