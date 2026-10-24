@@ -4,6 +4,8 @@ import android.content.Context
 import android.webkit.WebResourceResponse
 import androidx.webkit.WebViewAssetLoader
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
@@ -18,10 +20,11 @@ class WebPlayAssetSyncer(context: Context) {
     private val root = File(appContext.filesDir, "web-play-sync")
     private val versions = File(root, "versions")
     private val activePointer = File(root, "active-version")
+    private val syncMutex = PROCESS_MUTEX
 
     data class SyncResult(val changed: Boolean, val version: String?, val message: String)
 
-    suspend fun sync(): SyncResult = withContext(Dispatchers.IO) {
+    suspend fun sync(): SyncResult = withContext(Dispatchers.IO) { syncMutex.withLock {
         try {
             root.mkdirs()
             versions.mkdirs()
@@ -79,7 +82,6 @@ class WebPlayAssetSyncer(context: Context) {
                 check(staging.renameTo(finalDir)) { "Could not activate staged assets" }
                 val tempPointer = File(root, "active-version.tmp")
                 tempPointer.writeText(version)
-                if (activePointer.exists() && !activePointer.delete()) throw IllegalStateException("Could not replace active version pointer")
                 check(tempPointer.renameTo(activePointer)) { "Could not update active version pointer" }
                 versions.listFiles()?.filter { it.isDirectory && it.name != version && it.name != currentVersion }
                     ?.forEach { it.deleteRecursively() }
@@ -91,6 +93,19 @@ class WebPlayAssetSyncer(context: Context) {
         } catch (error: Exception) {
             SyncResult(false, activeVersion(), "Using last working assets (\${error.javaClass.simpleName})")
         }
+    } }
+
+    fun rollbackToPrevious(): Boolean {
+        val current = activeVersion() ?: return false
+        val previous = versions.listFiles()?.filter { it.isDirectory && it.name != current && it.name.matches(Regex("[a-f0-9]{7,40}")) }
+            ?.filter { REQUIRED_FILES.all { path -> File(it, path).isFile && File(it, path).length() > 0L } }
+            ?.maxByOrNull { it.lastModified() } ?: return false
+        return runCatching {
+            val temp = File(root, "active-version.rollback.tmp")
+            temp.writeText(previous.name)
+            check(temp.renameTo(activePointer))
+            true
+        }.getOrDefault(false)
     }
 
     fun activeVersion(): String? = runCatching { activePointer.takeIf { it.isFile }?.readText()?.trim() }.getOrNull()
@@ -144,6 +159,7 @@ class WebPlayAssetSyncer(context: Context) {
 
     companion object {
         const val APP_VERSION_CODE = 21
+        private val PROCESS_MUTEX = Mutex()
         private const val MAX_DOWNLOAD_BYTES = 8 * 1024 * 1024
         private const val MANIFEST_URL = "https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/web-play-manifest.json"
         private const val RAW_BASE = "https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber"
