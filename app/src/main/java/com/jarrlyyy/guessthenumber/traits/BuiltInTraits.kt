@@ -17,7 +17,7 @@ object BuiltInTraits {
         trait("autumn_glow", TraitCategory.SEASONAL, TraitEffect.COSMETIC_BADGE,
             seasonId = "autumn"),
         trait("winter_comet", TraitCategory.SEASONAL, TraitEffect.NEBULA_BONUS,
-            seasonId = "winter", activation = TraitActivationConditions(minimumLevel = 3)),
+            seasonId = "winter", activation = TraitActivationConditions(minimumCorrectGuesses = 50)),
         trait("spring_spark", TraitCategory.SEASONAL, TraitEffect.XP_MULTIPLIER,
             seasonId = "spring")
     ).also { TraitRegistry(it) }
