@@ -112,6 +112,32 @@ class TraitExtensionRuntimeTest {
         }
     }
 
+    @Test fun rejectsDuplicateModuleIdsAndEntrypoints() {
+        val duplicateIds = """{"schemaVersion":1,"traitId":"remote_rules","modules":[{"id":"rules","type":"JSON","entrypoint":"a.json"},{"id":"rules","type":"JSON","entrypoint":"b.json"}]}"""
+        assertThrows(IllegalArgumentException::class.java) {
+            runtime.validate(duplicateIds, mapOf("a.json" to "{}", "b.json" to "{}"), "remote_rules")
+        }
+        val duplicateEntrypoints = """{"schemaVersion":1,"traitId":"remote_rules","modules":[{"id":"first","type":"JSON","entrypoint":"rules.json"},{"id":"second","type":"JSON","entrypoint":"rules.json"}]}"""
+        assertThrows(IllegalArgumentException::class.java) {
+            runtime.validate(duplicateEntrypoints, mapOf("rules.json" to "{}"), "remote_rules")
+        }
+    }
+
+    @Test fun rejectsMalformedJsonAndNonObjectJsonModules() {
+        assertThrows(IllegalArgumentException::class.java) {
+            runtime.validate(
+                """{"schemaVersion":1,"traitId":"remote_rules","modules":[{"id":"rules","type":"JSON","entrypoint":"rules.json"}]}""",
+                mapOf("rules.json" to "{broken"), "remote_rules"
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            runtime.validate(
+                """{"schemaVersion":1,"traitId":"remote_rules","modules":[{"id":"rules","type":"JSON","entrypoint":"rules.json"}]}""",
+                mapOf("rules.json" to "[]"), "remote_rules"
+            )
+        }
+    }
+
     @Test fun rejectsWrongTraitIdentityAndUnknownSchema() {
         assertThrows(IllegalArgumentException::class.java) {
             runtime.validate("""{"schemaVersion":9,"traitId":"remote_rules","modules":[{"id":"rules","type":"JSON","entrypoint":"rules.json"}]}""",

@@ -84,7 +84,7 @@ class TraitExtensionRuntime(
                 }
                 "JSON" -> {
                     require(module.entrypoint.endsWith(".json", ignoreCase = true)) { "JSON modules must use .json entrypoints." }
-                    json.parseToJsonElement(source)
+                    json.parseToJsonElement(source).jsonObject
                 }
                 "JAVASCRIPT" -> {
                     require(module.entrypoint.endsWith(".js", ignoreCase = true)) { "JavaScript modules must use .js entrypoints." }

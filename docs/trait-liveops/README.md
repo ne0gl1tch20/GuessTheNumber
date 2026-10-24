@@ -9,15 +9,16 @@ The offline catalog contains **316 validated trait definitions across 30 catalog
 - `locales/en.json`: English title and description
 - `icon.svg`: local icon asset
 
-Catalog folders contain a `catalog.json` index listing their exact trait IDs. Unit tests compare every package against the Kotlin registry, verify all required files exist, parse the JSON, check the activation thresholds/effects and reject obvious active SVG content. This prevents a folder from counting as a trait unless its definition is present in the authoritative Kotlin registry.
+Catalog folders contain a `catalog.json` index listing their exact trait IDs. Unit tests compare every package against the Kotlin registry, verify all required files exist, parse the JSON, check the activation thresholds/effects, validate every locale and reject obvious active SVG content. This prevents a folder from counting as a trait unless its definition is present in the authoritative Kotlin registry.
 
 ## Extension modules
 
 A package may include `module.json` with module IDs, types, relative entrypoints and capabilities. Supported types are `LUA`, `JAVASCRIPT` and `JSON`:
 
 - **Lua logic:** runs in the instruction-budgeted Lua sandbox. It receives a bounded snapshot through `gtn.input` and can return an eligibility decision plus requested effects. Kotlin validates each requested effect against the trait's allowlist.
-- **JSON rules/config:** parsed as data, never evaluated as code.
-- **JavaScript presentation:** must expose `renderTrait(api)` or `registerTraitView(api)`. Validation rejects direct DOM, native bridge, network and dynamic-code access. It is returned as presentation source for a restricted WebView extension host and is never evaluated by Kotlin.
+- **JSON rules/config:** must be a JSON object, parsed as data and never evaluated as code.
+- **JavaScript presentation:** must expose `renderTrait(api)` or `registerTraitView(api)`. A conservative static check rejects common DOM, native bridge, network and dynamic-code APIs. This is a guardrail, not a JavaScript sandbox; source is returned as data for a restricted WebView extension host and is never evaluated by Kotlin here.
+- **Locale files:** `locales/en.json` is mandatory and every locale must have matching `id`, `title` and `description` keys. The locale resolver tries the exact language-region, then language-only, then English. Translation identity, missing/blank fields, unsupported locale tags, oversized files and key drift are covered by tests.
 
 Any remote package containing Lua or JavaScript must include `module.json`. Entry points must be included in the signed file list and hashes. Module count, source length, paths and capabilities are bounded. The built-in `100ConsecutiveGuessesTrait` package demonstrates all three module types.
 

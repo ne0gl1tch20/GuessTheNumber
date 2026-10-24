@@ -17,6 +17,7 @@ class TraitLocaleCatalog(
 ) {
     fun validate(localeFiles: Map<String, String>, expectedTraitId: String): TraitLocaleCatalog {
         require(expectedTraitId.matches(Regex("[a-z][a-z0-9_.-]{1,63}"))) { "Invalid trait ID." }
+        require(localeFiles.size in 1..MAX_LOCALES) { "Locale count is outside the supported limit." }
         require(localeFiles.containsKey("en")) { "Every trait must include the English fallback locale." }
         require(localeFiles.keys.all { LOCALE_PATTERN.matches(it) }) { "Invalid locale code." }
         val parsed = localeFiles.mapValues { (locale, source) ->
@@ -54,6 +55,7 @@ class TraitLocaleCatalog(
 
     companion object {
         const val MAX_LOCALE_CHARS = 8_192
+        const val MAX_LOCALES = 16
         private val LOCALE_PATTERN = Regex("[a-z]{2,3}(-[A-Z]{2})?")
         private val REQUIRED_KEYS = setOf("id", "title", "description")
     }
