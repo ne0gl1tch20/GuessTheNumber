@@ -92,6 +92,9 @@ object TraitDefinitionValidator {
 /** Immutable validated registry snapshot. The caller chooses when a new snapshot is activated. */
 class TraitRegistry(definitions: Collection<TraitDefinition>) {
     private val byId: Map<String, TraitDefinition>
+    private val sortedDefinitions: List<TraitDefinition>
+    private val visibleDefinitions: List<TraitDefinition>
+    private val hiddenDefinitions: List<TraitDefinition>
 
     init {
         require(definitions.size <= MAX_TRAITS) { "Trait catalog exceeds the supported limit." }
@@ -99,6 +102,9 @@ class TraitRegistry(definitions: Collection<TraitDefinition>) {
         require(definitions.map { it.id }.distinct().size == definitions.size) { "Duplicate trait ID." }
 
         byId = definitions.associateBy { it.id }
+        sortedDefinitions = byId.values.sortedBy { it.id }
+        visibleDefinitions = sortedDefinitions.filter { it.visibility == TraitVisibility.VISIBLE }
+        hiddenDefinitions = sortedDefinitions.filter { it.visibility == TraitVisibility.HIDDEN }
         byId.values.forEach { trait ->
             require(trait.dependencies.all(byId::containsKey)) {
                 "Trait ${trait.id} references a missing dependency."
@@ -111,10 +117,15 @@ class TraitRegistry(definitions: Collection<TraitDefinition>) {
         validateDependencyCycles(byId)
     }
 
-    fun all(): List<TraitDefinition> = byId.values.sortedBy { it.id }
+    /** Cached immutable views: activation runs on the guess hot path. */
+    fun all(): List<TraitDefinition> = sortedDefinitions
     fun find(id: String): TraitDefinition? = byId[id]
-    fun visible(): List<TraitDefinition> = all().filter { it.visibility == TraitVisibility.VISIBLE }
-    fun hidden(): List<TraitDefinition> = all().filter { it.visibility == TraitVisibility.HIDDEN }
+    fun visible(): List<TraitDefinition> = visibleDefinitions
+    fun hidden(): List<TraitDefinition> = hiddenDefinitions
+
+    /** Read-only registry snapshot for internal engines; avoids rebuilding an ID map per guess. */
+    internal fun byIdSnapshot(): Map<String, TraitDefinition> = byId
+
     val size: Int get() = byId.size
 
     private fun validateDependencyCycles(traits: Map<String, TraitDefinition>) {
