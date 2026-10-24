@@ -158,7 +158,7 @@ class TraitExtensionRuntime(
         const val MAX_INPUT_FIELDS = 64
         const val MAX_PATH_LENGTH = 160
         private val FORBIDDEN_JS = Regex(
-            "(?i)\\b(eval|Function|fetch|XMLHttpRequest|WebSocket|importScripts|parent|top|opener|localStorage|sessionStorage|indexedDB|navigator|location|Worker|BroadcastChannel|postMessage)\\b|\\bwindow\\s*\\.|\\bdocument\\s*\\.|\\bandroid\\s*\\.|\\bJava\\s*\\."
+            "(?i)\\b(eval|fetch|XMLHttpRequest|WebSocket|importScripts|parent|top|opener|localStorage|sessionStorage|indexedDB|navigator|location|Worker|BroadcastChannel|postMessage)\\b|\\bnew\\s+Function\\b|\\bFunction\\s*\\(|\\bwindow\\s*\\.|\\bdocument\\s*\\.|\\bandroid\\s*\\.|\\bJava\\s*\\."
         )
     }
 }

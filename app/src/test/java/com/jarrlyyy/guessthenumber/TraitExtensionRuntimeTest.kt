@@ -70,6 +70,8 @@ class TraitExtensionRuntimeTest {
         assertTrue(runtime.javascriptPresentation(good, "view").contains("renderTrait"))
         listOf(
             "function renderTrait(api) { window.Android.earnReward(); }",
+            "function renderTrait(api) { eval('api'); }",
+            "function renderTrait(api) { const f = new Function('return 1'); }",
             "function renderTrait(api) { parent.postMessage({operation:'setText'}); }",
             "function renderTrait(api) { localStorage.setItem('x', 'y'); }"
         ).forEach { unsafeSource ->
