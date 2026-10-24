@@ -24,6 +24,12 @@ Any remote package containing Lua or JavaScript must include `module.json`. Entr
 
 Current supported effect types are a closed allowlist. Nebula claim bonuses are applied through `TraitRewardPolicy` with the existing cap. Cosmetic badge traits are represented in the activation result. Existing XP/streak effect types remain descriptive until their dedicated gameplay systems consume them.
 
+## Developer inspector and seasonal lifecycle
+
+Debug builds expose a searchable Trait Registry Inspector in Developer Settings. It reads only the validated active registry and shows current-season context, active/inactive state, built-in versus LiveOps source, visibility, effects, activation thresholds, dependencies, conflicts and seasonal assignment. It never evaluates arbitrary source code and limits rendered results to 40 at a time.
+
+Season eligibility is evaluated from an explicit LocalDate and the offline calendar mapping: winter (December–February), spring (March–May), summer (June–August), and autumn (September–November). Tests cover month boundaries with explicit dates, independent of device timezone. Seasonal expiry disables activation and seasonal bonuses but preserves saved discovery IDs and old-save compatibility. The local calendar is for gameplay variety, not security-sensitive reward authority.
+
 ## Remote catalog protocol
 
 - Signed, versioned JSON manifest; RSA signature over exact payload bytes and SHA-256 payload verification.

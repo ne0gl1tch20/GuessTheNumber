@@ -36,6 +36,11 @@ import com.jarrlyyy.guessthenumber.domain.command.CommandAutocomplete
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.scripting.LuaEngine
+import com.jarrlyyy.guessthenumber.traits.ActiveTraitCatalog
+import com.jarrlyyy.guessthenumber.traits.TraitActivationContext
+import com.jarrlyyy.guessthenumber.traits.TraitActivationEngine
+import com.jarrlyyy.guessthenumber.traits.TraitRewardPolicy
+import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -73,6 +78,7 @@ fun AdvancedDevToolsScreen(
     var luaCommandOutput by remember { mutableStateOf("") }
     var luaCommandBusy by remember { mutableStateOf(false) }
     var webViewJsInput by remember { mutableStateOf("document.title") }
+    var traitSearchQuery by remember { mutableStateOf("") }
     val luaEngine = remember(context) { LuaEngine.get(context) }
     val coroutineScope = rememberCoroutineScope()
 
@@ -85,6 +91,27 @@ fun AdvancedDevToolsScreen(
     }
 
     val suggestions = remember(commandInput) { CommandAutocomplete.suggest(commandInput) }
+
+    // Read only the validated registry. The inspector never evaluates trait scripts.
+    val traitRegistry = ActiveTraitCatalog.current()
+    val activeSeasonId = TraitRewardPolicy.currentSeasonId(LocalDate.now())
+    val traitActivation = TraitActivationEngine(traitRegistry).evaluate(
+        TraitActivationContext(
+            state = state,
+            playerLevel = 1,
+            activeSeasonId = activeSeasonId,
+            discoveredTraitIds = state.discoveredTraitIds
+        )
+    )
+    val inspectedTraits = traitRegistry.all().filter { trait ->
+        val query = traitSearchQuery.trim()
+        query.isEmpty() || listOf(
+            trait.id, trait.titleKey, trait.descriptionKey, trait.category.name,
+            trait.source.name, trait.visibility.name, trait.effects.joinToString(" "),
+            trait.dependencies.joinToString(" "), trait.conflicts.joinToString(" "),
+            trait.seasonId.orEmpty()
+        ).any { it.contains(query, ignoreCase = true) }
+    }
 
     val filteredLogs = logs.filter { log ->
         (selectedLogLevel == "ALL" || log.level.name == selectedLogLevel) &&
@@ -114,6 +141,56 @@ fun AdvancedDevToolsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
+            item {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("Trait Registry Inspector", style = MaterialTheme.typography.titleLarge)
+                        Text("${traitRegistry.size} validated traits · ${traitActivation.activeTraitIds.size} active · season: $activeSeasonId")
+                        Text(
+                            "Built-in: ${traitRegistry.all().count { it.source.name == "BUILTIN" }} · LiveOps: ${traitRegistry.all().count { it.source.name == "LIVEOPS" }} · hidden: ${traitRegistry.hidden().size}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        OutlinedTextField(
+                            value = traitSearchQuery,
+                            onValueChange = { traitSearchQuery = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Search trait ID, category, effect or season") },
+                            singleLine = true,
+                            trailingIcon = {
+                                if (traitSearchQuery.isNotEmpty()) IconButton(onClick = { traitSearchQuery = "" }) {
+                                    Icon(Icons.Default.Clear, contentDescription = "Clear trait search")
+                                }
+                            }
+                        )
+                        Text("Showing ${minOf(inspectedTraits.size, 40)} of ${inspectedTraits.size} matching traits.", style = MaterialTheme.typography.labelSmall)
+                        inspectedTraits.take(40).forEach { trait ->
+                            HorizontalDivider()
+                            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                    Text(trait.id, style = MaterialTheme.typography.titleSmall)
+                                    Text(
+                                        if (trait.id in traitActivation.activeTraitIds) "ACTIVE" else "INACTIVE",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = if (trait.id in traitActivation.activeTraitIds) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Text("${trait.category} · ${trait.source} · ${trait.visibility}", style = MaterialTheme.typography.bodySmall)
+                                Text("Effects: ${trait.effects.joinToString()}", style = MaterialTheme.typography.bodySmall)
+                                Text(
+                                    "Requires: ${trait.activation.minimumCorrectGuesses} correct · level ${trait.activation.minimumLevel} · prestige ${trait.activation.minimumPrestige} · best streak ${trait.activation.minimumBestStreak}",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                if (trait.dependencies.isNotEmpty()) Text("Dependencies: ${trait.dependencies.joinToString()}", style = MaterialTheme.typography.bodySmall)
+                                if (trait.conflicts.isNotEmpty()) Text("Conflicts: ${trait.conflicts.joinToString()}", style = MaterialTheme.typography.bodySmall)
+                                trait.seasonId?.let { Text("Season: $it", style = MaterialTheme.typography.bodySmall) }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Compare the Kotlin-expected HTML version with the marker in the live WebView.
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
