@@ -33,6 +33,32 @@ class TraitGameplayCatalogTest {
         }
     }
 
+    @Test fun validatedRemoteGameplayEffectsAppearAsLogicNotCosmetics() {
+        val remote = TraitDefinition(
+            id = "remote_range_module",
+            titleKey = "trait.remote_range.title",
+            descriptionKey = "trait.remote_range.description",
+            category = TraitCategory.GAMEPLAY,
+            effects = setOf(TraitEffect.RANGE_HINT),
+            source = TraitSource.LIVEOPS,
+            catalogId = "community"
+        )
+        val cosmetic = TraitDefinition(
+            id = "remote_badge_only",
+            titleKey = "trait.remote_badge.title",
+            descriptionKey = "trait.remote_badge.description",
+            category = TraitCategory.GAMEPLAY,
+            effects = setOf(TraitEffect.COSMETIC_BADGE),
+            source = TraitSource.LIVEOPS,
+            catalogId = "community"
+        )
+        val registry = TraitRegistry(BuiltInTraits.definitions + remote + cosmetic)
+        val displayed = TraitGameplayCatalog.forRegistry(registry)
+        assertTrue(displayed.any { it.id == "remote_range_module" })
+        assertFalse(displayed.any { it.id == "remote_badge_only" })
+        assertTrue(displayed.first { it.id == "remote_range_module" }.fallbackDescription.contains("search range"))
+    }
+
     @Test fun unknownTraitsAndTraitsWithoutArmsCannotSelectVariants() {
         assertFalse(TraitGameplayCatalog.allowsArm("grant_money", "burst"))
         assertFalse(TraitGameplayCatalog.allowsArm("range_scout", "standard"))

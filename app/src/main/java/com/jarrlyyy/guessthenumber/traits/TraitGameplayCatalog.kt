@@ -52,6 +52,51 @@ object TraitGameplayCatalog {
         }
     }
 
+    private val gameplayEffects = setOf(
+        TraitEffect.COMBO_REWARD,
+        TraitEffect.RANGE_HINT,
+        TraitEffect.MISS_PENALTY_REDUCTION,
+        TraitEffect.RISK_REWARD,
+        TraitEffect.STREAK_PROTECTION
+    )
+
+    /**
+     * Includes validated remote gameplay modules that declare a supported gameplay effect.
+     * Unknown scripts and cosmetic-only traits are never presented as gameplay logic.
+     */
+    fun forRegistry(registry: TraitRegistry): List<GameplayTraitDefinition> {
+        val knownIds = all.mapTo(mutableSetOf()) { it.id }
+        val remote = registry.all()
+            .filter { trait ->
+                trait.source == TraitSource.LIVEOPS &&
+                    trait.category == TraitCategory.GAMEPLAY &&
+                    trait.effects.any { it in gameplayEffects } &&
+                    trait.id !in knownIds
+            }
+            .map { trait ->
+                val effectDescriptions = trait.effects
+                    .filter { it in gameplayEffects }
+                    .mapNotNull { effect ->
+                        when (effect) {
+                            TraitEffect.COMBO_REWARD -> "Adds a bounded streak-based bonus to correct-guess payouts."
+                            TraitEffect.RANGE_HINT -> "Narrows the search range after an incorrect guess."
+                            TraitEffect.MISS_PENALTY_REDUCTION -> "Refunds part of the normal penalty after an incorrect guess."
+                            TraitEffect.RISK_REWARD -> "Boosts correct-guess payouts and increases miss penalties."
+                            TraitEffect.STREAK_PROTECTION -> "Preserves the current streak after an incorrect guess."
+                            else -> null
+                        }
+                    }.distinct()
+                GameplayTraitDefinition(
+                    id = trait.id,
+                    fallbackTitle = trait.id.split('_', '-', '.').filter(String::isNotBlank)
+                        .joinToString(" ") { it.replaceFirstChar(Char::uppercase) },
+                    fallbackDescription = effectDescriptions.joinToString(" ")
+                        .ifBlank { "A validated gameplay module." }
+                )
+            }
+        return all + remote.sortedBy { it.id }
+    }
+
     fun find(traitId: String): GameplayTraitDefinition? = byId[traitId]
     fun allowsArm(traitId: String, armId: String): Boolean =
         byId[traitId]?.arms?.any { it.id == armId } == true

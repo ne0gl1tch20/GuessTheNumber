@@ -57,6 +57,7 @@ import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.audio.BackgroundMusicManager
 import com.jarrlyyy.guessthenumber.traits.BuiltInTraits
+import com.jarrlyyy.guessthenumber.traits.ActiveTraitCatalog
 import com.jarrlyyy.guessthenumber.traits.TraitGameplayCatalog
 import com.jarrlyyy.guessthenumber.traits.TraitActivationContext
 import com.jarrlyyy.guessthenumber.traits.TraitActivationEngine
@@ -717,12 +718,12 @@ fun ProductionWebPlayScreen(
                                                 .put("cost", talent.cost).put("owned", owned).put("canUnlock", canUnlock).put("affordable", affordable)
                                                 .put("requirement", if (!canUnlock) "Unlock ${talent.requiredParentId} first" else if (!affordable) "Need ${talent.cost} Prestige" else "Ready to unlock"))
                                         }
-                                        val traitRegistry = BuiltInTraits.registry()
+                                        val traitRegistry = ActiveTraitCatalog.current()
                                          val activeGameplayTraitIds = TraitActivationEngine(traitRegistry).evaluate(
                                              TraitActivationContext(game, playerLevel = 1, activeSeasonId = TraitRewardPolicy.currentSeasonId(), discoveredTraitIds = game.discoveredTraitIds)
                                          ).activeTraitIds
                                           val gameplayTraitsJson = org.json.JSONArray()
-                                          TraitGameplayCatalog.all.forEach { trait ->
+                                          TraitGameplayCatalog.forRegistry(traitRegistry).forEach { trait ->
                                               val definition = traitRegistry.find(trait.id) ?: return@forEach
                                               val armsJson = org.json.JSONArray()
                                               trait.arms.forEach { arm ->
