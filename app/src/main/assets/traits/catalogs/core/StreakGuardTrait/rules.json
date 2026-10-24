@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "id": "streak_guard",
   "activation": {
-    "minimumLevel": 5,
+    "minimumLevel": 1,
     "minimumPrestige": 0,
-    "minimumCorrectGuesses": 0
+    "minimumCorrectGuesses": 50
   },
   "dependencies": [],
   "conflicts": [],

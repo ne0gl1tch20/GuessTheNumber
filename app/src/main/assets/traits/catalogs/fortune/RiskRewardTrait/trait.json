@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "risk_reward",
+  "catalogId": "fortune",
+  "packageFolder": "RiskRewardTrait",
+  "titleKey": "trait.risk_reward.title",
+  "descriptionKey": "trait.risk_reward.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "RISK_REWARD"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

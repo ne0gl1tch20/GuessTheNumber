@@ -2,10 +2,11 @@
   "schemaVersion": 1,
   "catalogId": "streaks",
   "title": "Streaks",
-  "traitCount": 10,
+  "traitCount": 11,
   "traitIds": [
     "chain_reaction",
     "clean_chain",
+    "combo_momentum",
     "consecutive_climber",
     "long_chain",
     "rhythm_runner",

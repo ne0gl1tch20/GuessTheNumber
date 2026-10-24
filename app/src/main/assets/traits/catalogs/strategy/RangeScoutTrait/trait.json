@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "range_scout",
+  "catalogId": "strategy",
+  "packageFolder": "RangeScoutTrait",
+  "titleKey": "trait.range_scout.title",
+  "descriptionKey": "trait.range_scout.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "RANGE_HINT"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

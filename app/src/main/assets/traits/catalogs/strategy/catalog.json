@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "catalogId": "strategy",
   "title": "Strategy",
-  "traitCount": 10,
+  "traitCount": 11,
   "traitIds": [
     "adaptive_plan",
     "balanced_move",
@@ -13,6 +13,7 @@
     "patient_strategy",
     "planned_guess",
     "range_reader",
+    "range_scout",
     "strategic_eye"
   ],
   "authority": "Kotlin",

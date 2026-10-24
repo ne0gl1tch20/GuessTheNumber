@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "mistake_insurance",
+  "catalogId": "resilience",
+  "packageFolder": "MistakeInsuranceTrait",
+  "titleKey": "trait.mistake_insurance.title",
+  "descriptionKey": "trait.mistake_insurance.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "MISS_PENALTY_REDUCTION"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

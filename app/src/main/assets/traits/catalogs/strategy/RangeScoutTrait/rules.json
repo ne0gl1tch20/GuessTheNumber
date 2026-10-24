@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "range_scout",
+  "activation": {
+    "minimumLevel": 1,
+    "minimumPrestige": 0,
+    "minimumCorrectGuesses": 10,
+    "minimumBestStreak": 0
+  },
+  "dependencies": [],
+  "conflicts": [],
+  "effects": [
+    "RANGE_HINT"
+  ],
+  "seasonId": null,
+  "arms": {
+    "standard": {
+      "enabled": true
+    },
+    "precise": {
+      "enabled": true,
+      "minimumRangeWidth": 3
+    }
+  },
+  "note": "Kotlin validates eligibility and applies the gameplay effect. Arms are declarative tuning variants; unsupported or unselected arms do not execute code."
+}

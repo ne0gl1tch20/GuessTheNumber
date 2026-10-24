@@ -7,7 +7,7 @@ package com.jarrlyyy.guessthenumber.traits
 enum class TraitVisibility { VISIBLE, HIDDEN }
 enum class TraitSource { BUILTIN, LIVEOPS }
 enum class TraitCategory { PROGRESSION, GAMEPLAY, COLLECTION, SEASONAL }
-enum class TraitEffect { XP_MULTIPLIER, NEBULA_BONUS, STREAK_PROTECTION, COSMETIC_BADGE }
+enum class TraitEffect { XP_MULTIPLIER, NEBULA_BONUS, STREAK_PROTECTION, COSMETIC_BADGE, COMBO_REWARD, RANGE_HINT, MISS_PENALTY_REDUCTION, RISK_REWARD }
 
 data class TraitActivationConditions(
     val minimumLevel: Int = 1,

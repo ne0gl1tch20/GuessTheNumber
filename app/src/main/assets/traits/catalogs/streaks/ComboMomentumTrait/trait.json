@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "combo_momentum",
+  "catalogId": "streaks",
+  "packageFolder": "ComboMomentumTrait",
+  "titleKey": "trait.combo_momentum.title",
+  "descriptionKey": "trait.combo_momentum.description",
+  "category": "GAMEPLAY",
+  "visibility": "VISIBLE",
+  "effects": [
+    "COMBO_REWARD"
+  ],
+  "seasonId": null,
+  "definitionVersion": 1,
+  "authority": "Kotlin",
+  "packageFiles": [
+    "trait.json",
+    "rules.json",
+    "locales/en.json",
+    "icon.svg"
+  ]
+}

@@ -22,7 +22,7 @@ object BuiltInTraits {
 
         // Gameplay variants
         trait("streak_guard", TraitCategory.GAMEPLAY, TraitEffect.STREAK_PROTECTION,
-            activation = TraitActivationConditions(minimumLevel = 5)),
+            activation = TraitActivationConditions(minimumLevel = 1, minimumCorrectGuesses = 50L)),
         trait("focus_streak", TraitCategory.GAMEPLAY, TraitEffect.STREAK_PROTECTION,
             activation = TraitActivationConditions(minimumLevel = 10, minimumCorrectGuesses = 75),
             conflicts = setOf("streak_guard")),
@@ -1271,6 +1271,20 @@ object BuiltInTraits {
             seasonId = "winter",
             catalogId = "seasonal",
             activation = TraitActivationConditions(minimumPrestige = 4, minimumCorrectGuesses = 8300L))
+
+        // Gameplay traits use real Kotlin rule effects, not just collection metadata.
+        trait("combo_momentum", TraitCategory.GAMEPLAY, TraitEffect.COMBO_REWARD,
+            activation = TraitActivationConditions(minimumCorrectGuesses = 25L),
+            catalogId = "streaks"),
+        trait("range_scout", TraitCategory.GAMEPLAY, TraitEffect.RANGE_HINT,
+            activation = TraitActivationConditions(minimumCorrectGuesses = 10L),
+            catalogId = "strategy"),
+        trait("mistake_insurance", TraitCategory.GAMEPLAY, TraitEffect.MISS_PENALTY_REDUCTION,
+            activation = TraitActivationConditions(minimumCorrectGuesses = 50L),
+            catalogId = "resilience"),
+        trait("risk_reward", TraitCategory.GAMEPLAY, TraitEffect.RISK_REWARD,
+            activation = TraitActivationConditions(minimumCorrectGuesses = 100L),
+            catalogId = "fortune")
     ).also { TraitRegistry(it) }
 
     fun registry(): TraitRegistry = TraitRegistry(definitions)

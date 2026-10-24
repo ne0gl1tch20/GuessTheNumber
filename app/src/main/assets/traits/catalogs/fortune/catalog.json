@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "catalogId": "fortune",
   "title": "Fortune",
-  "traitCount": 10,
+  "traitCount": 11,
   "traitIds": [
     "bright_omen",
     "chance_keeper",
@@ -12,6 +12,7 @@
     "lucky_compass",
     "lucky_horizon",
     "lucky_legend",
+    "risk_reward",
     "silver_signal",
     "star_catcher"
   ],

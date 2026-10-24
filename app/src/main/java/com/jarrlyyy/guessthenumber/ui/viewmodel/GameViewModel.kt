@@ -462,6 +462,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+
+    private fun processGuessWithTraits(state: GameState, guess: Long) =
+        com.jarrlyyy.guessthenumber.traits.TraitGameplayRuntime.apply(
+            stateBefore = state,
+            guess = guess,
+            result = gameEngine.processGuess(state, guess)
+        )
+
     /**
      * Compatibility entry point for existing Compose and automation callers.
      * Keep its Boolean contract while newer UI adapters consume the typed outcome.
@@ -481,7 +489,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
         val currentState = refreshDailyQuestDay(_gameState.value)
         GameLogger.log(LogLevel.DEBUG, LoggerCategory.GUESS, "GUESS_BEGIN", "Processing guess within range ${currentState.currentRangeMin}..${currentState.currentRangeMax}.", correlationId)
-        val result = gameEngine.processGuess(currentState, guess)
+        val result = processGuessWithTraits(currentState, guess)
         guessingBot.observeGuess(guess.coerceIn(currentState.currentRangeMin, currentState.currentRangeMax), result.feedback)
         if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
             guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
@@ -1719,7 +1727,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                             currentState.currentRangeMin,
                             currentState.currentRangeMax
                         )
-                        val result = gameEngine.processGuess(currentState, guess)
+                        val result = processGuessWithTraits(currentState, guess)
                         guessingBot.observeGuess(guess, result.feedback)
                         val isCorrect = result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
                         if (isCorrect) {

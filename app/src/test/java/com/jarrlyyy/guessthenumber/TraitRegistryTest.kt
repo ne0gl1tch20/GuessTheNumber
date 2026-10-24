@@ -21,10 +21,10 @@ import kotlinx.serialization.json.int
 class TraitRegistryTest {
     @Test fun builtInCatalogLoadsOfflineAndHasVisibleAndHiddenTraits() {
         val registry = BuiltInTraits.registry()
-        assertEquals(316, registry.size)
+        assertEquals(320, registry.size)
         assertNotNull(registry.find("steady_start"))
         assertEquals(93, registry.hidden().size)
-        assertEquals(223, registry.visible().size)
+        assertEquals(227, registry.visible().size)
     }
 
     @Test fun rejectsDuplicateIds() {
@@ -62,7 +62,7 @@ class TraitRegistryTest {
     @Test fun largeBuiltInCatalogHasThirtyDistinctFoldersAndSupportedEffects() {
         val registry = BuiltInTraits.registry()
         assertEquals(30, registry.all().map { it.catalogId }.distinct().size)
-        assertEquals(316, registry.all().map { it.id }.distinct().size)
+        assertEquals(320, registry.all().map { it.id }.distinct().size)
         assertTrue(registry.all().all { it.effects.isNotEmpty() })
         assertEquals("100ConsecutiveGuessesTrait", registry.find("hundred_consecutive_guesses")?.packageFolder)
     }
