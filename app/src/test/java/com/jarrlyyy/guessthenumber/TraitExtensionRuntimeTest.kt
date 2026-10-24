@@ -123,6 +123,10 @@ class TraitExtensionRuntimeTest {
         assertThrows(IllegalStateException::class.java) {
             runtime.validate(base.replace("../rules.json", "rules.json"), emptyMap(), "remote_rules")
         }
+        val windowsTraversal = """{"schemaVersion":1,"traitId":"remote_rules","modules":[{"id":"rules","type":"JSON","entrypoint":"..\\rules.json"}]}"""
+        assertThrows(IllegalArgumentException::class.java) {
+            runtime.validate(windowsTraversal, mapOf("..\\rules.json" to "{}"), "remote_rules")
+        }
         assertThrows(IllegalArgumentException::class.java) {
             runtime.validate(
                 """{"schemaVersion":1,"traitId":"remote_rules","modules":[{"id":"rules","type":"JSON","entrypoint":"rules.json","capabilities":["award_currency"]}]}""",
