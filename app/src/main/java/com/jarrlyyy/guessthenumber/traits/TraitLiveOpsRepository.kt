@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.parseToJsonElement
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.HttpURLConnection
@@ -32,6 +33,7 @@ internal data class RemoteTraitDefinition(
     val minimumLevel: Int = 1, val minimumPrestige: Int = 0, val minimumCorrectGuesses: Long = 0L,
     val dependencies: List<String> = emptyList(), val conflicts: List<String> = emptyList(),
     val effects: List<String>, val seasonId: String? = null,
+    val catalogId: String = "core",
     val folderName: String? = null,
     val files: List<RemoteTraitFile> = emptyList()
 )
@@ -99,13 +101,24 @@ class TraitLiveOpsRepository(
                     require(sha256(bytes).equals(entry.sha256, ignoreCase = true)) {
                         "Trait file hash mismatch for ${trait.id}/${relative}."
                     }
-                    if (entry.kind == "lua") {
-                        LuaSandbox {}.validate(trait.id, bytes.toString(Charsets.UTF_8))
-                    } else {
-                        require(entry.kind == "json" && relative.endsWith(".json")) {
-                            "Unsupported trait file type."
+                    when (entry.kind) {
+                        "lua" -> LuaSandbox {}.validate(trait.id, bytes.toString(Charsets.UTF_8))
+                        "json" -> {
+                            val text = bytes.toString(Charsets.UTF_8)
+                            require(text.isNotBlank()) { "Trait JSON file is empty." }
+                            json.parseToJsonElement(text)
                         }
-                        require(bytes.toString(Charsets.UTF_8).isNotBlank()) { "Trait metadata file is empty." }
+                        "js", "css", "html", "svg", "txt" -> {
+                            val text = bytes.toString(Charsets.UTF_8)
+                            require(text.isNotBlank()) { "Trait text asset is empty." }
+                            if (entry.kind == "svg") {
+                                require(!Regex("(?i)<script|on[a-z]+\\s*=|javascript:").containsMatchIn(text)) {
+                                    "SVG contains unsafe active content."
+                                }
+                            }
+                        }
+                        "png", "webp", "ttf", "woff2" -> Unit
+                        else -> error("Unsupported trait file type.")
                     }
                     val output = File(staging, relative)
                     check(output.canonicalPath.startsWith(staging.canonicalPath + File.separator)) {
@@ -227,6 +240,7 @@ class TraitLiveOpsRepository(
         const val SCHEMA_VERSION = 1
         const val HOST_API_VERSION = 1
         const val MAX_TRAITS = 100
+        const val MAX_CATALOGS = 16
         const val MAX_FILES_PER_TRAIT = 24
         const val MAX_TOTAL_FILES = 500
         const val MAX_TOTAL_BUNDLE_BYTES = 8 * 1024 * 1024
@@ -249,6 +263,9 @@ internal fun validateAndMapTraitPayload(payload: TraitLiveOpsPayload, appVersion
     require(payload.catalogVersion > 0) { "Invalid trait catalog version." }
     require(payload.traits.size in 1..TraitLiveOpsRepository.MAX_TRAITS) { "Trait count is outside the supported limit." }
     require(payload.traits.map { it.id }.distinct().size == payload.traits.size) { "Duplicate remote trait IDs." }
+    val catalogIds = payload.traits.map { it.catalogId }.distinct()
+    require(catalogIds.size <= TraitLiveOpsRepository.MAX_CATALOGS) { "Too many trait catalogs." }
+    require(catalogIds.all { Regex("[A-Za-z0-9_-]{1,48}").matches(it) }) { "Invalid catalog ID." }
     val builtInIds = BuiltInTraits.definitions.mapTo(mutableSetOf()) { it.id }
     val definitions = payload.traits.map { remote ->
         require(remote.id !in builtInIds) { "Remote traits cannot replace built-in IDs." }
@@ -275,9 +292,15 @@ internal fun validateAndMapTraitPayload(payload: TraitLiveOpsPayload, appVersion
         trait.files.forEach { file ->
             validateTraitAssetPath(trait, file.path)
             require(file.sha256.matches(Regex("[a-fA-F0-9]{64}"))) { "Invalid SHA-256 for trait asset." }
-            require(file.kind in setOf("lua", "json")) { "Unsupported trait asset kind." }
-            require((file.kind == "lua") == file.path.endsWith(".lua")) { "Trait file extension does not match its kind." }
-            require(file.kind != "json" || file.path.endsWith(".json")) { "Trait JSON files must end in .json." }
+            val extensions = mapOf(
+                "lua" to ".lua", "json" to ".json", "js" to ".js", "css" to ".css",
+                "html" to ".html", "svg" to ".svg", "txt" to ".txt", "png" to ".png",
+                "webp" to ".webp", "ttf" to ".ttf", "woff2" to ".woff2"
+            )
+            require(file.kind in extensions) { "Unsupported trait asset kind." }
+            require(file.path.endsWith(extensions.getValue(file.kind), ignoreCase = true)) {
+                "Trait file extension does not match its kind."
+            }
         }
     }
     TraitRegistry(BuiltInTraits.definitions + definitions)
@@ -288,9 +311,12 @@ private fun validateTraitAssetPath(trait: RemoteTraitDefinition, path: String): 
     require(!trait.folderName.isNullOrBlank() && Regex("[A-Za-z0-9_-]{1,80}").matches(trait.folderName)) {
         "Trait asset path requires a valid folderName."
     }
-    val expectedPrefix = "assets/traits/" + trait.folderName + "/"
-    require(path.startsWith(expectedPrefix) && path.length <= 240) { "Trait asset path is outside its trait folder." }
+    require(Regex("[A-Za-z0-9_-]{1,48}").matches(trait.catalogId)) { "Invalid trait catalog ID." }
+    val expectedPrefix = "assets/traits/catalogs/" + trait.catalogId + "/" + trait.folderName + "/"
+    require(path.startsWith(expectedPrefix) && path.length <= 240) { "Trait asset path is outside its catalog/trait folder." }
     require(path.split('/').all { it.isNotBlank() && it != "." && it != ".." }) { "Invalid trait asset path." }
-    require(path.endsWith(".lua") || path.endsWith(".json")) { "Unsupported trait asset extension." }
+    require(path.substringAfterLast('.', "").lowercase() in setOf(
+        "lua", "json", "js", "css", "html", "svg", "txt", "png", "webp", "ttf", "woff2"
+    )) { "Unsupported trait asset extension." }
     return path
 }
