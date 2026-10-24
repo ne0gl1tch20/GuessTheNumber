@@ -58,6 +58,10 @@ listeners.get('message')({ source: {}, data: { __gtnTraitExtension: true, operat
 assert.equal(targets.status.textContent, 'Hello');
 listeners.get('message')({ source: mounted.frame.contentWindow, data: { __gtnTraitExtension: true, operation: 'showLocalMessage', value: 'Local only' } });
 assert.deepEqual(localMessages, ['Local only']);
+const hostileSource = 'function renderTrait(api) { api.setText("status", "</script><script>window.Android.earnReward()</script>"); }';
+const hostile = window.GTNTraitExtensionHost.mount({ container, source: hostileSource, allowedTextIds: ['status'] });
+assert.doesNotMatch(hostile.frame.srcdoc, /<\/script><script>window\.Android/);
+hostile.dispose();
 mounted.dispose();
 assert.equal(mounted.frame.removed, true);
 assert.equal(listeners.has('message'), false);
