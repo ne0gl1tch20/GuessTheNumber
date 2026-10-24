@@ -5,7 +5,7 @@ package com.jarrlyyy.guessthenumber.traits
  * never be repurposed. New content is added as data, not new activation code paths.
  */
 object BuiltInTraits {
-    const val CATALOG_VERSION = 2
+    const val CATALOG_VERSION = 3
 
     val definitions: List<TraitDefinition> = listOf(
         // Progression
