@@ -7,6 +7,7 @@ import com.jarrlyyy.guessthenumber.desktop.economy.DesktopTalentDef
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopMinigameDef
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
+import com.jarrlyyy.guessthenumber.shared.domain.TraitGameplayRules
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -37,6 +38,46 @@ private fun desktopWebUiStrings(localeTag: String): JSONObject {
             val key = iterator.next()
             merged.put(key, overlay.get(key))
         }
+    }
+    val gameplayTraits = JSONArray()
+    listOf(
+        Triple("combo_momentum", "Combo Momentum", "Correct-guess payouts scale with your current streak."),
+        Triple("range_scout", "Range Scout", "Wrong guesses narrow the visible search range."),
+        Triple("mistake_insurance", "Mistake Insurance", "Refunds part of the normal money penalty after a miss."),
+        Triple("risk_reward", "Risk Reward", "Correct guesses pay extra, but wrong guesses cost more."),
+        Triple("streak_guard", "Streak Guard", "Keeps your current streak after a wrong guess.")
+    ).forEach { (id, title, description) ->
+        val required = when (id) {
+            "combo_momentum" -> TraitGameplayRules.COMBO_MOMENTUM_UNLOCK
+            "range_scout" -> TraitGameplayRules.RANGE_SCOUT_UNLOCK
+            "mistake_insurance" -> TraitGameplayRules.MISTAKE_INSURANCE_UNLOCK
+            "risk_reward" -> TraitGameplayRules.RISK_REWARD_UNLOCK
+            else -> TraitGameplayRules.STREAK_GUARD_UNLOCK
+        }
+        val arms = when (id) {
+            "combo_momentum" -> listOf("steady" to "Steady", "burst" to "Burst")
+            "mistake_insurance" -> listOf("half_refund" to "Half refund", "careful" to "Careful")
+            "risk_reward" -> listOf("balanced" to "Balanced", "high_risk" to "High risk")
+            else -> emptyList()
+        }
+        val armsJson = JSONArray()
+        arms.forEach { (armId, label) ->
+            val desc = when (armId) {
+                "steady" -> "Up to 20% extra based on streak."
+                "burst" -> "Faster scaling, capped at 25% extra."
+                "half_refund" -> "Refund 50% of the miss penalty."
+                "careful" -> "Refund 75% of the miss penalty."
+                "balanced" -> "25% bonus on hits and 10% extra penalty on misses."
+                else -> "40% bonus on hits and 20% extra penalty on misses."
+            }
+            armsJson.put(JSONObject().put("id", armId).put("label", label).put("description", desc))
+        }
+        val defaultArm = when (id) { "combo_momentum" -> "steady"; "mistake_insurance" -> "half_refund"; "risk_reward" -> "balanced"; else -> "" }
+        gameplayTraits.put(JSONObject().put("id", id).put("title", title).put("description", description)
+            .put("active", id in TraitGameplayRules.activeGameplayTraitIds(game))
+            .put("requiredCorrectGuesses", required)
+            .put("selectedArm", game.selectedTraitArms[id] ?: defaultArm)
+            .put("arms", armsJson))
     }
     return JSONObject().apply {
         webUiStringKeys.forEach { key -> put(key, merged.optString(key, key)) }
@@ -199,6 +240,8 @@ internal fun desktopWebPlayState(
         .put("activeWorldId", game.activeWorldId)
         .put("talents", talentsJson)
         .put("activeMutators", JSONArray(game.activeMutators.toList()))
+        .put("gameplayTraits", gameplayTraits)
+        .put("selectedTraitArms", JSONObject().apply { game.selectedTraitArms.forEach { (id, arm) -> put(id, arm) } })
         .put("unlockedWorldCount", game.unlockedWorldIds.size)
         .put("defeatedBossCount", game.defeatedBossIds.size)
         .put("worldBossVictories", game.worldBossVictories)
