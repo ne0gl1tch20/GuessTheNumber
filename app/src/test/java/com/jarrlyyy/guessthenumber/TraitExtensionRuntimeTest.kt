@@ -25,6 +25,7 @@ class TraitExtensionRuntimeTest {
         val no = runtime.evaluateLua(extension, "logic", mapOf("correctGuesses" to "200", "bestStreak" to "9"), setOf(TraitEffect.COSMETIC_BADGE))
         val yes = runtime.evaluateLua(extension, "logic", mapOf("correctGuesses" to "100", "bestStreak" to "10"), setOf(TraitEffect.COSMETIC_BADGE))
         assertFalse(no.eligible)
+        assertEquals(emptySet<TraitEffect>(), no.requestedEffects)
         assertTrue(yes.eligible)
         assertEquals(setOf(TraitEffect.COSMETIC_BADGE), yes.requestedEffects)
     }
@@ -67,12 +68,18 @@ class TraitExtensionRuntimeTest {
             "remote_view"
         )
         assertTrue(runtime.javascriptPresentation(good, "view").contains("renderTrait"))
-        assertThrows(IllegalArgumentException::class.java) {
-            runtime.validate(
-                """{"schemaVersion":1,"traitId":"remote_view","modules":[{"id":"view","type":"JAVASCRIPT","entrypoint":"view.js"}]}""",
-                mapOf("view.js" to "function renderTrait(api) { window.Android.earnReward(); }"),
-                "remote_view"
-            )
+        listOf(
+            "function renderTrait(api) { window.Android.earnReward(); }",
+            "function renderTrait(api) { parent.postMessage({operation:'setText'}); }",
+            "function renderTrait(api) { localStorage.setItem('x', 'y'); }"
+        ).forEach { unsafeSource ->
+            assertThrows(IllegalArgumentException::class.java) {
+                runtime.validate(
+                    """{"schemaVersion":1,"traitId":"remote_view","modules":[{"id":"view","type":"JAVASCRIPT","entrypoint":"view.js"}]}""",
+                    mapOf("view.js" to unsafeSource),
+                    "remote_view"
+                )
+            }
         }
     }
 
