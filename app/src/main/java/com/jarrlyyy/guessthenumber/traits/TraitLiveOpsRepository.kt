@@ -199,6 +199,7 @@ class TraitLiveOpsRepository(
                     "Cached trait asset hash mismatch: ${trait.id}/${relative}."
                 }
             }
+            validateTraitModuleManifest(dir, trait)
         }
         return definitions
     }
@@ -326,6 +327,25 @@ internal fun validateAndMapTraitPayload(payload: TraitLiveOpsPayload, appVersion
     }
     TraitRegistry(BuiltInTraits.definitions + definitions)
     return definitions
+}
+
+private fun validateTraitModuleManifest(root: File, trait: RemoteTraitDefinition) {
+    val scriptFiles = trait.files.filter { it.kind == "lua" || it.kind == "js" }
+    val moduleManifestEntry = trait.files.singleOrNull {
+        it.path.endsWith("/module.json") && it.kind == "json"
+    }
+    if (scriptFiles.isEmpty() && moduleManifestEntry == null) return
+    require(moduleManifestEntry != null) {
+        "Trait ${trait.id} has script modules but no module.json manifest."
+    }
+    val prefix = "assets/traits/catalogs/${trait.catalogId}/${trait.folderName}/"
+    val sources = trait.files.filter { it.kind in setOf("lua", "js", "json") }.associate { entry ->
+        val relative = entry.path.removePrefix(prefix)
+        require(relative != entry.path && relative.isNotBlank()) { "Invalid trait module-relative path." }
+        relative to File(root, entry.path).readText()
+    }
+    val manifestText = File(root, moduleManifestEntry.path).readText()
+    TraitExtensionRuntime().validate(manifestText, sources, trait.id)
 }
 
 private fun validateTraitAssetPath(trait: RemoteTraitDefinition, path: String): String {
