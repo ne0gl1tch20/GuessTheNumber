@@ -29,7 +29,7 @@ fun DeveloperPlaygroundScreen(state: GameState, onExecuteCommand: (String) -> St
                 "web" -> WebProcessScreen()
                 "tests" -> DeveloperTestSuitesScreen(state, onExecuteCommand)
                 "ui" -> DeveloperUiPlaygroundScreen()
-                "save" -> DeveloperSaveLabScreen(state, onExecuteCommand)
+                "save" -> DeveloperSaveLabScreen(state)
                 "diagnostics" -> DeveloperDiagnosticsScreen(state)
                 "runtime" -> RuntimeInspectorScreen(state) { destination = "hub" }
                 else -> DeveloperHub { destination = it }
@@ -60,6 +60,7 @@ private fun DeveloperHub(onOpen: (String) -> Unit) {
         item { DeveloperEntry("Save Laboratory", "Exercise save/load, offline earnings and recovery scenarios", Icons.Default.Save) { onOpen("save") } }
         item { DeveloperEntry("Runtime Inspector", "Inspect active loops and authoritative runtime state", Icons.Default.Analytics) { onOpen("runtime") } }
         item { DeveloperEntry("Diagnostics", "Build, state, logging and runtime information", Icons.Default.Info) { onOpen("diagnostics") } }
+        item { DeveloperEntry("Runtime Inspector", "Read-only game state and background process overview", Icons.Default.Analytics) { onOpen("inspector") } }
     }
 }
 
