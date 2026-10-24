@@ -39,13 +39,13 @@ object TraitGameplayRules {
         if (result.feedback == GuessFeedback.CORRECT) {
             var multiplier = 1.0
             if (hasComboReward) {
-                val burst = stateBefore.selectedTraitArms["combo_momentum"] == "burst"
+                val burst = "combo_momentum" in activeTraitIds && stateBefore.selectedTraitArms["combo_momentum"] == "burst"
                 val perStreak = if (burst) BURST_COMBO_BONUS_PER_STREAK else COMBO_BONUS_PER_STREAK
                 val cap = if (burst) BURST_MAX_COMBO_BONUS else MAX_COMBO_BONUS
                 multiplier += (stateBefore.streak * perStreak).coerceAtMost(cap)
             }
             if (hasRiskReward) {
-                multiplier += if (stateBefore.selectedTraitArms["risk_reward"] == "high_risk") HIGH_RISK_SUCCESS_BONUS else RISK_REWARD_SUCCESS_BONUS
+                multiplier += if ("risk_reward" in activeTraitIds && stateBefore.selectedTraitArms["risk_reward"] == "high_risk") HIGH_RISK_SUCCESS_BONUS else RISK_REWARD_SUCCESS_BONUS
             }
             if (multiplier > 1.0) {
                 val adjustedReward = reward * BigNumber(multiplier)
@@ -58,9 +58,9 @@ object TraitGameplayRules {
             }
         } else {
             val originalPenalty = (stateBefore.money - nextState.money).max(BigNumber.ZERO)
-            val refundRate = if (stateBefore.selectedTraitArms["mistake_insurance"] == "careful") CAREFUL_REFUND_RATE else MISTAKE_REFUND_RATE
+            val refundRate = if ("mistake_insurance" in activeTraitIds && stateBefore.selectedTraitArms["mistake_insurance"] == "careful") CAREFUL_REFUND_RATE else MISTAKE_REFUND_RATE
             val refund = if (hasMissInsurance) originalPenalty * BigNumber(refundRate) else BigNumber.ZERO
-            val penaltyRate = if (stateBefore.selectedTraitArms["risk_reward"] == "high_risk") HIGH_RISK_MISS_PENALTY_RATE else RISK_MISS_PENALTY_RATE
+            val penaltyRate = if ("risk_reward" in activeTraitIds && stateBefore.selectedTraitArms["risk_reward"] == "high_risk") HIGH_RISK_MISS_PENALTY_RATE else RISK_MISS_PENALTY_RATE
             val extraPenalty = if (hasRiskReward) originalPenalty * BigNumber(penaltyRate) else BigNumber.ZERO
             if (refund > BigNumber.ZERO || extraPenalty > BigNumber.ZERO) {
                 nextState = nextState.copy(money = (nextState.money + refund - extraPenalty).max(BigNumber.ZERO))

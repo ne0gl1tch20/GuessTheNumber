@@ -109,7 +109,8 @@ class TraitGameplayRuntimeTest {
                 currentRangeMax = 100,
                 targetNumber = 50,
                 correctGuesses = 0,
-                streak = 5
+                streak = 5,
+                selectedTraitArms = mapOf("combo_momentum" to "burst")
             )
             val after = before.copy(
                 money = BigNumber(1_100),
@@ -120,6 +121,7 @@ class TraitGameplayRuntimeTest {
             val base = GuessResult(GuessFeedback.CORRECT, BigNumber(100), false, 6, after)
             val result = TraitGameplayRuntime.apply(before, 50, base, "summer")
             assertEquals(110.0, result.reward.value.toDouble(), 0.001)
+            assertEquals("Remote trait must not inherit a locked built-in arm", 1_110.0, result.newState.money.value.toDouble(), 0.001)
             assertEquals(1_110.0, result.newState.money.value.toDouble(), 0.001)
         } finally {
             ActiveTraitCatalog.install(originalRegistry)
