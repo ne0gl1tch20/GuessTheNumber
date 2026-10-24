@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "e96550f0789d04f546a4aa0f243e773566cf3e3e",
+  "version": "e66f10c9ca7ebb1ab54bab422a9521803e8b6ade",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -21,7 +21,7 @@
     },
     {
       "path": "web-play/index.html",
-      "sha256": "ea266eb61a080e380ed0b4e72001c27dfc7c2e2587dd0e14763a3198639e382d"
+      "sha256": "c33b7f845549470c7c46b0ae7d1c59a56fbfd55f9202ffd683c10feeb151b8a7"
     },
     {
       "path": "web-play/styles.css",
