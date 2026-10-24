@@ -67,7 +67,9 @@ class TraitLiveOpsRepositoryTest {
             RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/presentation.js", "0".repeat(64), "js"),
             RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/theme.css", "0".repeat(64), "css"),
             RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/icon.svg", "0".repeat(64), "svg"),
-            RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/config.json", "0".repeat(64), "json")
+            RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/config.json", "0".repeat(64), "json"),
+            RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/module.json", "0".repeat(64), "json"),
+            RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/locales/en.json", "0".repeat(64), "json")
         )
         val trait = RemoteTraitDefinition(
             "remote_nebula_finder", "trait.remote_nebula_finder.title", "trait.remote_nebula_finder.description",
@@ -76,6 +78,28 @@ class TraitLiveOpsRepositoryTest {
         )
         val result = validateAndMapTraitPayload(payload(listOf(trait)), 21)
         assertEquals("remote_nebula_finder", result.single().id)
+    }
+
+    @Test fun rejectsScriptPackagesWithoutModuleManifestOrEnglishLocale() {
+        val base = "assets/traits/catalogs/exploration/RemoteTrait/"
+        val script = RemoteTraitFile(base + "logic.lua", "0".repeat(64), "lua")
+        val locale = RemoteTraitFile(base + "locales/en.json", "0".repeat(64), "json")
+        val missingManifest = RemoteTraitDefinition(
+            "remote_script", "trait.remote_script.title", "trait.remote_script.description",
+            "COLLECTION", effects = listOf("COSMETIC_BADGE"), catalogId = "exploration",
+            folderName = "RemoteTrait", files = listOf(script, locale)
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            validateAndMapTraitPayload(payload(listOf(missingManifest)), 21)
+        }
+        val missingEnglish = missingManifest.copy(files = listOf(
+            script,
+            RemoteTraitFile(base + "module.json", "0".repeat(64), "json"),
+            RemoteTraitFile(base + "locales/fil.json", "0".repeat(64), "json")
+        ))
+        assertThrows(IllegalArgumentException::class.java) {
+            validateAndMapTraitPayload(payload(listOf(missingEnglish)), 21)
+        }
     }
 
     @Test fun rejectsTraitFilesOutsideTheirCatalogFolder() {

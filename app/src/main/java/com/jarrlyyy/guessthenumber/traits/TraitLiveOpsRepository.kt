@@ -199,7 +199,7 @@ class TraitLiveOpsRepository(
                     "Cached trait asset hash mismatch: ${trait.id}/${relative}."
                 }
             }
-            validateTraitModuleManifest(dir, trait)
+            validateTraitPackageContent(dir, trait)
         }
         return definitions
     }
@@ -329,16 +329,31 @@ internal fun validateAndMapTraitPayload(payload: TraitLiveOpsPayload, appVersion
     return definitions
 }
 
-private fun validateTraitModuleManifest(root: File, trait: RemoteTraitDefinition) {
+internal fun validateTraitPackageContent(root: File, trait: RemoteTraitDefinition) {
+    val prefix = "assets/traits/catalogs/${trait.catalogId}/${trait.folderName}/"
+    val localeEntries = trait.files.filter { it.path.startsWith(prefix + "locales/") && it.kind == "json" }
+    if (trait.files.isNotEmpty()) {
+        require(localeEntries.any { it.path == prefix + "locales/en.json" }) {
+            "Trait ${trait.id} package requires locales/en.json."
+        }
+        val localeSources = localeEntries.associate { entry ->
+            val relative = entry.path.removePrefix(prefix + "locales/")
+            require(relative.matches(Regex("[a-z]{2,3}(-[A-Z]{2})?\\.json"))) {
+                "Invalid locale file path: ${entry.path}"
+            }
+            relative.removeSuffix(".json") to File(root, entry.path).readText()
+        }
+        TraitLocaleCatalog().validate(localeSources, trait.id)
+    }
+
     val scriptFiles = trait.files.filter { it.kind == "lua" || it.kind == "js" }
     val moduleManifestEntry = trait.files.singleOrNull {
-        it.path.endsWith("/module.json") && it.kind == "json"
+        it.path == prefix + "module.json" && it.kind == "json"
     }
     if (scriptFiles.isEmpty() && moduleManifestEntry == null) return
     require(moduleManifestEntry != null) {
         "Trait ${trait.id} has script modules but no module.json manifest."
     }
-    val prefix = "assets/traits/catalogs/${trait.catalogId}/${trait.folderName}/"
     val sources = trait.files.filter { it.kind in setOf("lua", "js", "json") }.associate { entry ->
         val relative = entry.path.removePrefix(prefix)
         require(relative != entry.path && relative.isNotBlank()) { "Invalid trait module-relative path." }
