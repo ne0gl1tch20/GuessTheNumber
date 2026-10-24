@@ -12,11 +12,12 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.KeyFactory
+import java.security.MessageDigest
 import java.security.Signature
 import java.security.spec.X509EncodedKeySpec
 
 @Serializable
-internal data class SignedTraitManifest(val payloadBase64: String, val signatureBase64: String)
+internal data class SignedTraitManifest(val payloadBase64: String, val payloadSha256: String, val signatureBase64: String)
 @Serializable
 internal data class TraitLiveOpsPayload(
     val schemaVersion: Int, val hostApiVersion: Int, val minAppVersionCode: Int,
@@ -56,6 +57,7 @@ class TraitLiveOpsRepository(
             val envelopeBytes = readHttps(url)
             val envelope = json.decodeFromString<SignedTraitManifest>(envelopeBytes.toString(Charsets.UTF_8))
             val payloadBytes = Base64.decode(envelope.payloadBase64, Base64.DEFAULT)
+            require(sha256(payloadBytes).equals(envelope.payloadSha256, ignoreCase = true)) { "Trait catalog payload hash mismatch." }
             verifySignature(payloadBytes, envelope.signatureBase64)
             val payload = json.decodeFromString<TraitLiveOpsPayload>(payloadBytes.toString(Charsets.UTF_8))
             val definitions = validateAndMapTraitPayload(payload, BuildConfig.VERSION_CODE)
@@ -116,6 +118,7 @@ class TraitLiveOpsRepository(
         require(file.isFile && file.length() in 1..MAX_MANIFEST_BYTES.toLong()) { "Cached trait manifest missing or too large." }
         val envelope = json.decodeFromString<SignedTraitManifest>(file.readText())
         val bytes = Base64.decode(envelope.payloadBase64, Base64.DEFAULT)
+        require(sha256(bytes).equals(envelope.payloadSha256, ignoreCase = true)) { "Cached trait catalog hash mismatch." }
         verifySignature(bytes, envelope.signatureBase64)
         val payload = json.decodeFromString<TraitLiveOpsPayload>(bytes.toString(Charsets.UTF_8))
         require(payload.catalogVersion == expectedVersion) { "Cached trait catalog version mismatch." }
@@ -163,8 +166,10 @@ class TraitLiveOpsRepository(
     }
 
     private fun readVersion(file: File): Int = runCatching { file.readText().trim().toInt() }.getOrDefault(0)
+    private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
+        .digest(bytes).joinToString("") { "%02x".format(it) }
     private fun writeVersionAtomically(file: File, version: Int) {
-        check(file.parentFile?.mkdirs() != false) { "Could not create trait catalog storage." }
+        check(file.parentFile?.let { it.isDirectory || it.mkdirs() } != false) { "Could not create trait catalog storage." }
         val temp = File(file.parentFile, file.name + ".tmp")
         temp.writeText(version.toString())
         check(temp.renameTo(file) || run { file.delete(); temp.renameTo(file) }) {
