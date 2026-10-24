@@ -128,11 +128,41 @@ private fun WebProcessScreen(onTestDailyRewards: () -> Unit) {
             Button(onClick = {
                 val command = input.trim()
                 if (command.startsWith("/")) {
-                    if (command.substringBefore(' ').equals("/testdailyrewards", ignoreCase = true)) {
-                        logs = (logs + "${System.currentTimeMillis()} HOST → /testdailyrewards").takeLast(100)
-                        onTestDailyRewards()
-                    } else {
-                        logs = (logs + "${System.currentTimeMillis()} NOT WIRED → $command (no action taken)").takeLast(100)
+                    val name = command.substringBefore(' ').lowercase()
+                    val argument = command.substringAfter(' ', "").trim().lowercase()
+                    when (name) {
+                        "/testdailyrewards" -> {
+                            logs = (logs + "${System.currentTimeMillis()} HOST → $command").takeLast(100)
+                            onTestDailyRewards()
+                        }
+                        "/testpopup" -> {
+                            val script = when (argument) {
+                                "daily" -> "window.gtnShowDailyRewardTest && window.gtnShowDailyRewardTest()"
+                                "offline" -> "document.getElementById('offlineRewardOverlay').hidden=false; document.getElementById('offlineRewardAmount').textContent='TEST ONLY'; 'Visual-only popup; no reward granted'"
+                                else -> null
+                            }
+                            if (script == null) logs = (logs + "${System.currentTimeMillis()} SKIPPED → $command (use daily or offline)").takeLast(100)
+                            else { WebViewDebugConsole.runJavascript(script); logs = (logs + "${System.currentTimeMillis()} WEB TEST → $command").takeLast(100) }
+                        }
+                        "/testofflineearnings" -> {
+                            WebViewDebugConsole.runJavascript("document.getElementById('offlineRewardOverlay').hidden=false; document.getElementById('offlineRewardAmount').textContent='TEST ONLY'; 'Visual-only popup; no reward granted'")
+                            logs = (logs + "${System.currentTimeMillis()} WEB PREVIEW → $command (does not simulate save-loader earnings)").takeLast(100)
+                        }
+                        "/testtutorial" -> {
+                            if (argument == "nimmy") {
+                                WebViewDebugConsole.runJavascript("document.getElementById('rerunNimmyButton')?.click()")
+                                logs = (logs + "${System.currentTimeMillis()} WEB TEST → Nimmy tutorial replay requested").takeLast(100)
+                            } else logs = (logs + "${System.currentTimeMillis()} SKIPPED → $command (use nimmy)").takeLast(100)
+                        }
+                        "/testbridge" -> {
+                            WebViewDebugConsole.runJavascript("window.gtnReadState && window.gtnReadState()")
+                            logs = (logs + "${System.currentTimeMillis()} BRIDGE PING → read_state request sent; check JS console and bridge logs").takeLast(100)
+                        }
+                        "/testui" -> {
+                            WebViewDebugConsole.runJavascript("Array.from(document.querySelectorAll('#popupLayer .reward-overlay')).map(e=>e.id+':'+e.hidden+':'+e.getBoundingClientRect().width+'x'+e.getBoundingClientRect().height).join(',')")
+                            logs = (logs + "${System.currentTimeMillis()} UI AUDIT → popup overlay bounds requested").takeLast(100)
+                        }
+                        else -> logs = (logs + "${System.currentTimeMillis()} NOT WIRED → $command (no action taken)").takeLast(100)
                     }
                 } else {
                     WebViewDebugConsole.runJavascript(input)
@@ -142,7 +172,7 @@ private fun WebProcessScreen(onTestDailyRewards: () -> Unit) {
             OutlinedButton(onClick = { logs = emptyList() }) { Text("Clear command log") }
             OutlinedButton(onClick = { WebViewDebugConsole.clear() }) { Text("Clear JS console") }
         } }
-        item { DeveloperPanel("Available host command", "/testdailyrewards\n\nOther slash commands are shown as NOT WIRED until their real handlers are implemented. JavaScript expressions can be run directly.") }
+        item { DeveloperPanel("Web commands", "/testdailyrewards\n/testpopup daily|offline\n/testofflineearnings (visual-only preview)\n/testtutorial nimmy\n/testbridge\n/testui\n\nOther slash commands are marked NOT WIRED. JavaScript expressions can be run directly.") }
         item { Text("Web console", style = MaterialTheme.typography.titleMedium) }
         items(WebViewDebugConsole.entries.takeLast(100).asReversed()) { Text(it, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall) }
         item { Text("Web command log", style = MaterialTheme.typography.titleMedium) }
