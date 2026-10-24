@@ -92,6 +92,7 @@ class SaveManagerIsolatedStoreTest {
             }
             val manager = SaveManager(context, store)
             val state = manager.loadGame(1)
+            assertEquals(0, state.money.compareTo(BigNumber.ZERO))
             assertTrue(manager.validateSave(json.encodeToString(state.copy(lastSaveTimestamp = System.currentTimeMillis()))))
         } finally {
             cleanup.first.cancel()
