@@ -42,6 +42,12 @@ class TraitLocaleCatalogTest {
         }
     }
 
+    @Test fun rejectsLocaleMetadataThatDoesNotMatchItsFilename() {
+        assertThrows(IllegalArgumentException::class.java) {
+            catalog.validate(mapOf("en" to """{"locale":"fil","id":"remote_streak","title":"Title","description":"Description"}"""), "remote_streak")
+        }
+    }
+
     @Test fun rejectsBlankOrOversizedLocalizedText() {
         assertThrows(IllegalArgumentException::class.java) {
             catalog.validate(mapOf("en" to """{"id":"remote_streak","title":"","description":"x"}"""), "remote_streak")

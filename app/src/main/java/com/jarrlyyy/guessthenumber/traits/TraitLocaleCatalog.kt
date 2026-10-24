@@ -23,8 +23,13 @@ class TraitLocaleCatalog(
         val parsed = localeFiles.mapValues { (locale, source) ->
             require(source.isNotBlank() && source.length <= MAX_LOCALE_CHARS) { "Locale file is empty or too large: $locale" }
             val obj = json.parseToJsonElement(source).jsonObject
-            require(obj.keys == REQUIRED_KEYS) { "Locale keys do not match the trait locale schema: $locale" }
+            require(obj.keys.containsAll(REQUIRED_KEYS) && obj.keys.all { it in ALLOWED_KEYS }) {
+                "Locale keys do not match the trait locale schema: $locale"
+            }
             require(obj["id"]!!.jsonPrimitive.content == expectedTraitId) { "Locale trait ID mismatch: $locale" }
+            obj["locale"]?.let {
+                require(it.jsonPrimitive.content == locale) { "Locale tag does not match locale filename: $locale" }
+            }
             require(obj["title"]!!.jsonPrimitive.content.isNotBlank()) { "Missing localized title: $locale" }
             require(obj["description"]!!.jsonPrimitive.content.isNotBlank()) { "Missing localized description: $locale" }
             obj
@@ -59,5 +64,6 @@ class TraitLocaleCatalog(
         const val MAX_LOCALES = 16
         private val LOCALE_PATTERN = Regex("[a-z]{2,3}(-[A-Z]{2})?")
         private val REQUIRED_KEYS = setOf("id", "title", "description")
+        private val ALLOWED_KEYS = REQUIRED_KEYS + "locale"
     }
 }
