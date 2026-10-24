@@ -310,6 +310,20 @@ internal fun validateAndMapTraitPayload(payload: TraitLiveOpsPayload, appVersion
         if (trait.files.isNotEmpty()) {
             require(!trait.folderName.isNullOrBlank()) { "Trait files require a folderName." }
             require(Regex("[A-Za-z0-9_-]{1,80}").matches(trait.folderName)) { "Invalid trait folder name." }
+            val prefix = "assets/traits/catalogs/${trait.catalogId}/${trait.folderName}/"
+            val localeFiles = trait.files.filter { it.path.startsWith(prefix + "locales/") && it.kind == "json" }
+            require(localeFiles.any { it.path == prefix + "locales/en.json" }) {
+                "Trait ${trait.id} package requires locales/en.json."
+            }
+            localeFiles.forEach { locale ->
+                require(locale.path.removePrefix(prefix + "locales/").matches(Regex("[a-z]{2,3}(-[A-Z]{2})?\\.json"))) {
+                    "Invalid locale file path: ${locale.path}"
+                }
+            }
+            require(trait.files.none { it.kind == "lua" || it.kind == "js" } ||
+                trait.files.any { it.path == prefix + "module.json" && it.kind == "json" }) {
+                "Trait ${trait.id} script modules require module.json."
+            }
         }
         trait.files.forEach { file ->
             validateTraitAssetPath(trait, file.path)
