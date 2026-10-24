@@ -93,7 +93,9 @@ private fun CoreProcessScreen(state: GameState, onExecuteCommand: (String) -> St
             Button(onClick = {
                 if (input.isNotBlank()) {
                     val command = input.trim()
-                    if (command.substringBefore(' ').lowercase() in setOf("/reset", "/give", "/set", "/timeskip", "/skip", "/moneyprinter", "/unlock", "/unlock_all", "/crash_test", "/konami", "/win", "/completeguess", "/max_upgrades", "/maxupgrades", "/autoclicker", "/setlevel", "/speed", "/test", "/newnumber")) {
+                    // Default-deny command execution: only known read-only commands bypass confirmation.
+                    // New or renamed developer commands are therefore protected automatically.
+                    if (command.startsWith("/") && command.substringBefore(' ').lowercase() !in setOf("/version", "/state", "/inspect", "/stats", "/help")) {
                         pendingCommand = command
                     } else runCommand(command)
                 }
@@ -186,7 +188,7 @@ private fun DeveloperTestSuitesScreen(state: GameState, onExecuteCommand: (Strin
     val suites = listOf("Core read-only smoke checks" to listOf("/version", "/state", "/stats", "/help"))
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Text("Test Suites", style = MaterialTheme.typography.titleLarge) }
-        items(suites) { (name, commands) -> Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(name, style = MaterialTheme.typography.titleMedium); Text(commands.joinToString("  "), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall); Button(onClick = { val suite = commands.map { command -> val result = onExecuteCommand(command); val pass = result.isNotBlank() && !result.startsWith("Unknown command") && !result.startsWith("Invalid command") && !result.startsWith("Developer mode is disabled"); "${if (pass) "PASS" else "FAIL"}  $command → $result" }; results = results + suite }) { Text("Run suite") } } } }
+        items(suites) { (name, commands) -> Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(name, style = MaterialTheme.typography.titleMedium); Text(commands.joinToString("  "), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall); Button(onClick = { val suite = commands.map { command -> val result = onExecuteCommand(command); val expected = when (command) { "/version" -> "GuessTheNumber"; "/state" -> "State:"; "/stats" -> "Stats:"; "/help" -> "Available commands:"; else -> "" }; val pass = expected.isNotEmpty() && result.contains(expected) && !result.startsWith("Developer mode is disabled"); "${if (pass) "PASS" else "FAIL"}  $command → ${if (pass) "matched expected output" else "expected '$expected', got '$result'"}" }; results = results + suite }) { Text("Run suite") } } } }
         item { DeveloperPanel("Latest results", results.takeLast(30).joinToString("\n").ifBlank { "No tests run yet." }) }
         item { Text("Web-only commands such as /testdailyrewards remain on the Web Process screen so Core and Web tests stay separated.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
@@ -233,7 +235,7 @@ private fun DeveloperSaveLabScreen(state: GameState) {
         } }
         item { DeveloperPanel("Offline earnings result", "Elapsed seconds requested: $simulatedElapsedSeconds\nElapsed seconds capped: ${com.jarrlyyy.guessthenumber.domain.engine.OfflineEarningsCalculator.effectiveSeconds(simulatedElapsedSeconds)}\nAuto-clicker active: $previewAutoClickerActive\nEstimated money: $estimatedEarnings\nCap: 28800 seconds (8 hours)") }
         item { Text("Save fixture safety suite", style = MaterialTheme.typography.titleMedium) }
-        item { Text("Checks current-schema validation, malformed JSON rejection, negative currency and impossible range rejection, in-memory backup recovery, and legacy-compatible schema round-trip without touching DataStore.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { Text("Checks current-schema validation, malformed JSON rejection, negative currency rejection, and legacy-compatible schema round-trip without touching DataStore.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { Button(onClick = { fixtureResults = com.jarrlyyy.guessthenumber.data.store.SaveFixtureLab.runSafetySuite(state) }, modifier = Modifier.fillMaxWidth()) { Text("Run isolated save safety tests") } }
         if (fixtureResults.isNotEmpty()) {
             item { DeveloperPanel("Fixture results", fixtureResults.joinToString("\n") { "${if (it.passed) "PASS" else "FAIL"}  ${it.name}: ${it.detail}" }) }
