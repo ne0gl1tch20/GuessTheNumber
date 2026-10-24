@@ -16,22 +16,13 @@ import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.domain.command.CommandAutocomplete
 import com.jarrlyyy.guessthenumber.domain.command.CommandRegistry
-import com.jarrlyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeveloperPlaygroundScreen(
-    state: GameState,
-    onExecuteCommand: (String) -> String,
-    onBack: () -> Unit
-) {
+fun DeveloperPlaygroundScreen(state: GameState, onExecuteCommand: (String) -> String, onBack: () -> Unit) {
     var destination by remember { mutableStateOf("hub") }
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text(if (destination == "hub") "Developer Playground" else destinationLabel(destination)) },
-            navigationIcon = { IconButton(onClick = { if (destination == "hub") onBack() else destination = "hub" }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } }
-        )
-    }) { padding ->
+    Scaffold(topBar = { TopAppBar(title = { Text(if (destination == "hub") "Developer Playground" else destinationLabel(destination)) }, navigationIcon = { IconButton(onClick = { if (destination == "hub") onBack() else destination = "hub" }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } }) }) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             when (destination) {
                 "core" -> CoreProcessScreen(state, onExecuteCommand)
@@ -40,6 +31,7 @@ fun DeveloperPlaygroundScreen(
                 "ui" -> DeveloperUiPlaygroundScreen()
                 "save" -> DeveloperSaveLabScreen(state, onExecuteCommand)
                 "diagnostics" -> DeveloperDiagnosticsScreen(state)
+                "runtime" -> RuntimeInspectorScreen(state) { destination = "hub" }
                 else -> DeveloperHub { destination = it }
             }
         }
@@ -52,6 +44,7 @@ private fun destinationLabel(destination: String) = when (destination) {
     "tests" -> "Test Suites"
     "ui" -> "UI Playground"
     "save" -> "Save Laboratory"
+    "runtime" -> "Runtime Inspector"
     else -> "Diagnostics"
 }
 
@@ -65,43 +58,25 @@ private fun DeveloperHub(onOpen: (String) -> Unit) {
         item { DeveloperEntry("Test Suites", "Run grouped checks with PASS, FAIL and SKIPPED results", Icons.Default.CheckCircle) { onOpen("tests") } }
         item { DeveloperEntry("UI Playground", "Exercise popups, tutorials, loading and edge-case UI states", Icons.Default.Palette) { onOpen("ui") } }
         item { DeveloperEntry("Save Laboratory", "Exercise save/load, offline earnings and recovery scenarios", Icons.Default.Save) { onOpen("save") } }
+        item { DeveloperEntry("Runtime Inspector", "Inspect active loops and authoritative runtime state", Icons.Default.Analytics) { onOpen("runtime") } }
         item { DeveloperEntry("Diagnostics", "Build, state, logging and runtime information", Icons.Default.Info) { onOpen("diagnostics") } }
     }
 }
 
 @Composable
 private fun DeveloperEntry(title: String, description: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
-    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
-            Column { Text(title, style = MaterialTheme.typography.titleMedium); Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        }
-    }
+    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) { Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) { Icon(icon, null, tint = MaterialTheme.colorScheme.primary); Column { Text(title, style = MaterialTheme.typography.titleMedium); Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) } } }
 }
 
 @Composable
 private fun CoreProcessScreen(state: GameState, onExecuteCommand: (String) -> String) {
-    var input by remember { mutableStateOf("") }
-    var output by remember { mutableStateOf("") }
-    var logs by remember { mutableStateOf(listOf<String>()) }
+    var input by remember { mutableStateOf("") }; var output by remember { mutableStateOf("") }; var logs by remember { mutableStateOf(listOf<String>()) }
     val suggestions = remember(input) { CommandAutocomplete.suggest(input) }
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("Native Kotlin / Compose", style = MaterialTheme.typography.titleLarge) }
-        item {
-            OutlinedTextField(input, { input = it }, Modifier.fillMaxWidth(), label = { Text("Core command") }, singleLine = true)
-        }
+        item { OutlinedTextField(input, { input = it }, Modifier.fillMaxWidth(), label = { Text("Core command") }, singleLine = true) }
         if (suggestions.isNotEmpty()) item { Text(suggestions.joinToString("  • ") { it.insertText }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
-        item {
-            Button(onClick = {
-                if (input.isNotBlank()) {
-                    val result = onExecuteCommand(input)
-                    output = result
-                    logs = (logs + "${System.currentTimeMillis()}  $input → $result").takeLast(100)
-                    GameLogger.log(LogLevel.INFO, LoggerCategory.COMMAND, "DEV_PLAYGROUND", "Core command '$input': $result")
-                    input = ""
-                }
-            }) { Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Run") }
-        }
+        item { Button(onClick = { if (input.isNotBlank()) { val result = onExecuteCommand(input); output = result; logs = (logs + "${System.currentTimeMillis()}  $input → $result").takeLast(100); GameLogger.log(LogLevel.INFO, LoggerCategory.COMMAND, "DEV_PLAYGROUND", "Core command '$input': $result"); input = "" } }) { Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Run") } }
         item { DeveloperPanel("Core state", "money=${state.money}\nprestige=${state.prestige}\nultra=${state.ultra}\nnebula=${state.nebula}\nautoClicker=${state.autoClickerActive}\nlastSave=${state.lastSaveTimestamp}") }
         item { DeveloperPanel("Last result", output.ifBlank { "No command executed yet." }) }
         item { Text("Core command log", style = MaterialTheme.typography.titleMedium) }
@@ -111,21 +86,12 @@ private fun CoreProcessScreen(state: GameState, onExecuteCommand: (String) -> St
 
 @Composable
 private fun WebProcessScreen() {
-    var input by remember { mutableStateOf("document.title") }
-    var logs by remember { mutableStateOf(emptyList<String>()) }
+    var input by remember { mutableStateOf("document.title") }; var logs by remember { mutableStateOf(emptyList<String>()) }
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("HTML / JavaScript / Android WebView", style = MaterialTheme.typography.titleLarge) }
-        item { Text("Web commands are kept separate from Core commands. JavaScript execution uses the existing debug WebView console bridge.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { Text("Web commands and logs are isolated from the Core Process. JavaScript execution uses the existing debug WebView console bridge.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { OutlinedTextField(input, { input = it }, Modifier.fillMaxWidth(), label = { Text("JavaScript / Web command") }, minLines = 2) }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = {
-                    WebViewDebugConsole.runJavascript(input)
-                    logs = (logs + "${System.currentTimeMillis()}  JS → $input").takeLast(100)
-                }) { Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Run") }
-                OutlinedButton(onClick = { logs = emptyList(); WebViewDebugConsole.clear() }) { Text("Clear") }
-            }
-        }
+        item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { Button(onClick = { WebViewDebugConsole.runJavascript(input); logs = (logs + "${System.currentTimeMillis()}  JS → $input").takeLast(100) }) { Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Run") }; OutlinedButton(onClick = { logs = emptyList(); WebViewDebugConsole.clear() }) { Text("Clear") } } }
         item { DeveloperPanel("Suggested Web commands", "/testpopup <name>\n/testtutorial <name>\n/testdailyrewards\n/testofflineearnings\n/testbridge\n/testui") }
         item { Text("Web console", style = MaterialTheme.typography.titleMedium) }
         items(WebViewDebugConsole.entries.takeLast(100).asReversed()) { Text(it, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall) }
@@ -137,32 +103,12 @@ private fun WebProcessScreen() {
 @Composable
 private fun DeveloperTestSuitesScreen(state: GameState, onExecuteCommand: (String) -> String) {
     var results by remember { mutableStateOf(listOf<String>()) }
-    val suites = listOf(
-        "Core sanity" to listOf("/version", "/state", "/stats"),
-        "Rewards" to listOf("/testdailyrewards"),
-        "Recovery" to listOf("/test antitimetravel"),
-        "Gameplay" to listOf("/newnumber", "/autoclicker on")
-    )
+    val suites = listOf("Core sanity" to listOf("/version", "/state", "/stats"), "Recovery" to listOf("/test antitimetravel"), "Gameplay" to listOf("/newnumber", "/autoclicker on"))
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Text("Test Suites", style = MaterialTheme.typography.titleLarge) }
-        items(suites) { (name, commands) ->
-            Card(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(name, style = MaterialTheme.typography.titleMedium)
-                    Text(commands.joinToString("  "), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
-                    Button(onClick = {
-                        val suite = commands.map { command ->
-                            val result = onExecuteCommand(command)
-                            val pass = result.isNotBlank() && !result.startsWith("Unknown command") && !result.startsWith("Invalid command")
-                            "${if (pass) "PASS" else "FAIL"}  $command → $result"
-                        }
-                        results = results + suite
-                    }) { Text("Run suite") }
-                }
-            }
-        }
+        items(suites) { (name, commands) -> Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(name, style = MaterialTheme.typography.titleMedium); Text(commands.joinToString("  "), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall); Button(onClick = { val suite = commands.map { command -> val result = onExecuteCommand(command); val pass = result.isNotBlank() && !result.startsWith("Unknown command") && !result.startsWith("Invalid command"); "${if (pass) "PASS" else "FAIL"}  $command → $result" }; results = results + suite }) { Text("Run suite") } } } }
         item { DeveloperPanel("Latest results", results.takeLast(30).joinToString("\n").ifBlank { "No tests run yet." }) }
-        item { Text("Note: these command-level checks do not replace on-device visual verification.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { Text("Web-only commands such as /testdailyrewards remain on the Web Process screen so Core and Web tests stay separated.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }
 
@@ -171,7 +117,7 @@ private fun DeveloperUiPlaygroundScreen() {
     var selected by remember { mutableStateOf("popup") }
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("UI Playground", style = MaterialTheme.typography.titleLarge) }
-        item { Text("Use this screen to organize UI scenarios before wiring feature-specific Web commands.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { Text("Organize popup, tutorial, loading and edge-case scenarios here before wiring feature-specific Web commands.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { Button(onClick = { selected = "popup" }) { Text("Popup scenarios") }; Spacer(Modifier.height(4.dp)); Button(onClick = { selected = "tutorial" }) { Text("Tutorial scenarios") }; Spacer(Modifier.height(4.dp)); Button(onClick = { selected = "edge" }) { Text("Edge-case scenarios") } }
         item { DeveloperPanel("Selected scenario", selected) }
         item { DeveloperPanel("Acceptance checks", "Box remains fully visible\nCentered correctly\nButtons remain tappable\nLong text does not clip\nDismiss/collect closes correctly\nLocalization remains readable") }
@@ -187,7 +133,7 @@ private fun DeveloperSaveLabScreen(state: GameState, onExecuteCommand: (String) 
         item { Button(onClick = { result = onExecuteCommand("/timeskip 3600") }) { Text("Simulate 1 hour passive progress") } }
         item { Button(onClick = { result = onExecuteCommand("/test antitimetravel") }) { Text("Simulate time-travel protection") } }
         item { DeveloperPanel("Result", result.ifBlank { "No save scenario executed." }) }
-        item { Text("Destructive save/reset operations remain behind the existing developer command confirmation flow.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { Text("This laboratory operates on the developer playground's isolated state snapshot; real player saves are not overwritten.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }
 
@@ -204,11 +150,4 @@ private fun DeveloperDiagnosticsScreen(state: GameState) {
 }
 
 @Composable
-private fun DeveloperPanel(title: String, body: String) {
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(title, style = MaterialTheme.typography.titleSmall)
-            Text(body, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
-        }
-    }
-}
+private fun DeveloperPanel(title: String, body: String) { Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { Text(title, style = MaterialTheme.typography.titleSmall); Text(body, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall) } } }
