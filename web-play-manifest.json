@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "version": "24c6652e7df12c4761cbca22bd4187f36ba7ce0f",
+  "minAppVersionCode": 21,
+  "files": [
+    {
+      "path": "web-play/app.js",
+      "sha256": "0238b1407af5db66c911fb69189fa62e8dca129c4a17098e80f4cc6ec1f27ba4"
+    },
+    {
+      "path": "web-play/icons/guess-the-number.svg",
+      "sha256": "065890ac9bee6647b60cf1ac6abcb3370124bbcea1da4c73bdc9ad1b43214e3e"
+    },
+    {
+      "path": "web-play/icons/sparkle.svg",
+      "sha256": "a7d6e0c5654e27f369e37450e95644a6cc6b0568f01ffce8b677d13e8a9629c5"
+    },
+    {
+      "path": "web-play/icons/star.svg",
+      "sha256": "e56d8bb7457995a5c218fa1bd3b5281f3b19fee8418a527acc1f007139d8fab9"
+    },
+    {
+      "path": "web-play/index.html",
+      "sha256": "ea266eb61a080e380ed0b4e72001c27dfc7c2e2587dd0e14763a3198639e382d"
+    },
+    {
+      "path": "web-play/styles.css",
+      "sha256": "b4af708e3f30372caf5712c037b8f63f1100d96ef78b929f43ce602eea59e05e"
+    },
+    {
+      "path": "fonts/Inter-Italic-VariableFont_opsz,wght.ttf",
+      "sha256": "6136f73372fedc37b80fd1a8ec3e21734073ff17376f3672718f186779672e7a"
+    },
+    {
+      "path": "fonts/Inter-VariableFont_opsz,wght.ttf",
+      "sha256": "0be2399ea925f1f83ff974764761da9860ec50742ed29a5d4c1ffd0c5c7ac3a8"
+    },
+    {
+      "path": "fonts/JetBrainsMono-Italic-VariableFont_wght.ttf",
+      "sha256": "2d8ac6a590c2df8f63ae44807c40cac63bc481d197c4cb91d48f1a0f587fb32e"
+    },
+    {
+      "path": "fonts/JetBrainsMono-VariableFont_wght.ttf",
+      "sha256": "192a3158a926768d1fa520164f0fb0f40a6ad085435aa854e43eb14cb40d1aab"
+    },
+    {
+      "path": "fonts/Manrope-VariableFont_wght.ttf",
+      "sha256": "2b7a1ebc80c79246faa1b6e7093c7b91de2a4ceedb9b9a2b2fa05cf9bf8c77cd"
+    },
+    {
+      "path": "fonts/README.md",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "fonts/SpaceGrotesk-VariableFont_wght.ttf",
+      "sha256": "697a7905c71f7c61d071648bc73449541796af865b51c86a672795f3b452b142"
+    },
+    {
+      "path": "locales/ar.json",
+      "sha256": "fb7047e1444aa44b4083bdff9ce3c3a45f964a8e39714a5f4f22185384a3bfd9"
+    },
+    {
+      "path": "locales/de.json",
+      "sha256": "25b67677f62c8d245f7ca76afefffcddb57f70a49bc7a8349a603d1449cfea18"
+    },
+    {
+      "path": "locales/en_gb.json",
+      "sha256": "fbc0077281fa40daa3698c1e4a63475dbe90ed2d6a28571476ec1047d158dd0e"
+    },
+    {
+      "path": "locales/en_us.json",
+      "sha256": "821b0474a9f0770315bb50259a2c9d014f65dc049c0979124c4a547d9c95db5e"
+    },
+    {
+      "path": "locales/es.json",
+      "sha256": "741c93c8ec54beacd8b6ca35d62ffab5c0db71bed0e40348850087da66087b55"
+    },
+    {
+      "path": "locales/fil_ph.json",
+      "sha256": "5abd0f9af3fba29b2e6f664532994c48e5d2269b482103131b10fa600273198b"
+    },
+    {
+      "path": "locales/fr.json",
+      "sha256": "fdac9462bcadc524d39fb4e001abb9575b737abcac004b1915ac6647625cb15b"
+    },
+    {
+      "path": "locales/hi_in.json",
+      "sha256": "ce2e0dc01b9c6fb411b88b30e83b9ce9ea69f4f5ff82a8f47d4ba88d8952fd45"
+    },
+    {
+      "path": "locales/id.json",
+      "sha256": "6395e1615a39ecd7dbd60493b64b277a45d6938fd92e81128437b178ff095eca"
+    },
+    {
+      "path": "locales/it.json",
+      "sha256": "383c238c5cad6bc7f97764ea1fbef5ce5e8fa4a11c5d6733d07a257f31d16c47"
+    },
+    {
+      "path": "locales/ja.json",
+      "sha256": "f14598df7e9d52de3405a2135185185370abb01f1975a41f2246a4ef32514740"
+    },
+    {
+      "path": "locales/ko.json",
+      "sha256": "2fbcb23b5efa1fbc51e24f5bb7944ec4cbd9f1437df16186041980f17eae2987"
+    },
+    {
+      "path": "locales/nl.json",
+      "sha256": "9779ed5e0e9ff191a1261900611848e2ce4412bcaf7c3a501015d105add765f8"
+    },
+    {
+      "path": "locales/pl.json",
+      "sha256": "3125cb00de44add819d1c8938ea0fdebfa65c2116cde49df41ecfa3f018c2353"
+    },
+    {
+      "path": "locales/pt_br.json",
+      "sha256": "eb47d95da5dfc511ee4de043991b9e9a28b5badcb49f37a13c0c08642f5a5a27"
+    },
+    {
+      "path": "locales/pt_pt.json",
+      "sha256": "fffe38dd0272f207ff8fa8e0b3545fddbdee15c4de68378ca09bd3589acec1a4"
+    },
+    {
+      "path": "locales/ru.json",
+      "sha256": "074d5b02f86874365e0e57e8ac593a11a94a7d679e9a3372f8530173ccc7e7c7"
+    },
+    {
+      "path": "locales/th.json",
+      "sha256": "ebf664d97024a3c4f3128f6787ef87c58488373751a7f3e7637e37f28339d265"
+    },
+    {
+      "path": "locales/tr.json",
+      "sha256": "2128aef876c9052a7634c1629bda27b904d5646eb2bc45f36a7e0b88d950d0b7"
+    },
+    {
+      "path": "locales/uk.json",
+      "sha256": "009b2a7cf1a5e8136146341bf0a53adf794dd0e9f307a3f620a672ef1d21dfdf"
+    },
+    {
+      "path": "locales/vi.json",
+      "sha256": "23d16681fa557ff47dd4343daa68eb8e9efe3851219ebb80ca4467e92c9ccc3f"
+    },
+    {
+      "path": "locales/zh_cn.json",
+      "sha256": "f0052d1f62dc446835db93cbd0263e33af8f2ca0061f73f7ac469b813d3202b9"
+    },
+    {
+      "path": "locales/zh_tw.json",
+      "sha256": "013b29ea4d346ae69627683532a308d5d67d05caa997245bb239d087875e0bbb"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/README.md",
+      "sha256": "bfbaebab0c9d232ddbfee1129bf10100897d823dc77360c6c6d39ebb16b83636"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/components/demo.js",
+      "sha256": "49f0796a44e9ab9f72e4fce0c2b3e45e5194c315bab3f523fdafd88fe0f76f58"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-advanced.js",
+      "sha256": "afb87687b64ba441bba4fd2f96bff9d42ed16f550af68f61edd25f7ac646ebd8"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui.js",
+      "sha256": "49b2d5079cfd45be602438f567a26f4402056045c077bd4666dfdd2c00c4f728"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/demo.html",
+      "sha256": "25462ac6f9590b1283586c66a663167c35f5cc0e538da7bac13ef4e324f2587c"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg",
+      "sha256": "261b0acab6cc180c06b3934f198048b30919de581846ee2e8732536f132f1a04"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/styles/demo.css",
+      "sha256": "f5505ab411a08c0125a3a335ca3a95f6ab722d880fd43b8a24e4bd3cf708f4ed"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui-advanced.css",
+      "sha256": "bd2bc6ce1d77292f380558e505404529c6ce71aa23d4fbed109e8d76ebd70235"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css",
+      "sha256": "25b299bf8a97a63bf9414be14a9012b0e34b87c24d50f69d68d311c668bbdec3"
+    }
+  ]
+}
