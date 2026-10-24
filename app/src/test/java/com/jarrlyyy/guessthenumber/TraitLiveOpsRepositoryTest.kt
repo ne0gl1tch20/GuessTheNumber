@@ -70,12 +70,12 @@ class TraitLiveOpsRepositoryTest {
             RemoteTraitFile("assets/traits/catalogs/exploration/NebulaFinderTrait/config.json", "0".repeat(64), "json")
         )
         val trait = RemoteTraitDefinition(
-            "nebula_finder", "trait.nebula_finder.title", "trait.nebula_finder.description",
+            "remote_nebula_finder", "trait.remote_nebula_finder.title", "trait.remote_nebula_finder.description",
             "COLLECTION", effects = listOf("COSMETIC_BADGE"), catalogId = "exploration",
             folderName = "NebulaFinderTrait", files = files
         )
         val result = validateAndMapTraitPayload(payload(listOf(trait)), 21)
-        assertEquals("nebula_finder", result.single().id)
+        assertEquals("remote_nebula_finder", result.single().id)
     }
 
     @Test fun rejectsTraitFilesOutsideTheirCatalogFolder() {
