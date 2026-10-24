@@ -116,7 +116,24 @@ class TraitRegistryTest {
                 }
                 assertEquals("Locale keys differ in ${localeFile.path}", english.keys, localized.keys)
             }
-            if (definition.id == "hundred_consecutive_guesses") assertTrue(english["description"]!!.jsonPrimitive.content.contains("100 consecutive"))
+            if (definition.id == "hundred_consecutive_guesses") {
+                assertTrue(english["description"]!!.jsonPrimitive.content.contains("100 consecutive"))
+                val moduleFile = java.io.File(folder, "module.json")
+                assertTrue("Missing module manifest for milestone trait", moduleFile.isFile)
+                val moduleSources = mapOf(
+                    "logic.lua" to java.io.File(folder, "logic.lua").readText(),
+                    "presentation.js" to java.io.File(folder, "presentation.js").readText(),
+                    "rules.json" to rulesJson.readText()
+                )
+                val runtime = com.jarrlyyy.guessthenumber.traits.TraitExtensionRuntime()
+                val extension = runtime.validate(moduleFile.readText(), moduleSources, definition.id)
+                val before = runtime.evaluateLua(extension, "logic", mapOf("bestStreak" to "99"), definition.effects)
+                val reached = runtime.evaluateLua(extension, "logic", mapOf("bestStreak" to "100"), definition.effects)
+                assertTrue("Milestone must not activate early", !before.eligible)
+                assertTrue("Milestone should activate at 100", reached.eligible)
+                assertEquals(definition.effects, reached.requestedEffects)
+                assertTrue(runtime.javascriptPresentation(extension, "view").contains("renderTrait"))
+            }
         }
         all.map { it.catalogId }.distinct().forEach { catalogId ->
             val indexFile = java.io.File(projectRoot, "app/src/main/assets/traits/catalogs/${catalogId}/catalog.json")

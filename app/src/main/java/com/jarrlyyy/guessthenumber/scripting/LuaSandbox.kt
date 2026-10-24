@@ -42,7 +42,7 @@ internal class LuaSandbox(
         compilerGlobals.load(source, scriptId, Globals())
     }
 
-    fun execute(scriptId: String, source: String, input: Map<String, String> = emptyMap()): LuaValue {
+    fun execute(scriptId: String, source: String): LuaValue {
         checkSource(source)
 
         var logLines = 0
@@ -94,12 +94,6 @@ internal class LuaSandbox(
                 return LuaValue.NIL
             }
         })
-        val inputTable = LuaValue.tableOf()
-        input.entries.take(64).forEach { (key, value) ->
-            require(key.matches(Regex("[A-Za-z][A-Za-z0-9_]{0,47}"))) { "Invalid Lua input key." }
-            inputTable.set(key, LuaValue.valueOf(value.take(256)))
-        }
-        api.set("input", inputTable)
         globals.set("gtn", api)
 
         val chunk = compilerGlobals.load(source, scriptId, globals)

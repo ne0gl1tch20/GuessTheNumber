@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "traitId": "hundred_consecutive_guesses",
+  "modules": [
+    {
+      "id": "logic",
+      "type": "LUA",
+      "entrypoint": "logic.lua",
+      "capabilities": [
+        "read_snapshot"
+      ]
+    },
+    {
+      "id": "view",
+      "type": "JAVASCRIPT",
+      "entrypoint": "presentation.js",
+      "capabilities": [
+        "render_ui"
+      ]
+    },
+    {
+      "id": "rules",
+      "type": "JSON",
+      "entrypoint": "rules.json",
+      "capabilities": [
+        "read_rules"
+      ]
+    }
+  ]
+}

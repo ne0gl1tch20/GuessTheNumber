@@ -40,6 +40,17 @@ class TraitExtensionRuntimeTest {
         }
     }
 
+    @Test fun luaCannotReadSnapshotWithoutDeclaringCapability() {
+        val extension = runtime.validate(
+            """{"schemaVersion":1,"traitId":"remote_streak","modules":[{"id":"logic","type":"LUA","entrypoint":"logic.lua"}]}""",
+            mapOf("logic.lua" to """return { eligible = tonumber(gtn.input.bestStreak or "0") >= 10 }"""),
+            "remote_streak"
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            runtime.evaluateLua(extension, "logic", mapOf("bestStreak" to "10"), emptySet())
+        }
+    }
+
     @Test fun jsonModuleIsParsedAsDeclarativeData() {
         val extension = runtime.validate(
             """{"schemaVersion":1,"traitId":"remote_rules","modules":[{"id":"rules","type":"JSON","entrypoint":"rules.json","capabilities":["read_rules"]}]}""",
