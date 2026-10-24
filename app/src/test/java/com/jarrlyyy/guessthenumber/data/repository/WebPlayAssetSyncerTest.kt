@@ -1,6 +1,5 @@
 package com.jarrlyyy.guessthenumber.data.repository
 
-import androidx.test.core.app.ApplicationProvider
 import android.content.Context
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -9,10 +8,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class WebPlayAssetSyncerTest {
-    private val context = ApplicationProvider.getApplicationContext<Context>()
+    private val context = RuntimeEnvironment.getApplication<Context>()
     private val syncer = WebPlayAssetSyncer(context)
 
     @Test
