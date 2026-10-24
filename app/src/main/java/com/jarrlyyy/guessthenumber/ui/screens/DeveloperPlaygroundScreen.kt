@@ -212,18 +212,33 @@ private fun DeveloperUiPlaygroundScreen(onTestDailyRewards: () -> Unit) {
 @Composable
 private fun DeveloperSaveLabScreen(state: GameState) {
     var simulatedElapsedSeconds by remember { mutableStateOf(3600L) }
+    var previewAutoClickerActive by remember { mutableStateOf(state.autoClickerActive) }
+    var fixtureResults by remember { mutableStateOf(emptyList<com.jarrlyyy.guessthenumber.data.store.SaveFixtureLab.Check>()) }
+    val previewState = remember(state, previewAutoClickerActive) { state.copy(autoClickerActive = previewAutoClickerActive) }
+    val estimatedEarnings = com.jarrlyyy.guessthenumber.domain.engine.OfflineEarningsCalculator.calculate(previewState, simulatedElapsedSeconds)
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("Save Laboratory", style = MaterialTheme.typography.titleLarge) }
-        item { Text("Read-only preview only. These scenarios do not alter the active save.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { Text("All fixtures run in memory. No real save slot, file, or active game state is changed.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         item { DeveloperPanel("Current save state", "lastSaveTimestamp=${state.lastSaveTimestamp}\nautoClickerActive=${state.autoClickerActive}\ntimeTravelPenaltyUntil=${state.timeTravelPenaltyUntil}") }
-        item { Text("Offline duration preview", style = MaterialTheme.typography.titleMedium) }
+        item { Text("Offline earnings calculation (same calculator used by startup loading)", style = MaterialTheme.typography.titleMedium) }
         item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = { simulatedElapsedSeconds = 60L }) { Text("1 min") }
             OutlinedButton(onClick = { simulatedElapsedSeconds = 3600L }) { Text("1 hour") }
             OutlinedButton(onClick = { simulatedElapsedSeconds = 28800L }) { Text("8 hours") }
+            OutlinedButton(onClick = { simulatedElapsedSeconds = 86400L }) { Text("24 hours") }
         } }
-        item { DeveloperPanel("Offline earnings preview", "Elapsed seconds: ${simulatedElapsedSeconds}\nAuto-clicker active: ${state.autoClickerActive}\nEstimated money: ${if (state.autoClickerActive) 500L * simulatedElapsedSeconds else 0L}\nMaximum duration: 28800 seconds") }
-        item { Text("Corrupted-save, migration, and restore tests need isolated fixture storage before they can safely execute.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Checkbox(checked = previewAutoClickerActive, onCheckedChange = { previewAutoClickerActive = it })
+            Column { Text("Auto-clicker active for preview"); Text("This toggle only changes the simulated fixture.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        } }
+        item { DeveloperPanel("Offline earnings result", "Elapsed seconds requested: $simulatedElapsedSeconds\nElapsed seconds capped: ${com.jarrlyyy.guessthenumber.domain.engine.OfflineEarningsCalculator.effectiveSeconds(simulatedElapsedSeconds)}\nAuto-clicker active: $previewAutoClickerActive\nEstimated money: $estimatedEarnings\nCap: 28800 seconds (8 hours)") }
+        item { Text("Save fixture safety suite", style = MaterialTheme.typography.titleMedium) }
+        item { Text("Checks current-schema validation, malformed JSON rejection, negative currency rejection, and legacy-compatible schema round-trip without touching DataStore.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { Button(onClick = { fixtureResults = com.jarrlyyy.guessthenumber.data.store.SaveFixtureLab.runSafetySuite(state) }, modifier = Modifier.fillMaxWidth()) { Text("Run isolated save safety tests") } }
+        if (fixtureResults.isNotEmpty()) {
+            item { DeveloperPanel("Fixture results", fixtureResults.joinToString("\n") { "${if (it.passed) "PASS" else "FAIL"}  ${it.name}: ${it.detail}" }) }
+            item { Text("${fixtureResults.count { it.passed }} / ${fixtureResults.size} checks passed", color = if (fixtureResults.all { it.passed }) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error) }
+        }
     }
 }
 
