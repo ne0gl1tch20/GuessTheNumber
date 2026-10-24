@@ -139,6 +139,7 @@ fun ProductionWebPlayScreen(
     val awardArcadeReward by rememberUpdatedState(onArcadeReward)
     val settleStake by rememberUpdatedState(onSettleStake)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    var rollbackAttempted by remember { mutableStateOf(false) }
     val musicManager = remember { BackgroundMusicManager(context.applicationContext) }
     LaunchedEffect(state.settings.volume) { musicManager.setVolume(state.settings.volume) }
     val musicPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -224,6 +225,14 @@ fun ProductionWebPlayScreen(
                     }
                 }
                 webViewClient = object : WebViewClient() {
+                    override fun onReceivedError(view: WebView, request: WebResourceRequest, error: android.webkit.WebResourceError) {
+                        if (request.isForMainFrame && !rollbackAttempted) {
+                            rollbackAttempted = true
+                            if (webPlayAssetSyncer.rollbackToPrevious()) {
+                                view.post { view.loadUrl("$WEB_UI_ORIGIN${WEB_UI_PATH}index.html") }
+                            }
+                        }
+                    }
                     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest) = assetLoader.shouldInterceptRequest(request.url)
                     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                         val uri = request.url
