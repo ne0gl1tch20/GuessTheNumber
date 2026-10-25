@@ -269,7 +269,21 @@
         <div id="fontPreview" class="jui-card"><div class="jui-display">Jarrlyy UI</div><p class="jui-mono">0123456789 · GAME READY</p><p class="jui-muted">Font presets use local system fonts and need no CDN.</p></div>
       </section>
 
-    <footer class="lab-footer">
+    
+      <section class="jui-card lab-section" data-jui-reveal>
+        <h2>Motion engine · lightweight by design</h2>
+        <p class="jui-muted">Counters, progress, floating reward feedback and scroll reveals. Try it without a framework or network calls.</p>
+        <div class="jui-stat-grid">
+          <article class="jui-card"><span class="jui-stat-label">Animated score</span><strong id="motionScore" class="jui-stat-value">0</strong><span class="jui-stat-label">Count-up</span></article>
+          <article class="jui-card"><span class="jui-stat-label">Progress</span><strong id="motionProgressLabel" class="jui-stat-value">0%</strong><div id="motionProgress" class="jui-meter" role="progressbar" aria-label="Motion demo progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div></article>
+        </div>
+        <div class="jui-row">
+          <button id="motionReplay" class="jui-button jui-button-primary" type="button">Play animations</button>
+          <button id="motionReward" class="jui-button jui-button-accent" type="button">Pop +XP</button>
+        </div>
+        <p class="jui-muted" id="motionStatus" aria-live="polite">Motion respects your device's reduced-motion setting.</p>
+      </section>
+<footer class="lab-footer">
       <p>Jarrlyy UI SDK · local demo data only · no game saves, rewards or network requests are changed here.</p>
       <details class="lab-credits">
         <summary>Credits &amp; font information</summary>
@@ -282,5 +296,19 @@
   <script src="components/jarrlyy-ui.js"></script>
   <script src="components/jarrlyy-ui-advanced.js"></script>
   <script src="components/demo.js"></script>
+<script>
+(function(){
+  function ready(){
+    if(!window.JarrlyyUI || !window.JarrlyyUI.motion) return;
+    var score=document.getElementById("motionScore"), meter=document.getElementById("motionProgress"), label=document.getElementById("motionProgressLabel"), status=document.getElementById("motionStatus");
+    var play=document.getElementById("motionReplay"), reward=document.getElementById("motionReward");
+    function replay(){ window.JarrlyyUI.motion.count(score, 12450, {from:0,duration:720}); window.JarrlyyUI.motion.progress(meter, 76); window.JarrlyyUI.motion.count(label,76,{from:0,duration:600,format:function(v){return Math.round(v)+"%";}}); window.JarrlyyUI.motion.init(document); status.textContent="Animation played. Reduced-motion preferences are respected."; }
+    if(play) play.addEventListener("click", replay);
+    if(reward) reward.addEventListener("click", function(){ window.JarrlyyUI.motion.floatText(reward,"+XP"); status.textContent="Floating reward feedback triggered."; });
+    replay();
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",ready,{once:true}); else ready();
+})();
+</script>
 </body>
 </html>
