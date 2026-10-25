@@ -1,7 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.traits.TraitGameplayCatalog
-
 import com.jarrlyyy.guessthenumber.BuildConfig
 import android.net.Uri
 import org.json.JSONObject
@@ -121,6 +120,41 @@ internal object WebUiBridgeProtocol {
                 }
                 if (!valid) ParseResult.Invalid("invalid_setting_value", id) else ParseResult.Valid(id, type, settingKey = key, settingValue = value)
             }
+            "update_multiplier" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val multiplier = request.opt("multiplier") as? String ?: return ParseResult.Invalid("invalid_multiplier", id)
+                    if (multiplier !in buyMultipliers) ParseResult.Invalid("invalid_multiplier", id) else ParseResult.Valid(id, type, multiplier = multiplier)
+                }
+            }
+            "buy_prestige_upgrade", "buy_ultra_upgrade" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val itemId = request.opt("upgradeId") as? String ?: return ParseResult.Invalid("invalid_upgrade", id)
+                    if (!itemId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) ParseResult.Invalid("invalid_upgrade", id) else ParseResult.Valid(id, type, itemId = itemId)
+                }
+            }
+            "buy_prestige_shop_item", "buy_ultra_shop_item" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val itemId = request.opt("itemId") as? String ?: return ParseResult.Invalid("invalid_shop_item", id)
+                    if (!itemId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) ParseResult.Invalid("invalid_shop_item", id) else ParseResult.Valid(id, type, itemId = itemId)
+                }
+            }
+            "buy_upgrade" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val itemId = request.opt("upgradeId") as? String ?: return ParseResult.Invalid("invalid_upgrade", id)
+                    if (!itemId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) ParseResult.Invalid("invalid_upgrade", id) else ParseResult.Valid(id, type, itemId = itemId)
+                }
+            }
+            "buy_shop_item", "equip_cosmetic" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val itemId = request.opt("itemId") as? String ?: return ParseResult.Invalid("invalid_shop_item", id)
+                    if (!itemId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) ParseResult.Invalid("invalid_shop_item", id) else ParseResult.Valid(id, type, itemId = itemId)
+                }
+            }
             "submit_guess" -> {
                 if (request.length() != 4 || !request.has("guess")) return ParseResult.Invalid("invalid_request", id)
                 val guessText = request.opt("guess") as? String ?: return ParseResult.Invalid("invalid_guess", id)
@@ -128,7 +162,84 @@ internal object WebUiBridgeProtocol {
                 val guess = guessText.toLongOrNull() ?: return ParseResult.Invalid("invalid_guess", id)
                 ParseResult.Valid(id, type, guess = guess)
             }
-            else -> ParseResult.Valid(id, type)
+            "claim_daily_quest" -> {
+                if (request.length() != 4 || !request.has("questId")) return ParseResult.Invalid("invalid_request", id)
+                val questId = request.opt("questId") as? String ?: return ParseResult.Invalid("invalid_quest", id)
+                if (questId !in dailyQuestIds) ParseResult.Invalid("invalid_quest", id) else ParseResult.Valid(id, type, questId = questId)
+            }
+            "open_loot_chest" -> {
+                if (request.length() != 4 || !request.has("tier")) return ParseResult.Invalid("invalid_request", id)
+                val tier = request.opt("tier") as? String ?: return ParseResult.Invalid("invalid_tier", id)
+                if (tier !in lootTiers) ParseResult.Invalid("invalid_tier", id) else ParseResult.Valid(id, type, tier = tier)
+            }
+            "navigate" -> {
+                if (request.length() != 4 || !request.has("route")) return ParseResult.Invalid("invalid_request", id)
+                val route = request.opt("route") as? String ?: return ParseResult.Invalid("invalid_route", id)
+                if (route !in navigationRoutes && !(BuildConfig.DEBUG && route == "dev_settings") && !route.matches(Regex("menu_color_[A-Za-z0-9_-]{1,32}"))) ParseResult.Invalid("invalid_route", id) else ParseResult.Valid(id, type, route = route)
+            }
+            "select_trait_arm" -> {
+                if (request.length() != 5 || !request.has("traitId") || !request.has("armId")) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val traitId = request.opt("traitId") as? String ?: return ParseResult.Invalid("invalid_trait", id)
+                    val armId = request.opt("armId") as? String ?: return ParseResult.Invalid("invalid_arm", id)
+                    val trait = TraitGameplayCatalog.find(traitId) ?: return ParseResult.Invalid("invalid_trait", id)
+                    if (trait.arms.isEmpty()) ParseResult.Invalid("invalid_trait", id) else if (!TraitGameplayCatalog.allowsArm(traitId, armId)) ParseResult.Invalid("invalid_arm", id) else ParseResult.Valid(id, type, traitId = traitId, armId = armId)
+                }
+            }
+            "world_action" -> {
+                if (request.length() != 5 || !request.has("worldId") || !request.has("action")) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val worldId = request.opt("worldId") as? String ?: return ParseResult.Invalid("invalid_world", id)
+                    val action = request.opt("action") as? String ?: return ParseResult.Invalid("invalid_world_action", id)
+                    if (!worldId.matches(Regex("[A-Za-z0-9_-]{1,64}"))) ParseResult.Invalid("invalid_world", id) else if (action !in worldActions) ParseResult.Invalid("invalid_world_action", id) else ParseResult.Valid(id, type, worldId = worldId, worldAction = action)
+                }
+            }
+            "relic_action" -> {
+                if (request.length() != 5 || !request.has("relicId") || !request.has("action")) ParseResult.Invalid("invalid_request", id)
+                else {
+                    val relicId = request.opt("relicId") as? String ?: return ParseResult.Invalid("invalid_relic", id)
+                    val action = request.opt("action") as? String ?: return ParseResult.Invalid("invalid_relic_action", id)
+                    if (relicId !in setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")) ParseResult.Invalid("invalid_relic", id) else if (action !in relicActions) ParseResult.Invalid("invalid_relic_action", id) else ParseResult.Valid(id, type, relicId = relicId, relicAction = action)
+                }
+            }
+            "buy_talent" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id) else {
+                    val talentId = request.opt("talentId") as? String ?: return ParseResult.Invalid("invalid_talent", id)
+                    if (!talentId.matches(Regex("talent_[A-Za-z0-9_-]{1,48}"))) ParseResult.Invalid("invalid_talent", id) else ParseResult.Valid(id, type, itemId = talentId)
+                }
+            }
+            "set_mutator" -> {
+                if (request.length() != 5) ParseResult.Invalid("invalid_request", id) else {
+                    val mutatorId = request.opt("mutatorId") as? String ?: return ParseResult.Invalid("invalid_mutator", id)
+                    val active = request.opt("active") as? String ?: return ParseResult.Invalid("invalid_mutator_state", id)
+                    if (mutatorId !in mutatorIds) ParseResult.Invalid("invalid_mutator", id) else if (active !in setOf("true", "false")) ParseResult.Invalid("invalid_mutator_state", id) else ParseResult.Valid(id, type, mutatorId = mutatorId, mutatorActive = active == "true")
+                }
+            }
+            "arcade_reward" -> {
+                if (request.length() != 5) ParseResult.Invalid("invalid_request", id) else {
+                    val gameId = request.opt("gameId") as? String ?: return ParseResult.Invalid("invalid_arcade_game", id)
+                    val scoreText = request.opt("score") as? String ?: return ParseResult.Invalid("invalid_arcade_score", id)
+                    val score = scoreText.toIntOrNull() ?: return ParseResult.Invalid("invalid_arcade_score", id)
+                    if (gameId !in setOf("quick_guess", "reaction_test", "lucky_number", "memory_match", "number_rush")) ParseResult.Invalid("invalid_arcade_game", id) else if (score !in 0..9_999) ParseResult.Invalid("invalid_arcade_score", id) else ParseResult.Valid(id, type, arcadeGameId = gameId, arcadeScore = score)
+                }
+            }
+            "settle_stake" -> {
+                if (request.length() != 4) ParseResult.Invalid("invalid_request", id) else {
+                    val amount = request.opt("amount") as? String ?: return ParseResult.Invalid("invalid_stake", id)
+                    if (!amount.matches(Regex("[0-9]{1,18}")) || amount.toLongOrNull()?.let { it > 0L } != true) ParseResult.Invalid("invalid_stake", id) else ParseResult.Valid(id, type, stakeAmount = amount)
+                }
+            }
+            else -> ParseResult.Invalid("unknown_action", id)
         }
+    }
+}
+
+internal class WebUiRequestIdWindow(private val capacity: Int = 128) {
+    private val seen = LinkedHashSet<String>()
+    init { require(capacity > 0) { "capacity must be positive" } }
+    fun markIfNew(id: String): Boolean {
+        if (!seen.add(id)) return false
+        if (seen.size > capacity) { val oldest = seen.iterator(); oldest.next(); oldest.remove() }
+        return true
     }
 }
