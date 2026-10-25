@@ -206,7 +206,7 @@ fun ProductionWebPlayScreen(
             initialHex = currentHex,
             title = "🎨 Button color",
             onDismiss = {
-                notifyMenuStudioColorPicked(target, currentHex)
+                notifyMenuStudioColorPicked(target, null)
                 menuStudioColorTarget = null
             },
             onApply = { hex ->
