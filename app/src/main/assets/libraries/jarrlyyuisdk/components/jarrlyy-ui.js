@@ -491,6 +491,7 @@
   }
 
   function initMotion(root = doc) {
+    if (doc.documentElement) doc.documentElement.classList.add("jui-motion-enabled");
     const targets = $$("[data-jui-reveal]", root);
     if (!targets.length) return;
     if (motionPreference() || !("IntersectionObserver" in global)) {
