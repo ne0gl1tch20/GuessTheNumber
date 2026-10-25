@@ -98,7 +98,7 @@ class SecureSaveTransferTest {
     }
 
     @Test
-    fun tamperedSecureEnvelopeDoesNotReachImporter() = runBlocking {
+    fun tamperedSecureEnvelopeIsRejectedWithoutLegacyDowngrade() = runBlocking {
         val key = testKey()
         val envelope = SecureSaveTransfer.encryptWithKey("save-payload", key)
         val bytes = Base64.decode(envelope.removePrefix("GTNSEC2:"), Base64.NO_WRAP)
@@ -116,6 +116,6 @@ class SecureSaveTransferTest {
         )
 
         assertFalse(result)
-        assertTrue(importerCalled) // legacy fallback rejects the malformed secure string
+        assertFalse(importerCalled)
     }
 }
