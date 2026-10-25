@@ -1,6 +1,9 @@
 name: Stable Debug APK
 
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch:
     inputs:
       source_ref:
@@ -20,7 +23,7 @@ jobs:
       - name: Checkout selected source ref
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.source_ref }}
+          ref: ${{ inputs.source_ref || github.ref }}
       - name: Record checked-out source commit
         run: echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Set up JDK 17
@@ -121,7 +124,7 @@ jobs:
       - name: Publish debug-latest release asset
         env:
           GH_TOKEN: ${{ github.token }}
-          SOURCE_REF: ${{ inputs.source_ref }}
+          SOURCE_REF: ${{ inputs.source_ref || github.ref_name }}
         run: |
           version_code="$(grep -E '^[[:space:]]*val appVersionCode = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *//')"
           version_name="$(grep -E '^[[:space:]]*val appVersionName = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *"//; s/"$//')"
