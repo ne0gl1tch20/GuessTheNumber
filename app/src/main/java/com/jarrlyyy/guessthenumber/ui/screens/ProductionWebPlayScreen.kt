@@ -49,6 +49,7 @@ import androidx.webkit.WebViewFeature
 import org.json.JSONObject
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
+import com.jarrlyyy.guessthenumber.ui.components.ReusableColorPickerDialog
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GuessSubmissionResult
@@ -119,6 +120,7 @@ fun ProductionWebPlayScreen(
     val updateScope = rememberCoroutineScope()
     val webPlayAssetSyncer = remember(context) { WebPlayAssetSyncer(context) }
     var latestAvailableUpdate by remember { mutableStateOf<UpdateChannelChecker.AvailableUpdate?>(null) }
+    var menuStudioColorTarget by remember { mutableStateOf<String?>(null) }
     val progressionEngine = remember { GameEngine() }
     val currentGameState by rememberUpdatedState(state)
     val activeLocaleManager by rememberUpdatedState(localeManager)
@@ -147,6 +149,17 @@ fun ProductionWebPlayScreen(
     val awardArcadeReward by rememberUpdatedState(onArcadeReward)
     val settleStake by rememberUpdatedState(onSettleStake)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    fun notifyMenuStudioColorPicked(target: String, hex: String?) {
+        val targetJson = JSONObject.quote(target)
+        val colorJson = hex?.let { JSONObject.quote(it) } ?: "null"
+        webViewRef?.post {
+            webViewRef?.evaluateJavascript(
+                "window.gtnMenuStudioColorPicked && window.gtnMenuStudioColorPicked($targetJson,$colorJson)",
+                null
+            )
+        }
+    }
+
     var rollbackAttempted by remember { mutableStateOf(false) }
     val musicManager = remember { BackgroundMusicManager(context.applicationContext) }
     LaunchedEffect(state.settings.volume) { musicManager.setVolume(state.settings.volume) }
@@ -184,6 +197,32 @@ fun ProductionWebPlayScreen(
                 webViewRef?.evaluateJavascript("window.gtnShowDailyRewardTest && window.gtnShowDailyRewardTest()", null)
             }, 150L)
         }
+    }
+
+    menuStudioColorTarget?.let { target ->
+        val currentHex = state.settings.moreScreenButtonColors[target] ?: "#9B7CFF"
+        ReusableColorPickerDialog(
+            initialHex = currentHex,
+            title = "🎨 Button color",
+            onDismiss = {
+                notifyMenuStudioColorPicked(target, currentHex)
+                menuStudioColorTarget = null
+            },
+            onApply = { hex ->
+                onUpdateSettings(state.settings.copy(
+                    moreScreenButtonColors = state.settings.moreScreenButtonColors + (target to hex)
+                ))
+                notifyMenuStudioColorPicked(target, hex)
+                menuStudioColorTarget = null
+            },
+            onReset = {
+                onUpdateSettings(state.settings.copy(
+                    moreScreenButtonColors = state.settings.moreScreenButtonColors - target
+                ))
+                notifyMenuStudioColorPicked(target, null)
+                menuStudioColorTarget = null
+            }
+        )
     }
 
     AndroidView(
@@ -414,7 +453,11 @@ fun ProductionWebPlayScreen(
                                                  "claim_daily_reward" -> claimDailyReward()
                                                  "dismiss_offline_gains" -> { dismissOfflineGains(); offlineRewardDismissed = true }
                                                 "open_loot_chest" -> parsed.tier?.let(openLootChest)
-                                                "navigate" -> parsed.route?.let(navigateProgression)
+                                                "navigate" -> parsed.route?.let { route ->
+                                                    if (route.startsWith("menu_color_")) {
+                                                        menuStudioColorTarget = route.removePrefix("menu_color_")
+                                                    } else navigateProgression(route)
+                                                }
                                                  "select_trait_arm" -> if (parsed.traitId != null && parsed.armId != null) selectTraitArm(parsed.traitId, parsed.armId) else false
                                                 "open_arcade" -> navigateProgression("arcade")
                                                 "homebase_upgrade" -> navigateProgression("home_upgrade")
