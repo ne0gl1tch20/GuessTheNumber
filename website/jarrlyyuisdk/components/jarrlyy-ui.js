@@ -506,7 +506,8 @@
     targets.forEach((node) => observer.observe(node));
   }
 
-  global.JarrlyyUI = Object.freeze({ init, enhance, toast, dialog: makeDialog, tour, motion: Object.freeze({ count, progress, floatText, init: initMotion }) });
+  global.JarrlyyUI = Object.freeze({ init, enhance, toast, dialog: makeDialog, tour });
+  global.JarrlyyUIMotion = Object.freeze({ count, progress, floatText, init: initMotion });
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })(window);
