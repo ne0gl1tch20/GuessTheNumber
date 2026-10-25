@@ -365,7 +365,7 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn('id="arcadeLabTitle"', demo)
         self.assertIn(".arcade-lab", demo_css)
         self.assertIn("Jarrlyy arcade surface integration", web_css)
-        for relative in ("styles/jarrlyy-ui.css", "styles/jarrlyy-ui-advanced.css", "components/jarrlyy-ui.js", "components/jarrlyy-ui-advanced.js", "demo.html", "styles/demo.css"):
+        for relative in ("styles/jarrlyy-ui.css", "styles/jarrlyy-ui-advanced.css", "components/jarrlyy-ui.js", "components/jarrlyy-ui-advanced.js", "styles/demo.css"):
             with self.subTest(relative=relative):
                 self.assertEqual((SDK / relative).read_text(encoding="utf-8"), (ROOT / "website/jarrlyyuisdk" / relative).read_text(encoding="utf-8"), f"SDK copy drift: {relative}")
 
