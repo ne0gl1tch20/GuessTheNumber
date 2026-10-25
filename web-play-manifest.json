@@ -185,15 +185,15 @@
     },
     {
       "path": "web-play/index.html",
-      "sha256": "6a3ffe6ddc1bf486e6c6fac102e903cd9fa8e09580f95315cd005c048ccebd12"
+      "sha256": "8e3ed4f02d5e85869fe41fd1dbeaffd5d849fce16c8e49892083799888779475"
     },
     {
       "path": "web-play/menu-studio.js",
-      "sha256": "26f9d3314cf70bd5be162a028b3a94fa6a2468abbfe42912697435f233f6d219"
+      "sha256": "e66630ad3e3610755bfc06f48fe289d57b04587b16f3dc8284416ff2adb0badc"
     },
     {
       "path": "web-play/styles.css",
-      "sha256": "28f18dbad51ba1bf4f001693a2167a7660f625711c5e31e17379961cac43cc57"
+      "sha256": "c7af778d667a82235fc5826bc96f6aeda770b24e3ed28d253eef61cd359bd9a8"
     },
     {
       "path": "web-play/trait-extension-host.js",
