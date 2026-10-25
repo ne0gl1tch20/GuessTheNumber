@@ -1,4 +1,4 @@
-package com.jarrlyy.guessthenumber.shared.engine
+package com.jarrlyyy.guessthenumber.shared.engine
 
 import org.junit.Assert.assertTrue
 import org.junit.Test
