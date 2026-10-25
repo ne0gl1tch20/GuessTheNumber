@@ -583,6 +583,7 @@ fun ProductionWebPlayScreen(
                                                             "customPrimaryColor" -> settings.copy(themePreset = "Custom", customPrimaryColor = value)
                                                             "customSecondaryColor" -> settings.copy(themePreset = "Custom", customSecondaryColor = value)
                                                             "customTertiaryColor" -> settings.copy(themePreset = "Custom", customTertiaryColor = value)
+                                                            "webMenuStudioLayout" -> settings.copy(webMenuStudioLayout = value)
                                                             else -> throw IllegalArgumentException("Unsupported setting")
                                                         }
                                                         updateSettings(updated)
@@ -859,7 +860,8 @@ fun ProductionWebPlayScreen(
                                                 .put("themePreset", game.settings.themePreset)
                                                 .put("customPrimaryColor", game.settings.customPrimaryColor)
                                                 .put("customSecondaryColor", game.settings.customSecondaryColor)
-                                                .put("customTertiaryColor", game.settings.customTertiaryColor))
+                                                .put("customTertiaryColor", game.settings.customTertiaryColor)
+                                                .put("webMenuStudioLayout", game.settings.webMenuStudioLayout ?: ""))
                                             .put("uiStrings", JSONObject().apply {
                                                 listOf(
                                                     "stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc",
