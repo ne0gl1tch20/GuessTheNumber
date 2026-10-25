@@ -85,6 +85,21 @@ internal object WebUiBridgeProtocol {
                 if (!featureId.matches(Regex("[A-Za-z0-9_-]{1,48}"))) return ParseResult.Invalid("invalid_feature", id)
                 ParseResult.Valid(id, type, itemId = featureId)
             }
+            "creative_update_value" -> {
+                if (request.length() != 5 || !request.has("key") || !request.has("value")) return ParseResult.Invalid("invalid_request", id)
+                val key = request.opt("key") as? String ?: return ParseResult.Invalid("invalid_creative_value", id)
+                val value = request.opt("value") as? String ?: return ParseResult.Invalid("invalid_creative_value", id)
+                val allowedKeys = setOf("money", "prestige", "ultra", "nebula", "attempts", "correctGuesses", "streak", "bestStreak")
+                if (key !in allowedKeys) return ParseResult.Invalid("invalid_creative_value", id)
+                val valid = when (key) {
+                    "money", "prestige", "ultra", "nebula" -> value.length in 1..100 && Regex("[0-9]+(?:\\.[0-9]+)?(?:[A-Za-z]{1,4})?").matches(value)
+                    "attempts", "correctGuesses" -> value.toLongOrNull()?.let { it in 0L..1_000_000_000_000L } == true
+                    "streak", "bestStreak" -> value.toIntOrNull()?.let { it in 0..1_000_000 } == true
+                    else -> false
+                }
+                if (!valid) return ParseResult.Invalid("invalid_creative_value", id)
+                ParseResult.Valid(id, type, settingKey = key, settingValue = value)
+            }
             "creative_update_range" -> {
                 if (request.length() != 5 || !request.has("rangeMin") || !request.has("rangeMax")) return ParseResult.Invalid("invalid_request", id)
                 val minText = request.opt("rangeMin") as? String ?: return ParseResult.Invalid("invalid_creative_range", id)
