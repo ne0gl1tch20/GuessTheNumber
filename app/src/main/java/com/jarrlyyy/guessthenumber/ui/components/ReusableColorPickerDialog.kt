@@ -51,12 +51,15 @@ fun ReusableColorPickerDialog(
         value = (1f - position.y / height).coerceIn(0f, 1f)
     }
 
+    // Capture this before AlertDialog creates its separate dialog composition.
+    val localeManager = LocalAppLocaleManager.current
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title ?: LocalAppLocaleManager.current.getString("color_picker_title", "🎨 Pick a color")) },
+        title = { Text(title ?: localeManager.getString("color_picker_title", "🎨 Pick a color")) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(LocalAppLocaleManager.current.getString("color_picker_color", "Color"), style = MaterialTheme.typography.labelLarge)
+                Text(localeManager.getString("color_picker_color", "Color"), style = MaterialTheme.typography.labelLarge)
 
                 Box(
                     modifier = Modifier
@@ -104,7 +107,7 @@ fun ReusableColorPickerDialog(
                     }
                 }
 
-                Text(LocalAppLocaleManager.current.getString("color_picker_hue", "Hue: %d°").format(hue.toInt()))
+                Text(localeManager.getString("color_picker_hue", "Hue: %d°").format(hue.toInt()))
                 Slider(
                     value = hue,
                     onValueChange = { hue = it },
@@ -122,7 +125,7 @@ fun ReusableColorPickerDialog(
                         tonalElevation = 4.dp
                     ) {}
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(LocalAppLocaleManager.current.getString("color_picker_live_preview", "Live preview"), style = MaterialTheme.typography.labelLarge)
+                        Text(localeManager.getString("color_picker_live_preview", "Live preview"), style = MaterialTheme.typography.labelLarge)
                         Text(hex, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
@@ -140,17 +143,17 @@ fun ReusableColorPickerDialog(
                             value = next[2]
                         }
                     },
-                    label = { Text(LocalAppLocaleManager.current.getString("color_picker_hex", "Hex")) },
+                    label = { Text(localeManager.getString("color_picker_hex", "Hex")) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         },
-        confirmButton = { Button(onClick = { onApply(hex) }) { Text(LocalAppLocaleManager.current.getString("color_picker_apply", "Apply")) } },
+        confirmButton = { Button(onClick = { onApply(hex) }) { Text(localeManager.getString("color_picker_apply", "Apply")) } },
         dismissButton = {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                if (onReset != null) TextButton(onClick = onReset) { Text(LocalAppLocaleManager.current.getString("color_picker_use_theme", "Use theme")) }
-                TextButton(onClick = onDismiss) { Text(LocalAppLocaleManager.current.getString("color_picker_cancel", "Cancel")) }
+                if (onReset != null) TextButton(onClick = onReset) { Text(localeManager.getString("color_picker_use_theme", "Use theme")) }
+                TextButton(onClick = onDismiss) { Text(localeManager.getString("color_picker_cancel", "Cancel")) }
             }
         }
     )
