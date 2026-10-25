@@ -194,7 +194,10 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                         locale.getStringByEnglish("Website") to "https://ne0gl1tch20.github.io/GuessTheNumber"
                     ).forEach { (label, url) ->
                         OutlinedButton(
-                            onClick = {\n                                runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }\n                                    .onFailure { android.widget.Toast.makeText(context, locale.getStringByEnglish("Could not open this link."), android.widget.Toast.LENGTH_SHORT).show() }\n                            },
+                            onClick = {
+                                runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+                                    .onFailure { android.widget.Toast.makeText(context, locale.getStringByEnglish("Could not open this link."), android.widget.Toast.LENGTH_SHORT).show() }
+                            },
                             modifier = Modifier.fillMaxWidth()
                         ) { Text(label) }
                     }
