@@ -1,6 +1,7 @@
 # Guess The Number 3.1.0 — Unreleased
 
-- 🧪 **Creative Mode and trait-system expansion:** Phase 8+ implementation work is being tracked in the trait-system roadmap. Only items with implementation and passing checks will be marked complete.
+- 🧪 **Creative Mode runtime foundation:** added an isolated guess-run model with range validation, attempt limits, bounded hints, run snapshots, resume/clear helpers and schema v1/v2 migration to v3. The production player-facing session lifecycle still needs to be wired to these APIs.
+- 🌦️ **Seasonal trait calendar:** centralized deterministic season windows, including winter across year boundaries, and added boundary tests.
 - 💾 **Save compatibility:** portable encrypted backups and versioned per-slot Creative Mode saves remain supported. Keep the export passphrase somewhere safe; it is not stored by the app.
 - 🌦️ **Trait and seasonal architecture:** continued work is planned around deterministic activation, safe effect policies, signed catalog updates and offline-first seasonal behavior.
 - 📚 **Project history:** added [the PR-by-PR development ledger](../../../docs/PR_CHANGELOG.md) so merged work and open/unmerged attempts are easier to audit.
