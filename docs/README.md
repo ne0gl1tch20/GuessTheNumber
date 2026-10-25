@@ -4,6 +4,9 @@ This directory contains technical notes for the Android game, KMP architecture a
 
 ## Start here
 
+- [Project changelog](../CHANGELOG.md) — current release summary and validation notes.
+- [Pull Request Development Ledger](PR_CHANGELOG.md) — PR-by-PR development history, including unmerged attempts.
+
 | Document | What it covers |
 |---|---|
 | [Game content and feature flags](GAME_CONTENT.md) | Bundled JSON schemas, feature flags, LiveOps fields, validation and save compatibility |
