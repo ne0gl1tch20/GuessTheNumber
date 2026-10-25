@@ -87,6 +87,15 @@ class WebUiBridgeProtocolTest {
             "invalid_creative_value",
             (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-value-3","type":"creative_update_value","key":"grantRewards","value":"true"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
         )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid(
+                "creative-value-4",
+                "creative_update_value",
+                settingKey = "upgradeLevel:click_power",
+                settingValue = "10"
+            ),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-value-4","type":"creative_update_value","key":"upgradeLevel:click_power","value":"10"}""")
+        )
     }
 
     @Test
