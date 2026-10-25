@@ -6,6 +6,9 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 class CreativeModeSaveTest {
     @Test
@@ -28,6 +31,23 @@ class CreativeModeSaveTest {
         assertEquals(191L, rules?.rangeMax)
         assertEquals(3, rules?.extraHints)
         assertEquals(20, rules?.attemptLimit)
+    }
+
+    @Test
+    fun fullBackupBundleRoundTripsCreativeSlotData() {
+        val creative = CreativeModeSaveCodec.encode(
+            CreativeModeSave(name = "Slot Two Lab", enabled = true, rangeMax = 500L)
+        )
+        val bundle = EncryptedBackupBundle(
+            formatVersion = 3,
+            appPreferencesJson = "{}",
+            activeSlot = 2,
+            creativeSlots = mapOf(2 to creative)
+        )
+        val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+        val decoded = json.decodeFromString<EncryptedBackupBundle>(json.encodeToString(bundle))
+        assertEquals(3, decoded.formatVersion)
+        assertEquals("Slot Two Lab", CreativeModeSaveCodec.decodeAndMigrate(decoded.creativeSlots.getValue(2))?.name)
     }
 
     @Test
