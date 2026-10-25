@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "a1f2347cb7056c96542a59932d236cd2b7bf5bc8",
+  "version": "c0332e2bd7d753389e333216b694ffb473ba864c",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -29,7 +29,7 @@
     },
     {
       "path": "web-play/styles.css",
-      "sha256": "8c15f502bebe0adf02f1f6477e24e028cd65ae6786387162ff34dfa872186f5c"
+      "sha256": "dfe2b6ef226784737623aba9df906a114fae8870652ad9618162798364947dfd"
     },
     {
       "path": "web-play/trait-extension-host.js",
@@ -197,7 +197,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css",
-      "sha256": "f19d156117e69ef768399232ac7aced1689358aa700c937d3dd20f77c0f99359"
+      "sha256": "e23d1c68ff85a76d46f7452d553a0e1ff0ed50c137b8dc4bdd15bde2445709c6"
     }
   ]
 }
