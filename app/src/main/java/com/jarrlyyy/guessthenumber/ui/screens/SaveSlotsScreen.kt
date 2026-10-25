@@ -530,6 +530,7 @@ fun SaveSlotsScreen(
                                 CreativeGuessOutcome.OUT_OF_RANGE -> "That guess is outside this run's range."
                                 CreativeGuessOutcome.ATTEMPT_LIMIT -> "Attempt limit reached. Restart the run to try again."
                                 CreativeGuessOutcome.COMPLETED -> "This run is complete. Start a new run to play again."
+                                CreativeGuessOutcome.INVALID_CONFIGURATION -> "This run no longer matches the saved rules. Restart it to continue."
                             }
                             CreativeModeRuntime.persist(config, decision.run)?.let { persisted ->
                                 creativeRunSave = persisted
