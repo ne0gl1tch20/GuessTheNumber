@@ -1,0 +1,116 @@
+# Pull Request Development Ledger
+
+This is an audit ledger of the latest 100 pull requests returned by GitHub for this repository when the 3.1.0 documentation pass was prepared. It intentionally includes closed, unmerged and open entries so abandoned attempts are not mistaken for shipped work. A merged PR is not, by itself, proof that every runtime/device scenario was tested; use the PR's checks and body for its exact verification status.
+
+## Pull requests (oldest to newest)
+
+- [#248 — fix: restore GuessTheNumber shared Play branding](https://github.com/ne0gl1tch20/GuessTheNumber/pull/248) — Merged 2026-10-17.
+- [#249 — feat: lock Numberverse shared HTML UI for Android and Windows](https://github.com/ne0gl1tch20/GuessTheNumber/pull/249) — Merged 2026-10-17.
+- [#250 — feat: lock Android into HTML-first player UI](https://github.com/ne0gl1tch20/GuessTheNumber/pull/250) — Merged 2026-10-17.
+- [#251 — feat: lock in shared HTML mobile UI migration](https://github.com/ne0gl1tch20/GuessTheNumber/pull/251) — Merged 2026-10-17.
+- [#252 — feat: make HTML the shared mobile player UI](https://github.com/ne0gl1tch20/GuessTheNumber/pull/252) — Merged 2026-10-17.
+- [#253 — feat: brand the shared mobile UI as Numberverse](https://github.com/ne0gl1tch20/GuessTheNumber/pull/253) — Merged 2026-10-17.
+- [#254 — fix: wire the shared Numberverse HTML Play route](https://github.com/ne0gl1tch20/GuessTheNumber/pull/254) — Merged 2026-10-17.
+- [#255 — Polish Numberverse branding and navigation icons](https://github.com/ne0gl1tch20/GuessTheNumber/pull/255) — Merged 2026-10-17.
+- [#256 — Migrate Upgrades and Shop to the shared HTML interface](https://github.com/ne0gl1tch20/GuessTheNumber/pull/256) — Merged 2026-10-17.
+- [#257 — Start shared HTML UI migration across Android and Windows](https://github.com/ne0gl1tch20/GuessTheNumber/pull/257) — Merged 2026-10-17.
+- [#258 — Embed the shared HTML UI in Windows for Play, Upgrades and Shop](https://github.com/ne0gl1tch20/GuessTheNumber/pull/258) — Merged 2026-10-18.
+- [#259 — Add shared Home Base, Relics and Codex screens](https://github.com/ne0gl1tch20/GuessTheNumber/pull/259) — Merged 2026-10-18.
+- [#260 — Add shared saved settings and accessibility controls](https://github.com/ne0gl1tch20/GuessTheNumber/pull/260) — Merged 2026-10-18.
+- [#261 — Add shared Prestige and Ultra progression screens](https://github.com/ne0gl1tch20/GuessTheNumber/pull/261) — Merged 2026-10-18.
+- [#262 — Finish shared Talent and Mutator screens](https://github.com/ne0gl1tch20/GuessTheNumber/pull/262) — Merged 2026-10-18.
+- [#263 — Route desktop player screens through shared HTML](https://github.com/ne0gl1tch20/GuessTheNumber/pull/263) — Merged 2026-10-18.
+- [#264 — Finish shared Stats, Arcade and Lucky Stake screens](https://github.com/ne0gl1tch20/GuessTheNumber/pull/264) — Merged 2026-10-18.
+- [#265 — Localize remaining shared UI status messages](https://github.com/ne0gl1tch20/GuessTheNumber/pull/265) — Merged 2026-10-18.
+- [#266 — Localize shared settings and accessibility controls](https://github.com/ne0gl1tch20/GuessTheNumber/pull/266) — Merged 2026-10-18.
+- [#267 — Finish shared HTML auxiliary screens and localize arcade prompts](https://github.com/ne0gl1tch20/GuessTheNumber/pull/267) — Closed without merge.
+- [#268 — Finish auxiliary UI localization and remove technical wording](https://github.com/ne0gl1tch20/GuessTheNumber/pull/268) — Merged 2026-10-18.
+- [#269 — fix: restore Guess The Number UI and bridge diagnostics](https://github.com/ne0gl1tch20/GuessTheNumber/pull/269) — Merged 2026-10-18.
+- [#270 — fix: restore More menu and Arcade minigame loading](https://github.com/ne0gl1tch20/GuessTheNumber/pull/270) — Merged 2026-10-18.
+- [#271 — ci: separate Windows PR build tests from artifact packaging](https://github.com/ne0gl1tch20/GuessTheNumber/pull/271) — Merged 2026-10-18.
+- [#272 — Sync Web settings and fix navigation/fresh-save initialization](https://github.com/ne0gl1tch20/GuessTheNumber/pull/272) — Merged 2026-10-18.
+- [#273 — Improve HTML progression, save-slot navigation and visual stats](https://github.com/ne0gl1tch20/GuessTheNumber/pull/273) — Merged 2026-10-19.
+- [#274 — Add update diagnostics and fix arcade popup sizing](https://github.com/ne0gl1tch20/GuessTheNumber/pull/274) — Merged 2026-10-20.
+- [#275 — Fix arcade popup collapsing on mobile](https://github.com/ne0gl1tch20/GuessTheNumber/pull/275) — Closed without merge.
+- [#276 — Fix Android update installation callback](https://github.com/ne0gl1tch20/GuessTheNumber/pull/276) — Closed without merge.
+- [#277 — Handle Android update installation confirmation](https://github.com/ne0gl1tch20/GuessTheNumber/pull/277) — Merged 2026-10-20.
+- [#278 — Fix Stable Debug up-to-date detection](https://github.com/ne0gl1tch20/GuessTheNumber/pull/278) — Merged 2026-10-20.
+- [#279 — Prevent Stable Debug builds from publishing outdated launcher icons](https://github.com/ne0gl1tch20/GuessTheNumber/pull/279) — Merged 2026-10-20.
+- [#280 — Add Firebase Android SDK foundation](https://github.com/ne0gl1tch20/GuessTheNumber/pull/280) — Merged 2026-10-20.
+- [#281 — Add offline profiles and Nimmy first-run guide](https://github.com/ne0gl1tch20/GuessTheNumber/pull/281) — Merged 2026-10-20.
+- [#282 — Allow stable debug APK builds from any branch](https://github.com/ne0gl1tch20/GuessTheNumber/pull/282) — Merged 2026-10-20.
+- [#283 — Fix stable debug APK workflow on profile branch](https://github.com/ne0gl1tch20/GuessTheNumber/pull/283) — Merged 2026-10-20.
+- [#284 — Make Stable Debug update checks resolve release tags safely](https://github.com/ne0gl1tch20/GuessTheNumber/pull/284) — Merged 2026-10-20.
+- [#285 — Make Android profile setup scrollable and less cramped](https://github.com/ne0gl1tch20/GuessTheNumber/pull/285) — Merged 2026-10-20.
+- [#286 — Polish HTML economy, rewards, Nimmy tours, profiles and reset safeguards](https://github.com/ne0gl1tch20/GuessTheNumber/pull/286) — Merged 2026-10-21.
+- [#287 — Apply bundled custom fonts to HTML game UI](https://github.com/ne0gl1tch20/GuessTheNumber/pull/287) — Merged 2026-10-22.
+- [#288 — Refresh Guess The Number showcase website](https://github.com/ne0gl1tch20/GuessTheNumber/pull/288) — Merged 2026-10-21.
+- [#289 — Make showcase landing page interactive and animated](https://github.com/ne0gl1tch20/GuessTheNumber/pull/289) — Merged 2026-10-21.
+- [#290 — Replace website Unicode icons with crisp local SVGs](https://github.com/ne0gl1tch20/GuessTheNumber/pull/290) — Merged 2026-10-21.
+- [#291 — Guide HTML Reset Everything to Save Slots](https://github.com/ne0gl1tch20/GuessTheNumber/pull/291) — Merged 2026-10-21.
+- [#292 — docs: plan reusable HTML UI kit and Android back navigation](https://github.com/ne0gl1tch20/GuessTheNumber/pull/292) — Closed without merge.
+- [#293 — fix: restore Android back navigation across HTML and Compose screens](https://github.com/ne0gl1tch20/GuessTheNumber/pull/293) — Closed without merge.
+- [#294 — fix: confirm Android app exit and preserve localized back navigation](https://github.com/ne0gl1tch20/GuessTheNumber/pull/294) — Merged 2026-10-21.
+- [#295 — ci: audit all frontend assets and publish audit reports](https://github.com/ne0gl1tch20/GuessTheNumber/pull/295) — Merged 2026-10-21.
+- [#296 — feat: add Jarrlyy UI SDK and APK build metadata](https://github.com/ne0gl1tch20/GuessTheNumber/pull/296) — Merged 2026-10-22.
+- [#297 — fix: polish Jarrlyy UI SDK interactions and accessibility](https://github.com/ne0gl1tch20/GuessTheNumber/pull/297) — Merged 2026-10-22.
+- [#298 — test: verify shared UI fonts are actually applied](https://github.com/ne0gl1tch20/GuessTheNumber/pull/298) — Merged 2026-10-22.
+- [#299 — feat: use Jarrlyy UI SDK for player notifications](https://github.com/ne0gl1tch20/GuessTheNumber/pull/299) — Merged 2026-10-22.
+- [#300 — fix: finish Jarrlyy UI SDK audit](https://github.com/ne0gl1tch20/GuessTheNumber/pull/300) — Merged 2026-10-22.
+- [#301 — feat: complete curated Jarrlyy UI kit pass](https://github.com/ne0gl1tch20/GuessTheNumber/pull/301) — Merged 2026-10-22.
+- [#302 — docs: credit Jarrlyy UI SDK in About licenses](https://github.com/ne0gl1tch20/GuessTheNumber/pull/302) — Merged 2026-10-23.
+- [#303 — Add Jarrlyy UI SDK playground to the website](https://github.com/ne0gl1tch20/GuessTheNumber/pull/303) — Merged 2026-10-22.
+- [#304 — feat: showcase Jarrlyy UI SDK from landing page](https://github.com/ne0gl1tch20/GuessTheNumber/pull/304) — Merged 2026-10-22.
+- [#305 — feat: add motion, typography and credits to Jarrlyy UI SDK](https://github.com/ne0gl1tch20/GuessTheNumber/pull/305) — Merged 2026-10-22.
+- [#306 — feat: expand Jarrlyy UI SDK motion, typography and components](https://github.com/ne0gl1tch20/GuessTheNumber/pull/306) — Merged 2026-10-22.
+- [#307 — fix: keep Jarrlyy UI toggle switches compact](https://github.com/ne0gl1tch20/GuessTheNumber/pull/307) — Merged 2026-10-22.
+- [#308 — feat(ui): add Jarrlyy Compose parity primitives](https://github.com/ne0gl1tch20/GuessTheNumber/pull/308) — Merged 2026-10-23.
+- [#309 — feat: use Jarrlyy UI SDK across the website](https://github.com/ne0gl1tch20/GuessTheNumber/pull/309) — Merged 2026-10-23.
+- [#310 — Migrate GuessTheNumber UI to reusable Jarrlyy SDK components without redesign](https://github.com/ne0gl1tch20/GuessTheNumber/pull/310) — Merged 2026-10-23.
+- [#311 — Fix compact mobile navigation and Nimmy tutorial popup layout](https://github.com/ne0gl1tch20/GuessTheNumber/pull/311) — Merged 2026-10-23.
+- [#312 — Fix stable debug updates to use Actions artifacts](https://github.com/ne0gl1tch20/GuessTheNumber/pull/312) — Merged 2026-10-23.
+- [#313 — Fix Windows debug update artifact discovery](https://github.com/ne0gl1tch20/GuessTheNumber/pull/313) — Merged 2026-10-23.
+- [#314 — Fix clipped web popups and Nimmy tutorial positioning](https://github.com/ne0gl1tch20/GuessTheNumber/pull/314) — Merged 2026-10-23.
+- [#315 — Fix Android and Windows Debug updater downloads](https://github.com/ne0gl1tch20/GuessTheNumber/pull/315) — Merged 2026-10-23.
+- [#316 — Fix Nimmy and shared popup layout](https://github.com/ne0gl1tch20/GuessTheNumber/pull/316) — Merged 2026-10-23.
+- [#317 — Fix Stable Debug updater version detection](https://github.com/ne0gl1tch20/GuessTheNumber/pull/317) — Merged 2026-10-23.
+- [#318 — Standardize popup sizing and prevent clipping](https://github.com/ne0gl1tch20/GuessTheNumber/pull/318) — Merged 2026-10-23.
+- [#319 — Let Stable Debug publish from any selected ref](https://github.com/ne0gl1tch20/GuessTheNumber/pull/319) — Merged 2026-10-23.
+- [#320 — Move game dialogs into a dedicated popup layer](https://github.com/ne0gl1tch20/GuessTheNumber/pull/320) — Merged 2026-10-23.
+- [#321 — Fix Nimmy popup collapse in Android WebView](https://github.com/ne0gl1tch20/GuessTheNumber/pull/321) — Merged 2026-10-23.
+- [#322 — Fix reset popup clipping and guard Nimmy layout](https://github.com/ne0gl1tch20/GuessTheNumber/pull/322) — Merged 2026-10-23.
+- [#323 — Fix Daily Rewards popup clipping on Android](https://github.com/ne0gl1tch20/GuessTheNumber/pull/323) — Merged 2026-10-23.
+- [#324 — Close arcade popup after claiming reward](https://github.com/ne0gl1tch20/GuessTheNumber/pull/324) — Merged 2026-10-24.
+- [#325 — Close arcade popup immediately on claim tap](https://github.com/ne0gl1tch20/GuessTheNumber/pull/325) — Merged 2026-10-24.
+- [#326 — Fix arcade claim button while bridge requests are pending](https://github.com/ne0gl1tch20/GuessTheNumber/pull/326) — Merged 2026-10-24.
+- [#327 — Queue arcade reward claims while bridge is busy](https://github.com/ne0gl1tch20/GuessTheNumber/pull/327) — Merged 2026-10-24.
+- [#328 — Add offline-first web-play asset auto-sync](https://github.com/ne0gl1tch20/GuessTheNumber/pull/328) — Merged 2026-10-24.
+- [#329 — Add visible web-play auto-sync test card](https://github.com/ne0gl1tch20/GuessTheNumber/pull/329) — Merged 2026-10-24.
+- [#330 — Remove temporary web-play auto-sync test card](https://github.com/ne0gl1tch20/GuessTheNumber/pull/330) — Merged 2026-10-24.
+- [#331 — Force-close arcade popup immediately after claiming reward](https://github.com/ne0gl1tch20/GuessTheNumber/pull/331) — Merged 2026-10-24.
+- [#332 — Close arcade popup before attempting reward bridge send](https://github.com/ne0gl1tch20/GuessTheNumber/pull/332) — Merged 2026-10-24.
+- [#333 — Add HTML version diagnostics to Dev Settings](https://github.com/ne0gl1tch20/GuessTheNumber/pull/333) — Merged 2026-10-24.
+- [#334 — Route Android arcade to native Compose popup](https://github.com/ne0gl1tch20/GuessTheNumber/pull/334) — Merged 2026-10-24.
+- [#335 — Restore offline earnings popup after save loading](https://github.com/ne0gl1tch20/GuessTheNumber/pull/335) — Merged 2026-10-24.
+- [#336 — Build unified Developer & Testing Playground](https://github.com/ne0gl1tch20/GuessTheNumber/pull/336) — Merged 2026-10-24.
+- [#337 — docs: plan traits and seasonal system architecture](https://github.com/ne0gl1tch20/GuessTheNumber/pull/337) — Merged 2026-10-24.
+- [#338 — feat: add initial trait registry and schema](https://github.com/ne0gl1tch20/GuessTheNumber/pull/338) — Merged 2026-10-24.
+- [#339 — feat: add deterministic trait activation engine](https://github.com/ne0gl1tch20/GuessTheNumber/pull/339) — Merged 2026-10-24.
+- [#340 — Integrate trait rewards and persistent discoveries](https://github.com/ne0gl1tch20/GuessTheNumber/pull/340) — Merged 2026-10-24.
+- [#341 — Expand offline trait catalog for Phase 3](https://github.com/ne0gl1tch20/GuessTheNumber/pull/341) — Merged 2026-10-24.
+- [#342 — Add signed online trait catalogs for Phase 4](https://github.com/ne0gl1tch20/GuessTheNumber/pull/342) — Merged 2026-10-24.
+- [#343 — Profile trait activation hot path](https://github.com/ne0gl1tch20/GuessTheNumber/pull/343) — Merged 2026-10-24.
+- [#344 — Phase 6: native gameplay optimization and secure save transfer](https://github.com/ne0gl1tch20/GuessTheNumber/pull/344) — Merged 2026-10-24.
+- [#349 — Phase 6: secure save transfer, compatibility tests, and native benchmark](https://github.com/ne0gl1tch20/GuessTheNumber/pull/349) — Merged 2026-10-25.
+- [#350 — Phase 6: wire native optimizer into production gameplay](https://github.com/ne0gl1tch20/GuessTheNumber/pull/350) — Merged 2026-10-25.
+- [#351 — Portable encrypted backups and Phase 7 Creative Mode saves](https://github.com/ne0gl1tch20/GuessTheNumber/pull/351) — Merged 2026-10-25.
+
+## Major workstreams visible in this history
+
+- **Shared UI and Jarrlyy UI SDK:** PRs #248–#310 and follow-up fixes cover HTML-first/shared UI routing, Android/Windows player UI parity work, reusable SDK components, typography/fonts, icons, navigation, accessibility and popup behavior.
+- **Web-play asset sync and UI reliability:** PRs #328–#335 and #329–#334 cover offline-first web asset sync, bridge reward-claim queueing, arcade popup fixes, HTML version diagnostics and offline earnings restoration.
+- **Developer tools and traits:** PR #336 adds the developer/testing playground; PRs #337–#343 establish trait planning, schemas, activation, persistent discovery/reward policy, offline catalog expansion, signed online catalogs and profiling.
+- **Native gameplay and save portability:** PRs #344, #349 and #350 cover the native optimizer/security foundation, compatibility/benchmark follow-ups and production gameplay integration; PR #351 adds portable passphrase-encrypted backups and per-slot Creative Mode save/effect foundations.
+- **Updater and popup fixes:** PRs #274, #277–#284, #312–#319 and #321–#323 cover update-channel/artifact discovery, version checks, stable debug build behavior, and popup sizing/clipping.
+- **Important status rule:** some entries in the list are closed without merge. They are retained for traceability, not described as shipped features. The current default branch and merged PR diffs remain the source of truth.
+
