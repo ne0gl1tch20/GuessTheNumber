@@ -942,7 +942,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val number = value.toIntOrNull()?.takeIf { it in current.streak..1_000_000 } ?: return false
                 current.copy(bestStreak = number)
             }
-            else -> return false
+            else -> {
+                if (!key.startsWith("upgradeLevel:")) return false
+                val upgradeId = key.substringAfter("upgradeLevel:")
+                val definition = JsonConfigRepository(getApplication()).loadUpgrades().find { it.id == upgradeId } ?: return false
+                val level = value.toIntOrNull()?.takeIf { it in 0..definition.maxLevel } ?: return false
+                current.copy(upgradeLevels = current.upgradeLevels.toMutableMap().apply { put(upgradeId, level) })
+            }
         }
         _gameState.value = updated
         saveGameAsync()
