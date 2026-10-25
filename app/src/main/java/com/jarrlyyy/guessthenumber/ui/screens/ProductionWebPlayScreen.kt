@@ -107,6 +107,8 @@ fun ProductionWebPlayScreen(
     onEquipCosmetic: (String) -> Unit,
     onUpdateMultiplier: (String) -> Unit,
     onUpdateSettings: (GameSettings) -> Unit,
+    onCreativeUpdateRange: (Long, Long) -> Boolean,
+    onCreativeUpdateValue: (String, String) -> Boolean,
     onPrestigeReset: () -> Unit,
     onUltraReset: () -> Unit,
     onBuyTalent: (String, Long) -> Unit,
@@ -298,7 +300,26 @@ fun ProductionWebPlayScreen(
                     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest) = assetLoader.shouldInterceptRequest(request.url)
                     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                         val uri = request.url
-                        return !(uri.scheme == "https" && uri.host == "appassets.androidplatform.net" && uri.path == "${WEB_UI_PATH}index.html" && uri.query == null && uri.fragment == null)
+                        val isLocalAppPage = uri.scheme == "https" &&
+                            uri.host == "appassets.androidplatform.net" &&
+                            uri.path == "${WEB_UI_PATH}index.html" &&
+                            uri.query == null && uri.fragment == null
+                        if (isLocalAppPage) return false
+                        val allowedExternalHosts = setOf(
+                            "youtube.com", "www.youtube.com",
+                            "instagram.com", "www.instagram.com",
+                            "namemc.com", "www.namemc.com",
+                            "github.com", "www.github.com",
+                            "ne0gl1tch20.github.io"
+                        )
+                        if (uri.scheme == "https" && uri.host in allowedExternalHosts) {
+                            runCatching {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                            }.onFailure { exception ->
+                                WebViewDebugConsole.add("Could not open external link: ${exception.javaClass.simpleName}")
+                            }
+                        }
+                        return true
                     }
                 }
                 if (supportsMessageListener) {
@@ -510,6 +531,20 @@ fun ProductionWebPlayScreen(
                                                         else -> throw IllegalArgumentException("Unsupported music action")
                                                     }
                                                 }
+                                                "creative_update_value" -> {
+                                                    val key = parsed.settingKey
+                                                    val value = parsed.settingValue
+                                                    if (!stateProvider().creativeModeEnabled || key == null || value == null || !onCreativeUpdateValue(key, value)) {
+                                                        throw IllegalArgumentException("Creative Mode value update was rejected.")
+                                                    }
+                                                }
+                                                "creative_update_range" -> {
+                                                    val min = parsed.creativeRangeMin
+                                                    val max = parsed.creativeRangeMax
+                                                    if (!stateProvider().creativeModeEnabled || min == null || max == null || !onCreativeUpdateRange(min, max)) {
+                                                        throw IllegalArgumentException("Creative Mode range update was rejected.")
+                                                    }
+                                                }
                                                 "update_setting" -> {
                                                     val key = parsed.settingKey
                                                     val value = parsed.settingValue
@@ -548,6 +583,7 @@ fun ProductionWebPlayScreen(
                                                             "customPrimaryColor" -> settings.copy(themePreset = "Custom", customPrimaryColor = value)
                                                             "customSecondaryColor" -> settings.copy(themePreset = "Custom", customSecondaryColor = value)
                                                             "customTertiaryColor" -> settings.copy(themePreset = "Custom", customTertiaryColor = value)
+                                                            "webMenuStudioLayout" -> settings.copy(webMenuStudioLayout = value)
                                                             else -> throw IllegalArgumentException("Unsupported setting")
                                                         }
                                                         updateSettings(updated)
@@ -636,6 +672,8 @@ fun ProductionWebPlayScreen(
                                             return@post
                                         }
                                         val actionAccepted = when (parsed.type) {
+                                            "creative_update_value" -> game.creativeModeEnabled
+                                            "creative_update_range" -> game.creativeModeEnabled && game.currentRangeMin == parsed.creativeRangeMin && game.currentRangeMax == parsed.creativeRangeMax
                                             "claim_daily_quest" -> parsed.questId != null && parsed.questId in game.claimedDailyQuests && parsed.questId !in beforeAction.claimedDailyQuests
                                              "claim_daily_reward" -> game.lastDailyRewardDate != beforeAction.lastDailyRewardDate
                                             "open_loot_chest" -> when (parsed.tier) {
@@ -822,7 +860,8 @@ fun ProductionWebPlayScreen(
                                                 .put("themePreset", game.settings.themePreset)
                                                 .put("customPrimaryColor", game.settings.customPrimaryColor)
                                                 .put("customSecondaryColor", game.settings.customSecondaryColor)
-                                                .put("customTertiaryColor", game.settings.customTertiaryColor))
+                                                .put("customTertiaryColor", game.settings.customTertiaryColor)
+                                                .put("webMenuStudioLayout", game.settings.webMenuStudioLayout ?: ""))
                                             .put("uiStrings", JSONObject().apply {
                                                 listOf(
                                                     "stats", "statistics", "arcade", "arcade_title", "minigame_quick_guess_name", "minigame_quick_guess_desc", "minigame_reaction_test_name", "minigame_reaction_test_desc",
@@ -924,6 +963,7 @@ fun ProductionWebPlayScreen(
                                                         .put("description", minigame.description).put("rewardMultiplier", minigame.rewardMultiplier))
                                                 }
                                             })
+                                            .put("creativeModeEnabled", game.creativeModeEnabled)
                                             .put("rangeMin", (result?.rangeMin ?: game.currentRangeMin).toString())
                                             .put("rangeMax", (result?.rangeMax ?: game.currentRangeMax).toString())
                                             .put("attempts", result?.attempts ?: game.attempts)

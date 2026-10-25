@@ -69,6 +69,61 @@ class WebUiBridgeProtocolTest {
     }
 
     @Test
+    fun validatesCreativeModeValueEdits() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid(
+                "creative-value-1",
+                "creative_update_value",
+                settingKey = "money",
+                settingValue = "12.5K"
+            ),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-value-1","type":"creative_update_value","key":"money","value":"12.5K"}""")
+        )
+        assertEquals(
+            "invalid_creative_value",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-value-2","type":"creative_update_value","key":"money","value":"-999"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+        assertEquals(
+            "invalid_creative_value",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-value-3","type":"creative_update_value","key":"grantRewards","value":"true"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid(
+                "creative-value-4",
+                "creative_update_value",
+                settingKey = "upgradeLevel:click_power",
+                settingValue = "10"
+            ),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-value-4","type":"creative_update_value","key":"upgradeLevel:click_power","value":"10"}""")
+        )
+    }
+
+    @Test
+    fun validatesCreativeModeRangeUpdates() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid(
+                "creative-range-1",
+                "creative_update_range",
+                creativeRangeMin = 5L,
+                creativeRangeMax = 500L
+            ),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-range-1","type":"creative_update_range","rangeMin":"5","rangeMax":"500"}""")
+        )
+        assertEquals(
+            "invalid_creative_range",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-range-2","type":"creative_update_range","rangeMin":"0","rangeMax":"500"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+        assertEquals(
+            "invalid_creative_range",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-range-3","type":"creative_update_range","rangeMin":"500","rangeMax":"5"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+        assertEquals(
+            "invalid_request",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-range-4","type":"creative_update_range","rangeMin":"1","rangeMax":"100","money":"999"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+    }
+
+    @Test
     fun acceptsReadStateRequest() {
         assertEquals(
             WebUiBridgeProtocol.ParseResult.Valid("req_1", "read_state"),
@@ -406,6 +461,46 @@ class WebUiBridgeProtocolTest {
         assertEquals("invalid_music_action", (invalid as WebUiBridgeProtocol.ParseResult.Invalid).error)
         val extra = WebUiBridgeProtocol.parse("""{"version":1,"id":"music-3","type":"music_action","action":"play","unexpected":true}""")
         assertEquals("invalid_request", (extra as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
+    @Test
+    fun validatesMenuStudioLayoutSchemaAndRejectsMalformedLayouts() {
+        fun request(layout: String): String = org.json.JSONObject()
+            .put("version", 1)
+            .put("id", "menu-save-1")
+            .put("type", "update_setting")
+            .put("key", "webMenuStudioLayout")
+            .put("value", layout)
+            .toString()
+
+        val validLayout = org.json.JSONObject()
+            .put("areas", org.json.JSONObject().put("arcade", "nav"))
+            .put("orders", org.json.JSONObject()
+                .put("nav", org.json.JSONArray(listOf("worlds", "arcade")))
+                .put("more", org.json.JSONArray()))
+            .put("colors", org.json.JSONObject().put("arcade", "#7C4DFF"))
+            .toString()
+        assertTrue(WebUiBridgeProtocol.parse(request(validLayout)) is WebUiBridgeProtocol.ParseResult.Valid)
+
+        val unknownField = org.json.JSONObject()
+            .put("areas", org.json.JSONObject())
+            .put("orders", org.json.JSONObject().put("nav", org.json.JSONArray()).put("more", org.json.JSONArray()))
+            .put("debug", true)
+            .toString()
+        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(request(unknownField)) as WebUiBridgeProtocol.ParseResult.Invalid).error)
+
+        val invalidArea = org.json.JSONObject()
+            .put("areas", org.json.JSONObject().put("arcade", "admin"))
+            .put("orders", org.json.JSONObject().put("nav", org.json.JSONArray()).put("more", org.json.JSONArray()))
+            .toString()
+        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(request(invalidArea)) as WebUiBridgeProtocol.ParseResult.Invalid).error)
+
+        val invalidColor = org.json.JSONObject()
+            .put("areas", org.json.JSONObject())
+            .put("orders", org.json.JSONObject().put("nav", org.json.JSONArray()).put("more", org.json.JSONArray()))
+            .put("colors", org.json.JSONObject().put("arcade", "javascript:alert(1)"))
+            .toString()
+        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(request(invalidColor)) as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
 }

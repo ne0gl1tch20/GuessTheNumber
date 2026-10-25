@@ -856,6 +856,123 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun enableCreativeModeForSlot(slot: Int, rangeMin: Long, rangeMax: Long, onResult: (Boolean) -> Unit = {}) {
+        if (slot !in 1..MAX_SAVE_SLOTS ||
+            rangeMin < 1L || rangeMax < rangeMin ||
+            rangeMax > CreativeModeSave.MAX_RANGE
+        ) {
+            onResult(false)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = slotOperationMutex.withLock {
+                val metadata = saveManager.getSlotMetadata(slot)
+                if (metadata.isEmpty) return@withLock false
+                val current = saveManager.loadGame(slot)
+                // Creative Mode is permanent for this save. Never downgrade an existing creative save.
+                if (current.creativeModeEnabled) return@withLock true
+                val updated = current.copy(
+                    creativeModeEnabled = true,
+                    currentRangeMin = rangeMin,
+                    currentRangeMax = rangeMax,
+                    targetNumber = rangeMin + ((rangeMax - rangeMin) / 2L),
+                    attempts = 0L,
+                    correctGuesses = 0L,
+                    streak = 0
+                )
+                val saved = saveManager.saveGame(updated, slot)
+                if (saved && _activeSlot.value == slot) {
+                    _gameState.value = AntiCheatService.sanitizeCurrency(updated)
+                    guessingBot.reset(updated.currentRangeMin, updated.currentRangeMax)
+                    WidgetRefresh.request(getApplication<Application>())
+                }
+                saved
+            }
+            withContext(Dispatchers.Main) { onResult(result) }
+        }
+    }
+
+    fun updateCreativeRange(rangeMin: Long, rangeMax: Long): Boolean {
+        val current = _gameState.value
+        if (!current.creativeModeEnabled ||
+            rangeMin < 1L || rangeMax < rangeMin ||
+            rangeMax > CreativeModeSave.MAX_RANGE
+        ) return false
+        val updated = current.copy(
+            currentRangeMin = rangeMin,
+            currentRangeMax = rangeMax,
+            targetNumber = rangeMin + ((rangeMax - rangeMin) / 2L),
+            attempts = 0L,
+            correctGuesses = 0L,
+            streak = 0
+        )
+        _gameState.value = updated
+        guessingBot.reset(updated.currentRangeMin, updated.currentRangeMax)
+        saveGameAsync()
+        return true
+    }
+
+    fun updateCreativeValue(key: String, value: String): Boolean {
+        val current = _gameState.value
+        if (!current.creativeModeEnabled || value.length !in 1..100) return false
+        val updated = when (key) {
+            "money", "prestige", "ultra", "nebula" -> {
+                if (!Regex("[0-9]+(?:\\.[0-9]+)?(?:[A-Za-z]{1,4})?").matches(value)) return false
+                val amount = runCatching { BigNumber(value) }.getOrNull() ?: return false
+                when (key) {
+                    "money" -> current.copy(money = amount)
+                    "prestige" -> current.copy(prestige = amount)
+                    "ultra" -> current.copy(ultra = amount)
+                    else -> current.copy(nebula = amount)
+                }
+            }
+            "attempts" -> {
+                val number = value.toLongOrNull()?.takeIf { it in current.correctGuesses..1_000_000_000_000L } ?: return false
+                current.copy(attempts = number)
+            }
+            "correctGuesses" -> {
+                val number = value.toLongOrNull()?.takeIf { it in 0L..current.attempts } ?: return false
+                current.copy(correctGuesses = number)
+            }
+            "streak" -> {
+                val number = value.toIntOrNull()?.takeIf { it in 0..1_000_000 } ?: return false
+                current.copy(streak = number, bestStreak = maxOf(current.bestStreak, number))
+            }
+            "bestStreak" -> {
+                val number = value.toIntOrNull()?.takeIf { it in current.streak..1_000_000 } ?: return false
+                current.copy(bestStreak = number)
+            }
+            else -> {
+                val repository = JsonConfigRepository(getApplication())
+                when {
+                    key.startsWith("upgradeLevel:") -> {
+                        val id = key.substringAfter("upgradeLevel:")
+                        val definition = repository.loadUpgrades().find { it.id == id } ?: return false
+                        val level = value.toIntOrNull()?.takeIf { it in 0..definition.maxLevel } ?: return false
+                        current.copy(upgradeLevels = current.upgradeLevels.toMutableMap().apply { put(id, level) })
+                    }
+                    key.startsWith("prestigeUpgradeLevel:") -> {
+                        val id = key.substringAfter("prestigeUpgradeLevel:")
+                        val definition = repository.loadPrestigeUpgrades().find { it.id == id } ?: return false
+                        val level = value.toIntOrNull()?.takeIf { it in 0..definition.maxLevel } ?: return false
+                        current.copy(prestigeUpgradeLevels = current.prestigeUpgradeLevels.toMutableMap().apply { put(id, level) })
+                    }
+                    key.startsWith("ultraUpgradeLevel:") -> {
+                        val id = key.substringAfter("ultraUpgradeLevel:")
+                        val definition = repository.loadUltraUpgrades().find { it.id == id } ?: return false
+                        val level = value.toIntOrNull()?.takeIf { it in 0..definition.maxLevel } ?: return false
+                        current.copy(ultraUpgradeLevels = current.ultraUpgradeLevels.toMutableMap().apply { put(id, level) })
+                    }
+                    else -> return false
+                }
+            }
+        }
+        _gameState.value = updated
+        saveGameAsync()
+        WidgetRefresh.request(getApplication<Application>())
+        return true
+    }
+
     fun loadCreativeModeSave(slot: Int, onLoaded: (CreativeModeSave?) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val save = saveManager.loadCreativeModeSave(slot)

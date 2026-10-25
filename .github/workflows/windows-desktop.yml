@@ -216,7 +216,7 @@ jobs:
           name: GuessTheNumber-Web-Frontend-Audit
           path: build/reports/web-frontend-audit.txt
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7
 
       - name: Upload Windows installer artifact
         uses: actions/upload-artifact@v4
@@ -224,7 +224,7 @@ jobs:
           name: GuessTheNumber-Windows-Desktop
           path: desktopApp/build/compose/binaries/main/msi/*.msi
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7
 
       - name: Upload Windows Debug update artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -235,7 +235,7 @@ jobs:
             ${{ env.GTN_DEBUG_ZIP }}
             ${{ env.GTN_DEBUG_MANIFEST }}
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7
 
       - name: Publish Windows Debug assets to debug-latest
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'

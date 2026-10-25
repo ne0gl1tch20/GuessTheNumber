@@ -133,6 +133,45 @@
       </div>
       <div class="sparkle-field" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
+<section class="creative-tools card" id="creativeToolsPanel" aria-labelledby="creativeToolsHeading" hidden>
+  <div class="panel-title"><span class="panel-glyph" aria-hidden="true">✦</span><div><span class="eyebrow">CREATIVE SAVE</span><h2 id="creativeToolsHeading">Creative Tools</h2></div></div>
+  <p class="catalog-intro">Changes are validated and saved by the Android game. Updating the range starts a fresh guessing round.</p>
+  <div class="creative-range-fields">
+    <label class="setting-field"><span>Range minimum</span><input id="creativeRangeMin" type="number" min="1" max="1000000" inputmode="numeric" value="1"></label>
+    <label class="setting-field"><span>Range maximum</span><input id="creativeRangeMax" type="number" min="1" max="1000000" inputmode="numeric" value="100"></label>
+  </div>
+  <button type="button" class="jui-button jui-button-primary jui-button-block" id="creativeSaveRange">Apply range</button>
+  <h3 class="creative-subheading">Game values</h3>
+  <p class="catalog-intro">Set currencies and run counters directly. Values are checked before saving.</p>
+  <div class="creative-state-grid">
+    <label class="setting-field"><span>Money</span><input id="creativeValue_money" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
+    <label class="setting-field"><span>Prestige</span><input id="creativeValue_prestige" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
+    <label class="setting-field"><span>Ultra</span><input id="creativeValue_ultra" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
+    <label class="setting-field"><span>Nebula</span><input id="creativeValue_nebula" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
+    <label class="setting-field"><span>Attempts</span><input id="creativeValue_attempts" type="number" min="0" max="1000000000000" value="0"></label>
+    <label class="setting-field"><span>Correct guesses</span><input id="creativeValue_correctGuesses" type="number" min="0" max="1000000000000" value="0"></label>
+    <label class="setting-field"><span>Current streak</span><input id="creativeValue_streak" type="number" min="0" max="1000000" value="0"></label>
+    <label class="setting-field"><span>Best streak</span><input id="creativeValue_bestStreak" type="number" min="0" max="1000000" value="0"></label>
+  </div>
+  <div class="creative-value-actions">
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="money">Set money</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="prestige">Set prestige</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="ultra">Set ultra</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="nebula">Set nebula</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="attempts">Set attempts</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="correctGuesses">Set correct guesses</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="streak">Set streak</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="bestStreak">Set best streak</button>
+  </div>
+  <h3 class="creative-subheading">Upgrade levels</h3>
+  <p class="catalog-intro">Set owned upgrade levels directly, within each upgrade’s configured maximum.</p>
+  <div id="creativeUpgradeList" class="creative-upgrade-list"><p class="catalog-empty">Loading upgrade catalog…</p></div>
+  <h3 class="creative-subheading">Prestige upgrades</h3>
+  <div id="creativePrestigeUpgradeList" class="creative-upgrade-list"><p class="catalog-empty">Loading prestige upgrades…</p></div>
+  <h3 class="creative-subheading">Ultra upgrades</h3>
+  <div id="creativeUltraUpgradeList" class="creative-upgrade-list"><p class="catalog-empty">Loading ultra upgrades…</p></div>
+  <p id="creativeToolsStatus" class="catalog-intro" role="status" aria-live="polite"></p>
+</section>
 <section class="guess-card card">
       <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
       <form id="guessForm" autocomplete="off">
@@ -346,6 +385,18 @@
           <p id="aboutReleaseNotes"></p>
           <button type="button" class="primary-action" id="aboutInstallUpdate" data-bridge-action="install_update" data-i18n="update_install" disabled>Install update</button>
           <button type="button" class="secondary-action" id="aboutOpenUpdate" data-bridge-action="open_update_page" data-i18n="update_open" disabled>Open update page</button>
+        </div>
+      </section>
+      <section class="about-social card" aria-labelledby="aboutSocialHeading">
+        <span class="eyebrow">CONNECT</span>
+        <h2 id="aboutSocialHeading">Socials &amp; source code</h2>
+        <p class="catalog-intro">These links always open in your external browser.</p>
+        <div class="about-social-links">
+          <a class="jui-button jui-button-secondary jui-button-block" href="https://www.youtube.com/@theg0ldne0_01" rel="noopener noreferrer">YouTube · @theg0ldne0_01</a>
+          <a class="jui-button jui-button-secondary jui-button-block" href="https://www.instagram.com/theg0ldne0_01/" rel="noopener noreferrer">Instagram · theg0ldne0_01</a>
+          <a class="jui-button jui-button-secondary jui-button-block" href="https://namemc.com/profile/PearlSteve15" rel="noopener noreferrer">NameMC · PearlSteve15</a>
+          <a class="jui-button jui-button-secondary jui-button-block" href="https://github.com/ne0gl1tch20" rel="noopener noreferrer">GitHub · Source code</a>
+          <a class="jui-button jui-button-secondary jui-button-block" href="https://ne0gl1tch20.github.io/GuessTheNumber" rel="noopener noreferrer">Official website</a>
         </div>
       </section>
       <section class="about-licenses card">

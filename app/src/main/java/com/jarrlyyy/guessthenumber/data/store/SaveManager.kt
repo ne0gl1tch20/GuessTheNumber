@@ -313,15 +313,35 @@ class SaveManager private constructor(
         }
     }
 
+    private fun preserveCreativeMode(existing: GameState?, incoming: GameState): GameState {
+        if (existing?.creativeModeEnabled != true || incoming.creativeModeEnabled) return incoming
+        val min = existing.currentRangeMin.coerceAtLeast(1L)
+        val max = existing.currentRangeMax.coerceAtLeast(min)
+        return incoming.copy(
+            creativeModeEnabled = true,
+            currentRangeMin = min,
+            currentRangeMax = max,
+            targetNumber = incoming.targetNumber.coerceIn(min, max)
+        )
+    }
+
     private fun sanitizeLoadedState(state: GameState): GameState {
         val money = if (state.money.value < BigDecimal.ZERO) BigNumber.ZERO else state.money
         val prestige = if (state.prestige.value < BigDecimal.ZERO) BigNumber.ZERO else state.prestige
         val ultra = if (state.ultra.value < BigDecimal.ZERO) BigNumber.ZERO else state.ultra
         val nebula = if (state.nebula.value < BigDecimal.ZERO) BigNumber.ZERO else state.nebula
-        val min = 1L
         val betterRangeLevel = state.upgradeLevels["better_range"] ?: 0
         val difficultyMax = Difficulty.rangeMax(state.difficultyId, betterRangeLevel)
-        val max = state.currentRangeMax.coerceAtLeast(difficultyMax).coerceAtLeast(min)
+        val min = if (state.creativeModeEnabled) {
+            state.currentRangeMin.coerceIn(1L, CreativeModeSave.MAX_RANGE)
+        } else {
+            1L
+        }
+        val max = if (state.creativeModeEnabled) {
+            state.currentRangeMax.coerceIn(min, CreativeModeSave.MAX_RANGE)
+        } else {
+            state.currentRangeMax.coerceAtLeast(difficultyMax).coerceAtLeast(min)
+        }
         val target = state.targetNumber.coerceIn(min, max)
         val attempts = maxOf(0L, state.attempts)
         val correct = maxOf(0L, state.correctGuesses)
@@ -426,6 +446,12 @@ class SaveManager private constructor(
     suspend fun importSave(inputString: String, slot: Int = -1): Boolean {
         val decrypted = decrypt(inputString)
         val bundle = decrypted.takeIf { it.isNotEmpty() }?.let { runCatching { json.decodeFromString<EncryptedBackupBundle>(it) }.getOrNull() }
+        val existingCreativeStates = (1..MAX_SAVE_SLOTS).mapNotNull { index ->
+            saveStore.data.first()[getSaveKey(index)]?.let { raw ->
+                runCatching { json.decodeFromString<GameState>(raw) }.getOrNull()
+                    ?.takeIf { it.creativeModeEnabled }?.let { index to it }
+            }
+        }.toMap()
         if (bundle != null) {
             if (bundle.formatVersion !in 2..3) return false
             return try {
@@ -436,8 +462,20 @@ class SaveManager private constructor(
                         prefs.remove(getBackupKey(index))
                         prefs.remove(getCreativeModeKey(index))
                     }
-                    bundle.slots.forEach { (index, raw) -> if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) prefs[getSaveKey(index)] = json.encodeToString(json.decodeFromString<GameState>(raw).copy(settings = GameSettings())) }
-                    bundle.backups.forEach { (index, raw) -> if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) prefs[getBackupKey(index)] = json.encodeToString(json.decodeFromString<GameState>(raw).copy(settings = GameSettings())) }
+                    bundle.slots.forEach { (index, raw) ->
+                        if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) {
+                            val incoming = json.decodeFromString<GameState>(raw)
+                            val protected = preserveCreativeMode(existingCreativeStates[index], incoming)
+                            prefs[getSaveKey(index)] = json.encodeToString(protected.copy(settings = GameSettings()))
+                        }
+                    }
+                    bundle.backups.forEach { (index, raw) ->
+                        if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) {
+                            val incoming = json.decodeFromString<GameState>(raw)
+                            val protected = preserveCreativeMode(existingCreativeStates[index], incoming)
+                            prefs[getBackupKey(index)] = json.encodeToString(protected.copy(settings = GameSettings()))
+                        }
+                    }
                     bundle.creativeSlots.forEach { (index, raw) ->
                         if (index in 1..MAX_SAVE_SLOTS) {
                             CreativeModeSaveCodec.decodeAndMigrate(raw)?.let { migrated ->
@@ -455,8 +493,12 @@ class SaveManager private constructor(
 
         val jsonString = if (validateSave(inputString)) inputString else decrypted.takeIf { validateSave(it) } ?: return false
         return try {
-            val state = json.decodeFromString<GameState>(jsonString)
-            saveGame(state, if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot())
+            val targetSlot = if (slot in 1..MAX_SAVE_SLOTS) slot else getActiveSlot()
+            val existing = saveStore.data.first()[getSaveKey(targetSlot)]?.let {
+                runCatching { json.decodeFromString<GameState>(it) }.getOrNull()
+            }
+            val state = preserveCreativeMode(existing, json.decodeFromString<GameState>(jsonString))
+            saveGame(state, targetSlot)
         } catch (_: Exception) { false }
     }
 
@@ -543,7 +585,15 @@ class SaveManager private constructor(
 
     suspend fun applySaveJson(slot: Int, raw: String): Boolean {
         if (slot !in 1..MAX_SAVE_SLOTS || !validateSave(raw)) return false
-        return saveStore.edit { it[getSaveKey(slot)] = raw }.let { true }
+        return try {
+            val incoming = json.decodeFromString<GameState>(raw)
+            val existing = saveStore.data.first()[getSaveKey(slot)]?.let {
+                runCatching { json.decodeFromString<GameState>(it) }.getOrNull()
+            }
+            val protected = preserveCreativeMode(existing, incoming)
+            saveStore.edit { it[getSaveKey(slot)] = json.encodeToString(protected) }
+            true
+        } catch (_: Exception) { false }
     }
 
     suspend fun createFreshSlot(slot: Int, difficultyId: String, profileName: String = "", profileIconId: String = SaveProfile.DEFAULT_ICON): Boolean {
