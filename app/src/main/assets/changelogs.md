@@ -1,4 +1,16 @@
-# Guess The Number 3.1.0 — Unreleased
+# Guess The Number 3.2.0 — Unreleased
+
+## Creative Mode, trait systems and reliability
+
+- 🎮 **Creative Mode gameplay (Phases 8–10):** added isolated guess sessions, range validation, too-low/too-high/correct outcomes, bounded hints, attempt limits, restart/close behavior and effect previews. Creative Mode stays separate from the normal economy, rewards and progression.
+- 💾 **Creative session recovery:** schema v3 snapshots persist per save slot, resume after decoding, clear safely and travel inside portable encrypted backups. Schema v1/v2 saves migrate forward without inventing a run.
+- 🛡️ **Stricter run validation:** completed snapshots must now contain a real completed attempt and correct guess; stale configurations and malformed snapshots are rejected.
+- 🌦️ **Trait and seasonal architecture:** centralized deterministic seasonal boundaries (including winter across year-end), retained signed catalog validation and offline fallback, and kept Creative Mode isolated from trait/reward authority.
+- 🧪 **Expanded tests:** combined effect composition, run limits, hints, snapshot migration/resume and malformed completed-run coverage.
+- 🔐 **Portable encrypted backups:** cross-device exports use a user passphrase and authenticated encryption. The app does not store the passphrase; losing it can make the backup unrecoverable.
+- 📚 **Project history:** docs/PR_CHANGELOG.md indexes PRs #1–#353, including closed-unmerged attempts for traceability. The index is a history ledger, not a claim that every attempt shipped.
+- 🔢 **App version:** bumped to **3.2.0** (versionCode **23**); the web-play asset compatibility gate is kept in sync.
+
 
 - 🧪 **Creative Mode runtime foundation:** added an isolated guess-run model with range validation, attempt limits, bounded hints, run snapshots, resume/clear helpers and schema v1/v2 migration to v3. The Save Slots screen now launches/resumes the per-slot run, records guesses and hints, and persists snapshots. Android device-level interaction still needs verification.
 - 🌦️ **Seasonal trait calendar:** centralized deterministic season windows, including winter across year boundaries, and added boundary tests.
@@ -7,7 +19,7 @@
 - 📚 **Project history:** added [the PR-by-PR development ledger](https://github.com/ne0gl1tch20/GuessTheNumber/blob/master/docs/PR_CHANGELOG.md) so merged work and open/unmerged attempts are easier to audit.
 - 🔢 **App version:** bumped to 3.1.0 (versionCode 22).
 
-## Unreleased (HTML More Hub, changelog and player feedback)
+## Earlier development notes (HTML More Hub, changelog and player feedback)
 - 📋 **Canonical changelog content**: The shared HTML changelog now reads this Markdown file and formats its headings, bold text, code and lists instead of duplicating release notes in HTML.
 
 - 📋 Added an in-game Changelog page linked from More, with recent UI, progression and platform changes.
@@ -16,13 +28,13 @@
 - 🔄 Improved the About update button hit target and refreshed HTML strings after state/locale updates; device-level updater interaction still needs verification.
 - 🎵 Added a player-facing HTML Background Music page in More.
 
-## Unreleased (Shared HTML Play polish)
+## Earlier development notes (Shared HTML Play polish)
 
 - 🎨 The shared Play header now uses the canonical `GTN_APP_LOGO.png` artwork, packaged locally for offline use.
 - 🧹 Removed the extra branding tagline and restored the Guess The Number name for a cleaner header.
 - 🧭 Documented the target to migrate all player-facing Android screens to the same shared HTML/CSS/JavaScript interface in staged, verified route groups. Existing Compose screens are not yet all migrated.
 
-## Unreleased (Windows Progression Parity)
+## Earlier development notes (Windows Progression Parity)
 
 - 🔄 **Windows Debug updates**: The About menu now checks the latest successful Windows Desktop CI run on `master`, downloads its short-lived Actions artifact, verifies the bundled manifest and SHA-256 checksum, and launches the MSI installer. The channel remains separate from production releases; interactive update/install testing is still pending.
 - 🌳 **Windows Talent Web**: Replaced the flat talent catalog with a connected six-node tree, selectable node details, zoom controls, drag/pinch navigation, parent-lock feedback and transaction-backed unlocks. Runtime screenshot parity remains unverified.
@@ -33,24 +45,24 @@
 - 🎲 **Lucky Stake**: Added a Windows coin-flip screen with positive/affordable stake validation and a streak-based payout multiplier. Localization and runtime parity remain unverified.
 - 🧪 **Candidate status**: These are in-progress Windows ports, not a parity-complete release. On PR #215 head `c2138c0ff8ce2aba8813dd3104a560b489c82575`, Android Validation passed and Windows Desktop CI failed; see the parity audit before treating this work as validated.
 
-## Unreleased (Windows Android visual parity)
+## Earlier development notes (Windows Android visual parity)
 
 - 🎨 **Android theme parity pass**: aligned Windows Material 3 light/dark colors, expressive corner shapes and typography letter spacing with the Android theme tokens. Windows-only system chrome stays native. AMOLED/custom color settings and screenshot comparison remain to be verified.
 
 - 🧭 **Android-style Windows navigation**: Windows now uses the Android app's bottom navigation pattern with Play, Upgrades, Shop and More labels, matching Material icons and selection indicators. Declared Compose Material icon-core explicitly so the desktop target does not rely on a removed transitive dependency. Runtime visual verification is still pending.
 
-## Unreleased (Windows exact-port UI parity)
+## Earlier development notes (Windows exact-port UI parity)
 
 - 🛒 **Upgrades screen**: Windows now mirrors Android's Money balance header, buy-multiplier dropdown, upgrade descriptions and levels, combined batch costs, affordability states and purchase-highlight animation. Gameplay transactions still use the existing economy transaction layer.
 - ✨ **Nebula Shop parity pass**: Added the Nebula balance/equipped-cosmetic header, Android's All / Automation / Boosts / Cosmetics filters, catalog-driven shop cards and owned-cosmetic Equip/Equipped states. Cosmetic equipping validates ownership and persists through the desktop economy transaction flow.
 
 - 🎯 **Shared guess feedback presentation**: Windows Play now uses the same shared status-colored feedback card as Android, including matching ready/invalid, too-low, too-high and correct states. Blind-mutator guesses keep direction hints hidden, and the card respects the saved reduced-motion setting.
 
-## Unreleased (Windows Play Screen Parity)
+## Earlier development notes (Windows Play Screen Parity)
 
 - ⌨️ **Shared guess entry**: Windows Play now uses the same shared controlled numeric input component as Android, including the displayed allowed range and Enter-to-submit behavior, while keeping desktop validation, save-before-feedback, and gameplay rules unchanged.
 
-## Unreleased (Windows Stage 2 Economy Parity)
+## Earlier development notes (Windows Stage 2 Economy Parity)
 
 - 💰 **Desktop economy actions**: Windows now exposes the shared production economy through upgrade purchases, Prestige and Ultra resets, Prestige/Ultra upgrades, Nebula shop purchases and talent unlocks. Transactions validate affordability and prerequisites, preserve permanent progress across resets and save before updating the visible state.
 - 🧪 **Economy parity coverage**: Added tests for exact upgrade costs, insufficient funds, maximum levels, Prestige/Ultra reset requirements and preserved state, duplicate shop purchases, talent prerequisites and bundled catalog loading.
@@ -60,7 +72,7 @@
 - 🛍️ **Shop effects**: Windows now supports Nebula Crystal's 2× future Nebula rewards and Golden Guess Pass's critical-sized bonus on every tenth lifetime guess when that guess is correct. Unknown shop effects remain unavailable.
 - 🏆 **Progression hooks**: Achievement milestones award their configured Nebula rewards once and update lifetime earned statistics. World unlocks check boss, correct-guess, upgrade, Prestige and Ultra requirements, with explicit unlock/select controls on Play.
 
-## Unreleased (Windows Relic Gameplay Parity)
+## Earlier development notes (Windows Relic Gameplay Parity)
 
 - 💎 **Relic gameplay parity**: Windows now presents the four canonical Android boss relics, uses the same relic IDs as saved gameplay state, allows all four relics to be equipped and surfaces the real 2-piece, 3-piece and 4-piece bonuses. The existing post-guess reward calculation applies the equipped relic effects, including the four-piece +1 Nebula reward.
 - 🧪 **Relic set coverage**: Added tests for the catalog's canonical boss relic IDs, four-slot equipment limit and actual 2/3/4-piece gameplay reward effects.
@@ -75,7 +87,7 @@
 - 🧪 **Build and test maintenance**: Fixed Compose named-argument errors and nullable signing metadata found by the first CI run.
 - 🏷️ **App version**: versionCode 21 / versionName 3.0.3.
 
-## Unreleased (Player Experience)
+## Earlier development notes (Player Experience)
 
 - 🧭 **More Hub feature discovery**: Selecting an unlocked feature now opens its destination immediately; the destination shows its localized first-run tour after rendering. Tour completion or dismissal is saved per feature, while Settings, About and developer/testing routes remain excluded.
 - 🔊 **Independent SFX mixer foundation**: Added a separate sound-effects volume preference and a resilient asset lookup/player API. Missing `assets/sfx/` folders or clips return a not-found result without interrupting gameplay; no bundled sound assets are added in this phase.
@@ -84,7 +96,7 @@
 - 🎯 **Accurate guess feedback**: Keyboard and button submissions now share one handler, and rate-limited guesses show a localized retry message instead of misleading high/low/correct feedback. Feedback uses the same clamped number the game engine evaluates.
 - 🎯 **Clearer guess feedback**: High, low, and correct guesses now use distinct icons and theme-aware feedback cards. Feedback transitions respect the reduced-motion setting, and Blindfolded Oracle hides feedback from both the Guess button and keyboard submission paths.
 
-## Unreleased (Cross-Core Runtime Hardening)
+## Earlier development notes (Cross-Core Runtime Hardening)
 
 - 💾 **Preserve recoverable saves**: Saving over a corrupted primary no longer overwrites a valid last-known-good backup.
 - 💾 **Reject impossible save state**: Save validation now rejects out-of-range targets and negative economy/progression counters so recovery can prefer a valid backup.
@@ -93,7 +105,7 @@
 - 🌐 **Locale resilience**: Locale catalog references are safely published across threads, and invalid currency codes fall back to a plain localized number instead of throwing.
 - 🧪 **Regression coverage**: Added tests for recoverable save backups, invalid saved state, and invalid currency formatting.
 
-## Unreleased (Post-v3.0.2 Development Updates)
+## Earlier development notes (Post-v3.0.2 Development Updates)
 
 - 🎨 **Live theme preview**: Settings now previews the selected primary, secondary, and tertiary colors in a sample game card and action button, updating immediately as theme colors change.
 
