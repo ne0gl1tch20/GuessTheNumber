@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Guess The Number</title>
-  <meta name="gtn-html-version" content="2026.10.24.1">
+  <meta name="gtn-html-version" content="2026.10.25.1">
   <link rel="stylesheet" href="../libraries/jarrlyyuisdk/styles/jarrlyy-ui.css">
   <link rel="stylesheet" href="../libraries/jarrlyyuisdk/styles/jarrlyy-ui-advanced.css">
   <link rel="stylesheet" href="styles.css">
@@ -36,6 +36,14 @@
     <symbol id="icon-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="icon-gift" viewBox="0 0 24 24"><path d="M3 10h18v11H3zM2 6h20v4H2zM12 6v15M12 6H7.5a2.5 2.5 0 1 1 2.5-2.5C10 5 12 6 12 6Zm0 0h4.5A2.5 2.5 0 1 0 14 3.5C14 5 12 6 12 6Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="icon-gem" viewBox="0 0 24 24"><path d="m3 8 4-5h10l4 5-9 13L3 8Z" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m3 8 18 0M7 3l5 18 5-18M7 3l-4 5m14-5 4 5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></symbol>
+
+    <symbol id="icon-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="icon-flame" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-3.5-2-5.4-4.4-8.3.1 2.1-1.1 3.1-2.1 3.8C12.2 6.2 9.6 3.6 7 2c.6 4.6-2 6.8-2 11a7 7 0 0 0 7 9Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 22a3.5 3.5 0 0 0 3.5-3.5c0-1.6-.9-2.6-2.2-4-.2 1.4-1.2 1.8-1.8 2.3-.2-1.2-.9-2.2-1.8-3.1-.1 2-1.2 2.7-1.2 4.8A3.5 3.5 0 0 0 12 22Z" fill="currentColor" fill-opacity=".2" stroke="currentColor" stroke-width="1.2"/></symbol>
+    <symbol id="icon-coins" viewBox="0 0 24 24"><ellipse cx="9" cy="6" rx="6" ry="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3 6v5c0 1.7 2.7 3 6 3s6-1.3 6-3V6M3 10v5c0 1.7 2.7 3 6 3 1.2 0 2.3-.2 3.3-.6M15 12c3.3 0 6 1.3 6 3s-2.7 3-6 3-6-1.3-6-3 2.7-3 6-3Z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 18v2c0 1.7 2.7 3 6 3s6-1.3 6-3v-5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m7.5 12.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-wand" viewBox="0 0 24 24"><path d="m4 20 12-12 4 4L8 24M14 4l1-3m4 7 3-1M8 5 6 3M19 16l2 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="m18 2 .6 1.4L20 4l-1.4.6L18 6l-.6-1.4L16 4l1.4-.6L18 2Z" fill="currentColor"/></symbol>
+    <symbol id="icon-code" viewBox="0 0 24 24"><path d="m8 8-5 4 5 4m8-8 5 4-5 4m-3-11-2 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14m-6-6 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </svg>
   <main class="app">
     <header class="topbar">
@@ -133,8 +141,58 @@
       </div>
       <div class="sparkle-field" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
+
+<section class="guess-card card">
+      <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
+      <form id="guessForm" autocomplete="off">
+        <div class="input-shell">
+          <input id="guessInput" type="text" inputmode="numeric" pattern="-?[0-9]+" maxlength="20" placeholder="Enter a number" aria-label="Your guess">
+          <button id="guessButton" type="submit" aria-label="Guess"><svg class="guess-submit-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M4 12h15M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </form>
+      <p id="actionStatus" class="action-status" role="status" aria-live="polite" aria-atomic="true">Ready when you are.</p>
+      <div class="guess-tools" aria-label="Quick guess helpers">
+        <span class="guess-tools-label">QUICK PICK</span>
+        <div class="guess-tool-buttons">
+          <button type="button" data-guess-pick="min" aria-label="Use lower end of range"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-arrow-down"></use></svg> LOW END</button>
+          <button type="button" data-guess-pick="mid" aria-label="Use midpoint of range"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-target"></use></svg> MIDPOINT</button>
+          <button type="button" data-guess-pick="max" aria-label="Use upper end of range"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-arrow-up"></use></svg> HIGH END</button>
+          <button type="button" data-guess-pick="clear" aria-label="Clear guess input"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-refresh"></use></svg> CLEAR</button>
+        </div>
+      </div>
+    </section>
+<section class="stats-grid" aria-label="Run statistics">
+      <article class="stat-card card">
+        <span class="stat-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-target"></use></svg></span>
+        <span class="stat-value" id="attempts">0</span>
+        <span class="stat-label">ATTEMPTS</span>
+      </article>
+      <article class="stat-card card">
+        <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span>
+        <span class="stat-value" id="correct">0</span>
+        <span class="stat-label">CORRECT</span>
+      </article>
+      <article class="stat-card card">
+        <span class="stat-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-flame"></use></svg></span>
+        <span class="stat-value" id="streak">0</span>
+        <span class="stat-label">STREAK</span>
+      </article>
+    </section>
+<section class="economy-card card">
+      <div class="economy-row">
+        <div><span class="stat-label"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-coins"></use></svg> MONEY</span><strong id="money">0</strong></div>
+        <div class="income"><span>＋</span><strong id="income">0</strong><small>/s</small></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-caption"><span>RUN MOMENTUM</span><span id="bestStreak">BEST 0</span></div>
+    </section>
+
+<section class="quick-actions">
+      <button class="action-card" id="beyondButton" type="button"><span class="action-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-chevron-right"></use></svg></strong></button>
+      <button class="action-card" id="questButton" type="button"><span class="action-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-chevron-right"></use></svg></strong></button>
+    </section>
 <section class="creative-tools card" id="creativeToolsPanel" aria-labelledby="creativeToolsHeading" hidden>
-  <div class="panel-title"><span class="panel-glyph" aria-hidden="true">✦</span><div><span class="eyebrow">CREATIVE SAVE</span><h2 id="creativeToolsHeading">Creative Tools</h2></div></div>
+  <div class="panel-title"><span class="panel-glyph" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-wand"></use></svg></span><div><span class="eyebrow">CREATIVE SAVE</span><h2 id="creativeToolsHeading">Creative Tools</h2></div></div>
   <p class="catalog-intro">Changes are validated and saved by the Android game. Updating the range starts a fresh guessing round.</p>
   <div class="creative-range-fields">
     <label class="setting-field"><span>Range minimum</span><input id="creativeRangeMin" type="number" min="1" max="1000000" inputmode="numeric" value="1"></label>
@@ -154,14 +212,14 @@
     <label class="setting-field"><span>Best streak</span><input id="creativeValue_bestStreak" type="number" min="0" max="1000000" value="0"></label>
   </div>
   <div class="creative-value-actions">
-    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="money">Set money</button>
-    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="prestige">Set prestige</button>
-    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="ultra">Set ultra</button>
-    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="nebula">Set nebula</button>
-    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="attempts">Set attempts</button>
-    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="correctGuesses">Set correct guesses</button>
-    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="streak">Set streak</button>
-    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="bestStreak">Set best streak</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="money"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-coins"></use></svg> Set money</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="prestige"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-crown"></use></svg> Set prestige</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="ultra"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-layers"></use></svg> Set ultra</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="nebula"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gem"></use></svg> Set nebula</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="attempts"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-target"></use></svg> Set attempts</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="correctGuesses"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check-circle"></use></svg> Set correct guesses</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="streak"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-flame"></use></svg> Set streak</button>
+    <button type="button" class="jui-button jui-button-secondary" data-creative-apply="bestStreak"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-star"></use></svg> Set best streak</button>
   </div>
   <h3 class="creative-subheading">Upgrade levels</h3>
   <p class="catalog-intro">Set owned upgrade levels directly, within each upgrade’s configured maximum.</p>
@@ -172,55 +230,11 @@
   <div id="creativeUltraUpgradeList" class="creative-upgrade-list"><p class="catalog-empty">Loading ultra upgrades…</p></div>
   <p id="creativeToolsStatus" class="catalog-intro" role="status" aria-live="polite"></p>
 </section>
-<section class="guess-card card">
-      <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
-      <form id="guessForm" autocomplete="off">
-        <div class="input-shell">
-          <input id="guessInput" type="text" inputmode="numeric" pattern="-?[0-9]+" maxlength="20" placeholder="Enter a number" aria-label="Your guess">
-          <button id="guessButton" type="submit" aria-label="Guess"><svg class="guess-submit-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M4 12h15M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div>
-      </form>
-      <p id="actionStatus" class="action-status" role="status" aria-live="polite" aria-atomic="true">Ready when you are.</p>
-      <div class="guess-tools" aria-label="Quick guess helpers">
-        <span class="guess-tools-label">QUICK PICK</span>
-        <div class="guess-tool-buttons">
-          <button type="button" data-guess-pick="min" aria-label="Use lower end of range">LOW END</button>
-          <button type="button" data-guess-pick="mid" aria-label="Use midpoint of range">MIDPOINT</button>
-          <button type="button" data-guess-pick="max" aria-label="Use upper end of range">HIGH END</button>
-          <button type="button" data-guess-pick="clear" aria-label="Clear guess input">CLEAR</button>
-        </div>
-      </div>
-    </section>
-<section class="stats-grid" aria-label="Run statistics">
-      <article class="stat-card card">
-        <span class="stat-icon">🎯</span>
-        <span class="stat-value" id="attempts">0</span>
-        <span class="stat-label">ATTEMPTS</span>
-      </article>
-      <article class="stat-card card">
-        <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span>
-        <span class="stat-value" id="correct">0</span>
-        <span class="stat-label">CORRECT</span>
-      </article>
-      <article class="stat-card card">
-        <span class="stat-icon">🔥</span>
-        <span class="stat-value" id="streak">0</span>
-        <span class="stat-label">STREAK</span>
-      </article>
-    </section>
-<section class="economy-card card">
-      <div class="economy-row">
-        <div><span class="stat-label">MONEY</span><strong id="money">0</strong></div>
-        <div class="income"><span>＋</span><strong id="income">0</strong><small>/s</small></div>
-      </div>
-      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-caption"><span>RUN MOMENTUM</span><span id="bestStreak">BEST 0</span></div>
-    </section>
 
-<section class="quick-actions">
-      <button class="action-card" id="beyondButton" type="button"><span class="action-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong>›</strong></button>
-      <button class="action-card" id="questButton" type="button"><span class="action-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong>›</strong></button>
-    </section>
+<section class="debug-build-card card" id="debugBuildCard" aria-labelledby="debugBuildHeading" hidden>
+  <div class="debug-build-heading"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-code"></use></svg><div><span class="eyebrow">DEVELOPER INFO</span><h2 id="debugBuildHeading">Debug build</h2></div><span class="debug-build-badge">DEBUG</span></div>
+  <p>This copy of Guess The Number is a debug build. Developer tools and diagnostics may be available, and behavior can differ from a release build. Your progress is saved to the active local save slot.</p>
+</section>
     </div>
     <div class="screen" id="screen-worlds" role="tabpanel" aria-labelledby="tab-worlds" data-screen="worlds" hidden>
 <section class="progression-card card" id="progressionPanel" aria-label="Beyond the Numbers progression">
@@ -592,7 +606,7 @@
       <strong class="reward-amount" id="dailyRewardAmount">+5 Nebula</strong>
       <p class="reward-streak" id="dailyRewardStreak">Day 1 streak</p>
       <div id="dailyRewardSchedule" class="daily-reward-schedule" aria-label="Upcoming daily rewards"></div>
-      <button type="button" class="primary-action reward-claim" id="dailyRewardClaim">Claim reward</button><button type="button" class="secondary-action reward-close" id="dailyRewardClose">Close</button>
+      <button type="button" class="primary-action reward-claim" id="dailyRewardClaim"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"></use></svg> Claim reward</button><button type="button" class="secondary-action reward-close" id="dailyRewardClose">Close</button>
     </div>
   </section>
   <section id="resetMovedDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetMovedTitle" aria-describedby="resetMovedMessage">

@@ -1249,3 +1249,42 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 :root[data-theme-mode="Light"] .jui-root .jui-field::placeholder { color:#66718a; }
 :root[data-theme-mode="Light"] .popup-layer > .reward-overlay,
 :root[data-theme-mode="Light"] .popup-layer > .nimmy-tutorial:not([hidden]) { background:rgba(27,35,58,.38); }
+
+
+/* Compact Creative Tools layout: it now sits below the Daily Momentum shortcut. */
+.creative-tools{padding:14px;margin-top:10px;margin-bottom:10px}
+.creative-tools .panel-title{gap:9px;margin-bottom:5px}
+.creative-tools .panel-glyph{width:32px;height:32px;display:grid;place-items:center}
+.creative-tools .panel-glyph .ui-icon{width:19px;height:19px}
+.creative-tools h2{font-size:19px;margin:2px 0}
+.creative-tools .catalog-intro{font-size:12px;line-height:1.45;margin:6px 0}
+.creative-tools .creative-range-fields{gap:8px;margin:9px 0}
+.creative-tools .creative-subheading{font-size:14px;margin:12px 0 4px}
+.creative-tools .creative-state-grid{gap:8px;margin:8px 0}
+.creative-tools .setting-field{gap:5px;font-size:12px}
+.creative-tools .setting-field input,.creative-tools .setting-field select{min-height:38px;padding:8px 10px}
+.creative-tools .creative-value-actions{gap:6px}
+.creative-tools .creative-value-actions button{min-height:36px;padding:8px;font-size:12px}
+.creative-tools .creative-upgrade-list{gap:6px;margin:8px 0}
+.creative-tools .creative-upgrade-row{gap:6px;padding:8px}
+.guess-tool-buttons button .ui-icon{width:14px;height:14px;vertical-align:-2px}
+.debug-build-card{margin-top:10px;padding:14px;border:1px solid color-mix(in srgb,#f59e0b 50%,var(--line));background:linear-gradient(135deg,color-mix(in srgb,#f59e0b 9%,var(--panel)),var(--panel))}
+.debug-build-card[hidden]{display:none!important}
+.debug-build-heading{display:flex;align-items:center;gap:9px}
+.debug-build-heading>.ui-icon{width:22px;height:22px;flex:none;color:#d97706}
+.debug-build-heading h2{margin:2px 0;font-size:16px}
+.debug-build-heading .eyebrow{font-size:10px;letter-spacing:.1em}
+.debug-build-badge{margin-left:auto;padding:4px 7px;border-radius:999px;background:color-mix(in srgb,#f59e0b 16%,var(--panel));color:var(--text);font-size:10px;font-weight:800;letter-spacing:.08em}
+.debug-build-card p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+
+
+/* Keep long changelog text inside the screen on narrow WebViews. */
+.changelog-screen,.changelog-list,.changelog-entry,.changelog-entry-top,.changelog-markdown-paragraph,.changelog-markdown-list,.changelog-markdown-list li{min-width:0;max-width:100%;box-sizing:border-box}
+.changelog-screen :is(h1,h2,h3,h4,p,li,span,a,strong,em,code,pre){overflow-wrap:anywhere;word-break:normal}
+.changelog-markdown-paragraph,.changelog-entry li,.changelog-heading p{white-space:normal;overflow-wrap:anywhere;word-break:normal}
+.changelog-markdown-list{padding-left:clamp(16px,4vw,20px)}
+.changelog-entry{overflow-wrap:anywhere}
+.changelog-entry-top>*{min-width:0;max-width:100%}
+.changelog-markdown-paragraph code,.changelog-markdown-list code{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+.changelog-markdown-paragraph a,.changelog-markdown-list a{overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:420px){.changelog-heading{padding:16px}.changelog-heading h2{font-size:24px}.changelog-entry{padding:14px}.changelog-entry h3{overflow-wrap:anywhere}.changelog-markdown-list{gap:7px}}

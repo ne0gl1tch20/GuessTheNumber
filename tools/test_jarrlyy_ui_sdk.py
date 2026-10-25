@@ -315,5 +315,38 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn("#arcadeGame[hidden]{display:none!important;visibility:hidden!important;pointer-events:none!important}", (WEB / "styles.css").read_text(encoding="utf-8"))
 
 
+    def test_html_play_creative_tools_icons_notation_and_debug_card(self):
+        html = (WEB / "index.html").read_text(encoding="utf-8")
+        css = (WEB / "styles.css").read_text(encoding="utf-8")
+        app = (WEB / "app.js").read_text(encoding="utf-8")
+
+        # Creative Tools follows the Daily Momentum shortcut and stays compact.
+        self.assertLess(html.index('id="questButton"'), html.index('id="creativeToolsPanel"'))
+        self.assertLess(html.index('id="creativeToolsPanel"'), html.index('id="debugBuildCard"'))
+        self.assertIn(".creative-tools{padding:14px;margin-top:10px;margin-bottom:10px}", css.replace(" ", ""))
+
+        # Debug builds show a dedicated info card after the rest of the Play screen.
+        self.assertIn('id="debugBuildCard"', html)
+        self.assertIn('debugBuildCard.hidden=!s.debugBuild', app)
+        self.assertIn("Your progress is saved to the active local save slot.", html)
+
+        # Buttons and stat icons use the local SVG sprite rather than text-only glyphs.
+        for icon in ("icon-target", "icon-flame", "icon-coins", "icon-check-circle", "icon-wand", "icon-code", "icon-arrow-down"):
+            with self.subTest(icon=icon):
+                self.assertIn(f'id="{icon}"', html)
+        self.assertIn('data-guess-pick="mid" aria-label="Use midpoint of range"><svg', html)
+
+        # HTML rendering honors the saved notation and locale preference.
+        self.assertIn("function formatGameNumber(value,settings=lastState?.settings||{})", app)
+        self.assertIn("notation==='Standard'", app)
+        self.assertIn("notation==='Engineering'", app)
+        self.assertIn("formatGameNumber(s.money,s.settings)", app)
+
+        # Rejected claims must not be mislabeled as guess-rate limiting.
+        self.assertIn("Daily reward is already claimed. Come back tomorrow.", app)
+        self.assertIn("Reward could not be claimed. Finish the minigame and try again.", app)
+        self.assertNotIn(":'Guess rate-limited')", app)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
