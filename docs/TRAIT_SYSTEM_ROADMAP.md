@@ -83,3 +83,38 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 ## Completion rule
 
 No phase adds features outside its acceptance criteria. Phase 6 is complete only after its security/native tests and measured comparison are green. If the comparison shows Kotlin is already fast enough, the native path may be reduced or removed and Phase 6 can still be considered successful. Phase 7 is complete only after portable-backup authentication, creative-schema migration/validation, slot isolation, backup compatibility and the required CI checks are green. Creative effects remain a bounded data-driven policy, not arbitrary scripts or reward authority.
+
+
+## Phase 8 — Creative Mode production gameplay integration: in progress
+
+Implemented on the current feature branch:
+- The active save slot loads its own Creative Mode profile into the gameplay runtime; switching slots swaps the profile too.
+- Validated range bounds and range-scale output are applied to the production guess path, and newly generated targets are clamped to the effective Creative Mode range.
+- The per-target attempt limit rejects further guesses once the configured budget is exhausted.
+- The runtime exposes the active profile's extra-hint allowance for a presentation/bridge adapter.
+- Saving a Creative Mode profile for the active slot refreshes the runtime profile immediately.
+
+Remaining acceptance work before Phase 8 can be called complete:
+- Add focused production-pipeline tests for range scaling, attempt-limit rejection, slot switching, reset/import refresh and disabled-profile behavior.
+- Wire the extra-hint allowance to the player-facing hint UI and verify Android/Windows/HTML parity where the hint action is exposed.
+- Run all relevant Android, Windows and HTML CI workflows and fix any failures.
+
+## Phase 9 — Creative Mode save-data and effect runtime expansion: planned
+
+- Introduce a versioned, typed runtime context for per-round/per-session effects instead of growing ad-hoc branches in the ViewModel.
+- Define effect lifecycle rules (profile load, round start, guess accepted/rejected, round end, slot switch and reset) and deterministic effect ordering.
+- Keep user-authored content declarative and allowlisted. No arbitrary Lua/JavaScript execution in the trusted gameplay path, no direct save mutation and no currency/progression authority.
+- Add migration fixtures for every supported schema version and bundle version, including malformed and future-version rejection.
+- Add replayable tests proving that effect order, random inputs and state transitions are deterministic.
+
+## Phase 10 — Trait and seasonal architecture expansion: planned
+
+- Unify seasonal activation around a validated season context with explicit start/end timestamps, stable season IDs, eligibility rules and offline fallback.
+- Separate trait definition, activation decision, effect intent, persistence and reward settlement into testable modules.
+- Preserve signed-catalog verification, rollback protection, built-in trait ID protection and offline-first operation.
+- Add season-boundary tests, timezone/DST tests, expired/unknown-season fallback tests, trait conflict/dependency tests and save migration tests.
+- Add a single CI acceptance matrix for Kotlin gameplay, Android, Windows, HTML/CSS/JS and signed catalog fixtures.
+
+## Phase acceptance status
+
+Phase 8 is **not marked complete yet**: the first production integration is in place, but its dedicated tests and player-facing hint wiring still need to pass. Phases 9 and 10 are recorded as the next implementation stages rather than falsely labelled complete. The changelog at the repository root is the historical index for merged pull requests and release notes.
