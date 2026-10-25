@@ -88,12 +88,12 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 - The run runtime has no currency, reward, progression, filesystem or script capability.
 - Still required: connect the runtime to a player-facing Creative Mode launch/play flow and prove the per-slot configuration is used by that flow before marking this phase complete.
 
-## Phase 9 — Creative Mode session persistence and recovery: planned
+## Phase 9 — Creative Mode session persistence and recovery: in progress
 
-- Persist an explicit, versioned Creative Mode run snapshot separately from normal GameState.
-- Include session snapshots in encrypted backup bundles with backward-compatible migrations.
-- Define crash/relaunch recovery, reset/duplicate behavior, and validation for stale or mismatched session/config IDs.
-- Save and restore session state atomically; reject invalid snapshots without corrupting the normal save.
+- Added schema v3 run snapshots with bounded IDs, range/target validation, attempt/hint counters and completed-state validation.
+- Added explicit runtime helpers to persist a run into its per-slot Creative Mode config, resume it after decoding, and clear a saved run.
+- Existing encrypted backup bundles already carry the Creative Mode config payload; schema v1/v2 imports migrate forward and never invent an active run.
+- Still required: call these helpers from the actual player-facing Creative Mode session lifecycle and verify crash/relaunch recovery, reset/duplicate behavior and atomic writes.
 
 ## Phase 10 — Creative effect composition and authoring: planned
 
