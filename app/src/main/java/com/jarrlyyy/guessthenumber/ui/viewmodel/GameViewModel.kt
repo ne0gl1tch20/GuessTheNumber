@@ -18,6 +18,9 @@ import com.jarrlyyy.guessthenumber.widget.WidgetRefresh
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import com.jarrlyyy.guessthenumber.data.store.exportSecureSave
 import com.jarrlyyy.guessthenumber.data.store.importSecureOrLegacySave
+import com.jarrlyyy.guessthenumber.data.store.exportPortableBackup
+import com.jarrlyyy.guessthenumber.data.store.importPortableOrLegacyBackup
+import com.jarrlyyy.guessthenumber.data.store.CreativeModeSave
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
@@ -850,6 +853,20 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             _gameState.value = state.copy(ultra = newUltra, ultraShopPurchases = newPurchases)
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.SHOP, "BUY_ULTRA_SHOP", "Purchased ultra shop item $itemId")
+        }
+    }
+
+    fun loadCreativeModeSave(slot: Int, onLoaded: (CreativeModeSave?) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val save = saveManager.loadCreativeModeSave(slot)
+            withContext(Dispatchers.Main) { onLoaded(save) }
+        }
+    }
+
+    fun saveCreativeModeSave(slot: Int, save: CreativeModeSave, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = slotOperationMutex.withLock { saveManager.saveCreativeModeSave(slot, save) }
+            withContext(Dispatchers.Main) { onResult(result) }
         }
     }
 
