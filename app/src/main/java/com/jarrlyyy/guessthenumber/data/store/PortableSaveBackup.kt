@@ -69,7 +69,7 @@ object PortableSaveBackup {
         }
     }
 
-    fun isPortableFormat(input: String): Boolean = input.startsWith(PREFIX)
+    fun isPortableFormat(input: String): Boolean = input.startsWith("GTNPORT")
 
     private fun deriveKey(passphrase: CharArray, salt: ByteArray): SecretKey {
         val spec = PBEKeySpec(passphrase, salt, PBKDF2_ITERATIONS, KEY_BITS)
