@@ -86,7 +86,8 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 - Added a deterministic, immutable Creative Mode run model with validated range, guess outcomes, attempt-limit enforcement and bounded hint usage.
 - Rejected/out-of-range guesses do not consume attempts; completed runs reject further guesses.
 - The run runtime has no currency, reward, progression, filesystem or script capability.
-- Still required: connect the runtime to a player-facing Creative Mode launch/play flow and prove the per-slot configuration is used by that flow before marking this phase complete.
+- The Save Slots screen now launches/resumes a run from the selected slot, submits guesses, consumes bounded parity hints, supports restart and persists run snapshots through the existing slot save API.
+- CI and a device-level interaction check are still required before this phase can be marked complete.
 
 ## Phase 9 — Creative Mode session persistence and recovery: in progress
 
@@ -95,13 +96,12 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 - Existing encrypted backup bundles already carry the Creative Mode config payload; schema v1/v2 imports migrate forward and never invent an active run.
 - Still required: call these helpers from the actual player-facing Creative Mode session lifecycle and verify crash/relaunch recovery, reset/duplicate behavior and atomic writes.
 
-## Phase 10 — Creative effect composition and authoring: planned
+## Phase 10 — Creative effect composition and authoring: in progress
 
-- Add stable effect IDs, explicit composition order, conflict rules and per-effect limits.
-- Keep effects declarative and allowlisted; no arbitrary Lua/JavaScript execution from a Creative Mode save.
-- Separate informational effects (hints/UI) from gameplay constraints (range/attempts).
-- Add a preview/validation path so invalid configurations are rejected before a run starts.
-- Prove Creative Mode effects cannot grant currency, unlock progression or change reward eligibility.
+- The Save Slots editor exposes range scaling, extra hints and attempt limits; the shared policy composes them into bounded runtime rules.
+- Effects remain declarative and allowlisted. Creative Mode runs have no currency, reward, progression or script capability.
+- Runtime checks reject guesses outside the run range, over-limit guesses, stale snapshots and runs whose rules no longer match the saved configuration.
+- Still required: add a clear effect preview/conflict explanation and broaden end-to-end tests for combinations before marking this phase complete.
 
 ## Phase 11 — Trait/season lifecycle policy: in progress
 
