@@ -248,7 +248,7 @@ fun SaveSlotsScreen(
                             )
                         }
                     }
-                    Text(localizedText("Difficulty"), style = MaterialTheme.typography.labelLarge)
+                    Text(locale.getStringByEnglish("Difficulty"), style = MaterialTheme.typography.labelLarge)
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         Difficulty.ids.forEach { id ->
                             FilterChip(
@@ -267,7 +267,7 @@ fun SaveSlotsScreen(
                         if (success) showCreateDialog = null
                         refreshMetadata()
                     }
-                }) { Text(localizedText("Create")) }
+                }) { Text(locale.getStringByEnglish("Create")) }
             },
             dismissButton = { TextButton(onClick = { showCreateDialog = null }) { Text(locale.getString("cancel", "Cancel")) } }
         )
