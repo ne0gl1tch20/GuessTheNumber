@@ -55,12 +55,11 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 
 ### Save transfer security
 
-- New `GTNSEC2:` versioned transfer envelopes use AES-256-GCM with authenticated data and an Android Keystore-protected non-exportable key.
-- Save Slots export now uses `exportSecureSave()` and import uses `importSecureOrLegacySave()` through the existing view-model actions.
-- Secure envelopes are authenticated before their payload reaches `SaveManager`; malformed/tampered envelopes are rejected.
-- Existing legacy encrypted/plain import remains accepted through an explicit compatibility path, covered by a regression test.
-- The secure export key is device-bound in this phase because the current transfer UI has no passphrase/key-sharing flow. A future portable export format must add explicit user-controlled key material rather than embedding a secret in the APK.
-- C++ is not used to implement cryptography from scratch. Native code is used for the gameplay algorithm; platform cryptography provides the save-transfer security boundary.
+- New Save Slots exports use the portable `GTNPORT1:` envelope: PBKDF2-HMAC-SHA256 (310,000 iterations), random 128-bit salt, AES-256-GCM, random 96-bit IV and authenticated format metadata. The key is derived from a user passphrase, not Android Keystore, so a backup can be restored on another device with the same passphrase.
+- Export asks users to confirm a 12+ character passphrase; import accepts the passphrase without persisting it. The backup format remains compatible across devices using the same format and passphrase.
+- Wrong passphrases, altered ciphertext, malformed envelopes and unknown `GTNPORT` versions are rejected. Portable-format failures never downgrade to the legacy parser.
+- Existing device-bound `GTNSEC2:` envelopes and supported legacy encrypted/plain imports remain importable through explicit compatibility paths.
+- C++ is not used to implement cryptography from scratch. Native code is used for gameplay compute; standard platform/JVM cryptography provides the save-transfer security boundary.
 
 ### Phase 6 acceptance
 
@@ -71,13 +70,16 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 - The measured native-vs-Kotlin core comparison supports keeping the native path enabled, with JNI overhead explicitly excluded from the performance claim.
 - Android validation/tests, Windows build/tests, HTML/CSS/JS checks, native/security validation and the native-vs-Kotlin benchmark all passed on the final save-transfer integration commit.
 
-## Phase 7 — Creative mode save data and effects: planned after Phase 6
+## Phase 7 — Creative mode save data and effects: complete
 
-- Define a versioned creative-mode save schema with safe defaults, validation and migration.
-- Decide which creative settings and custom effects are per-save-slot and which are global.
-- Build bounded effect definitions and validation so custom effects cannot directly grant rewards, corrupt normal saves or bypass gameplay rules.
-- Cover import/export, legacy compatibility, localization, malformed data, slot isolation and round-trip tests before connecting creative effects to gameplay.
+- Added a versioned Creative Mode schema (v2) with safe defaults, strict bounds and migration from v1. Unsupported schema versions and malformed definitions are rejected.
+- Creative Mode configuration is stored per save slot, exposed in the Save Slots UI, copied with slot duplication and removed when that slot is reset.
+- The full encrypted backup bundle is now version 3 and includes Creative Mode configurations. Import remains compatible with version 2 bundles and migrates older Creative Mode schemas safely.
+- The effect allowlist supports bounded range scaling, extra hints and attempt limits only. Effects cannot execute arbitrary code, award currency or mutate progression; Kotlin validation remains authoritative.
+- Added tests for schema migration, unsupported/malformed saves, effect bounds, disabled effects, full-backup serialization and per-slot isolation/reset.
+- Portable backup tests cover authenticated round-trip, wrong passphrase, tampering, malformed/unknown versions and legacy import routing.
+- Android validation, Phase 6 native/security validation, Windows build/tests and HTML/CSS/JS checks passed on the final implementation commit.
 
 ## Completion rule
 
-No phase adds features outside its acceptance criteria. Phase 6 is complete only after its security/native tests and measured comparison are green. If the comparison shows Kotlin is already fast enough, the native path may be reduced or removed and Phase 6 can still be considered successful. Phase 7 then handles creative-mode save data and effects separately.
+No phase adds features outside its acceptance criteria. Phase 6 is complete only after its security/native tests and measured comparison are green. If the comparison shows Kotlin is already fast enough, the native path may be reduced or removed and Phase 6 can still be considered successful. Phase 7 is complete only after portable-backup authentication, creative-schema migration/validation, slot isolation, backup compatibility and the required CI checks are green. Creative effects remain a bounded data-driven policy, not arbitrary scripts or reward authority.
