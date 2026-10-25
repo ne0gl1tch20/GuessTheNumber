@@ -427,8 +427,10 @@ fun SaveSlotsScreen(
                 val rangeMax = creativeRangeMax.toLongOrNull()
                 val hints = creativeHints.toIntOrNull()
                 val attemptLimit = creativeAttemptLimit.toIntOrNull()
-                val valid = !creativeName.isBlank() && rangeMax in 1L..CreativeModeSave.MAX_RANGE &&
-                    hints in 0..5 && attemptLimit in 0..100
+                val valid = !creativeName.isBlank() &&
+                    rangeMax != null && rangeMax in 1L..CreativeModeSave.MAX_RANGE &&
+                    hints != null && hints in 0..5 &&
+                    attemptLimit != null && attemptLimit in 0..100
                 TextButton(
                     enabled = valid,
                     onClick = {
