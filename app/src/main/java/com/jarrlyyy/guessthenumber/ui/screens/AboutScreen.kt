@@ -134,7 +134,19 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                                             ApkUpdateInstaller(context).install(
                                                 update.downloadUrl,
                                                 requireChecksum = update.requireChecksum,
-                                                expectedCommitSha = update.expectedCommitSha
+                                                expectedCommitSha = update.expectedCommitSha,
+                                                onProgress = { stage, downloaded, total ->
+                                                    scope.launch {
+                                                        val downloadedMb = downloaded / (1024L * 1024L)
+                                                        updateMessage = if (total > 0L) {
+                                                            val totalMb = total / (1024L * 1024L)
+                                                            val percent = (downloaded * 100L / total).coerceIn(0L, 100L)
+                                                            "$stage $downloadedMb MB / $totalMb MB ($percent%)"
+                                                        } else {
+                                                            "$stage $downloadedMb MB downloaded"
+                                                        }
+                                                    }
+                                                }
                                             )
                                         }
                                         installingUpdate = false
