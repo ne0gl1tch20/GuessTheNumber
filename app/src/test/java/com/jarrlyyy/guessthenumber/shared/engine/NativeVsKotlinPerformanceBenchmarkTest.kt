@@ -71,7 +71,7 @@ class NativeVsKotlinPerformanceBenchmarkTest {
         state = state xor maxOf(0L, case.attempts) * ATTEMPTS_MULTIPLIER
 
         val sample = mix(state)
-        var offset = sample.mod(width)
+        var offset = (sample.toULong() % width.toULong()).toLong()
         val pressure = minOf(case.streak, 32).toLong() + when (case.difficulty) {
             "extreme" -> 3L
             "hard" -> 2L
