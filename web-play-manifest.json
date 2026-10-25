@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "c682b21029e96111356195242e46077fdc9b4bee",
+  "version": "87ed2b5cf63f8360488bc893f86d8531e6ad050e",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -25,7 +25,7 @@
     },
     {
       "path": "web-play/menu-studio.js",
-      "sha256": "9e2c8527eff8337ad475810330b9d764f5f223d9d56feaf43cfc259d5609f2b6"
+      "sha256": "17161cf67b59bfde2bc2b796aea298cb491e6fe61b038d37ba7b28302e84562e"
     },
     {
       "path": "web-play/styles.css",
