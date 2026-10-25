@@ -533,7 +533,7 @@ fun ProductionWebPlayScreen(
                                                 "creative_update_range" -> {
                                                     val min = parsed.creativeRangeMin
                                                     val max = parsed.creativeRangeMax
-                                                    if (!gameStateForBridge().creativeModeEnabled || min == null || max == null || !onCreativeUpdateRange(min, max)) {
+                                                    if (!stateProvider().creativeModeEnabled || min == null || max == null || !onCreativeUpdateRange(min, max)) {
                                                         throw IllegalArgumentException("Creative Mode range update was rejected.")
                                                     }
                                                 }
