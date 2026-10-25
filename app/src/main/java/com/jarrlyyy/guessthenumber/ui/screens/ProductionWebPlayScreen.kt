@@ -149,12 +149,13 @@ fun ProductionWebPlayScreen(
     val awardArcadeReward by rememberUpdatedState(onArcadeReward)
     val settleStake by rememberUpdatedState(onSettleStake)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
-    fun notifyMenuStudioColorPicked(target: String, hex: String?) {
+    fun notifyMenuStudioColorPicked(target: String, hex: String?, reset: Boolean = false) {
         val targetJson = JSONObject.quote(target)
         val colorJson = hex?.let { JSONObject.quote(it) } ?: "null"
+        val resetJson = reset.toString()
         webViewRef?.post {
             webViewRef?.evaluateJavascript(
-                "window.gtnMenuStudioColorPicked && window.gtnMenuStudioColorPicked($targetJson,$colorJson)",
+                "window.gtnMenuStudioColorPicked && window.gtnMenuStudioColorPicked($targetJson,$colorJson,$resetJson)",
                 null
             )
         }
@@ -219,7 +220,7 @@ fun ProductionWebPlayScreen(
                 onUpdateSettings(state.settings.copy(
                     moreScreenButtonColors = state.settings.moreScreenButtonColors - target
                 ))
-                notifyMenuStudioColorPicked(target, null)
+                notifyMenuStudioColorPicked(target, null, reset = true)
                 menuStudioColorTarget = null
             }
         )
