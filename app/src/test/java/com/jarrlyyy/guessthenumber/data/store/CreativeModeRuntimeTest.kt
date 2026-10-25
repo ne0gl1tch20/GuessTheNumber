@@ -125,4 +125,45 @@ class CreativeModeRuntimeTest {
         assertNull(CreativeModeRuntime.useHint(changedConfig, valid))
     }
 
+
+    @Test fun allCreativeEffectsComposeIntoOneBoundedRuntimePolicy() {
+        val config = CreativeModeSave(
+            enabled = true,
+            rangeMin = 10,
+            rangeMax = 20,
+            effects = listOf(
+                CreativeModeEffect("scale-range", CreativeEffectType.RANGE_SCALE, 2),
+                CreativeModeEffect("extra-hints", CreativeEffectType.EXTRA_HINTS, 3),
+                CreativeModeEffect("limit-attempts", CreativeEffectType.ATTEMPT_LIMIT, 4),
+                CreativeModeEffect("more-hints", CreativeEffectType.EXTRA_HINTS, 4),
+                CreativeModeEffect("stricter-limit", CreativeEffectType.ATTEMPT_LIMIT, 2)
+            )
+        )
+        val rules = CreativeModeEffectPolicy.resolve(config)!!
+        assertEquals(10L, rules.rangeMin)
+        assertEquals(43L, rules.rangeMax)
+        assertEquals(7, rules.extraHints)
+        assertEquals(2, rules.attemptLimit)
+        val run = CreativeModeRuntime.start(config, 42)!!
+        assertEquals(CreativeGuessOutcome.TOO_HIGH, CreativeModeRuntime.submitGuess(config, run, 43).outcome)
+    }
+
+    @Test fun completedSnapshotMustRepresentAnActualCorrectGuess() {
+        val invalid = CreativeModeSave(
+            enabled = true,
+            activeRun = CreativeModeRunSnapshot(
+                runId = "creative-run-123",
+                rangeMin = 1,
+                rangeMax = 10,
+                target = 5,
+                attemptsUsed = 0,
+                correctGuesses = 0,
+                completed = true
+            )
+        )
+        assertFalse(CreativeModeSaveCodec.validate(invalid))
+        val raw = """{"schemaVersion":3,"name":"My Creative Mode","enabled":true,"rangeMin":1,"rangeMax":100,"effects":[],"activeRun":{"runId":"creative-run-123","rangeMin":1,"rangeMax":10,"target":5,"attemptsUsed":0,"correctGuesses":0,"hintsUsed":0,"completed":true}}"""
+        assertNull(CreativeModeSaveCodec.decodeAndMigrate(raw))
+    }
+
 }
