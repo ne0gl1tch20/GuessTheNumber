@@ -16,10 +16,11 @@ data class CreativeModeSave(
     val enabled: Boolean = false,
     val rangeMin: Long = 1L,
     val rangeMax: Long = 100L,
-    val effects: List<CreativeModeEffect> = emptyList()
+    val effects: List<CreativeModeEffect> = emptyList(),
+    val activeRun: CreativeModeRunSnapshot? = null
 ) {
     companion object {
-        const val CURRENT_SCHEMA_VERSION = 2
+        const val CURRENT_SCHEMA_VERSION = 3
         const val MAX_EFFECTS = 16
         const val MAX_RANGE = 1_000_000L
     }
@@ -30,6 +31,19 @@ data class CreativeModeEffect(
     val id: String,
     val type: CreativeEffectType,
     val value: Int
+)
+
+/** Persistable snapshot for a Creative Mode run; it never contains rewards or progression. */
+@Serializable
+data class CreativeModeRunSnapshot(
+    val runId: String,
+    val rangeMin: Long,
+    val rangeMax: Long,
+    val target: Long,
+    val attemptsUsed: Int = 0,
+    val correctGuesses: Int = 0,
+    val hintsUsed: Int = 0,
+    val completed: Boolean = false
 )
 
 @Serializable
@@ -57,7 +71,8 @@ object CreativeModeSaveCodec {
     fun decodeAndMigrate(raw: String): CreativeModeSave? = runCatching {
         val decoded = json.decodeFromString<CreativeModeSave>(raw)
         val migrated = when (decoded.schemaVersion) {
-            1 -> decoded.copy(schemaVersion = CreativeModeSave.CURRENT_SCHEMA_VERSION, effects = emptyList())
+            1 -> decoded.copy(schemaVersion = CreativeModeSave.CURRENT_SCHEMA_VERSION, effects = emptyList(), activeRun = null)
+            2 -> decoded.copy(schemaVersion = CreativeModeSave.CURRENT_SCHEMA_VERSION, activeRun = null)
             CreativeModeSave.CURRENT_SCHEMA_VERSION -> decoded
             else -> return null
         }
@@ -71,6 +86,7 @@ object CreativeModeSaveCodec {
             save.rangeMax > CreativeModeSave.MAX_RANGE) return false
         if (save.effects.size > CreativeModeSave.MAX_EFFECTS) return false
         if (save.effects.map { it.id }.toSet().size != save.effects.size) return false
+        if (save.activeRun != null && !validateRunSnapshot(save.activeRun)) return false
         return save.effects.all { effect ->
             Regex("[a-z][a-z0-9_-]{1,31}").matches(effect.id) &&
                 when (effect.type) {
@@ -80,6 +96,17 @@ object CreativeModeSaveCodec {
                 }
         }
     }
+
+    fun validateRunSnapshot(snapshot: CreativeModeRunSnapshot): Boolean =
+        Regex("[a-zA-Z0-9_-]{8,64}").matches(snapshot.runId) &&
+            snapshot.rangeMin >= 1L &&
+            snapshot.rangeMax >= snapshot.rangeMin &&
+            snapshot.rangeMax <= CreativeModeSave.MAX_RANGE &&
+            snapshot.target in snapshot.rangeMin..snapshot.rangeMax &&
+            snapshot.attemptsUsed >= 0 &&
+            snapshot.correctGuesses >= 0 &&
+            snapshot.correctGuesses <= snapshot.attemptsUsed &&
+            snapshot.hintsUsed in 0..10
 }
 
 object CreativeModeEffectPolicy {

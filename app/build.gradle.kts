@@ -12,8 +12,8 @@ plugins {
 val generatedWebPlayAssets = layout.buildDirectory.dir("generated/webPlayAssets")
 val generatedDebugBuildInfo = layout.buildDirectory.dir("generated/buildInfo/debug")
 val generatedReleaseBuildInfo = layout.buildDirectory.dir("generated/buildInfo/release")
-val appVersionName = "3.0.3"
-val appVersionCode = 21
+val appVersionName = "3.1.0"
+val appVersionCode = 22
 val generatedLauncherIconRes = layout.buildDirectory.dir("generated/launcherIconRes")
 val launcherLogo = rootProject.file("GTN_APP_LOGO.png")
 val prepareWebPlayBrandAsset by tasks.registering(Copy::class) {

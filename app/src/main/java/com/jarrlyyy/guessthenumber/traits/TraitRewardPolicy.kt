@@ -51,10 +51,6 @@ object TraitRewardPolicy {
     }
 
     /** Calendar mapping is deterministic and offline; no network or remote clock is needed. */
-    fun currentSeasonId(date: LocalDate = LocalDate.now()): String = when (date.monthValue) {
-        12, 1, 2 -> "winter"
-        in 3..5 -> "spring"
-        in 6..8 -> "summer"
-        else -> "autumn"
-    }
+    fun currentSeasonId(date: LocalDate = LocalDate.now()): String =
+        TraitSeasonPolicy.seasonFor(date).id
 }

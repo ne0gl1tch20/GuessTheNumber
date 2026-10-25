@@ -80,6 +80,51 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 - Portable backup tests cover authenticated round-trip, wrong passphrase, tampering, malformed/unknown versions and legacy import routing.
 - Android validation, Phase 6 native/security validation, Windows build/tests and HTML/CSS/JS checks passed on the final implementation commit.
 
+
+## Phase 8 — Creative Mode runtime core: implementation complete; device verification pending
+
+- Added a deterministic, immutable Creative Mode run model with validated range, guess outcomes, attempt-limit enforcement and bounded hint usage.
+- Rejected/out-of-range guesses do not consume attempts; completed runs reject further guesses.
+- The run runtime has no currency, reward, progression, filesystem or script capability.
+- The Save Slots screen now launches/resumes a run from the selected slot, submits guesses, consumes bounded parity hints, supports restart and persists run snapshots through the existing slot save API.
+- Android unit tests, lint and full Gradle check pass; a device-level interaction check remains pending.
+
+## Phase 9 — Creative Mode session persistence and recovery: implementation complete; restart/device verification pending
+
+- Added schema v3 run snapshots with bounded IDs, range/target validation, attempt/hint counters and completed-state validation.
+- Added explicit runtime helpers to persist a run into its per-slot Creative Mode config, resume it after decoding, and clear a saved run.
+- Existing encrypted backup bundles already carry the Creative Mode config payload; schema v1/v2 imports migrate forward and never invent an active run.
+- The Save Slots flow calls persist/resume/clear through the per-slot save API, and the portable backup carries the snapshot. Process-death/relaunch behavior and device-level recovery remain manual verification items.
+
+## Phase 10 — Creative effect composition and authoring: implementation in place; end-to-end/device verification pending
+
+- The Save Slots editor exposes range scaling, extra hints and attempt limits; the shared policy composes them into bounded runtime rules.
+- Effects remain declarative and allowlisted. Creative Mode runs have no currency, reward, progression or script capability.
+- Runtime checks reject guesses outside the run range, over-limit guesses, stale snapshots and runs whose rules no longer match the saved configuration.
+- The editor now previews the effective range, hint count and attempt limit before saving. Broader end-to-end combination tests and device-level verification remain pending.
+
+## Phase 11 — Trait/season lifecycle policy: complete
+
+- Centralized the offline calendar in TraitSeasonPolicy; season windows use inclusive start/exclusive end boundaries and correctly cross the winter year boundary.
+- Season selection is deterministic from a supplied date for tests and replayable behavior.
+- The central calendar is used by TraitRewardPolicy and an activation test proves winter-only traits deactivate at the spring boundary. Seasonal catalogs remain signed/validated and offline-first.
+
+## Phase 12 — Trait/season integration and cross-system isolation: complete
+
+- The season calendar is centralized and is used by the trait reward policy; boundary tests verify seasonal activation changes at the calendar transition.
+- Creative Mode intentionally does not accept GameState, trait effect intents, reward policies or script handles. The separate runtime prevents trait/creative modifiers from stacking accidentally until a concrete cross-system feature is designed and tested.
+- Existing registry and signed-catalog validation continue to enforce stable IDs, dependency/conflict rules, schema/host compatibility, rollback rejection and offline fallback.
+- New effects remain gated on an authoritative Kotlin implementation, localization and tests; remote catalogs remain declarative and fail-closed.
+
+## Phase 13 — Final integration and release verification: CI complete; device QA pending
+
+- Verify Android, Windows, HTML/CSS/JS, native/security and trait profiling workflows against the exact final commit.
+- Audit save compatibility from legacy imports through the current portable backup bundle.
+- Update the player changelog and the PR ledger for every shipped change.
+- Bump app version only alongside a release-ready set of changes and record the exact versionCode.
+- Android unit tests, lint and full Gradle check, Windows desktop build/tests, HTML/CSS/JS checks, native/security validation and trait profiling all passed for the implementation revision. The 3.1.0/versionCode 22 metadata and PR ledger are included.
+- Keep on-device visual/bridge verification separate from CI claims; Save Slots Creative Mode interaction still needs a device pass.
+
 ## Completion rule
 
-No phase adds features outside its acceptance criteria. Phase 6 is complete only after its security/native tests and measured comparison are green. If the comparison shows Kotlin is already fast enough, the native path may be reduced or removed and Phase 6 can still be considered successful. Phase 7 is complete only after portable-backup authentication, creative-schema migration/validation, slot isolation, backup compatibility and the required CI checks are green. Creative effects remain a bounded data-driven policy, not arbitrary scripts or reward authority.
+No phase adds features outside its acceptance criteria. A phase is complete only when the implementation is connected to its real production flow, tests cover the acceptance criteria, and required CI checks pass. Documentation and a pure runtime model alone do not count as full gameplay integration. Native performance claims must continue to exclude JNI overhead unless that overhead is measured. Creative effects remain bounded data-driven policy, not arbitrary scripts or reward authority.

@@ -36,6 +36,10 @@ import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.data.store.CreativeModeSave
 import com.jarrlyyy.guessthenumber.data.store.CreativeModeEffect
 import com.jarrlyyy.guessthenumber.data.store.CreativeEffectType
+import com.jarrlyyy.guessthenumber.data.store.CreativeModeRuntime
+import com.jarrlyyy.guessthenumber.data.store.CreativeModeRun
+import com.jarrlyyy.guessthenumber.data.store.CreativeGuessOutcome
+import com.jarrlyyy.guessthenumber.data.store.CreativeModeEffectPolicy
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
@@ -44,6 +48,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,9 +76,16 @@ fun SaveSlotsScreen(
     var showImportDialog by remember { mutableStateOf(false) }
     var showPortableExportDialog by remember { mutableStateOf(false) }
     var showCreativeDialog by remember { mutableStateOf(false) }
+    var showCreativeRunDialog by remember { mutableStateOf(false) }
+    var creativeRunSave by remember { mutableStateOf<CreativeModeSave?>(null) }
+    var creativeRunSlot by remember { mutableIntStateOf(1) }
+    var creativeRun by remember { mutableStateOf<CreativeModeRun?>(null) }
+    var creativeRunGuess by remember { mutableStateOf("") }
+    var creativeRunMessage by remember { mutableStateOf("") }
     var creativeName by remember { mutableStateOf("My Creative Mode") }
     var creativeEnabled by remember { mutableStateOf(false) }
     var creativeRangeMax by remember { mutableStateOf("100") }
+    var creativeRangeScale by remember { mutableStateOf("1") }
     var creativeHints by remember { mutableStateOf("0") }
     var creativeAttemptLimit by remember { mutableStateOf("0") }
     var exportPassphrase by remember { mutableStateOf("") }
@@ -391,6 +403,26 @@ fun SaveSlotsScreen(
             onDismissRequest = { showCreativeDialog = false },
             title = { Text("Creative Mode • Slot $activeSlot") },
             text = {
+                val previewMax = creativeRangeMax.toLongOrNull()?.takeIf { it in 1L..CreativeModeSave.MAX_RANGE }
+                val previewScale = creativeRangeScale.toIntOrNull()?.takeIf { it in 1..5 }
+                val previewHints = creativeHints.toIntOrNull()?.takeIf { it in 0..5 }
+                val previewAttemptLimit = creativeAttemptLimit.toIntOrNull()?.takeIf { it in 0..100 }
+                val previewEffects = buildList {
+                    if ((previewScale ?: 1) > 1) add(CreativeModeEffect("range-scale", CreativeEffectType.RANGE_SCALE, previewScale!!))
+                    if ((previewHints ?: 0) > 0) add(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, previewHints!!))
+                    if ((previewAttemptLimit ?: 0) > 0) add(CreativeModeEffect("attempt-cap", CreativeEffectType.ATTEMPT_LIMIT, previewAttemptLimit!!))
+                }
+                val previewRules = if (previewMax != null && previewScale != null && previewHints != null && previewAttemptLimit != null) {
+                    CreativeModeEffectPolicy.resolve(
+                        CreativeModeSave(
+                            name = creativeName.trim().ifBlank { "Preview" },
+                            enabled = creativeEnabled,
+                            rangeMin = 1L,
+                            rangeMax = previewMax,
+                            effects = previewEffects
+                        )
+                    )
+                } else null
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text("This configuration belongs to the selected save slot. Effects are bounded rule modifiers only: they cannot grant currency, rewards or change normal save progression.")
                     OutlinedTextField(
@@ -410,6 +442,12 @@ fun SaveSlotsScreen(
                         singleLine = true
                     )
                     OutlinedTextField(
+                        value = creativeRangeScale,
+                        onValueChange = { creativeRangeScale = it.filter(Char::isDigit).take(1) },
+                        label = { Text("Range scale (1–5; 1 = normal)") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
                         value = creativeHints,
                         onValueChange = { creativeHints = it.filter(Char::isDigit).take(2) },
                         label = { Text("Extra hints (0–5)") },
@@ -421,20 +459,31 @@ fun SaveSlotsScreen(
                         label = { Text("Attempt limit (0 off, 1–100)") },
                         singleLine = true
                     )
+                    Text(
+                        when {
+                            !creativeEnabled -> "Preview: Creative rules are disabled."
+                            previewRules != null -> "Preview: range ${previewRules.rangeMin}–${previewRules.rangeMax}, ${previewRules.extraHints} hints, attempt limit ${previewRules.attemptLimit ?: "off"}."
+                            else -> "Preview unavailable until all values are valid."
+                        },
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             },
             confirmButton = {
                 val rangeMax = creativeRangeMax.toLongOrNull()
+                val rangeScale = creativeRangeScale.toIntOrNull()
                 val hints = creativeHints.toIntOrNull()
                 val attemptLimit = creativeAttemptLimit.toIntOrNull()
                 val valid = !creativeName.isBlank() &&
                     rangeMax != null && rangeMax in 1L..CreativeModeSave.MAX_RANGE &&
+                    rangeScale != null && rangeScale in 1..5 &&
                     hints != null && hints in 0..5 &&
                     attemptLimit != null && attemptLimit in 0..100
                 TextButton(
                     enabled = valid,
                     onClick = {
                         val effects = buildList {
+                            if ((rangeScale ?: 1) > 1) add(CreativeModeEffect("range-scale", CreativeEffectType.RANGE_SCALE, rangeScale!!))
                             if ((hints ?: 0) > 0) add(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, hints!!))
                             if ((attemptLimit ?: 0) > 0) add(CreativeModeEffect("attempt-cap", CreativeEffectType.ATTEMPT_LIMIT, attemptLimit!!))
                         }
@@ -456,6 +505,102 @@ fun SaveSlotsScreen(
                 TextButton(onClick = { showCreativeDialog = false }) { Text(locale.getString("cancel", "Cancel")) }
             }
         )
+    }
+
+    if (showCreativeRunDialog) {
+        val config = creativeRunSave
+        val run = creativeRun
+        if (config != null && run != null) {
+            val rules = CreativeModeEffectPolicy.resolve(config)
+            AlertDialog(
+                onDismissRequest = { showCreativeRunDialog = false },
+                title = { Text(config.name) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("Creative Mode is isolated from your normal money, rewards and progression.")
+                        Text("Range: ${run.rangeMin}–${run.rangeMax} • Attempts: ${run.attemptsUsed}${rules?.attemptLimit?.let { " / $it" } ?: ""}")
+                        Text("Hints used: ${run.hintsUsed} / ${rules?.extraHints ?: 0}")
+                        OutlinedTextField(
+                            value = creativeRunGuess,
+                            onValueChange = { creativeRunGuess = it.filter(Char::isDigit).take(8) },
+                            label = { Text("Your guess") },
+                            singleLine = true
+                        )
+                        Text(creativeRunMessage)
+                        if (!run.completed && rules != null && run.hintsUsed < rules.extraHints) {
+                            OutlinedButton(onClick = {
+                                val updated = CreativeModeRuntime.useHint(config, run)
+                                if (updated != null) {
+                                    creativeRun = updated
+                                    creativeRunMessage = if (updated.target % 2L == 0L) "Hint: the target is even." else "Hint: the target is odd."
+                                    CreativeModeRuntime.persist(config, updated)?.let { persisted ->
+                                        creativeRunSave = persisted
+                                        viewModel.saveCreativeModeSave(creativeRunSlot, persisted) { success ->
+                                            if (!success) creativeRunMessage = "Hint used, but saving the run failed. Keep this dialog open."
+                                        }
+                                    }
+                                }
+                            }) { Text("Use hint") }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        enabled = !run.completed && creativeRunGuess.toLongOrNull() != null,
+                        onClick = {
+                            val guess = creativeRunGuess.toLongOrNull() ?: return@TextButton
+                            val decision = CreativeModeRuntime.submitGuess(config, run, guess)
+                            creativeRun = decision.run
+                            creativeRunGuess = ""
+                            creativeRunMessage = when (decision.outcome) {
+                                CreativeGuessOutcome.TOO_LOW -> "Too low. Try a higher number."
+                                CreativeGuessOutcome.TOO_HIGH -> "Too high. Try a lower number."
+                                CreativeGuessOutcome.CORRECT -> "Correct! This Creative Mode run is complete."
+                                CreativeGuessOutcome.OUT_OF_RANGE -> "That guess is outside this run's range."
+                                CreativeGuessOutcome.ATTEMPT_LIMIT -> "Attempt limit reached. Restart the run to try again."
+                                CreativeGuessOutcome.COMPLETED -> "This run is complete. Start a new run to play again."
+                                CreativeGuessOutcome.INVALID_CONFIGURATION -> "This run no longer matches the saved rules. Restart it to continue."
+                            }
+                            CreativeModeRuntime.persist(config, decision.run)?.let { persisted ->
+                                creativeRunSave = persisted
+                                viewModel.saveCreativeModeSave(activeSlot, persisted) { success ->
+                                    if (!success) creativeRunMessage = "Run updated, but saving failed. Keep this dialog open."
+                                }
+                            }
+                        }
+                    ) { Text(if (run.completed) "Completed" else "Guess") }
+                },
+                dismissButton = {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TextButton(onClick = {
+                            val cleared = CreativeModeRuntime.clearPersistedRun(config)
+                            viewModel.saveCreativeModeSave(activeSlot, cleared) { success ->
+                                if (success) {
+                                    val rules = CreativeModeEffectPolicy.resolve(cleared)
+                                    val target = rules?.let { Random.nextLong(it.rangeMin, it.rangeMax + 1L) }
+                                    val nextRun = if (target != null) CreativeModeRuntime.start(cleared, target) else null
+                                    if (nextRun != null) {
+                                        val persisted = CreativeModeRuntime.persist(cleared, nextRun)
+                                        if (persisted != null) {
+                                            creativeRunSave = persisted
+                                            creativeRun = nextRun
+                                            creativeRunGuess = ""
+                                            creativeRunMessage = "New run started."
+                                            viewModel.saveCreativeModeSave(activeSlot, persisted) { saved ->
+                                                if (!saved) creativeRunMessage = "New run started but could not be saved."
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    creativeRunMessage = "Could not reset the saved run."
+                                }
+                            }
+                        }) { Text("Restart") }
+                        TextButton(onClick = { showCreativeRunDialog = false }) { Text("Close") }
+                    }
+                }
+            )
+        }
     }
 
     if (showPortableExportDialog) {
@@ -614,19 +759,57 @@ fun SaveSlotsScreen(
             }
 
             item {
-                OutlinedButton(
-                    onClick = {
-                        viewModel.loadCreativeModeSave(activeSlot) { saved ->
-                            creativeName = saved?.name ?: "My Creative Mode"
-                            creativeEnabled = saved?.enabled ?: false
-                            creativeRangeMax = (saved?.rangeMax ?: 100L).toString()
-                            creativeHints = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.EXTRA_HINTS }?.value ?: 0).toString()
-                            creativeAttemptLimit = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.ATTEMPT_LIMIT }?.value ?: 0).toString()
-                            showCreativeDialog = true
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) { Text("Creative Mode Save • Slot $activeSlot") }
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.loadCreativeModeSave(activeSlot) { saved ->
+                                creativeName = saved?.name ?: "My Creative Mode"
+                                creativeEnabled = saved?.enabled ?: false
+                                creativeRangeMax = (saved?.rangeMax ?: 100L).toString()
+                                creativeRangeScale = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.RANGE_SCALE }?.value ?: 1).toString()
+                                creativeHints = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.EXTRA_HINTS }?.value ?: 0).toString()
+                                creativeAttemptLimit = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.ATTEMPT_LIMIT }?.value ?: 0).toString()
+                                showCreativeDialog = true
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("Creative Mode Save • Slot $activeSlot") }
+                    Button(
+                        onClick = {
+                            val selectedSlot = activeSlot
+                            creativeRunSlot = selectedSlot
+                            viewModel.loadCreativeModeSave(selectedSlot) { saved ->
+                                val rules = saved?.let(CreativeModeEffectPolicy::resolve)
+                                if (saved == null || !saved.enabled || rules == null) {
+                                    android.widget.Toast.makeText(context, "Enable and save a valid Creative Mode configuration first.", android.widget.Toast.LENGTH_SHORT).show()
+                                } else {
+                                    val run = CreativeModeRuntime.resume(saved) ?: run {
+                                        val target = Random.nextLong(rules.rangeMin, rules.rangeMax + 1L)
+                                        CreativeModeRuntime.start(saved, target)
+                                    }
+                                    if (run == null) {
+                                        android.widget.Toast.makeText(context, "Could not start this Creative Mode run.", android.widget.Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        val persisted = CreativeModeRuntime.persist(saved, run)
+                                        if (persisted == null) {
+                                            android.widget.Toast.makeText(context, "The Creative Mode run failed validation.", android.widget.Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            creativeRunSave = persisted
+                                            creativeRun = run
+                                            creativeRunGuess = ""
+                                            creativeRunMessage = if (saved.activeRun != null) "Resumed your saved run." else "New run started. No normal-game rewards are granted."
+                                            viewModel.saveCreativeModeSave(activeSlot, persisted) { success ->
+                                                if (success) showCreativeRunDialog = true
+                                                else android.widget.Toast.makeText(context, "Could not save the Creative Mode run.", android.widget.Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("Play Creative Mode • Slot $activeSlot") }
+                }
             }
 
             for (slot in 1..MAX_SAVE_SLOTS) {
