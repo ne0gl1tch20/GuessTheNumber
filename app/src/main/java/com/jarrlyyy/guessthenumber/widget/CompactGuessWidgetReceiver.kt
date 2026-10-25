@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.toMutablePreferences
 import androidx.glance.Button
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -22,7 +21,7 @@ import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
-import androidx.glance.cornerRadius
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -33,6 +32,7 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
+import androidx.glance.layout.size
 import androidx.glance.text.FontFamily
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -58,6 +58,9 @@ class CompactGuessWidget : GlanceAppWidget() {
         val state = saveManager.loadGame(slot)
         val locale = LocaleManager(context)
         locale.loadLocaleForTag(state.settings.locale)
+        val title = locale.getString("widget_title", "Guess The Number")
+        val titleBitmap = renderWidgetFontText(context, title, "fonts/Manrope-VariableFont_wght.ttf", 82, 14, 11f, widgetTextColor(context, 0xFF202536.toInt(), 0xFFF4F5FA.toInt()), true)
+        val balanceBitmap = renderWidgetFontText(context, state.money.format(), "fonts/JetBrainsMono-VariableFont_wght.ttf", 62, 20, 16f, widgetTextColor(context, 0xFF6750A4.toInt(), 0xFFD0BCFF.toInt()), true)
         provideContent {
             GlanceTheme {
                 Column(
@@ -73,10 +76,10 @@ class CompactGuessWidget : GlanceAppWidget() {
                         )
                         Spacer(GlanceModifier.width(6.dp))
                         Column(modifier = GlanceModifier.defaultWeight()) {
-                            Text(locale.getString("widget_title", "Guess The Number"), style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 11.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onBackground))
+                            Image(provider = ImageProvider(titleBitmap), contentDescription = title, modifier = GlanceModifier.width(82.dp).height(14.dp))
                             Text(locale.getString("widget_slot", "Slot %d • %s", slot, state.profileName.ifBlank { state.difficultyId }), style = TextStyle(fontSize = 9.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant))
                         }
-                        Text(state.money.format(), style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp, fontFamily = FontFamily("sans-serif-rounded"), color = GlanceTheme.colors.primary))
+                        Image(provider = ImageProvider(balanceBitmap), contentDescription = state.money.format(), modifier = GlanceModifier.width(62.dp).height(20.dp))
                     }
                     Spacer(GlanceModifier.height(4.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
@@ -112,7 +115,7 @@ class CycleCompactWidgetSaveSlotCallback : ActionCallback {
         val current = (widgetState[compactWidgetSaveSlotKey] ?: activeSlot).coerceIn(1, MAX_SAVE_SLOTS)
         val nextSlot = nextOccupiedSaveSlot(context, current)
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { preferences ->
-            preferences.toMutablePreferences().apply { this[compactWidgetSaveSlotKey] = nextSlot }
+            preferences[compactWidgetSaveSlotKey] = nextSlot
         }
         CompactGuessWidget().update(context, glanceId)
     }
