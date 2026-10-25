@@ -1288,3 +1288,10 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 .changelog-markdown-paragraph code,.changelog-markdown-list code{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
 .changelog-markdown-paragraph a,.changelog-markdown-list a{overflow-wrap:anywhere;word-break:break-word}
 @media(max-width:420px){.changelog-heading{padding:16px}.changelog-heading h2{font-size:24px}.changelog-entry{padding:14px}.changelog-entry h3{overflow-wrap:anywhere}.changelog-markdown-list{gap:7px}}
+
+/* Jarrlyy arcade surface integration: additive styling, no game-state ownership. */
+body.jui-game-compat .jui-button-keycap { min-height:44px; border-radius:12px; box-shadow:0 3px 0 color-mix(in srgb,var(--jui-bg) 72%,#000 28%),inset 0 1px 0 rgba(255,255,255,.13); }
+body.jui-game-compat .jui-button-keycap:active:not(:disabled) { transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb,var(--jui-bg) 72%,#000 28%); }
+body.jui-game-compat .jui-dialog { box-sizing:border-box; width:min(440px,calc(100vw - 24px)); max-width:calc(100vw - 24px); max-height:calc(100dvh - max(24px,env(safe-area-inset-top) + env(safe-area-inset-bottom))); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; overflow-wrap:anywhere; }
+body.jui-game-compat .jui-dialog-actions { display:flex; flex-wrap:wrap; gap:.55rem; } body.jui-game-compat .jui-dialog-actions>.jui-button { flex:1 1 120px; min-width:0; overflow-wrap:anywhere; }
+@media(max-height:480px) { body.jui-game-compat .jui-dialog { max-height:calc(100dvh - 12px); margin-block:6px; } }

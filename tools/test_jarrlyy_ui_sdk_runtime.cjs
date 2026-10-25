@@ -53,6 +53,7 @@ assert.equal(typeof window.JarrlyyUI, "object");
 assert.equal(typeof window.JarrlyyUI.init, "function");
 assert.equal(typeof window.JarrlyyUI.toast, "function");
 assert.equal(typeof window.JarrlyyUI.dialog, "function");
+assert.equal(typeof window.JarrlyyUI.createKeyButton, "function");
 assert.equal(Object.isFrozen(window.JarrlyyUI), true);
 
 // The motion primitives remain separate from the stable core API.

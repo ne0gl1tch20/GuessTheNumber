@@ -129,3 +129,11 @@
 .jui-switch-group .jui-switch > span:first-child { flex: 1; min-width: 0; }
 .jui-switch-group .jui-switch > span:last-child { flex: 0 0 44px; }
 .jui-switch-group .jui-switch-track { order: 2; }
+
+/* Arcade-compatible overlay containment and button sizing. */
+.jui-dialog { box-sizing:border-box; width:min(440px,calc(100vw - 24px)); max-width:calc(100vw - 24px); max-height:calc(100dvh - 24px); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; overflow-wrap:anywhere; }
+.jui-dialog::backdrop { background:rgba(3,5,13,.72); }
+.jui-dialog-actions { display:flex; flex-wrap:wrap; gap:.55rem; }
+.jui-dialog-actions>.jui-button { flex:1 1 120px; min-width:0; overflow-wrap:anywhere; }
+.jui-root :where(.jui-tabs,.jui-segmented) { max-width:100%; } .jui-root :where(.jui-tabs button,.jui-segmented [data-jui-segment]) { overflow-wrap:anywhere; }
+@media(max-height:480px) { .jui-dialog { max-height:calc(100dvh - 12px); margin-block:6px; } }

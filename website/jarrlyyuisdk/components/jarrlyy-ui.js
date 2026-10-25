@@ -508,7 +508,21 @@
     targets.forEach((node) => observer.observe(node));
   }
 
-  global.JarrlyyUI = Object.freeze({ init, enhance, toast, dialog: makeDialog, tour });
+  
+  function createKeyButton(label, variant = "primary", options = {}) {
+    const button = doc.createElement("button");
+    button.type = "button";
+    button.className = "jui-button jui-button-keycap";
+    const allowed = new Set(["primary", "secondary", "accent", "danger"]);
+    button.classList.add("jui-button-" + (allowed.has(variant) ? variant : "primary"));
+    button.textContent = String(label == null ? "" : label);
+    if (options.ariaLabel) button.setAttribute("aria-label", String(options.ariaLabel));
+    if (options.disabled) button.disabled = true;
+    if (typeof options.onClick === "function") button.addEventListener("click", options.onClick);
+    return button;
+  }
+
+  global.JarrlyyUI = Object.freeze({ init, enhance, toast, dialog: makeDialog, tour, createKeyButton });
   global.JarrlyyUIMotion = Object.freeze({ count, progress, floatText, init: initMotion });
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init, { once: true });
   else init();

@@ -25,3 +25,7 @@ body { margin: 0; background: radial-gradient(ellipse at 10% 0, rgba(155,124,255
 
 #motionProgress { margin-top: .45rem; }
 #motionProgress > span { width: var(--jui-progress, 0%); transition: width 420ms cubic-bezier(.2,.8,.2,1); }
+
+.arcade-lab { display:grid; gap:.9rem; } .arcade-lab-actions { display:flex; flex-wrap:wrap; gap:.65rem; } .arcade-lab-actions .jui-button { flex:1 1 120px; }
+.arcade-lab-loader-label { display:flex; align-items:center; gap:.6rem; color:var(--jui-muted); font-size:.85rem; } .arcade-lab .jui-hud { margin-top:.25rem; }
+@media(max-width:480px) { .arcade-lab-actions .jui-button { flex-basis:100%; } }

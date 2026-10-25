@@ -105,3 +105,14 @@ The adapter auto-mounts the current document body, initializes available SDK lay
 The Android web-play loader reads `web-play-manifest.json`, checks each asset's SHA-256, stages the new asset set, and only switches the active version after validation. It retains offline/bundled fallback behavior. The `Publish Web Play Asset Manifest` workflow includes `app/src/main/assets/libraries/**`, regenerates the manifest on master pushes, and validates it on pull requests. Thus compatible HTML/CSS/JS SDK changes can sync to supported installed app versions without rebuilding the APK. Native code, manifest schema changes or a raised minimum app version still require a compatible app release.
 
 The website and bundled SDK copies are checked for parity in CI. Keep the host adapter, core/advanced layers, motion demo and styles mirrored; don't edit only one copy. The public Pages workflow validates and deploys the website separately from the Android asset manifest.
+
+
+## Arcade surface extension
+
+The optional arcade surface layer adds tactile keycap buttons and compact HUD primitives without replacing the core design system:
+- Add `jui-button-keycap` alongside an existing button variant (`jui-button-primary`, `jui-button-secondary`, `jui-button-accent` or `jui-button-danger`).
+- Use `jui-hud`, `jui-hud-copy`, `jui-hud-title`, `jui-hud-subtitle`, `jui-hud-metrics`, and `jui-hud-metric` for responsive game-style headers.
+- Use `jui-section-label` for compact section headings, `jui-meter` with a `--jui-meter-value` percentage for progress, and `jui-activity` with three child `i` elements for a lightweight busy indicator.
+- `JarrlyyUI.createKeyButton(label, variant?, options?)` creates a button with a safe text label, optional `ariaLabel`, `disabled`, and `onClick` options. Allowed variants are `primary`, `secondary`, `accent`, and `danger`.
+
+These primitives are authored specifically for Jarrlyy UI. They use general tactile-control and compact-HUD design patterns without copying third-party source or class names. They preserve existing APIs, use local CSS, support reduced motion, and do not access game state.

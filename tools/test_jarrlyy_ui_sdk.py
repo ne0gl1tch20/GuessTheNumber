@@ -348,5 +348,26 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertNotIn(":'Guess rate-limited')", app)
 
 
+    def test_arcade_surface_extension_is_original_responsive_and_mirrored(self):
+        sdk_css = (SDK / "styles/jarrlyy-ui.css").read_text(encoding="utf-8")
+        advanced_css = (SDK / "styles/jarrlyy-ui-advanced.css").read_text(encoding="utf-8")
+        sdk_js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
+        demo = (SDK / "demo.html").read_text(encoding="utf-8")
+        demo_css = (SDK / "styles/demo.css").read_text(encoding="utf-8")
+        web_css = (WEB / "styles.css").read_text(encoding="utf-8")
+        for token in ("--jui-key-face", "--jui-key-lip", ".jui-button-keycap", ".jui-hud", ".jui-meter", ".jui-activity", "prefers-reduced-motion"):
+            with self.subTest(token=token):
+                self.assertIn(token, sdk_css)
+        for token in ("max-height:calc(100dvh - 24px)", "overflow-wrap:anywhere", "overscroll-behavior:contain"):
+            with self.subTest(dialog_rule=token):
+                self.assertIn(token, advanced_css.replace(" ", ""))
+        self.assertIn("function createKeyButton", sdk_js)
+        self.assertIn('id="arcadeLabTitle"', demo)
+        self.assertIn(".arcade-lab", demo_css)
+        self.assertIn("Jarrlyy arcade surface integration", web_css)
+        for relative in ("styles/jarrlyy-ui.css", "styles/jarrlyy-ui-advanced.css", "components/jarrlyy-ui.js", "components/jarrlyy-ui-advanced.js", "demo.html", "styles/demo.css"):
+            with self.subTest(relative=relative):
+                self.assertEqual((SDK / relative).read_text(encoding="utf-8"), (ROOT / "website/jarrlyyuisdk" / relative).read_text(encoding="utf-8"), f"SDK copy drift: {relative}")
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
