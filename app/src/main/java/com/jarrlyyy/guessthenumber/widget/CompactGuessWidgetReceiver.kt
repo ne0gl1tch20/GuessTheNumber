@@ -9,6 +9,8 @@ import androidx.glance.Button
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.GlanceAppWidget
@@ -30,10 +32,12 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
+import androidx.glance.text.FontFamily
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.jarrlyyy.guessthenumber.MainActivity
+import com.jarrlyyy.guessthenumber.R
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
@@ -55,43 +59,36 @@ class CompactGuessWidget : GlanceAppWidget() {
         locale.loadLocaleForTag(state.settings.locale)
         provideContent {
             GlanceTheme {
-                Column(
-                    modifier = GlanceModifier.fillMaxSize().background(GlanceTheme.colors.background).cornerRadius(22.dp).padding(12.dp),
-                    verticalAlignment = Alignment.Vertical.CenterVertically,
-                    horizontalAlignment = Alignment.Horizontal.Start
+                Row(
+                    modifier = GlanceModifier.fillMaxSize().background(GlanceTheme.colors.background)
+                        .cornerRadius(22.dp).padding(10.dp),
+                    verticalAlignment = Alignment.Vertical.CenterVertically
                 ) {
-                    Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
-                        Column(modifier = GlanceModifier.defaultWeight()) {
-                            Text(locale.getString("widget_title", "🎯 Guess The Number"), style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 14.sp, color = GlanceTheme.colors.onBackground))
-                            Text(locale.getString("widget_slot", "Save slot %d • %s", slot, state.profileName.ifBlank { state.difficultyId }), style = TextStyle(fontSize = 10.sp, color = GlanceTheme.colors.onSurfaceVariant))
-                        }
-                        Text("GTN", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp, color = GlanceTheme.colors.secondary))
+                    Image(
+                        provider = ImageProvider(R.drawable.gtn_app_logo),
+                        contentDescription = locale.getString("widget_title", "Guess The Number"),
+                        modifier = GlanceModifier.size(32.dp)
+                    )
+                    Spacer(GlanceModifier.width(8.dp))
+                    Column(modifier = GlanceModifier.defaultWeight(), verticalAlignment = Alignment.Vertical.CenterVertically) {
+                        Text(locale.getString("widget_title", "Guess The Number"), style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onBackground))
+                        Text(locale.getString("widget_slot", "Slot %d • %s", slot, state.profileName.ifBlank { state.difficultyId }), style = TextStyle(fontSize = 10.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant))
+                        Spacer(GlanceModifier.height(3.dp))
+                        Text(state.money.format(), style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp, fontFamily = FontFamily("sans-serif-rounded"), color = GlanceTheme.colors.primary))
+                        Text(locale.getString("widget_streak", "Streak %d", state.streak), style = TextStyle(fontSize = 10.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant))
                     }
-                    Spacer(GlanceModifier.height(8.dp))
-                    Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
-                        Column(modifier = GlanceModifier.defaultWeight().background(GlanceTheme.colors.surface).cornerRadius(15.dp).padding(10.dp)) {
-                            Text(locale.getString("widget_money", "Money"), style = TextStyle(fontSize = 10.sp, color = GlanceTheme.colors.onSurfaceVariant))
-                            Spacer(GlanceModifier.height(2.dp))
-                            Text(state.money.format(), style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 19.sp, color = GlanceTheme.colors.primary))
-                        }
-                        Spacer(GlanceModifier.width(8.dp))
-                        Column(modifier = GlanceModifier.defaultWeight().background(GlanceTheme.colors.surface).cornerRadius(15.dp).padding(10.dp)) {
-                            Text(locale.getString("widget_streak", "Streak %d", state.streak), style = TextStyle(fontSize = 10.sp, color = GlanceTheme.colors.onSurfaceVariant))
-                            Spacer(GlanceModifier.height(2.dp))
-                            Text(locale.getString("widget_worlds_bosses", "Worlds %d • Bosses %d", state.unlockedWorldIds.size, state.defeatedBossIds.size), style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 12.sp, color = GlanceTheme.colors.onBackground))
-                        }
-                    }
-                    Spacer(GlanceModifier.height(7.dp))
-                    Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
-                        Button(text = locale.getString("play", "Play"), onClick = actionRunCallback<OpenCompactWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
-                        Spacer(GlanceModifier.width(8.dp))
-                        Button(text = locale.getString("widget_next_slot", "Next Slot"), onClick = actionRunCallback<CycleCompactWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
+                    Spacer(GlanceModifier.width(6.dp))
+                    Column(verticalAlignment = Alignment.Vertical.CenterVertically, horizontalAlignment = Alignment.Horizontal.End) {
+                        Button(text = locale.getString("play", "Play"), onClick = actionRunCallback<OpenCompactWidgetSaveSlotCallback>())
+                        Spacer(GlanceModifier.height(4.dp))
+                        Button(text = locale.getString("widget_next_slot", "Switch"), onClick = actionRunCallback<CycleCompactWidgetSaveSlotCallback>())
                     }
                 }
             }
         }
     }
 }
+
 
 class OpenCompactWidgetSaveSlotCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
