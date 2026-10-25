@@ -32,7 +32,6 @@ import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.MainActivity
 import com.jarrlyyy.guessthenumber.R
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
-import androidx.glance.unit.ColorProvider
 
 private val widgetSaveSlotKey = intPreferencesKey("widget_selected_save_slot")
 
