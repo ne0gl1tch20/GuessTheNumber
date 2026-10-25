@@ -107,6 +107,7 @@ fun ProductionWebPlayScreen(
     onEquipCosmetic: (String) -> Unit,
     onUpdateMultiplier: (String) -> Unit,
     onUpdateSettings: (GameSettings) -> Unit,
+    onCreativeUpdateRange: (Long, Long) -> Boolean,
     onPrestigeReset: () -> Unit,
     onUltraReset: () -> Unit,
     onBuyTalent: (String, Long) -> Unit,
@@ -529,6 +530,13 @@ fun ProductionWebPlayScreen(
                                                         else -> throw IllegalArgumentException("Unsupported music action")
                                                     }
                                                 }
+                                                "creative_update_range" -> {
+                                                    val min = parsed.creativeRangeMin
+                                                    val max = parsed.creativeRangeMax
+                                                    if (!gameStateForBridge().creativeModeEnabled || min == null || max == null || !onCreativeUpdateRange(min, max)) {
+                                                        throw IllegalArgumentException("Creative Mode range update was rejected.")
+                                                    }
+                                                }
                                                 "update_setting" -> {
                                                     val key = parsed.settingKey
                                                     val value = parsed.settingValue
@@ -655,6 +663,7 @@ fun ProductionWebPlayScreen(
                                             return@post
                                         }
                                         val actionAccepted = when (parsed.type) {
+                                            "creative_update_range" -> game.creativeModeEnabled && game.currentRangeMin == parsed.creativeRangeMin && game.currentRangeMax == parsed.creativeRangeMax
                                             "claim_daily_quest" -> parsed.questId != null && parsed.questId in game.claimedDailyQuests && parsed.questId !in beforeAction.claimedDailyQuests
                                              "claim_daily_reward" -> game.lastDailyRewardDate != beforeAction.lastDailyRewardDate
                                             "open_loot_chest" -> when (parsed.tier) {
@@ -943,6 +952,7 @@ fun ProductionWebPlayScreen(
                                                         .put("description", minigame.description).put("rewardMultiplier", minigame.rewardMultiplier))
                                                 }
                                             })
+                                            .put("creativeModeEnabled", game.creativeModeEnabled)
                                             .put("rangeMin", (result?.rangeMin ?: game.currentRangeMin).toString())
                                             .put("rangeMax", (result?.rangeMax ?: game.currentRangeMax).toString())
                                             .put("attempts", result?.attempts ?: game.attempts)
