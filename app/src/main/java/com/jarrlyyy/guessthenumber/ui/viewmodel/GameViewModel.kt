@@ -460,6 +460,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             slotOperationMutex.withLock {
                 saveManager.resetSlot(slot)
                 if (_activeSlot.value == slot) {
+                    activeCreativeModeSave = null
                     saveManager.setActiveSlot(slot)
                     val globalSettings = saveManager.loadGame(slot).settings
                     val fresh = GameState(settings = globalSettings, tutorialCompleted = globalSettings.tutorialCompleted, lastSaveTimestamp = System.currentTimeMillis())
@@ -935,9 +936,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 saveManager.importPortableOrLegacyBackup(json, passphrase.toCharArray(), _activeSlot.value)
             }
             if (success) {
-                val loaded = saveManager.loadGame(_activeSlot.value)
+                val activeSlot = _activeSlot.value
+                val loaded = saveManager.loadGame(activeSlot)
+                val creativeSave = saveManager.loadCreativeModeSave(activeSlot)
                 val sanitized = AntiCheatService.sanitizeCurrency(loaded)
                 withContext(Dispatchers.Main) {
+                    activeCreativeModeSave = creativeSave
                     _gameState.value = sanitized
                     _hasAnySave.value = true
                     guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
