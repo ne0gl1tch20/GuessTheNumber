@@ -26,13 +26,13 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
-import androidx.glance.layout.defaultWeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.layout.size
+import androidx.glance.text.FontFamily
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -74,7 +74,7 @@ class CompactGuessWidget : GlanceAppWidget() {
                             modifier = GlanceModifier.size(25.dp)
                         )
                         Spacer(GlanceModifier.width(6.dp))
-                        Column(modifier = GlanceModifier.defaultWeight()) {
+                        Column(modifier = GlanceModifier.width(72.dp)) {
                             Image(provider = ImageProvider(titleBitmap), contentDescription = title, modifier = GlanceModifier.width(72.dp).height(16.dp))
                             Text(locale.getString("widget_slot", "Slot %d • %s", slot, state.profileName.ifBlank { state.difficultyId }), style = TextStyle(fontSize = 9.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant))
                         }
@@ -82,9 +82,9 @@ class CompactGuessWidget : GlanceAppWidget() {
                     }
                     Spacer(GlanceModifier.height(4.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
-                        Button(text = locale.getString("play", "Play"), onClick = actionRunCallback<OpenCompactWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
+                        Button(text = locale.getString("play", "Play"), onClick = actionRunCallback<OpenCompactWidgetSaveSlotCallback>())
                         Spacer(GlanceModifier.width(6.dp))
-                        Button(text = locale.getString("widget_next_slot", "Switch"), onClick = actionRunCallback<CycleCompactWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
+                        Button(text = locale.getString("widget_next_slot", "Switch"), onClick = actionRunCallback<CycleCompactWidgetSaveSlotCallback>())
                     }
                 }
             }
