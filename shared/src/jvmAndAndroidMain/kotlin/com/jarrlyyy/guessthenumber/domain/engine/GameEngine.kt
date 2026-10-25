@@ -12,6 +12,7 @@ import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRewardRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessCoreState
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessTransitionRules
+import com.jarrlyyy.guessthenumber.shared.engine.NativeGameplayOptimizer
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -121,7 +122,16 @@ class GameEngine(private val rng: Random = Random.Default) {
             val criticalRoll = rng.nextDouble()
             val newMin = 1L
             val newMax = getRangeMax(state)
-            val generatedNextTarget = rng.nextLong(newMin, newMax + 1)
+            // The native optimizer only proposes a bounded target. Kotlin still validates
+            // the transition and owns all gameplay state, rewards and persistence.
+            val generatedNextTarget = NativeGameplayOptimizer.nextTarget(
+                rangeMin = newMin,
+                rangeMax = newMax,
+                difficulty = state.difficultyId,
+                streak = state.streak,
+                attempts = state.attempts,
+                rng = rng
+            )
             val decision = GuessTransitionRules.resolve(
                 stateTransition = transition.stateTransition,
                 currentState = transition.nextState,
