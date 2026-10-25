@@ -4,7 +4,7 @@
   const doc = global.document;
   if (!doc) return;
   const $ = (selector, root = doc) => root.querySelector(selector);
-  const $$ = (selector, root = doc) => Array.from(root.querySelectorAll(selector));
+  const $ = (selector, root = doc) => Array.from(root.querySelectorAll(selector));
   let tourSequence = 0;
 
   function toast(message, duration = 2800) {
@@ -430,7 +430,8 @@
     const end = Number(target);
     if (!Number.isFinite(end)) return;
     const start = Number.isFinite(Number(options.from)) ? Number(options.from) : (Number(element.dataset.juiCountValue) || 0);
-    const duration = Math.max(0, Math.min(5000, Number(options.duration) || 650));
+    const requestedDuration = options.duration == null ? 650 : Number(options.duration);
+    const duration = Math.max(0, Math.min(5000, Number.isFinite(requestedDuration) ? requestedDuration : 650));
     const format = typeof options.format === "function" ? options.format : (value) => Math.round(value).toLocaleString();
     element.dataset.juiCountValue = String(end);
     if (motionPreference() || duration === 0 || !global.requestAnimationFrame) {
