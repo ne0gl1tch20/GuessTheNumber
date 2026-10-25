@@ -1081,9 +1081,9 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 .trait-arm-button:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
 
 
-/* Offline Earnings uses the same WebView-safe viewport contract as Nebula
-   Rewards. Keep the overlay anchored to the viewport and the dialog scrollable
-   so a stale/collapsed 100vh or a short landscape screen cannot flatten it. */
+/* Offline Earnings must use an explicit viewport-sized grid in Android WebView.
+   Percentage max-heights can resolve against an auto-sized grid track and flatten
+   the dialog into a thin strip. Use viewport bounds and let the dialog scroll. */
 #offlineRewardOverlay {
   position: fixed;
   inset: auto;
@@ -1091,6 +1091,9 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
   right: 0;
   bottom: max(12px, env(safe-area-inset-bottom));
   left: 0;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
   width: auto;
   height: auto;
   max-height: none;
@@ -1104,11 +1107,13 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 
 #offlineRewardOverlay .reward-dialog {
   position: relative;
+  align-self: center;
   box-sizing: border-box;
   width: min(390px, 100%);
   min-width: 0;
   max-width: 100%;
-  max-height: 100%;
+  max-height: calc(100vh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: auto;
   overflow-x: hidden;
   overflow-y: auto;
