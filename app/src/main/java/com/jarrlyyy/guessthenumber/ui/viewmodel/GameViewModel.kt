@@ -909,7 +909,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun saveCreativeModeSave(slot: Int, save: CreativeModeSave, onResult: (Boolean) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = slotOperationMutex.withLock { saveManager.saveCreativeModeSave(slot, save) }
-            withContext(Dispatchers.Main) { onResult(result) }
+            withContext(Dispatchers.Main) {
+                if (result && slot == _activeSlot.value) activeCreativeModeSave = save
+                onResult(result)
+            }
         }
     }
 
