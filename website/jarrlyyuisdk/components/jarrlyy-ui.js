@@ -420,7 +420,96 @@
     initActions();
   }
 
+
+  // Phase 2: lightweight motion primitives. Animate only while visible and
+  // respect OS/app reduced-motion settings. No dependencies or perpetual RAF.
+  const motionPreference = () => !!(global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  function count(element, target, options = {}) {
+    if (!element) return;
+    const end = Number(target);
+    if (!Number.isFinite(end)) return;
+    const start = Number.isFinite(Number(options.from)) ? Number(options.from) : (Number(element.dataset.juiCountValue) || 0);
+    const requestedDuration = options.duration == null ? 650 : Number(options.duration);
+    const duration = Math.max(0, Math.min(5000, Number.isFinite(requestedDuration) ? requestedDuration : 650));
+    const format = typeof options.format === "function" ? options.format : (value) => Math.round(value).toLocaleString();
+    element.dataset.juiCountValue = String(end);
+    if (motionPreference() || duration === 0 || !global.requestAnimationFrame) {
+      element.textContent = format(end);
+      return;
+    }
+    let frame = 0;
+    let startTime = 0;
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+    const tick = (now) => {
+      if (!element.isConnected) return;
+      if (doc.hidden) { frame = global.requestAnimationFrame(tick); return; }
+      if (!startTime) startTime = now;
+      const progress = Math.min(1, (now - startTime) / duration);
+      element.textContent = format(start + (end - start) * ease(progress));
+      if (progress < 1) frame = global.requestAnimationFrame(tick);
+      else element.textContent = format(end);
+    };
+    if (frame) global.cancelAnimationFrame(frame);
+    frame = global.requestAnimationFrame(tick);
+  }
+
+  function progress(element, value, options = {}) {
+    if (!element) return;
+    const min = Number.isFinite(Number(options.min)) ? Number(options.min) : 0;
+    const max = Number.isFinite(Number(options.max)) ? Number(options.max) : 100;
+    const target = Math.max(min, Math.min(max, Number(value) || 0));
+    const percent = max === min ? 0 : ((target - min) / (max - min)) * 100;
+    element.setAttribute("role", element.getAttribute("role") || "progressbar");
+    element.setAttribute("aria-valuemin", String(min));
+    element.setAttribute("aria-valuemax", String(max));
+    element.setAttribute("aria-valuenow", String(target));
+    element.style.setProperty("--jui-progress", percent + "%");
+    const fill = element.matches(".jui-meter") ? element.querySelector("span") : element.querySelector(".jui-meter span");
+    if (fill) fill.style.width = percent + "%";
+  }
+
+  function floatText(anchor, message, options = {}) {
+    if (!anchor || !anchor.isConnected) return null;
+    const item = doc.createElement("span");
+    item.className = "jui-motion-float";
+    item.textContent = String(message == null ? "" : message);
+    item.setAttribute("aria-hidden", "true");
+    if (options.className && /^[a-z0-9_-]+$/i.test(options.className)) item.classList.add(options.className);
+    const host = options.container || anchor.parentElement || doc.body;
+    if (global.getComputedStyle(host).position === "static") host.classList.add("jui-motion-positioned");
+    host.appendChild(item);
+    const rect = anchor.getBoundingClientRect();
+    const hostRect = host.getBoundingClientRect();
+    item.style.left = (rect.left - hostRect.left + rect.width / 2) + "px";
+    item.style.top = (rect.top - hostRect.top) + "px";
+    if (motionPreference()) { item.remove(); return null; }
+    const remove = () => item.remove();
+    item.addEventListener("animationend", remove, { once: true });
+    global.setTimeout(remove, 1400);
+    return item;
+  }
+
+  function initMotion(root = doc) {
+    if (doc.documentElement) doc.documentElement.classList.add("jui-motion-enabled");
+    const targets = $$("[data-jui-reveal]", root);
+    if (!targets.length) return;
+    if (motionPreference() || !("IntersectionObserver" in global)) {
+      targets.forEach((node) => node.classList.add("jui-motion-visible"));
+      return;
+    }
+    const observer = new global.IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("jui-motion-visible");
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    targets.forEach((node) => observer.observe(node));
+  }
+
   global.JarrlyyUI = Object.freeze({ init, enhance, toast, dialog: makeDialog, tour });
+  global.JarrlyyUIMotion = Object.freeze({ count, progress, floatText, init: initMotion });
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })(window);
