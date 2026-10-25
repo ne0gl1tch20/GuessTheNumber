@@ -83,12 +83,23 @@ object SecureSaveTransfer {
 suspend fun SaveManager.exportSecureSave(slot: Int = -1): String =
     SecureSaveTransfer.encrypt(exportSave(slot))
 
-suspend fun SaveManager.importSecureOrLegacySave(input: String, slot: Int = -1): Boolean {
-    val securePayload = SecureSaveTransfer.decrypt(input)
+internal suspend fun importSecureOrLegacyPayload(
+    input: String,
+    decryptSecure: (String) -> String?,
+    importPayload: suspend (String) -> Boolean
+): Boolean {
+    val securePayload = decryptSecure(input)
     return if (securePayload != null) {
-        importSave(securePayload, slot)
+        importPayload(securePayload)
     } else {
         // Explicit compatibility path for all supported legacy encrypted/plain imports.
-        importSave(input, slot)
+        importPayload(input)
     }
 }
+
+suspend fun SaveManager.importSecureOrLegacySave(input: String, slot: Int = -1): Boolean =
+    importSecureOrLegacyPayload(
+        input = input,
+        decryptSecure = SecureSaveTransfer::decrypt,
+        importPayload = { payload -> importSave(payload, slot) }
+    )
