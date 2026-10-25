@@ -246,7 +246,7 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn(':root[data-theme-mode="Light"] .setting-row small', css)
         self.assertIn('color: var(--muted);', css)
         # Regression coverage includes legacy card surfaces and the shared SDK palette.
-        for token in ("--jui-surface:#fff", ".hero-card,.boss-card", ".jui-root .jui-button-primary", "color-scheme:light"):
+        for token in ("--jui-surface:#fff", ".hero-card,.boss-card", ".jui-root.jui-button-primary", "color-scheme:light"):
             with self.subTest(token=token):
                 self.assertIn(token, css.replace(" ", ""))
         sdk_css = (SDK / "styles/jarrlyy-ui.css").read_text(encoding="utf-8")
