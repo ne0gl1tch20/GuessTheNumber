@@ -80,6 +80,50 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 - Portable backup tests cover authenticated round-trip, wrong passphrase, tampering, malformed/unknown versions and legacy import routing.
 - Android validation, Phase 6 native/security validation, Windows build/tests and HTML/CSS/JS checks passed on the final implementation commit.
 
+
+## Phase 8 — Creative Mode runtime core: in progress
+
+- Added a deterministic, immutable Creative Mode run model with validated range, guess outcomes, attempt-limit enforcement and bounded hint usage.
+- Rejected/out-of-range guesses do not consume attempts; completed runs reject further guesses.
+- The run runtime has no currency, reward, progression, filesystem or script capability.
+- Still required: connect the runtime to a player-facing Creative Mode launch/play flow and prove the per-slot configuration is used by that flow before marking this phase complete.
+
+## Phase 9 — Creative Mode session persistence and recovery: planned
+
+- Persist an explicit, versioned Creative Mode run snapshot separately from normal GameState.
+- Include session snapshots in encrypted backup bundles with backward-compatible migrations.
+- Define crash/relaunch recovery, reset/duplicate behavior, and validation for stale or mismatched session/config IDs.
+- Save and restore session state atomically; reject invalid snapshots without corrupting the normal save.
+
+## Phase 10 — Creative effect composition and authoring: planned
+
+- Add stable effect IDs, explicit composition order, conflict rules and per-effect limits.
+- Keep effects declarative and allowlisted; no arbitrary Lua/JavaScript execution from a Creative Mode save.
+- Separate informational effects (hints/UI) from gameplay constraints (range/attempts).
+- Add a preview/validation path so invalid configurations are rejected before a run starts.
+- Prove Creative Mode effects cannot grant currency, unlock progression or change reward eligibility.
+
+## Phase 11 — Trait/season lifecycle policy: in progress
+
+- Centralized the offline calendar in TraitSeasonPolicy; season windows use inclusive start/exclusive end boundaries and correctly cross the winter year boundary.
+- Season selection is deterministic from a supplied date for tests and replayable behavior.
+- Still required: connect the lifecycle policy to catalog activation/refresh and document what happens to currently active seasonal traits when a season changes.
+
+## Phase 12 — Trait/effect interoperability and catalog hardening: planned
+
+- Define the narrow bridge between Creative Mode modifiers and trait effect intents; reject unsupported overlaps instead of stacking them accidentally.
+- Add tests for duplicate IDs, conflicts, seasonal transitions, remote-catalog rollback, offline fallback and save migrations.
+- Expand trait/season content only when its effect has an authoritative Kotlin implementation and localization/test coverage.
+- Keep signed remote catalogs fail-closed and built-in traits available offline.
+
+## Phase 13 — Final integration and release verification: planned
+
+- Verify Android, Windows, HTML/CSS/JS, native/security and trait profiling workflows against the exact final commit.
+- Audit save compatibility from legacy imports through the current portable backup bundle.
+- Update the player changelog and the PR ledger for every shipped change.
+- Bump app version only alongside a release-ready set of changes and record the exact versionCode.
+- Keep on-device visual/bridge verification separate from CI claims.
+
 ## Completion rule
 
-No phase adds features outside its acceptance criteria. Phase 6 is complete only after its security/native tests and measured comparison are green. If the comparison shows Kotlin is already fast enough, the native path may be reduced or removed and Phase 6 can still be considered successful. Phase 7 is complete only after portable-backup authentication, creative-schema migration/validation, slot isolation, backup compatibility and the required CI checks are green. Creative effects remain a bounded data-driven policy, not arbitrary scripts or reward authority.
+No phase adds features outside its acceptance criteria. A phase is complete only when the implementation is connected to its real production flow, tests cover the acceptance criteria, and required CI checks pass. Documentation and a pure runtime model alone do not count as full gameplay integration. Native performance claims must continue to exclude JNI overhead unless that overhead is measured. Creative effects remain bounded data-driven policy, not arbitrary scripts or reward authority.
