@@ -1,6 +1,6 @@
 # Changelog
 
-All notable project changes are recorded here. This file was missing from the repository root, so this first edition reconstructs the recent merged pull-request history from GitHub. The PR index below covers the 200 most recent closed pull requests available during this pass; entries explicitly marked as unmerged in GitHub were excluded from the merged-history index. Older PRs should be appended in a follow-up audit rather than guessed.
+All notable project changes are recorded here. This file was missing from the repository root, so this first edition reconstructs the full closed pull-request history currently returned by GitHub. It includes every merged PR from #1 through #351 available at the time of this audit; closed but unmerged PRs are excluded.
 
 ## [3.1.0] - 2026-10-25
 
@@ -226,6 +226,136 @@ The entries below are ordered newest to oldest and preserve the merged PR titles
 - [#150](https://github.com/ne0gl1tch20/GuessTheNumber/pull/150) test(save): preserve recovery backup on atomic update rejection
 - [#149](https://github.com/ne0gl1tch20/GuessTheNumber/pull/149) test(save): prevent duplicate challenge rewards after reload
 - [#148](https://github.com/ne0gl1tch20/GuessTheNumber/pull/148) docs(kmp): audit challenge claim persistence atomicity
+- [#147](https://github.com/ne0gl1tch20/GuessTheNumber/pull/147) feat(kmp): share deterministic challenge claim decisions
+- [#146](https://github.com/ne0gl1tch20/GuessTheNumber/pull/146) test(kmp): strengthen guess economy parity coverage
+- [#145](https://github.com/ne0gl1tch20/GuessTheNumber/pull/145) feat(kmp): extract shared guess economy decision
+- [#144](https://github.com/ne0gl1tch20/GuessTheNumber/pull/144) feat(kmp): introduce shared guessing state model
+- [#143](https://github.com/ne0gl1tch20/GuessTheNumber/pull/143) ci: keep Android validation tests-only except stable debug APK
+- [#142](https://github.com/ne0gl1tch20/GuessTheNumber/pull/142) feat(kmp): add deterministic shared guess transition contract
+- [#141](https://github.com/ne0gl1tch20/GuessTheNumber/pull/141) feat(kmp): share guessing range invariants
+- [#140](https://github.com/ne0gl1tch20/GuessTheNumber/pull/140) docs(kmp): audit remaining GameEngine migration work
+- [#139](https://github.com/ne0gl1tch20/GuessTheNumber/pull/139) docs: add temporary KMP migration PR roadmap
+- [#138](https://github.com/ne0gl1tch20/GuessTheNumber/pull/138) refactor(kmp): centralize challenge claim eligibility
+- [#137](https://github.com/ne0gl1tch20/GuessTheNumber/pull/137) ci: run Android preflight checks for shared and desktop
+- [#136](https://github.com/ne0gl1tch20/GuessTheNumber/pull/136) refactor(kmp): share base guess reward constants
+- [#135](https://github.com/ne0gl1tch20/GuessTheNumber/pull/135) refactor(kmp): share talent reward multiplier
+- [#134](https://github.com/ne0gl1tch20/GuessTheNumber/pull/134) refactor(kmp): share mutator range rule
+- [#133](https://github.com/ne0gl1tch20/GuessTheNumber/pull/133) refactor(kmp): share difficulty balance rules
+- [#132](https://github.com/ne0gl1tch20/GuessTheNumber/pull/132) refactor(kmp): share wrong-guess tax rules
+- [#131](https://github.com/ne0gl1tch20/GuessTheNumber/pull/131) refactor(kmp): share guess reward multiplier rules
+- [#130](https://github.com/ne0gl1tch20/GuessTheNumber/pull/130) refactor(kmp): share critical chance scaling
+- [#129](https://github.com/ne0gl1tch20/GuessTheNumber/pull/129) refactor(kmp): share Prestige and Ultra reward formulas
+- [#128](https://github.com/ne0gl1tch20/GuessTheNumber/pull/128) refactor(kmp): share challenge reward validation
+- [#127](https://github.com/ne0gl1tch20/GuessTheNumber/pull/127) refactor(kmp): share prestige and ultra requirement rules
+- [#126](https://github.com/ne0gl1tch20/GuessTheNumber/pull/126) refactor(kmp): centralize production frenzy multiplier rules
+- [#125](https://github.com/ne0gl1tch20/GuessTheNumber/pull/125) refactor(kmp): centralize production mutator rules in shared
+- [#124](https://github.com/ne0gl1tch20/GuessTheNumber/pull/124) test(kmp): strengthen shared production guess transition coverage
+- [#123](https://github.com/ne0gl1tch20/GuessTheNumber/pull/123) feat(kmp): extract reusable shared guess entry UI
+- [#122](https://github.com/ne0gl1tch20/GuessTheNumber/pull/122) test(windows): validate Debug updater and MSI in-place upgrades
+- [#121](https://github.com/ne0gl1tch20/GuessTheNumber/pull/121) feat(windows): download and launch verified Debug MSI updates
+- [#120](https://github.com/ne0gl1tch20/GuessTheNumber/pull/120) feat(windows): discover Windows Debug updates from GitHub Releases
+- [#116](https://github.com/ne0gl1tch20/GuessTheNumber/pull/116) ci(windows): publish versioned Debug MSI update packages
+- [#115](https://github.com/ne0gl1tch20/GuessTheNumber/pull/115) feat(kmp): add shared guessing game state reducer
+- [#114](https://github.com/ne0gl1tch20/GuessTheNumber/pull/114) feat(kmp): share deterministic guess state transitions
+- [#113](https://github.com/ne0gl1tch20/GuessTheNumber/pull/113) feat(kmp): add Android target to shared module
+- [#112](https://github.com/ne0gl1tch20/GuessTheNumber/pull/112) feat(kmp): introduce first shared Compose gameplay screen
+- [#111](https://github.com/ne0gl1tch20/GuessTheNumber/pull/111) feat(tours): add replay feature tours action
+- [#110](https://github.com/ne0gl1tch20/GuessTheNumber/pull/110) fix(android): make rewards, tours and channel updates reliable
+- [#109](https://github.com/ne0gl1tch20/GuessTheNumber/pull/109) feat(kmp): connect shared engine, saves and Lua runtime to desktop
+- [#108](https://github.com/ne0gl1tch20/GuessTheNumber/pull/108) feat(kmp): move core game engine into shared JVM domain
+- [#107](https://github.com/ne0gl1tch20/GuessTheNumber/pull/107) feat(kmp): move game state models into shared JVM domain
+- [#106](https://github.com/ne0gl1tch20/GuessTheNumber/pull/106) feat(kmp): move BigNumber into shared JVM domain
+- [#105](https://github.com/ne0gl1tch20/GuessTheNumber/pull/105) feat(kmp): share foundational domain rules
+- [#104](https://github.com/ne0gl1tch20/GuessTheNumber/pull/104) fix(windows): add Start Menu and desktop shortcuts
+- [#103](https://github.com/ne0gl1tch20/GuessTheNumber/pull/103) fix(ci): generate and upload Windows desktop installer
+- [#102](https://github.com/ne0gl1tch20/GuessTheNumber/pull/102) ci: build and package Windows desktop app
+- [#101](https://github.com/ne0gl1tch20/GuessTheNumber/pull/101) feat(kmp): add Compose Multiplatform desktop prototype
+- [#100](https://github.com/ne0gl1tch20/GuessTheNumber/pull/100) build(kmp): align Gradle and Kotlin with supported toolchain
+- [#99](https://github.com/ne0gl1tch20/GuessTheNumber/pull/99) feat(kmp): scaffold shared module and extract guess rules
+- [#90](https://github.com/ne0gl1tch20/GuessTheNumber/pull/90) feat(onboarding): integrate More Hub discovery popups
+- [#89](https://github.com/ne0gl1tch20/GuessTheNumber/pull/89) feat(audio): integrate SFX mixer on current master
+- [#88](https://github.com/ne0gl1tch20/GuessTheNumber/pull/88) feat(multiplayer): add validated local session protocol
+- [#85](https://github.com/ne0gl1tch20/GuessTheNumber/pull/85) docs: map stranded feature work and current implementation status
+- [#84](https://github.com/ne0gl1tch20/GuessTheNumber/pull/84) feat: polish purchases and queue achievement celebrations
+- [#83](https://github.com/ne0gl1tch20/GuessTheNumber/pull/83) docs: sync Joy roadmap statuses with master
+- [#82](https://github.com/ne0gl1tch20/GuessTheNumber/pull/82) fix: prevent misleading guess feedback
+- [#80](https://github.com/ne0gl1tch20/GuessTheNumber/pull/80) feat(game-feel): add setting-aware tactile feedback
+- [#79](https://github.com/ne0gl1tch20/GuessTheNumber/pull/79) feat(a11y): announce gameplay feedback to screen readers
+- [#78](https://github.com/ne0gl1tch20/GuessTheNumber/pull/78) feat(play): polish random-event announcements
+- [#77](https://github.com/ne0gl1tch20/GuessTheNumber/pull/77) feat(play): celebrate early progression milestones
+- [#76](https://github.com/ne0gl1tch20/GuessTheNumber/pull/76) feat(achievements): queue unlock celebrations
+- [#75](https://github.com/ne0gl1tch20/GuessTheNumber/pull/75) feat(upgrades): highlight successful purchases
+- [#74](https://github.com/ne0gl1tch20/GuessTheNumber/pull/74) feat(shop): highlight purchased items
+- [#73](https://github.com/ne0gl1tch20/GuessTheNumber/pull/73) feat(play): clarify high and low guess feedback
+- [#72](https://github.com/ne0gl1tch20/GuessTheNumber/pull/72) Harden save recovery, audio imports, and cross-core runtime paths
+- [#71](https://github.com/ne0gl1tch20/GuessTheNumber/pull/71) [TEMP PLAN] Roadmap #94: App-wide hardening: remaining audit follow-ups
+- [#70](https://github.com/ne0gl1tch20/GuessTheNumber/pull/70) [TEMP PLAN] Roadmap #93: Compose previews and accessibility: remaining follow-ups
+- [#69](https://github.com/ne0gl1tch20/GuessTheNumber/pull/69) [TEMP PLAN] Roadmap #63: Expanded Settings and customization hub: remaining scope
+- [#68](https://github.com/ne0gl1tch20/GuessTheNumber/pull/68) [TEMP PLAN] Roadmap #95: Advanced low-latency audio and DSP evaluation
+- [#67](https://github.com/ne0gl1tch20/GuessTheNumber/pull/67) [TEMP PLAN] Roadmap #92: Debug runtime test bench and SFX mixer
+- [#66](https://github.com/ne0gl1tch20/GuessTheNumber/pull/66) [TEMP PLAN] Roadmap #73: What's New and version history
+- [#65](https://github.com/ne0gl1tch20/GuessTheNumber/pull/65) [TEMP PLAN] Roadmap #55: App-wide haptics and feedback controls
+- [#64](https://github.com/ne0gl1tch20/GuessTheNumber/pull/64) [TEMP PLAN] Roadmap #71: Welcome-back experience
+- [#63](https://github.com/ne0gl1tch20/GuessTheNumber/pull/63) [TEMP PLAN] Roadmap #66: Developer Settings test dashboard
+- [#62](https://github.com/ne0gl1tch20/GuessTheNumber/pull/62) [TEMP PLAN] Roadmap #65: Optional Google Play Games cloud saves
+- [#61](https://github.com/ne0gl1tch20/GuessTheNumber/pull/61) [TEMP PLAN] Roadmap #64: Player-selected background music lifecycle
+- [#60](https://github.com/ne0gl1tch20/GuessTheNumber/pull/60) [TEMP PLAN] Roadmap #62: Material 3 Expressive motion and loading system
+- [#59](https://github.com/ne0gl1tch20/GuessTheNumber/pull/59) [TEMP PLAN] Roadmap #61: Interactive feature discovery and saved tutorial flags
+- [#58](https://github.com/ne0gl1tch20/GuessTheNumber/pull/58) [TEMP PLAN] Roadmap #60: Opt-in notifications and background helper
+- [#57](https://github.com/ne0gl1tch20/GuessTheNumber/pull/57) [TEMP PLAN] Roadmap #59: Return-friendly goals, streaks, and widgets
+- [#56](https://github.com/ne0gl1tch20/GuessTheNumber/pull/56) [TEMP PLAN] Roadmap #58: Privacy, security, and player trust
+- [#55](https://github.com/ne0gl1tch20/GuessTheNumber/pull/55) [TEMP PLAN] Roadmap #57: Release-candidate readiness gate
+- [#54](https://github.com/ne0gl1tch20/GuessTheNumber/pull/54) [TEMP PLAN] Roadmap #56: Localization and content completeness
+- [#53](https://github.com/ne0gl1tch20/GuessTheNumber/pull/53) [TEMP PLAN] Roadmap #54: Accessibility and device adaptability
+- [#52](https://github.com/ne0gl1tch20/GuessTheNumber/pull/52) [TEMP PLAN] Roadmap #53: Runtime performance, memory, and battery
+- [#51](https://github.com/ne0gl1tch20/GuessTheNumber/pull/51) [TEMP PLAN] Roadmap #52: Save integrity and recovery experience
+- [#50](https://github.com/ne0gl1tch20/GuessTheNumber/pull/50) [TEMP PLAN] Roadmap #51: First-run onboarding and in-game help
+- [#49](https://github.com/ne0gl1tch20/GuessTheNumber/pull/49) [TEMP PLAN] Roadmap #50: Interaction and navigation consistency
+- [#48](https://github.com/ne0gl1tch20/GuessTheNumber/pull/48) [TEMP PLAN] Roadmap #49: Signature game-feel polish
+- [#47](https://github.com/ne0gl1tch20/GuessTheNumber/pull/47) feat(settings): add live theme preview
+- [#46](https://github.com/ne0gl1tch20/GuessTheNumber/pull/46) polish(settings): organize controls into clear sections
+- [#45](https://github.com/ne0gl1tch20/GuessTheNumber/pull/45) feat(settings): add localized descriptions for every setting
+- [#44](https://github.com/ne0gl1tch20/GuessTheNumber/pull/44) fix(game): reject corrupted LiveOps claim state
+- [#43](https://github.com/ne0gl1tch20/GuessTheNumber/pull/43) feat(a11y): announce progression node selection and status
+- [#42](https://github.com/ne0gl1tch20/GuessTheNumber/pull/42) docs: plan native Lua LiveOps APIs and advanced audio processing
+- [#41](https://github.com/ne0gl1tch20/GuessTheNumber/pull/41) fix(game): harden LiveOps reward arithmetic
+- [#40](https://github.com/ne0gl1tch20/GuessTheNumber/pull/40) feat(ui): add Compose preview fixtures and accessible guidance
+- [#39](https://github.com/ne0gl1tch20/GuessTheNumber/pull/39) build(ci): improve dependency and artifact reproducibility
+- [#38](https://github.com/ne0gl1tch20/GuessTheNumber/pull/38) docs(perf): establish PR89 performance baseline protocol
+- [#37](https://github.com/ne0gl1tch20/GuessTheNumber/pull/37) docs: record standing changelog maintenance rule
+- [#36](https://github.com/ne0gl1tch20/GuessTheNumber/pull/36) docs: document recent development updates in changelog
+- [#34](https://github.com/ne0gl1tch20/GuessTheNumber/pull/34) feat: add build-channel-aware update discovery
+- [#33](https://github.com/ne0gl1tch20/GuessTheNumber/pull/33) feat: show More Hub progression unlock requirements
+- [#32](https://github.com/ne0gl1tch20/GuessTheNumber/pull/32) feat: add optional math strategy lab
+- [#31](https://github.com/ne0gl1tch20/GuessTheNumber/pull/31) feat: spotlight early progression goals
+- [#30](https://github.com/ne0gl1tch20/GuessTheNumber/pull/30) feat: add development banner to showcase website
+- [#29](https://github.com/ne0gl1tch20/GuessTheNumber/pull/29) docs: clarify showcase phone is illustrative
+- [#28](https://github.com/ne0gl1tch20/GuessTheNumber/pull/28) feat: launch an animated GuessTheNumber showcase website
+- [#27](https://github.com/ne0gl1tch20/GuessTheNumber/pull/27) docs: plan polished GitHub Pages app showcase (#91)
+- [#26](https://github.com/ne0gl1tch20/GuessTheNumber/pull/26) test: strengthen localization runtime and release gate (#83)
+- [#25](https://github.com/ne0gl1tch20/GuessTheNumber/pull/25) docs: plan build-channel-aware updates
+- [#24](https://github.com/ne0gl1tch20/GuessTheNumber/pull/24) feat: celebrate winning streak milestones
+- [#23](https://github.com/ne0gl1tch20/GuessTheNumber/pull/23) test: cover final Lua payload boundary cases
+- [#22](https://github.com/ne0gl1tch20/GuessTheNumber/pull/22) test: cover LiveOps fallback and recovery boundaries
+- [#21](https://github.com/ne0gl1tch20/GuessTheNumber/pull/21) test: cover Lua answer and reward boundaries
+- [#20](https://github.com/ne0gl1tch20/GuessTheNumber/pull/20) test: verify Lua sandbox recovers after script failures
+- [#19](https://github.com/ne0gl1tch20/GuessTheNumber/pull/19) test: cover Lua activity lifecycle regressions
+- [#18](https://github.com/ne0gl1tch20/GuessTheNumber/pull/18) Harden Lua activity payload validation
+- [#17](https://github.com/ne0gl1tch20/GuessTheNumber/pull/17) Move Seasonal Events catalog content into bounded Lua
+- [#16](https://github.com/ne0gl1tch20/GuessTheNumber/pull/16) Extract and test seasonal claim policy
+- [#15](https://github.com/ne0gl1tch20/GuessTheNumber/pull/15) Audit legacy Seasonal Events migration requirements
+- [#14](https://github.com/ne0gl1tch20/GuessTheNumber/pull/14) Move random-event selection into Lua
+- [#13](https://github.com/ne0gl1tch20/GuessTheNumber/pull/13) Add debug-only Lua Testing Hub and rename Activity Hub
+- [#12](https://github.com/ne0gl1tch20/GuessTheNumber/pull/12) Expose the feature-flagged Lua Activity Hub in release builds
+- [#11](https://github.com/ne0gl1tch20/GuessTheNumber/pull/11) Harden LiveOps bundle integrity and rollback recovery
+- [#10](https://github.com/ne0gl1tch20/GuessTheNumber/pull/10) Handle already-active LiveOps bundle versions
+- [#9](https://github.com/ne0gl1tch20/GuessTheNumber/pull/9) Fix line-wrapped LiveOps public key in BuildConfig
+- [#8](https://github.com/ne0gl1tch20/GuessTheNumber/pull/8) Fix LiveOps manifest URL branch
+- [#7](https://github.com/ne0gl1tch20/GuessTheNumber/pull/7) Make Lua script testing developer-only
+- [#6](https://github.com/ne0gl1tch20/GuessTheNumber/pull/6) Fix Lua runtime execution and harden stability
+- [#5](https://github.com/ne0gl1tch20/GuessTheNumber/pull/5) Add embedded Lua engine, offline GO hub, and signed LiveOps client
+- [#3](https://github.com/ne0gl1tch20/GuessTheNumber/pull/3) Beyond the Numbers Ultimate Expansion v3.0.0
+- [#2](https://github.com/ne0gl1tch20/GuessTheNumber/pull/2) Polish expressive UI motion and gameplay feedback
 
 ## Changelog maintenance
 - Add a dated version section for every release or meaningful batch of merged changes.
