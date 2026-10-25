@@ -16,6 +16,8 @@ import com.jarrlyyy.guessthenumber.data.notification.GameReminderWorker
 import com.jarrlyyy.guessthenumber.data.notification.NotificationHelper
 import com.jarrlyyy.guessthenumber.widget.WidgetRefresh
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
+import com.jarrlyyy.guessthenumber.data.store.exportSecureSave
+import com.jarrlyyy.guessthenumber.data.store.importSecureOrLegacySave
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
@@ -853,7 +855,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun exportSave(onExported: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val json = saveManager.exportSave(_activeSlot.value)
+            val json = saveManager.exportSecureSave(_activeSlot.value)
             withContext(Dispatchers.Main) {
                 onExported(json)
             }
@@ -863,7 +865,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun importSave(json: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val success = slotOperationMutex.withLock {
-                saveManager.importSave(json, _activeSlot.value)
+                saveManager.importSecureOrLegacySave(json, _activeSlot.value)
             }
             if (success) {
                 val loaded = saveManager.loadGame(_activeSlot.value)

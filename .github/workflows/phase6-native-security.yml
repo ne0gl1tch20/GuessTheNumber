@@ -6,6 +6,8 @@ on:
     paths:
       - "app/src/main/cpp/**"
       - "app/src/main/java/com/jarrlyyy/guessthenumber/data/store/SecureSaveTransfer.kt"
+      - "app/src/main/java/com/jarrlyyy/guessthenumber/ui/viewmodel/GameViewModel.kt"
+      - "app/src/test/java/com/jarrlyyy/guessthenumber/data/store/SecureSaveTransferTest.kt"
       - "shared/src/jvmAndAndroidMain/kotlin/com/jarrlyyy/guessthenumber/shared/engine/NativeGameplayOptimizer.kt"
       - "app/build.gradle.kts"
       - "docs/TRAIT_SYSTEM_ROADMAP.md"
