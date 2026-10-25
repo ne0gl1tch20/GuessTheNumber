@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.widget
 import android.content.Context
 import android.content.Intent
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.toMutablePreferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
@@ -90,7 +91,7 @@ class GuessWidget : GlanceAppWidget() {
                         ) {
                             Text(locale.getString("widget_streak", "Streak %d", state.streak), style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 12.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurface))
                             Spacer(GlanceModifier.height(3.dp))
-                            Text(locale.getString("widget_worlds_bosses", "%d worlds", state.unlockedWorldIds.size), style = TextStyle(fontSize = 10.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant))
+                            Text(locale.getString("widget_worlds_bosses", "Worlds %d • Bosses %d", state.unlockedWorldIds.size, state.defeatedBossIds.size), style = TextStyle(fontSize = 10.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant))
                         }
                     }
                     Spacer(GlanceModifier.height(7.dp))
