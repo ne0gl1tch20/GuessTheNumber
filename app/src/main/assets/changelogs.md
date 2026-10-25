@@ -12,7 +12,7 @@
 - 🌦️ **Trait and seasonal architecture:** centralized deterministic seasonal boundaries (including winter across year-end), retained signed catalog validation and offline fallback, and kept Creative Mode isolated from trait/reward authority.
 - 🧪 **Expanded tests:** combined effect composition, run limits, hints, snapshot migration/resume and malformed completed-run coverage.
 - 🔐 **Portable encrypted backups:** cross-device exports use a user passphrase and authenticated encryption. The app does not store the passphrase; losing it can make the backup unrecoverable.
-- 📚 **Project history:** docs/PR_CHANGELOG.md indexes PRs #1–#355, including closed-unmerged attempts for traceability. The index is a history ledger, not a claim that every attempt shipped.
+- 📚 **Project history:** docs/PR_CHANGELOG.md indexes PRs #1–#356, including closed-unmerged attempts for traceability. The index is a history ledger, not a claim that every attempt shipped.
 - 🔢 **App version:** bumped to **3.2.0** (versionCode **23**); the web-play asset compatibility gate is kept in sync.
 
 
@@ -21,11 +21,11 @@
 - 🧪 **Creative Mode runtime foundation:** added an isolated guess-run model with range validation, attempt limits, bounded hints, run snapshots, resume/clear helpers and schema v1/v2 migration to v3. The Save Slots screen now launches/resumes the per-slot run, records guesses and hints, and persists snapshots. Android device-level interaction still needs verification.
 - 🌦️ **Seasonal trait calendar:** centralized deterministic season windows, including winter across year boundaries, and added boundary tests.
 - 💾 **Save compatibility:** portable encrypted backups and versioned per-slot Creative Mode saves remain supported. Keep the export passphrase somewhere safe; it is not stored by the app.
-- 🌦️ **Trait and seasonal architecture:** continued work is planned around deterministic activation, safe effect policies, signed catalog updates and offline-first seasonal behavior.
+- 🌦️ **Trait and seasonal architecture:** deterministic activation and seasonal boundaries are centralized, effect policies are bounded, signed catalog updates remain validated and offline fallback is preserved.
 - 📚 **Project history:** added [the PR-by-PR development ledger](https://github.com/ne0gl1tch20/GuessTheNumber/blob/master/docs/PR_CHANGELOG.md) so merged work and open/unmerged attempts are easier to audit.
 - 🔢 **App version:** bumped to 3.1.0 (versionCode 22).
 
-## Unreleased (HTML More Hub, changelog and player feedback)
+## Earlier development notes (HTML More Hub, changelog and player feedback)
 - 📋 **Canonical changelog content**: The shared HTML changelog now reads this Markdown file and formats its headings, bold text, code and lists instead of duplicating release notes in HTML.
 
 - 📋 Added an in-game Changelog page linked from More, with recent UI, progression and platform changes.

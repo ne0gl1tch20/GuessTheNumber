@@ -25,7 +25,7 @@ This is the project-level release summary. For the exhaustive PR-by-PR record, i
 - Portable encrypted exports use passphrase-derived authenticated encryption; the app does not store the passphrase. Losing it may make a backup unrecoverable.
 - Shared HTML/CSS/JavaScript UI and the Jarrlyy UI SDK received extensive migration, accessibility, navigation, font, icon and popup-reliability work.
 - Web-play asset auto-sync, update-channel handling, developer diagnostics, offline rewards and bridge-safe arcade claims were expanded.
-- Added a PR-by-PR ledger covering PRs #1–#355, including open and closed-unmerged work, to preserve the project history instead of treating only the latest feature as the whole release.
+- Added a PR-by-PR ledger covering PRs #1–#356, including open and closed-unmerged work, to preserve the project history instead of treating only the latest feature as the whole release.
 - Bumped the app to 3.2.0 / versionCode 23 and synchronized the web-play compatibility gate.
 
 ### Validation boundaries
@@ -46,4 +46,4 @@ This is the project-level release summary. For the exhaustive PR-by-PR record, i
 
 ## v3.0.2 and earlier — Development history
 
-The [PR development ledger](docs/PR_CHANGELOG.md) preserves individual PR titles and status snapshots across core gameplay, progression/economy, localization, save systems, Android/Windows parity, shared HTML/CSS/JavaScript UI, Jarrlyy UI SDK, updater reliability, trait catalogs, native optimization, security and Creative Mode work.
+The [PR development ledger](docs/PR_CHANGELOG.md) preserves individual PR titles and status snapshots through PR #356 across core gameplay, progression/economy, localization, save systems, Android/Windows parity, shared HTML/CSS/JavaScript UI, Jarrlyy UI SDK, updater reliability, trait catalogs, native optimization, security and Creative Mode work.
