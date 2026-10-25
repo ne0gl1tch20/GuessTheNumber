@@ -12,6 +12,8 @@
 - 🔢 **App version:** bumped to **3.2.0** (versionCode **23**); the web-play asset compatibility gate is kept in sync.
 
 
+## Earlier development notes (3.1.0 and prior)
+
 - 🧪 **Creative Mode runtime foundation:** added an isolated guess-run model with range validation, attempt limits, bounded hints, run snapshots, resume/clear helpers and schema v1/v2 migration to v3. The Save Slots screen now launches/resumes the per-slot run, records guesses and hints, and persists snapshots. Android device-level interaction still needs verification.
 - 🌦️ **Seasonal trait calendar:** centralized deterministic season windows, including winter across year boundaries, and added boundary tests.
 - 💾 **Save compatibility:** portable encrypted backups and versioned per-slot Creative Mode saves remain supported. Keep the export passphrase somewhere safe; it is not stored by the app.
