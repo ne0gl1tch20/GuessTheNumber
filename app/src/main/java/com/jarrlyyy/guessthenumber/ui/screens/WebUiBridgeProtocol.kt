@@ -58,6 +58,40 @@ internal object WebUiBridgeProtocol {
         return currentUri.scheme == "https" && currentUri.host == "appassets.androidplatform.net" && currentUri.path == expectedPath && currentUri.query == null && currentUri.fragment == null && currentUri.userInfo == null && currentUri.port == -1
     }
 
+    private fun isValidMenuStudioLayout(value: String): Boolean {
+        if (value.length !in 1..1600) return false
+        return runCatching {
+            val root = JSONObject(value)
+            val rootKeys = root.keys().asSequence().toSet()
+            if (rootKeys.any { it !in setOf("areas", "orders", "colors") }) return false
+            val allowedId = Regex("[A-Za-z0-9_-]{1,64}")
+            val areas = root.optJSONObject("areas") ?: return false
+            if (areas.length() > 100) return false
+            val areaKeys = areas.keys().asSequence().toList()
+            if (areaKeys.any { !allowedId.matches(it) || areas.opt(it) !in setOf("nav", "more") }) return false
+            val orders = root.optJSONObject("orders") ?: return false
+            if (orders.keys().asSequence().any { it !in setOf("nav", "more") }) return false
+            for (area in listOf("nav", "more")) {
+                val order = orders.optJSONArray(area) ?: return false
+                if (order.length() > 100) return false
+                val seen = mutableSetOf<String>()
+                for (i in 0 until order.length()) {
+                    val id = order.opt(i) as? String ?: return false
+                    if (!allowedId.matches(id) || !seen.add(id)) return false
+                }
+            }
+            val colors = root.optJSONObject("colors")
+            if (root.has("colors") && colors == null) return false
+            if (colors != null) {
+                if (colors.length() > 100) return false
+                val hex = Regex("#[0-9A-Fa-f]{6}")
+                val keys = colors.keys().asSequence().toList()
+                if (keys.any { !allowedId.matches(it) || !hex.matches(colors.optString(it)) }) return false
+            }
+            true
+        }.getOrDefault(false)
+    }
+
     fun parse(raw: String): ParseResult {
         if (raw.length > MAX_MESSAGE_LENGTH) return ParseResult.Invalid("message_too_large")
         val request = try { JSONObject(raw) } catch (_: Exception) { return ParseResult.Invalid("invalid_json") }
@@ -115,7 +149,7 @@ internal object WebUiBridgeProtocol {
                     "volume", "sfxVolume" -> value.toFloatOrNull()?.let { it in 0f..1f } == true
                     "themePreset" -> value in setOf("Neon", "Sunset", "Ocean", "Forest", "Custom")
                     "customPrimaryColor", "customSecondaryColor", "customTertiaryColor" -> value.matches(Regex("#[0-9A-Fa-f]{6}"))
-                    "webMenuStudioLayout" -> value.length in 1..1600 && runCatching { JSONObject(value) }.isSuccess
+                    "webMenuStudioLayout" -> isValidMenuStudioLayout(value)
                     else -> false
                 }
                 if (!valid) ParseResult.Invalid("invalid_setting_value", id) else ParseResult.Valid(id, type, settingKey = key, settingValue = value)
