@@ -54,7 +54,9 @@ class NativeVsKotlinPerformanceBenchmarkTest {
             appendLine("checksum=$expectedChecksum")
             appendLine("bounded=true")
         }
-        val reportFile = File("app/build/reports/native-vs-kotlin-kotlin.txt")
+        val reportPath = System.getenv("BENCHMARK_REPORT_PATH")
+            ?: "build/reports/native-vs-kotlin-kotlin.txt"
+        val reportFile = File(reportPath)
         reportFile.parentFile?.mkdirs()
         reportFile.writeText(report)
         println("NATIVE_VS_KOTLIN_KOTLIN_BENCHMARK " + report.replace("\n", " ").trim())
