@@ -79,6 +79,10 @@ class GuessWidget : GlanceAppWidget() {
                                 style = TextStyle(fontSize = 10.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant)
                             )
                         }
+                        if (compactHeight) {
+                            Spacer(GlanceModifier.width(4.dp))
+                            Image(provider = ImageProvider(balanceBitmap), contentDescription = state.money.format(), modifier = GlanceModifier.width(68.dp).height(26.dp))
+                        }
                     }
                     if (!compactHeight) {
                     Spacer(GlanceModifier.height(7.dp))
@@ -92,7 +96,7 @@ class GuessWidget : GlanceAppWidget() {
                         }
                         Spacer(GlanceModifier.width(8.dp))
                         Column(
-                            modifier = GlanceModifier.defaultWeight().background(GlanceTheme.colors.surface)
+                            modifier = GlanceModifier.defaultWeight().background(R.color.widget_surface)
                                 .cornerRadius(15.dp).padding(horizontal = 10.dp, vertical = 8.dp)
                         ) {
                             Text(locale.getString("widget_streak", "Streak %d", state.streak), style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 12.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurface))
