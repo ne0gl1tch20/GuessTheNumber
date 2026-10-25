@@ -4,7 +4,7 @@
   const doc = global.document;
   if (!doc) return;
   const $ = (selector, root = doc) => root.querySelector(selector);
-  const $ = (selector, root = doc) => Array.from(root.querySelectorAll(selector));
+  const $$ = (selector, root = doc) => Array.from(root.querySelectorAll(selector));
   let tourSequence = 0;
 
   function toast(message, duration = 2800) {
@@ -491,7 +491,7 @@
   }
 
   function initMotion(root = doc) {
-    const targets = $("[data-jui-reveal]", root);
+    const targets = $$("[data-jui-reveal]", root);
     if (!targets.length) return;
     if (motionPreference() || !("IntersectionObserver" in global)) {
       targets.forEach((node) => node.classList.add("jui-motion-visible"));
