@@ -26,7 +26,8 @@ class PortableSaveBackupTest {
         assertNull(PortableSaveBackup.decrypt(envelope, "another incorrect passphrase".toCharArray()))
         val encoded = envelope.removePrefix(PortableSaveBackup.PREFIX)
         val changed = encoded.toCharArray()
-        changed[changed.lastIndex] = if (changed.last() == 'A') 'B' else 'A'
+        val tamperIndex = changed.size / 2
+        changed[tamperIndex] = if (changed[tamperIndex] == 'A') 'B' else 'A'
         assertNull(PortableSaveBackup.decrypt(PortableSaveBackup.PREFIX + String(changed), "a long unique backup passphrase".toCharArray()))
     }
 
