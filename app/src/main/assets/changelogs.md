@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 🏠 **Launcher widgets:** refined the expanded and compact home-screen widgets into app-style companions with the selected save, balance, quick progress and direct Play/save-switch actions. Gameplay and save data remain owned by Kotlin.
+
 ### Guess The Number 3.2.0 — Creative Mode Phase 8–10 hardening
 
 ## Creative Mode, trait systems and reliability
