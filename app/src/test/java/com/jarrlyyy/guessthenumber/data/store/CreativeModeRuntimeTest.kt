@@ -119,7 +119,9 @@ class CreativeModeRuntimeTest {
         assertFalse(decision.accepted)
         assertNull(CreativeModeRuntime.persist(config, forged))
         val changedConfig = config.copy(effects = emptyList())
-        assertNull(CreativeModeRuntime.resume(CreativeModeRuntime.persist(config, valid)!!.copy(effects = emptyList())))
+        val usedHint = CreativeModeRuntime.useHint(config, valid)!!
+        val persisted = CreativeModeRuntime.persist(config, usedHint)!!
+        assertNull(CreativeModeRuntime.resume(persisted.copy(effects = emptyList())))
         assertNull(CreativeModeRuntime.useHint(changedConfig, valid))
     }
 
