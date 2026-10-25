@@ -84,6 +84,7 @@ fun SaveSlotsScreen(
     var creativeName by remember { mutableStateOf("My Creative Mode") }
     var creativeEnabled by remember { mutableStateOf(false) }
     var creativeRangeMax by remember { mutableStateOf("100") }
+    var creativeRangeScale by remember { mutableStateOf("1") }
     var creativeHints by remember { mutableStateOf("0") }
     var creativeAttemptLimit by remember { mutableStateOf("0") }
     var exportPassphrase by remember { mutableStateOf("") }
@@ -420,6 +421,12 @@ fun SaveSlotsScreen(
                         singleLine = true
                     )
                     OutlinedTextField(
+                        value = creativeRangeScale,
+                        onValueChange = { creativeRangeScale = it.filter(Char::isDigit).take(1) },
+                        label = { Text("Range scale (1–5; 1 = normal)") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
                         value = creativeHints,
                         onValueChange = { creativeHints = it.filter(Char::isDigit).take(2) },
                         label = { Text("Extra hints (0–5)") },
@@ -435,16 +442,19 @@ fun SaveSlotsScreen(
             },
             confirmButton = {
                 val rangeMax = creativeRangeMax.toLongOrNull()
+                val rangeScale = creativeRangeScale.toIntOrNull()
                 val hints = creativeHints.toIntOrNull()
                 val attemptLimit = creativeAttemptLimit.toIntOrNull()
                 val valid = !creativeName.isBlank() &&
                     rangeMax != null && rangeMax in 1L..CreativeModeSave.MAX_RANGE &&
+                    rangeScale != null && rangeScale in 1..5 &&
                     hints != null && hints in 0..5 &&
                     attemptLimit != null && attemptLimit in 0..100
                 TextButton(
                     enabled = valid,
                     onClick = {
                         val effects = buildList {
+                            if ((rangeScale ?: 1) > 1) add(CreativeModeEffect("range-scale", CreativeEffectType.RANGE_SCALE, rangeScale!!))
                             if ((hints ?: 0) > 0) add(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, hints!!))
                             if ((attemptLimit ?: 0) > 0) add(CreativeModeEffect("attempt-cap", CreativeEffectType.ATTEMPT_LIMIT, attemptLimit!!))
                         }
@@ -726,6 +736,7 @@ fun SaveSlotsScreen(
                                 creativeName = saved?.name ?: "My Creative Mode"
                                 creativeEnabled = saved?.enabled ?: false
                                 creativeRangeMax = (saved?.rangeMax ?: 100L).toString()
+                                creativeRangeScale = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.RANGE_SCALE }?.value ?: 1).toString()
                                 creativeHints = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.EXTRA_HINTS }?.value ?: 0).toString()
                                 creativeAttemptLimit = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.ATTEMPT_LIMIT }?.value ?: 0).toString()
                                 showCreativeDialog = true
