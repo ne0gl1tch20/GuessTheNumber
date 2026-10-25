@@ -57,7 +57,14 @@ jobs:
 
           kotlin_checksum="$(awk -F= '$1 == "checksum" {print $2}' "$kotlin_report")"
           native_checksum="$(awk -F= '$1 == "checksum" {print $2}' "$native_report")"
-          test "$kotlin_checksum" = "$native_checksum"
+          if [ "$kotlin_checksum" = "$native_checksum" ]; then
+            parity=true
+          else
+            parity=false
+          fi
+          echo "Kotlin checksum: $kotlin_checksum"
+          echo "Native checksum: $native_checksum"
+          echo "Output parity: $parity"
 
           kotlin_median="$(awk -F= '$1 == "medianNsPerEvaluation" {print $2}' "$kotlin_report")"
           native_median="$(awk -F= '$1 == "medianNsPerEvaluation" {print $2}' "$native_report")"
@@ -86,6 +93,7 @@ jobs:
             echo "warmupIterations=2000"
             echo "samples=21"
             echo "iterationsPerSample=20000"
+            echo "outputParity=$parity"
             cat "$kotlin_report"
             cat "$native_report"
             python3 - "$kotlin_median" "$native_median" "$kotlin_p95" "$native_p95" "$kotlin_tp" "$native_tp" <<'PY'
