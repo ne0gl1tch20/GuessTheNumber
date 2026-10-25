@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "2702551689e1895d8d545dfb1cbfb529a075aef5",
+  "version": "1b9ceda28a33e74c595d6bd1298579878e8cec5a",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -21,7 +21,7 @@
     },
     {
       "path": "web-play/index.html",
-      "sha256": "f4c6b5f728f83a1509681aa1bbb492a0d7c11fa588a6fa3041520f3cfe42033e"
+      "sha256": "84deed6580db1bc4eca1d94d1d6c17caf04c701c0e44bd8673b4a31c5ab34baa"
     },
     {
       "path": "web-play/styles.css",
@@ -153,7 +153,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/README.md",
-      "sha256": "d686250a045b7ca63ded49cf24e5f1f7f88742a8bb3b1015d4622fa321f46298"
+      "sha256": "8ea74a1e209b36a524ab23ff18c3747d5220071134a017cec2aa365a6f92b337"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/demo.js",
@@ -164,12 +164,16 @@
       "sha256": "afb87687b64ba441bba4fd2f96bff9d42ed16f550af68f61edd25f7ac646ebd8"
     },
     {
+      "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-host.js",
+      "sha256": "3fbb20f77f130d276478080f39ebb2341caec11452abad5e0cdbbba29f9c4000"
+    },
+    {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui.js",
       "sha256": "1067286f59356b1bf9952889b2bdc71ce28f40c48cd4082a7e492f3578982ea5"
     },
     {
       "path": "libraries/jarrlyyuisdk/demo.html",
-      "sha256": "fbe3d2b8bec0f064e012597b7405f6501bf5ad04d95456e5f45ae715b0136756"
+      "sha256": "b4398f6ec923f31333b2d182707c36c115fd7c485d636b72a8fee575671b9ad8"
     },
     {
       "path": "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg",
@@ -177,11 +181,11 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/motion-demo.js",
-      "sha256": "f83d60dd7680e7df9ba8adafb928ce87e03954fb09dd254fe0c12e013fe3e553"
+      "sha256": "d43983000dc895b7502865c313573536bfe579f950c85e31fcbaa42de79987d8"
     },
     {
       "path": "libraries/jarrlyyuisdk/styles/demo.css",
-      "sha256": "f5505ab411a08c0125a3a335ca3a95f6ab722d880fd43b8a24e4bd3cf708f4ed"
+      "sha256": "9371818eb41da2abb36e6cbcf7ddd3e1fc5ff1fd79127f66a2d135759e305eba"
     },
     {
       "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui-advanced.css",
