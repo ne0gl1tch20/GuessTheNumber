@@ -403,6 +403,26 @@ fun SaveSlotsScreen(
             onDismissRequest = { showCreativeDialog = false },
             title = { Text("Creative Mode • Slot $activeSlot") },
             text = {
+                val previewMax = creativeRangeMax.toLongOrNull()?.takeIf { it in 1L..CreativeModeSave.MAX_RANGE }
+                val previewScale = creativeRangeScale.toIntOrNull()?.takeIf { it in 1..5 }
+                val previewHints = creativeHints.toIntOrNull()?.takeIf { it in 0..5 }
+                val previewAttemptLimit = creativeAttemptLimit.toIntOrNull()?.takeIf { it in 0..100 }
+                val previewEffects = buildList {
+                    if ((previewScale ?: 1) > 1) add(CreativeModeEffect("range-scale", CreativeEffectType.RANGE_SCALE, previewScale!!))
+                    if ((previewHints ?: 0) > 0) add(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, previewHints!!))
+                    if ((previewAttemptLimit ?: 0) > 0) add(CreativeModeEffect("attempt-cap", CreativeEffectType.ATTEMPT_LIMIT, previewAttemptLimit!!))
+                }
+                val previewRules = if (previewMax != null && previewScale != null && previewHints != null && previewAttemptLimit != null) {
+                    CreativeModeEffectPolicy.resolve(
+                        CreativeModeSave(
+                            name = creativeName.trim().ifBlank { "Preview" },
+                            enabled = creativeEnabled,
+                            rangeMin = 1L,
+                            rangeMax = previewMax,
+                            effects = previewEffects
+                        )
+                    )
+                } else null
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text("This configuration belongs to the selected save slot. Effects are bounded rule modifiers only: they cannot grant currency, rewards or change normal save progression.")
                     OutlinedTextField(
@@ -438,6 +458,14 @@ fun SaveSlotsScreen(
                         onValueChange = { creativeAttemptLimit = it.filter(Char::isDigit).take(3) },
                         label = { Text("Attempt limit (0 off, 1–100)") },
                         singleLine = true
+                    )
+                    Text(
+                        when {
+                            !creativeEnabled -> "Preview: Creative rules are disabled."
+                            previewRules != null -> "Preview: range ${previewRules.rangeMin}–${previewRules.rangeMax}, ${previewRules.extraHints} hints, attempt limit ${previewRules.attemptLimit ?: "off"}."
+                            else -> "Preview unavailable until all values are valid."
+                        },
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             },
