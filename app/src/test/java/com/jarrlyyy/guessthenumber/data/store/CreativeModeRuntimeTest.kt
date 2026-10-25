@@ -70,4 +70,43 @@ class CreativeModeRuntimeTest {
             CreativeModeSave(enabled = true, rangeMin = 10, rangeMax = 20), 21
         ))
     }
+
+    @Test fun activeRunSnapshotSurvivesCodecRoundTripAndCanResume() {
+        val config = save(CreativeModeEffect("hints", CreativeEffectType.EXTRA_HINTS, 2))
+        val run = CreativeModeRuntime.start(config, 15)!!
+        val firstGuess = CreativeModeRuntime.submitGuess(config, run, 12).run
+        val usedHint = CreativeModeRuntime.useHint(config, firstGuess)!!
+        val persisted = CreativeModeRuntime.persist(config, usedHint)!!
+        val encoded = CreativeModeSaveCodec.encode(persisted)
+        val decoded = CreativeModeSaveCodec.decodeAndMigrate(encoded)!!
+        val resumed = CreativeModeRuntime.resume(decoded)!!
+        assertEquals(usedHint.runId, resumed.runId)
+        assertEquals(usedHint.attemptsUsed, resumed.attemptsUsed)
+        assertEquals(usedHint.hintsUsed, resumed.hintsUsed)
+        assertEquals(usedHint.target, resumed.target)
+    }
+
+    @Test fun versionTwoCreativeSavesMigrateWithoutInventingARun() {
+        val old = """{"schemaVersion":2,"name":"Old v2","enabled":true,"rangeMin":1,"rangeMax":40,"effects":[]}"""
+        val migrated = CreativeModeSaveCodec.decodeAndMigrate(old)
+        assertNotNull(migrated)
+        assertEquals(CreativeModeSave.CURRENT_SCHEMA_VERSION, migrated?.schemaVersion)
+        assertNull(migrated?.activeRun)
+    }
+
+    @Test fun invalidRunSnapshotsAreRejected() {
+        val bad = CreativeModeSave(
+            enabled = true,
+            activeRun = CreativeModeRunSnapshot(
+                runId = "short",
+                rangeMin = 1,
+                rangeMax = 10,
+                target = 11,
+                attemptsUsed = -1
+            )
+        )
+        assertFalse(CreativeModeSaveCodec.validate(bad))
+        assertNull(CreativeModeRuntime.resume(bad))
+    }
+
 }
