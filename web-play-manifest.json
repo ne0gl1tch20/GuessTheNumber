@@ -1,40 +1,8 @@
 {
   "schemaVersion": 1,
-  "version": "e599c77c3712bc0c280df945930b71ce7347bc46",
+  "version": "dac5991026dfe7d1b9593c5bd0985dd53507ed26",
   "minAppVersionCode": 21,
   "files": [
-    {
-      "path": "web-play/app.js",
-      "sha256": "c0817f0311b8d9b53fa7023f7cd448cf7a1dc22bc3ff40378e7b2ec8ae8181c0"
-    },
-    {
-      "path": "web-play/icons/guess-the-number.svg",
-      "sha256": "065890ac9bee6647b60cf1ac6abcb3370124bbcea1da4c73bdc9ad1b43214e3e"
-    },
-    {
-      "path": "web-play/icons/sparkle.svg",
-      "sha256": "a7d6e0c5654e27f369e37450e95644a6cc6b0568f01ffce8b677d13e8a9629c5"
-    },
-    {
-      "path": "web-play/icons/star.svg",
-      "sha256": "e56d8bb7457995a5c218fa1bd3b5281f3b19fee8418a527acc1f007139d8fab9"
-    },
-    {
-      "path": "web-play/index.html",
-      "sha256": "8e3ed4f02d5e85869fe41fd1dbeaffd5d849fce16c8e49892083799888779475"
-    },
-    {
-      "path": "web-play/menu-studio.js",
-      "sha256": "e66630ad3e3610755bfc06f48fe289d57b04587b16f3dc8284416ff2adb0badc"
-    },
-    {
-      "path": "web-play/styles.css",
-      "sha256": "c7af778d667a82235fc5826bc96f6aeda770b24e3ed28d253eef61cd359bd9a8"
-    },
-    {
-      "path": "web-play/trait-extension-host.js",
-      "sha256": "ecef072e5d782e0d7cd0ba2ddc7db805259005327c3ef354a8010ef601a21fee"
-    },
     {
       "path": "fonts/Inter-Italic-VariableFont_opsz,wght.ttf",
       "sha256": "6136f73372fedc37b80fd1a8ec3e21734073ff17376f3672718f186779672e7a"
@@ -62,6 +30,50 @@
     {
       "path": "fonts/SpaceGrotesk-VariableFont_wght.ttf",
       "sha256": "697a7905c71f7c61d071648bc73449541796af865b51c86a672795f3b452b142"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/components/demo.js",
+      "sha256": "49f0796a44e9ab9f72e4fce0c2b3e45e5194c315bab3f523fdafd88fe0f76f58"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-advanced.js",
+      "sha256": "afb87687b64ba441bba4fd2f96bff9d42ed16f550af68f61edd25f7ac646ebd8"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-host.js",
+      "sha256": "3fbb20f77f130d276478080f39ebb2341caec11452abad5e0cdbbba29f9c4000"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui.js",
+      "sha256": "1067286f59356b1bf9952889b2bdc71ce28f40c48cd4082a7e492f3578982ea5"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/demo.html",
+      "sha256": "b4398f6ec923f31333b2d182707c36c115fd7c485d636b72a8fee575671b9ad8"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg",
+      "sha256": "261b0acab6cc180c06b3934f198048b30919de581846ee2e8732536f132f1a04"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/motion-demo.js",
+      "sha256": "d43983000dc895b7502865c313573536bfe579f950c85e31fcbaa42de79987d8"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/README.md",
+      "sha256": "8ea74a1e209b36a524ab23ff18c3747d5220071134a017cec2aa365a6f92b337"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/styles/demo.css",
+      "sha256": "9371818eb41da2abb36e6cbcf7ddd3e1fc5ff1fd79127f66a2d135759e305eba"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui-advanced.css",
+      "sha256": "bd2bc6ce1d77292f380558e505404529c6ce71aa23d4fbed109e8d76ebd70235"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css",
+      "sha256": "f19d156117e69ef768399232ac7aced1689358aa700c937d3dd20f77c0f99359"
     },
     {
       "path": "locales/ar.json",
@@ -156,48 +168,36 @@
       "sha256": "cffbbc4eb4e511f1fc912d67233c9a1f5a937e7bf1e2ec99bb6590c3dbda7139"
     },
     {
-      "path": "libraries/jarrlyyuisdk/README.md",
-      "sha256": "8ea74a1e209b36a524ab23ff18c3747d5220071134a017cec2aa365a6f92b337"
+      "path": "web-play/app.js",
+      "sha256": "c0817f0311b8d9b53fa7023f7cd448cf7a1dc22bc3ff40378e7b2ec8ae8181c0"
     },
     {
-      "path": "libraries/jarrlyyuisdk/components/demo.js",
-      "sha256": "49f0796a44e9ab9f72e4fce0c2b3e45e5194c315bab3f523fdafd88fe0f76f58"
+      "path": "web-play/icons/guess-the-number.svg",
+      "sha256": "065890ac9bee6647b60cf1ac6abcb3370124bbcea1da4c73bdc9ad1b43214e3e"
     },
     {
-      "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-advanced.js",
-      "sha256": "afb87687b64ba441bba4fd2f96bff9d42ed16f550af68f61edd25f7ac646ebd8"
+      "path": "web-play/icons/sparkle.svg",
+      "sha256": "a7d6e0c5654e27f369e37450e95644a6cc6b0568f01ffce8b677d13e8a9629c5"
     },
     {
-      "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-host.js",
-      "sha256": "3fbb20f77f130d276478080f39ebb2341caec11452abad5e0cdbbba29f9c4000"
+      "path": "web-play/icons/star.svg",
+      "sha256": "e56d8bb7457995a5c218fa1bd3b5281f3b19fee8418a527acc1f007139d8fab9"
     },
     {
-      "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui.js",
-      "sha256": "1067286f59356b1bf9952889b2bdc71ce28f40c48cd4082a7e492f3578982ea5"
+      "path": "web-play/index.html",
+      "sha256": "6a3ffe6ddc1bf486e6c6fac102e903cd9fa8e09580f95315cd005c048ccebd12"
     },
     {
-      "path": "libraries/jarrlyyuisdk/demo.html",
-      "sha256": "b4398f6ec923f31333b2d182707c36c115fd7c485d636b72a8fee575671b9ad8"
+      "path": "web-play/menu-studio.js",
+      "sha256": "26f9d3314cf70bd5be162a028b3a94fa6a2468abbfe42912697435f233f6d219"
     },
     {
-      "path": "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg",
-      "sha256": "261b0acab6cc180c06b3934f198048b30919de581846ee2e8732536f132f1a04"
+      "path": "web-play/styles.css",
+      "sha256": "28f18dbad51ba1bf4f001693a2167a7660f625711c5e31e17379961cac43cc57"
     },
     {
-      "path": "libraries/jarrlyyuisdk/motion-demo.js",
-      "sha256": "d43983000dc895b7502865c313573536bfe579f950c85e31fcbaa42de79987d8"
-    },
-    {
-      "path": "libraries/jarrlyyuisdk/styles/demo.css",
-      "sha256": "9371818eb41da2abb36e6cbcf7ddd3e1fc5ff1fd79127f66a2d135759e305eba"
-    },
-    {
-      "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui-advanced.css",
-      "sha256": "bd2bc6ce1d77292f380558e505404529c6ce71aa23d4fbed109e8d76ebd70235"
-    },
-    {
-      "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css",
-      "sha256": "f19d156117e69ef768399232ac7aced1689358aa700c937d3dd20f77c0f99359"
+      "path": "web-play/trait-extension-host.js",
+      "sha256": "ecef072e5d782e0d7cd0ba2ddc7db805259005327c3ef354a8010ef601a21fee"
     }
   ]
 }
