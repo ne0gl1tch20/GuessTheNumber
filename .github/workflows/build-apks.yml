@@ -81,6 +81,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 7
           name: GuessTheNumber-test-reports
           path: |
             app/build/reports/tests/**
