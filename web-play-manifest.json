@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "f632442953c6b7f730eeb6dc4044e69d1d85484c",
+  "version": "2702551689e1895d8d545dfb1cbfb529a075aef5",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -153,7 +153,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/README.md",
-      "sha256": "9f4c033f8288d497b3eafdec773849532f0f373aaeaf2e964938a080c53bcc4b"
+      "sha256": "d686250a045b7ca63ded49cf24e5f1f7f88742a8bb3b1015d4622fa321f46298"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/demo.js",
@@ -165,15 +165,19 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui.js",
-      "sha256": "49b2d5079cfd45be602438f567a26f4402056045c077bd4666dfdd2c00c4f728"
+      "sha256": "1067286f59356b1bf9952889b2bdc71ce28f40c48cd4082a7e492f3578982ea5"
     },
     {
       "path": "libraries/jarrlyyuisdk/demo.html",
-      "sha256": "3e9b34dc506b395f3389baf073648dc397978b0ab308d09c251ba43b8e213223"
+      "sha256": "fbe3d2b8bec0f064e012597b7405f6501bf5ad04d95456e5f45ae715b0136756"
     },
     {
       "path": "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg",
       "sha256": "261b0acab6cc180c06b3934f198048b30919de581846ee2e8732536f132f1a04"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/motion-demo.js",
+      "sha256": "f83d60dd7680e7df9ba8adafb928ce87e03954fb09dd254fe0c12e013fe3e553"
     },
     {
       "path": "libraries/jarrlyyuisdk/styles/demo.css",
@@ -185,7 +189,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css",
-      "sha256": "f2835215e943a590d12376955519c9904ca8601d3a9d143c121abe172a80e3db"
+      "sha256": "f19d156117e69ef768399232ac7aced1689358aa700c937d3dd20f77c0f99359"
     }
   ]
 }
