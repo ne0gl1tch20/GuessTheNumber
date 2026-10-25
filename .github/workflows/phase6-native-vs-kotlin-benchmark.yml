@@ -85,7 +85,7 @@ jobs:
             echo "benchmarkWorkload=128 deterministic adaptive-target cases"
             echo "warmupIterations=2000"
             echo "samples=21"
-            echo "iterationsPerSample=100"
+            echo "iterationsPerSample=20000"
             cat "$kotlin_report"
             cat "$native_report"
             python3 - "$kotlin_median" "$native_median" "$kotlin_p95" "$native_p95" "$kotlin_tp" "$native_tp" <<'PY'
