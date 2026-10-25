@@ -173,7 +173,7 @@ fun QuickGuessDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
                     onReward(1L, BigNumber((score * 500).toLong()))
                     onDismiss()
                 }) {
-                    Text(localizedText(locale.getString("claim_reward_button", "Claim Reward")))
+                    Text(locale.getString("claim_reward_button", "Claim Reward"))
                 }
             }
         }
