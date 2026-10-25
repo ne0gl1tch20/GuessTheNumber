@@ -255,11 +255,19 @@ body.arcade-modal-open{overflow:hidden}body.arcade-modal-open::before{content:""
 .creative-state-grid input{width:100%;min-width:0}
 .creative-value-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .creative-value-actions button{width:100%;min-width:0;white-space:normal}
+.creative-upgrade-list{display:grid;gap:8px;margin:12px 0}
+.creative-upgrade-row{display:grid;grid-template-columns:minmax(0,1fr) 92px 56px;align-items:center;gap:8px;padding:10px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}
+.creative-upgrade-copy{display:grid;gap:4px;min-width:0}
+.creative-upgrade-copy strong{font-size:12px;overflow-wrap:anywhere}
+.creative-upgrade-copy span{font-size:11px;color:var(--muted)}
+.creative-upgrade-row input{width:100%;min-width:0;padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text)}
+.creative-upgrade-row button{min-height:38px;padding:8px}
+
 
 .creative-range-fields .setting-field{margin:0;min-width:0}
 .creative-range-fields input{width:100%;min-width:0}
 #creativeSaveRange{width:100%;min-height:44px}
-@media(max-width:390px){.creative-range-fields,.creative-state-grid,.creative-value-actions{grid-template-columns:1fr}}
+@media(max-width:390px){.creative-range-fields,.creative-state-grid,.creative-value-actions{grid-template-columns:1fr}.creative-upgrade-row{grid-template-columns:minmax(0,1fr) 72px 48px;gap:6px;padding:8px}}
 
 /* Player-facing HTML background music screen */
 .music-player-panel{display:flex;flex-direction:column;gap:16px}.music-now-playing{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,rgba(155,124,255,.16),rgba(98,232,255,.08))}.music-art{display:grid;place-items:center;flex:0 0 68px;width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-size:34px}.music-now-playing>div:last-child{display:grid;gap:6px;min-width:0}.music-now-playing strong{font-size:15px}.music-now-playing span{font-size:12px;line-height:1.5;color:var(--muted)}.music-toggle-row{margin:0}.music-player-panel .setting-field{margin:0}.music-player-panel input[type=range]{width:100%;accent-color:var(--accent)}
