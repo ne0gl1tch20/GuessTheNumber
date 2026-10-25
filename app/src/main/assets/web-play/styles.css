@@ -1231,7 +1231,7 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
  .jui-root .jui-muted,.jui-root .jui-field-label
 ) { color:var(--muted); }
 :root[data-theme-mode="Light"] :is(
- .screen h1,.screen h2,.screen h3,.screen strong,.screen .catalog-entry-copy>strong,
+ .screen h1,.screen h2,.screen h3,.screen .catalog-entry-copy>strong,
  .screen .quest-row-copy strong,.screen .milestone-copy strong,.jui-root,
  .jui-root .jui-card,.jui-root .jui-button,.jui-root .jui-icon-button
 ) { color:var(--text); }
