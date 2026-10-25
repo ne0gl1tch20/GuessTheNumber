@@ -330,10 +330,18 @@ class SaveManager private constructor(
         val prestige = if (state.prestige.value < BigDecimal.ZERO) BigNumber.ZERO else state.prestige
         val ultra = if (state.ultra.value < BigDecimal.ZERO) BigNumber.ZERO else state.ultra
         val nebula = if (state.nebula.value < BigDecimal.ZERO) BigNumber.ZERO else state.nebula
-        val min = 1L
         val betterRangeLevel = state.upgradeLevels["better_range"] ?: 0
         val difficultyMax = Difficulty.rangeMax(state.difficultyId, betterRangeLevel)
-        val max = state.currentRangeMax.coerceAtLeast(difficultyMax).coerceAtLeast(min)
+        val min = if (state.creativeModeEnabled) {
+            state.currentRangeMin.coerceIn(1L, CreativeModeSave.MAX_RANGE)
+        } else {
+            1L
+        }
+        val max = if (state.creativeModeEnabled) {
+            state.currentRangeMax.coerceIn(min, CreativeModeSave.MAX_RANGE)
+        } else {
+            state.currentRangeMax.coerceAtLeast(difficultyMax).coerceAtLeast(min)
+        }
         val target = state.targetNumber.coerceIn(min, max)
         val attempts = maxOf(0L, state.attempts)
         val correct = maxOf(0L, state.correctGuesses)
