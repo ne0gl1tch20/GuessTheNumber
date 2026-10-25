@@ -943,11 +943,28 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 current.copy(bestStreak = number)
             }
             else -> {
-                if (!key.startsWith("upgradeLevel:")) return false
-                val upgradeId = key.substringAfter("upgradeLevel:")
-                val definition = JsonConfigRepository(getApplication()).loadUpgrades().find { it.id == upgradeId } ?: return false
-                val level = value.toIntOrNull()?.takeIf { it in 0..definition.maxLevel } ?: return false
-                current.copy(upgradeLevels = current.upgradeLevels.toMutableMap().apply { put(upgradeId, level) })
+                val repository = JsonConfigRepository(getApplication())
+                when {
+                    key.startsWith("upgradeLevel:") -> {
+                        val id = key.substringAfter("upgradeLevel:")
+                        val definition = repository.loadUpgrades().find { it.id == id } ?: return false
+                        val level = value.toIntOrNull()?.takeIf { it in 0..definition.maxLevel } ?: return false
+                        current.copy(upgradeLevels = current.upgradeLevels.toMutableMap().apply { put(id, level) })
+                    }
+                    key.startsWith("prestigeUpgradeLevel:") -> {
+                        val id = key.substringAfter("prestigeUpgradeLevel:")
+                        val definition = repository.loadPrestigeUpgrades().find { it.id == id } ?: return false
+                        val level = value.toIntOrNull()?.takeIf { it in 0..definition.maxLevel } ?: return false
+                        current.copy(prestigeUpgradeLevels = current.prestigeUpgradeLevels.toMutableMap().apply { put(id, level) })
+                    }
+                    key.startsWith("ultraUpgradeLevel:") -> {
+                        val id = key.substringAfter("ultraUpgradeLevel:")
+                        val definition = repository.loadUltraUpgrades().find { it.id == id } ?: return false
+                        val level = value.toIntOrNull()?.takeIf { it in 0..definition.maxLevel } ?: return false
+                        current.copy(ultraUpgradeLevels = current.ultraUpgradeLevels.toMutableMap().apply { put(id, level) })
+                    }
+                    else -> return false
+                }
             }
         }
         _gameState.value = updated
