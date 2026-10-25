@@ -227,6 +227,11 @@ fun SaveSlotsScreen(
     if (showCreateDialog != null) {
         val slotNum = showCreateDialog!!
         var difficultyDraft by remember(slotNum) { mutableStateOf(difficultySelections[slotNum] ?: Difficulty.CLASSIC) }
+        var creativeModeDraft by remember(slotNum) { mutableStateOf(false) }
+        var creativeRangeMinDraft by remember(slotNum) { mutableStateOf("1") }
+        var creativeRangeMaxDraft by remember(slotNum) { mutableStateOf("100") }
+        var creativeHintsDraft by remember(slotNum) { mutableStateOf("0") }
+        var creativeAttemptLimitDraft by remember(slotNum) { mutableStateOf("0") }
         AlertDialog(
             onDismissRequest = { showCreateDialog = null },
             title = { Text(locale.getString("create_save_slot_format", "Create Save Slot %d", slotNum)) },
@@ -258,14 +263,86 @@ fun SaveSlotsScreen(
                             )
                         }
                     }
+                    Divider()
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text("Creative Mode", style = MaterialTheme.typography.titleSmall)
+                            Text("Permanent for this save. You can’t turn it off later.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Switch(checked = creativeModeDraft, onCheckedChange = { creativeModeDraft = it })
+                    }
+                    if (creativeModeDraft) {
+                        OutlinedTextField(
+                            value = creativeRangeMinDraft,
+                            onValueChange = { creativeRangeMinDraft = it.filter(Char::isDigit).take(7) },
+                            label = { Text("Number range minimum (1–1,000,000)") },
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = creativeRangeMaxDraft,
+                            onValueChange = { creativeRangeMaxDraft = it.filter(Char::isDigit).take(7) },
+                            label = { Text("Number range maximum (1–1,000,000)") },
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = creativeHintsDraft,
+                            onValueChange = { creativeHintsDraft = it.filter(Char::isDigit).take(2) },
+                            label = { Text("Extra hints (0–5)") },
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = creativeAttemptLimitDraft,
+                            onValueChange = { creativeAttemptLimitDraft = it.filter(Char::isDigit).take(3) },
+                            label = { Text("Attempt limit (0 = unlimited, 1–100)") },
+                            singleLine = true
+                        )
+                    }
                 }
             },
             confirmButton = {
                 Button(onClick = {
                     difficultySelections[slotNum] = difficultyDraft
+                    val rangeMin = creativeRangeMinDraft.toLongOrNull()
+                    val rangeMax = creativeRangeMaxDraft.toLongOrNull()
+                    val hints = creativeHintsDraft.toIntOrNull()
+                    val attemptLimit = creativeAttemptLimitDraft.toIntOrNull()
+                    if (creativeModeDraft && (
+                        rangeMin == null || rangeMax == null ||
+                        rangeMin !in 1L..CreativeModeSave.MAX_RANGE ||
+                        rangeMax !in rangeMin..CreativeModeSave.MAX_RANGE ||
+                        hints == null || hints !in 0..5 ||
+                        attemptLimit == null || attemptLimit !in 0..100
+                    )) {
+                        android.widget.Toast.makeText(context, "Check the Creative Mode values and try again.", android.widget.Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
                     viewModel.createSlot(slotNum, difficultyDraft, createNameDraft, createIconDraft) { success ->
-                        if (success) showCreateDialog = null
-                        refreshMetadata()
+                        if (!success) {
+                            android.widget.Toast.makeText(context, "Could not create this save slot.", android.widget.Toast.LENGTH_SHORT).show()
+                            refreshMetadata()
+                            return@createSlot
+                        }
+                        if (creativeModeDraft) {
+                            val effects = buildList {
+                                if ((hints ?: 0) > 0) add(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, hints!!))
+                                if ((attemptLimit ?: 0) > 0) add(CreativeModeEffect("attempt-cap", CreativeEffectType.ATTEMPT_LIMIT, attemptLimit!!))
+                            }
+                            val creativeSave = CreativeModeSave(
+                                name = createNameDraft.trim().ifBlank { "Creative Save $slotNum" }.take(40),
+                                enabled = true,
+                                rangeMin = rangeMin!!,
+                                rangeMax = rangeMax!!,
+                                effects = effects
+                            )
+                            viewModel.saveCreativeModeSave(slotNum, creativeSave) { saved ->
+                                if (saved) showCreateDialog = null
+                                else android.widget.Toast.makeText(context, "The save was created, but Creative Mode settings could not be saved. Reset the slot and try again.", android.widget.Toast.LENGTH_LONG).show()
+                                refreshMetadata()
+                            }
+                        } else {
+                            showCreateDialog = null
+                            refreshMetadata()
+                        }
                     }
                 }) { Text(locale.getStringByEnglish("Create")) }
             },
@@ -755,60 +832,6 @@ fun SaveSlotsScreen(
                     ) {
                         Text(locale.getString("save_import_button", "Import Encrypted Save"))
                     }
-                }
-            }
-
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(
-                        onClick = {
-                            viewModel.loadCreativeModeSave(activeSlot) { saved ->
-                                creativeName = saved?.name ?: "My Creative Mode"
-                                creativeEnabled = saved?.enabled ?: false
-                                creativeRangeMax = (saved?.rangeMax ?: 100L).toString()
-                                creativeRangeScale = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.RANGE_SCALE }?.value ?: 1).toString()
-                                creativeHints = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.EXTRA_HINTS }?.value ?: 0).toString()
-                                creativeAttemptLimit = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.ATTEMPT_LIMIT }?.value ?: 0).toString()
-                                showCreativeDialog = true
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) { Text("Creative Mode Save • Slot $activeSlot") }
-                    Button(
-                        onClick = {
-                            val selectedSlot = activeSlot
-                            creativeRunSlot = selectedSlot
-                            viewModel.loadCreativeModeSave(selectedSlot) { saved ->
-                                val rules = saved?.let(CreativeModeEffectPolicy::resolve)
-                                if (saved == null || !saved.enabled || rules == null) {
-                                    android.widget.Toast.makeText(context, "Enable and save a valid Creative Mode configuration first.", android.widget.Toast.LENGTH_SHORT).show()
-                                } else {
-                                    val run = CreativeModeRuntime.resume(saved) ?: run {
-                                        val target = Random.nextLong(rules.rangeMin, rules.rangeMax + 1L)
-                                        CreativeModeRuntime.start(saved, target)
-                                    }
-                                    if (run == null) {
-                                        android.widget.Toast.makeText(context, "Could not start this Creative Mode run.", android.widget.Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        val persisted = CreativeModeRuntime.persist(saved, run)
-                                        if (persisted == null) {
-                                            android.widget.Toast.makeText(context, "The Creative Mode run failed validation.", android.widget.Toast.LENGTH_SHORT).show()
-                                        } else {
-                                            creativeRunSave = persisted
-                                            creativeRun = run
-                                            creativeRunGuess = ""
-                                            creativeRunMessage = if (saved.activeRun != null) "Resumed your saved run." else "New run started. No normal-game rewards are granted."
-                                            viewModel.saveCreativeModeSave(activeSlot, persisted) { success ->
-                                                if (success) showCreativeRunDialog = true
-                                                else android.widget.Toast.makeText(context, "Could not save the Creative Mode run.", android.widget.Toast.LENGTH_SHORT).show()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) { Text("Play Creative Mode • Slot $activeSlot") }
                 }
             }
 
