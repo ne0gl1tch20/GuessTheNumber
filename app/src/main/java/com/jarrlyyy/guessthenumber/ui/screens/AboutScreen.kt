@@ -181,20 +181,20 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                 }
             }
             item {
-                Text("Find us online", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
-                Text("These links open in your browser.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(locale.getStringByEnglish("Find us online"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                Text(locale.getStringByEnglish("These links open in your browser."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
-                        "YouTube · @theg0ldne0_01" to "https://www.youtube.com/@theg0ldne0_01",
-                        "Instagram · theg0ldne0_01" to "https://www.instagram.com/theg0ldne0_01/",
-                        "NameMC · PearlSteve15" to "https://namemc.com/profile/PearlSteve15",
-                        "GitHub · ne0gl1tch20 (source code)" to "https://github.com/ne0gl1tch20",
-                        "Website" to "https://ne0gl1tch20.github.io/GuessTheNumber"
+                        locale.getStringByEnglish("YouTube · @theg0ldne0_01") to "https://www.youtube.com/@theg0ldne0_01",
+                        locale.getStringByEnglish("Instagram · theg0ldne0_01") to "https://www.instagram.com/theg0ldne0_01/",
+                        locale.getStringByEnglish("NameMC · PearlSteve15") to "https://namemc.com/profile/PearlSteve15",
+                        locale.getStringByEnglish("GitHub · ne0gl1tch20 (source code)") to "https://github.com/ne0gl1tch20",
+                        locale.getStringByEnglish("Website") to "https://ne0gl1tch20.github.io/GuessTheNumber"
                     ).forEach { (label, url) ->
                         OutlinedButton(
-                            onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) },
+                            onClick = {\n                                runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }\n                                    .onFailure { android.widget.Toast.makeText(context, locale.getStringByEnglish("Could not open this link."), android.widget.Toast.LENGTH_SHORT).show() }\n                            },
                             modifier = Modifier.fillMaxWidth()
                         ) { Text(label) }
                     }
