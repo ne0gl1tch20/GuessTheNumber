@@ -1,4 +1,22 @@
-# Guess The Number 3.1.0 — Unreleased
+# Changelog
+
+## Unreleased
+
+### Guess The Number 3.2.0 — Creative Mode Phase 8–10 hardening
+
+## Creative Mode, trait systems and reliability
+
+- 🎮 **Creative Mode gameplay (Phases 8–10):** added isolated guess sessions, range validation, too-low/too-high/correct outcomes, bounded hints, attempt limits, restart/close behavior and effect previews. Creative Mode stays separate from the normal economy, rewards and progression.
+- 💾 **Creative session recovery:** schema v3 snapshots persist per save slot, resume after decoding, clear safely and travel inside portable encrypted backups. Schema v1/v2 saves migrate forward without inventing a run.
+- 🛡️ **Stricter run validation:** completed snapshots must now contain a real completed attempt and correct guess; stale configurations and malformed snapshots are rejected.
+- 🌦️ **Trait and seasonal architecture:** centralized deterministic seasonal boundaries (including winter across year-end), retained signed catalog validation and offline fallback, and kept Creative Mode isolated from trait/reward authority.
+- 🧪 **Expanded tests:** combined effect composition, run limits, hints, snapshot migration/resume and malformed completed-run coverage.
+- 🔐 **Portable encrypted backups:** cross-device exports use a user passphrase and authenticated encryption. The app does not store the passphrase; losing it can make the backup unrecoverable.
+- 📚 **Project history:** docs/PR_CHANGELOG.md indexes PRs #1–#355, including closed-unmerged attempts for traceability. The index is a history ledger, not a claim that every attempt shipped.
+- 🔢 **App version:** bumped to **3.2.0** (versionCode **23**); the web-play asset compatibility gate is kept in sync.
+
+
+## Earlier development notes (3.1.0 and prior)
 
 - 🧪 **Creative Mode runtime foundation:** added an isolated guess-run model with range validation, attempt limits, bounded hints, run snapshots, resume/clear helpers and schema v1/v2 migration to v3. The Save Slots screen now launches/resumes the per-slot run, records guesses and hints, and persists snapshots. Android device-level interaction still needs verification.
 - 🌦️ **Seasonal trait calendar:** centralized deterministic season windows, including winter across year boundaries, and added boundary tests.

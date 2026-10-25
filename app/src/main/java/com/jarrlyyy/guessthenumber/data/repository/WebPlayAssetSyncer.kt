@@ -184,7 +184,7 @@ class WebPlayAssetSyncer(context: Context) {
     }
 
     companion object {
-        const val APP_VERSION_CODE = 22
+        const val APP_VERSION_CODE = 23
         private val PROCESS_MUTEX = Mutex()
         private const val MAX_DOWNLOAD_BYTES = 8 * 1024 * 1024
         private const val MANIFEST_URL = "https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/web-play-manifest.json"
