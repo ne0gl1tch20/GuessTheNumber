@@ -1,0 +1,234 @@
+# Changelog
+
+All notable project changes are recorded here. This file was missing from the repository root, so this first edition reconstructs the recent merged pull-request history from GitHub. The PR index below covers the 200 most recent closed pull requests available during this pass; entries explicitly marked as unmerged in GitHub were excluded from the merged-history index. Older PRs should be appended in a follow-up audit rather than guessed.
+
+## [3.1.0] - 2026-10-25
+
+### Creative Mode and gameplay
+- Connected the active save slot's Creative Mode profile to the production guess pipeline.
+- Applied validated Creative Mode range bounds to active gameplay and clamped generated targets back inside the configured range.
+- Enforced the configured per-target attempt limit before accepting another guess.
+- Added a safe accessor for the active profile's extra-hint allowance so UI/bridge layers can expose hints without giving scripts authority over saves or rewards.
+- Kept Kotlin authoritative for gameplay transitions and kept Creative Mode configuration isolated by save slot.
+
+### Saves and security
+- Added portable encrypted backup support through the `GTNPORT1:` envelope, using a passphrase-derived key, PBKDF2-HMAC-SHA256, AES-256-GCM, random salt and IV, and authenticated metadata.
+- Kept explicit import compatibility for supported legacy and device-bound backup formats; portable-envelope failures do not fall back to legacy parsing.
+- Added versioned Creative Mode save data, schema migration, bounded effect validation, per-slot storage, duplication/reset behavior, and backup-bundle compatibility.
+
+### Native gameplay and performance
+- Integrated the bounded C++20 optimizer into production next-target generation while keeping Kotlin responsible for validation, rewards, persistence and game state.
+- Added native-vs-Kotlin benchmark coverage and documented that microbenchmark results exclude JNI overhead.
+
+### Traits and seasonal architecture
+- Added a validated trait registry, deterministic activation, bounded gameplay effects, persistent discoveries/rewards, an expanded offline catalog and signed online trait catalogs.
+- Added a repeatable warmed JVM profile for the trait activation hot path.
+
+### Shared UI, website and reliability
+- Continued the shared HTML player UI migration across Android and Windows and expanded reusable Jarrlyy UI SDK components.
+- Improved localization, accessibility, custom fonts, SVG icon use, landing-page motion and player-facing UI consistency.
+- Fixed repeated popup clipping/collapse issues, arcade reward-claim bridge timing, updater version/artifact discovery and Android/Windows debug download paths.
+- Added offline-first web-play asset auto-sync and developer diagnostics.
+- Updated the application version to **3.1.0 (versionCode 22)**.
+
+## PR history index
+
+The entries below are ordered newest to oldest and preserve the merged PR titles as a navigable history. The PR itself contains the full implementation details and review/CI evidence.
+
+- [#351](https://github.com/ne0gl1tch20/GuessTheNumber/pull/351) Portable encrypted backups and Phase 7 Creative Mode saves
+- [#350](https://github.com/ne0gl1tch20/GuessTheNumber/pull/350) Phase 6: wire native optimizer into production gameplay
+- [#349](https://github.com/ne0gl1tch20/GuessTheNumber/pull/349) Phase 6: secure save transfer, compatibility tests, and native benchmark
+- [#344](https://github.com/ne0gl1tch20/GuessTheNumber/pull/344) Phase 6: native gameplay optimization and secure save transfer
+- [#343](https://github.com/ne0gl1tch20/GuessTheNumber/pull/343) Profile trait activation hot path
+- [#342](https://github.com/ne0gl1tch20/GuessTheNumber/pull/342) Add signed online trait catalogs for Phase 4
+- [#341](https://github.com/ne0gl1tch20/GuessTheNumber/pull/341) Expand offline trait catalog for Phase 3
+- [#340](https://github.com/ne0gl1tch20/GuessTheNumber/pull/340) Integrate trait rewards and persistent discoveries
+- [#339](https://github.com/ne0gl1tch20/GuessTheNumber/pull/339) feat: add deterministic trait activation engine
+- [#338](https://github.com/ne0gl1tch20/GuessTheNumber/pull/338) feat: add initial trait registry and schema
+- [#337](https://github.com/ne0gl1tch20/GuessTheNumber/pull/337) docs: plan traits and seasonal system architecture
+- [#336](https://github.com/ne0gl1tch20/GuessTheNumber/pull/336) Build unified Developer & Testing Playground
+- [#335](https://github.com/ne0gl1tch20/GuessTheNumber/pull/335) Restore offline earnings popup after save loading
+- [#334](https://github.com/ne0gl1tch20/GuessTheNumber/pull/334) Route Android arcade to native Compose popup
+- [#333](https://github.com/ne0gl1tch20/GuessTheNumber/pull/333) Add HTML version diagnostics to Dev Settings
+- [#332](https://github.com/ne0gl1tch20/GuessTheNumber/pull/332) Close arcade popup before attempting reward bridge send
+- [#331](https://github.com/ne0gl1tch20/GuessTheNumber/pull/331) Force-close arcade popup immediately after claiming reward
+- [#330](https://github.com/ne0gl1tch20/GuessTheNumber/pull/330) Remove temporary web-play auto-sync test card
+- [#329](https://github.com/ne0gl1tch20/GuessTheNumber/pull/329) Add visible web-play auto-sync test card
+- [#328](https://github.com/ne0gl1tch20/GuessTheNumber/pull/328) Add offline-first web-play asset auto-sync
+- [#327](https://github.com/ne0gl1tch20/GuessTheNumber/pull/327) Queue arcade reward claims while bridge is busy
+- [#326](https://github.com/ne0gl1tch20/GuessTheNumber/pull/326) Fix arcade claim button while bridge requests are pending
+- [#325](https://github.com/ne0gl1tch20/GuessTheNumber/pull/325) Close arcade popup immediately on claim tap
+- [#324](https://github.com/ne0gl1tch20/GuessTheNumber/pull/324) Close arcade popup after claiming reward
+- [#323](https://github.com/ne0gl1tch20/GuessTheNumber/pull/323) Fix Daily Rewards popup clipping on Android
+- [#322](https://github.com/ne0gl1tch20/GuessTheNumber/pull/322) Fix reset popup clipping and guard Nimmy layout
+- [#321](https://github.com/ne0gl1tch20/GuessTheNumber/pull/321) Fix Nimmy popup collapse in Android WebView
+- [#320](https://github.com/ne0gl1tch20/GuessTheNumber/pull/320) Move game dialogs into a dedicated popup layer
+- [#319](https://github.com/ne0gl1tch20/GuessTheNumber/pull/319) Let Stable Debug publish from any selected ref
+- [#318](https://github.com/ne0gl1tch20/GuessTheNumber/pull/318) Standardize popup sizing and prevent clipping
+- [#317](https://github.com/ne0gl1tch20/GuessTheNumber/pull/317) Fix Stable Debug updater version detection
+- [#316](https://github.com/ne0gl1tch20/GuessTheNumber/pull/316) Fix Nimmy and shared popup layout
+- [#315](https://github.com/ne0gl1tch20/GuessTheNumber/pull/315) Fix Android and Windows Debug updater downloads
+- [#314](https://github.com/ne0gl1tch20/GuessTheNumber/pull/314) Fix clipped web popups and Nimmy tutorial positioning
+- [#313](https://github.com/ne0gl1tch20/GuessTheNumber/pull/313) Fix Windows debug update artifact discovery
+- [#312](https://github.com/ne0gl1tch20/GuessTheNumber/pull/312) Fix stable debug updates to use Actions artifacts
+- [#311](https://github.com/ne0gl1tch20/GuessTheNumber/pull/311) Fix compact mobile navigation and Nimmy tutorial popup layout
+- [#310](https://github.com/ne0gl1tch20/GuessTheNumber/pull/310) Migrate GuessTheNumber UI to reusable Jarrlyy SDK components without redesign
+- [#309](https://github.com/ne0gl1tch20/GuessTheNumber/pull/309) feat: use Jarrlyy UI SDK across the website
+- [#308](https://github.com/ne0gl1tch20/GuessTheNumber/pull/308) feat(ui): add Jarrlyy Compose parity primitives
+- [#307](https://github.com/ne0gl1tch20/GuessTheNumber/pull/307) fix: keep Jarrlyy UI toggle switches compact
+- [#306](https://github.com/ne0gl1tch20/GuessTheNumber/pull/306) feat: expand Jarrlyy UI SDK motion, typography and components
+- [#305](https://github.com/ne0gl1tch20/GuessTheNumber/pull/305) feat: add motion, typography and credits to Jarrlyy UI SDK
+- [#304](https://github.com/ne0gl1tch20/GuessTheNumber/pull/304) feat: showcase Jarrlyy UI SDK from landing page
+- [#303](https://github.com/ne0gl1tch20/GuessTheNumber/pull/303) Add Jarrlyy UI SDK playground to the website
+- [#302](https://github.com/ne0gl1tch20/GuessTheNumber/pull/302) docs: credit Jarrlyy UI SDK in About licenses
+- [#301](https://github.com/ne0gl1tch20/GuessTheNumber/pull/301) feat: complete curated Jarrlyy UI kit pass
+- [#300](https://github.com/ne0gl1tch20/GuessTheNumber/pull/300) fix: finish Jarrlyy UI SDK audit
+- [#299](https://github.com/ne0gl1tch20/GuessTheNumber/pull/299) feat: use Jarrlyy UI SDK for player notifications
+- [#298](https://github.com/ne0gl1tch20/GuessTheNumber/pull/298) test: verify shared UI fonts are actually applied
+- [#297](https://github.com/ne0gl1tch20/GuessTheNumber/pull/297) fix: polish Jarrlyy UI SDK interactions and accessibility
+- [#296](https://github.com/ne0gl1tch20/GuessTheNumber/pull/296) feat: add Jarrlyy UI SDK and APK build metadata
+- [#295](https://github.com/ne0gl1tch20/GuessTheNumber/pull/295) ci: audit all frontend assets and publish audit reports
+- [#294](https://github.com/ne0gl1tch20/GuessTheNumber/pull/294) fix: confirm Android app exit and preserve localized back navigation
+- [#291](https://github.com/ne0gl1tch20/GuessTheNumber/pull/291) Guide HTML Reset Everything to Save Slots
+- [#290](https://github.com/ne0gl1tch20/GuessTheNumber/pull/290) Replace website Unicode icons with crisp local SVGs
+- [#289](https://github.com/ne0gl1tch20/GuessTheNumber/pull/289) Make showcase landing page interactive and animated
+- [#288](https://github.com/ne0gl1tch20/GuessTheNumber/pull/288) Refresh Guess The Number showcase website
+- [#287](https://github.com/ne0gl1tch20/GuessTheNumber/pull/287) Apply bundled custom fonts to HTML game UI
+- [#286](https://github.com/ne0gl1tch20/GuessTheNumber/pull/286) Polish HTML economy, rewards, Nimmy tours, profiles and reset safeguards
+- [#285](https://github.com/ne0gl1tch20/GuessTheNumber/pull/285) Make Android profile setup scrollable and less cramped
+- [#284](https://github.com/ne0gl1tch20/GuessTheNumber/pull/284) Make Stable Debug update checks resolve release tags safely
+- [#283](https://github.com/ne0gl1tch20/GuessTheNumber/pull/283) Fix stable debug APK workflow on profile branch
+- [#282](https://github.com/ne0gl1tch20/GuessTheNumber/pull/282) Allow stable debug APK builds from any branch
+- [#281](https://github.com/ne0gl1tch20/GuessTheNumber/pull/281) Add offline profiles and Nimmy first-run guide
+- [#280](https://github.com/ne0gl1tch20/GuessTheNumber/pull/280) Add Firebase Android SDK foundation
+- [#279](https://github.com/ne0gl1tch20/GuessTheNumber/pull/279) Prevent Stable Debug builds from publishing outdated launcher icons
+- [#278](https://github.com/ne0gl1tch20/GuessTheNumber/pull/278) Fix Stable Debug up-to-date detection
+- [#277](https://github.com/ne0gl1tch20/GuessTheNumber/pull/277) Handle Android update installation confirmation
+- [#274](https://github.com/ne0gl1tch20/GuessTheNumber/pull/274) Add update diagnostics and fix arcade popup sizing
+- [#273](https://github.com/ne0gl1tch20/GuessTheNumber/pull/273) Improve HTML progression, save-slot navigation and visual stats
+- [#272](https://github.com/ne0gl1tch20/GuessTheNumber/pull/272) Sync Web settings and fix navigation/fresh-save initialization
+- [#271](https://github.com/ne0gl1tch20/GuessTheNumber/pull/271) ci: separate Windows PR build tests from artifact packaging
+- [#270](https://github.com/ne0gl1tch20/GuessTheNumber/pull/270) fix: restore More menu and Arcade minigame loading
+- [#269](https://github.com/ne0gl1tch20/GuessTheNumber/pull/269) fix: restore Guess The Number UI and bridge diagnostics
+- [#268](https://github.com/ne0gl1tch20/GuessTheNumber/pull/268) Finish auxiliary UI localization and remove technical wording
+- [#266](https://github.com/ne0gl1tch20/GuessTheNumber/pull/266) Localize shared settings and accessibility controls
+- [#265](https://github.com/ne0gl1tch20/GuessTheNumber/pull/265) Localize remaining shared UI status messages
+- [#264](https://github.com/ne0gl1tch20/GuessTheNumber/pull/264) Finish shared Stats, Arcade and Lucky Stake screens
+- [#263](https://github.com/ne0gl1tch20/GuessTheNumber/pull/263) Route desktop player screens through shared HTML
+- [#262](https://github.com/ne0gl1tch20/GuessTheNumber/pull/262) Finish shared Talent and Mutator screens
+- [#261](https://github.com/ne0gl1tch20/GuessTheNumber/pull/261) Add shared Prestige and Ultra progression screens
+- [#260](https://github.com/ne0gl1tch20/GuessTheNumber/pull/260) Add shared saved settings and accessibility controls
+- [#259](https://github.com/ne0gl1tch20/GuessTheNumber/pull/259) Add shared Home Base, Relics and Codex screens
+- [#258](https://github.com/ne0gl1tch20/GuessTheNumber/pull/258) Embed the shared HTML UI in Windows for Play, Upgrades and Shop
+- [#257](https://github.com/ne0gl1tch20/GuessTheNumber/pull/257) Start shared HTML UI migration across Android and Windows
+- [#256](https://github.com/ne0gl1tch20/GuessTheNumber/pull/256) Migrate Upgrades and Shop to the shared HTML interface
+- [#255](https://github.com/ne0gl1tch20/GuessTheNumber/pull/255) Polish Numberverse branding and navigation icons
+- [#254](https://github.com/ne0gl1tch20/GuessTheNumber/pull/254) fix: wire the shared Numberverse HTML Play route
+- [#253](https://github.com/ne0gl1tch20/GuessTheNumber/pull/253) feat: brand the shared mobile UI as Numberverse
+- [#252](https://github.com/ne0gl1tch20/GuessTheNumber/pull/252) feat: make HTML the shared mobile player UI
+- [#251](https://github.com/ne0gl1tch20/GuessTheNumber/pull/251) feat: lock in shared HTML mobile UI migration
+- [#250](https://github.com/ne0gl1tch20/GuessTheNumber/pull/250) feat: lock Android into HTML-first player UI
+- [#249](https://github.com/ne0gl1tch20/GuessTheNumber/pull/249) feat: lock Numberverse shared HTML UI for Android and Windows
+- [#248](https://github.com/ne0gl1tch20/GuessTheNumber/pull/248) fix: restore GuessTheNumber shared Play branding
+- [#247](https://github.com/ne0gl1tch20/GuessTheNumber/pull/247) feat: brand shared game UI as Numberverse and lock full HTML migration
+- [#246](https://github.com/ne0gl1tch20/GuessTheNumber/pull/246) Polish shared Play branding and define full Android HTML UI target
+- [#245](https://github.com/ne0gl1tch20/GuessTheNumber/pull/245) feat: integrate shared web Play into one cohesive game interface
+- [#244](https://github.com/ne0gl1tch20/GuessTheNumber/pull/244) Polish shared web play pending and error states
+- [#243](https://github.com/ne0gl1tch20/GuessTheNumber/pull/243) feat: batch quick-guess controls and keyboard shortcuts into shared Play
+- [#242](https://github.com/ne0gl1tch20/GuessTheNumber/pull/242) feat: batch achievement milestones and journey stats into shared Play
+- [#241](https://github.com/ne0gl1tch20/GuessTheNumber/pull/241) feat: add game-style reward celebrations to shared Play
+- [#240](https://github.com/ne0gl1tch20/GuessTheNumber/pull/240) feat: add random-event showcase and Math Strategy Lab to shared Play
+- [#239](https://github.com/ne0gl1tch20/GuessTheNumber/pull/239) feat: connect world unlocks and boss battles to shared web Play
+- [#238](https://github.com/ne0gl1tch20/GuessTheNumber/pull/238) feat: add reversible shared web Play route and authoritative actions
+- [#236](https://github.com/ne0gl1tch20/GuessTheNumber/pull/236) feat: bring idle progression and boss HUD into shared web Play UI
+- [#234](https://github.com/ne0gl1tch20/GuessTheNumber/pull/234) feat: build responsive shared web idle-game Play surface
+- [#233](https://github.com/ne0gl1tch20/GuessTheNumber/pull/233) fix: require exact bundled prototype URL for bridge
+- [#232](https://github.com/ne0gl1tch20/GuessTheNumber/pull/232) fix: preserve exact Long guesses in shared web UI
+- [#231](https://github.com/ne0gl1tch20/GuessTheNumber/pull/231) fix: ignore stale shared web UI bridge replies
+- [#230](https://github.com/ne0gl1tch20/GuessTheNumber/pull/230) fix: prevent replayed shared web UI requests
+- [#228](https://github.com/ne0gl1tch20/GuessTheNumber/pull/228) feat: add isolated Android shared web UI prototype
+- [#227](https://github.com/ne0gl1tch20/GuessTheNumber/pull/227) docs: align Lua localization and parity plans with shared web UI
+- [#226](https://github.com/ne0gl1tch20/GuessTheNumber/pull/226) docs: lock shared HTML UI architecture direction
+- [#225](https://github.com/ne0gl1tch20/GuessTheNumber/pull/225) docs: fix malformed documentation index table
+- [#224](https://github.com/ne0gl1tch20/GuessTheNumber/pull/224) docs: propose shared HTML UI with Kotlin native hosts
+- [#223](https://github.com/ne0gl1tch20/GuessTheNumber/pull/223) docs: record Windows Arcade scroll fix verification
+- [#222](https://github.com/ne0gl1tch20/GuessTheNumber/pull/222) fix(windows): prevent nested Arcade scroll constraints
+- [#221](https://github.com/ne0gl1tch20/GuessTheNumber/pull/221) feat(windows): port Android Arcade minigames
+- [#220](https://github.com/ne0gl1tch20/GuessTheNumber/pull/220) feat(shared): implement permanent progression upgrade effects
+- [#219](https://github.com/ne0gl1tch20/GuessTheNumber/pull/219) fix(windows): match Android Auto Clicker speed
+- [#218](https://github.com/ne0gl1tch20/GuessTheNumber/pull/218) fix(windows): validate talents from canonical catalog
+- [#217](https://github.com/ne0gl1tch20/GuessTheNumber/pull/217) fix(windows): validate canonical talent transactions
+- [#216](https://github.com/ne0gl1tch20/GuessTheNumber/pull/216) docs: lock Windows KMP exact-port wish and parity contract
+- [#215](https://github.com/ne0gl1tch20/GuessTheNumber/pull/215) feat(windows): expand Android screen parity coverage
+- [#214](https://github.com/ne0gl1tch20/GuessTheNumber/pull/214) feat(windows): align theme and navigation motion with Android
+- [#213](https://github.com/ne0gl1tch20/GuessTheNumber/pull/213) feat(windows): restore Android visual parity foundations
+- [#212](https://github.com/ne0gl1tch20/GuessTheNumber/pull/212) feat(windows): match Android shop categories and cosmetics
+- [#211](https://github.com/ne0gl1tch20/GuessTheNumber/pull/211) feat(windows): match Android upgrades screen presentation
+- [#210](https://github.com/ne0gl1tch20/GuessTheNumber/pull/210) feat(windows): reuse shared guess feedback UI
+- [#209](https://github.com/ne0gl1tch20/GuessTheNumber/pull/209) feat(windows): reuse shared guess input on Play screen
+- [#208](https://github.com/ne0gl1tch20/GuessTheNumber/pull/208) docs(windows): make exact Android port the locked goal
+- [#207](https://github.com/ne0gl1tch20/GuessTheNumber/pull/207) feat(windows): align primary UI navigation with Android
+- [#205](https://github.com/ne0gl1tch20/GuessTheNumber/pull/205) feat(windows): wire permanent shop effects
+- [#204](https://github.com/ne0gl1tch20/GuessTheNumber/pull/204) feat(windows): close core economy parity gaps
+- [#203](https://github.com/ne0gl1tch20/GuessTheNumber/pull/203) docs(windows): record Stage 2-D parity evidence
+- [#202](https://github.com/ne0gl1tch20/GuessTheNumber/pull/202) feat(windows): complete shop boost and progression hooks
+- [#201](https://github.com/ne0gl1tch20/GuessTheNumber/pull/201) fix(windows): complete daily and treasure reward parity
+- [#200](https://github.com/ne0gl1tch20/GuessTheNumber/pull/200) fix(windows): submit guesses with Enter
+- [#199](https://github.com/ne0gl1tch20/GuessTheNumber/pull/199) feat(windows): connect production economy and progression actions
+- [#198](https://github.com/ne0gl1tch20/GuessTheNumber/pull/198) feat(windows): add first production economy and reset flows
+- [#197](https://github.com/ne0gl1tch20/GuessTheNumber/pull/197) test(windows): add Stage 2-D gameplay and save parity verification
+- [#196](https://github.com/ne0gl1tch20/GuessTheNumber/pull/196) feat(windows): implement Stage 2-C desktop persistence and recovery
+- [#195](https://github.com/ne0gl1tch20/GuessTheNumber/pull/195) feat(kmp): land Windows production gameplay and Android parity guardrails
+- [#194](https://github.com/ne0gl1tch20/GuessTheNumber/pull/194) feat(windows): connect Play to production guessing engine
+- [#193](https://github.com/ne0gl1tch20/GuessTheNumber/pull/193) refactor(kmp): share production state and exact decimal model
+- [#192](https://github.com/ne0gl1tch20/GuessTheNumber/pull/192) docs(plan): define Windows migration Stage 2
+- [#191](https://github.com/ne0gl1tch20/GuessTheNumber/pull/191) fix(windows): theme native chrome and wire app logo
+- [#190](https://github.com/ne0gl1tch20/GuessTheNumber/pull/190) fix(windows): resolve Enter input and shell background QA
+- [#189](https://github.com/ne0gl1tch20/GuessTheNumber/pull/189) fix(windows): resolve interactive shell QA regressions
+- [#188](https://github.com/ne0gl1tch20/GuessTheNumber/pull/188) feat(windows): batch desktop shell parity and accessibility
+- [#187](https://github.com/ne0gl1tch20/GuessTheNumber/pull/187) feat(windows): follow system light and dark theme
+- [#186](https://github.com/ne0gl1tch20/GuessTheNumber/pull/186) fix(windows): initialize shell focus for shortcuts
+- [#185](https://github.com/ne0gl1tch20/GuessTheNumber/pull/185) feat(windows): add shell keyboard shortcuts
+- [#184](https://github.com/ne0gl1tch20/GuessTheNumber/pull/184) fix(windows): set a usable minimum window size
+- [#183](https://github.com/ne0gl1tch20/GuessTheNumber/pull/183) docs(windows): complete Stage 1 parity inventory
+- [#182](https://github.com/ne0gl1tch20/GuessTheNumber/pull/182) feat(windows): add desktop navigation shell
+- [#181](https://github.com/ne0gl1tch20/GuessTheNumber/pull/181) docs: record Stage 1 Windows parity source audit
+- [#180](https://github.com/ne0gl1tch20/GuessTheNumber/pull/180) docs: lock Windows parity into five sequential stages
+- [#179](https://github.com/ne0gl1tch20/GuessTheNumber/pull/179) docs: split KMP foundation from Windows feature parity
+- [#178](https://github.com/ne0gl1tch20/GuessTheNumber/pull/178) docs(kmp): record shared feedback icon milestone
+- [#177](https://github.com/ne0gl1tch20/GuessTheNumber/pull/177) feat(kmp): share feedback icon semantics
+- [#176](https://github.com/ne0gl1tch20/GuessTheNumber/pull/176) docs(kmp): add production runtime parity checklist
+- [#175](https://github.com/ne0gl1tch20/GuessTheNumber/pull/175) refactor(kmp): use shared feedback status in production Play
+- [#174](https://github.com/ne0gl1tch20/GuessTheNumber/pull/174) ci: keep Windows debug builds out of GitHub Releases
+- [#173](https://github.com/ne0gl1tch20/GuessTheNumber/pull/173) website: add API-powered Android and Windows downloads
+- [#172](https://github.com/ne0gl1tch20/GuessTheNumber/pull/172) website: replace dev status with dedicated downloads page
+- [#171](https://github.com/ne0gl1tch20/GuessTheNumber/pull/171) docs(website): show current KMP migration progress
+- [#170](https://github.com/ne0gl1tch20/GuessTheNumber/pull/170) docs(kmp): record shared feedback card integration
+- [#169](https://github.com/ne0gl1tch20/GuessTheNumber/pull/169) feat(kmp): share production feedback card
+- [#168](https://github.com/ne0gl1tch20/GuessTheNumber/pull/168) docs(kmp): record production shared input integration
+- [#167](https://github.com/ne0gl1tch20/GuessTheNumber/pull/167) feat(kmp): use shared guess input in production Play
+- [#166](https://github.com/ne0gl1tch20/GuessTheNumber/pull/166) docs(kmp): record shared guess input migration
+- [#165](https://github.com/ne0gl1tch20/GuessTheNumber/pull/165) feat(kmp): extract shared controlled guess input
+- [#164](https://github.com/ne0gl1tch20/GuessTheNumber/pull/164) docs(kmp): record shared production feedback status
+- [#163](https://github.com/ne0gl1tch20/GuessTheNumber/pull/163) feat(kmp): drive production feedback styling from shared status
+- [#162](https://github.com/ne0gl1tch20/GuessTheNumber/pull/162) docs(kmp): record production presentation adapter
+- [#161](https://github.com/ne0gl1tch20/GuessTheNumber/pull/161) feat(kmp): adapt Android production state to shared presentation
+- [#160](https://github.com/ne0gl1tch20/GuessTheNumber/pull/160) docs(kmp): record controlled shared UI milestone
+- [#159](https://github.com/ne0gl1tch20/GuessTheNumber/pull/159) feat(kmp): add controlled shared guessing content
+- [#158](https://github.com/ne0gl1tch20/GuessTheNumber/pull/158) feat(kmp): define shared navigation and action contracts
+- [#157](https://github.com/ne0gl1tch20/GuessTheNumber/pull/157) refactor(kmp): return complete shared guess transition state
+- [#156](https://github.com/ne0gl1tch20/GuessTheNumber/pull/156) test(save): cover DataStore write failures
+- [#155](https://github.com/ne0gl1tch20/GuessTheNumber/pull/155) docs(save): design write-failure test seam
+- [#154](https://github.com/ne0gl1tch20/GuessTheNumber/pull/154) test(save): cover settings and slot metadata round trips
+- [#153](https://github.com/ne0gl1tch20/GuessTheNumber/pull/153) docs(save): audit schema and migration behavior
+- [#152](https://github.com/ne0gl1tch20/GuessTheNumber/pull/152) test(save): preserve legacy save data across round trips
+- [#151](https://github.com/ne0gl1tch20/GuessTheNumber/pull/151) docs: refresh README and project documentation
+- [#150](https://github.com/ne0gl1tch20/GuessTheNumber/pull/150) test(save): preserve recovery backup on atomic update rejection
+- [#149](https://github.com/ne0gl1tch20/GuessTheNumber/pull/149) test(save): prevent duplicate challenge rewards after reload
+- [#148](https://github.com/ne0gl1tch20/GuessTheNumber/pull/148) docs(kmp): audit challenge claim persistence atomicity
+
+## Changelog maintenance
+- Add a dated version section for every release or meaningful batch of merged changes.
+- Link each related PR instead of relying on commit subjects alone.
+- Record migration, compatibility, security, and behavior changes alongside user-visible features.
+- Keep unmerged, closed PRs out of the shipped-change list unless clearly labelled as abandoned or superseded.
