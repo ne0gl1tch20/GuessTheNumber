@@ -347,10 +347,10 @@ This ledger indexes pull requests numbered #1–#355 returned for this repositor
 - [#342 — Add signed online trait catalogs for Phase 4](https://github.com/ne0gl1tch20/GuessTheNumber/pull/342) — Merged 2026-10-24.
 - [#343 — Profile trait activation hot path](https://github.com/ne0gl1tch20/GuessTheNumber/pull/343) — Merged 2026-10-24.
 - [#344 — Phase 6: native gameplay optimization and secure save transfer](https://github.com/ne0gl1tch20/GuessTheNumber/pull/344) — Merged 2026-10-24.
-- [#345 — Phase 6: benchmark native adaptive target against Kotlin](https://github.com/ne0gl1tch20/GuessTheNumber/pull/345) — Open.
-- [#346 — Phase 6: final native-vs-Kotlin performance benchmark](https://github.com/ne0gl1tch20/GuessTheNumber/pull/346) — Open.
-- [#347 — Phase 6: verify native vs Kotlin benchmark in CI](https://github.com/ne0gl1tch20/GuessTheNumber/pull/347) — Open.
-- [#348 — Phase 6: final CI benchmark verification](https://github.com/ne0gl1tch20/GuessTheNumber/pull/348) — Open.
+- [#345 — Phase 6: benchmark native adaptive target against Kotlin](https://github.com/ne0gl1tch20/GuessTheNumber/pull/345) — Closed without merge 2026-10-25 (superseded by merged PR #349).
+- [#346 — Phase 6: final native-vs-Kotlin performance benchmark](https://github.com/ne0gl1tch20/GuessTheNumber/pull/346) — Closed without merge 2026-10-25 (superseded by merged PR #349).
+- [#347 — Phase 6: verify native vs Kotlin benchmark in CI](https://github.com/ne0gl1tch20/GuessTheNumber/pull/347) — Closed without merge 2026-10-25 (superseded by merged PR #349).
+- [#348 — Phase 6: final CI benchmark verification](https://github.com/ne0gl1tch20/GuessTheNumber/pull/348) — Closed without merge 2026-10-25 (superseded by merged PR #349).
 - [#349 — Phase 6: secure save transfer, compatibility tests, and native benchmark](https://github.com/ne0gl1tch20/GuessTheNumber/pull/349) — Merged 2026-10-25.
 - [#350 — Phase 6: wire native optimizer into production gameplay](https://github.com/ne0gl1tch20/GuessTheNumber/pull/350) — Merged 2026-10-25.
 - [#351 — Portable encrypted backups and Phase 7 Creative Mode saves](https://github.com/ne0gl1tch20/GuessTheNumber/pull/351) — Merged 2026-10-25.
