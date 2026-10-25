@@ -42,16 +42,16 @@ Acceptance criteria:
 
 Latest CI profile (OpenJDK 21, 320 traits, 1,000 warmups, 21 samples × 200 evaluations): median 32,297 ns/evaluation, p95 40,661 ns/evaluation, median throughput 30,962 evaluations/second. Results are diagnostic, not a machine-speed pass/fail threshold. The report is uploaded by the `Trait Runtime Profiling` workflow.
 
-## Phase 6 — Native C++ engine and save-security work: in progress
+## Phase 6 — Native C++ engine and save-security work: complete
 
 Phase 6 is deliberately narrow: use native code for personalized compute work, while keeping Kotlin authoritative. Do not port the whole game engine just because C++ exists.
 
 ### Native gameplay
 
 - Android now builds a C++20 shared library through CMake/NDK and exposes one narrow JNI function.
-- `NativeGameplayOptimizer` accepts only bounded range, difficulty ID, streak, attempts and a caller-provided seed. It returns a clamped candidate target and has a Kotlin fallback for JVM/desktop or native-load failures.
-- The native algorithm uses the **difficulty stored in the active save state** as an input. It never reads or mutates save files itself, so difficulty remains per-slot rather than global.
-- A repeatable native-vs-Kotlin core benchmark now runs in GitHub Actions and uploads its report. It checks deterministic checksum parity and reports median/p95 latency plus derived throughput. The microbenchmark excludes Android JNI-call overhead, so it does not claim whole-game speedup.
+- `NativeGameplayOptimizer` is wired into production `GameEngine.processGuess()` for next-target generation after a correct guess. It accepts only bounded range, difficulty ID, streak, attempts and a seeded random input, returns a clamped candidate target, and falls back to Kotlin when native loading or invocation fails.
+- The native algorithm receives the **difficulty stored in the active save state** plus that save's streak and attempts. It never reads or mutates save files, rewards or game state; Kotlin validates the transition and remains authoritative.
+- A repeatable native-vs-Kotlin core benchmark runs in GitHub Actions and uploads its report. For 128 deterministic cases, 2,000 warmups and 21 × 5,000 iterations, Kotlin median/p95 were 20.671/35.392 ns with 48.38M evaluations/s; native median/p95 were 5.999/6.306 ns with 166.68M evaluations/s. Checksum parity passed and both outputs stayed bounded. The microbenchmark excludes Android JNI-call overhead, so it does not claim whole-game speedup.
 
 ### Save transfer security
 
@@ -64,11 +64,12 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 
 ### Phase 6 acceptance
 
-- Android native build and gameplay/security tests pass.
+- Android native build, production-engine integration tests and secure-transfer tests pass in GitHub Actions.
 - No save state or reward authority moves into C++.
-- Native output stays within supplied bounds and deterministic inputs are reproducible.
-- Secure envelope tampering is rejected and legacy imports continue to work.
-- A measured native-vs-Kotlin comparison determines whether the native gameplay path remains enabled as a performance optimization.
+- Native output stays within supplied bounds and deterministic benchmark inputs produce matching checksums.
+- Secure envelope ciphertext/tag tampering and malformed envelopes are rejected without a legacy downgrade; legacy import compatibility is covered by tests.
+- The measured native-vs-Kotlin core comparison supports keeping the native path enabled, with JNI overhead explicitly excluded from the performance claim.
+- Android validation/tests, Windows build/tests, HTML/CSS/JS checks, native/security validation and the native-vs-Kotlin benchmark all passed on the final save-transfer integration commit.
 
 ## Phase 7 — Creative mode save data and effects: planned after Phase 6
 
