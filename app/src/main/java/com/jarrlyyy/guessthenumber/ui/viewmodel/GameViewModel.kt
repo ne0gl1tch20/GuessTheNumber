@@ -1825,7 +1825,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_ASYNC_BEGIN", "Persisting game state for slot=$slot.")
                 if (saveManager.saveGame(state, slot)) {
                     GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_ASYNC_OK", "Game state persisted for slot=$slot.")
-                    WidgetRefresh.request(getApplication<Application>())
                 } else {
                     GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "SAVE_ASYNC_FAILED", "Could not persist the latest game state for slot $slot.")
                 }
@@ -1842,9 +1841,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     val slot = _activeSlot.value
                     if (saveManager.getSlotMetadata(slot).isEmpty) return@withLock
                     val state = _gameState.value.copy(lastSaveTimestamp = System.currentTimeMillis())
-                    if (saveManager.saveGame(state, slot)) {
-                        WidgetRefresh.request(getApplication<Application>())
-                    } else {
+                    if (!saveManager.saveGame(state, slot)) {
                         GameLogger.log(LogLevel.ERROR, LoggerCategory.SAVE, "AUTOSAVE_FAILED", "Could not persist the latest game state for slot $slot.")
                     }
                 }
