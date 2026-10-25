@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "c2d860e3344b1782f4b1a268d39e62294a12aa58",
+  "version": "a47f3690e94acf51b9c022214201a93433f29ec0",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -29,7 +29,7 @@
     },
     {
       "path": "web-play/styles.css",
-      "sha256": "9750c1dd621e1c50553926d28cc96ecda4fc0b75763ed3142da1b2e876e2c9a5"
+      "sha256": "dd0a961e185dab8e20419c45ec9f456889b331a69032ccd19568c121f62719b7"
     },
     {
       "path": "web-play/trait-extension-host.js",
@@ -157,7 +157,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/README.md",
-      "sha256": "8ea74a1e209b36a524ab23ff18c3747d5220071134a017cec2aa365a6f92b337"
+      "sha256": "4d9231957dfb39aca2927ca7727f4eaaa2d4a16c4b12ac8d10d0eb419238959c"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/demo.js",
@@ -173,11 +173,11 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui.js",
-      "sha256": "1067286f59356b1bf9952889b2bdc71ce28f40c48cd4082a7e492f3578982ea5"
+      "sha256": "b3a4db08a9a540b9e0527f40058f73ec3551cf80eb705b0a563a6571a1036b2e"
     },
     {
       "path": "libraries/jarrlyyuisdk/demo.html",
-      "sha256": "b4398f6ec923f31333b2d182707c36c115fd7c485d636b72a8fee575671b9ad8"
+      "sha256": "c1a95a54f85ba5e2282227ead8386c46aee82f599ed2cd5b7ccf6f627966eb5a"
     },
     {
       "path": "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg",
@@ -189,15 +189,15 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/styles/demo.css",
-      "sha256": "9371818eb41da2abb36e6cbcf7ddd3e1fc5ff1fd79127f66a2d135759e305eba"
+      "sha256": "6e3323dc16d6527c44c76b72343d5f1d93d567080841183529fd45cc46ab7d89"
     },
     {
       "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui-advanced.css",
-      "sha256": "bd2bc6ce1d77292f380558e505404529c6ce71aa23d4fbed109e8d76ebd70235"
+      "sha256": "7c42db4e68a22312a50488d5c5a8d3519ad5be1e66f3e1b4151a5f8b54b966b9"
     },
     {
       "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css",
-      "sha256": "e23d1c68ff85a76d46f7452d553a0e1ff0ed50c137b8dc4bdd15bde2445709c6"
+      "sha256": "7323e00f31042fe27c78d11bcdad486449c8f7ca5c5d17a63ac857d8bab0b52c"
     }
   ]
 }
