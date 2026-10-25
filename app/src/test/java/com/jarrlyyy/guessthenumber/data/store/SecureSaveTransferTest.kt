@@ -2,7 +2,7 @@ package com.jarrlyyy.guessthenumber.data.store
 
 import android.content.Context
 import android.util.Base64
-import androidx.test.core.app.ApplicationProvider
+import org.robolectric.RuntimeEnvironment
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -66,11 +66,14 @@ class SecureSaveTransferTest {
 
     @Test
     fun legacySaveExportRemainsImportableThroughCompatibilityEntryPoint() = runBlocking {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+        val context: Context = RuntimeEnvironment.getApplication()
         val saveManager = SaveManager(context)
         val legacyExport = saveManager.exportSave()
 
         assertFalse(SecureSaveTransfer.isSecureFormat(legacyExport))
         assertTrue(saveManager.importSecureOrLegacySave(legacyExport))
+
+        val tamperedSecureEnvelope = "GTNSEC2:not-base64!!!"
+        assertFalse(saveManager.importSecureOrLegacySave(tamperedSecureEnvelope))
     }
 }
