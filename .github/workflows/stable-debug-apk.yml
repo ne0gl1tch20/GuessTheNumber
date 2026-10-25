@@ -100,24 +100,28 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 7
           name: GuessTheNumber-debug-${{ github.run_number }}
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
       - name: Upload installable debug archive
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 7
           name: GuessTheNumber-debug.zip
           path: GuessTheNumber-debug.zip
           if-no-files-found: error
       - name: Upload frontend audit report
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 7
           name: GuessTheNumber-Web-Frontend-Audit-${{ github.run_number }}
           path: build/reports/web-frontend-audit.txt
           if-no-files-found: error
       - name: Upload stable update artifact
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 7
           name: GuessTheNumber-debug
           path: |
             ${{ runner.temp }}/gtn-debug/GuessTheNumber-debug.apk
