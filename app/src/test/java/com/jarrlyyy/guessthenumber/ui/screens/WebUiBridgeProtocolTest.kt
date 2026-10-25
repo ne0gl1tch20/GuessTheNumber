@@ -69,6 +69,27 @@ class WebUiBridgeProtocolTest {
     }
 
     @Test
+    fun validatesCreativeModeValueEdits() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid(
+                "creative-value-1",
+                "creative_update_value",
+                settingKey = "money",
+                settingValue = "12.5K"
+            ),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-value-1","type":"creative_update_value","key":"money","value":"12.5K"}""")
+        )
+        assertEquals(
+            "invalid_creative_value",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-value-2","type":"creative_update_value","key":"money","value":"-999"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+        assertEquals(
+            "invalid_creative_value",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-value-3","type":"creative_update_value","key":"grantRewards","value":"true"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+    }
+
+    @Test
     fun validatesCreativeModeRangeUpdates() {
         assertEquals(
             WebUiBridgeProtocol.ParseResult.Valid(
