@@ -133,6 +133,16 @@
       </div>
       <div class="sparkle-field" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
+<section class="creative-tools card" id="creativeToolsPanel" aria-labelledby="creativeToolsHeading" hidden>
+  <div class="panel-title"><span class="panel-glyph" aria-hidden="true">✦</span><div><span class="eyebrow">CREATIVE SAVE</span><h2 id="creativeToolsHeading">Creative Tools</h2></div></div>
+  <p class="catalog-intro">Changes are validated and saved by the Android game. Updating the range starts a fresh guessing round.</p>
+  <div class="creative-range-fields">
+    <label class="setting-field"><span>Range minimum</span><input id="creativeRangeMin" type="number" min="1" max="1000000" inputmode="numeric" value="1"></label>
+    <label class="setting-field"><span>Range maximum</span><input id="creativeRangeMax" type="number" min="1" max="1000000" inputmode="numeric" value="100"></label>
+  </div>
+  <button type="button" class="jui-button jui-button-primary jui-button-block" id="creativeSaveRange">Apply range</button>
+  <p id="creativeToolsStatus" class="catalog-intro" role="status" aria-live="polite"></p>
+</section>
 <section class="guess-card card">
       <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
       <form id="guessForm" autocomplete="off">
