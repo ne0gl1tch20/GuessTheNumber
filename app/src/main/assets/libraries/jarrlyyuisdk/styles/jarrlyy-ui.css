@@ -361,3 +361,28 @@
   .jui-root *, .jui-advanced-root * { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .jui-motion-enabled .jui-motion-reveal, .jui-motion-enabled [data-jui-reveal] { opacity: 1; transform: none; }
 }
+
+
+/* Host theme bridge: the game sets data-jui-theme on <html>. */
+:root[data-jui-theme="light"] {
+  color-scheme: light;
+  --jui-bg:#f3f5fb; --jui-surface:#fff; --jui-raised:#e8edf8;
+  --jui-border:rgba(31,42,70,.16); --jui-text:#172038; --jui-muted:#56617c;
+  --jui-purple:#7050d8; --jui-cyan:#087b9a; --jui-danger:#b72e55;
+  --jui-success:#087b49; --jui-focus:0 0 0 3px rgba(65,89,190,.28);
+}
+:root[data-jui-theme="light"] .jui-root,
+:root[data-jui-theme="light"] .jui-advanced-root { color-scheme:light; color:var(--jui-text); }
+:root[data-jui-theme="light"] .jui-card,
+:root[data-jui-theme="light"] .jui-dialog,
+:root[data-jui-theme="light"] .jui-bottom-sheet,
+:root[data-jui-theme="light"] .jui-drawer { background-color:var(--jui-surface); border-color:var(--jui-border); color:var(--jui-text); }
+:root[data-jui-theme="light"] .jui-field { background:#fff; color:var(--jui-text); border-color:var(--jui-border); }
+:root[data-jui-theme="light"] .jui-field::placeholder { color:#66718a; }
+:root[data-jui-theme="light"] .jui-button,
+:root[data-jui-theme="light"] .jui-icon-button { background-color:var(--jui-raised); color:var(--jui-text); }
+:root[data-jui-theme="light"] .jui-button-primary { background:linear-gradient(115deg,#8064e8,#5574db); color:#fff; }
+:root[data-jui-theme="light"] .jui-button-accent { color:#086b83; }
+:root[data-jui-theme="light"] .jui-badge-purple { color:#6243bd; }
+:root[data-jui-theme="light"] .jui-badge-cyan { color:#086b83; }
+:root[data-jui-theme="light"] .jui-badge-success { color:#087b49; }
