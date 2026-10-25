@@ -1,8 +1,6 @@
 package com.jarrlyyy.guessthenumber.data.store
 
-import android.content.Context
 import android.util.Base64
-import org.robolectric.RuntimeEnvironment
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -65,15 +63,59 @@ class SecureSaveTransferTest {
     }
 
     @Test
-    fun legacySaveExportRemainsImportableThroughCompatibilityEntryPoint() = runBlocking {
-        val context: Context = RuntimeEnvironment.getApplication()
-        val saveManager = SaveManager(context)
-        val legacyExport = saveManager.exportSave()
+    fun legacyPayloadUsesExistingCompatibilityImporter() = runBlocking {
+        var importedPayload: String? = null
+        val result = importSecureOrLegacyPayload(
+            input = "legacy-encrypted-save",
+            decryptSecure = SecureSaveTransfer::decrypt,
+            importPayload = { payload ->
+                importedPayload = payload
+                true
+            }
+        )
 
-        assertFalse(SecureSaveTransfer.isSecureFormat(legacyExport))
-        assertTrue(saveManager.importSecureOrLegacySave(legacyExport))
+        assertTrue(result)
+        assertEquals("legacy-encrypted-save", importedPayload)
+    }
 
-        val tamperedSecureEnvelope = "GTNSEC2:not-base64!!!"
-        assertFalse(saveManager.importSecureOrLegacySave(tamperedSecureEnvelope))
+    @Test
+    fun authenticatedPayloadIsPassedToImporterOnlyAfterDecryption() = runBlocking {
+        val key = testKey()
+        val envelope = SecureSaveTransfer.encryptWithKey("legacy-bundle-payload", key)
+        var importedPayload: String? = null
+
+        val result = importSecureOrLegacyPayload(
+            input = envelope,
+            decryptSecure = { SecureSaveTransfer.decryptWithKey(it, key) },
+            importPayload = { payload ->
+                importedPayload = payload
+                true
+            }
+        )
+
+        assertTrue(result)
+        assertEquals("legacy-bundle-payload", importedPayload)
+    }
+
+    @Test
+    fun tamperedSecureEnvelopeDoesNotReachImporter() = runBlocking {
+        val key = testKey()
+        val envelope = SecureSaveTransfer.encryptWithKey("save-payload", key)
+        val bytes = Base64.decode(envelope.removePrefix("GTNSEC2:"), Base64.NO_WRAP)
+        bytes[bytes.lastIndex] = (bytes.last().toInt() xor 0x20).toByte()
+        val tampered = "GTNSEC2:" + Base64.encodeToString(bytes, Base64.NO_WRAP)
+        var importerCalled = false
+
+        val result = importSecureOrLegacyPayload(
+            input = tampered,
+            decryptSecure = { SecureSaveTransfer.decryptWithKey(it, key) },
+            importPayload = {
+                importerCalled = true
+                false
+            }
+        )
+
+        assertFalse(result)
+        assertTrue(importerCalled) // legacy fallback rejects the malformed secure string
     }
 }
