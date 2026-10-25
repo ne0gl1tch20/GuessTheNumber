@@ -465,17 +465,42 @@ class WebUiBridgeProtocolTest {
 
     @Test
     fun validatesMenuStudioLayoutSchemaAndRejectsMalformedLayouts() {
-        val valid = """{"version":1,"id":"menu-save-1","type":"update_setting","key":"webMenuStudioLayout","value":"{\"areas\":{\"arcade\":\"nav\"},\"orders\":{\"nav\":[\"worlds\",\"arcade\"],\"more\":[]},\"colors\":{\"arcade\":\"#7C4DFF\"}}"}"""
-        assertTrue(WebUiBridgeProtocol.parse(valid) is WebUiBridgeProtocol.ParseResult.Valid)
+        fun request(layout: String): String = org.json.JSONObject()
+            .put("version", 1)
+            .put("id", "menu-save-1")
+            .put("type", "update_setting")
+            .put("key", "webMenuStudioLayout")
+            .put("value", layout)
+            .toString()
 
-        val unknownField = """{"version":1,"id":"menu-save-2","type":"update_setting","key":"webMenuStudioLayout","value":"{\"areas\":{},\"orders\":{\"nav\":[],\"more\":[]},\"debug\":true}"}"""
-        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(unknownField) as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        val validLayout = org.json.JSONObject()
+            .put("areas", org.json.JSONObject().put("arcade", "nav"))
+            .put("orders", org.json.JSONObject()
+                .put("nav", org.json.JSONArray(listOf("worlds", "arcade")))
+                .put("more", org.json.JSONArray()))
+            .put("colors", org.json.JSONObject().put("arcade", "#7C4DFF"))
+            .toString()
+        assertTrue(WebUiBridgeProtocol.parse(request(validLayout)) is WebUiBridgeProtocol.ParseResult.Valid)
 
-        val invalidArea = """{"version":1,"id":"menu-save-3","type":"update_setting","key":"webMenuStudioLayout","value":"{\"areas\":{\"arcade\":\"admin\"},\"orders\":{\"nav\":[],\"more\":[]}}"}"""
-        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(invalidArea) as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        val unknownField = org.json.JSONObject()
+            .put("areas", org.json.JSONObject())
+            .put("orders", org.json.JSONObject().put("nav", org.json.JSONArray()).put("more", org.json.JSONArray()))
+            .put("debug", true)
+            .toString()
+        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(request(unknownField)) as WebUiBridgeProtocol.ParseResult.Invalid).error)
 
-        val invalidColor = """{"version":1,"id":"menu-save-4","type":"update_setting","key":"webMenuStudioLayout","value":"{\"areas\":{},\"orders\":{\"nav\":[],\"more\":[]},\"colors\":{\"arcade\":\"javascript:alert(1)\"}}"}"""
-        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(invalidColor) as WebUiBridgeProtocol.ParseResult.Invalid).error)
+        val invalidArea = org.json.JSONObject()
+            .put("areas", org.json.JSONObject().put("arcade", "admin"))
+            .put("orders", org.json.JSONObject().put("nav", org.json.JSONArray()).put("more", org.json.JSONArray()))
+            .toString()
+        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(request(invalidArea)) as WebUiBridgeProtocol.ParseResult.Invalid).error)
+
+        val invalidColor = org.json.JSONObject()
+            .put("areas", org.json.JSONObject())
+            .put("orders", org.json.JSONObject().put("nav", org.json.JSONArray()).put("more", org.json.JSONArray()))
+            .put("colors", org.json.JSONObject().put("arcade", "javascript:alert(1)"))
+            .toString()
+        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(request(invalidColor)) as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
 }
