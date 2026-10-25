@@ -356,8 +356,8 @@ This ledger indexes pull requests numbered #1–#355 returned for this repositor
 - [#351 — Portable encrypted backups and Phase 7 Creative Mode saves](https://github.com/ne0gl1tch20/GuessTheNumber/pull/351) — Merged 2026-10-25.
 - [#352 — Creative Mode gameplay, snapshots, seasonal policy, and v3.1.0 release docs](https://github.com/ne0gl1tch20/GuessTheNumber/pull/352) — Merged 2026-10-25.
 - [#353 — Phase 8 Creative Mode runtime, version 3.1.0 and full PR changelog](https://github.com/ne0gl1tch20/GuessTheNumber/pull/353) — Closed without merge 2026-10-25.
-- [#354 — Add root v3.1.0 changelog and link the full PR ledger](https://github.com/ne0gl1tch20/GuessTheNumber/pull/354) — Open.
-- [#355 — Harden Creative Mode Phase 10, bump to v3.2.0, and refresh changelog](https://github.com/ne0gl1tch20/GuessTheNumber/pull/355) — Open.
+- [#354 — Add root v3.1.0 changelog and link the full PR ledger](https://github.com/ne0gl1tch20/GuessTheNumber/pull/354) — Closed without merge 2026-10-25.
+- [#355 — Harden Creative Mode Phase 10, bump to v3.2.0, and refresh changelog](https://github.com/ne0gl1tch20/GuessTheNumber/pull/355) — Merged 2026-10-25.
 
 ## Major workstreams
 
