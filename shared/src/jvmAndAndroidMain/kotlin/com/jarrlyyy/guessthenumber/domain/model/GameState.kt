@@ -8,6 +8,8 @@ data class GameState(
     val difficultyId: String = "classic",
     val profileName: String = "",
     val profileIconId: String = SaveProfileRules.DEFAULT_ICON,
+    /** Permanently marks this save as Creative Mode; old saves default to normal mode. */
+    val creativeModeEnabled: Boolean = false,
     val money: BigNumber = BigNumber.ZERO,
     val prestige: BigNumber = BigNumber.ZERO,
     val ultra: BigNumber = BigNumber.ZERO,
