@@ -912,6 +912,44 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         return true
     }
 
+    fun updateCreativeValue(key: String, value: String): Boolean {
+        val current = _gameState.value
+        if (!current.creativeModeEnabled || value.length !in 1..100) return false
+        val updated = when (key) {
+            "money", "prestige", "ultra", "nebula" -> {
+                if (!Regex("[0-9]+(?:\\.[0-9]+)?(?:[A-Za-z]{1,4})?").matches(value)) return false
+                val amount = runCatching { BigNumber(value) }.getOrNull() ?: return false
+                when (key) {
+                    "money" -> current.copy(money = amount)
+                    "prestige" -> current.copy(prestige = amount)
+                    "ultra" -> current.copy(ultra = amount)
+                    else -> current.copy(nebula = amount)
+                }
+            }
+            "attempts" -> {
+                val number = value.toLongOrNull()?.takeIf { it in current.correctGuesses..1_000_000_000_000L } ?: return false
+                current.copy(attempts = number)
+            }
+            "correctGuesses" -> {
+                val number = value.toLongOrNull()?.takeIf { it in 0L..current.attempts } ?: return false
+                current.copy(correctGuesses = number)
+            }
+            "streak" -> {
+                val number = value.toIntOrNull()?.takeIf { it in 0..1_000_000 } ?: return false
+                current.copy(streak = number, bestStreak = maxOf(current.bestStreak, number))
+            }
+            "bestStreak" -> {
+                val number = value.toIntOrNull()?.takeIf { it in current.streak..1_000_000 } ?: return false
+                current.copy(bestStreak = number)
+            }
+            else -> return false
+        }
+        _gameState.value = updated
+        saveGameAsync()
+        WidgetRefresh.request(getApplication<Application>())
+        return true
+    }
+
     fun loadCreativeModeSave(slot: Int, onLoaded: (CreativeModeSave?) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val save = saveManager.loadCreativeModeSave(slot)
