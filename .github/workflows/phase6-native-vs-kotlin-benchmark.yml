@@ -88,7 +88,7 @@ jobs:
             echo "benchmarkWorkload=128 deterministic adaptive-target cases"
             echo "warmupIterations=2000"
             echo "samples=21"
-            echo "iterationsPerSample=20000"
+            echo "iterationsPerSample=5000"
             echo "outputParity=$parity"
             cat "$kotlin_report"
             cat "$native_report"
