@@ -134,7 +134,7 @@ fun QuickGuessDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(localizedText("Quick Guess Minigame")) },
+        title = { Text(locale.getStringByEnglish("Quick Guess Minigame")) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (!gameOver) {
@@ -147,7 +147,7 @@ fun QuickGuessDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
                     OutlinedTextField(
                         value = input,
                         onValueChange = { input = it },
-                        label = { Text(localizedText("Enter number")) },
+                        label = { Text(locale.getStringByEnglish("Enter number")) },
                         singleLine = true
                     )
                 } else {
@@ -197,12 +197,12 @@ fun ReactionTestDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Uni
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(localizedText("Reaction Test")) },
+        title = { Text(locale.getStringByEnglish("Reaction Test")) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 when (state) {
-                    "wait" -> Text(localizedText("Wait for green..."), fontSize = 20.sp, color = MaterialTheme.colorScheme.error)
-                    "ready" -> Text(localizedText("TAP NOW!"), fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
+                    "wait" -> Text(locale.getStringByEnglish("Wait for green..."), fontSize = 20.sp, color = MaterialTheme.colorScheme.error)
+                    "ready" -> Text(locale.getStringByEnglish("TAP NOW!"), fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
                     "clicked" -> Text(locale.getString("reaction_time_format", "Reaction: %dms", reactionTime), fontSize = 20.sp)
                 }
             }
@@ -239,11 +239,11 @@ fun LuckyNumberDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(localizedText("Lucky Number Box")) },
+        title = { Text(locale.getStringByEnglish("Lucky Number Box")) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (chosenBox == null) {
-                    Text(localizedText("Choose one of three mystery boxes to find the jackpot Nebula prize:"), fontSize = 16.sp)
+                    Text(locale.getStringByEnglish("Choose one of three mystery boxes to find the jackpot Nebula prize:"), fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally), modifier = Modifier.fillMaxWidth()) {
                         for (i in 1..3) {
@@ -297,18 +297,18 @@ fun MemoryMatchDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(localizedText("Memory Digit Sequence")) },
+        title = { Text(locale.getStringByEnglish("Memory Digit Sequence")) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (showDigits) {
                     Text(locale.getString("memorize_format", "Memorize: %s", sequence.joinToString(" ")), fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
                 } else if (resultText.isEmpty()) {
-                    Text(localizedText("Enter the 3 digits (e.g. 123):"), fontSize = 16.sp)
+                    Text(locale.getStringByEnglish("Enter the 3 digits (e.g. 123):"), fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = input,
                         onValueChange = { input = it },
-                        label = { Text(localizedText("Sequence")) },
+                        label = { Text(locale.getStringByEnglish("Sequence")) },
                         singleLine = true
                     )
                 } else {
@@ -333,7 +333,7 @@ fun MemoryMatchDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit
                         resultText = locale.getString("memory_incorrect_format", "Incorrect! Expected %s", expected)
                     }
                 }) {
-                    Text(localizedText("Submit"))
+                    Text(locale.getStringByEnglish("Submit"))
                 }
             } else if (resultText.isNotEmpty()) {
                 Button(onClick = {
@@ -358,7 +358,7 @@ fun NumberRushDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(localizedText("Number Rush")) },
+        title = { Text(locale.getStringByEnglish("Number Rush")) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (!finished) {
@@ -397,7 +397,7 @@ fun NumberRushDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Unit)
                         }
                     }
                 } else {
-                    Text(localizedText("Rush Completed Successfully! Won 1 Nebula!"), fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+                    Text(locale.getStringByEnglish("Rush Completed Successfully! Won 1 Nebula!"), fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
                 }
             }
         },
