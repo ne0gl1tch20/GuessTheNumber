@@ -12,6 +12,8 @@ import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.SizeMode
+import androidx.glance.LocalSize
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.provideContent
 import androidx.glance.state.PreferencesGlanceStateDefinition
@@ -41,6 +43,7 @@ class GuessWidgetReceiver : GlanceAppWidgetReceiver() {
 
 /** Polished launcher widget. Values come from the selected persisted save. */
 class GuessWidget : GlanceAppWidget() {
+    override val sizeMode = SizeMode.Exact
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val saveManager = SaveManager(context)
         val widgetPreferences = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
@@ -52,10 +55,13 @@ class GuessWidget : GlanceAppWidget() {
         val titleBitmap = renderWidgetFontText(context, title, "fonts/Manrope-VariableFont_wght.ttf", 150, 20, 14f, widgetTextColor(context, 0xFF202536.toInt(), 0xFFF4F5FA.toInt()), true)
         val balanceBitmap = renderWidgetFontText(context, state.money.format(), "fonts/JetBrainsMono-VariableFont_wght.ttf", 82, 30, 22f, widgetTextColor(context, 0xFF6750A4.toInt(), 0xFFD0BCFF.toInt()), true)
         provideContent {
+            val widgetSize = LocalSize.current
+            val compactWidth = widgetSize.width < 280.dp
+            val compactHeight = widgetSize.height < 155.dp
             GlanceTheme {
                 Column(
-                    modifier = GlanceModifier.fillMaxSize().background(GlanceTheme.colors.background)
-                        .cornerRadius(22.dp).padding(12.dp),
+                    modifier = GlanceModifier.fillMaxSize().background(R.color.widget_background)
+                        .cornerRadius(22.dp).padding(if (compactHeight) 7.dp else 12.dp),
                     verticalAlignment = Alignment.Vertical.CenterVertically,
                     horizontalAlignment = Alignment.Horizontal.Start
                 ) {
@@ -67,21 +73,22 @@ class GuessWidget : GlanceAppWidget() {
                         )
                         Spacer(GlanceModifier.width(8.dp))
                         Column(modifier = GlanceModifier.defaultWeight()) {
-                            Image(provider = ImageProvider(titleBitmap), contentDescription = title, modifier = GlanceModifier.width(150.dp).height(20.dp))
+                            Image(provider = ImageProvider(titleBitmap), contentDescription = title, modifier = GlanceModifier.width(if (compactWidth) 115.dp else 150.dp).height(20.dp))
                             Text(
                                 locale.getString("widget_slot", "Save slot %d • %s", selectedSlot, state.profileName.ifBlank { state.difficultyId }),
                                 style = TextStyle(fontSize = 10.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant)
                             )
                         }
                     }
+                    if (!compactHeight) {
                     Spacer(GlanceModifier.height(7.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
                         Column(
-                            modifier = GlanceModifier.defaultWeight().background(GlanceTheme.colors.surface)
+                            modifier = GlanceModifier.defaultWeight().background(R.color.widget_surface)
                                 .cornerRadius(15.dp).padding(horizontal = 11.dp, vertical = 8.dp)
                         ) {
                             Text(locale.getString("widget_money", "Balance"), style = TextStyle(fontSize = 10.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant))
-                            Image(provider = ImageProvider(balanceBitmap), contentDescription = state.money.format(), modifier = GlanceModifier.width(82.dp).height(30.dp))
+                            Image(provider = ImageProvider(balanceBitmap), contentDescription = state.money.format(), modifier = GlanceModifier.width(if (compactWidth) 68.dp else 82.dp).height(30.dp))
                         }
                         Spacer(GlanceModifier.width(8.dp))
                         Column(
@@ -93,7 +100,8 @@ class GuessWidget : GlanceAppWidget() {
                             Text(locale.getString("widget_worlds_bosses", "Worlds %d • Bosses %d", state.unlockedWorldIds.size, state.defeatedBossIds.size), style = TextStyle(fontSize = 10.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant))
                         }
                     }
-                    Spacer(GlanceModifier.height(7.dp))
+                    }
+                    Spacer(GlanceModifier.height(if (compactHeight) 3.dp else 7.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
                         Button(text = locale.getString("play", "Play"), onClick = actionRunCallback<OpenWidgetSaveSlotCallback>(), modifier = GlanceModifier.defaultWeight())
                         Spacer(GlanceModifier.width(8.dp))
