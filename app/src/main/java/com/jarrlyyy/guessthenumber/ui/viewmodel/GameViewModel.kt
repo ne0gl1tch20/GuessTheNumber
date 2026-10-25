@@ -856,6 +856,62 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun enableCreativeModeForSlot(slot: Int, rangeMin: Long, rangeMax: Long, onResult: (Boolean) -> Unit = {}) {
+        if (slot !in 1..MAX_SAVE_SLOTS ||
+            rangeMin < 1L || rangeMax < rangeMin ||
+            rangeMax > CreativeModeSave.MAX_RANGE
+        ) {
+            onResult(false)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = slotOperationMutex.withLock {
+                val metadata = saveManager.getSlotMetadata(slot)
+                if (metadata.isEmpty) return@withLock false
+                val current = saveManager.loadGame(slot)
+                // Creative Mode is permanent for this save. Never downgrade an existing creative save.
+                if (current.creativeModeEnabled) return@withLock true
+                val updated = current.copy(
+                    creativeModeEnabled = true,
+                    currentRangeMin = rangeMin,
+                    currentRangeMax = rangeMax,
+                    targetNumber = rangeMin + ((rangeMax - rangeMin) / 2L),
+                    attempts = 0L,
+                    correctGuesses = 0L,
+                    streak = 0
+                )
+                val saved = saveManager.saveGame(updated, slot)
+                if (saved && _activeSlot.value == slot) {
+                    _gameState.value = AntiCheatService.sanitizeCurrency(updated)
+                    guessingBot.reset(updated.currentRangeMin, updated.currentRangeMax)
+                    WidgetRefresh.request(getApplication<Application>())
+                }
+                saved
+            }
+            withContext(Dispatchers.Main) { onResult(result) }
+        }
+    }
+
+    fun updateCreativeRange(rangeMin: Long, rangeMax: Long): Boolean {
+        val current = _gameState.value
+        if (!current.creativeModeEnabled ||
+            rangeMin < 1L || rangeMax < rangeMin ||
+            rangeMax > CreativeModeSave.MAX_RANGE
+        ) return false
+        val updated = current.copy(
+            currentRangeMin = rangeMin,
+            currentRangeMax = rangeMax,
+            targetNumber = rangeMin + ((rangeMax - rangeMin) / 2L),
+            attempts = 0L,
+            correctGuesses = 0L,
+            streak = 0
+        )
+        _gameState.value = updated
+        guessingBot.reset(updated.currentRangeMin, updated.currentRangeMax)
+        saveGameAsync()
+        return true
+    }
+
     fun loadCreativeModeSave(slot: Int, onLoaded: (CreativeModeSave?) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val save = saveManager.loadCreativeModeSave(slot)
