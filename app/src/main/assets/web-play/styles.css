@@ -1138,5 +1138,28 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 .menu-studio-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.menu-studio-section{min-width:0;padding:14px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}.menu-studio-section h3{margin:0 0 5px}.menu-studio-list{display:grid;gap:8px;min-height:76px;padding:2px;border-radius:12px}.menu-studio-row{display:flex;align-items:center;gap:9px;min-width:0;padding:10px;border:1px solid color-mix(in srgb,var(--menu-button-color,#9b7cff) 38%,transparent);border-radius:14px;background:color-mix(in srgb,var(--menu-button-color,#9b7cff) 9%,var(--panel2));touch-action:pan-y}.menu-studio-row.dragging{opacity:.45}.menu-studio-row.drop-target{outline:2px dashed var(--accent2);outline-offset:2px}.menu-studio-grip{font-size:22px;line-height:1;color:var(--muted);cursor:grab;user-select:none}.menu-studio-row-copy{display:grid;gap:2px;min-width:0;flex:1}.menu-studio-row-copy strong{font-size:13px;overflow-wrap:anywhere}.menu-studio-row-copy small{font-size:10px;color:var(--muted)}.menu-studio-color-label{display:grid;justify-items:center;gap:3px;font-size:10px;color:var(--muted)}.menu-studio-color-label input{width:34px;height:32px;padding:2px;border:1px solid var(--line);border-radius:8px;background:var(--panel);cursor:pointer}.menu-studio-move{max-width:104px;padding:7px 9px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);font-size:10px;font-weight:800}.menu-studio-empty{padding:18px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--line);border-radius:12px}.menu-studio-footer{display:flex;align-items:center;gap:12px;margin-top:18px}.menu-studio-footer #menuStudioStatus{flex:1;color:var(--muted);font-size:11px}.menu-studio-secondary{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--text);font-weight:800}.menu-studio-footer .primary-action{min-height:44px;padding:10px 18px}.screen-nav [data-screen-target].menu-studio-moved{display:none!important}.screen-nav [data-screen-target]:not(#tab-play):not(#tab-more){border-color:color-mix(in srgb,var(--menu-button-color,var(--accent)) 48%,var(--line));color:var(--menu-button-color,var(--text))}.more-links .more-link-card{border-color:color-mix(in srgb,var(--menu-button-color,var(--accent)) 32%,var(--line))}.more-links .more-link-icon{color:var(--menu-button-color,var(--accent2))}.more-links .more-link-card{color:var(--menu-button-color,var(--text))}
 @media(max-width:620px){.menu-studio-columns{grid-template-columns:1fr}.menu-studio-dialog{max-height:calc(100dvh - 24px);padding:14px}.menu-studio-row{gap:7px;padding:8px}.menu-studio-move{max-width:92px}.menu-studio-footer{flex-wrap:wrap}.menu-studio-footer #menuStudioStatus{flex-basis:100%;order:3}.menu-studio-footer .primary-action{margin-left:auto}}
 @media(prefers-reduced-motion:reduce){.menu-studio-overlay *{animation:none!important;transition:none!important}}
+/* WebView-safe Menu Studio modal sizing.
+   Explicit viewport dimensions avoid intrinsic grid collapse in some Android WebViews. */
+body > #menuStudioOverlay.menu-studio-overlay {
+  position: fixed !important; inset: 0 !important;
+  width: 100vw !important; height: 100vh !important; height: 100dvh !important;
+  min-width: 0 !important; min-height: 0 !important;
+  box-sizing: border-box !important; display: flex !important; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+  overflow-x: hidden !important; overflow-y: auto !important;
+  overscroll-behavior: contain; transform: none !important;
+}
+body > #menuStudioOverlay > .menu-studio-dialog {
+  flex: 0 1 auto; width: min(940px, 100%); min-width: 0; min-height: 0;
+  max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: auto; overflow-x: hidden; overflow-y: auto; overflow-wrap: anywhere;
+  overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 620px) {
+  body > #menuStudioOverlay > .menu-studio-dialog { width: 100%; padding: 14px; }
+}
+
 
 .more-links [data-screen-target].menu-studio-moved{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:14px;border:1px solid color-mix(in srgb,var(--menu-button-color,var(--accent)) 36%,var(--line));border-radius:18px;background:var(--panel2);color:var(--menu-button-color,var(--text));text-align:left}
