@@ -1,6 +1,6 @@
 # Jarrlyy UI SDK
 
-A local-first, framework-free HTML/CSS/JavaScript component kit for GuessTheNumber's shared Android WebView and Windows desktop web UI, with an optional advanced layer for host apps.
+A local-first, framework-free HTML/CSS/JavaScript UI engine for games and everyday apps. It powers GuessTheNumber's shared Android WebView and Windows desktop UI, and is structured so other hosts can reuse the same core components with their own theme and behavior.
 
 ## Load it
 
@@ -14,6 +14,12 @@ From \`app/src/main/assets/web-play/index.html\`:
 \`\`\`
 
 Keep these local assets together. There is no CDN, npm, runtime network request, Android dependency or game-state dependency. CSS classes use the \`jui-\` namespace and declarative controls use \`data-jui-*\` attributes.
+
+## Reuse across game and everyday apps
+
+Treat the SDK as a host-neutral UI engine, not as a GuessTheNumber-only skin. Core buttons, forms, layout, overlays, navigation, feedback and theme tokens should work in games, dashboards, study tools and utilities. The host owns its data, routing, localization and business rules. Game-specific presentation belongs in optional components or host adapters rather than being required by core controls. Keep selectors namespaced, prefer CSS custom properties for theming, and preserve existing class names and APIs when extending components.
+
+The SDK root (`.jui-root`, or `.jui-advanced-root` for an advanced-only host) opts a page into SDK-wide touch behavior. The default WebView tap highlight is disabled inside that root, while visible `:focus-visible` keyboard indicators remain enabled.
 
 ## Curated component inventory
 

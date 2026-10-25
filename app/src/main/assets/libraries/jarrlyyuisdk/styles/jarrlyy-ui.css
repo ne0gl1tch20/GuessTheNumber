@@ -1,4 +1,11 @@
 /* Jarrlyy UI SDK · local, framework-free, themeable components */
+/*
+ * Host-neutral touch behavior: suppress the browser's default tap flash
+ * inside SDK roots. Keep :focus-visible styles below for keyboard users.
+ */
+.jui-root, .jui-root *, .jui-advanced-root, .jui-advanced-root * {
+  -webkit-tap-highlight-color: transparent;
+}
 :root {
   --jui-bg: #0b0d18;
   --jui-surface: #14172a;
