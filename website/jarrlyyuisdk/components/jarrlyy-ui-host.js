@@ -45,4 +45,7 @@
   }
 
   global.JarrlyyUIHost = Object.freeze({ mount, setTheme });
+  const ready = () => mount({ root: doc.body });
+  if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", ready, { once: true });
+  else ready();
 })(window);
