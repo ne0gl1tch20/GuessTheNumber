@@ -21,6 +21,8 @@ import com.jarrlyyy.guessthenumber.data.store.importSecureOrLegacySave
 import com.jarrlyyy.guessthenumber.data.store.exportPortableBackup
 import com.jarrlyyy.guessthenumber.data.store.importPortableOrLegacyBackup
 import com.jarrlyyy.guessthenumber.data.store.CreativeModeSave
+import com.jarrlyyy.guessthenumber.data.store.CreativeModeEffectPolicy
+import com.jarrlyyy.guessthenumber.data.store.CreativeEffectType
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
@@ -81,6 +83,7 @@ data class GuessSubmissionResult(
 class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val saveManager = SaveManager(application)
     private val slotOperationMutex = Mutex()
+    @Volatile private var activeCreativeModeSave: CreativeModeSave? = null
     private val liveOpsClaimMutex = Mutex()
     private val _gameState = MutableStateFlow(GameState(lastSavedVersion = BuildConfig.VERSION_NAME))
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
@@ -189,6 +192,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             val loaded = saveManager.loadGame(targetSlot)
+            val creativeSave = saveManager.loadCreativeModeSave(targetSlot)
+            withContext(Dispatchers.Main) { activeCreativeModeSave = creativeSave }
             GameLogger.log(LogLevel.DEBUG, LoggerCategory.SAVE, "SAVE_READ", "Read save data for slot=$targetSlot; applying state validation.")
             val sanitized = AntiCheatService.sanitizeCurrency(loaded)
 
@@ -352,9 +357,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                         }
                         saveManager.setActiveSlot(slot)
                         val loaded = saveManager.loadGame(slot)
+                        val creativeSave = saveManager.loadCreativeModeSave(slot)
                         val sanitized = AntiCheatService.sanitizeCurrency(loaded)
                         withContext(Dispatchers.Main) {
                             _activeSlot.value = slot
+                            activeCreativeModeSave = creativeSave
                             _gameState.value = sanitized
                             guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
                             lastIncomeMeasurement = sanitized.money
@@ -478,12 +485,44 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         return true
     }
 
-    private fun processGuessWithTraits(state: GameState, guess: Long) =
-        com.jarrlyyy.guessthenumber.traits.TraitGameplayRuntime.apply(
+    private fun processGuessWithTraits(state: GameState, guess: Long): com.jarrlyyy.guessthenumber.domain.engine.GuessResult {
+        val creativeSave = activeCreativeModeSave
+        val rules = creativeSave?.let(CreativeModeEffectPolicy::resolve)
+        val boundedState = if (creativeSave?.enabled == true && rules != null) {
+            state.copy(
+                currentRangeMin = rules.rangeMin,
+                currentRangeMax = rules.rangeMax,
+                targetNumber = state.targetNumber.coerceIn(rules.rangeMin, rules.rangeMax)
+            )
+        } else state
+        val baseResult = gameEngine.processGuess(boundedState, guess)
+        val creativeResult = if (creativeSave?.enabled == true && rules != null) {
+            val next = baseResult.newState
+            baseResult.copy(newState = next.copy(
+                currentRangeMin = rules.rangeMin,
+                currentRangeMax = rules.rangeMax,
+                targetNumber = next.targetNumber.coerceIn(rules.rangeMin, rules.rangeMax)
+            ))
+        } else baseResult
+        return com.jarrlyyy.guessthenumber.traits.TraitGameplayRuntime.apply(
             stateBefore = state,
             guess = guess,
-            result = gameEngine.processGuess(state, guess)
+            result = creativeResult
         )
+    }
+
+    /** Extra hints configured for the active slot. The caller still decides how to present them. */
+    fun activeCreativeExtraHints(): Int {
+        val save = activeCreativeModeSave?.takeIf { it.enabled } ?: return 0
+        return CreativeModeEffectPolicy.resolve(save)?.extraHints ?: 0
+    }
+
+    /** Whether the active creative profile has exhausted its per-target attempt budget. */
+    fun isCreativeAttemptLimitReached(): Boolean {
+        val save = activeCreativeModeSave?.takeIf { it.enabled } ?: return false
+        val limit = CreativeModeEffectPolicy.resolve(save)?.attemptLimit ?: return false
+        return _gameState.value.attempts >= limit.toLong()
+    }
 
     /**
      * Compatibility entry point for existing Compose and automation callers.
@@ -503,6 +542,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             return _gameState.value.toGuessSubmissionResult(accepted = false, status = null)
         }
         val currentState = refreshDailyQuestDay(_gameState.value)
+        if (isCreativeAttemptLimitReached()) {
+            GameLogger.log(LogLevel.INFO, LoggerCategory.GUESS, "CREATIVE_ATTEMPT_LIMIT", "Creative Mode attempt limit reached for the active target.", correlationId)
+            return currentState.toGuessSubmissionResult(accepted = false, status = "CREATIVE_ATTEMPT_LIMIT")
+        }
         GameLogger.log(LogLevel.DEBUG, LoggerCategory.GUESS, "GUESS_BEGIN", "Processing guess within range ${currentState.currentRangeMin}..${currentState.currentRangeMax}.", correlationId)
         val result = processGuessWithTraits(currentState, guess)
         guessingBot.observeGuess(guess.coerceIn(currentState.currentRangeMin, currentState.currentRangeMax), result.feedback)
