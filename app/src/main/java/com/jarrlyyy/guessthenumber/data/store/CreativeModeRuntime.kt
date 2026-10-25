@@ -1,10 +1,13 @@
 package com.jarrlyyy.guessthenumber.data.store
 
+import java.util.UUID
+
 /**
  * Isolated, deterministic Creative Mode run state. This model deliberately has no currency,
  * reward, progression, filesystem, or scripting capability. The host owns persistence and UI.
  */
 data class CreativeModeRun(
+    val runId: String = UUID.randomUUID().toString(),
     val rangeMin: Long,
     val rangeMax: Long,
     val target: Long,
@@ -14,6 +17,7 @@ data class CreativeModeRun(
     val completed: Boolean = false
 ) {
     init {
+        require(Regex("[a-zA-Z0-9_-]{8,64}").matches(runId))
         require(rangeMin >= 1L && rangeMax >= rangeMin && rangeMax <= CreativeModeSave.MAX_RANGE)
         require(target in rangeMin..rangeMax)
         require(attemptsUsed >= 0 && correctGuesses >= 0 && hintsUsed >= 0)
@@ -39,12 +43,49 @@ object CreativeModeRuntime {
         if (!save.enabled || target !in rules.rangeMin..rules.rangeMax) return null
         return runCatching {
             CreativeModeRun(
+                runId = UUID.randomUUID().toString(),
                 rangeMin = rules.rangeMin,
                 rangeMax = rules.rangeMax,
                 target = target
             )
         }.getOrNull()
     }
+
+    fun resume(save: CreativeModeSave): CreativeModeRun? {
+        val snapshot = save.activeRun ?: return null
+        if (!save.enabled || !CreativeModeSaveCodec.validate(save) ||
+            !CreativeModeSaveCodec.validateRunSnapshot(snapshot)) return null
+        return runCatching {
+            CreativeModeRun(
+                runId = snapshot.runId,
+                rangeMin = snapshot.rangeMin,
+                rangeMax = snapshot.rangeMax,
+                target = snapshot.target,
+                attemptsUsed = snapshot.attemptsUsed,
+                correctGuesses = snapshot.correctGuesses,
+                hintsUsed = snapshot.hintsUsed,
+                completed = snapshot.completed
+            )
+        }.getOrNull()
+    }
+
+    fun persist(save: CreativeModeSave, run: CreativeModeRun): CreativeModeSave? {
+        if (!save.enabled || !CreativeModeSaveCodec.validate(save)) return null
+        val snapshot = CreativeModeRunSnapshot(
+            runId = run.runId,
+            rangeMin = run.rangeMin,
+            rangeMax = run.rangeMax,
+            target = run.target,
+            attemptsUsed = run.attemptsUsed,
+            correctGuesses = run.correctGuesses,
+            hintsUsed = run.hintsUsed,
+            completed = run.completed
+        )
+        return save.copy(activeRun = snapshot).takeIf(CreativeModeSaveCodec::validate)
+    }
+
+    fun clearPersistedRun(save: CreativeModeSave): CreativeModeSave =
+        save.copy(activeRun = null)
 
     fun submitGuess(save: CreativeModeSave, run: CreativeModeRun, guess: Long): CreativeGuessDecision {
         val rules = CreativeModeEffectPolicy.resolve(save)
