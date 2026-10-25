@@ -109,4 +109,18 @@ class CreativeModeRuntimeTest {
         assertNull(CreativeModeRuntime.resume(bad))
     }
 
+
+    @Test fun runtimeRejectsForgedOrStaleRunsThatDoNotMatchCurrentRules() {
+        val config = save(CreativeModeEffect("hints", CreativeEffectType.EXTRA_HINTS, 1))
+        val valid = CreativeModeRuntime.start(config, 15)!!
+        val forged = valid.copy(rangeMax = 100)
+        val decision = CreativeModeRuntime.submitGuess(config, forged, 15)
+        assertEquals(CreativeGuessOutcome.INVALID_CONFIGURATION, decision.outcome)
+        assertFalse(decision.accepted)
+        assertNull(CreativeModeRuntime.persist(config, forged))
+        val changedConfig = config.copy(effects = emptyList())
+        assertNull(CreativeModeRuntime.resume(CreativeModeRuntime.persist(config, valid)!!.copy(effects = emptyList())))
+        assertNull(CreativeModeRuntime.useHint(changedConfig, valid))
+    }
+
 }
