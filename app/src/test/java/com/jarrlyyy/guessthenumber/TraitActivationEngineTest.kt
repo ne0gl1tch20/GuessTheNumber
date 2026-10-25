@@ -4,6 +4,8 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.traits.BuiltInTraits
 import com.jarrlyyy.guessthenumber.traits.TraitActivationContext
 import com.jarrlyyy.guessthenumber.traits.TraitActivationEngine
+import com.jarrlyyy.guessthenumber.traits.TraitRewardPolicy
+import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -86,4 +88,25 @@ class TraitActivationEngineTest {
         assertEquals(25L, state.correctGuesses)
         assertTrue(result.activeTraitIds.contains("nebula_finder"))
     }
+
+    @Test fun centralCalendarPolicyChangesSeasonalActivationAtBoundary() {
+        val state = GameState(correctGuesses = 50)
+        val winterId = TraitRewardPolicy.currentSeasonId(LocalDate.of(2026, 12, 31))
+        val springId = TraitRewardPolicy.currentSeasonId(LocalDate.of(2027, 3, 1))
+        assertEquals("winter", winterId)
+        assertEquals("spring", springId)
+
+        val winter = engine.evaluate(
+            TraitActivationContext(state, playerLevel = 3, activeSeasonId = winterId)
+        )
+        assertTrue(winter.isActive("winter_comet"))
+        assertFalse(winter.isActive("autumn_glow"))
+
+        val spring = engine.evaluate(
+            TraitActivationContext(state, playerLevel = 3, activeSeasonId = springId)
+        )
+        assertFalse(spring.isActive("winter_comet"))
+        assertFalse(spring.isActive("autumn_glow"))
+    }
+
 }
