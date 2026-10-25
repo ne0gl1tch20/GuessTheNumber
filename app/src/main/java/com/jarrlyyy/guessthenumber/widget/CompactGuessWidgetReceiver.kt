@@ -59,8 +59,8 @@ class CompactGuessWidget : GlanceAppWidget() {
         val locale = LocaleManager(context)
         locale.loadLocaleForTag(state.settings.locale)
         val title = locale.getString("widget_title", "Guess The Number")
-        val titleBitmap = renderWidgetFontText(context, title, "fonts/Manrope-VariableFont_wght.ttf", 82, 14, 11f, widgetTextColor(context, 0xFF202536.toInt(), 0xFFF4F5FA.toInt()), true)
-        val balanceBitmap = renderWidgetFontText(context, state.money.format(), "fonts/JetBrainsMono-VariableFont_wght.ttf", 62, 20, 16f, widgetTextColor(context, 0xFF6750A4.toInt(), 0xFFD0BCFF.toInt()), true)
+        val titleBitmap = renderWidgetFontText(context, title, "fonts/Manrope-VariableFont_wght.ttf", 72, 16, 11f, widgetTextColor(context, 0xFF202536.toInt(), 0xFFF4F5FA.toInt()), true)
+        val balanceBitmap = renderWidgetFontText(context, state.money.format(), "fonts/JetBrainsMono-VariableFont_wght.ttf", 56, 22, 16f, widgetTextColor(context, 0xFF6750A4.toInt(), 0xFFD0BCFF.toInt()), true)
         provideContent {
             GlanceTheme {
                 Column(
@@ -76,10 +76,10 @@ class CompactGuessWidget : GlanceAppWidget() {
                         )
                         Spacer(GlanceModifier.width(6.dp))
                         Column(modifier = GlanceModifier.defaultWeight()) {
-                            Image(provider = ImageProvider(titleBitmap), contentDescription = title, modifier = GlanceModifier.width(82.dp).height(14.dp))
+                            Image(provider = ImageProvider(titleBitmap), contentDescription = title, modifier = GlanceModifier.width(72.dp).height(16.dp))
                             Text(locale.getString("widget_slot", "Slot %d • %s", slot, state.profileName.ifBlank { state.difficultyId }), style = TextStyle(fontSize = 9.sp, fontFamily = FontFamily.SansSerif, color = GlanceTheme.colors.onSurfaceVariant))
                         }
-                        Image(provider = ImageProvider(balanceBitmap), contentDescription = state.money.format(), modifier = GlanceModifier.width(62.dp).height(20.dp))
+                        Image(provider = ImageProvider(balanceBitmap), contentDescription = state.money.format(), modifier = GlanceModifier.width(56.dp).height(22.dp))
                     }
                     Spacer(GlanceModifier.height(4.dp))
                     Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
@@ -114,7 +114,7 @@ class CycleCompactWidgetSaveSlotCallback : ActionCallback {
         val widgetState = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
         val current = (widgetState[compactWidgetSaveSlotKey] ?: activeSlot).coerceIn(1, MAX_SAVE_SLOTS)
         val nextSlot = nextOccupiedSaveSlot(context, current)
-        updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { preferences ->
+        updateAppWidgetState(context, glanceId) { preferences ->
             preferences[compactWidgetSaveSlotKey] = nextSlot
         }
         CompactGuessWidget().update(context, glanceId)
