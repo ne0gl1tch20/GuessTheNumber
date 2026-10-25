@@ -108,6 +108,7 @@ fun ProductionWebPlayScreen(
     onUpdateMultiplier: (String) -> Unit,
     onUpdateSettings: (GameSettings) -> Unit,
     onCreativeUpdateRange: (Long, Long) -> Boolean,
+    onCreativeUpdateValue: (String, String) -> Boolean,
     onPrestigeReset: () -> Unit,
     onUltraReset: () -> Unit,
     onBuyTalent: (String, Long) -> Unit,
@@ -530,6 +531,13 @@ fun ProductionWebPlayScreen(
                                                         else -> throw IllegalArgumentException("Unsupported music action")
                                                     }
                                                 }
+                                                "creative_update_value" -> {
+                                                    val key = parsed.settingKey
+                                                    val value = parsed.settingValue
+                                                    if (!stateProvider().creativeModeEnabled || key == null || value == null || !onCreativeUpdateValue(key, value)) {
+                                                        throw IllegalArgumentException("Creative Mode value update was rejected.")
+                                                    }
+                                                }
                                                 "creative_update_range" -> {
                                                     val min = parsed.creativeRangeMin
                                                     val max = parsed.creativeRangeMax
@@ -663,6 +671,7 @@ fun ProductionWebPlayScreen(
                                             return@post
                                         }
                                         val actionAccepted = when (parsed.type) {
+                                            "creative_update_value" -> game.creativeModeEnabled
                                             "creative_update_range" -> game.creativeModeEnabled && game.currentRangeMin == parsed.creativeRangeMin && game.currentRangeMax == parsed.creativeRangeMax
                                             "claim_daily_quest" -> parsed.questId != null && parsed.questId in game.claimedDailyQuests && parsed.questId !in beforeAction.claimedDailyQuests
                                              "claim_daily_reward" -> game.lastDailyRewardDate != beforeAction.lastDailyRewardDate
