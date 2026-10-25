@@ -4,7 +4,7 @@
 - 🌦️ **Seasonal trait calendar:** centralized deterministic season windows, including winter across year boundaries, and added boundary tests.
 - 💾 **Save compatibility:** portable encrypted backups and versioned per-slot Creative Mode saves remain supported. Keep the export passphrase somewhere safe; it is not stored by the app.
 - 🌦️ **Trait and seasonal architecture:** continued work is planned around deterministic activation, safe effect policies, signed catalog updates and offline-first seasonal behavior.
-- 📚 **Project history:** added [the PR-by-PR development ledger](../../../docs/PR_CHANGELOG.md) so merged work and open/unmerged attempts are easier to audit.
+- 📚 **Project history:** added [the PR-by-PR development ledger](../../../../docs/PR_CHANGELOG.md) so merged work and open/unmerged attempts are easier to audit.
 - 🔢 **App version:** bumped to 3.1.0 (versionCode 22).
 
 ## Unreleased (HTML More Hub, changelog and player feedback)
