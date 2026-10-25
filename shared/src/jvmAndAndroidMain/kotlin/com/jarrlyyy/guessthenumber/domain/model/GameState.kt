@@ -10,6 +10,8 @@ data class GameState(
     val profileIconId: String = SaveProfileRules.DEFAULT_ICON,
     /** Permanently marks this save as Creative Mode; old saves default to normal mode. */
     val creativeModeEnabled: Boolean = false,
+    val creativeAttemptLimit: Int = 0,
+    val creativeRewardMultiplier: Double = 1.0,
     val money: BigNumber = BigNumber.ZERO,
     val prestige: BigNumber = BigNumber.ZERO,
     val ultra: BigNumber = BigNumber.ZERO,
@@ -137,6 +139,8 @@ data class GameSettings(
     val customTertiaryColor: String = "#00C853",
     val moreScreenOrder: List<String> = DEFAULT_MORE_SCREEN_ORDER,
     val moreScreenButtonColors: Map<String, String> = emptyMap(),
+    /** Web Menu Studio layout, stored with global app preferences rather than browser storage. */
+    val webMenuStudioLayout: String? = null,
     val tutorialCompleted: Boolean = false,
     val tutorialSeenFeatures: Set<String> = emptySet()
 )
