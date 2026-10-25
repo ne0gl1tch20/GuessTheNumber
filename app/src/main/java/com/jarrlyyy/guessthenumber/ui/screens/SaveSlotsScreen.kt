@@ -517,7 +517,7 @@ fun SaveSlotsScreen(
 
     if (showImportDialog) {
         AlertDialog(
-            onDismissRequest = { showImportDialog = false },
+            onDismissRequest = { showImportDialog = false; importPassphrase = "" },
             title = { Text(locale.getString("save_import_title", "Import Save Data")) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -559,7 +559,7 @@ fun SaveSlotsScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showImportDialog = false }) {
+                TextButton(onClick = { showImportDialog = false; importPassphrase = "" }) {
                     Text(locale.getString("cancel", "Cancel"))
                 }
             }
