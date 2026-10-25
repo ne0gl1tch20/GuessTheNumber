@@ -853,6 +853,41 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun exportPortableSave(passphrase: String, onExported: (String?) -> Unit) {
+        if (passphrase.length < com.jarrlyyy.guessthenumber.data.store.PortableSaveBackup.MIN_PASSPHRASE_LENGTH) {
+            onExported(null)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = runCatching {
+                saveManager.exportPortableBackup(passphrase.toCharArray(), _activeSlot.value)
+            }.getOrNull()
+            withContext(Dispatchers.Main) { onExported(result) }
+        }
+    }
+
+    fun importSave(json: String, passphrase: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = slotOperationMutex.withLock {
+                saveManager.importPortableOrLegacyBackup(json, passphrase.toCharArray(), _activeSlot.value)
+            }
+            if (success) {
+                val loaded = saveManager.loadGame(_activeSlot.value)
+                val sanitized = AntiCheatService.sanitizeCurrency(loaded)
+                withContext(Dispatchers.Main) {
+                    _gameState.value = sanitized
+                    _hasAnySave.value = true
+                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                    lastIncomeMeasurement = sanitized.money
+                    _incomePerSecond.value = BigNumber.ZERO
+                    onResult(true)
+                }
+            } else {
+                withContext(Dispatchers.Main) { onResult(false) }
+            }
+        }
+    }
+
     fun exportSave(onExported: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val json = saveManager.exportSecureSave(_activeSlot.value)
