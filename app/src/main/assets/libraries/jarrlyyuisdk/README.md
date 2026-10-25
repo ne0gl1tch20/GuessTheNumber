@@ -82,3 +82,26 @@ The optional motion API is exposed as the separate global `JarrlyyUIMotion` and 
 - `JarrlyyUIMotion.init(root?)` activates one-time `data-jui-reveal` entrances as content scrolls into view.
 
 Motion uses requestAnimationFrame only for active counters, IntersectionObserver for on-demand reveal, transform/opacity for smooth compositing, and automatic cleanup for floating text. It respects `prefers-reduced-motion`, avoids external libraries and runtime requests, and degrades to immediate values when animation APIs are unavailable. These primitives are browser, Android WebView and Windows WebView friendly; host code remains responsible for authoritative state.
+
+
+## Host integration and release pipeline (Phase 3)
+
+Load `components/jarrlyy-ui-host.js` after the core and advanced scripts when a host wants one small lifecycle/event adapter. It is framework-free and works in a browser, Android WebView or Windows WebView:
+
+```html
+<script src="components/jarrlyy-ui.js"></script>
+<script src="components/jarrlyy-ui-advanced.js"></script>
+<script src="components/jarrlyy-ui-host.js"></script>
+```
+
+The adapter auto-mounts the current document body, initializes available SDK layers safely, and exposes:
+
+- `JarrlyyUIHost.mount({ root?, theme? })` returns `setTheme(theme)`, `on("jui:change", handler)` (returns an unsubscribe function) and `emit("jui:change", detail)`.
+- `JarrlyyUIHost.setTheme(root, "light" | "dark" | "system")` applies a theme or removes the explicit theme override for system/default styling.
+- Host events use bubbling `CustomEvent` values. The SDK does not add a native JavaScript bridge or own app state, routes, saves, rewards or localization.
+
+### Publishing and no-APK updates
+
+The Android web-play loader reads `web-play-manifest.json`, checks each asset's SHA-256, stages the new asset set, and only switches the active version after validation. It retains offline/bundled fallback behavior. The `Publish Web Play Asset Manifest` workflow includes `app/src/main/assets/libraries/**`, regenerates the manifest on master pushes, and validates it on pull requests. Thus compatible HTML/CSS/JS SDK changes can sync to supported installed app versions without rebuilding the APK. Native code, manifest schema changes or a raised minimum app version still require a compatible app release.
+
+The website and bundled SDK copies are checked for parity in CI. Keep the host adapter, core/advanced layers, motion demo and styles mirrored; don't edit only one copy. The public Pages workflow validates and deploys the website separately from the Android asset manifest.
