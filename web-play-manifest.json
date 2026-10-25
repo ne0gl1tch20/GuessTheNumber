@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "82c8974cbfd9fe21a30594a7244643e6cc0ff8aa",
+  "version": "f632442953c6b7f730eeb6dc4044e69d1d85484c",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -153,7 +153,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/README.md",
-      "sha256": "bfbaebab0c9d232ddbfee1129bf10100897d823dc77360c6c6d39ebb16b83636"
+      "sha256": "9f4c033f8288d497b3eafdec773849532f0f373aaeaf2e964938a080c53bcc4b"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/demo.js",
@@ -169,7 +169,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/demo.html",
-      "sha256": "25462ac6f9590b1283586c66a663167c35f5cc0e538da7bac13ef4e324f2587c"
+      "sha256": "3e9b34dc506b395f3389baf073648dc397978b0ab308d09c251ba43b8e213223"
     },
     {
       "path": "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg",
@@ -185,7 +185,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css",
-      "sha256": "25b299bf8a97a63bf9414be14a9012b0e34b87c24d50f69d68d311c668bbdec3"
+      "sha256": "f2835215e943a590d12376955519c9904ca8601d3a9d143c121abe172a80e3db"
     }
   ]
 }
