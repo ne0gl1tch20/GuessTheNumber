@@ -1,6 +1,6 @@
 # Guess The Number 3.1.0 — Unreleased
 
-- 🧪 **Creative Mode runtime foundation:** added an isolated guess-run model with range validation, attempt limits, bounded hints, run snapshots, resume/clear helpers and schema v1/v2 migration to v3. The production player-facing session lifecycle still needs to be wired to these APIs.
+- 🧪 **Creative Mode runtime foundation:** added an isolated guess-run model with range validation, attempt limits, bounded hints, run snapshots, resume/clear helpers and schema v1/v2 migration to v3. The Save Slots screen now launches/resumes the per-slot run, records guesses and hints, and persists snapshots. Android device-level interaction still needs verification.
 - 🌦️ **Seasonal trait calendar:** centralized deterministic season windows, including winter across year boundaries, and added boundary tests.
 - 💾 **Save compatibility:** portable encrypted backups and versioned per-slot Creative Mode saves remain supported. Keep the export passphrase somewhere safe; it is not stored by the app.
 - 🌦️ **Trait and seasonal architecture:** continued work is planned around deterministic activation, safe effect policies, signed catalog updates and offline-first seasonal behavior.
