@@ -48,4 +48,3 @@ jobs:
           name: trait-activation-profile
           path: app/build/reports/trait-activation-benchmark.txt
           if-no-files-found: error
-          retention-days: 30
