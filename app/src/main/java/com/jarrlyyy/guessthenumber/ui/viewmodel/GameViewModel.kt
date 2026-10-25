@@ -18,6 +18,9 @@ import com.jarrlyyy.guessthenumber.widget.WidgetRefresh
 import com.jarrlyyy.guessthenumber.data.store.SaveManager
 import com.jarrlyyy.guessthenumber.data.store.exportSecureSave
 import com.jarrlyyy.guessthenumber.data.store.importSecureOrLegacySave
+import com.jarrlyyy.guessthenumber.data.store.exportPortableBackup
+import com.jarrlyyy.guessthenumber.data.store.importPortableOrLegacyBackup
+import com.jarrlyyy.guessthenumber.data.store.CreativeModeSave
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
@@ -850,6 +853,55 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             _gameState.value = state.copy(ultra = newUltra, ultraShopPurchases = newPurchases)
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.SHOP, "BUY_ULTRA_SHOP", "Purchased ultra shop item $itemId")
+        }
+    }
+
+    fun loadCreativeModeSave(slot: Int, onLoaded: (CreativeModeSave?) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val save = saveManager.loadCreativeModeSave(slot)
+            withContext(Dispatchers.Main) { onLoaded(save) }
+        }
+    }
+
+    fun saveCreativeModeSave(slot: Int, save: CreativeModeSave, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = slotOperationMutex.withLock { saveManager.saveCreativeModeSave(slot, save) }
+            withContext(Dispatchers.Main) { onResult(result) }
+        }
+    }
+
+    fun exportPortableSave(passphrase: String, onExported: (String?) -> Unit) {
+        if (passphrase.length < com.jarrlyyy.guessthenumber.data.store.PortableSaveBackup.MIN_PASSPHRASE_LENGTH) {
+            onExported(null)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = runCatching {
+                saveManager.exportPortableBackup(passphrase.toCharArray(), _activeSlot.value)
+            }.getOrNull()
+            withContext(Dispatchers.Main) { onExported(result) }
+        }
+    }
+
+    fun importSave(json: String, passphrase: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = slotOperationMutex.withLock {
+                saveManager.importPortableOrLegacyBackup(json, passphrase.toCharArray(), _activeSlot.value)
+            }
+            if (success) {
+                val loaded = saveManager.loadGame(_activeSlot.value)
+                val sanitized = AntiCheatService.sanitizeCurrency(loaded)
+                withContext(Dispatchers.Main) {
+                    _gameState.value = sanitized
+                    _hasAnySave.value = true
+                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                    lastIncomeMeasurement = sanitized.money
+                    _incomePerSecond.value = BigNumber.ZERO
+                    onResult(true)
+                }
+            } else {
+                withContext(Dispatchers.Main) { onResult(false) }
+            }
         }
     }
 

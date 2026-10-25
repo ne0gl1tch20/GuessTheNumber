@@ -33,6 +33,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
+import com.jarrlyyy.guessthenumber.data.store.CreativeModeSave
+import com.jarrlyyy.guessthenumber.data.store.CreativeModeEffect
+import com.jarrlyyy.guessthenumber.data.store.CreativeEffectType
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
@@ -66,6 +69,16 @@ fun SaveSlotsScreen(
     var showDuplicateDialog by remember { mutableStateOf<Int?>(null) }
     var showRestoreDialog by remember { mutableStateOf<Int?>(null) }
     var showImportDialog by remember { mutableStateOf(false) }
+    var showPortableExportDialog by remember { mutableStateOf(false) }
+    var showCreativeDialog by remember { mutableStateOf(false) }
+    var creativeName by remember { mutableStateOf("My Creative Mode") }
+    var creativeEnabled by remember { mutableStateOf(false) }
+    var creativeRangeMax by remember { mutableStateOf("100") }
+    var creativeHints by remember { mutableStateOf("0") }
+    var creativeAttemptLimit by remember { mutableStateOf("0") }
+    var exportPassphrase by remember { mutableStateOf("") }
+    var exportPassphraseConfirm by remember { mutableStateOf("") }
+    var importPassphrase by remember { mutableStateOf("") }
     var showResetEverythingDialog by remember { mutableStateOf(false) }
     var resetEverythingAcknowledged by remember { mutableStateOf(false) }
     var resetMathAnswer by remember { mutableStateOf("") }
@@ -373,21 +386,159 @@ fun SaveSlotsScreen(
         )
     }
 
+    if (showCreativeDialog) {
+        AlertDialog(
+            onDismissRequest = { showCreativeDialog = false },
+            title = { Text("Creative Mode • Slot $activeSlot") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("This configuration belongs to the selected save slot. Effects are bounded rule modifiers only: they cannot grant currency, rewards or change normal save progression.")
+                    OutlinedTextField(
+                        value = creativeName,
+                        onValueChange = { creativeName = it.take(40) },
+                        label = { Text("Mode name") },
+                        singleLine = true
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Enable creative rules", modifier = Modifier.weight(1f))
+                        Switch(checked = creativeEnabled, onCheckedChange = { creativeEnabled = it })
+                    }
+                    OutlinedTextField(
+                        value = creativeRangeMax,
+                        onValueChange = { creativeRangeMax = it.filter(Char::isDigit).take(7) },
+                        label = { Text("Range maximum (1–1,000,000)") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = creativeHints,
+                        onValueChange = { creativeHints = it.filter(Char::isDigit).take(2) },
+                        label = { Text("Extra hints (0–5)") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = creativeAttemptLimit,
+                        onValueChange = { creativeAttemptLimit = it.filter(Char::isDigit).take(3) },
+                        label = { Text("Attempt limit (0 off, 1–100)") },
+                        singleLine = true
+                    )
+                }
+            },
+            confirmButton = {
+                val rangeMax = creativeRangeMax.toLongOrNull()
+                val hints = creativeHints.toIntOrNull()
+                val attemptLimit = creativeAttemptLimit.toIntOrNull()
+                val valid = !creativeName.isBlank() &&
+                    rangeMax != null && rangeMax in 1L..CreativeModeSave.MAX_RANGE &&
+                    hints != null && hints in 0..5 &&
+                    attemptLimit != null && attemptLimit in 0..100
+                TextButton(
+                    enabled = valid,
+                    onClick = {
+                        val effects = buildList {
+                            if ((hints ?: 0) > 0) add(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, hints!!))
+                            if ((attemptLimit ?: 0) > 0) add(CreativeModeEffect("attempt-cap", CreativeEffectType.ATTEMPT_LIMIT, attemptLimit!!))
+                        }
+                        val save = CreativeModeSave(
+                            name = creativeName.trim(),
+                            enabled = creativeEnabled,
+                            rangeMin = 1L,
+                            rangeMax = rangeMax!!,
+                            effects = effects
+                        )
+                        viewModel.saveCreativeModeSave(activeSlot, save) { success ->
+                            android.widget.Toast.makeText(context, if (success) "Creative Mode saved to Slot $activeSlot." else "Creative Mode save was rejected.", android.widget.Toast.LENGTH_SHORT).show()
+                            if (success) showCreativeDialog = false
+                        }
+                    }
+                ) { Text("Save Creative Mode") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCreativeDialog = false }) { Text(locale.getString("cancel", "Cancel")) }
+            }
+        )
+    }
+
+    if (showPortableExportDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showPortableExportDialog = false
+                exportPassphrase = ""
+                exportPassphraseConfirm = ""
+            },
+            title = { Text("Create Portable Encrypted Backup") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Use a passphrase with at least 12 characters. You will need this exact passphrase to restore the backup on another device. It cannot be recovered.")
+                    OutlinedTextField(
+                        value = exportPassphrase,
+                        onValueChange = { exportPassphrase = it.take(128) },
+                        label = { Text("Backup passphrase") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = exportPassphraseConfirm,
+                        onValueChange = { exportPassphraseConfirm = it.take(128) },
+                        label = { Text("Confirm passphrase") },
+                        singleLine = true
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = exportPassphrase.length >= 12 && exportPassphrase == exportPassphraseConfirm,
+                    onClick = {
+                        val passphrase = exportPassphrase
+                        viewModel.exportPortableSave(passphrase) { backup ->
+                            if (backup != null) {
+                                val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+                                clipboard?.setPrimaryClip(
+                                    ClipData.newPlainText("GuessTheNumberPortableBackup", backup)
+                                )
+                                android.widget.Toast.makeText(context, "Portable encrypted backup copied. Keep your passphrase safe!", android.widget.Toast.LENGTH_LONG).show()
+                            } else {
+                                android.widget.Toast.makeText(context, "Could not create portable backup.", android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                            exportPassphrase = ""
+                            exportPassphraseConfirm = ""
+                            showPortableExportDialog = false
+                        }
+                    }
+                ) { Text("Encrypt & Copy") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPortableExportDialog = false
+                    exportPassphrase = ""
+                    exportPassphraseConfirm = ""
+                }) { Text(locale.getString("cancel", "Cancel")) }
+            }
+        )
+    }
+
     if (showImportDialog) {
         AlertDialog(
-            onDismissRequest = { showImportDialog = false },
+            onDismissRequest = { showImportDialog = false; importPassphrase = "" },
             title = { Text(locale.getString("save_import_title", "Import Save Data")) },
             text = {
-                OutlinedTextField(
-                    value = importString,
-                    onValueChange = { importString = it },
-                    label = { Text(locale.getString("save_import_hint", "Paste encrypted save string here")) },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(
+                        value = importString,
+                        onValueChange = { importString = it },
+                        label = { Text(locale.getString("save_import_hint", "Paste encrypted save string here")) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = importPassphrase,
+                        onValueChange = { importPassphrase = it.take(128) },
+                        label = { Text("Portable backup passphrase (leave blank for legacy backups)") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.importSave(importString) { success ->
+                    viewModel.importSave(importString, importPassphrase) { success ->
                         android.widget.Toast.makeText(
                             context,
                             locale.getString(
@@ -398,6 +549,7 @@ fun SaveSlotsScreen(
                         ).show()
                         if (success) {
                             importString = ""
+                            importPassphrase = ""
                             refreshMetadata()
                         }
                         showImportDialog = false
@@ -407,7 +559,7 @@ fun SaveSlotsScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showImportDialog = false }) {
+                TextButton(onClick = { showImportDialog = false; importPassphrase = "" }) {
                     Text(locale.getString("cancel", "Cancel"))
                 }
             }
@@ -447,19 +599,7 @@ fun SaveSlotsScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = {
-                            viewModel.exportSave { json ->
-                                val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
-                                clipboard?.setPrimaryClip(
-                                    ClipData.newPlainText(locale.getString("save_export_label", "GuessTheNumberSave"), json)
-                                )
-                                android.widget.Toast.makeText(
-                                    context,
-                                    locale.getString("save_export_success", "Encrypted save copied to clipboard!"),
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        },
+                        onClick = { showPortableExportDialog = true },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(locale.getString("save_export_button", "Export Encrypted Save"))
@@ -471,6 +611,22 @@ fun SaveSlotsScreen(
                         Text(locale.getString("save_import_button", "Import Encrypted Save"))
                     }
                 }
+            }
+
+            item {
+                OutlinedButton(
+                    onClick = {
+                        viewModel.loadCreativeModeSave(activeSlot) { saved ->
+                            creativeName = saved?.name ?: "My Creative Mode"
+                            creativeEnabled = saved?.enabled ?: false
+                            creativeRangeMax = (saved?.rangeMax ?: 100L).toString()
+                            creativeHints = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.EXTRA_HINTS }?.value ?: 0).toString()
+                            creativeAttemptLimit = (saved?.effects?.firstOrNull { it.type == CreativeEffectType.ATTEMPT_LIMIT }?.value ?: 0).toString()
+                            showCreativeDialog = true
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Creative Mode Save • Slot $activeSlot") }
             }
 
             for (slot in 1..MAX_SAVE_SLOTS) {
