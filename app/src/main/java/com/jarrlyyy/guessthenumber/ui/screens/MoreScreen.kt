@@ -111,15 +111,15 @@ fun MoreScreen(
         "ultra" to "Ultra Hub & Upgrades",
         "prestige" to "Prestige Hub & Upgrades",
         "save_slots" to "Save Slots",
-        "music" to localizedText("Background Music Player"),
-        "world_map" to localizedText("World Map"),
-        "lua_hub" to localizedText("Activity Hub"),
-        "lua_testing_hub" to localizedText("Lua Testing Hub"),
-        "relics" to localizedText("Relic Collection"),
-        "home_base" to localizedText("Home Base"),
-        "codex" to localizedText("Explorer's Codex"),
-        "endgame" to localizedText("Endgame Challenges"),
-        "staking" to localizedText("Lucky Stake")
+        "music" to locale.getStringByEnglish("Background Music Player"),
+        "world_map" to locale.getStringByEnglish("World Map"),
+        "lua_hub" to locale.getStringByEnglish("Activity Hub"),
+        "lua_testing_hub" to locale.getStringByEnglish("Lua Testing Hub"),
+        "relics" to locale.getStringByEnglish("Relic Collection"),
+        "home_base" to locale.getStringByEnglish("Home Base"),
+        "codex" to locale.getStringByEnglish("Explorer's Codex"),
+        "endgame" to locale.getStringByEnglish("Endgame Challenges"),
+        "staking" to locale.getStringByEnglish("Lucky Stake")
     )
     val icons = mapOf(
         "achievements" to Icons.Default.EmojiEvents,
@@ -149,7 +149,7 @@ fun MoreScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(localizedText("More Hub"), style = MaterialTheme.typography.titleMedium) },
+                title = { Text(locale.getStringByEnglish("More Hub"), style = MaterialTheme.typography.titleMedium) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
@@ -169,9 +169,9 @@ fun MoreScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text(localizedText("More Menu"), style = MaterialTheme.typography.headlineSmall)
+                            Text(locale.getStringByEnglish("More Menu"), style = MaterialTheme.typography.headlineSmall)
                             Text(
-                                localizedText("Your shortcuts, your order."),
+                                locale.getStringByEnglish("Your shortcuts, your order."),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -188,7 +188,7 @@ fun MoreScreen(
                         ) {
                             Icon(Icons.Default.DragHandle, contentDescription = null)
                             Spacer(Modifier.width(6.dp))
-                            Text(if (isReordering) localizedText("Done") else localizedText("Reorder"))
+                            Text(if (isReordering) locale.getStringByEnglish("Done") else locale.getStringByEnglish("Reorder"))
                         }
                     }
 
@@ -199,12 +199,12 @@ fun MoreScreen(
                     ) {
                         Icon(Icons.Default.Replay, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text(localizedText("Replay Feature Tours"))
+                        Text(locale.getStringByEnglish("Replay Feature Tours"))
                     }
 
                     if (isReordering) {
                         Text(
-                            localizedText("Hold and drag to rearrange"),
+                            locale.getStringByEnglish("Hold and drag to rearrange"),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -324,7 +324,7 @@ fun MoreScreen(
                             }
                         }
                         if (isReordering) {
-                            Icon(Icons.Default.DragHandle, contentDescription = localizedText("Reorder"), tint = contentTint)
+                            Icon(Icons.Default.DragHandle, contentDescription = locale.getStringByEnglish("Reorder"), tint = contentTint)
                         } else {
                             IconButton(
                                 onClick = { colorTarget = route },
@@ -334,7 +334,7 @@ fun MoreScreen(
                             }
                             Icon(
                                 imageVector = if (isLocked) Icons.Default.Lock else Icons.Default.ChevronRight,
-                                contentDescription = if (isLocked) locale.getString("more_locked_short", "Locked · tap to view requirements") else localizedText("Open"),
+                                contentDescription = if (isLocked) locale.getString("more_locked_short", "Locked · tap to view requirements") else locale.getStringByEnglish("Open"),
                                 tint = if (isLocked) MaterialTheme.colorScheme.outline else contentTint
                             )
                         }
