@@ -43,7 +43,7 @@ object PortableSaveBackup {
             System.arraycopy(ciphertext, 0, envelope, salt.size + iv.size, ciphertext.size)
             PREFIX + Base64.getEncoder().withoutPadding().encodeToString(envelope)
         } finally {
-            passphrase.fill('\\u0000')
+            passphrase.fill('\u0000')
         }
     }
 
