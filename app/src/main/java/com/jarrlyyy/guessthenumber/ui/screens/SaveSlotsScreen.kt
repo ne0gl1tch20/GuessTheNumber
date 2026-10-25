@@ -78,6 +78,7 @@ fun SaveSlotsScreen(
     var showCreativeDialog by remember { mutableStateOf(false) }
     var showCreativeRunDialog by remember { mutableStateOf(false) }
     var creativeRunSave by remember { mutableStateOf<CreativeModeSave?>(null) }
+    var creativeRunSlot by remember { mutableIntStateOf(1) }
     var creativeRun by remember { mutableStateOf<CreativeModeRun?>(null) }
     var creativeRunGuess by remember { mutableStateOf("") }
     var creativeRunMessage by remember { mutableStateOf("") }
@@ -506,7 +507,7 @@ fun SaveSlotsScreen(
                                     creativeRunMessage = if (updated.target % 2L == 0L) "Hint: the target is even." else "Hint: the target is odd."
                                     CreativeModeRuntime.persist(config, updated)?.let { persisted ->
                                         creativeRunSave = persisted
-                                        viewModel.saveCreativeModeSave(activeSlot, persisted) { success ->
+                                        viewModel.saveCreativeModeSave(creativeRunSlot, persisted) { success ->
                                             if (!success) creativeRunMessage = "Hint used, but saving the run failed. Keep this dialog open."
                                         }
                                     }
@@ -747,7 +748,9 @@ fun SaveSlotsScreen(
                     ) { Text("Creative Mode Save • Slot $activeSlot") }
                     Button(
                         onClick = {
-                            viewModel.loadCreativeModeSave(activeSlot) { saved ->
+                            val selectedSlot = activeSlot
+                            creativeRunSlot = selectedSlot
+                            viewModel.loadCreativeModeSave(selectedSlot) { saved ->
                                 val rules = saved?.let(CreativeModeEffectPolicy::resolve)
                                 if (saved == null || !saved.enabled || rules == null) {
                                     android.widget.Toast.makeText(context, "Enable and save a valid Creative Mode configuration first.", android.widget.Toast.LENGTH_SHORT).show()
