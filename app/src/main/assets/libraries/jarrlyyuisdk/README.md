@@ -74,11 +74,11 @@ Use the SDK's `JarrlyyUI.dialog(title, message, options)` for standard prompts w
 
 ## Motion engine (Phase 2)
 
-The optional motion API is exposed as `JarrlyyUI.motion` and has no dependency on a game loop or native host:
+The optional motion API is exposed as the separate global `JarrlyyUIMotion` and has no dependency on a game loop or native host:
 
-- `JarrlyyUI.motion.count(element, target, { from?, duration?, format? })` animates a numeric label.
-- `JarrlyyUI.motion.progress(element, value, { min?, max? })` updates a meter and its accessible progress values.
-- `JarrlyyUI.motion.floatText(anchor, message, { className?, container? })` shows short-lived floating feedback.
-- `JarrlyyUI.motion.init(root?)` activates one-time `data-jui-reveal` entrances as content scrolls into view.
+- `JarrlyyUIMotion.count(element, target, { from?, duration?, format? })` animates a numeric label.
+- `JarrlyyUIMotion.progress(element, value, { min?, max? })` updates a meter and its accessible progress values.
+- `JarrlyyUIMotion.floatText(anchor, message, { className?, container? })` shows short-lived floating feedback.
+- `JarrlyyUIMotion.init(root?)` activates one-time `data-jui-reveal` entrances as content scrolls into view.
 
 Motion uses requestAnimationFrame only for active counters, IntersectionObserver for on-demand reveal, transform/opacity for smooth compositing, and automatic cleanup for floating text. It respects `prefers-reduced-motion`, avoids external libraries and runtime requests, and degrades to immediate values when animation APIs are unavailable. These primitives are browser, Android WebView and Windows WebView friendly; host code remains responsible for authoritative state.
