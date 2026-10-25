@@ -1,6 +1,14 @@
 name: Stable Debug APK
 
+# Keep only the newest Stable Debug build running; newer runs cancel older ones.
+concurrency:
+  group: stable-debug-apk
+  cancel-in-progress: true
+
 on:
+  push:
+    branches:
+      - master
   pull_request:
     types:
       - closed
