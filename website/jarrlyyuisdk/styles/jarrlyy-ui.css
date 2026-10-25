@@ -386,3 +386,27 @@
 :root[data-jui-theme="light"] .jui-badge-purple { color:#6243bd; }
 :root[data-jui-theme="light"] .jui-badge-cyan { color:#086b83; }
 :root[data-jui-theme="light"] .jui-badge-success { color:#087b49; }
+
+/* Jarrlyy Arcade Surface: original tactile controls and compact game primitives. */
+.jui-root, .jui-advanced-root { --jui-key-face: color-mix(in srgb,var(--jui-raised) 88%,var(--jui-cyan) 12%); --jui-key-lip: color-mix(in srgb,var(--jui-bg) 76%,#000 24%); --jui-key-rim: color-mix(in srgb,var(--jui-border) 70%,var(--jui-cyan) 30%); --jui-key-depth: 3px; --jui-key-radius: 10px; }
+.jui-button-keycap { --jui-button-face:var(--jui-key-face); position:relative; min-height:44px; border:1px solid var(--jui-key-rim); border-radius:var(--jui-key-radius); background:var(--jui-button-face); color:var(--jui-text); box-shadow:0 var(--jui-key-depth) 0 var(--jui-key-lip),inset 0 1px 0 rgba(255,255,255,.14); transform:translateY(0); transition:transform var(--jui-motion-fast),box-shadow var(--jui-motion-fast),background var(--jui-motion-fast); font-weight:800; letter-spacing:.035em; }
+.jui-button-keycap:active:not(:disabled) { transform:translateY(2px); box-shadow:0 1px 0 var(--jui-key-lip),inset 0 1px 0 rgba(255,255,255,.08); }
+.jui-button-keycap:disabled { box-shadow:none; opacity:.55; }
+.jui-button-keycap.jui-button-primary { --jui-button-face:color-mix(in srgb,var(--jui-success) 18%,var(--jui-surface)); border-color:color-mix(in srgb,var(--jui-success) 50%,var(--jui-border)); }
+.jui-button-keycap.jui-button-accent { --jui-button-face:color-mix(in srgb,var(--jui-cyan) 15%,var(--jui-surface)); border-color:color-mix(in srgb,var(--jui-cyan) 45%,var(--jui-border)); }
+.jui-button-keycap.jui-button-danger { --jui-button-face:color-mix(in srgb,var(--jui-danger) 13%,var(--jui-surface)); border-color:color-mix(in srgb,var(--jui-danger) 45%,var(--jui-border)); }
+.jui-button-keycap.jui-button-secondary { --jui-button-face:var(--jui-surface); }
+.jui-hud { display:flex; align-items:center; justify-content:space-between; gap:.75rem; min-width:0; padding:.85rem 1rem; border:1px solid var(--jui-border); border-radius:var(--jui-radius); background:linear-gradient(135deg,color-mix(in srgb,var(--jui-cyan) 7%,var(--jui-surface)),var(--jui-surface)); }
+.jui-hud-copy { min-width:0; } .jui-hud-title { margin:0; color:var(--jui-text); font-weight:850; letter-spacing:.055em; overflow-wrap:anywhere; }
+.jui-hud-subtitle { margin:.25rem 0 0; color:var(--jui-muted); font-size:.76rem; letter-spacing:.07em; text-transform:uppercase; overflow-wrap:anywhere; }
+.jui-hud-metrics { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:.45rem .75rem; min-width:0; }
+.jui-hud-metric { display:grid; gap:.15rem; text-align:right; font-variant-numeric:tabular-nums; } .jui-hud-metric-label { color:var(--jui-muted); font-size:.65rem; letter-spacing:.08em; text-transform:uppercase; }
+.jui-hud-metric-value { color:var(--jui-cyan); font-weight:850; overflow-wrap:anywhere; }
+.jui-section-label { display:flex; align-items:center; gap:.6rem; margin:1.1rem 0 .55rem; color:var(--jui-muted); font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+.jui-section-label::after { content:""; height:1px; flex:1; background:var(--jui-border); }
+.jui-meter { height:6px; overflow:hidden; border-radius:999px; background:var(--jui-border); } .jui-meter>span { display:block; width:var(--jui-meter-value,0%); height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--jui-purple),var(--jui-cyan)); transition:width var(--jui-motion-slow); }
+.jui-activity { display:inline-flex; align-items:center; gap:.22rem; min-width:30px; color:currentColor; } .jui-activity>i { width:.38rem; height:.8rem; border-radius:2px; background:currentColor; opacity:.22; animation:jui-activity-pulse 1.05s ease-in-out infinite; }
+.jui-activity>i:nth-child(2) { animation-delay:.15s; } .jui-activity>i:nth-child(3) { animation-delay:.3s; }
+@keyframes jui-activity-pulse { 0%,65%,100% { opacity:.22; transform:scaleY(.65); } 30% { opacity:1; transform:scaleY(1); } }
+@media(max-width:480px) { .jui-hud { align-items:flex-start; flex-direction:column; } .jui-hud-metrics { justify-content:flex-start; width:100%; } .jui-hud-metric { text-align:left; } }
+@media(prefers-reduced-motion:reduce) { .jui-button-keycap,.jui-meter>span { transition:none; } .jui-activity>i { animation-duration:2.8s; } }
