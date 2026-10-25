@@ -87,21 +87,21 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 - Rejected/out-of-range guesses do not consume attempts; completed runs reject further guesses.
 - The run runtime has no currency, reward, progression, filesystem or script capability.
 - The Save Slots screen now launches/resumes a run from the selected slot, submits guesses, consumes bounded parity hints, supports restart and persists run snapshots through the existing slot save API.
-- CI and a device-level interaction check are still required before this phase can be marked complete.
+- Android unit tests, lint and full Gradle check pass; a device-level interaction check remains pending.
 
 ## Phase 9 — Creative Mode session persistence and recovery: implementation complete; restart/device verification pending
 
 - Added schema v3 run snapshots with bounded IDs, range/target validation, attempt/hint counters and completed-state validation.
 - Added explicit runtime helpers to persist a run into its per-slot Creative Mode config, resume it after decoding, and clear a saved run.
 - Existing encrypted backup bundles already carry the Creative Mode config payload; schema v1/v2 imports migrate forward and never invent an active run.
-- Still required: call these helpers from the actual player-facing Creative Mode session lifecycle and verify crash/relaunch recovery, reset/duplicate behavior and atomic writes.
+- The Save Slots flow calls persist/resume/clear through the per-slot save API, and the portable backup carries the snapshot. Process-death/relaunch behavior and device-level recovery remain manual verification items.
 
-## Phase 10 — Creative effect composition and authoring: implementation complete; device verification pending
+## Phase 10 — Creative effect composition and authoring: implementation in place; end-to-end/device verification pending
 
 - The Save Slots editor exposes range scaling, extra hints and attempt limits; the shared policy composes them into bounded runtime rules.
 - Effects remain declarative and allowlisted. Creative Mode runs have no currency, reward, progression or script capability.
 - Runtime checks reject guesses outside the run range, over-limit guesses, stale snapshots and runs whose rules no longer match the saved configuration.
-- Still required: add a clear effect preview/conflict explanation and broaden end-to-end tests for combinations before marking this phase complete.
+- The editor now previews the effective range, hint count and attempt limit before saving. Broader end-to-end combination tests and device-level verification remain pending.
 
 ## Phase 11 — Trait/season lifecycle policy: complete
 
