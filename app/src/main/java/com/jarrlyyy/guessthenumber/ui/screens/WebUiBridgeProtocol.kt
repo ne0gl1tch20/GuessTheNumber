@@ -46,7 +46,9 @@ internal object WebUiBridgeProtocol {
             val musicPosition: Int? = null,
             val musicName: String? = null,
             val traitId: String? = null,
-            val armId: String? = null
+            val armId: String? = null,
+            val creativeRangeMin: Long? = null,
+            val creativeRangeMax: Long? = null
         ) : ParseResult
         data class Invalid(val error: String, val id: String = "") : ParseResult
     }
@@ -82,6 +84,15 @@ internal object WebUiBridgeProtocol {
                 val featureId = request.optString("featureId")
                 if (!featureId.matches(Regex("[A-Za-z0-9_-]{1,48}"))) return ParseResult.Invalid("invalid_feature", id)
                 ParseResult.Valid(id, type, itemId = featureId)
+            }
+            "creative_update_range" -> {
+                if (request.length() != 5 || !request.has("rangeMin") || !request.has("rangeMax")) return ParseResult.Invalid("invalid_request", id)
+                val minText = request.opt("rangeMin") as? String ?: return ParseResult.Invalid("invalid_creative_range", id)
+                val maxText = request.opt("rangeMax") as? String ?: return ParseResult.Invalid("invalid_creative_range", id)
+                val min = minText.toLongOrNull() ?: return ParseResult.Invalid("invalid_creative_range", id)
+                val max = maxText.toLongOrNull() ?: return ParseResult.Invalid("invalid_creative_range", id)
+                if (min !in 1L..1_000_000L || max !in min..1_000_000L) return ParseResult.Invalid("invalid_creative_range", id)
+                ParseResult.Valid(id, type, creativeRangeMin = min, creativeRangeMax = max)
             }
             "submit_guess" -> {
                 if (request.length() != 4 || !request.has("guess")) return ParseResult.Invalid("invalid_request", id)
