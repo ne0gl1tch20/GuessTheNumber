@@ -20,6 +20,7 @@ class JarrlyyUiSdkTests(unittest.TestCase):
             "demo.html",
             "styles/jarrlyy-ui-advanced.css",
             "components/jarrlyy-ui-advanced.js",
+            "components/jarrlyy-ui-host.js",
         ):
             with self.subTest(path=relative):
                 self.assertTrue((SDK / relative).is_file(), f"Missing SDK file: {relative}")
