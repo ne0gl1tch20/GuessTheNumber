@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 🏠 **Launcher widgets:** use bundled Manrope and JetBrains Mono fonts for the branded title and balance, fix widget compilation, and refresh only when needed instead of scheduling a daily wake-up.
+
 - 🏠 **Launcher widgets:** refined the expanded and compact home-screen widgets into app-style companions with the selected save, balance, quick progress and direct Play/save-switch actions. Gameplay and save data remain owned by Kotlin.
 
 ### Guess The Number 3.2.0 — Creative Mode Phase 8–10 hardening
