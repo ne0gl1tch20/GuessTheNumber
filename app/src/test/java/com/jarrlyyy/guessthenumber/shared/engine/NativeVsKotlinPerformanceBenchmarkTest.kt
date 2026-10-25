@@ -12,18 +12,18 @@ class NativeVsKotlinPerformanceBenchmarkTest {
     @Test
     fun kotlinCoreReportsMedianP95AndThroughput() {
         val cases = BenchmarkCaseSet
-        repeat(WARMUP_ITERATIONS) {
-            for (case in cases) kotlinAdaptiveTarget(case)
+        repeat(WARMUP_ITERATIONS) { iteration ->
+            for (case in cases) kotlinAdaptiveTarget(case, iteration)
         }
 
         var expectedChecksum = 0L
-        for (case in cases) expectedChecksum = expectedChecksum xor kotlinAdaptiveTarget(case)
+        for (case in cases) expectedChecksum = expectedChecksum xor kotlinAdaptiveTarget(case, 0)
         val samples = LongArray(SAMPLE_COUNT)
         repeat(SAMPLE_COUNT) {
             val started = System.nanoTime()
             var checksum = 0L
-            repeat(ITERATIONS_PER_SAMPLE) {
-                for (case in cases) checksum = checksum xor kotlinAdaptiveTarget(case)
+            repeat(ITERATIONS_PER_SAMPLE) { iteration ->
+                for (case in cases) checksum = checksum xor kotlinAdaptiveTarget(case, iteration)
             }
             sink = checksum
             samples[it] = (System.nanoTime() - started) / (ITERATIONS_PER_SAMPLE * cases.size)
@@ -36,7 +36,7 @@ class NativeVsKotlinPerformanceBenchmarkTest {
 
         assertTrue("Benchmark samples must be positive", samples.all { it > 0L })
         assertTrue("Representative output must remain bounded", cases.all {
-            val result = kotlinAdaptiveTarget(it)
+            val result = kotlinAdaptiveTarget(it, 0)
             result in it.rangeMin..it.rangeMax
         })
 
@@ -60,12 +60,12 @@ class NativeVsKotlinPerformanceBenchmarkTest {
         println("NATIVE_VS_KOTLIN_KOTLIN_BENCHMARK " + report.replace("\n", " ").trim())
     }
 
-    private fun kotlinAdaptiveTarget(case: BenchmarkCase): Long {
+    private fun kotlinAdaptiveTarget(case: BenchmarkCase, iteration: Int): Long {
         if (case.rangeMax < case.rangeMin) return case.rangeMin
         val width = (case.rangeMax - case.rangeMin) + 1L
         if (width <= 0L) return case.rangeMin
 
-        var state = case.seed
+        var state = case.seed xor iteration.toLong() * ITERATION_SALT
         state = state xor difficultySalt(case.difficulty)
         state = state xor maxOf(0, case.streak).toLong() * STREAK_MULTIPLIER
         state = state xor maxOf(0L, case.attempts) * ATTEMPTS_MULTIPLIER
@@ -132,12 +132,13 @@ class NativeVsKotlinPerformanceBenchmarkTest {
     private companion object {
         const val WARMUP_ITERATIONS = 2_000
         const val SAMPLE_COUNT = 21
-        const val ITERATIONS_PER_SAMPLE = 100_000
+        const val ITERATIONS_PER_SAMPLE = 20_000
         const val MIX_INCREMENT = -7046029254386353131L
         const val MIX_MULTIPLIER_A = -4658895280553007687L
         const val MIX_MULTIPLIER_B = -7723592293110705685L
         const val STREAK_MULTIPLIER = -2960836687051489901L
         const val ATTEMPTS_MULTIPLIER = -6511265742569879269L
+        const val ITERATION_SALT = -7046029254386353131L
 
         @Volatile
         var sink = 0L
