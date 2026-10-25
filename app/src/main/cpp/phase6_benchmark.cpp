@@ -56,7 +56,7 @@ uint64_t evaluate(const std::vector<BenchmarkCase>& cases, int iteration) {
 int main() {
     constexpr int warmupIterations = 2000;
     constexpr int sampleCount = 21;
-    constexpr int iterationsPerSample = 20000;
+    constexpr int iterationsPerSample = 5000;
     const auto cases = makeCases();
 
     for (int i = 0; i < warmupIterations; ++i) {
