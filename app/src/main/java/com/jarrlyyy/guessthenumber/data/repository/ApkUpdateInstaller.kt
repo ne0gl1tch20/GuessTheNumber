@@ -26,7 +26,7 @@ class ApkUpdateInstaller(private val context: Context) {
         private const val EXPECTED_DEBUG_APK = "GuessTheNumber-debug.apk"
     }
 
-    fun install(downloadUrl: String, requireChecksum: Boolean = false, expectedCommitSha: String? = null): Result<Unit> {
+    fun install(downloadUrl: String, requireChecksum: Boolean = false, expectedCommitSha: String? = null, onProgress: (stage: String, downloaded: Long, total: Long) -> Unit = { _, _, _ -> }): Result<Unit> {
         val source = runCatching { java.net.URI(downloadUrl) }.getOrNull()
             ?: return Result.failure(IllegalArgumentException("Invalid update URL."))
         if (source.scheme != "https" || source.host !in setOf("github.com", "api.github.com")) {
@@ -39,12 +39,15 @@ class ApkUpdateInstaller(private val context: Context) {
         return runCatching {
             if (URL(downloadUrl).path.lowercase().endsWith(".apk")) {
                 require(!requireChecksum) { "The Stable Debug update must be a ZIP artifact." }
-                download(downloadUrl, directApk)
+                download(downloadUrl, directApk, onProgress)
+                onProgress("Validating downloaded APK…", directApk.length(), directApk.length())
                 validateApk(directApk)
                 installApks(listOf(directApk))
             } else {
-                download(downloadUrl, archive)
+                download(downloadUrl, archive, onProgress)
+                onProgress("Extracting update…", archive.length(), archive.length())
                 extractSafely(archive, extracted)
+                onProgress("Checking update integrity…", archive.length(), archive.length())
                 val files = extracted.walkTopDown().filter { it.isFile }.toList()
                 require(files.all { it.parentFile?.canonicalFile == extracted.canonicalFile }) {
                     "Update archive contains unexpected nested paths."
@@ -77,12 +80,13 @@ class ApkUpdateInstaller(private val context: Context) {
         }
     }
 
-    private fun download(address: String, destination: File) {
+    private fun download(address: String, destination: File, onProgress: (String, Long, Long) -> Unit) {
         val connection = URL(address).openConnection() as HttpURLConnection
         connection.connectTimeout = 15000
         connection.readTimeout = 30000
         connection.instanceFollowRedirects = true
         connection.setRequestProperty("User-Agent", "GuessTheNumber-Updater")
+        val deadlineNanos = System.nanoTime() + 10L * 60L * 1_000_000_000L
         try {
             require(connection.responseCode in 200..299) { "Download failed: HTTP ${connection.responseCode}" }
             val length = connection.contentLengthLong
@@ -90,14 +94,22 @@ class ApkUpdateInstaller(private val context: Context) {
             connection.inputStream.use { input ->
                 FileOutputStream(destination).use { output ->
                     var total = 0L
+                    var lastReported = 0L
                     val buffer = ByteArray(32 * 1024)
+                    onProgress("Downloading update…", 0L, length)
                     while (true) {
+                        require(System.nanoTime() < deadlineNanos) { "Update download timed out after 10 minutes." }
                         val count = input.read(buffer)
                         if (count < 0) break
                         total += count
                         require(total <= MAX_ARCHIVE_BYTES) { "Update archive is too large." }
                         output.write(buffer, 0, count)
+                        if (total - lastReported >= 256L * 1024L || (length > 0L && total >= length)) {
+                            onProgress("Downloading update…", total, length)
+                            lastReported = total
+                        }
                     }
+                    onProgress("Download complete. Preparing update…", total, length)
                 }
             }
         } finally { connection.disconnect() }
