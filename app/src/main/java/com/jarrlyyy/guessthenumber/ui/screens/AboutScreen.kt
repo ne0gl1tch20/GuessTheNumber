@@ -180,6 +180,26 @@ fun AboutScreen(viewModel: com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewMode
                     }
                 }
             }
+            item {
+                Text("Find us online", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
+                Text("These links open in your browser.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(
+                        "YouTube · @theg0ldne0_01" to "https://www.youtube.com/@theg0ldne0_01",
+                        "Instagram · theg0ldne0_01" to "https://www.instagram.com/theg0ldne0_01/",
+                        "NameMC · PearlSteve15" to "https://namemc.com/profile/PearlSteve15",
+                        "GitHub · ne0gl1tch20 (source code)" to "https://github.com/ne0gl1tch20",
+                        "Website" to "https://ne0gl1tch20.github.io/GuessTheNumber"
+                    ).forEach { (label, url) ->
+                        OutlinedButton(
+                            onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(label) }
+                    }
+                }
+            }
             item { Text(locale.getString("about_licenses_title", "Open Source Licenses (Android Standards)"), fontSize = 18.sp, style = MaterialTheme.typography.titleMedium) }
             items(libraries) { lib ->
                 Card(Modifier.fillMaxWidth()) {
