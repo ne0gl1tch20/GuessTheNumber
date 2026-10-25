@@ -25,7 +25,7 @@ data class CreativeModeRun(
     }
 }
 
-enum class CreativeGuessOutcome { TOO_LOW, TOO_HIGH, CORRECT, OUT_OF_RANGE, ATTEMPT_LIMIT, COMPLETED }
+enum class CreativeGuessOutcome { TOO_LOW, TOO_HIGH, CORRECT, OUT_OF_RANGE, ATTEMPT_LIMIT, COMPLETED, INVALID_CONFIGURATION }
 
 data class CreativeGuessDecision(
     val outcome: CreativeGuessOutcome,
@@ -53,8 +53,11 @@ object CreativeModeRuntime {
 
     fun resume(save: CreativeModeSave): CreativeModeRun? {
         val snapshot = save.activeRun ?: return null
-        if (!save.enabled || !CreativeModeSaveCodec.validate(save) ||
-            !CreativeModeSaveCodec.validateRunSnapshot(snapshot)) return null
+        val rules = CreativeModeEffectPolicy.resolve(save) ?: return null
+        if (!save.enabled || !CreativeModeSaveCodec.validateRunSnapshot(snapshot) ||
+            snapshot.rangeMin != rules.rangeMin || snapshot.rangeMax != rules.rangeMax ||
+            snapshot.hintsUsed > rules.extraHints ||
+            (rules.attemptLimit != null && snapshot.attemptsUsed > rules.attemptLimit)) return null
         return runCatching {
             CreativeModeRun(
                 runId = snapshot.runId,
@@ -70,7 +73,8 @@ object CreativeModeRuntime {
     }
 
     fun persist(save: CreativeModeSave, run: CreativeModeRun): CreativeModeSave? {
-        if (!save.enabled || !CreativeModeSaveCodec.validate(save)) return null
+        val rules = CreativeModeEffectPolicy.resolve(save) ?: return null
+        if (!save.enabled || !matchesRules(run, rules)) return null
         val snapshot = CreativeModeRunSnapshot(
             runId = run.runId,
             rangeMin = run.rangeMin,
@@ -87,11 +91,30 @@ object CreativeModeRuntime {
     fun clearPersistedRun(save: CreativeModeSave): CreativeModeSave =
         save.copy(activeRun = null)
 
+    private fun matchesRules(run: CreativeModeRun, rules: CreativeRuntimeRules): Boolean =
+        CreativeModeSaveCodec.validateRunSnapshot(
+            CreativeModeRunSnapshot(
+                runId = run.runId,
+                rangeMin = run.rangeMin,
+                rangeMax = run.rangeMax,
+                target = run.target,
+                attemptsUsed = run.attemptsUsed,
+                correctGuesses = run.correctGuesses,
+                hintsUsed = run.hintsUsed,
+                completed = run.completed
+            )
+        ) && run.rangeMin == rules.rangeMin && run.rangeMax == rules.rangeMax &&
+            run.hintsUsed <= rules.extraHints &&
+            (rules.attemptLimit == null || run.attemptsUsed <= rules.attemptLimit)
+
     fun submitGuess(save: CreativeModeSave, run: CreativeModeRun, guess: Long): CreativeGuessDecision {
         val rules = CreativeModeEffectPolicy.resolve(save)
-            ?: return CreativeGuessDecision(CreativeGuessOutcome.COMPLETED, run, false)
+            ?: return CreativeGuessDecision(CreativeGuessOutcome.INVALID_CONFIGURATION, run, false)
         if (!save.enabled || run.completed) {
             return CreativeGuessDecision(CreativeGuessOutcome.COMPLETED, run, false)
+        }
+        if (!matchesRules(run, rules)) {
+            return CreativeGuessDecision(CreativeGuessOutcome.INVALID_CONFIGURATION, run, false)
         }
         if (guess !in run.rangeMin..run.rangeMax) {
             return CreativeGuessDecision(CreativeGuessOutcome.OUT_OF_RANGE, run, false)
@@ -117,7 +140,7 @@ object CreativeModeRuntime {
 
     fun useHint(save: CreativeModeSave, run: CreativeModeRun): CreativeModeRun? {
         val rules = CreativeModeEffectPolicy.resolve(save) ?: return null
-        if (!save.enabled || run.completed || run.hintsUsed >= rules.extraHints) return null
+        if (!save.enabled || !matchesRules(run, rules) || run.completed || run.hintsUsed >= rules.extraHints) return null
         return run.copy(hintsUsed = run.hintsUsed + 1)
     }
 }
