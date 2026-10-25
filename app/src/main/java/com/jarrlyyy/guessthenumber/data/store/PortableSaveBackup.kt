@@ -27,21 +27,24 @@ object PortableSaveBackup {
         require(passphrase.size >= MIN_PASSPHRASE_LENGTH) {
             "Passphrase must be at least $MIN_PASSPHRASE_LENGTH characters."
         }
-        val salt = ByteArray(SALT_BYTES)
-        val iv = ByteArray(IV_BYTES)
-        SecureRandom().nextBytes(salt)
-        SecureRandom().nextBytes(iv)
-        val key = deriveKey(passphrase, salt)
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.ENCRYPT_MODE, key, GCMParameterSpec(TAG_BITS, iv))
-        cipher.updateAAD(AAD.toByteArray(Charsets.UTF_8))
-        val ciphertext = cipher.doFinal(payload.toByteArray(Charsets.UTF_8))
-        val envelope = ByteArray(salt.size + iv.size + ciphertext.size)
-        System.arraycopy(salt, 0, envelope, 0, salt.size)
-        System.arraycopy(iv, 0, envelope, salt.size, iv.size)
-        System.arraycopy(ciphertext, 0, envelope, salt.size + iv.size, ciphertext.size)
-        passphrase.fill('\u0000')
-        return PREFIX + Base64.getEncoder().withoutPadding().encodeToString(envelope)
+        return try {
+            val salt = ByteArray(SALT_BYTES)
+            val iv = ByteArray(IV_BYTES)
+            SecureRandom().nextBytes(salt)
+            SecureRandom().nextBytes(iv)
+            val key = deriveKey(passphrase, salt)
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.ENCRYPT_MODE, key, GCMParameterSpec(TAG_BITS, iv))
+            cipher.updateAAD(AAD.toByteArray(Charsets.UTF_8))
+            val ciphertext = cipher.doFinal(payload.toByteArray(Charsets.UTF_8))
+            val envelope = ByteArray(salt.size + iv.size + ciphertext.size)
+            System.arraycopy(salt, 0, envelope, 0, salt.size)
+            System.arraycopy(iv, 0, envelope, salt.size, iv.size)
+            System.arraycopy(ciphertext, 0, envelope, salt.size + iv.size, ciphertext.size)
+            PREFIX + Base64.getEncoder().withoutPadding().encodeToString(envelope)
+        } finally {
+            passphrase.fill('\\u0000')
+        }
     }
 
     fun decrypt(input: String, passphrase: CharArray): String? {
