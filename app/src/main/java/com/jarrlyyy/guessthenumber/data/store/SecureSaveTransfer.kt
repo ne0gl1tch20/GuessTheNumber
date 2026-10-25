@@ -88,13 +88,13 @@ internal suspend fun importSecureOrLegacyPayload(
     decryptSecure: (String) -> String?,
     importPayload: suspend (String) -> Boolean
 ): Boolean {
-    val securePayload = decryptSecure(input)
-    return if (securePayload != null) {
-        importPayload(securePayload)
-    } else {
-        // Explicit compatibility path for all supported legacy encrypted/plain imports.
-        importPayload(input)
+    if (SecureSaveTransfer.isSecureFormat(input)) {
+        // Never downgrade a malformed/tampered secure envelope into the legacy parser.
+        val securePayload = decryptSecure(input) ?: return false
+        return importPayload(securePayload)
     }
+    // Explicit compatibility path for all supported legacy encrypted/plain imports.
+    return importPayload(input)
 }
 
 suspend fun SaveManager.importSecureOrLegacySave(input: String, slot: Int = -1): Boolean =
