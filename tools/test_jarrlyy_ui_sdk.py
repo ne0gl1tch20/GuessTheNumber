@@ -358,7 +358,7 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         for token in ("--jui-key-face", "--jui-key-lip", ".jui-button-keycap", ".jui-hud", ".jui-meter", ".jui-activity", "prefers-reduced-motion"):
             with self.subTest(token=token):
                 self.assertIn(token, sdk_css)
-        for token in ("max-height:calc(100dvh - 24px)", "overflow-wrap:anywhere", "overscroll-behavior:contain"):
+        for token in ("max-height:calc(100dvh-24px)", "overflow-wrap:anywhere", "overscroll-behavior:contain"):
             with self.subTest(dialog_rule=token):
                 self.assertIn(token, advanced_css.replace(" ", ""))
         self.assertIn("function createKeyButton", sdk_js)
