@@ -20,13 +20,15 @@ class TraitSeasonPolicyTest {
     @Test fun winterCrossesYearBoundaryAndLeapDayIsHandled() {
         val winterStart = TraitSeasonPolicy.seasonFor(LocalDate.of(2026, 12, 1))
         assertTrue(winterStart.contains(LocalDate.of(2027, 1, 1)))
-        assertTrue(winterStart.contains(LocalDate.of(2028, 2, 29)))
-        assertFalse(winterStart.contains(LocalDate.of(2028, 3, 1)))
+        val leapWinter = TraitSeasonPolicy.seasonFor(LocalDate.of(2028, 2, 29))
+        assertTrue(leapWinter.contains(LocalDate.of(2028, 2, 29)))
+        assertFalse(leapWinter.contains(LocalDate.of(2028, 3, 1)))
     }
 
     @Test fun seasonEndIsExclusiveAndSeasonCheckIsDeterministic() {
         assertTrue(TraitSeasonPolicy.isActive("spring", LocalDate.of(2026, 5, 31)))
         assertFalse(TraitSeasonPolicy.isActive("spring", LocalDate.of(2026, 6, 1)))
-        assertEquals(0L, TraitSeasonPolicy.seasonFor(LocalDate.of(2026, 6, 1)).daysRemaining(LocalDate.of(2026, 6, 1)))
+        val spring = TraitSeasonPolicy.seasonFor(LocalDate.of(2026, 5, 31))
+        assertEquals(0L, spring.daysRemaining(LocalDate.of(2026, 6, 1)))
     }
 }
