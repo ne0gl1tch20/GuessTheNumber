@@ -245,6 +245,14 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         self.assertIn('color: var(--text);', css)
         self.assertIn(':root[data-theme-mode="Light"] .setting-row small', css)
         self.assertIn('color: var(--muted);', css)
+        # Regression coverage includes legacy card surfaces and the shared SDK palette.
+        for token in ("--jui-surface:#fff", ".hero-card,.boss-card", ".jui-root.jui-button-primary", "color-scheme:light"):
+            with self.subTest(token=token):
+                self.assertIn(token, css.replace(" ", ""))
+        sdk_css = (SDK / "styles/jarrlyy-ui.css").read_text(encoding="utf-8")
+        self.assertIn(':root[data-jui-theme="light"]', sdk_css)
+        self.assertIn('--jui-surface:#fff', sdk_css.replace(" ", ""))
+        self.assertIn('color-scheme:light', sdk_css.replace(" ", ""))
 
 
     def test_shared_popup_sizing_standard_covers_nimmy_arcade_and_sdk_prompts(self):

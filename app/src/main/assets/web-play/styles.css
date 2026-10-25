@@ -1192,3 +1192,60 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 
 
 .more-links [data-screen-target].menu-studio-moved{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:14px;border:1px solid color-mix(in srgb,var(--menu-button-color,var(--accent)) 36%,var(--line));border-radius:18px;background:var(--panel2);color:var(--menu-button-color,var(--text));text-align:left}
+
+
+/* Light mode parity: override dark-only legacy surfaces and SDK tokens. */
+:root[data-theme-mode="Light"] {
+  color-scheme: light;
+  --jui-bg: #f3f5fb; --jui-surface: #ffffff; --jui-raised: #e8edf8;
+  --jui-border: rgba(31,42,70,.16); --jui-text: #172038; --jui-muted: #56617c;
+  --jui-purple: #7050d8; --jui-cyan: #087b9a; --jui-danger: #b72e55;
+  --jui-success: #087b49; --jui-focus: 0 0 0 3px rgba(65,89,190,.28);
+}
+:root[data-theme-mode="Light"] body,
+:root[data-theme-mode="Light"] body.jui-game-compat {
+  color: var(--text); background: linear-gradient(180deg,#f8f9ff 0%,#edf1fa 100%); color-scheme: light;
+}
+:root[data-theme-mode="Light"] :is(
+ .card,.stat-card,.progression-card,.quest-card,.loot-card,.boss-card,.economy-card,
+ .guess-card,.hero-card,.trait-entry,.catalog-panel,.catalog-entry,.catalog-row,
+ .achievement-card,.milestone-card,.music-card,.about-card,.about-hero,.event-card,
+ .strategy-card,.menu-studio-section,.settings-list,.settings-card,.jui-card,
+ .jui-dialog,.jui-bottom-sheet,.jui-drawer,.reward-dialog,.nimmy-dialog
+) { color:var(--text); border-color:var(--line); background-color:var(--panel); }
+:root[data-theme-mode="Light"] :is(
+ .card,.stat-card,.progression-card,.quest-card,.loot-card,.economy-card,.guess-card,
+ .trait-entry,.catalog-panel,.catalog-entry,.catalog-row,.achievement-card,
+ .milestone-card,.music-card,.about-card,.event-card,.strategy-card,.menu-studio-section,.settings-card
+) { background-image:linear-gradient(145deg,rgba(255,255,255,.98),rgba(239,243,252,.98)); box-shadow:0 10px 28px rgba(35,49,83,.08); }
+:root[data-theme-mode="Light"] :is(
+ .hero-card,.boss-card,.realm-row,.currency-tile,.progression-mini-grid>div,
+ .quest-metrics>div,.loot-items>div,.menu-studio-row,.menu-studio-preview-chip
+) { color:var(--text); border-color:var(--line); background-color:var(--panel2); }
+:root[data-theme-mode="Light"] :is(.hero-card,.boss-card) { background-image:linear-gradient(145deg,#fff,#edf1fa); }
+:root[data-theme-mode="Light"] :is(
+ .screen p,.screen li,.screen label,.screen summary,.screen .description,
+ .screen .catalog-entry-copy>span,.screen .catalog-entry-copy>small,
+ .screen .quest-row-copy small,.screen .milestone-copy small,.screen .about-description,
+ .screen .about-update-copy,.screen .menu-studio-row-copy small,.screen .menu-studio-section>p,
+ .jui-root .jui-muted,.jui-root .jui-field-label
+) { color:var(--muted); }
+:root[data-theme-mode="Light"] :is(
+ .screen h1,.screen h2,.screen h3,.screen .catalog-entry-copy>strong,
+ .screen .quest-row-copy strong,.screen .milestone-copy strong,.jui-root,
+ .jui-root .jui-card,.jui-root .jui-button,.jui-root .jui-icon-button
+) { color:var(--text); }
+:root[data-theme-mode="Light"] :is(
+ .progress-track,.boss-health-track,.input-shell input,.setting-field select,.setting-field textarea,
+ .setting-field input:not([type="checkbox"]):not([type="range"]),.jui-root .jui-field,.jui-root .jui-switch-track
+) { background-color:var(--panel2); border-color:var(--line); color:var(--text); }
+:root[data-theme-mode="Light"] .jui-root,
+:root[data-theme-mode="Light"] .jui-advanced-root { color-scheme:light; }
+:root[data-theme-mode="Light"] .jui-root .jui-button,
+:root[data-theme-mode="Light"] .jui-root .jui-icon-button { background-color:var(--jui-raised); border-color:var(--jui-border); color:var(--jui-text); }
+:root[data-theme-mode="Light"] .jui-root .jui-button-primary { background:linear-gradient(115deg,#8064e8,#5574db); color:#fff; }
+:root[data-theme-mode="Light"] .jui-root .jui-button-accent,
+:root[data-theme-mode="Light"] .jui-root .jui-badge-cyan { color:#086b83; }
+:root[data-theme-mode="Light"] .jui-root .jui-field::placeholder { color:#66718a; }
+:root[data-theme-mode="Light"] .popup-layer > .reward-overlay,
+:root[data-theme-mode="Light"] .popup-layer > .nimmy-tutorial:not([hidden]) { background:rgba(27,35,58,.38); }
