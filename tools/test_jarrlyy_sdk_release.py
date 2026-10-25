@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Release-contract checks for the shared Jarrlyy UI SDK."""
 from pathlib import Path
+import sys
 import unittest
 
-from tools.generate_web_play_manifest import build_manifest
-
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from tools.generate_web_play_manifest import build_manifest
 BUNDLED = ROOT / "app/src/main/assets/libraries/jarrlyyuisdk"
 PUBLIC = ROOT / "website/jarrlyyuisdk"
 WORKFLOW = ROOT / ".github/workflows/web-play-manifest.yml"
