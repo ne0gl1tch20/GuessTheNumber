@@ -90,8 +90,11 @@ internal object WebUiBridgeProtocol {
                 val key = request.opt("key") as? String ?: return ParseResult.Invalid("invalid_creative_value", id)
                 val value = request.opt("value") as? String ?: return ParseResult.Invalid("invalid_creative_value", id)
                 val allowedKeys = setOf("money", "prestige", "ultra", "nebula", "attempts", "correctGuesses", "streak", "bestStreak")
-                if (key !in allowedKeys) return ParseResult.Invalid("invalid_creative_value", id)
-                val valid = when (key) {
+                val upgradeLevelKey = key.matches(Regex("upgradeLevel:[A-Za-z0-9_-]{1,64}"))
+                if (key !in allowedKeys && !upgradeLevelKey) return ParseResult.Invalid("invalid_creative_value", id)
+                val valid = if (upgradeLevelKey) {
+                    value.toIntOrNull()?.let { it in 0..999_999 } == true
+                } else when (key) {
                     "money", "prestige", "ultra", "nebula" -> value.length in 1..100 && Regex("[0-9]+(?:\\.[0-9]+)?(?:[A-Za-z]{1,4})?").matches(value)
                     "attempts", "correctGuesses" -> value.toLongOrNull()?.let { it in 0L..1_000_000_000_000L } == true
                     "streak", "bestStreak" -> value.toIntOrNull()?.let { it in 0..1_000_000 } == true
