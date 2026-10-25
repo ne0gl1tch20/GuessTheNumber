@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstdint>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -63,7 +64,7 @@ int main() {
     }
 
     const uint64_t expectedChecksum = evaluate(cases, 0);
-    std::vector<int64_t> samples;
+    std::vector<double> samples;
     samples.reserve(sampleCount);
 
     for (int sample = 0; sample < sampleCount; ++sample) {
@@ -75,15 +76,17 @@ int main() {
         const auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::steady_clock::now() - started).count();
         sink = checksum ^ static_cast<uint64_t>(sample);
-        samples.push_back(elapsed / (iterationsPerSample * static_cast<int>(cases.size())));
+        samples.push_back(static_cast<double>(elapsed) /
+                          (iterationsPerSample * static_cast<int>(cases.size())));
     }
 
     std::sort(samples.begin(), samples.end());
-    const int64_t median = samples[samples.size() / 2];
-    const int64_t p95 = samples[((samples.size() - 1) * 95) / 100];
-    const uint64_t throughput = median == 0 ? UINT64_MAX : 1000000000ULL / static_cast<uint64_t>(median);
+    const double median = samples[samples.size() / 2];
+    const double p95 = samples[((samples.size() - 1) * 95) / 100];
+    const double throughput = median <= 0.0 ? 0.0 : 1000000000.0 / median;
 
     std::ofstream report("build/reports/native-vs-kotlin-native.txt");
+    report << std::fixed << std::setprecision(3);
     report << "NATIVE_CORE\n";
     report << "compiler=" << __VERSION__ << "\n";
     report << "cases=" << cases.size() << "\n";
@@ -97,7 +100,8 @@ int main() {
     report << "bounded=true\n";
     report.close();
 
-    std::cout << "NATIVE_VS_KOTLIN_NATIVE_BENCHMARK "
+    std::cout << std::fixed << std::setprecision(3)
+              << "NATIVE_VS_KOTLIN_NATIVE_BENCHMARK "
               << "medianNsPerEvaluation=" << median << ' '
               << "p95NsPerEvaluation=" << p95 << ' '
               << "medianEvaluationsPerSecond=" << throughput << ' '
