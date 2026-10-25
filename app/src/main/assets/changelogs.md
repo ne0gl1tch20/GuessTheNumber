@@ -1,3 +1,11 @@
+# Guess The Number 3.1.0 — Unreleased
+
+- 🧪 **Creative Mode and trait-system expansion:** Phase 8+ implementation work is being tracked in the trait-system roadmap. Only items with implementation and passing checks will be marked complete.
+- 💾 **Save compatibility:** portable encrypted backups and versioned per-slot Creative Mode saves remain supported. Keep the export passphrase somewhere safe; it is not stored by the app.
+- 🌦️ **Trait and seasonal architecture:** continued work is planned around deterministic activation, safe effect policies, signed catalog updates and offline-first seasonal behavior.
+- 📚 **Project history:** added [the PR-by-PR development ledger](../../../docs/PR_CHANGELOG.md) so merged work and open/unmerged attempts are easier to audit.
+- 🔢 **App version:** bumped to 3.1.0 (versionCode 22).
+
 ## Unreleased (HTML More Hub, changelog and player feedback)
 - 📋 **Canonical changelog content**: The shared HTML changelog now reads this Markdown file and formats its headings, bold text, code and lists instead of duplicating release notes in HTML.
 
