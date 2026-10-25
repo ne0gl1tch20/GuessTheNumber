@@ -51,13 +51,14 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 - Android now builds a C++20 shared library through CMake/NDK and exposes one narrow JNI function.
 - `NativeGameplayOptimizer` accepts only bounded range, difficulty ID, streak, attempts and a caller-provided seed. It returns a clamped candidate target and has a Kotlin fallback for JVM/desktop or native-load failures.
 - The native algorithm uses the **difficulty stored in the active save state** as an input. It never reads or mutates save files itself, so difficulty remains per-slot rather than global.
-- Phase 6 still needs a representative before/after workload comparison against the Phase 5 Kotlin/JVM reference before the native path can be called performance-proven.
+- A repeatable native-vs-Kotlin core benchmark now runs in GitHub Actions and uploads its report. It checks deterministic checksum parity and reports median/p95 latency plus derived throughput. The microbenchmark excludes Android JNI-call overhead, so it does not claim whole-game speedup.
 
 ### Save transfer security
 
 - New `GTNSEC2:` versioned transfer envelopes use AES-256-GCM with authenticated data and an Android Keystore-protected non-exportable key.
-- Secure envelopes are authenticated before their payload reaches `SaveManager`.
-- Existing legacy encrypted/plain import remains accepted through an explicit compatibility path.
+- Save Slots export now uses `exportSecureSave()` and import uses `importSecureOrLegacySave()` through the existing view-model actions.
+- Secure envelopes are authenticated before their payload reaches `SaveManager`; malformed/tampered envelopes are rejected.
+- Existing legacy encrypted/plain import remains accepted through an explicit compatibility path, covered by a regression test.
 - The secure export key is device-bound in this phase because the current transfer UI has no passphrase/key-sharing flow. A future portable export format must add explicit user-controlled key material rather than embedding a secret in the APK.
 - C++ is not used to implement cryptography from scratch. Native code is used for the gameplay algorithm; platform cryptography provides the save-transfer security boundary.
 
