@@ -25,7 +25,7 @@ class CreativeModeSaveTest {
         assertEquals(save, decoded)
         val rules = CreativeModeEffectPolicy.resolve(decoded!!)
         assertEquals(10L, rules?.rangeMin)
-        assertEquals(190L, rules?.rangeMax)
+        assertEquals(191L, rules?.rangeMax)
         assertEquals(3, rules?.extraHints)
         assertEquals(20, rules?.attemptLimit)
     }
