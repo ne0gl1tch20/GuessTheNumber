@@ -48,6 +48,21 @@ class PortableSaveBackupTest {
     }
 
     @Test
+    fun unknownPortableVersionsNeverFallBackToLegacyImport() {
+        var legacyCalled = false
+        val result = kotlinx.coroutines.runBlocking {
+            importPortableOrLegacyBackup(
+                input = "GTNPORT2:some-payload",
+                passphrase = "a long unique backup passphrase".toCharArray(),
+                importPortable = { false },
+                importLegacy = { legacyCalled = true; true }
+            )
+        }
+        assertFalse(result)
+        assertFalse(legacyCalled)
+    }
+
+    @Test
     fun legacyFormatsStillUseLegacyImportPath() {
         var imported = ""
         val result = kotlinx.coroutines.runBlocking {
