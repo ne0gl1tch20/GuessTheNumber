@@ -57,6 +57,11 @@ jobs:
           test -s "$kotlin_report"
           test -s "$native_report"
 
+          echo "--- Kotlin report ---"
+          cat "$kotlin_report"
+          echo "--- Native report ---"
+          cat "$native_report"
+
           kotlin_checksum="$(awk -F= '$1 == "checksum" {print $2}' "$kotlin_report")"
           native_checksum="$(awk -F= '$1 == "checksum" {print $2}' "$native_report")"
           if [ "$kotlin_checksum" = "$native_checksum" ]; then parity=true; else parity=false; fi
@@ -71,6 +76,8 @@ jobs:
           kotlin_tp="$(awk -F= '$1 == "medianEvaluationsPerSecond" {print $2}' "$kotlin_report")"
           native_tp="$(awk -F= '$1 == "medianEvaluationsPerSecond" {print $2}' "$native_report")"
 
+          test -n "$kotlin_median" -a -n "$native_median" -a -n "$kotlin_p95" -a -n "$native_p95" -a -n "$kotlin_tp" -a -n "$native_tp"
+
           python3 - "$kotlin_median" "$native_median" "$kotlin_p95" "$native_p95" "$kotlin_tp" "$native_tp" <<'PY'
           import sys
           km, nm, kp, np, kt, nt = map(float, sys.argv[1:])
@@ -80,9 +87,9 @@ jobs:
           print(f"Native p95: {np:.3f} ns/evaluation")
           print(f"Kotlin throughput: {kt:.3f} evaluations/s")
           print(f"Native throughput: {nt:.3f} evaluations/s")
-          print(f"Median speedup: {km / nm:.2f}x")
-          print(f"P95 speedup: {kp / np:.2f}x")
-          print(f"Throughput multiplier: {nt / kt:.2f}x")
+          print(f"Median speedup: {km / nm:.2f}x" if nm else "Median speedup: unavailable")
+          print(f"P95 speedup: {kp / np:.2f}x" if np else "P95 speedup: unavailable")
+          print(f"Throughput multiplier: {nt / kt:.2f}x" if kt else "Throughput multiplier: unavailable")
           PY
 
           {
@@ -97,9 +104,9 @@ jobs:
             python3 - "$kotlin_median" "$native_median" "$kotlin_p95" "$native_p95" "$kotlin_tp" "$native_tp" <<'PY'
           import sys
           km, nm, kp, np, kt, nt = map(float, sys.argv[1:])
-          print(f"medianSpeedup={km / nm:.4f}x")
-          print(f"p95Speedup={kp / np:.4f}x")
-          print(f"throughputMultiplier={nt / kt:.4f}x")
+          print(f"medianSpeedup={km / nm:.4f}x" if nm else "medianSpeedup=unavailable")
+          print(f"p95Speedup={kp / np:.4f}x" if np else "p95Speedup=unavailable")
+          print(f"throughputMultiplier={nt / kt:.4f}x" if kt else "throughputMultiplier=unavailable")
           PY
           } > app/build/reports/phase6-native-vs-kotlin-benchmark.txt
 
