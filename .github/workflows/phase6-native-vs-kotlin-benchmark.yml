@@ -33,7 +33,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run Kotlin JVM benchmark
-        run: ./gradlew :app:testDebugUnitTest --tests com.jarrlyyy.guessthenumber.shared.engine.NativeVsKotlinPerformanceBenchmarkTest --no-build-cache --console=plain
+        run: ./gradlew :app:testDebugUnitTest --no-build-cache --console=plain
 
       - name: Compile native benchmark
         run: |
@@ -57,11 +57,7 @@ jobs:
 
           kotlin_checksum="$(awk -F= '$1 == "checksum" {print $2}' "$kotlin_report")"
           native_checksum="$(awk -F= '$1 == "checksum" {print $2}' "$native_report")"
-          if [ "$kotlin_checksum" = "$native_checksum" ]; then
-            parity=true
-          else
-            parity=false
-          fi
+          if [ "$kotlin_checksum" = "$native_checksum" ]; then parity=true; else parity=false; fi
           echo "Kotlin checksum: $kotlin_checksum"
           echo "Native checksum: $native_checksum"
           echo "Output parity: $parity"
@@ -76,12 +72,12 @@ jobs:
           python3 - "$kotlin_median" "$native_median" "$kotlin_p95" "$native_p95" "$kotlin_tp" "$native_tp" <<'PY'
           import sys
           km, nm, kp, np, kt, nt = map(float, sys.argv[1:])
-          print(f"Kotlin median: {km:.0f} ns/evaluation")
-          print(f"Native median: {nm:.0f} ns/evaluation")
-          print(f"Kotlin p95: {kp:.0f} ns/evaluation")
-          print(f"Native p95: {np:.0f} ns/evaluation")
-          print(f"Kotlin throughput: {kt:.0f} evaluations/s")
-          print(f"Native throughput: {nt:.0f} evaluations/s")
+          print(f"Kotlin median: {km:.3f} ns/evaluation")
+          print(f"Native median: {nm:.3f} ns/evaluation")
+          print(f"Kotlin p95: {kp:.3f} ns/evaluation")
+          print(f"Native p95: {np:.3f} ns/evaluation")
+          print(f"Kotlin throughput: {kt:.3f} evaluations/s")
+          print(f"Native throughput: {nt:.3f} evaluations/s")
           print(f"Median speedup: {km / nm:.2f}x")
           print(f"P95 speedup: {kp / np:.2f}x")
           print(f"Throughput multiplier: {nt / kt:.2f}x")
