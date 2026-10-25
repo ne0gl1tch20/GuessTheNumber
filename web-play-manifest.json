@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "2049414efeebee9440777c800e4b5ba1dd1401b0",
+  "version": "4889159b18e3d019583c816ccf59da931d24adc2",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -25,11 +25,11 @@
     },
     {
       "path": "web-play/menu-studio.js",
-      "sha256": "c741eaef52d0f0e721e86fa95d9825d7c5a8098a498a82d33c69fd1229c07f96"
+      "sha256": "2886e8b1accf5a770541c0bdd89351ff276201a05ffd2e6d6382907bc2188b72"
     },
     {
       "path": "web-play/styles.css",
-      "sha256": "c7af778d667a82235fc5826bc96f6aeda770b24e3ed28d253eef61cd359bd9a8"
+      "sha256": "f03d1c6fab692515730c82221ee9167382d970851693b9db08ed9d69ecf065b8"
     },
     {
       "path": "web-play/trait-extension-host.js",
