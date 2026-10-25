@@ -23,6 +23,8 @@ This directory contains technical notes for the Android game, KMP architecture a
 
 ## Related documents
 
+- [Pull Request Development Ledger](PR_CHANGELOG.md): PR-by-PR history, including open and unmerged attempts.
+
 - [Root README](../README.md): overview, setup, CI expectations and KMP boundaries.
 - [Android runtime QA checklist](../.openai/kmp_runtime_parity_checklist.md): post-foundation runtime checks; unrun cases remain unverified.
 - [Save schema and migration](SAVE_SCHEMA_AND_MIGRATION.md): save format, defaults, recovery and compatibility expectations.
