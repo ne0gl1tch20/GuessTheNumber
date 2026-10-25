@@ -14,6 +14,7 @@ on:
       - "app/src/test/java/com/jarrlyyy/guessthenumber/data/store/SecureSaveTransferTest.kt"
       - "app/src/test/java/com/jarrlyyy/guessthenumber/data/store/PortableSaveBackupTest.kt"
       - "app/src/test/java/com/jarrlyyy/guessthenumber/data/store/CreativeModeSaveTest.kt"
+      - "app/src/test/java/com/jarrlyyy/guessthenumber/data/store/CreativeModeSaveManagerTest.kt"
       - "shared/src/jvmAndAndroidMain/kotlin/com/jarrlyyy/guessthenumber/shared/engine/NativeGameplayOptimizer.kt"
       - "app/build.gradle.kts"
       - "docs/TRAIT_SYSTEM_ROADMAP.md"
