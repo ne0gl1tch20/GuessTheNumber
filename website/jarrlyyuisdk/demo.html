@@ -296,19 +296,6 @@
   <script src="components/jarrlyy-ui.js"></script>
   <script src="components/jarrlyy-ui-advanced.js"></script>
   <script src="components/demo.js"></script>
-<script>
-(function(){
-  function ready(){
-    if(!window.JarrlyyUI || !window.JarrlyyUI.motion) return;
-    var score=document.getElementById("motionScore"), meter=document.getElementById("motionProgress"), label=document.getElementById("motionProgressLabel"), status=document.getElementById("motionStatus");
-    var play=document.getElementById("motionReplay"), reward=document.getElementById("motionReward");
-    function replay(){ window.JarrlyyUI.motion.count(score, 12450, {from:0,duration:720}); window.JarrlyyUI.motion.progress(meter, 76); window.JarrlyyUI.motion.count(label,76,{from:0,duration:600,format:function(v){return Math.round(v)+"%";}}); window.JarrlyyUI.motion.init(document); status.textContent="Animation played. Reduced-motion preferences are respected."; }
-    if(play) play.addEventListener("click", replay);
-    if(reward) reward.addEventListener("click", function(){ window.JarrlyyUI.motion.floatText(reward,"+XP"); status.textContent="Floating reward feedback triggered."; });
-    replay();
-  }
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",ready,{once:true}); else ready();
-})();
-</script>
+<script src="motion-demo.js"></script>
 </body>
 </html>
