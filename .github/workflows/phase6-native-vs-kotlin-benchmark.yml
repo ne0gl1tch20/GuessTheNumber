@@ -114,6 +114,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 7
           name: phase6-native-vs-kotlin-benchmark
           path: |
             app/build/reports/phase6-native-vs-kotlin-benchmark.txt
