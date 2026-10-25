@@ -66,6 +66,10 @@ fun SaveSlotsScreen(
     var showDuplicateDialog by remember { mutableStateOf<Int?>(null) }
     var showRestoreDialog by remember { mutableStateOf<Int?>(null) }
     var showImportDialog by remember { mutableStateOf(false) }
+    var showPortableExportDialog by remember { mutableStateOf(false) }
+    var exportPassphrase by remember { mutableStateOf("") }
+    var exportPassphraseConfirm by remember { mutableStateOf("") }
+    var importPassphrase by remember { mutableStateOf("") }
     var showResetEverythingDialog by remember { mutableStateOf(false) }
     var resetEverythingAcknowledged by remember { mutableStateOf(false) }
     var resetMathAnswer by remember { mutableStateOf("") }
@@ -373,21 +377,87 @@ fun SaveSlotsScreen(
         )
     }
 
+    if (showPortableExportDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showPortableExportDialog = false
+                exportPassphrase = ""
+                exportPassphraseConfirm = ""
+            },
+            title = { Text("Create Portable Encrypted Backup") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Use a passphrase with at least 12 characters. You will need this exact passphrase to restore the backup on another device. It cannot be recovered.")
+                    OutlinedTextField(
+                        value = exportPassphrase,
+                        onValueChange = { exportPassphrase = it.take(128) },
+                        label = { Text("Backup passphrase") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = exportPassphraseConfirm,
+                        onValueChange = { exportPassphraseConfirm = it.take(128) },
+                        label = { Text("Confirm passphrase") },
+                        singleLine = true
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = exportPassphrase.length >= 12 && exportPassphrase == exportPassphraseConfirm,
+                    onClick = {
+                        val passphrase = exportPassphrase
+                        viewModel.exportPortableSave(passphrase) { backup ->
+                            if (backup != null) {
+                                val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+                                clipboard?.setPrimaryClip(
+                                    ClipData.newPlainText("GuessTheNumberPortableBackup", backup)
+                                )
+                                android.widget.Toast.makeText(context, "Portable encrypted backup copied. Keep your passphrase safe!", android.widget.Toast.LENGTH_LONG).show()
+                            } else {
+                                android.widget.Toast.makeText(context, "Could not create portable backup.", android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                            exportPassphrase = ""
+                            exportPassphraseConfirm = ""
+                            showPortableExportDialog = false
+                        }
+                    }
+                ) { Text("Encrypt & Copy") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPortableExportDialog = false
+                    exportPassphrase = ""
+                    exportPassphraseConfirm = ""
+                }) { Text(locale.getString("cancel", "Cancel")) }
+            }
+        )
+    }
+
     if (showImportDialog) {
         AlertDialog(
             onDismissRequest = { showImportDialog = false },
             title = { Text(locale.getString("save_import_title", "Import Save Data")) },
             text = {
-                OutlinedTextField(
-                    value = importString,
-                    onValueChange = { importString = it },
-                    label = { Text(locale.getString("save_import_hint", "Paste encrypted save string here")) },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(
+                        value = importString,
+                        onValueChange = { importString = it },
+                        label = { Text(locale.getString("save_import_hint", "Paste encrypted save string here")) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = importPassphrase,
+                        onValueChange = { importPassphrase = it.take(128) },
+                        label = { Text("Portable backup passphrase (leave blank for legacy backups)") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.importSave(importString) { success ->
+                    viewModel.importSave(importString, importPassphrase) { success ->
                         android.widget.Toast.makeText(
                             context,
                             locale.getString(
@@ -398,6 +468,7 @@ fun SaveSlotsScreen(
                         ).show()
                         if (success) {
                             importString = ""
+                            importPassphrase = ""
                             refreshMetadata()
                         }
                         showImportDialog = false
@@ -447,19 +518,7 @@ fun SaveSlotsScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = {
-                            viewModel.exportSave { json ->
-                                val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
-                                clipboard?.setPrimaryClip(
-                                    ClipData.newPlainText(locale.getString("save_export_label", "GuessTheNumberSave"), json)
-                                )
-                                android.widget.Toast.makeText(
-                                    context,
-                                    locale.getString("save_export_success", "Encrypted save copied to clipboard!"),
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        },
+                        onClick = { showPortableExportDialog = true },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(locale.getString("save_export_button", "Export Encrypted Save"))
