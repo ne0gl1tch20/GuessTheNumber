@@ -335,9 +335,16 @@ fun SaveSlotsScreen(
                                 effects = effects
                             )
                             viewModel.saveCreativeModeSave(slotNum, creativeSave) { saved ->
-                                if (saved) showCreateDialog = null
-                                else android.widget.Toast.makeText(context, "The save was created, but Creative Mode settings could not be saved. Reset the slot and try again.", android.widget.Toast.LENGTH_LONG).show()
-                                refreshMetadata()
+                                if (!saved) {
+                                    android.widget.Toast.makeText(context, "The save was created, but Creative Mode settings could not be saved. Reset the slot and try again.", android.widget.Toast.LENGTH_LONG).show()
+                                    refreshMetadata()
+                                } else {
+                                    viewModel.enableCreativeModeForSlot(slotNum, rangeMin!!, rangeMax!!) { enabled ->
+                                        if (enabled) showCreateDialog = null
+                                        else android.widget.Toast.makeText(context, "Creative Mode could not be enabled for this save.", android.widget.Toast.LENGTH_LONG).show()
+                                        refreshMetadata()
+                                    }
+                                }
                             }
                         } else {
                             showCreateDialog = null
