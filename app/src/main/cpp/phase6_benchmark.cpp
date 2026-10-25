@@ -85,7 +85,7 @@ int main() {
     const double p95 = samples[((samples.size() - 1) * 95) / 100];
     const double throughput = median <= 0.0 ? 0.0 : 1000000000.0 / median;
 
-    std::ofstream report("build/reports/native-vs-kotlin-native.txt");
+    std::ofstream report("app/build/reports/native-vs-kotlin-native.txt");
     report << std::fixed << std::setprecision(3);
     report << "NATIVE_CORE\n";
     report << "compiler=" << __VERSION__ << "\n";
