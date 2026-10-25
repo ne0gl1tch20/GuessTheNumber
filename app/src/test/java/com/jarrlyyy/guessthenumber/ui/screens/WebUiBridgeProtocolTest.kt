@@ -69,6 +69,31 @@ class WebUiBridgeProtocolTest {
     }
 
     @Test
+    fun validatesCreativeModeRangeUpdates() {
+        assertEquals(
+            WebUiBridgeProtocol.ParseResult.Valid(
+                "creative-range-1",
+                "creative_update_range",
+                creativeRangeMin = 5L,
+                creativeRangeMax = 500L
+            ),
+            WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-range-1","type":"creative_update_range","rangeMin":"5","rangeMax":"500"}""")
+        )
+        assertEquals(
+            "invalid_creative_range",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-range-2","type":"creative_update_range","rangeMin":"0","rangeMax":"500"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+        assertEquals(
+            "invalid_creative_range",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-range-3","type":"creative_update_range","rangeMin":"500","rangeMax":"5"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+        assertEquals(
+            "invalid_request",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"creative-range-4","type":"creative_update_range","rangeMin":"1","rangeMax":"100","money":"999"}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+    }
+
+    @Test
     fun acceptsReadStateRequest() {
         assertEquals(
             WebUiBridgeProtocol.ParseResult.Valid("req_1", "read_state"),
