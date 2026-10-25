@@ -44,11 +44,12 @@ data class SaveSlotMetadata(
 
 @kotlinx.serialization.Serializable
 data class EncryptedBackupBundle(
-    val formatVersion: Int = 2,
+    val formatVersion: Int = 3,
     val appPreferencesJson: String,
     val activeSlot: Int,
     val slots: Map<Int, String> = emptyMap(),
-    val backups: Map<Int, String> = emptyMap()
+    val backups: Map<Int, String> = emptyMap(),
+    val creativeSlots: Map<Int, String> = emptyMap()
 )
 
 class SaveManager private constructor(
@@ -66,6 +67,7 @@ class SaveManager private constructor(
 
     private fun getSaveKey(slot: Int) = stringPreferencesKey("game_state_slot_${slot}_json")
     private fun getBackupKey(slot: Int) = stringPreferencesKey("game_state_slot_${slot}_backup_json")
+    private fun getCreativeModeKey(slot: Int) = stringPreferencesKey("creative_mode_slot_${slot}_json")
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
@@ -403,11 +405,20 @@ class SaveManager private constructor(
         val backups = buildMap {
             for (index in 1..MAX_SAVE_SLOTS) prefs[getBackupKey(index)]?.let { if (validateSave(it)) put(index, it) }
         }
+        val creativeSlots = buildMap {
+            for (index in 1..MAX_SAVE_SLOTS) {
+                prefs[getCreativeModeKey(index)]?.let { raw ->
+                    CreativeModeSaveCodec.decodeAndMigrate(raw)?.let { put(index, CreativeModeSaveCodec.encode(it)) }
+                }
+            }
+        }
         val bundle = EncryptedBackupBundle(
+            formatVersion = 3,
             appPreferencesJson = globalPreferences.encode(appSettings),
             activeSlot = getActiveSlot(),
             slots = slots,
-            backups = backups
+            backups = backups,
+            creativeSlots = creativeSlots
         )
         return encrypt(json.encodeToString(bundle))
     }
@@ -416,15 +427,24 @@ class SaveManager private constructor(
         val decrypted = decrypt(inputString)
         val bundle = decrypted.takeIf { it.isNotEmpty() }?.let { runCatching { json.decodeFromString<EncryptedBackupBundle>(it) }.getOrNull() }
         if (bundle != null) {
+            if (bundle.formatVersion !in 2..3) return false
             return try {
                 val importedSettings = globalPreferences.decode(bundle.appPreferencesJson) ?: return false
                 saveStore.edit { prefs ->
                     for (index in 1..MAX_SAVE_SLOTS) {
                         prefs.remove(getSaveKey(index))
                         prefs.remove(getBackupKey(index))
+                        prefs.remove(getCreativeModeKey(index))
                     }
                     bundle.slots.forEach { (index, raw) -> if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) prefs[getSaveKey(index)] = json.encodeToString(json.decodeFromString<GameState>(raw).copy(settings = GameSettings())) }
                     bundle.backups.forEach { (index, raw) -> if (index in 1..MAX_SAVE_SLOTS && validateSave(raw)) prefs[getBackupKey(index)] = json.encodeToString(json.decodeFromString<GameState>(raw).copy(settings = GameSettings())) }
+                    bundle.creativeSlots.forEach { (index, raw) ->
+                        if (index in 1..MAX_SAVE_SLOTS) {
+                            CreativeModeSaveCodec.decodeAndMigrate(raw)?.let { migrated ->
+                                prefs[getCreativeModeKey(index)] = CreativeModeSaveCodec.encode(migrated)
+                            }
+                        }
+                    }
                     prefs[activeSlotKey] = bundle.activeSlot.coerceIn(1, MAX_SAVE_SLOTS)
                 }
                 globalPreferences.saveSettings(importedSettings)
@@ -487,6 +507,33 @@ class SaveManager private constructor(
         globalPreferences.saveSettings(settings)
         globalPreferences.markMigrationCompleted()
         return true
+    }
+
+    suspend fun loadCreativeModeSave(slot: Int): CreativeModeSave? {
+        if (slot !in 1..MAX_SAVE_SLOTS) return null
+        val raw = saveStore.data.first()[getCreativeModeKey(slot)] ?: return null
+        val decoded = CreativeModeSaveCodec.decodeAndMigrate(raw) ?: return null
+        val canonical = runCatching { CreativeModeSaveCodec.encode(decoded) }.getOrNull() ?: return null
+        if (canonical != raw) saveStore.edit { it[getCreativeModeKey(slot)] = canonical }
+        return decoded
+    }
+
+    suspend fun saveCreativeModeSave(slot: Int, save: CreativeModeSave): Boolean {
+        if (slot !in 1..MAX_SAVE_SLOTS || !CreativeModeSaveCodec.validate(save)) return false
+        val encoded = runCatching { CreativeModeSaveCodec.encode(save) }.getOrNull() ?: return false
+        return try {
+            saveStore.edit { it[getCreativeModeKey(slot)] = encoded }
+            true
+        } catch (_: Exception) { false }
+    }
+
+    suspend fun exportCreativeModeSave(slot: Int): String? =
+        loadCreativeModeSave(slot)?.let(CreativeModeSaveCodec::encode)
+
+    suspend fun importCreativeModeSave(slot: Int, raw: String): Boolean {
+        if (slot !in 1..MAX_SAVE_SLOTS) return false
+        val migrated = CreativeModeSaveCodec.decodeAndMigrate(raw) ?: return false
+        return saveCreativeModeSave(slot, migrated)
     }
 
     suspend fun getSaveJson(slot: Int): String? {
@@ -561,6 +608,7 @@ class SaveManager private constructor(
             saveStore.edit { p ->
                 p[getSaveKey(target)] = sourceJson
                 prefs[getBackupKey(source)]?.let { p[getBackupKey(target)] = it }
+                prefs[getCreativeModeKey(source)]?.let { p[getCreativeModeKey(target)] = it }
             }
             GameLogger.log(LogLevel.INFO, LoggerCategory.SAVE, "DUPLICATE_SLOT", "Duplicated slot $source to slot $target.")
             true
@@ -594,6 +642,7 @@ class SaveManager private constructor(
         saveStore.edit { prefs ->
             prefs.remove(getSaveKey(s))
             prefs.remove(getBackupKey(s))
+            prefs.remove(getCreativeModeKey(s))
         }
         GameLogger.log(LogLevel.WARN, LoggerCategory.SAVE, "RESET_SLOT", "Save slot $s reset.")
     }
