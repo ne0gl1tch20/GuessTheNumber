@@ -141,11 +141,11 @@ class CreativeModeRuntimeTest {
         )
         val rules = CreativeModeEffectPolicy.resolve(config)!!
         assertEquals(10L, rules.rangeMin)
-        assertEquals(43L, rules.rangeMax)
+        assertEquals(31L, rules.rangeMax)
         assertEquals(7, rules.extraHints)
         assertEquals(2, rules.attemptLimit)
-        val run = CreativeModeRuntime.start(config, 42)!!
-        assertEquals(CreativeGuessOutcome.TOO_HIGH, CreativeModeRuntime.submitGuess(config, run, 43).outcome)
+        val run = CreativeModeRuntime.start(config, 30)!!
+        assertEquals(CreativeGuessOutcome.TOO_HIGH, CreativeModeRuntime.submitGuess(config, run, 31).outcome)
     }
 
     @Test fun completedSnapshotMustRepresentAnActualCorrectGuess() {
