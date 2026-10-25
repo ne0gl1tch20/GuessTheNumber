@@ -1,6 +1,6 @@
 # Pull Request Development Ledger
 
-This ledger lists all 351 pull requests returned by GitHub for this repository during the 3.1.0 documentation pass. It includes merged, open and closed-unmerged entries so abandoned attempts are traceable and not mistaken for shipped work. The list is sorted by PR number. A merged PR is not, by itself, proof that every runtime/device scenario was tested; use the PR's checks and body for exact verification evidence.
+This ledger lists all 351 pull requests returned by GitHub for this repository during the 3.1.0 documentation pass. It includes merged, open and closed-unmerged entries so abandoned attempts are traceable and not mistaken for shipped work. Statuses are a snapshot from when this ledger was generated; follow each PR link for its current state. The list is sorted by PR number. A merged PR is not, by itself, proof that every runtime/device scenario was tested; use the PR's checks and body for exact verification evidence.
 
 ## Complete pull request index
 
