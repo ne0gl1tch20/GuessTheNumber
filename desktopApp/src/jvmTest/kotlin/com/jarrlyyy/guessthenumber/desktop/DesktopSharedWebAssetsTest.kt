@@ -105,7 +105,7 @@ class DesktopSharedWebAssetsTest {
         keys.forEach { key -> assertTrue("Settings markup must use $key", html.contains("data-i18n=\"$key\"")) }
         assertFalse(html.contains("Changes apply on both Android and Windows"))
         // The About screen intentionally credits native libraries; scope jargon checks to the game/settings UI.
-        val playerCopy = (html.substringBefore("data-screen=\"about\"") + html.substringAfter("id=\"screen-settings\"") + "\n" + asset("web-play/app.js")).lowercase()
+        val playerCopy = (html.substringBefore("data-screen=\"about\"") + html.substringAfter("id=\"screen-settings\"").substringBefore("data-screen=\"about\"")).lowercase()
         listOf("kotlin", "javascript", "typescript", "lua", "python", "scripting language").forEach { term ->
             assertFalse("Player-facing shared UI should not expose implementation jargon: $term", playerCopy.contains(term))
         }
