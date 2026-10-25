@@ -463,4 +463,19 @@ class WebUiBridgeProtocolTest {
         assertEquals("invalid_request", (extra as WebUiBridgeProtocol.ParseResult.Invalid).error)
     }
 
+    @Test
+    fun validatesMenuStudioLayoutSchemaAndRejectsMalformedLayouts() {
+        val valid = """{"version":1,"id":"menu-save-1","type":"update_setting","key":"webMenuStudioLayout","value":"{\\"areas\\":{\\"arcade\\":\\"nav\\"},\\"orders\\":{\\"nav\\":[\\"worlds\\",\\"arcade\\"],\\"more\\":[]},\\"colors\\":{\\"arcade\\":\\"#7C4DFF\\"}}"}"""
+        assertTrue(WebUiBridgeProtocol.parse(valid) is WebUiBridgeProtocol.ParseResult.Valid)
+
+        val unknownField = """{"version":1,"id":"menu-save-2","type":"update_setting","key":"webMenuStudioLayout","value":"{\\"areas\\":{},\\"orders\\":{\\"nav\\":[],\\"more\\":[]},\\"debug\\":true}"}"""
+        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(unknownField) as WebUiBridgeProtocol.ParseResult.Invalid).error)
+
+        val invalidArea = """{"version":1,"id":"menu-save-3","type":"update_setting","key":"webMenuStudioLayout","value":"{\\"areas\\":{\\"arcade\\":\\"admin\\"},\\"orders\\":{\\"nav\\":[],\\"more\\":[]}}"}"""
+        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(invalidArea) as WebUiBridgeProtocol.ParseResult.Invalid).error)
+
+        val invalidColor = """{"version":1,"id":"menu-save-4","type":"update_setting","key":"webMenuStudioLayout","value":"{\\"areas\\":{},\\"orders\\":{\\"nav\\":[],\\"more\\":[]},\\"colors\\":{\\"arcade\\":\\"javascript:alert(1)\\"}}"}"""
+        assertEquals("invalid_setting_value", (WebUiBridgeProtocol.parse(invalidColor) as WebUiBridgeProtocol.ParseResult.Invalid).error)
+    }
+
 }
