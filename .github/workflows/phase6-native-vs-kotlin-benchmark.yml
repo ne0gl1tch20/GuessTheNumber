@@ -33,6 +33,8 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run Kotlin JVM benchmark
+        env:
+          BENCHMARK_REPORT_PATH: ${{ github.workspace }}/app/build/reports/native-vs-kotlin-kotlin.txt
         run: ./gradlew :app:testDebugUnitTest --no-build-cache --console=plain
 
       - name: Compile native benchmark
@@ -102,8 +104,12 @@ jobs:
           } > app/build/reports/phase6-native-vs-kotlin-benchmark.txt
 
       - name: Upload benchmark report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: phase6-native-vs-kotlin-benchmark
-          path: app/build/reports/phase6-native-vs-kotlin-benchmark.txt
-          if-no-files-found: error
+          path: |
+            app/build/reports/phase6-native-vs-kotlin-benchmark.txt
+            app/build/reports/native-vs-kotlin-kotlin.txt
+            app/build/reports/native-vs-kotlin-native.txt
+          if-no-files-found: warn
