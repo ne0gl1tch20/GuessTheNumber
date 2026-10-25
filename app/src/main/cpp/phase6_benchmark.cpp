@@ -36,8 +36,9 @@ std::vector<BenchmarkCase> makeCases() {
 
 volatile uint64_t sink = 0;
 
-uint64_t evaluate(const std::vector<BenchmarkCase>& cases) {
+uint64_t evaluate(const std::vector<BenchmarkCase>& cases, int iteration) {
     uint64_t checksum = 0;
+    const int64_t iterationSalt = static_cast<int64_t>(iteration) * 0x9E3779B97F4A7C15ULL;
     for (const auto& item : cases) {
         checksum ^= static_cast<uint64_t>(gtn_native::adaptiveTarget(
             item.rangeMin,
@@ -45,7 +46,7 @@ uint64_t evaluate(const std::vector<BenchmarkCase>& cases) {
             item.difficulty,
             item.streak,
             item.attempts,
-            item.seed));
+            item.seed ^ iterationSalt));
     }
     return checksum;
 }
@@ -54,14 +55,14 @@ uint64_t evaluate(const std::vector<BenchmarkCase>& cases) {
 int main() {
     constexpr int warmupIterations = 2000;
     constexpr int sampleCount = 21;
-    constexpr int iterationsPerSample = 100000;
+    constexpr int iterationsPerSample = 20000;
     const auto cases = makeCases();
 
     for (int i = 0; i < warmupIterations; ++i) {
-        sink = evaluate(cases);
+        sink = evaluate(cases, i);
     }
 
-    const uint64_t expectedChecksum = evaluate(cases);
+    const uint64_t expectedChecksum = evaluate(cases, 0);
     std::vector<int64_t> samples;
     samples.reserve(sampleCount);
 
@@ -69,7 +70,7 @@ int main() {
         uint64_t checksum = 0;
         const auto started = std::chrono::steady_clock::now();
         for (int iteration = 0; iteration < iterationsPerSample; ++iteration) {
-            checksum ^= evaluate(cases);
+            checksum ^= evaluate(cases, iteration);
         }
         const auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::steady_clock::now() - started).count();
