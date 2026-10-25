@@ -106,7 +106,8 @@ object CreativeModeSaveCodec {
             snapshot.attemptsUsed >= 0 &&
             snapshot.correctGuesses >= 0 &&
             snapshot.correctGuesses <= snapshot.attemptsUsed &&
-            snapshot.hintsUsed in 0..10
+            snapshot.hintsUsed in 0..10 &&
+            (!snapshot.completed || (snapshot.attemptsUsed > 0 && snapshot.correctGuesses > 0))
 }
 
 object CreativeModeEffectPolicy {
