@@ -1,4 +1,4 @@
-package com.jarrlyyy.guessthenumber.shared.engine
+package com.jarrlyy.guessthenumber.shared.engine
 
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -18,7 +18,7 @@ class NativeVsKotlinPerformanceBenchmarkTest {
 
         var expectedChecksum = 0L
         for (case in cases) expectedChecksum = expectedChecksum xor kotlinAdaptiveTarget(case, 0)
-        val samples = LongArray(SAMPLE_COUNT)
+        val samples = DoubleArray(SAMPLE_COUNT)
         repeat(SAMPLE_COUNT) {
             val started = System.nanoTime()
             var checksum = 0L
@@ -26,15 +26,15 @@ class NativeVsKotlinPerformanceBenchmarkTest {
                 for (case in cases) checksum = checksum xor kotlinAdaptiveTarget(case, iteration)
             }
             sink = checksum
-            samples[it] = (System.nanoTime() - started) / (ITERATIONS_PER_SAMPLE * cases.size)
+            samples[it] = (System.nanoTime() - started).toDouble() / (ITERATIONS_PER_SAMPLE * cases.size)
         }
 
         val ordered = samples.sorted()
         val median = ordered[ordered.size / 2]
         val p95 = ordered[((ordered.size - 1) * 95) / 100]
-        val throughput = if (median == 0L) Long.MAX_VALUE else 1_000_000_000L / median
+        val throughput = if (median <= 0.0) 0.0 else 1_000_000_000.0 / median
 
-        assertTrue("Benchmark samples must be positive", samples.all { it > 0L })
+        assertTrue("Benchmark samples must be positive", samples.all { it > 0.0 })
         assertTrue("Representative output must remain bounded", cases.all {
             val result = kotlinAdaptiveTarget(it, 0)
             result in it.rangeMin..it.rangeMax
@@ -48,9 +48,9 @@ class NativeVsKotlinPerformanceBenchmarkTest {
             appendLine("warmupIterations=$WARMUP_ITERATIONS")
             appendLine("samples=$SAMPLE_COUNT")
             appendLine("iterationsPerSample=$ITERATIONS_PER_SAMPLE")
-            appendLine("medianNsPerEvaluation=$median")
-            appendLine("p95NsPerEvaluation=$p95")
-            appendLine("medianEvaluationsPerSecond=$throughput")
+            appendLine("medianNsPerEvaluation=%.3f".format(median))
+            appendLine("p95NsPerEvaluation=%.3f".format(p95))
+            appendLine("medianEvaluationsPerSecond=%.3f".format(throughput))
             appendLine("checksum=$expectedChecksum")
             appendLine("bounded=true")
         }
