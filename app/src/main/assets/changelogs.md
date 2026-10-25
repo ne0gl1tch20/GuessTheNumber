@@ -8,7 +8,7 @@
 - 🌦️ **Trait and seasonal architecture:** centralized deterministic seasonal boundaries (including winter across year-end), retained signed catalog validation and offline fallback, and kept Creative Mode isolated from trait/reward authority.
 - 🧪 **Expanded tests:** combined effect composition, run limits, hints, snapshot migration/resume and malformed completed-run coverage.
 - 🔐 **Portable encrypted backups:** cross-device exports use a user passphrase and authenticated encryption. The app does not store the passphrase; losing it can make the backup unrecoverable.
-- 📚 **Project history:** docs/PR_CHANGELOG.md indexes PRs #1–#353, including closed-unmerged attempts for traceability. The index is a history ledger, not a claim that every attempt shipped.
+- 📚 **Project history:** docs/PR_CHANGELOG.md indexes PRs #1–#355, including closed-unmerged attempts for traceability. The index is a history ledger, not a claim that every attempt shipped.
 - 🔢 **App version:** bumped to **3.2.0** (versionCode **23**); the web-play asset compatibility gate is kept in sync.
 
 
