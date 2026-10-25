@@ -105,7 +105,7 @@ internal object WebUiBridgeProtocol {
             "navigate" -> {
                 if (request.length() != 4 || !request.has("route")) return ParseResult.Invalid("invalid_request", id)
                 val route = request.opt("route") as? String ?: return ParseResult.Invalid("invalid_route", id)
-                if (route !in navigationRoutes && !(BuildConfig.DEBUG && route == "dev_settings")) return ParseResult.Invalid("invalid_route", id)
+                if (route !in navigationRoutes && !(BuildConfig.DEBUG && route == "dev_settings") && !route.matches(Regex("menu_color_[A-Za-z0-9_-]{1,32}"))) return ParseResult.Invalid("invalid_route", id)
                 ParseResult.Valid(id, type, route = route)
             }
             "select_trait_arm" -> {
