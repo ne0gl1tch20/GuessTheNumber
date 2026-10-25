@@ -298,7 +298,26 @@ fun ProductionWebPlayScreen(
                     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest) = assetLoader.shouldInterceptRequest(request.url)
                     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                         val uri = request.url
-                        return !(uri.scheme == "https" && uri.host == "appassets.androidplatform.net" && uri.path == "${WEB_UI_PATH}index.html" && uri.query == null && uri.fragment == null)
+                        val isLocalAppPage = uri.scheme == "https" &&
+                            uri.host == "appassets.androidplatform.net" &&
+                            uri.path == "${WEB_UI_PATH}index.html" &&
+                            uri.query == null && uri.fragment == null
+                        if (isLocalAppPage) return false
+                        val allowedExternalHosts = setOf(
+                            "youtube.com", "www.youtube.com",
+                            "instagram.com", "www.instagram.com",
+                            "namemc.com", "www.namemc.com",
+                            "github.com", "www.github.com",
+                            "ne0gl1tch20.github.io"
+                        )
+                        if (uri.scheme == "https" && uri.host in allowedExternalHosts) {
+                            runCatching {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                            }.onFailure { exception ->
+                                WebViewDebugConsole.add("Could not open external link: ${exception.javaClass.simpleName}")
+                            }
+                        }
+                        return true
                     }
                 }
                 if (supportsMessageListener) {
