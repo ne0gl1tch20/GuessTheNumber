@@ -1079,3 +1079,51 @@ body > #arcadeGame.arcade-game:not([hidden]) #arcadePlayArea {
 .trait-arm-button.is-selected{border-color:var(--accent2);background:rgba(98,232,255,.1)}
 .trait-arm-button:disabled{opacity:.68;cursor:default}
 .trait-arm-button:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+
+
+/* Offline Earnings must use an explicit viewport-sized grid in Android WebView.
+   Percentage max-heights can resolve against an auto-sized grid track and flatten
+   the dialog into a thin strip. Use viewport bounds and let the dialog scroll. */
+#offlineRewardOverlay {
+  position: fixed;
+  inset: auto;
+  top: max(12px, env(safe-area-inset-top));
+  right: 0;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  left: 0;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: auto;
+  height: auto;
+  max-height: none;
+  min-width: 0;
+  padding: 12px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+#offlineRewardOverlay .reward-dialog {
+  position: relative;
+  align-self: center;
+  box-sizing: border-box;
+  width: min(390px, 100%);
+  min-width: 0;
+  max-width: 100%;
+  max-height: calc(100vh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-height: 520px) {
+  #offlineRewardOverlay .reward-dialog {
+    padding-block: 12px;
+  }
+}
