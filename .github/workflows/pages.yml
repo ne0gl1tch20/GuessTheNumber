@@ -38,6 +38,8 @@ jobs:
           test -s website/jarrlyyuisdk/demo.html
           test -s website/jarrlyyuisdk/components/jarrlyy-ui.js
           test -s website/jarrlyyuisdk/components/jarrlyy-ui-advanced.js
+          test -s website/jarrlyyuisdk/components/jarrlyy-ui-host.js
+          test -s website/jarrlyyuisdk/motion-demo.js
           test -s website/jarrlyyuisdk/styles/jarrlyy-ui.css
           test -s website/jarrlyyuisdk/styles/jarrlyy-ui-advanced.css
           test -s website/jarrlyyuisdk/icons/jarrlyy-icons.svg

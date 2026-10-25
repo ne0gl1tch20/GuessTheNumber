@@ -23,6 +23,5 @@ body { margin: 0; background: radial-gradient(ellipse at 10% 0, rgba(155,124,255
 .lab-credits p { margin: .5rem 0 0; }
 .lab-credits a { color: var(--jui-cyan); text-underline-offset: .18em; }
 
-
 #motionProgress { margin-top: .45rem; }
 #motionProgress > span { width: var(--jui-progress, 0%); transition: width 420ms cubic-bezier(.2,.8,.2,1); }

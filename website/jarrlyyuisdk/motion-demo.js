@@ -13,7 +13,7 @@
     function replay() {
       motion.count(score, 12450, { from: 0, duration: 720 });
       motion.progress(meter, 76);
-      ui.motion.count(label, 76, { from: 0, duration: 600, format: function (value) { return Math.round(value) + "%"; } });
+      motion.count(label, 76, { from: 0, duration: 600, format: function (value) { return Math.round(value) + "%"; } });
       motion.init(document);
       status.textContent = "Animation played. Reduced-motion preferences are respected.";
     }
