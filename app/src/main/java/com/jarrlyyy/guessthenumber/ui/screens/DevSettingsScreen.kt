@@ -143,8 +143,6 @@ fun AdvancedDevToolsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            item { JarrlyyDspTestCard() }
-
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -797,6 +795,7 @@ fun DevSettingsScreen(
         ) {
             item { Text("Developer & Testing Playground", style = MaterialTheme.typography.headlineSmall) }
             item { Text("Open the dedicated process screens for debugging, testing, and diagnostics.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            item { JarrlyyDspTestCard() }
             item {
                 Card(onClick = { onNavigate("process_inspector") }, modifier = Modifier.fillMaxWidth()) {
                     Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
