@@ -22,7 +22,7 @@ Pattern patternFor(int p) {
   case kError: return {{{235,175,0,0}},2,2,4600};
   case kReward: return {{{523.25f,659.25f,783.99f,1046.5f}},4,0,4200};
   case kArcade: return {{{392,523.25f,659.25f,783.99f}},4,1,3000};
-  case kLow: return {{{190,146.83f,0,0}},2,2,4400};
+  case kLow: return {{{392.0f,329.63f,0,0}},2,1,5200};
   case kHigh: return {{{698.46f,880,0,0}},2,1,3400};
   default: return {{{990,0,0,0}},1,0,2200};
  }
@@ -32,20 +32,44 @@ public:
  bool play(int32_t p,float v,uint32_t fx) {
   std::lock_guard<std::mutex> apiLock(apiMutex_);
   if(p<kTap||p>kHigh||!ensureStream()) return false;
+  if(!startOrRecoverStream()) return false;
   uint32_t w=write_.load(std::memory_order_relaxed), next=(w+1U)%kQueueSize;
   if(next==read_.load(std::memory_order_acquire)) return false;
   queue_[w]=Command{p,std::clamp(v,0.0f,0.45f),fx&15U};
   write_.store(next,std::memory_order_release);
   stop_.store(false,std::memory_order_release);
-  auto state=AAudioStream_getState(stream_);
-  if(state==AAUDIO_STREAM_STATE_STOPPED||state==AAUDIO_STREAM_STATE_PAUSED) (void)AAudioStream_requestStart(stream_);
   return true;
  }
  void stopAll(){ stop_.store(true,std::memory_order_release); }
  bool supported() const { return true; }
 private:
+ bool startOrRecoverStream() {
+  if(!stream_) return ensureStream();
+  aaudio_stream_state_t state=AAudioStream_getState(stream_);
+  for(int attempt=0;state==AAUDIO_STREAM_STATE_STOPPING&&attempt<5;++attempt) {
+   aaudio_stream_state_t next=state;
+   (void)AAudioStream_waitForStateChange(stream_,state,&next,50000000LL);
+   state=AAudioStream_getState(stream_);
+  }
+  if(state==AAUDIO_STREAM_STATE_DISCONNECTED||state==AAUDIO_STREAM_STATE_STOPPING) {
+   (void)AAudioStream_close(stream_);
+   stream_=nullptr;
+   return ensureStream();
+  }
+  if(state==AAUDIO_STREAM_STATE_STOPPED||state==AAUDIO_STREAM_STATE_PAUSED) {
+   if(AAudioStream_requestStart(stream_)==AAUDIO_OK) return true;
+   (void)AAudioStream_close(stream_);
+   stream_=nullptr;
+   return ensureStream();
+  }
+  return state==AAUDIO_STREAM_STATE_STARTED||state==AAUDIO_STREAM_STATE_STARTING;
+ }
  bool ensureStream() {
-  if(stream_!=nullptr) return true;
+  if(stream_!=nullptr) {
+   if(AAudioStream_getState(stream_)!=AAUDIO_STREAM_STATE_DISCONNECTED) return true;
+   (void)AAudioStream_close(stream_);
+   stream_=nullptr;
+  }
   AAudioStreamBuilder* b=nullptr;
   if(AAudio_createStreamBuilder(&b)!=AAUDIO_OK||!b) return false;
   AAudioStreamBuilder_setDirection(b,AAUDIO_DIRECTION_OUTPUT);
