@@ -62,7 +62,7 @@ private:
    stream_=nullptr;
    return ensureStream();
   }
-  return state==AAUDIO_STREAM_STATE_STARTED;
+  return state==AAUDIO_STREAM_STATE_STARTED||state==AAUDIO_STREAM_STATE_STARTING;
  }
  bool ensureStream() {
   if(stream_!=nullptr) {\n   if(AAudioStream_getState(stream_)!=AAUDIO_STREAM_STATE_DISCONNECTED) return true;\n   (void)AAudioStream_close(stream_);\n   stream_=nullptr;\n  }
