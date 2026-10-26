@@ -3,7 +3,8 @@
 The native library libjarrlyyydsp.so is a reusable Android procedural-audio engine. It synthesizes UI and arcade sounds from oscillator patterns instead of requiring a separate file for every sound.
 
 ## API
-- C++ header: app/src/main/cpp/jarrlyy_dsp_engine.h
+- Public C API header (C/C++): app/src/main/cpp/jarrlyy_dsp.h
+- Internal C++ engine header: app/src/main/cpp/jarrlyy_dsp_engine.h
 - C API: jarrlyy_dsp_play_preset, jarrlyy_dsp_stop_all, jarrlyy_dsp_is_supported
 - Kotlin facade: com.jarrlyyy.guessthenumber.audio.JarrlyyDspEngine
 
