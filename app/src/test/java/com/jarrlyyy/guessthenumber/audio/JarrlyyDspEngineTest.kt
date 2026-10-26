@@ -15,7 +15,7 @@ class JarrlyyDspEngineTest {
         val flags = listOf(JarrlyyDspEngine.EFFECT_LOWPASS, JarrlyyDspEngine.EFFECT_REVERB,
             JarrlyyDspEngine.EFFECT_CHORUS, JarrlyyDspEngine.EFFECT_DISTORTION)
         assertEquals(4, flags.distinct().size)
-        assertEquals(15, flags.fold(0) { combined, flag -> combined or flag })
+        assertTrue(flags.fold(0) { combined, flag -> combined or flag } == 15)
     }
 
     @Test fun rejectsInvalidPresetAndNonFiniteVolumeWithoutLoadingNativeCode() {
