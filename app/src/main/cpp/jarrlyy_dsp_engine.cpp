@@ -5,6 +5,7 @@
 #include <atomic>
 #include <cmath>
 #include <cstdint>
+#include <mutex>
 
 namespace jarrlyy_dsp {
 namespace {
@@ -29,6 +30,7 @@ Pattern patternFor(int p) {
 class Engine {
 public:
  bool play(int32_t p,float v,uint32_t fx) {
+  std::lock_guard<std::mutex> apiLock(apiMutex_);
   if(p<kTap||p>kHigh||!ensureStream()) return false;
   uint32_t w=write_.load(std::memory_order_relaxed), next=(w+1U)%kQueueSize;
   if(next==read_.load(std::memory_order_acquire)) return false;
@@ -56,7 +58,13 @@ private:
   aaudio_result_t r=AAudioStreamBuilder_openStream(b,&stream_);
   AAudioStreamBuilder_delete(b);
   if(r!=AAUDIO_OK||!stream_){stream_=nullptr;return false;}
-  return AAudioStream_requestStart(stream_)==AAUDIO_OK;
+  const aaudio_result_t startResult=AAudioStream_requestStart(stream_);
+  if(startResult!=AAUDIO_OK){
+   (void)AAudioStream_close(stream_);
+   stream_=nullptr;
+   return false;
+  }
+  return true;
  }
  static aaudio_data_callback_result_t callback(AAudioStream*,void* u,void* data,int32_t frames) {
   auto* e=static_cast<Engine*>(u); e->render(static_cast<float*>(data),frames);
@@ -111,6 +119,7 @@ private:
   if(active)idleFrames_=0;else idleFrames_+=uint64_t(frames);
   if(idleFrames_>72000U)std::fill(out,out+frames*2,0.0f);
  }
+ std::mutex apiMutex_;
  AAudioStream* stream_=nullptr;
  std::array<Command,kQueueSize> queue_{};
  std::array<Voice,kVoiceCount> voices_{};
