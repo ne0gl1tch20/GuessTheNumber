@@ -7,8 +7,14 @@ bool playPreset(int32_t preset, float volume, uint32_t effects);
 void stopAll();
 bool isSupported();
 }
+#if defined(__GNUC__)
+#define JARRLYY_DSP_API __attribute__((visibility("default")))
+#else
+#define JARRLYY_DSP_API
+#endif
+
 extern "C" {
-int jarrlyy_dsp_play_preset(int32_t preset, float volume, uint32_t effects);
-void jarrlyy_dsp_stop_all();
-int jarrlyy_dsp_is_supported();
+JARRLYY_DSP_API int jarrlyy_dsp_play_preset(int32_t preset, float volume, uint32_t effects);
+JARRLYY_DSP_API void jarrlyy_dsp_stop_all();
+JARRLYY_DSP_API int jarrlyy_dsp_is_supported();
 }
