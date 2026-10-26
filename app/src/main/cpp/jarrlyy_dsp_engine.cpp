@@ -51,7 +51,7 @@ private:
    (void)AAudioStream_waitForStateChange(stream_,state,&next,50000000LL);
    state=AAudioStream_getState(stream_);
   }
-  if(state==AAUDIO_STREAM_STATE_DISCONNECTED) {
+  if(state==AAUDIO_STREAM_STATE_DISCONNECTED||state==AAUDIO_STREAM_STATE_STOPPING) {
    (void)AAudioStream_close(stream_);
    stream_=nullptr;
    return ensureStream();
