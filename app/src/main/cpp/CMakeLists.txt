@@ -13,3 +13,18 @@ target_compile_options(gtn_native PRIVATE -Wall -Wextra -Werror -fvisibility=hid
 
 find_library(log-lib log)
 target_link_libraries(gtn_native PRIVATE ${log-lib})
+
+# Reusable procedural audio engine. The stream is opened lazily by the first play request.
+add_library(
+    jarrlyyydsp
+    SHARED
+    jarrlyy_dsp_engine.cpp
+    jarrlyy_dsp_jni.cpp
+)
+target_compile_features(jarrlyyydsp PRIVATE cxx_std_20)
+target_compile_options(jarrlyyydsp PRIVATE -Wall -Wextra -Werror -fvisibility=hidden)
+find_library(aaudio-lib aaudio)
+if(NOT aaudio-lib)
+    message(FATAL_ERROR "Android NDK AAudio library is required for jarrlyyydsp")
+endif()
+target_link_libraries(jarrlyyydsp PRIVATE ${aaudio-lib} ${log-lib})
