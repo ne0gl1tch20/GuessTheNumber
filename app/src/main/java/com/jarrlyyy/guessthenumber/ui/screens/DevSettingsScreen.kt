@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jarrlyyy.guessthenumber.audio.JarrlyyDspEngine
 import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
@@ -141,6 +142,8 @@ fun AdvancedDevToolsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
+            item { JarrlyyDspTestCard() }
 
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
@@ -816,6 +819,99 @@ fun DevSettingsScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+private fun JarrlyyDspTestCard() {
+    var volume by remember { mutableFloatStateOf(0.18f) }
+    var effects by remember { mutableIntStateOf(0) }
+    var status by remember { mutableStateOf("Choose a generated sound to test the native engine.") }
+    val nativeAvailable = remember { JarrlyyDspEngine.isNativeLibraryAvailable() }
+
+    DisposableEffect(Unit) {
+        onDispose { JarrlyyDspEngine.stopAll() }
+    }
+
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(Icons.Default.GraphicEq, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                Text("Jarrlyy DSP Engine", style = MaterialTheme.typography.titleLarge)
+            }
+            Text(
+                if (nativeAvailable) "Native library loaded · Android AAudio · synthesized audio"
+                else "Native library unavailable in this build or device environment.",
+                style = MaterialTheme.typography.bodySmall,
+                color = if (nativeAvailable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+            )
+            Text("Generated test sounds", style = MaterialTheme.typography.titleMedium)
+            JarrlyyDspEngine.presets.chunked(2).forEach { pair ->
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    pair.forEach { preset ->
+                        OutlinedButton(
+                            onClick = {
+                                status = if (JarrlyyDspEngine.playPreset(preset.id, volume, effects)) {
+                                    "Playing: " + preset.title
+                                } else {
+                                    "Could not play sound. Check device audio output and native build."
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(preset.title)
+                        }
+                    }
+                    if (pair.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
+            Text("Test volume: " + (volume * 100).toInt() + "%", style = MaterialTheme.typography.labelLarge)
+            Slider(value = volume, onValueChange = { volume = it }, valueRange = 0.0f..0.45f)
+            Text("DSP effects", style = MaterialTheme.typography.titleMedium)
+            Text("Effects are applied by the native audio callback.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            listOf(
+                Triple("Low-pass filter", JarrlyyDspEngine.EFFECT_LOWPASS, "Smooths high frequencies"),
+                Triple("Reverb", JarrlyyDspEngine.EFFECT_REVERB, "Adds a short space-like tail"),
+                Triple("Chorus", JarrlyyDspEngine.EFFECT_CHORUS, "Adds a modulated delayed layer"),
+                Triple("Distortion", JarrlyyDspEngine.EFFECT_DISTORTION, "Adds saturated arcade grit")
+            ).forEach { effect ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(effect.first, style = MaterialTheme.typography.bodyMedium)
+                        Text(effect.third, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Switch(
+                        checked = (effects and effect.second) != 0,
+                        onCheckedChange = { enabled ->
+                            effects = if (enabled) effects or effect.second else effects and effect.second.inv()
+                        }
+                    )
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Button(onClick = {
+                    status = if (JarrlyyDspEngine.stopAll()) "Stop requested." else "Native engine unavailable."
+                }) {
+                    Icon(Icons.Default.Stop, contentDescription = null)
+                    Spacer(Modifier.width(6.dp))
+                    Text("Stop sounds")
+                }
+                Text(status, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            }
+            Text(
+                "This panel only generates audio. It does not modify saves, settings, progression, or rewards.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
