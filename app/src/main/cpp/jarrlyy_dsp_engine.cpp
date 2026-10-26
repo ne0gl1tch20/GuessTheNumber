@@ -22,7 +22,7 @@ Pattern patternFor(int p) {
   case kError: return {{{235,175,0,0}},2,2,4600};
   case kReward: return {{{523.25f,659.25f,783.99f,1046.5f}},4,0,4200};
   case kArcade: return {{{392,523.25f,659.25f,783.99f}},4,1,3000};
-  case kLow: return {{{190,146.83f,0,0}},2,2,4400};
+  case kLow: return {{{392.0f,329.63f,0,0}},2,1,5200};
   case kHigh: return {{{698.46f,880,0,0}},2,1,3400};
   default: return {{{990,0,0,0}},1,0,2200};
  }
@@ -32,20 +32,30 @@ public:
  bool play(int32_t p,float v,uint32_t fx) {
   std::lock_guard<std::mutex> apiLock(apiMutex_);
   if(p<kTap||p>kHigh||!ensureStream()) return false;
+  auto state=AAudioStream_getState(stream_);
+  if(state==AAUDIO_STREAM_STATE_DISCONNECTED) {
+   (void)AAudioStream_close(stream_);
+   stream_=nullptr;
+   if(!ensureStream()) return false;
+  } else if(state==AAUDIO_STREAM_STATE_STOPPED||state==AAUDIO_STREAM_STATE_PAUSED) {
+   if(AAudioStream_requestStart(stream_)!=AAUDIO_OK) {
+    (void)AAudioStream_close(stream_);
+    stream_=nullptr;
+    if(!ensureStream()) return false;
+   }
+  }
   uint32_t w=write_.load(std::memory_order_relaxed), next=(w+1U)%kQueueSize;
   if(next==read_.load(std::memory_order_acquire)) return false;
   queue_[w]=Command{p,std::clamp(v,0.0f,0.45f),fx&15U};
   write_.store(next,std::memory_order_release);
   stop_.store(false,std::memory_order_release);
-  auto state=AAudioStream_getState(stream_);
-  if(state==AAUDIO_STREAM_STATE_STOPPED||state==AAUDIO_STREAM_STATE_PAUSED) (void)AAudioStream_requestStart(stream_);
   return true;
  }
  void stopAll(){ stop_.store(true,std::memory_order_release); }
  bool supported() const { return true; }
 private:
  bool ensureStream() {
-  if(stream_!=nullptr) return true;
+  if(stream_!=nullptr) {\n   if(AAudioStream_getState(stream_)!=AAUDIO_STREAM_STATE_DISCONNECTED) return true;\n   (void)AAudioStream_close(stream_);\n   stream_=nullptr;\n  }
   AAudioStreamBuilder* b=nullptr;
   if(AAudio_createStreamBuilder(&b)!=AAUDIO_OK||!b) return false;
   AAudioStreamBuilder_setDirection(b,AAUDIO_DIRECTION_OUTPUT);
@@ -68,7 +78,7 @@ private:
  }
  static aaudio_data_callback_result_t callback(AAudioStream*,void* u,void* data,int32_t frames) {
   auto* e=static_cast<Engine*>(u); e->render(static_cast<float*>(data),frames);
-  return e->idleFrames_>72000U?AAUDIO_CALLBACK_RESULT_STOP:AAUDIO_CALLBACK_RESULT_CONTINUE;
+  return AAUDIO_CALLBACK_RESULT_CONTINUE;
  }
  bool dequeue(Command& c) {
   uint32_t r=read_.load(std::memory_order_relaxed);
