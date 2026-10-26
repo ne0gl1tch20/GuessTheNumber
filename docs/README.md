@@ -16,6 +16,7 @@ This directory contains technical notes for the Android game, KMP architecture a
 | [Shared Web UI migration matrix](SHARED_WEB_UI_MIGRATION_MATRIX.md) | Source-audited first production gameplay slice, Kotlin-owned action path, migration scope and acceptance evidence |
 | [Shared Web UI gameplay bridge contract](SHARED_WEB_UI_GAMEPLAY_BRIDGE_CONTRACT.md) | Proposed versioned request/response contract and acceptance checks for the first real guessing interaction |
 | [Shared Web UI theme foundation](SHARED_WEB_UI_THEME_FOUNDATION.md) | Reusable CSS design tokens and baseline components; currently integrated only by the debug prototype |
+| [Unified Vue + Canvas + Jarrlyy stack plan](VUE_CANVAS_JARRLYY_UNIFIED_STACK_PLAN.md) | Proposed Vue, Canvas, HTML/CSS, Jarrlyy UI SDK, JavaScript, Kotlin/KMP, sandboxed Lua and optional C++ responsibilities, rollout phases and acceptance gates |
 | [Windows WebView host evaluation](WINDOWS_WEBVIEW_HOST_EVALUATION.md) | Source-based Windows host options, MSI/runtime constraints and the next isolated proof of concept |
 | [Windows feature parity plan](WINDOWS_FEATURE_PARITY_PLAN.md) | Ordered plan for the intended player-facing feature set on Windows |
 | [Windows Android UI parity audit](WINDOWS_ANDROID_UI_PARITY_AUDIT.md) | Screen-by-screen implementation status and remaining visual/behavior gaps |
