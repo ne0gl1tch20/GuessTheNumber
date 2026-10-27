@@ -55,7 +55,7 @@ calls.dialog.options.onConfirm();
 assert.equal(confirmed, true);
 
 const mounted = api.mount({ name: "Example" }, "#mount", { value: 3 });
-assert.equal(mounted, root);
+assert.ok(mounted && typeof mounted.mount === "function", "mount should return the Vue app instance");
 assert.equal(calls.registered.name, "JarrlyyButton");
 assert.equal(calls.mounted.target, root);
 assert.equal(api.mount({}, "#missing"), null);
