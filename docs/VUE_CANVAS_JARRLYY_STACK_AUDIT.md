@@ -28,7 +28,7 @@
 
 ### Runtime and test constraints
 
-- Source inspection confirms no `package.json` or local Vue runtime through the inspected search results. Vue is therefore **not yet integrated**.
+- At the initial audit point, no Vue runtime was present. Vue 3.5.22 is now vendored under `app/src/main/assets/libraries/vue/` and loaded locally by the shared HTML page; the runtime remains offline-safe.
 - The audit did not execute Gradle, frontend tests, Android runtime checks or desktop runtime checks. No performance baseline is claimed.
 - C++ remains deferred until repeatable profiling demonstrates a bottleneck. This audit found no evidence that adding a native C++ layer is currently necessary.
 - Lua sandbox implementation and its current tests still need a focused source/test audit before changing that subsystem.
@@ -45,4 +45,4 @@
 
 ## Gate result
 
-**Phase 0 source-audit gate: passed with follow-up work.** The architecture and current integration points are identified. The baseline measurement, focused Lua audit, and runtime/build checks remain open. Phase 1 must add a real local Vue runtime and a verified integration path before Vue can be called integrated.
+**Phase 0 source-audit gate: passed with follow-up work.** The architecture and current integration points are identified. Vue 3.5.22 is now bundled locally, with an initial Vue/Jarrlyy adapter and Vue-managed Canvas celebration slice. The bridge and Lua source reviews found existing bounded, allowlisted implementations with targeted tests, so those subsystems were not rewritten. Frontend CI, Kotlin tests, runtime/build/performance baselines, accessibility checks and Android/Windows verification remain open.
