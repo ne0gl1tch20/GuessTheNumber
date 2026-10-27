@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "409c8bf92cbc3fcecbc4431ce684e5328a3f1fc1",
+  "version": "8ba29c867f64b5d12ae3a3ee31c99b3aae564abf",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -21,7 +21,7 @@
     },
     {
       "path": "web-play/index.html",
-      "sha256": "76d99e0b9c0655bc9b8b7d551af8c97f2a2b6ebb36b1ec713f015a332477c954"
+      "sha256": "4b5bffb93507002f939346366a715c5dc871a589cd0efe79ad909d7e64043146"
     },
     {
       "path": "web-play/menu-studio.js",
@@ -38,6 +38,10 @@
     {
       "path": "web-play/vue-canvas-effects.js",
       "sha256": "aed1e476b6a50460d12762a5e73690ec853f314b8a4fc1481a4f1df83a82d1a3"
+    },
+    {
+      "path": "web-play/vue-jarrlyy-adapter.js",
+      "sha256": "e74a2b588ce3869f785af2366331f6f357927691b3d450fa1a31cb7bf78e165a"
     },
     {
       "path": "fonts/Inter-Italic-VariableFont_opsz,wght.ttf",
