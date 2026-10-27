@@ -1,6 +1,6 @@
 # Unified Frontend and Runtime Plan: Vue + Canvas + Jarrlyy UI SDK + HTML + C++ + Kotlin + Lua + JavaScript
 
-**Status:** Proposed implementation plan; this document does not claim the stack is integrated or tested.
+**Status (2026-10-27):** Phase 0 source audit completed and recorded in [the audit report](VUE_CANVAS_JARRLYY_STACK_AUDIT.md). Vue/Canvas integration and runtime verification are still pending; this plan remains the execution authority.
 **Target repository:** `ne0gl1tch20/GuessTheNumber`
 **Branch policy for this task:** Commit the plan directly to `master`, as requested.
 **Architecture rule:** Unite the technologies through explicit boundaries, not by making every language implement the same responsibilities.
@@ -149,8 +149,16 @@ Canvas is a visual layer mounted inside a Vue component. Vue controls its lifecy
 - Introducing remote runtime dependencies, ads, analytics or accounts.
 - Claiming Windows or device parity before the relevant checks run.
 
+## Current execution status
+
+- [x] Phase 0 source audit written to `VUE_CANVAS_JARRLYY_STACK_AUDIT.md`.
+- [ ] Phase 0 runtime/build/performance baseline and focused Lua sandbox audit.
+- [ ] Phase 1: vendor pinned Vue 3 locally and prove an offline-safe, backwards-compatible integration.
+- [ ] Phases 2–7: implement incrementally and record real test evidence. No runtime acceptance is claimed yet.
+
 ## References within this repository
 
+- [Unified stack source audit](VUE_CANVAS_JARRLYY_STACK_AUDIT.md)
 - [Shared Web UI architecture](SHARED_WEB_UI_ARCHITECTURE.md)
 - [Shared Web UI migration matrix](SHARED_WEB_UI_MIGRATION_MATRIX.md)
 - [Gameplay bridge contract](SHARED_WEB_UI_GAMEPLAY_BRIDGE_CONTRACT.md)
