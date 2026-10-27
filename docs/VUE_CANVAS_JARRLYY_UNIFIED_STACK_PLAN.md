@@ -1,6 +1,6 @@
 # Unified Frontend and Runtime Plan: Vue + Canvas + Jarrlyy UI SDK + HTML + C++ + Kotlin + Lua + JavaScript
 
-**Status (2026-10-27):** Phase 0 source audit is complete. Phase 1 has an initial locally bundled Vue 3.5.22 runtime and Jarrlyy adapter; Phase 2 has a Vue-managed Canvas celebration slice and lifecycle tests. The initial adapter test exposed a test expectation bug, now being corrected. Full-screen migration, full CI, Android runtime, accessibility and performance gates remain open. See [the audit report](VUE_CANVAS_JARRLYY_STACK_AUDIT.md).
+**Status (2026-10-27):** Phase 0 source audit is complete. Phase 1 has an initial locally bundled Vue 3.5.22 runtime and Jarrlyy adapter; Phase 2 has a Vue-managed Canvas celebration slice and lifecycle tests. The adapter test expectation has been corrected; the latest HTML/CSS/JS workflow passes on commit `5289763c1e4434c33c4433def57ff4ccc67db2e6`. Full-screen migration, Android runtime validation, accessibility and performance gates remain open; Windows CI and Android APK CI are still running for the latest commits. See [the audit report](VUE_CANVAS_JARRLYY_STACK_AUDIT.md).
 **Target repository:** `ne0gl1tch20/GuessTheNumber`
 **Branch policy for this task:** Commit the plan directly to `master`, as requested.
 **Architecture rule:** Unite the technologies through explicit boundaries, not by making every language implement the same responsibilities.
