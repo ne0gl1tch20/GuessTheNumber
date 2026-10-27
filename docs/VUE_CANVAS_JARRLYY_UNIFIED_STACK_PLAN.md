@@ -152,9 +152,11 @@ Canvas is a visual layer mounted inside a Vue component. Vue controls its lifecy
 ## Current execution status
 
 - [x] Phase 0 source audit written to `VUE_CANVAS_JARRLYY_STACK_AUDIT.md`.
+- [x] Initial Phase 1 foundation: Vue 3.5.22 production runtime is bundled locally at `app/src/main/assets/libraries/vue/`; HTML loads it before the isolated effects module.
+- [x] First isolated Canvas slice: correct-guess celebrations use a Vue-managed Canvas with DPR capped at 2, reduced-motion support, hidden-page cleanup and a legacy fallback.
+- [ ] Phase 1 acceptance gate: run frontend checks and verify no regression; add the remaining Jarrlyy SDK adapter/accessibility contract before migrating ordinary UI controls.
 - [ ] Phase 0 runtime/build/performance baseline and focused Lua sandbox audit.
-- [ ] Phase 1: vendor pinned Vue 3 locally and prove an offline-safe, backwards-compatible integration.
-- [ ] Phases 2–7: implement incrementally and record real test evidence. No runtime acceptance is claimed yet.
+- [ ] Phases 3–7: implement incrementally and record real test evidence. No Android/Windows runtime acceptance is claimed yet.
 
 ## References within this repository
 
