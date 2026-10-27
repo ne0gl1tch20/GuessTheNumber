@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "6495bd7dcd5116073bd8467bf5a694ec31b41757",
+  "version": "315bf416a9a49cca75174788a5c7ca0b379d9e05",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -198,6 +198,18 @@
     {
       "path": "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css",
       "sha256": "7323e00f31042fe27c78d11bcdad486449c8f7ca5c5d17a63ac857d8bab0b52c"
+    },
+    {
+      "path": "libraries/vue/LICENSE",
+      "sha256": "49190d1f742dd61e47fe816df4963e5186a2a62100d9122f9883a60ea32973ac"
+    },
+    {
+      "path": "libraries/vue/VERSION.txt",
+      "sha256": "fc184be53388c4dd6f260d0b9584b392b9ddd34acbdce2772169e4bd34e122ec"
+    },
+    {
+      "path": "libraries/vue/vue.global.prod.js",
+      "sha256": "dae9c178e86e09240e58721cdb46a81ac96ae1dc6a870d1b1bb9ffaee3c6d3fe"
     }
   ]
 }
