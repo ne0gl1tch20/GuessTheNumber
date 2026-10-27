@@ -11,10 +11,15 @@ const component={
  render(){return h('canvas',{class:'gtn-vue-canvas-effects__canvas', 'aria-hidden':'true'})},
  mounted(){
   this.canvas=this.$el;
-  this.context=this.canvas.getContext('2d',{alpha:true});
   this.particles=[];
   this.frame=0;
   this.lastFrame=0;
+  this.resizeObserver=null;
+  this.onResize=null;
+  this.onBurst=null;
+  this.onVisibility=null;
+  this.context=this.canvas.getContext('2d',{alpha:true});
+  if(!this.context){window.gtnVueCanvasEffectsReady=false;return;}
   this.resizeObserver=typeof ResizeObserver==='function'?new ResizeObserver(()=>this.resize()):null;
   this.onResize=()=>this.resize();
   this.onBurst=event=>this.burst(event);
