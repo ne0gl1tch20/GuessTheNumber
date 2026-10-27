@@ -75,7 +75,7 @@ const vnode = api.Button.setup(
   { slots: { default: () => ["Confirm"] }, emit: (name, event) => { calls.click = { name, event }; } },
 )();
 assert.equal(vnode.type, "button");
-assert.deepEqual(vnode.props.class, ["jui-button", "jui-button-danger"]);
+assert.equal(vnode.props.class.join(" "), "jui-button jui-button-danger");
 assert.equal(vnode.props.type, "submit");
 assert.equal(vnode.props.disabled, true);
 vnode.props.onClick("click-event");
