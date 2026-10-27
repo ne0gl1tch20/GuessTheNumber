@@ -137,4 +137,20 @@ const noVueWindow = {};
 const noVueDocument = { getElementById: () => ({}) };
 vm.runInNewContext(source, { window: noVueWindow, document: noVueDocument });
 assert.equal(noVueWindow.gtnVueCanvasEffectsReady, false, "missing Vue should fail closed to the legacy celebration");
+
+const noCanvasWindow = {
+  Vue: {
+    h: () => ({}),
+    createApp(component) {
+      return { mount() {
+        const instance = { $el: { getContext: () => null } };
+        for (const [name, fn] of Object.entries(component.methods)) instance[name] = fn.bind(instance);
+        component.mounted.call(instance);
+        return instance;
+      } };
+    },
+  },
+};
+vm.runInNewContext(source, { window: noCanvasWindow, document: noVueDocument });
+assert.equal(noCanvasWindow.gtnVueCanvasEffectsReady, false, "unsupported Canvas must preserve the legacy celebration");
 console.log("Vue Canvas effects lifecycle, reduced workload and cleanup checks passed.");
