@@ -1309,3 +1309,9 @@ body.jui-game-compat .jui-dialog-actions { display:flex; flex-wrap:wrap; gap:.55
 .update-notice-dismiss:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
 @media(max-width:360px){.update-notice{align-items:flex-start;gap:8px;padding:11px}.update-notice-actions{min-width:65px}.update-notice h2{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.update-notice *{animation:none!important;transition:none!important}}
+
+
+/* Vue-managed Canvas is reserved for non-interactive celebration visuals. */
+.gtn-vue-canvas-effects{position:fixed;inset:0;z-index:10000;pointer-events:none;overflow:hidden;contain:strict}
+.gtn-vue-canvas-effects__canvas{display:block;width:100%;height:100%;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.gtn-vue-canvas-effects{display:none}}
