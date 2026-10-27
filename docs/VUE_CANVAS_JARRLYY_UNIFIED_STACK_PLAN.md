@@ -157,8 +157,11 @@ Canvas is a visual layer mounted inside a Vue component. Vue controls its lifecy
 - [x] Initial Vue/Jarrlyy adapter added with SDK toast/dialog reuse, an SDK-styled Vue button component and namespaced host events.
 - [x] Automated lifecycle/adapter checks added to the shared frontend CI workflow.
 - [ ] Phase 1 acceptance gate: confirm CI passes, verify no regression, and complete keyboard/focus/accessibility checks before migrating ordinary UI controls.
-- [ ] Phase 0 runtime/build/performance baseline and focused Lua sandbox audit.
-- [ ] Phases 3–7: implement incrementally and record real test evidence. No Android/Windows runtime acceptance is claimed yet.
+- [x] Phase 3/4 source review: existing Kotlin WebView protocol and Lua sandbox already implement bounded, allowlisted contracts with targeted tests; no duplicate rewrite was added.
+- [ ] Phase 0 runtime/build/performance baseline; execute the existing bridge and Lua tests.
+- [ ] Phase 6: migrate a real low-risk HTML UI surface to Vue only after the foundation/accessibility gate passes.
+- [ ] Phase 7: run frontend CI, Kotlin tests and available Android/Windows runtime checks; no device/desktop acceptance is claimed yet.
+- [ ] Phase 5 C++ decision: remains deferred until profiling demonstrates a specific bottleneck.
 
 ## References within this repository
 
