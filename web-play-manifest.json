@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "8ba29c867f64b5d12ae3a3ee31c99b3aae564abf",
+  "version": "5a2a01e108c557a51ee40d5cbc19bc853740ab11",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -37,7 +37,7 @@
     },
     {
       "path": "web-play/vue-canvas-effects.js",
-      "sha256": "aed1e476b6a50460d12762a5e73690ec853f314b8a4fc1481a4f1df83a82d1a3"
+      "sha256": "aa7a56bd3a5b9931f0f908257dde1b09c1b1a3e269726074ac9a844d186ba67f"
     },
     {
       "path": "web-play/vue-jarrlyy-adapter.js",
