@@ -156,6 +156,7 @@ Canvas is a visual layer mounted inside a Vue component. Vue controls its lifecy
 - [x] First isolated Canvas slice: correct-guess celebrations use a Vue-managed Canvas with DPR capped at 2, reduced-motion support, hidden-page cleanup and a legacy fallback.
 - [x] Initial Vue/Jarrlyy adapter added with SDK toast/dialog reuse, an SDK-styled Vue button component and namespaced host events.
 - [x] Automated lifecycle/adapter checks added to the shared frontend CI workflow.
+- [x] Source-level JavaScript parse checks and mocked runtime smoke checks passed for Canvas drawing/cleanup, reduced-motion behavior, unsupported-Canvas fallback and the Jarrlyy adapter API.
 - [ ] Phase 1 acceptance gate: confirm CI passes, verify no regression, and complete keyboard/focus/accessibility checks before migrating ordinary UI controls.
 - [x] Phase 3/4 source review: existing Kotlin WebView protocol and Lua sandbox already implement bounded, allowlisted contracts with targeted tests; no duplicate rewrite was added.
 - [ ] Phase 0 runtime/build/performance baseline; execute the existing bridge and Lua tests.
