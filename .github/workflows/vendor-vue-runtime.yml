@@ -1,4 +1,4 @@
-name: Vendor pinned Vue runtime
+name: Verify pinned Vue runtime
 
 on:
   push:
@@ -6,39 +6,27 @@ on:
     paths:
       - ".github/workflows/vendor-vue-runtime.yml"
       - "tools/vendor_vue_runtime.sh"
+      - "app/src/main/assets/libraries/vue/**"
   pull_request:
     paths:
       - ".github/workflows/vendor-vue-runtime.yml"
       - "tools/vendor_vue_runtime.sh"
+      - "app/src/main/assets/libraries/vue/**"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  vendor-vue:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+  verify-vue:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out master
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          ref: master
-          fetch-depth: 0
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Vendor pinned Vue runtime
+      - name: Rebuild the pinned local runtime
         run: bash tools/vendor_vue_runtime.sh
-      - name: Commit the offline runtime if it changed
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/src/main/assets/libraries/vue/
-          if git diff --cached --quiet; then
-            echo "Vue runtime already matches the pinned version."
-            exit 0
-          fi
-          git commit -m "build: vendor Vue 3.5.22 runtime for offline web UI"
-          git push origin master
+      - name: Verify vendored runtime is reproducible
+        run: git diff --exit-code -- app/src/main/assets/libraries/vue/
