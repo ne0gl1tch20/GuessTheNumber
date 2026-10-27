@@ -465,3 +465,4 @@ window.gtnShowDailyRewardTest = function () {
  return true;
 };
 })();
+/* Vue Canvas migration: celebration effects are optional visuals with a legacy fallback. */
