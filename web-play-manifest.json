@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "315bf416a9a49cca75174788a5c7ca0b379d9e05",
+  "version": "8384e2594a025ffca9c6b42965cff93281feb845",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -34,6 +34,10 @@
     {
       "path": "web-play/trait-extension-host.js",
       "sha256": "ecef072e5d782e0d7cd0ba2ddc7db805259005327c3ef354a8010ef601a21fee"
+    },
+    {
+      "path": "web-play/vue-canvas-effects.js",
+      "sha256": "aed1e476b6a50460d12762a5e73690ec853f314b8a4fc1481a4f1df83a82d1a3"
     },
     {
       "path": "fonts/Inter-Italic-VariableFont_opsz,wght.ttf",
