@@ -15,7 +15,7 @@ tar -xzf "$TMP/vue-${VERSION}.tgz" -C "$TMP/package"
 PACKAGE="$TMP/package/package"
 node -e 'const p=require(process.argv[1]); if(p.version!==process.argv[2]) { console.error("Unexpected Vue version: "+p.version); process.exit(1); }' "$PACKAGE/package.json" "$VERSION"
 test -s "$PACKAGE/dist/vue.global.prod.js"
-grep -q "Vue.js v${VERSION}" "$PACKAGE/dist/vue.global.prod.js"
+grep -qi "vue v${VERSION}" "$PACKAGE/dist/vue.global.prod.js"
 test -s "$PACKAGE/LICENSE"
 
 cp "$PACKAGE/dist/vue.global.prod.js" "$DEST/vue.global.prod.js"
