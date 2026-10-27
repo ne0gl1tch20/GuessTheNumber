@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "db3e4f5076ed77c92584c673941a816c43bb8cb2",
+  "version": "07775a260d4f9d1b326a16a3aadc991b2b9acfbe",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -209,7 +209,7 @@
     },
     {
       "path": "libraries/vue/VERSION.txt",
-      "sha256": "fc184be53388c4dd6f260d0b9584b392b9ddd34acbdce2772169e4bd34e122ec"
+      "sha256": "93f9228413ddb9761756ea283cec8df754b06d6259b79a88931eed317627684d"
     },
     {
       "path": "libraries/vue/vue.global.prod.js",
