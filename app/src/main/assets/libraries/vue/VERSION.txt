@@ -1,0 +1,2 @@
+Vue 3.5.22 (global production build)
+Source: https://github.com/cdnjs/cdnjs/blob/master/ajax/libs/vue/3.5.22/vue.global.prod.js
