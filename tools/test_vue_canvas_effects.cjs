@@ -119,4 +119,21 @@ assert.equal(window.gtnVueCanvasEffectsReady, false, "unmount should clear ready
 assert.equal((listeners.get("gtn:canvas-burst") || []).length, 0, "unmount should remove event listener");
 assert.equal(calls.resizeDisconnect, 1, "unmount should disconnect ResizeObserver");
 
+const html = fs.readFileSync("app/src/main/assets/web-play/index.html", "utf8");
+const vueRuntime = fs.readFileSync("app/src/main/assets/libraries/vue/vue.global.prod.js", "utf8");
+const version = fs.readFileSync("app/src/main/assets/libraries/vue/VERSION.txt", "utf8");
+const vueTag = html.indexOf('src="../libraries/vue/vue.global.prod.js"');
+const effectsTag = html.indexOf('src="vue-canvas-effects.js"');
+const appTag = html.indexOf('src="app.js"');
+assert.ok(vueTag >= 0 && effectsTag > vueTag && appTag > effectsTag, "Vue runtime and Canvas module must load before app.js");
+assert.match(html, /script-src 'self'/, "script CSP must stay local-only");
+assert.match(html, /connect-src 'none'/, "runtime network access must remain disabled");
+assert.match(vueRuntime, /vue v3\.5\.22/i, "vendored runtime must match the pinned Vue version");
+assert.match(version, /Vue 3\.5\.22/, "runtime version metadata must match");
+assert.match(html, /id="gtnVueCanvasEffects"/, "Canvas layer mount point must exist");
+
+const noVueWindow = {};
+const noVueDocument = { getElementById: () => ({}) };
+vm.runInNewContext(source, { window: noVueWindow, document: noVueDocument });
+assert.equal(noVueWindow.gtnVueCanvasEffectsReady, false, "missing Vue should fail closed to the legacy celebration");
 console.log("Vue Canvas effects lifecycle, reduced workload and cleanup checks passed.");
