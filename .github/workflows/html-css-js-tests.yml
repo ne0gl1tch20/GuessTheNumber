@@ -1,6 +1,13 @@
 name: HTML CSS JS Tests
 
 on:
+  push:
+    branches: [master]
+    paths:
+      - "app/src/main/assets/web-play/**"
+      - "app/src/main/assets/libraries/vue/**"
+      - "tools/test_vue_canvas_effects.cjs"
+      - ".github/workflows/html-css-js-tests.yml"
   pull_request:
   workflow_dispatch:
 
@@ -51,6 +58,9 @@ jobs:
 
       - name: Smoke-test Jarrlyy UI SDK runtime initialization
         run: node tools/test_jarrlyy_ui_sdk_runtime.cjs
+
+      - name: Test Vue Canvas effects lifecycle and cleanup
+        run: node tools/test_vue_canvas_effects.cjs
 
       - name: Verify Jarrlyy SDK parity and release contract
         run: python tools/test_jarrlyy_sdk_release.py
