@@ -47,7 +47,7 @@ jobs:
           npm install --no-package-lock --no-audit --no-fund
           npm run typecheck
           npm run build
-          node ../../../../../../tools/test_jarrlyy_ui_typescript.mjs
+          node ../../../../../../../tools/test_jarrlyy_ui_typescript.mjs
 
       - name: Check syntax of every tracked JavaScript file
         shell: bash
