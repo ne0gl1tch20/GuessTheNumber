@@ -195,7 +195,7 @@ type JarrlyyUIMotionApi = Readonly<{
         if ((event.target as Element | null)?.closest("button")) close();
       });
       menu.addEventListener("keydown", (event) => {
-        const items = $<HTMLButtonElement>("button:not(:disabled)", menu);
+        const items = $$<HTMLButtonElement>("button:not(:disabled)", menu);
         if (!items.length) return;
         if (event.key === "Tab") { close(); return; }
         const current = items.indexOf(doc.activeElement);
@@ -227,7 +227,7 @@ type JarrlyyUIMotionApi = Readonly<{
       const render = () => {
         slides.forEach((slide, i) => { slide.hidden = i !== index; slide.setAttribute("aria-hidden", String(i !== index)); });
         if (count) count.textContent = slides.length ? (index + 1) + " / " + slides.length : "0 / 0";
-        $<HTMLButtonElement>("[data-jui-carousel-prev], [data-jui-carousel-next]", carousel).forEach((button) => { button.disabled = slides.length < 2; });
+        $$<HTMLButtonElement>("[data-jui-carousel-prev], [data-jui-carousel-next]", carousel).forEach((button) => { button.disabled = slides.length < 2; });
       };
       $("[data-jui-carousel-prev]", carousel)?.addEventListener("click", () => { if (slides.length < 2) return; index = (index + slides.length - 1) % slides.length; render(); });
       $("[data-jui-carousel-next]", carousel)?.addEventListener("click", () => { if (slides.length < 2) return; index = (index + 1) % slides.length; render(); });
@@ -353,7 +353,7 @@ type JarrlyyUIMotionApi = Readonly<{
     $$("[data-jui-dropzone]").forEach((zone) => {
       if (zone.dataset.juiDropzoneReady) return;
       zone.dataset.juiDropzoneReady = "true";
-      const input = $<HTMLInputElement>("input[type=file]", zone);
+      const input = $$<HTMLInputElement>("input[type=file]", zone);
       const status = $("[data-jui-drop-status]", zone);
       const showFiles = (files: FileList | null | undefined) => {
         if (!status) return;
@@ -386,7 +386,7 @@ type JarrlyyUIMotionApi = Readonly<{
         ]);
       });
     });
-    $<HTMLInputElement>("[data-jui-color-target]").forEach((input) => {
+    $$<HTMLInputElement>("[data-jui-color-target]").forEach((input) => {
       if (input.dataset.juiColorReady) return;
       input.dataset.juiColorReady = "true";
       input.addEventListener("input", () => {
