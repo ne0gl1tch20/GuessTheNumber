@@ -40,6 +40,7 @@ import com.jarrlyyy.guessthenumber.domain.model.LiveOpsClaimPolicy
 import com.jarrlyyy.guessthenumber.domain.model.RandomEventEngine
 import com.jarrlyyy.guessthenumber.scripting.LuaRandomEventSelector
 import com.jarrlyyy.guessthenumber.scripting.LuaInvisibleTraitSelector
+import com.jarrlyyy.guessthenumber.shared.domain.InvisibleTraitEngine
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
@@ -618,14 +619,18 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (state.money >= requiredMoney && reward > BigNumber.ZERO) {
             val newPrestige = state.prestige + reward
             val newStats = state.statistics.copy(prestigesCount = state.statistics.prestigesCount + 1)
-            _gameState.value = state.copy(
-                money = gameEngine.prestigeStartingCapital(state),
-                prestige = newPrestige,
-                upgradeLevels = emptyMap(),
-                currentRangeMin = 1,
-                currentRangeMax = Difficulty.rangeMax(state.difficultyId, 0),
-                statistics = newStats,
-                prestigeCount = state.prestigeCount + 1
+            _gameState.value = InvisibleTraitEngine.observeProgression(
+                state.copy(
+                    money = gameEngine.prestigeStartingCapital(state),
+                    prestige = newPrestige,
+                    upgradeLevels = emptyMap(),
+                    currentRangeMin = 1,
+                    currentRangeMax = Difficulty.rangeMax(state.difficultyId, 0),
+                    statistics = newStats,
+                    prestigeCount = state.prestigeCount + 1
+                ),
+                previousPrestige = state.prestigeCount,
+                previousUltra = state.ultraCount
             )
             resetGuessingBots(_gameState.value.currentRangeMin, _gameState.value.currentRangeMax)
             saveGameAsync()
@@ -641,14 +646,18 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (canUltra && reward > BigNumber.ZERO) {
             val newUltra = state.ultra + reward
             val newStats = state.statistics.copy(ultrasCount = state.statistics.ultrasCount + 1)
-            _gameState.value = state.copy(
-                money = gameEngine.prestigeStartingCapital(state),
-                prestige = BigNumber.ZERO,
-                ultra = newUltra,
-                upgradeLevels = emptyMap(),
-                prestigeUpgradeLevels = emptyMap(),
-                statistics = newStats,
-                ultraCount = state.ultraCount + 1
+            _gameState.value = InvisibleTraitEngine.observeProgression(
+                state.copy(
+                    money = gameEngine.prestigeStartingCapital(state),
+                    prestige = BigNumber.ZERO,
+                    ultra = newUltra,
+                    upgradeLevels = emptyMap(),
+                    prestigeUpgradeLevels = emptyMap(),
+                    statistics = newStats,
+                    ultraCount = state.ultraCount + 1
+                ),
+                previousPrestige = state.prestigeCount,
+                previousUltra = state.ultraCount
             )
             resetGuessingBots(_gameState.value.currentRangeMin, _gameState.value.currentRangeMax)
             saveGameAsync()
