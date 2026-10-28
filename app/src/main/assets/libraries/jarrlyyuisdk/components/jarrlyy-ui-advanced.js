@@ -1,11 +1,14 @@
-/* Generated from typescript/runtime/jarrlyy-ui-advanced.ts by TypeScript. */
-(function (global) {
+/* Jarrlyy UI SDK · optional interactive component layer.
+ * TypeScript source: ../typescript/runtime/jarrlyy-ui-advanced.ts
+ */
+(() => {
   "use strict";
+  const global = window;
   const doc = global.document;
   if (!doc || global.JarrlyyUIAdvanced) return;
   const $ = (selector, root = doc) => root.querySelector(selector);
   const $$ = (selector, root = doc) => Array.from(root.querySelectorAll(selector));
-  const emit = (node, name, detail) => node.dispatchEvent(new global.CustomEvent(name, { bubbles: true, detail }));
+  const emit = (node, name, detail) => node.dispatchEvent(new CustomEvent(name, { bubbles: true, detail }));
   const initialized = new WeakSet();
 
   function initTabs() {
@@ -166,7 +169,7 @@
   function setLoading(button, loading, label) {
     if (!button) return;
     if (loading) {
-      if (button.dataset.juiOriginalLabel === undefined) button.dataset.juiOriginalLabel = button.textContent.trim();
+      if (button.dataset.juiOriginalLabel === undefined) button.dataset.juiOriginalLabel = button.textContent?.trim() ?? "";
       if (button.dataset.juiOriginalDisabled === undefined) button.dataset.juiOriginalDisabled = String(button.disabled);
       button.disabled = true;
       button.setAttribute("aria-busy", "true");
@@ -220,4 +223,4 @@
   global.JarrlyyUIAdvanced = Object.freeze({ init, setLoading, setProgress });
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
-})(window);
+})();
