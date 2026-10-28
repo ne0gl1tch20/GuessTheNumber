@@ -761,7 +761,11 @@ fun ProductionWebPlayScreen(
                                         val hasOwnedBot = game.shopPurchases.any { it in ownedBotIds }
                                         shopDefinitions.forEach { item ->
                                             val owned = item.id in game.shopPurchases
-                                            shopJson.put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
+                                            val nameKey = "shop_item_${item.id}_name"
+                                            val descriptionKey = "shop_item_${item.id}_desc"
+                                            val localizedName = activeLocaleManager.getString(nameKey).takeIf { it.isNotBlank() && it != nameKey } ?: item.name
+                                            val localizedDescription = activeLocaleManager.getString(descriptionKey).takeIf { it.isNotBlank() && it != descriptionKey } ?: item.description
+                                            shopJson.put(JSONObject().put("id", item.id).put("name", localizedName).put("description", localizedDescription)
                                                 .put("cost", item.nebulaCost).put("category", item.category).put("cosmetic", item.isCosmetic)
                                                 .put("owned", owned).put("equipped", game.equippedCosmeticId == item.id)
                                                 .put("affordable", (item.id !in setOf("bot_speed_upgrade", "bot_logic_upgrade") || hasOwnedBot) && game.nebula >= BigNumber(item.nebulaCost)))
