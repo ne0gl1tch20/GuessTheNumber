@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "version": "aaf978aa805142a7ef03dc63e7363cf9f166fc0d",
+  "version": "21cbbe414ef8282cd06fef33963352d76ae085b0",
   "minAppVersionCode": 21,
   "files": [
     {
       "path": "web-play/app.js",
-      "sha256": "9ddf760fc053743318a746d8ccb69b866de247c4440c2ad71562f22c3d865c9b"
+      "sha256": "e0f54995f9f0da7a226ee2557ed2d82535784f00bafa58faacd101e4a2c5355e"
     },
     {
       "path": "web-play/icons/guess-the-number.svg",
@@ -21,15 +21,15 @@
     },
     {
       "path": "web-play/index.html",
-      "sha256": "4c0171c65ae702536df6aba12e58006c06d8f512e71c1ea9638aa322c2911cf9"
+      "sha256": "e0c5e466dc4c1eae879934b39a7baa36206530f643b6f9745d6f52ce38fa7a23"
     },
     {
       "path": "web-play/menu-studio.js",
-      "sha256": "4f0a10c61bfa0f6096ca181e0dd7281db0fc2c26806116cc289a39d55dfe5193"
+      "sha256": "03db68f8a6b9f63b1ec293d12fdfe84ec18a0417e1edea4d48a251a70e3785a2"
     },
     {
       "path": "web-play/styles.css",
-      "sha256": "d89cd7edec37ffd1ba6153cd6ec4b92d6e7f84a37d387e150ca3ae9128a40d2a"
+      "sha256": "fa173dd1b2428d1ad786439e166bb56f387a47b77b3f3bc6eef7117461ed2cf3"
     },
     {
       "path": "web-play/trait-extension-host.js",
