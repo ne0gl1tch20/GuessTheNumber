@@ -9,6 +9,11 @@ on:
   push:
     branches:
       - master
+    # Web-player-only edits do not need to rebuild/publish the debug APK.
+    paths:
+      - '**'
+      - '!app/src/main/assets/web-play/**'
+      - '!.github/workflows/stable-debug-apk.yml'
   pull_request:
     types:
       - closed
