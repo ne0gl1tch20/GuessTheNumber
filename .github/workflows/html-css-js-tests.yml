@@ -1,4 +1,5 @@
 name: HTML CSS JS Tests
+# Re-run the full web-asset validation after core SDK TypeScript typing fixes.
 
 on:
   push:
