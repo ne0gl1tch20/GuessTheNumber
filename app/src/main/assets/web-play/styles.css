@@ -1321,3 +1321,74 @@ body.jui-game-compat .jui-dialog-actions { display:flex; flex-wrap:wrap; gap:.55
 #gtnBotArenaCanvasHost{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}#gtnBotArenaCanvasHost canvas{display:block;width:100%;height:100%}.bot-arena-overlay{position:relative;z-index:1;pointer-events:none;padding:14px;display:flex;min-height:190px;flex-direction:column;justify-content:flex-start;align-items:flex-start;gap:4px}.bot-arena-overlay p{max-width:72%;margin:0;padding:7px 10px;border:1px solid rgba(158,177,255,.16);border-radius:12px;background:rgba(7,12,26,.76);color:#dbe4ff;font-size:11px;line-height:1.4;backdrop-filter:blur(8px)}.bot-arena-overlay #botArenaEmpty{max-width:100%;align-self:center;margin:auto;text-align:center;color:#b5c3e9}.bot-arena-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;color:#aeb9d8;font-size:11px}.bot-arena-footer button{border:1px solid rgba(155,124,255,.3);border-radius:999px;background:rgba(155,124,255,.13);color:#d9d0ff;padding:8px 12px;font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap}
 .play-controls-drawer{position:relative;margin:10px 0 16px}.play-controls-drawer>summary{position:fixed;left:50%;bottom:calc(58px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:41;display:flex;align-items:center;gap:10px;min-width:210px;max-width:calc(100vw - 32px);padding:9px 17px;border:1px solid rgba(154,137,255,.42);border-radius:18px;background:rgba(17,23,43,.96);color:var(--text);box-shadow:0 12px 35px rgba(0,0,0,.35);list-style:none;cursor:pointer;backdrop-filter:blur(18px)}.play-controls-drawer>summary::-webkit-details-marker{display:none}.drawer-handle{display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:rgba(155,124,255,.2);font-size:21px;line-height:1;color:#c9bbff}.drawer-summary-copy{display:flex;flex-direction:column;gap:2px;text-align:left}.drawer-summary-copy strong{font-size:12px}.drawer-summary-copy small{font-size:9px;color:#9ba7c8}
 .play-controls-drawer[open]::before{content:"";position:fixed;inset:0;z-index:39;background:rgba(3,6,15,.66);backdrop-filter:blur(3px)}.play-controls-drawer[open]>summary{bottom:calc(min(72dvh,640px) + 58px + env(safe-area-inset-bottom))}.play-controls-drawer-content{display:none}.play-controls-drawer[open] .play-controls-drawer-content{display:block;position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));z-index:40;max-height:72dvh;overflow-y:auto;overscroll-behavior:contain;padding:14px 14px 24px;border:1px solid rgba(154,137,255,.28);border-bottom:0;border-radius:24px 24px 0 0;background:rgba(10,15,31,.98);box-shadow:0 -20px 60px rgba(0,0,0,.38)}.play-controls-drawer[open] .play-controls-drawer-content>*{max-width:760px;margin-left:auto;margin-right:auto}.play-controls-drawer[open] .play-controls-drawer-content .card{margin-top:10px;margin-bottom:10px}.play-controls-drawer[open]>summary .drawer-handle{transform:rotate(180deg)}@media(prefers-reduced-motion:reduce){.play-controls-drawer>summary,.bot-arena-footer button{transition:none!important}}
+
+
+/* Draggable More window: the menu can be pulled out and repositioned with touch or mouse. */
+#screen-more.more-window-open {
+  position: fixed;
+  z-index: 80;
+  top: max(12px, env(safe-area-inset-top));
+  right: 12px;
+  bottom: calc(82px + env(safe-area-inset-bottom));
+  left: 12px;
+  width: auto;
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px;
+  border: 1px solid var(--line, rgba(155,124,255,.34));
+  border-radius: 24px;
+  background: var(--panel, #10172b);
+  box-shadow: 0 24px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(155,124,255,.08);
+  animation: moreWindowOpen .18s ease-out;
+}
+#screen-more .more-window-toolbar {
+  position: sticky;
+  top: -12px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -12px -12px 14px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line, rgba(255,255,255,.12));
+  border-radius: 23px 23px 0 0;
+  background: var(--panel, #10172b);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#screen-more .more-window-toolbar:active { cursor: grabbing; }
+#screen-more .more-window-grip {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 10px;
+  color: var(--muted, #aab5d0);
+  background: rgba(155,124,255,.14);
+  font-size: 20px;
+  line-height: 1;
+}
+#screen-more .more-window-title { flex: 1; min-width: 0; font-size: 15px; font-weight: 850; }
+#screen-more .more-window-hint { display: block; margin-top: 2px; color: var(--muted, #aab5d0); font-size: 10px; font-weight: 600; }
+#screen-more .more-window-close {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border: 1px solid var(--line, rgba(255,255,255,.12));
+  border-radius: 12px;
+  color: var(--text, #fff);
+  background: rgba(255,255,255,.06);
+  font-size: 23px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#screen-more.more-window-open .more-screen { padding-bottom: 8px; }
+@keyframes moreWindowOpen { from { opacity: .65; scale: .985; } to { opacity: 1; scale: 1; } }
+@media (prefers-reduced-motion: reduce) { #screen-more.more-window-open { animation: none; } }

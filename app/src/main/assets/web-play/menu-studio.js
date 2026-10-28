@@ -14,6 +14,34 @@ function esc(e){if(e.key==='Escape'&&editing)close(false)}
 function open(){if(editing)return;editing=true;setup();initialConfig=JSON.parse(JSON.stringify(cfg));let root=$('#menuStudioScreen');if(!root){root=document.createElement('section');root.id='menuStudioScreen';root.className='screen menu-studio-screen';root.dataset.screen='menu-studio';root.hidden=true;root.setAttribute('aria-hidden','true');root.innerHTML='<div class="menu-studio-page"><header class="menu-studio-page-head"><button type="button" id="menuStudioBack" class="menu-studio-back">‹ <span>Settings</span></button><div><span class="eyebrow">PERSONALIZE</span><h2>Customize buttons</h2><p>Reorder your navigation, move destinations into More and choose each button color with GTN’s built-in color picker.</p></div></header><section class="menu-studio-section"><h3>Top bar</h3><p>Drag to reorder buttons. Play and More remain pinned.</p><div id="menuStudioNavList" class="menu-studio-list"></div></section><section class="menu-studio-section"><h3>More menu</h3><p>Move extra destinations here to keep your main navigation tidy.</p><div id="menuStudioMoreList" class="menu-studio-list"></div></section><section class="menu-studio-section"><h3>Live preview</h3><p>Changes preview on the navigation buttons as you customize them.</p><div id="menuStudioPreview" class="menu-studio-preview"></div></section><footer class="menu-studio-footer"><button type="button" id="menuStudioReset" class="menu-studio-secondary">Reset layout</button><span id="menuStudioStatus" role="status"></span><button type="button" id="menuStudioDone" class="primary-action">Save changes</button></footer></div>';($('.app')||document.body).appendChild(root)}document.querySelectorAll('[data-screen]').forEach(s=>{s.hidden=s!==root;s.setAttribute('aria-hidden',String(s!==root))});root.hidden=false;root.setAttribute('aria-hidden','false');render();$('#menuStudioBack').addEventListener('click',()=>close(false));$('#menuStudioDone').addEventListener('click',()=>close(true));$('#menuStudioReset').addEventListener('click',()=>{cfg={areas:{},orders:{nav:pinned.slice(),more:defaultMoreOrder.slice()},colors:{}};setup();apply();render()});document.addEventListener('keydown',esc);root.scrollTop=0;window.scrollTo?.(0,0)}
 window.gtnMenuStudioColorPicked=function(id,hex,reset=false){if(!ids().includes(id))return;if(reset)delete cfg.colors[id];else if(hex&&/^#[0-9a-f]{6}$/i.test(hex))cfg.colors[id]=hex.toUpperCase();else return;apply();render();const status=$('#menuStudioStatus');if(status)status.textContent=reset?'Default color restored.':'Color applied.'};
 window.addEventListener('message',event=>{let message;try{message=typeof event.data==='string'?JSON.parse(event.data):event.data}catch{return}if(!message||message.type!=='state'||!message.state)return;const raw=message.state.settings?.webMenuStudioLayout;if(typeof raw==='string'&&raw)applyStoredLayout(raw)});
-function init(){const panel=$('#screen-settings .catalog-panel');if(!panel||!nav()||!more())return;moreIds=Array.from(more().querySelectorAll('[data-screen-target]')).map(b=>b.dataset.screenTarget).filter(Boolean);defaultMoreOrder=moreIds.slice();const group=document.createElement('div');group.className='settings-group menu-studio-entry';group.innerHTML='<h3>Menu Studio</h3><p class="catalog-intro">Reorder navigation, move buttons into More and choose colors for individual buttons. Layouts are saved with the app preferences.</p><button type="button" class="primary-action" id="openMenuStudio">Customize buttons</button>';panel.insertBefore(group,panel.querySelector('.tutorial-settings')||null);$('#openMenuStudio').addEventListener('click',open);setup();apply();requestState()}
+function setupDraggableMoreWindow(){
+ const root=$('#screen-more');if(!root||root.dataset.draggableWindowReady==='true')return;
+ root.dataset.draggableWindowReady='true';
+ const bar=document.createElement('header');bar.className='more-window-toolbar';bar.setAttribute('aria-label','Drag More menu window');
+ const grip=document.createElement('span');grip.className='more-window-grip';grip.setAttribute('aria-hidden','true');grip.textContent='⠿';
+ const title=document.createElement('span');title.className='more-window-title';title.textContent='More menu';
+ const hint=document.createElement('small');hint.className='more-window-hint';hint.textContent='Drag here to move this window';title.appendChild(hint);
+ const closeButton=document.createElement('button');closeButton.type='button';closeButton.className='more-window-close';closeButton.setAttribute('aria-label','Close menu');closeButton.textContent='×';
+ closeButton.addEventListener('click',()=>$('#tab-play')?.click());
+ bar.append(grip,title,closeButton);root.prepend(bar);
+ let activePointer=null,startX=0,startY=0,startLeft=0,startTop=0;
+ bar.addEventListener('pointerdown',e=>{
+  if(e.target.closest('button')||e.button!==0)return;
+  activePointer=e.pointerId;const rect=root.getBoundingClientRect();
+  startX=e.clientX;startY=e.clientY;startLeft=rect.left;startTop=rect.top;
+  root.style.left=rect.left+'px';root.style.top=rect.top+'px';root.style.right='auto';root.style.bottom='auto';root.style.width=rect.width+'px';root.style.height=rect.height+'px';
+  try{bar.setPointerCapture(e.pointerId)}catch{}
+  e.preventDefault();
+ });
+ bar.addEventListener('pointermove',e=>{
+  if(activePointer!==e.pointerId)return;
+  const maxLeft=Math.max(0,window.innerWidth-root.offsetWidth),maxTop=Math.max(0,window.innerHeight-root.offsetHeight);
+  root.style.left=Math.min(maxLeft,Math.max(0,startLeft+e.clientX-startX))+'px';
+  root.style.top=Math.min(maxTop,Math.max(0,startTop+e.clientY-startY))+'px';
+ });
+ const stop=e=>{if(activePointer!==e.pointerId)return;activePointer=null;};
+ bar.addEventListener('pointerup',stop);bar.addEventListener('pointercancel',stop);bar.addEventListener('lostpointercapture',stop);
+}
+function init(){const panel=$('#screen-settings .catalog-panel');if(!panel||!nav()||!more())return;setupDraggableMoreWindow();moreIds=Array.from(more().querySelectorAll('[data-screen-target]')).map(b=>b.dataset.screenTarget).filter(Boolean);defaultMoreOrder=moreIds.slice();const group=document.createElement('div');group.className='settings-group menu-studio-entry';group.innerHTML='<h3>Menu Studio</h3><p class="catalog-intro">Reorder navigation, move buttons into More and choose colors for individual buttons. Layouts are saved with the app preferences.</p><button type="button" class="primary-action" id="openMenuStudio">Customize buttons</button>';panel.insertBefore(group,panel.querySelector('.tutorial-settings')||null);$('#openMenuStudio').addEventListener('click',open);setup();apply();requestState()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
