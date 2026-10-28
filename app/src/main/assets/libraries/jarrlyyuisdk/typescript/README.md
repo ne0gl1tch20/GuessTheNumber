@@ -1,6 +1,6 @@
 # Jarrlyy UI SDK TypeScript source
 
-This directory is the typed source layer for the reusable Jarrlyy UI SDK. It lives inside GuessTheNumber and has no framework dependency.
+This directory contains the typed source for the framework-free Jarrlyy UI SDK. It lives inside GuessTheNumber and has no runtime framework dependency.
 
 ## Build
 
@@ -12,25 +12,18 @@ npm run typecheck
 npm run build
 ```
 
-The module build emits ES2020 JavaScript modules and declaration files into `dist/`. The runtime build compiles `runtime/jarrlyy-ui-advanced.ts` into the classic browser script at `../components/jarrlyy-ui-advanced.js`. That generated file keeps the existing `window.JarrlyyUIAdvanced` API so the WebView can continue loading it with a normal script tag. Commit the generated runtime asset together with source changes.
+The build emits the utility ES modules and declaration files into `dist/`, compiles the **core UI runtime** from `runtime/jarrlyy-ui.ts` to the classic browser script `../components/jarrlyy-ui.js`, and compiles the advanced component runtime from `runtime/jarrlyy-ui-advanced.ts` to `../components/jarrlyy-ui-advanced.js`. The classic-script outputs preserve the existing `window.JarrlyyUI`, `window.JarrlyyUIMotion` and `window.JarrlyyUIAdvanced` contracts used by the WebView.
 
-CI builds the modules and classic runtime before running the SDK runtime tests, so those tests exercise the TypeScript-generated component layer.
+The core migration is staged: the public core and motion API contracts are declared in TypeScript, and the complete existing behavior layer is now authored as TypeScript. Some legacy internal callback and DOM paths still need tighter annotations. Keep changes in the TypeScript source and rebuild the classic scripts instead of editing generated runtime output by hand.
+
+CI type-checks the reusable modules, builds all three outputs, and runs runtime tests against the generated scripts. The game remains the owner of game state, saves, rewards, localization and native bridge behavior.
 
 ## Public API
 
-Typed host integration and interactive helpers are also available:
+- Core: `init`, `enhance`, `toast`, `dialog`, `tour`, `createKeyButton`.
+- Motion: `count`, `progress`, `floatText`, `init`.
+- Host integration: `mountHost(options?, window?, document?)`, `setHostTheme(root, "light" | "dark" | "system")`, `isJarrlyyEventName(name)`.
+- Advanced UI: `setLoading(button, loading, label?, document?)`, `setProgress(element, value)`.
+- DOM helpers: `humanize`, `setTextContent`, `prefersReducedMotion`, `setIconButtonLabel`.
 
-- `mountHost(options?, window?, document?)` initializes available SDK layers and returns theme/event helpers.
-- `setHostTheme(root, "light" | "dark" | "system")` applies or clears a theme override.
-- `isJarrlyyEventName(name)` validates namespaced `jui:*` events.
-- `setLoading(button, loading, label?, document?)` preserves and restores a button's label and disabled state.
-- `setProgress(element, value)` clamps progress to 0–100 and updates ARIA progress attributes.
-
-Import module helpers from the generated `dist/index.js`:
-
-- `humanize(value, fallback?)`
-- `setTextContent(node, value, fallback?)`
-- `prefersReducedMotion()`
-- `setIconButtonLabel(button, iconId, label)`
-
-Keep game state, saves, rewards, localization and native bridge logic out of this library. The TypeScript component runtime owns reusable UI behavior only; host applications continue to own routing and game rules.
+Keep the SDK focused on reusable presentation and accessible interactions. Do not move game rules, save serialization, rewards or unrestricted native bridge access into this library.
