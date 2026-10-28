@@ -13,7 +13,6 @@ on:
     paths:
       - '**'
       - '!app/src/main/assets/web-play/**'
-      - '!.github/workflows/stable-debug-apk.yml'
   pull_request:
     types:
       - closed
@@ -91,7 +90,9 @@ jobs:
       - name: Build signed debug APK
         env:
           GTN_DEBUG_KEYSTORE_PATH: ${{ runner.temp }}/gtn-signing/debug.keystore
-        run: ./gradlew assembleDebug --no-daemon
+        # Clean Android's incremental APK packaging state before the publishable build.
+        # Keep stack traces in CI so packaging failures expose their real cause.
+        run: ./gradlew clean assembleDebug --no-daemon --stacktrace
       - name: Validate embedded APK build metadata
         run: |
           version_name="$(grep -E '^[[:space:]]*val appVersionName = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *"//; s/"$//')"
