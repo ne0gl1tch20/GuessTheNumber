@@ -21,6 +21,7 @@ interface OptionalInitializer {
 }
 
 interface JarrlyyHostWindow extends Window {
+  CustomEvent: typeof CustomEvent;
   JarrlyyUI?: OptionalInitializer;
   JarrlyyUIAdvanced?: OptionalInitializer;
   JarrlyyUIMotion?: OptionalInitializer;
