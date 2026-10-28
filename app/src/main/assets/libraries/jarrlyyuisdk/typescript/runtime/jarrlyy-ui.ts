@@ -2,6 +2,14 @@
  * TypeScript source of truth; generated classic-script output remains at components/jarrlyy-ui.js.
  * Keep the public window.JarrlyyUI and window.JarrlyyUIMotion contracts stable during migration.
  */
+interface JarrlyyDialogOptions { cancelText?: string; confirmText?: string; onConfirm?: () => void; }
+interface JarrlyyTourStep { title?: string; message?: string; description?: string; }
+interface JarrlyyTourOptions { skipText?: string; previousText?: string; title?: string; finishText?: string; nextText?: string; onSkip?: () => void; onComplete?: () => void; }
+interface JarrlyyCountOptions { from?: number; duration?: number; format?: (value: number) => string; }
+interface JarrlyyProgressOptions { min?: number; max?: number; }
+interface JarrlyyFloatTextOptions { className?: string; container?: HTMLElement; }
+interface JarrlyyKeyButtonOptions { ariaLabel?: string; disabled?: boolean; onClick?: (event: MouseEvent) => void; }
+interface Window { JarrlyyUI: JarrlyyUICoreApi; JarrlyyUIMotion: JarrlyyUIMotionApi; }
 type JarrlyyUICoreApi = Readonly<{
   init: () => void;
   enhance: (root?: ParentNode) => void;
@@ -20,8 +28,8 @@ type JarrlyyUIMotionApi = Readonly<{
   "use strict";
   const doc = global.document;
   if (!doc) return;
-  const $ = (selector, root = doc) => root.querySelector(selector);
-  const $$ = (selector, root = doc) => Array.from(root.querySelectorAll(selector));
+  const $ = <T extends Element = HTMLElement>(selector: string, root: ParentNode = doc): T | null => root.querySelector<T>(selector);
+  const $ = <T extends Element = HTMLElement>(selector: string, root: ParentNode = doc): T[] => Array.from(root.querySelectorAll<T>(selector));
   let tourSequence = 0;
 
   function toast(message, duration = 2800) {
@@ -41,8 +49,8 @@ type JarrlyyUIMotionApi = Readonly<{
     global.setTimeout(() => item.remove(), Math.max(700, Number(duration) || 2800));
   }
 
-  function makeDialog(title, message, options = {}) {
-    const previousFocus = doc.activeElement;
+  function makeDialog(title: unknown, message: unknown, options: JarrlyyDialogOptions = {}): HTMLDialogElement {
+    const previousFocus = doc.activeElement as HTMLElement | null;
     const dialog = doc.createElement("dialog");
     dialog.className = "jui-dialog";
     const heading = doc.createElement("h2");
@@ -82,7 +90,7 @@ type JarrlyyUIMotionApi = Readonly<{
     return dialog;
   }
 
-  function tour(steps, options = {}) {
+  function tour(steps: JarrlyyTourStep[], options: JarrlyyTourOptions = {}): HTMLDialogElement | null {
     const normalized = Array.isArray(steps) ? steps.filter((step) => step && (step.title || step.message || step.description)) : [];
     if (!normalized.length) return null;
     const previousFocus = doc.activeElement;
@@ -251,7 +259,7 @@ type JarrlyyUIMotionApi = Readonly<{
       if (button.dataset.juiSortReady) return;
       button.dataset.juiSortReady = "true";
       button.addEventListener("click", () => {
-        const table = button.closest("table");
+        const table = button.closest("table") as HTMLTableElement | null;
         const body = table?.tBodies[0];
         if (!body) return;
         const column = Array.from(button.closest("tr").children).indexOf(button.closest("th"));
@@ -347,7 +355,7 @@ type JarrlyyUIMotionApi = Readonly<{
       zone.dataset.juiDropzoneReady = "true";
       const input = $("input[type=file]", zone);
       const status = $("[data-jui-drop-status]", zone);
-      const showFiles = (files) => {
+      const showFiles = (files: FileList | null | undefined) => {
         if (!status) return;
         status.textContent = files && files.length ? Array.from(files).map((file) => file.name).join(", ") : "No file selected";
       };
@@ -393,11 +401,11 @@ type JarrlyyUIMotionApi = Readonly<{
 
   // Adopt existing app markup as SDK components without replacing its legacy
   // classes. App-specific styles can therefore preserve the original visuals.
-  function enhance(root = doc) {
+  function enhance(root: ParentNode = doc) {
     if (!root || !root.querySelectorAll) return;
     const all = (selector) => {
       const nodes = Array.from(root.querySelectorAll(selector));
-      if (root.matches && root.matches(selector)) nodes.unshift(root);
+      if (root.nodeType === 1 && (root as Element).matches(selector)) nodes.unshift(root as Element);
       return nodes;
     };
     all("button, [role=\"button\"]").forEach((node) => {
@@ -419,7 +427,7 @@ type JarrlyyUIMotionApi = Readonly<{
     if (!global.MutationObserver || !doc.body) return;
     const observer = new global.MutationObserver((records) => {
       records.forEach((record) => record.addedNodes.forEach((node) => {
-        if (node.nodeType === 1) enhance(node);
+        if (node.nodeType === 1) enhance(node as Element);
       }));
     });
     observer.observe(doc.body, { childList: true, subtree: true });
@@ -442,7 +450,7 @@ type JarrlyyUIMotionApi = Readonly<{
   // respect OS/app reduced-motion settings. No dependencies or perpetual RAF.
   const motionPreference = () => !!(global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
-  function count(element, target, options = {}) {
+  function count(element: HTMLElement | null, target: number, options: JarrlyyCountOptions = {}) {
     if (!element) return;
     const end = Number(target);
     if (!Number.isFinite(end)) return;
@@ -471,7 +479,7 @@ type JarrlyyUIMotionApi = Readonly<{
     frame = global.requestAnimationFrame(tick);
   }
 
-  function progress(element, value, options = {}) {
+  function progress(element: HTMLElement | null, value: number, options: JarrlyyProgressOptions = {}) {
     if (!element) return;
     const min = Number.isFinite(Number(options.min)) ? Number(options.min) : 0;
     const max = Number.isFinite(Number(options.max)) ? Number(options.max) : 100;
@@ -486,7 +494,7 @@ type JarrlyyUIMotionApi = Readonly<{
     if (fill) fill.style.width = percent + "%";
   }
 
-  function floatText(anchor, message, options = {}) {
+  function floatText(anchor: HTMLElement | null, message: unknown, options: JarrlyyFloatTextOptions = {}): HTMLElement | null {
     if (!anchor || !anchor.isConnected) return null;
     const item = doc.createElement("span");
     item.className = "jui-motion-float";
@@ -507,7 +515,7 @@ type JarrlyyUIMotionApi = Readonly<{
     return item;
   }
 
-  function initMotion(root = doc) {
+  function initMotion(root: ParentNode = doc) {
     if (doc.documentElement) doc.documentElement.classList.add("jui-motion-enabled");
     const targets = $$("[data-jui-reveal]", root);
     if (!targets.length) return;
@@ -526,7 +534,7 @@ type JarrlyyUIMotionApi = Readonly<{
   }
 
   
-  function createKeyButton(label, variant = "primary", options = {}) {
+  function createKeyButton(label: unknown, variant = "primary", options: JarrlyyKeyButtonOptions = {}): HTMLButtonElement {
     const button = doc.createElement("button");
     button.type = "button";
     button.className = "jui-button jui-button-keycap";
