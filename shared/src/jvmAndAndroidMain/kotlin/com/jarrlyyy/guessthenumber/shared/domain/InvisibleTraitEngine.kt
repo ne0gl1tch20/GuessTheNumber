@@ -80,7 +80,7 @@ object InvisibleTraitEngine {
 
         // Adaptive helpers: deliberately small, deterministic and cooldown-limited.
         if (p.failedGuessesObserved >= FAILURE_HELPER_THRESHOLD) offer(HELPER_MISTAKE_INSURANCE)
-        if (p.failedGuessesObserved >= RANGE_HELPER_THRESHOLD && state.correctGuesses >= 10L) offer(HELPER_RANGE_SCOUT)
+        if (p.failedGuessesObserved >= RANGE_HELPER_THRESHOLD && p.correctGuessesObserved >= 10L) offer(HELPER_RANGE_SCOUT)
         if (p.longStreaksObserved > 0L) offer(HELPER_STREAK_GUARD)
         if (p.failedGuessesObserved >= COMEBACK_FAILURE_THRESHOLD && p.correctGuessesObserved > 0L) offer(HELPER_COMEBACK)
         if (state.streak >= MOMENTUM_STREAK_THRESHOLD) offer(HELPER_MOMENTUM)
