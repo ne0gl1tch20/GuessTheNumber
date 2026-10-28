@@ -64,7 +64,7 @@ const component={
      c.fillStyle='#f3f5ff';c.beginPath();this.roundedRect(c,-bubbleW/2,bubbleY,bubbleW,22,8);c.fill();
      c.fillStyle='#171d35';c.font='bold 11px monospace';c.fillText(this.typingIndex<String(this.state.guess||'').length?'⌨ '+text:text,0,bubbleY+15);
      c.fillStyle='#f3f5ff';c.beginPath();c.moveTo(-4,bubbleY+22);c.lineTo(3,bubbleY+22);c.lineTo(0,bubbleY+28);c.fill();
-     if(this.typingIndex>=String(this.state.guess||'').length&&this.state.feedback){c.fillStyle=this.state.feedback==='CORRECT'?'#63f5a4':this.state.feedback==='TOO_LOW'?'#62e8ff':'#ffb86b';c.font='bold 9px sans-serif';c.fillText(this.state.feedback.replace('_',' '),0,-75);}
+     if(this.typingIndex>=String(this.state.guess||'').length&&this.state.feedback){c.fillStyle=this.state.feedback==='CORRECT'?'#63f5a4':this.state.feedback==='TOO_LOW'?'#62e8ff':this.state.feedback==='TOO_HIGH'?'#ffb86b':'#e8edff';c.font='bold 9px sans-serif';c.fillText(this.state.feedback.replace('_',' '),0,-75);}
     }
     c.restore();
    });
