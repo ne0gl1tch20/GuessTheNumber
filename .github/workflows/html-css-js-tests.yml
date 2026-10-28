@@ -41,6 +41,13 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Type-check and build Jarrlyy UI SDK TypeScript source
+        working-directory: app/src/main/assets/libraries/jarrlyyuisdk/typescript
+        run: |
+          npm install --no-package-lock --no-audit --no-fund
+          npm run typecheck
+          npm run build
+
       - name: Check syntax of every tracked JavaScript file
         shell: bash
         run: |
