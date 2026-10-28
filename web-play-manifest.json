@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "50501ad3e6a10454a3ac4ae2d63c6fce9792dc10",
+  "version": "79497bdfac97d5c85b9f1ae272eff47bb088edda",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -165,7 +165,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/README.md",
-      "sha256": "59f9e7d3eb2af81aa77bfb367b958e28dddb5a88fb450fdcd7f08b9ce4f9622b"
+      "sha256": "8d8d14db67262b6ad9c14f1ce14f5f26ae56972088a9aae9a1f03fa0dcb80c6d"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/demo.js",
