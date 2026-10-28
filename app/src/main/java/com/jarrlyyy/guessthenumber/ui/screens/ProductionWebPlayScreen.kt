@@ -757,12 +757,14 @@ fun ProductionWebPlayScreen(
                                                 .put("maxed", maxed).put("affordable", !maxed && amount > 0 && game.money >= cost))
                                         }
                                         val shopJson = org.json.JSONArray()
+                                        val ownedBotIds = setOf("auto_clicker_basic", "bot_byte", "bot_pixel")
+                                        val hasOwnedBot = game.shopPurchases.any { it in ownedBotIds }
                                         shopDefinitions.forEach { item ->
                                             val owned = item.id in game.shopPurchases
                                             shopJson.put(JSONObject().put("id", item.id).put("name", item.name).put("description", item.description)
                                                 .put("cost", item.nebulaCost).put("category", item.category).put("cosmetic", item.isCosmetic)
                                                 .put("owned", owned).put("equipped", game.equippedCosmeticId == item.id)
-                                                .put("affordable", game.nebula >= BigNumber(item.nebulaCost)))
+                                                .put("affordable", (item.id !in setOf("bot_speed_upgrade", "bot_logic_upgrade") || hasOwnedBot) && game.nebula >= BigNumber(item.nebulaCost)))
                                         }
                                         fun progressionUpgradeJson(definitions: List<com.jarrlyyy.guessthenumber.domain.model.UpgradeDef>, levels: Map<String, Int>, currency: BigNumber): org.json.JSONArray =
                                             org.json.JSONArray().apply {
@@ -1018,6 +1020,10 @@ fun ProductionWebPlayScreen(
                                             .put("prestige", game.prestige.format())
                                             .put("ultra", game.ultra.format())
                                             .put("nebula", game.nebula.format())
+                                            .put("lastBotGuess", game.lastBotGuess?.toString() ?: "")
+                                            .put("lastBotFeedback", game.lastBotFeedback ?: "")
+                                            .put("lastBotId", game.lastBotId ?: "")
+                                            .put("botActionSequence", game.botActionSequence)
                                             .put("prestigeCount", game.prestigeCount)
                                             .put("ultraCount", game.ultraCount)
                                             .put("activeWorldId", game.activeWorldId)
