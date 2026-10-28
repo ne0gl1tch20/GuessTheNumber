@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "version": "ca2d67461b0a4b1199d6ace2bbefe6d430b195bb",
+  "version": "aaf978aa805142a7ef03dc63e7363cf9f166fc0d",
   "minAppVersionCode": 21,
   "files": [
     {
       "path": "web-play/app.js",
-      "sha256": "fb510fddec10ea9c063eac7be2e9a611bf289296b3b94a24e2b9ef491b47ef88"
+      "sha256": "9ddf760fc053743318a746d8ccb69b866de247c4440c2ad71562f22c3d865c9b"
     },
     {
       "path": "web-play/icons/guess-the-number.svg",
@@ -21,7 +21,7 @@
     },
     {
       "path": "web-play/index.html",
-      "sha256": "12605dd812cef315aa3c3f687dcf38174bec047a2cfeda4de6902009da07b8c1"
+      "sha256": "4c0171c65ae702536df6aba12e58006c06d8f512e71c1ea9638aa322c2911cf9"
     },
     {
       "path": "web-play/menu-studio.js",
@@ -29,11 +29,15 @@
     },
     {
       "path": "web-play/styles.css",
-      "sha256": "c0b9edabe3224091dc87eeb3c04b013fc75fd2e5497ad7d741e4ed4e9f9d059e"
+      "sha256": "d89cd7edec37ffd1ba6153cd6ec4b92d6e7f84a37d387e150ca3ae9128a40d2a"
     },
     {
       "path": "web-play/trait-extension-host.js",
       "sha256": "ecef072e5d782e0d7cd0ba2ddc7db805259005327c3ef354a8010ef601a21fee"
+    },
+    {
+      "path": "web-play/vue-bot-arena.js",
+      "sha256": "1e0dee97d689d9f770ee46005eaad52bae218fcd74d1017c9e7eccd371f87b7b"
     },
     {
       "path": "web-play/vue-canvas-effects.js",
@@ -73,95 +77,95 @@
     },
     {
       "path": "locales/ar.json",
-      "sha256": "7d25453947114bb8158f77a61b0844af7c8210a00837f15a6e4e66686491f5d1"
+      "sha256": "3674bb1bf65352e1204c9e14df5719466266ffa3d3c76abb004398bbadec751e"
     },
     {
       "path": "locales/de.json",
-      "sha256": "b02319a4c9221ad50939eba863688dc1c05bc738c337af310be5868742bad23a"
+      "sha256": "1193312036434aa224fb14d7acf14f446bc042c3ffb310b1553dadda5531da93"
     },
     {
       "path": "locales/en_gb.json",
-      "sha256": "3f0c82df957ca9dd5e79ce87c2f4171998ffe4ca427b1e98ea51aee88452255f"
+      "sha256": "24774022569b0c281052221cbdd6b3cf6d60d7b307ce108f72c5ecc570f79f35"
     },
     {
       "path": "locales/en_us.json",
-      "sha256": "11b1756fad8e31f8c75b051e9934cadc0eb695e7bd57500d7c903cdd5842f18c"
+      "sha256": "1106bb24d46fa1643ea23d80b1caf877f8de70d80ac43d3920e622873ef81da4"
     },
     {
       "path": "locales/es.json",
-      "sha256": "f83645e4f8593ad42cb582f353e3a69d23974641066db2366f71985f7ab52015"
+      "sha256": "e2db3fb65d2bd2a86d12cb36387d06e6c422a5fdc35c74c7b95a8c852e3faffb"
     },
     {
       "path": "locales/fil_ph.json",
-      "sha256": "a2faeb88d7acc28b8e11090bd8d8793701368c65534d3aa34df560b4868d3886"
+      "sha256": "a324d75af1250c157ebf1a4f75a9c90b59963a68bc9e92260ca1de83dae66756"
     },
     {
       "path": "locales/fr.json",
-      "sha256": "050a247cfb4633869a9b527d56a719fe28291533610a92d6aa658a18de5e9204"
+      "sha256": "91a644c948a21ef93ad7f8a41fd0c154a1f4204323e27c053c6f937488f518a3"
     },
     {
       "path": "locales/hi_in.json",
-      "sha256": "da964ef304aa29c032ec27a64f8a66d8710f412efaa10b760089d01f7fad4b80"
+      "sha256": "aa3238b913d9962a3a1b147aaf051a7b1200b89dcaf94868d7efe6721f97caaf"
     },
     {
       "path": "locales/id.json",
-      "sha256": "eda1430700abbdb05e46ae9182ce06922bf906edf8af22ea04f5f8ebb5b2fa26"
+      "sha256": "66e4bd168a6129d75158c1fdf55b6cee34014d9871ed9a56ec1da57db38b4de6"
     },
     {
       "path": "locales/it.json",
-      "sha256": "e5c8c92febd28f8f6a52e481eda229a40388ac15d434dff002eea1b752b19a96"
+      "sha256": "3524d763d301981d3f77d611a826eb00db3ed8c28ffe74a89595d14a5678d918"
     },
     {
       "path": "locales/ja.json",
-      "sha256": "60f405de3f0ea6b4f1c3f78e39dfbcb4e05c92f977b907fd74906a980432f705"
+      "sha256": "203ad9d2ea923f4b3937f9fb81117fbcb07d548b33439d6603d52d22d081b0b0"
     },
     {
       "path": "locales/ko.json",
-      "sha256": "6ff8a6bff8fbc48055e9e514e1869adfbe6ef11bada8684dd9f36a316e90702a"
+      "sha256": "1b13ff7728850f0ef0377ae375dfcfb13b1adf4b69b5ca9185ddd111763a3567"
     },
     {
       "path": "locales/nl.json",
-      "sha256": "61fb7e7223fb4eca2a312fb985aecdf85cefa82d407324c9e9c91456b4ee922d"
+      "sha256": "befe2652002e97813d2141c76ad3471d610ae69da0a90f42d80266bed3dfa02e"
     },
     {
       "path": "locales/pl.json",
-      "sha256": "f50c2d991741896e15297c942fd5f033a3e0d0b5c6920bcae9f6b9df69dabc47"
+      "sha256": "dd83ca3b802dc7590d7d2b0b54759066481a0d558047cb88d9c72884748b03c4"
     },
     {
       "path": "locales/pt_br.json",
-      "sha256": "d9f27989f33c3cd719e0650d8419d2b2c5ede0fa39f5ef65a55784f9ba1b1f0f"
+      "sha256": "c6bb89e98c400f576911d19d8a2a293989c902114fcdaea209cddd2331b5b260"
     },
     {
       "path": "locales/pt_pt.json",
-      "sha256": "b84365d1a6aeb4a4abc83cd2c9c8b83f052bb82e68f0cc15e01b59c45ecf582b"
+      "sha256": "78b052cd3b6f067a4ffa15f064bb1e51c4391fa18db82f912b5c71c4e629f66b"
     },
     {
       "path": "locales/ru.json",
-      "sha256": "5f2888cf75c2754e4f0720073381580bfa5c3eba13933b32032964781483d9ff"
+      "sha256": "13a4aaa7695f35d46633f6fa0b5b1b9ccb859114e96d22e88c21d923360accdf"
     },
     {
       "path": "locales/th.json",
-      "sha256": "f0238ec1022db05071bcba24b7b13b394c0fe3a3905caf9aca56519cd95d30ad"
+      "sha256": "7bc451dc1080aaeeadf06ab3cfb1a89fe21981cc85a57eeedf5c618de1aca914"
     },
     {
       "path": "locales/tr.json",
-      "sha256": "a438b02def96ec0cebf620f678c41a274264f63ca21cb4c0320f41389946d187"
+      "sha256": "093f103cc3d3071990d5ee538383761e5e9b8f1a6197b1519e82212c23c94e17"
     },
     {
       "path": "locales/uk.json",
-      "sha256": "078ce49fb01f73e3be09fe18c884db7bb5e65342abe90f95dc009481a3b4a433"
+      "sha256": "0161d1234fb013f8d568385eeff844544187137c8110a67b13e75249aa156613"
     },
     {
       "path": "locales/vi.json",
-      "sha256": "3e560129247327e011987adfc51bc9decca59da04a3e3d6c54e154a12912abf0"
+      "sha256": "8dd35f26f3074a09f55d5ebb70a013f2500b029dd08a7f8fc90165a85f2e54dc"
     },
     {
       "path": "locales/zh_cn.json",
-      "sha256": "0e4a627ee5d55b585df9ed433936bee12daeabf8711684b5205a056f02583058"
+      "sha256": "bd6a599fbd7b7f36426ad0923331f7c68a587314936785fbcbb35a91a6870d25"
     },
     {
       "path": "locales/zh_tw.json",
-      "sha256": "cffbbc4eb4e511f1fc912d67233c9a1f5a937e7bf1e2ec99bb6590c3dbda7139"
+      "sha256": "a87943b298a3b12dcea2236350bde072b8d6aac324beebcfb4eb23e3d916a55e"
     },
     {
       "path": "libraries/jarrlyyuisdk/README.md",
