@@ -6,7 +6,8 @@ const path = require('node:path');
 
 const sourcePath = path.join(__dirname, '../app/src/main/assets/libraries/jarrlyyuisdk/components/jarrlyy-ui-dom-utils.js');
 const source = fs.readFileSync(sourcePath, 'utf8');
-const window = {};
+let systemReducedMotion = false;
+const window = { matchMedia(query) { assert.equal(query, '(prefers-reduced-motion: reduce)'); return { matches: systemReducedMotion }; } };
 const context = { window, globalThis: window, document: {
   createElementNS(namespace, tag) { return makeNode(tag); },
   createTextNode(text) { return { nodeType: 3, textContent: text }; }
@@ -26,6 +27,10 @@ function makeNode(tag) {
 vm.runInNewContext(source, context, { filename: sourcePath });
 const api = window.JarrlyyUIDOM;
 assert.ok(api, 'utility API is exposed');
+assert.equal(api.prefersReducedMotion(), false);
+systemReducedMotion = true;
+assert.equal(api.prefersReducedMotion(), true, 'browser reduced-motion preference is respected');
+systemReducedMotion = false;
 assert.equal(api.humanize('crystal_gardens'), 'Crystal Gardens');
 assert.equal(api.humanize('nebula-reach'), 'Nebula Reach');
 assert.equal(api.humanize('', 'Untitled'), 'Untitled');
@@ -52,4 +57,5 @@ assert.ok(!/function\s+setTextContent\s*\(/.test(app), 'text helper implementati
 assert.ok(app.includes('JarrlyyUIDOM.humanize('));
 assert.ok(app.includes('JarrlyyUIDOM.setIconButtonLabel('));
 assert.ok(app.includes('JarrlyyUIDOM.setTextContent('));
+assert.ok(app.includes('JarrlyyUIDOM.prefersReducedMotion()'));
 console.log('Jarrlyy UI DOM utility tests passed.');

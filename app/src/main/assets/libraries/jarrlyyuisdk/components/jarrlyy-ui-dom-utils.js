@@ -18,6 +18,10 @@
     return true;
   }
 
+  function prefersReducedMotion() {
+    return !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
   function setIconButtonLabel(node, iconId, label) {
     if (!node) return;
     let svg = node.querySelector('svg');
@@ -38,5 +42,5 @@
     node.replaceChildren(svg, document.createTextNode(' ' + String(label ?? '')));
   }
 
-  root.JarrlyyUIDOM = Object.freeze({ humanize, setTextContent, setIconButtonLabel });
+  root.JarrlyyUIDOM = Object.freeze({ humanize, setTextContent, setIconButtonLabel, prefersReducedMotion });
 })(typeof window !== 'undefined' ? window : globalThis);

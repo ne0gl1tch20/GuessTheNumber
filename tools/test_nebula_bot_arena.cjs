@@ -29,5 +29,5 @@ for (const marker of ['bot_byte', 'bot_pixel', 'bot_speed_upgrade', 'bot_logic_u
   if (!vm.includes(marker)) throw new Error('Missing authoritative bot behavior: ' + marker);
 }
 if (!screen.includes('.put("autoClickerActive", game.autoClickerActive)')) throw new Error('Missing automation state bridge field.');
-if (!html.includes('<details class="play-controls-drawer"') || !html.includes('</details>')) throw new Error('Pull-up drawer structure missing.');
+if (!/<details\b[^>]*\bclass="play-controls-drawer"/.test(html) || !/<\/details>/.test(html)) throw new Error('Pull-up drawer structure missing.');
 console.log('Nebula bot arena integration checks passed.');

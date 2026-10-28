@@ -37,6 +37,7 @@ The gallery at \`demo.html\` demonstrates the components with local, non-persist
 Core API:
 - `JarrlyyUIDOM.humanize(value, fallback?)` for title-casing underscore/hyphen identifiers.
 - `JarrlyyUIDOM.setTextContent(node, value, fallback?)` for safe, idempotent text-only DOM updates (returns whether text changed).
+- `JarrlyyUIDOM.prefersReducedMotion()` for reading the browser's reduced-motion accessibility preference.
 - `JarrlyyUIDOM.setIconButtonLabel(button, iconId, label)` for accessible SVG-icon button labels.
 - \`JarrlyyUI.toast(message, duration?)\`
 - \`JarrlyyUI.dialog(title, message, options?)\`
