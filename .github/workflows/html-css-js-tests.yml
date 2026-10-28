@@ -70,6 +70,9 @@ jobs:
       - name: Test web currency labels
         run: node tools/test_web_currency_labels.cjs
 
+      - name: Test Nebula guessing bot arena
+        run: node tools/test_nebula_bot_arena.cjs
+
       - name: Verify Jarrlyy SDK parity and release contract
         run: python tools/test_jarrlyy_sdk_release.py
 

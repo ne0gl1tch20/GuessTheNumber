@@ -10,6 +10,38 @@
       "isCosmetic": false
     },
     {
+      "id": "bot_byte",
+      "name": "Byte Bot",
+      "description": "Adds a second bot to the guessing team. Bots take turns and use real game feedback.",
+      "nebulaCost": 60,
+      "category": "automation",
+      "isCosmetic": false
+    },
+    {
+      "id": "bot_pixel",
+      "name": "Pixel Bot",
+      "description": "Adds another bot to the guessing team. It takes turns guessing with the others.",
+      "nebulaCost": 75,
+      "category": "automation",
+      "isCosmetic": false
+    },
+    {
+      "id": "bot_speed_upgrade",
+      "name": "Bot Speed Upgrade",
+      "description": "Makes the automation team guess 50% faster.",
+      "nebulaCost": 35,
+      "category": "automation",
+      "isCosmetic": false
+    },
+    {
+      "id": "bot_logic_upgrade",
+      "name": "Shared Memory Upgrade",
+      "description": "Lets all owned bots share their learned high/low hints instead of learning separately.",
+      "nebulaCost": 50,
+      "category": "automation",
+      "isCosmetic": false
+    },
+    {
       "id": "nebula_boost",
       "name": "Nebula Crystal",
       "description": "Permanently increases Nebula gains by 2x.",

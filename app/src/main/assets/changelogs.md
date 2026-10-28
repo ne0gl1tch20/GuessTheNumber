@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+### Guess The Number 3.3.0 — Nebula Bot Arena
+
+- 🤖 **Nebula Bot Arena:** buy Byte and Pixel bots, watch their real guesses and high/low feedback in a Vue-managed 2D Canvas arena, and upgrade bot speed/shared memory. Play controls move into an accessible pull-up drawer.
+- 💾 **Bot save compatibility:** older saves receive safe defaults, while bot activity is saved with the existing game state.
+
 
 - 🏠 **Launcher widgets:** use bundled Manrope and JetBrains Mono fonts for the branded title and balance, fix widget compilation, and refresh only when needed instead of scheduling a daily wake-up.
 
