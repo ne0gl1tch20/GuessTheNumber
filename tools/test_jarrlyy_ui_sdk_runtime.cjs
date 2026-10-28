@@ -127,5 +127,23 @@ assert.equal(window.JarrlyyUIAdvanced.setProgress(advancedMeter, 120), 100);
 assert.equal(advancedAttributes["aria-valuenow"], "100");
 assert.equal(window.JarrlyyUIAdvanced.setProgress(advancedMeter, "not-a-number"), 0);
 assert.equal(window.JarrlyyUIAdvanced.setProgress(null, 25), null);
+const buttonAttributes = {};
+const buttonChildren = [];
+const loadingButton = {
+  dataset: {},
+  disabled: true,
+  textContent: "Keep disabled",
+  setAttribute(name, value) { buttonAttributes[name] = String(value); },
+  removeAttribute(name) { delete buttonAttributes[name]; },
+  replaceChildren(...children) { buttonChildren.splice(0, buttonChildren.length, ...children); this.textContent = ""; },
+  append(...children) { buttonChildren.push(...children); },
+};
+window.JarrlyyUIAdvanced.setLoading(loadingButton, true, "Saving…");
+assert.equal(loadingButton.disabled, true);
+assert.equal(buttonAttributes["aria-busy"], "true");
+window.JarrlyyUIAdvanced.setLoading(loadingButton, false);
+assert.equal(loadingButton.textContent, "Keep disabled");
+assert.equal(loadingButton.disabled, true);
+assert.equal(buttonAttributes["aria-busy"], undefined);
 
 console.log("Jarrlyy UI SDK core, motion, host adapter and advanced runtime checks passed.");
