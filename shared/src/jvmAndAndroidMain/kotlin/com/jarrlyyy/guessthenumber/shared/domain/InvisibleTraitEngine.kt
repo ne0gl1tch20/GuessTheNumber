@@ -92,6 +92,20 @@ object InvisibleTraitEngine {
         return Decision(helpers, bonuses)
     }
 
+    /**
+     * Treat policy output as requests, never authority. A script may select only intents
+     * that the Kotlin rules consider eligible for this exact state.
+     */
+    fun validateDecision(state: GameState, requested: Decision): Decision {
+        val eligible = evaluate(state)
+        return Decision(
+            helperIds = requested.helperIds.intersect(eligible.helperIds)
+                .take(MAX_HELPERS_PER_GUESS)
+                .toSet(),
+            bonusIds = requested.bonusIds.intersect(eligible.bonusIds)
+        )
+    }
+
     fun markHelperUses(state: GameState, helperIds: Set<String>): GameState {
         if (helperIds.isEmpty()) return state
         val tick = state.traitProfile.totalGuessesObserved
