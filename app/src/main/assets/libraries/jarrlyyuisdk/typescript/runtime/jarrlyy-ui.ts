@@ -189,7 +189,7 @@ type JarrlyyUIMotionApi = Readonly<{
         });
         menu.hidden = !opening;
         button.setAttribute("aria-expanded", String(opening));
-        if (opening) (menu.querySelector("button:not(:disabled)") || menu).focus({ preventScroll: true });
+        if (opening) ((menu.querySelector("button:not(:disabled)") as HTMLElement | null) || menu).focus({ preventScroll: true });
       });
       menu.addEventListener("click", (event) => {
         if (event.target.closest("button")) close();
@@ -353,7 +353,7 @@ type JarrlyyUIMotionApi = Readonly<{
     $$("[data-jui-dropzone]").forEach((zone) => {
       if (zone.dataset.juiDropzoneReady) return;
       zone.dataset.juiDropzoneReady = "true";
-      const input = $("input[type=file]", zone);
+      const input = $<HTMLInputElement>("input[type=file]", zone);
       const status = $("[data-jui-drop-status]", zone);
       const showFiles = (files: FileList | null | undefined) => {
         if (!status) return;
@@ -490,7 +490,7 @@ type JarrlyyUIMotionApi = Readonly<{
     element.setAttribute("aria-valuemax", String(max));
     element.setAttribute("aria-valuenow", String(target));
     element.style.setProperty("--jui-progress", percent + "%");
-    const fill = element.matches(".jui-meter") ? element.querySelector("span") : element.querySelector(".jui-meter span");
+    const fill = element.matches(".jui-meter") ? element.querySelector<HTMLElement>("span") : element.querySelector<HTMLElement>(".jui-meter span");
     if (fill) fill.style.width = percent + "%";
   }
 
