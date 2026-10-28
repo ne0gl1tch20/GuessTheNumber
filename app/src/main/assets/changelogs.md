@@ -5,6 +5,7 @@
 - 🤖 **Nebula Bot Arena:** buy Byte and Pixel bots, watch their real guesses and high/low feedback in a Vue-managed 2D Canvas arena, and upgrade bot speed/shared memory. Play controls move into an accessible pull-up drawer.
 - 💾 **Bot save compatibility:** older saves receive safe defaults, while bot activity is saved with the existing game state.
 - 🪟 **Draggable More menu:** open the main menu as a floating window and move it around by touch or mouse; fixed the Beyond the Numbers screen markup so later screens no longer nest inside it. The visual bot arena is unchanged.
+- 🔧 **Native developer overlay:** debug builds can open the native Developer Settings screen from a floating wrench button; the dev screen now reuses the channel-aware updater and shows download/install progress.
 
 
 - 🏠 **Launcher widgets:** use bundled Manrope and JetBrains Mono fonts for the branded title and balance, fix widget compilation, and refresh only when needed instead of scheduling a daily wake-up.
