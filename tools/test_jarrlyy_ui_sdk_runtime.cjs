@@ -11,6 +11,10 @@ const hostSource = fs.readFileSync(
   "app/src/main/assets/libraries/jarrlyyuisdk/components/jarrlyy-ui-host.js",
   "utf8"
 );
+const advancedSource = fs.readFileSync(
+  "app/src/main/assets/libraries/jarrlyyuisdk/components/jarrlyy-ui-advanced.js",
+  "utf8"
+);
 
 const listeners = new Map();
 const body = {
@@ -38,6 +42,16 @@ const document = {
   activeElement: null,
   querySelector() { return null; },
   querySelectorAll() { return []; },
+  createElement(tagName) {
+    return {
+      tagName,
+      dataset: {},
+      attributes: {},
+      className: "",
+      textContent: "",
+      setAttribute(name, value) { this.attributes[name] = String(value); },
+    };
+  },
   addEventListener() {},
 };
 const window = {
@@ -97,4 +111,21 @@ host.emit("jui:change", { value: "after-unsubscribe" });
 assert.equal(received, null);
 assert.equal(host.emit("unsafe-event", {}), false);
 
-console.log("Jarrlyy UI SDK core, motion and host adapter runtime checks passed.");
+// Load the TypeScript-generated advanced component layer as a classic WebView script.
+vm.runInNewContext(advancedSource, { window, document, console, CustomEvent, setTimeout });
+assert.equal(typeof window.JarrlyyUIAdvanced, "object");
+assert.equal(typeof window.JarrlyyUIAdvanced.init, "function");
+assert.equal(typeof window.JarrlyyUIAdvanced.setLoading, "function");
+assert.equal(typeof window.JarrlyyUIAdvanced.setProgress, "function");
+const advancedAttributes = {};
+const advancedMeter = {
+  style: { setProperty(name, value) { advancedAttributes[name] = value; } },
+  setAttribute(name, value) { advancedAttributes[name] = String(value); },
+  querySelector() { return null; },
+};
+assert.equal(window.JarrlyyUIAdvanced.setProgress(advancedMeter, 120), 100);
+assert.equal(advancedAttributes["aria-valuenow"], "100");
+assert.equal(window.JarrlyyUIAdvanced.setProgress(advancedMeter, "not-a-number"), 0);
+assert.equal(window.JarrlyyUIAdvanced.setProgress(null, 25), null);
+
+console.log("Jarrlyy UI SDK core, motion, host adapter and advanced runtime checks passed.");
