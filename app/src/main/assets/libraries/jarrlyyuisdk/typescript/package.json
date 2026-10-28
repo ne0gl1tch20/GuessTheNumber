@@ -1,0 +1,15 @@
+{
+  "name": "jarrlyy-ui-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Typed, framework-free reusable UI utilities for Jarrlyy UI SDK.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "build": "tsc --project tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "5.8.3"
+  }
+}
