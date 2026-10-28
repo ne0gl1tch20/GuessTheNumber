@@ -66,6 +66,12 @@ All user-facing text remains owned by the host app and must be localized there. 
 - Comfortable touch targets, responsive overlay widths and safe-area-aware floating actions.
 - Reduced-motion support for overlays, loading indicators, skeletons and interactive controls.
 
+## TypeScript source foundation
+
+Typed source now lives in `typescript/` inside this repository. It provides strict TypeScript definitions and build output for reusable SDK utilities, with the compiler pinned in its local package manifest. Run `npm install`, `npm run typecheck` and `npm run build` from that directory. CI runs the same checks.
+
+This is an incremental migration: the current WebView-facing JavaScript globals remain in place for compatibility while the typed module API is validated. New reusable logic should prefer the TypeScript source; migrate existing runtime helpers only alongside tests that prove the compiled output preserves the current browser API.
+
 ## Build integration
 
 Android packages this directory under \`assets/libraries/jarrlyyuisdk/\`. The Windows shared-web host ships the same local web bundle. Keep the core and advanced CSS/JS files versioned together.
