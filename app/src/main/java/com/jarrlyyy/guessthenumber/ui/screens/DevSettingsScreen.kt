@@ -964,11 +964,11 @@ private fun DeveloperUpdateToolsCard() {
                                         }
                                     )
                                 }
-                                installingUpdate = false
+                                installingUpdate = result.isSuccess
                                 updateMessage = result.fold(
                                     {
                                         updateErrorLogs = null
-                                        locale.getString("update_install_started", "Installation started. Confirm the Android installer prompt.")
+                                        locale.getString("update_install_started", "Installing update… Follow the Android installer prompt and keep this app open.")
                                     },
                                     { error ->
                                         updateErrorLogs = buildString {
@@ -992,7 +992,7 @@ private fun DeveloperUpdateToolsCard() {
                     if (installingUpdate) {
                         CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
                         Spacer(Modifier.width(8.dp))
-                        Text(locale.getString("update_downloading", "Downloading and preparing update…"))
+                        Text(locale.getString("update_install_started", "Installing update…"))
                     } else {
                         Text(locale.getString("update_install", "Install update"))
                     }
