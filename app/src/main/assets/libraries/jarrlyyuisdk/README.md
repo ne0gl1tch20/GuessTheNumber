@@ -35,6 +35,8 @@ The gallery at \`demo.html\` demonstrates the components with local, non-persist
 ## APIs
 
 Core API:
+- `JarrlyyUIDOM.humanize(value, fallback?)` for title-casing underscore/hyphen identifiers.
+- `JarrlyyUIDOM.setIconButtonLabel(button, iconId, label)` for accessible SVG-icon button labels.
 - \`JarrlyyUI.toast(message, duration?)\`
 - \`JarrlyyUI.dialog(title, message, options?)\`
 - \`JarrlyyUI.tour(steps, options?)\`
