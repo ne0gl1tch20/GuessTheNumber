@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "a94300046dea42747ec9cfb0023b5cbce5585446",
+  "version": "44abcd9f3024b04bb2997a82be2476c8d1d11f82",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -229,7 +229,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/typescript/runtime/jarrlyy-ui.ts",
-      "sha256": "7a65e31eb861c01c1b9676c5e4cfaf6507e8db203c24a05578527b190429a683"
+      "sha256": "8d074512a16a53447118d30b40686fcce7f5600561b9251b253ac5ba32052148"
     },
     {
       "path": "libraries/jarrlyyuisdk/typescript/src/advanced-utils.ts",
