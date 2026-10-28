@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.traits
 
+import com.jarrlyyy.guessthenumber.shared.domain.InvisibleTraitEngine
 import com.jarrlyyy.guessthenumber.shared.domain.TraitGameplayRules
 import com.jarrlyyy.guessthenumber.domain.engine.GuessResult
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -18,7 +19,8 @@ object TraitGameplayRuntime {
         stateBefore: GameState,
         guess: Long,
         result: GuessResult,
-        activeSeasonId: String = TraitRewardPolicy.currentSeasonId(LocalDate.now())
+        activeSeasonId: String = TraitRewardPolicy.currentSeasonId(LocalDate.now()),
+        adaptiveDecisionProvider: (GameState) -> InvisibleTraitEngine.Decision = InvisibleTraitEngine::evaluate
     ): GuessResult {
         val activeRegistry = registry()
         val activation = TraitActivationEngine(activeRegistry).evaluate(
@@ -33,7 +35,14 @@ object TraitGameplayRuntime {
         val activeEffects = active.associateWith { traitId ->
             activeRegistry.find(traitId)?.effects?.mapTo(mutableSetOf()) { it.name }.orEmpty()
         }
-        return TraitGameplayRules.apply(stateBefore, guess, result, active, activeEffects)
+        return TraitGameplayRules.apply(
+            stateBefore = stateBefore,
+            guess = guess,
+            result = result,
+            activeTraitIds = active,
+            activeEffects = activeEffects,
+            adaptiveDecisionProvider = adaptiveDecisionProvider
+        )
     }
 
     /** Validate and persist an arm choice; unknown traits/arms are rejected. */
@@ -52,5 +61,4 @@ object TraitGameplayRuntime {
         require(traitId in active) { "Trait is not currently active." }
         return state.copy(selectedTraitArms = state.selectedTraitArms + (traitId to armId))
     }
-
 }

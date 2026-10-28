@@ -35,6 +35,8 @@ data class GameState(
     val completedChallenges: Set<String> = emptySet(),
     val statistics: GameStatistics = GameStatistics(),
     val settings: GameSettings = GameSettings(),
+    /** Versioned, invisible behavioral memory. Missing in legacy saves and safely defaulted. */
+    val traitProfile: TraitProfile = TraitProfile(),
     val lastSaveTimestamp: Long = System.currentTimeMillis(),
     val lastSavedVersion: String = "unknown",
     val timeTravelPenaltyUntil: Long = 0L,
