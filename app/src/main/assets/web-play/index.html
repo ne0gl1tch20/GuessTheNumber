@@ -415,6 +415,10 @@
         <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-refresh"></use></svg></span><div><h2 id="aboutUpdateHeading" data-i18n="update_check">Check for updates</h2></div><span class="panel-chip" id="aboutUpdateBadge">—</span></div>
         <button type="button" class="primary-action" id="aboutCheckUpdates" data-bridge-action="check_updates" data-i18n="update_check">Check for updates</button>
         <div id="aboutUpdateStatus" class="about-update-status" role="status" aria-live="polite"></div>
+        <div id="aboutUpdateProgress" class="about-update-progress" hidden>
+          <div class="about-update-progress-head"><span id="aboutUpdateProgressLabel">Preparing update…</span></div>
+          <div class="about-update-progress-track" role="progressbar" aria-label="Update download progress" aria-valuemin="0" aria-valuemax="100"><span id="aboutUpdateProgressFill"></span></div>
+        </div>
         <div id="aboutAvailableUpdate" class="about-available-update" hidden>
           <span class="eyebrow" data-i18n="update_available">Update available</span>
           <h3 id="aboutAvailableVersion">—</h3>
