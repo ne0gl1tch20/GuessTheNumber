@@ -292,7 +292,7 @@ function renderBotArena(s){
  const count=$('botArenaCount'),empty=$('botArenaEmpty'),status=$('botArenaStatus'),last=$('botArenaLastGuess');
  if(count)count.textContent=bots.length?String(bots.length)+' BOT'+(bots.length===1?'':'S')+' OWNED':'NO BOTS YET';
  if(empty)empty.hidden=bots.length>0;
- if(status)status.textContent=!bots.length?'Buy a bot in the Nebula Shop to start the simulation.':!active?'Your bots are owned but automation is paused.':'Bots take turns using real game feedback.';
+ if(status){status.textContent=!bots.length?'Buy a bot in the Nebula Shop to start the simulation.':!active?'Your bots are owned but automation is paused.':'';status.hidden=!!bots.length&&active;}
  if(last)last.textContent=lastGuess&&sequence>0&&activeBot?activeBot.name+' guessed '+lastGuess+' · '+(feedback==='TOO_LOW'?'TOO LOW':feedback==='TOO_HIGH'?'TOO HIGH':feedback==='CORRECT'?'CORRECT':'WAITING'):'Waiting for the first bot guess…';
  if(typeof window.CustomEvent==='function')window.dispatchEvent(new CustomEvent('gtn:bot-state',{detail:{bots,activeBotId:activeBot?activeBot.id:'',guess:lastGuess,feedback,sequence,active,reducedMotion:reducedMotion()}}));
 }
