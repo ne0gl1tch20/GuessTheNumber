@@ -8,6 +8,7 @@ on:
       - "app/src/main/assets/libraries/vue/**"
       - "tools/test_vue_canvas_effects.cjs"
       - "tools/test_vue_jarrlyy_adapter.cjs"
+      - "tools/test_web_currency_labels.cjs"
       - ".github/workflows/html-css-js-tests.yml"
   pull_request:
   workflow_dispatch:
@@ -65,6 +66,9 @@ jobs:
 
       - name: Test Vue/Jarrlyy UI SDK adapter contract
         run: node tools/test_vue_jarrlyy_adapter.cjs
+
+      - name: Test web currency labels
+        run: node tools/test_web_currency_labels.cjs
 
       - name: Verify Jarrlyy SDK parity and release contract
         run: python tools/test_jarrlyy_sdk_release.py
