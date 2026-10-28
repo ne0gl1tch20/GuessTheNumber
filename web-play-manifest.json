@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "50acb8e1d14b5d91e04f679722d02a2e73362431",
+  "version": "5b35427798ef51e363ad2c453d1f97e90a3867d1",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -226,6 +226,10 @@
     {
       "path": "libraries/jarrlyyuisdk/typescript/src/dom-utils.ts",
       "sha256": "310ad3173d43ce921b328f232ed8972c26185b75d420d0c7c8de60af3428d21a"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/typescript/src/host-adapter.ts",
+      "sha256": "6016d18b693033913b326c0eaaedcc27d161dbd6ad53416531010d834157258a"
     },
     {
       "path": "libraries/jarrlyyuisdk/typescript/src/index.ts",
