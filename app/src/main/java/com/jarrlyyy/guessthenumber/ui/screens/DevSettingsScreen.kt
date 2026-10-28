@@ -2,6 +2,9 @@ package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.ui.localization.LocalAppLocaleManager
 import com.jarrlyyy.guessthenumber.ui.localization.localizedText
+import com.jarrlyyy.guessthenumber.BuildConfig
+import com.jarrlyyy.guessthenumber.data.repository.UpdateChannelChecker
+import com.jarrlyyy.guessthenumber.data.repository.ApkUpdateInstaller
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -795,6 +798,7 @@ fun DevSettingsScreen(
         ) {
             item { Text("Developer & Testing Playground", style = MaterialTheme.typography.headlineSmall) }
             item { Text("Open the dedicated process screens for debugging, testing, and diagnostics.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            item { DeveloperUpdateToolsCard() }
             item { JarrlyyDspTestCard() }
             item {
                 Card(onClick = { onNavigate("process_inspector") }, modifier = Modifier.fillMaxWidth()) {
@@ -817,6 +821,188 @@ fun DevSettingsScreen(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun DeveloperUpdateToolsCard() {
+    val context = LocalContext.current
+    val locale = LocalAppLocaleManager.current
+    val scope = rememberCoroutineScope()
+    val channelLabel = if (BuildConfig.UPDATE_CHANNEL == "debug") {
+        locale.getString("update_channel_debug", "Debug channel")
+    } else {
+        locale.getString("update_channel_release", "Release channel")
+    }
+    var checkingUpdates by remember { mutableStateOf(false) }
+    var installingUpdate by remember { mutableStateOf(false) }
+    var updateMessage by remember { mutableStateOf<String?>(null) }
+    var availableUpdate by remember { mutableStateOf<UpdateChannelChecker.AvailableUpdate?>(null) }
+    var updateErrorLogs by remember { mutableStateOf<String?>(null) }
+    var downloadProgress by remember { mutableStateOf<Float?>(null) }
+
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text("Native App Updater", style = MaterialTheme.typography.titleLarge)
+            Text(
+                locale.getString("update_channel_label", "Update channel: %s", channelLabel),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Text(
+                "Uses the same channel-aware checker and verified APK installer as About, with download progress visible here.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Button(
+                onClick = {
+                    scope.launch {
+                        checkingUpdates = true
+                        updateMessage = null
+                        availableUpdate = null
+                        updateErrorLogs = null
+                        when (val result = UpdateChannelChecker.check()) {
+                            is UpdateChannelChecker.Result.Available -> {
+                                availableUpdate = result.update
+                                updateMessage = locale.getString("update_available", "An update is available.")
+                            }
+                            UpdateChannelChecker.Result.UpToDate -> {
+                                updateMessage = locale.getString("update_up_to_date", "You're up to date.")
+                            }
+                            UpdateChannelChecker.Result.Unavailable -> {
+                                updateMessage = locale.getString("update_unavailable", "Couldn't check for updates. Try again later.")
+                                updateErrorLogs = "Update check did not find a usable update source.\nChannel: ${BuildConfig.UPDATE_CHANNEL}\nApp version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+                            }
+                            is UpdateChannelChecker.Result.Failed -> {
+                                updateMessage = locale.getString("update_unavailable", "Couldn't check for updates. Try again later.")
+                                updateErrorLogs = result.diagnostics
+                            }
+                        }
+                        checkingUpdates = false
+                    }
+                },
+                enabled = !checkingUpdates && !installingUpdate,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (checkingUpdates) {
+                    CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                    Spacer(Modifier.width(8.dp))
+                    Text(locale.getString("update_checking", "Checking for updates…"))
+                } else {
+                    Text(locale.getString("update_check", "Check for updates"))
+                }
+            }
+            updateMessage?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+            if (installingUpdate) {
+                if (downloadProgress == null) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                } else {
+                    LinearProgressIndicator(
+                        progress = { downloadProgress!!.coerceIn(0f, 1f) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+            updateErrorLogs?.let { logs ->
+                OutlinedButton(
+                    onClick = {
+                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        clipboard.setPrimaryClip(ClipData.newPlainText("Update error logs", logs))
+                        Toast.makeText(context, locale.getString("update_copy_error_logs", "Update error logs copied"), Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text(locale.getString("update_copy_error_logs", "Copy update error logs")) }
+            }
+            availableUpdate?.let { update ->
+                Text(update.title, style = MaterialTheme.typography.titleMedium)
+                if (update.details.isNotBlank()) {
+                    Text(update.details, style = MaterialTheme.typography.bodySmall)
+                }
+                Button(
+                    onClick = {
+                        if (!context.packageManager.canRequestPackageInstalls()) {
+                            context.startActivity(
+                                Intent(
+                                    android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                                    android.net.Uri.parse("package:${context.packageName}")
+                                )
+                            )
+                            updateMessage = locale.getString(
+                                "update_permission_required",
+                                "Allow this app to install updates, then return and tap Install again."
+                            )
+                        } else {
+                            scope.launch {
+                                installingUpdate = true
+                                downloadProgress = null
+                                updateMessage = locale.getString("update_downloading", "Downloading and preparing update…")
+                                val result = withContext(Dispatchers.IO) {
+                                    ApkUpdateInstaller(context).install(
+                                        update.downloadUrl,
+                                        requireChecksum = update.requireChecksum,
+                                        expectedCommitSha = update.expectedCommitSha,
+                                        onProgress = { stage, downloaded, total ->
+                                            scope.launch {
+                                                downloadProgress = if (total > 0L) {
+                                                    (downloaded.toFloat() / total.toFloat()).coerceIn(0f, 1f)
+                                                } else null
+                                                val downloadedMb = downloaded / (1024L * 1024L)
+                                                updateMessage = if (total > 0L) {
+                                                    val totalMb = total / (1024L * 1024L)
+                                                    val percent = (downloaded * 100L / total).coerceIn(0L, 100L)
+                                                    "$stage $downloadedMb MB / $totalMb MB ($percent%)"
+                                                } else {
+                                                    "$stage $downloadedMb MB downloaded"
+                                                }
+                                            }
+                                        }
+                                    )
+                                }
+                                installingUpdate = false
+                                updateMessage = result.fold(
+                                    {
+                                        updateErrorLogs = null
+                                        locale.getString("update_install_started", "Installation started. Confirm the Android installer prompt.")
+                                    },
+                                    { error ->
+                                        updateErrorLogs = buildString {
+                                            appendLine("Update installation failed")
+                                            appendLine("App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+                                            appendLine("Channel: ${BuildConfig.UPDATE_CHANNEL}")
+                                            appendLine("Failure: ${error.javaClass.name}")
+                                            appendLine("Message: ${error.message ?: "(no message)"}")
+                                            appendLine()
+                                            append(error.stackTraceToString().take(8000))
+                                        }
+                                        locale.getString("update_install_failed", "Update failed: %s", error.message ?: "unknown error")
+                                    }
+                                )
+                            }
+                        }
+                    },
+                    enabled = !installingUpdate && !checkingUpdates,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (installingUpdate) {
+                        CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                        Spacer(Modifier.width(8.dp))
+                        Text(locale.getString("update_downloading", "Downloading and preparing update…"))
+                    } else {
+                        Text(locale.getString("update_install", "Install update"))
+                    }
+                }
+                OutlinedButton(
+                    onClick = {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(update.url)))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text(locale.getString("update_open", "Open update page")) }
             }
         }
     }
