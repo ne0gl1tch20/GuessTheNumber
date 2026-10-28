@@ -8,6 +8,8 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 /**
  * Cross-platform deterministic gameplay effects for active trait definitions.
  * The host supplies effects from its validated registry; unknown effect strings are ignored.
+ *
+ * The invisible trait profile is observed here so Android and desktop share the same rules.
  */
 object TraitGameplayRules {
     fun activeGameplayTraitIds(state: GameState): Set<String> = buildSet {
@@ -27,14 +29,17 @@ object TraitGameplayRules {
     ): GuessResult {
         if (guess !in stateBefore.currentRangeMin..stateBefore.currentRangeMax) return result
 
+        val observedState = InvisibleTraitEngine.observeGuess(stateBefore, result)
+        val adaptive = InvisibleTraitEngine.evaluate(observedState)
         val effectTypes = activeTraitIds.flatMapTo(mutableSetOf()) { activeEffects[it].orEmpty() }
-        val hasComboReward = "combo_momentum" in activeTraitIds || "COMBO_REWARD" in effectTypes
-        val hasRangeHint = "range_scout" in activeTraitIds || "RANGE_HINT" in effectTypes
-        val hasMissInsurance = "mistake_insurance" in activeTraitIds || "MISS_PENALTY_REDUCTION" in effectTypes
-        val hasRiskReward = "risk_reward" in activeTraitIds || "RISK_REWARD" in effectTypes
-        val hasStreakProtection = "streak_guard" in activeTraitIds || "STREAK_PROTECTION" in effectTypes
 
-        var nextState = result.newState
+        val hasComboReward = "combo_momentum" in activeTraitIds || "COMBO_REWARD" in effectTypes || InvisibleTraitEngine.HELPER_MOMENTUM in adaptive.helperIds
+        val hasRangeHint = "range_scout" in activeTraitIds || "RANGE_HINT" in effectTypes || InvisibleTraitEngine.HELPER_RANGE_SCOUT in adaptive.helperIds
+        val hasMissInsurance = "mistake_insurance" in activeTraitIds || "MISS_PENALTY_REDUCTION" in effectTypes || InvisibleTraitEngine.HELPER_MISTAKE_INSURANCE in adaptive.helperIds
+        val hasRiskReward = "risk_reward" in activeTraitIds || "RISK_REWARD" in effectTypes
+        val hasStreakProtection = "streak_guard" in activeTraitIds || "STREAK_PROTECTION" in effectTypes || InvisibleTraitEngine.HELPER_STREAK_GUARD in adaptive.helperIds
+
+        var nextState = result.newState.copy(traitProfile = observedState.traitProfile)
         var reward = result.reward
         if (result.feedback == GuessFeedback.CORRECT) {
             var multiplier = 1.0
@@ -46,6 +51,13 @@ object TraitGameplayRules {
             }
             if (hasRiskReward) {
                 multiplier += if ("risk_reward" in activeTraitIds && stateBefore.selectedTraitArms["risk_reward"] == "high_risk") HIGH_RISK_SUCCESS_BONUS else RISK_REWARD_SUCCESS_BONUS
+            }
+            if (InvisibleTraitEngine.HELPER_COMEBACK in adaptive.helperIds) multiplier += COMEBACK_BONUS
+            if (InvisibleTraitEngine.HELPER_MOMENTUM in adaptive.helperIds) multiplier += MOMENTUM_BONUS
+
+            if (adaptive.bonusIds.isNotEmpty()) {
+                multiplier += adaptive.bonusIds.size * PROGRESSION_BONUS_PER_MILESTONE
+                nextState = InvisibleTraitEngine.markBonusesAwarded(nextState, adaptive.bonusIds)
             }
             if (multiplier > 1.0) {
                 val adjustedReward = reward * BigNumber(multiplier)
@@ -92,4 +104,7 @@ object TraitGameplayRules {
     const val HIGH_RISK_MISS_PENALTY_RATE = 0.20
     const val MISTAKE_REFUND_RATE = 0.50
     const val CAREFUL_REFUND_RATE = 0.75
+    const val COMEBACK_BONUS = 0.05
+    const val MOMENTUM_BONUS = 0.03
+    const val PROGRESSION_BONUS_PER_MILESTONE = 0.10
 }
