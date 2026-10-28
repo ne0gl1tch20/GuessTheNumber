@@ -8,12 +8,14 @@ import com.jarrlyyy.guessthenumber.shared.domain.TraitGameplayRules
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlinx.serialization.json.Json
 
 class InvisibleTraitEngineTest {
     @Test
-    fun legacyDefaultProfileStartsEmpty() {
-        val state = GameState()
+    fun legacySaveWithoutTraitProfileDeserializesWithSafeDefaults() {
+        val state = Json.decodeFromString<GameState>("{}")
         assertEquals(0L, state.traitProfile.totalGuessesObserved)
+        assertEquals(0L, state.traitProfile.failedGuessesObserved)
         assertTrue(state.traitProfile.awardedBonuses.isEmpty())
     }
 
