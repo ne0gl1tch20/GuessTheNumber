@@ -40,6 +40,11 @@ data class GameState(
     val timeTravelPenaltyUntil: Long = 0L,
     val autoClickerActive: Boolean = false,
     val autoClickerSpeed: Double = 1.0,
+    /** Last authoritative guess made by an owned automation bot, for presentation only. */
+    val lastBotGuess: Long? = null,
+    val lastBotFeedback: String? = null,
+    val lastBotId: String? = null,
+    val botActionSequence: Long = 0L,
     val tutorialCompleted: Boolean = false,
     val buyMultiplier: String = "1",
     val prestigeCount: Long = 0,
