@@ -115,8 +115,8 @@ assert.equal(window.__component.particles.length, 0, "hidden pages should clear 
 assert.ok(calls.cancel > 0, "hidden pages should cancel animation work");
 
 window.__component.beforeUnmount();
-assert.equal(window.gtnVueCanvasEffectsReady, false, "unmount should clear ready flag");
-assert.equal((listeners.get("gtn:canvas-burst") || []).length, 0, "unmount should remove event listener");
+assert.equal(window.jarrlyyParticleEffectsReady, false, "unmount should clear ready flag");
+assert.equal((listeners.get("jarrlyy:particle-burst") || []).length, 0, "unmount should remove event listener");
 assert.equal(calls.resizeDisconnect, 1, "unmount should disconnect ResizeObserver");
 
 const html = fs.readFileSync("app/src/main/assets/web-play/index.html", "utf8");
@@ -142,7 +142,7 @@ assert.match(source, /if\(reducedMotion\(\)\|\|document\.hidden\|\|!this\.contex
 const noVueWindow = {};
 const noVueDocument = { querySelector: () => ({}) };
 vm.runInNewContext(source, { window: noVueWindow, document: noVueDocument });
-assert.equal(noVueWindow.gtnVueCanvasEffectsReady, false, "missing Vue should fail closed to the legacy celebration");
+assert.equal(noVueWindow.jarrlyyParticleEffectsReady, false, "missing Vue should fail closed to the legacy celebration");
 
 const noCanvasWindow = {
   Vue: {
@@ -158,5 +158,5 @@ const noCanvasWindow = {
   },
 };
 vm.runInNewContext(source, { window: noCanvasWindow, document: noVueDocument });
-assert.equal(noCanvasWindow.gtnVueCanvasEffectsReady, false, "unsupported Canvas must preserve the legacy celebration");
+assert.equal(noCanvasWindow.jarrlyyParticleEffectsReady, false, "unsupported Canvas must preserve the legacy celebration");
 console.log("Vue Canvas effects lifecycle, reduced workload and cleanup checks passed.");
