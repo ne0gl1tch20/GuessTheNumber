@@ -8,6 +8,7 @@ on:
       - "app/src/main/assets/libraries/vue/**"
       - "app/src/main/assets/libraries/jarrlyyuisdk/**"
       - "tools/test_vue_canvas_effects.cjs"
+      - "tools/test_jarrlyy_ui_dom_utils.cjs"
       - "tools/test_vue_jarrlyy_adapter.cjs"
       - "tools/test_web_currency_labels.cjs"
       - ".github/workflows/html-css-js-tests.yml"
