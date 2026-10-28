@@ -146,6 +146,24 @@
       <div class="sparkle-field" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
 
+<section class="bot-arena-card card" id="botArena" aria-labelledby="botArenaTitle">
+  <div class="bot-arena-heading">
+    <div><span class="eyebrow">AUTOMATION LAB</span><h2 id="botArenaTitle">Guessing Bots</h2></div>
+    <span class="panel-chip" id="botArenaCount">NO BOTS YET</span>
+  </div>
+  <div class="bot-arena-stage">
+    <div id="gtnBotArenaCanvasHost" aria-hidden="true"></div>
+    <div class="bot-arena-overlay">
+      <p id="botArenaEmpty">Buy a bot in the Nebula Shop to bring the arena to life.</p>
+      <p id="botArenaStatus" role="status" aria-live="polite">Your bots will show their real guesses here.</p>
+    </div>
+  </div>
+  <div class="bot-arena-footer"><span id="botArenaLastGuess">Waiting for your first bot…</span><button type="button" id="botArenaShopButton">Nebula Shop ↗</button></div>
+</section>
+
+<details class="play-controls-drawer" id="playControlsDrawer">
+  <summary aria-label="Open or close game controls"><span class="drawer-handle" aria-hidden="true">⌃</span><span class="drawer-summary-copy"><strong>Game controls</strong><small>Guesses · stats · quests · tools</small></span></summary>
+  <div class="play-controls-drawer-content">
 <section class="guess-card card">
       <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
       <form id="guessForm" autocomplete="off">
