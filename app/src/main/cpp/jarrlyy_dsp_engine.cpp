@@ -13,8 +13,15 @@ constexpr uint32_t kQueueSize=32, kDelayFrames=12000;
 constexpr int kVoiceCount=12;
 constexpr float kPi=3.14159265358979323846f;
 struct Command { int32_t preset=0; float volume=0.18f; uint32_t effects=0; };
-struct Voice { bool active=false; int32_t preset=0; uint64_t age=0; float phase=0.0f; float volume=0.0f; };
 struct Pattern { std::array<float,4> notes{}; int count=1; int wave=0; uint32_t noteFrames=2200; };
+struct Voice {
+ bool active=false;
+ int32_t preset=0;
+ uint64_t age=0;
+ float phase=0.0f;
+ float volume=0.0f;
+ Pattern pattern{};
+};
 Pattern patternFor(int p) {
  switch(p) {
   case kConfirm: return {{{660,880,0,0}},2,0,3800};
@@ -112,7 +119,7 @@ private:
   while(dequeue(c)){
    auto it=std::find_if(voices_.begin(),voices_.end(),[](const Voice& v){return !v.active;});
    if(it==voices_.end())it=voices_.begin();
-   *it=Voice{true,c.preset,0U,0.0f,c.volume}; effects_=c.effects;
+   *it=Voice{true,c.preset,0U,0.0f,c.volume,patternFor(c.preset)}; effects_=c.effects;
   }
   int rate=stream_?AAudioStream_getSampleRate(stream_):48000;
   bool active=false;
@@ -120,7 +127,7 @@ private:
    float mixed=0.0f;
    for(auto& v:voices_){
     if(!v.active)continue;
-    Pattern p=patternFor(v.preset);uint64_t total=uint64_t(p.count)*p.noteFrames;
+    const Pattern& p=v.pattern;uint64_t total=uint64_t(p.count)*p.noteFrames;
     if(v.age>=total){v.active=false;continue;}
     uint32_t ni=uint32_t(v.age/p.noteFrames), nf=uint32_t(v.age%p.noteFrames);
     float hz=p.notes[std::min<uint32_t>(ni,3U)];
