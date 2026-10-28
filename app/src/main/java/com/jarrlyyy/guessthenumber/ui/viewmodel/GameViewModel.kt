@@ -608,7 +608,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             val newStats = state.statistics.copy(moneySpent = state.statistics.moneySpent + cost)
             _gameState.value = InvisibleTraitEngine.observeUpgradePurchase(
                 state.copy(money = newMoney, upgradeLevels = newLevels, statistics = newStats, dailyQuestUpgradePurchases = state.dailyQuestUpgradePurchases + 1),
-                countDelta = (newLevel - currentLevel).toLong().coerceAtLeast(1L)
+                countDelta = (newLevel - currentLevel).toLong()
             )
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.UPGRADE, "BUY_UPGRADE", "Bought upgrade $upgradeId to level $newLevel")
