@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "abd5bf24b8ec7e157515963f2640ddedd245646d",
+  "version": "3620e7f955fab249cb43d36d643926001ddb44c2",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -221,7 +221,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/typescript/package.json",
-      "sha256": "142144839e00501f661fae7a604513fc45b6fcc551b92a8220b91f38568f0f36"
+      "sha256": "8f5f2cd6379115817ad9c1269e790ca1f256081c89fa349e7f84b0d8446e8b99"
     },
     {
       "path": "libraries/jarrlyyuisdk/typescript/runtime/jarrlyy-ui-advanced.ts",
@@ -246,6 +246,10 @@
     {
       "path": "libraries/jarrlyyuisdk/typescript/tsconfig.json",
       "sha256": "a69d9ba75bfa5b4191ec6acc5929a9fa5606eed289b2e97a36e3146f2f83c9b7"
+    },
+    {
+      "path": "libraries/jarrlyyuisdk/typescript/tsconfig.runtime.json",
+      "sha256": "edf4ee33851e088cbf367dc6b6c5cd1f082375cb90e8957f37a658ae0132c42a"
     },
     {
       "path": "libraries/vue/LICENSE",
