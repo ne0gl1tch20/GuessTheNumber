@@ -95,6 +95,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private val gameEngine = GameEngine()
     private val guessingBot = GuessingBot()
+    private val independentBotGuessers = mutableMapOf<String, GuessingBot>()
     private val randomEventEngine = RandomEventEngine()
     private val luaRandomEventSelector by lazy { LuaRandomEventSelector(getApplication<Application>()) }
     private val commandExecutor = CommandExecutor()
@@ -649,17 +650,25 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun buyShopItem(itemId: String, costNebula: Long) {
         val state = _gameState.value
+        val botIds = setOf("auto_clicker_basic", "bot_byte", "bot_pixel")
+        val botUpgradeIds = setOf("bot_speed_upgrade", "bot_logic_upgrade")
+        // Upgrades require at least one owned bot; the WebView's affordability is only a display hint.
+        if (itemId in botUpgradeIds && state.shopPurchases.none { it in botIds }) return
         val cost = BigNumber(costNebula)
         if (state.nebula >= cost && !state.shopPurchases.contains(itemId)) {
             val newPurchases = state.shopPurchases + itemId
             val newNebula = state.nebula - cost
-            val autoActive = if (itemId == "auto_clicker_basic") true else state.autoClickerActive
+            val autoActive = if (itemId in botIds) true else state.autoClickerActive
+            val nextSpeed = if (itemId == "bot_speed_upgrade") {
+                (state.autoClickerSpeed * 1.5).coerceAtMost(5.0)
+            } else state.autoClickerSpeed
             val cosmetic = if (itemId.startsWith("cosmetic_")) itemId else state.equippedCosmeticId
             _gameState.value = state.copy(
                 nebula = newNebula,
                 shopPurchases = newPurchases,
                 equippedCosmeticId = cosmetic,
-                autoClickerActive = autoActive
+                autoClickerActive = autoActive,
+                autoClickerSpeed = nextSpeed
             )
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.SHOP, "BUY_SHOP", "Purchased shop item $itemId")
@@ -1901,20 +1910,38 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 withContext(Dispatchers.Main) {
                     val currentState = refreshDailyQuestDay(_gameState.value)
                     if (currentState.autoClickerActive) {
-                        val guess = guessingBot.nextGuess(
+                        val ownedBots = listOf("auto_clicker_basic", "bot_byte", "bot_pixel")
+                            .filter { it in currentState.shopPurchases }
+                            .ifEmpty { listOf("auto_clicker_basic") }
+                        val botId = ownedBots[(currentState.botActionSequence % ownedBots.size).toInt()]
+                        // Shared Memory lets every bot learn from the team's full feedback history.
+                        // Without it, each additional bot maintains its own feedback-only search interval.
+                        val activeGuesser = if ("bot_logic_upgrade" in currentState.shopPurchases || botId == "auto_clicker_basic") {
+                            guessingBot
+                        } else {
+                            independentBotGuessers.getOrPut(botId) { GuessingBot() }
+                        }
+                        val guess = activeGuesser.nextGuess(
                             currentState.currentRangeMin,
                             currentState.currentRangeMax
                         )
                         val result = processGuessWithTraits(currentState, guess)
-                        guessingBot.observeGuess(guess, result.feedback)
+                        activeGuesser.observeGuess(guess, result.feedback)
                         val isCorrect = result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
                         if (isCorrect) {
+                            activeGuesser.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
                             guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
+                            independentBotGuessers.values.forEach { it.reset(result.newState.currentRangeMin, result.newState.currentRangeMax) }
                         }
                         val talentAdjustedState = applyTalentBonuses(currentState, result.newState, isCorrect)
                         val progressedState = recordLootDrop(
                             recordDailyGuess(currentState, talentAdjustedState, isCorrect),
                             isCorrect
+                        ).copy(
+                            lastBotGuess = guess,
+                            lastBotFeedback = result.feedback.name,
+                            lastBotId = botId,
+                            botActionSequence = currentState.botActionSequence + 1L
                         )
                         _gameState.value = progressedState
                         val activeBossWorld = progressedState.activeBossBattleWorldId
