@@ -3,7 +3,6 @@ package com.jarrlyyy.guessthenumber.shared.domain
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
 import com.jarrlyyy.guessthenumber.domain.engine.GuessResult
 import com.jarrlyyy.guessthenumber.domain.model.GameState
-import com.jarrlyyy.guessthenumber.domain.model.TraitProfile
 
 /**
  * Deterministic, save-safe brain for the invisible trait system.
@@ -33,7 +32,7 @@ object InvisibleTraitEngine {
         val failed = !correct
         val nextStreak = result.newStreak
         val nextProfile = profile.copy(
-            totalGuessesObserved = (profile.totalGuessesObserved + 1L).coerceAtLeast(profile.totalGuessesObserved),
+            totalGuessesObserved = profile.totalGuessesObserved + 1L,
             correctGuessesObserved = if (correct) profile.correctGuessesObserved + 1L else profile.correctGuessesObserved,
             failedGuessesObserved = if (failed) profile.failedGuessesObserved + 1L else profile.failedGuessesObserved,
             longStreaksObserved = if (nextStreak >= LONG_STREAK_THRESHOLD) profile.longStreaksObserved + 1L else profile.longStreaksObserved,
@@ -72,21 +71,42 @@ object InvisibleTraitEngine {
 
     fun evaluate(state: GameState): Decision {
         val p = state.traitProfile
+        val tick = p.totalGuessesObserved
         val helpers = linkedSetOf<String>()
+
+        fun offer(id: String) {
+            if (!cooldownActive(p, id, tick) && helpers.size < MAX_HELPERS_PER_GUESS) helpers += id
+        }
+
+        // Adaptive helpers: deliberately small, deterministic and cooldown-limited.
+        if (p.failedGuessesObserved >= FAILURE_HELPER_THRESHOLD) offer(HELPER_MISTAKE_INSURANCE)
+        if (p.failedGuessesObserved >= RANGE_HELPER_THRESHOLD && state.correctGuesses >= 10L) offer(HELPER_RANGE_SCOUT)
+        if (p.longStreaksObserved > 0L) offer(HELPER_STREAK_GUARD)
+        if (p.failedGuessesObserved >= COMEBACK_FAILURE_THRESHOLD && p.correctGuessesObserved > 0L) offer(HELPER_COMEBACK)
+        if (state.streak >= MOMENTUM_STREAK_THRESHOLD) offer(HELPER_MOMENTUM)
+
         val bonuses = linkedSetOf<String>()
-
-        // Adaptive helpers: deliberately small and deterministic.
-        if (p.failedGuessesObserved >= FAILURE_HELPER_THRESHOLD) helpers += HELPER_MISTAKE_INSURANCE
-        if (p.failedGuessesObserved >= RANGE_HELPER_THRESHOLD && state.correctGuesses >= 10L) helpers += HELPER_RANGE_SCOUT
-        if (p.longStreaksObserved > 0L) helpers += HELPER_STREAK_GUARD
-        if (p.failedGuessesObserved >= COMEBACK_FAILURE_THRESHOLD && p.correctGuessesObserved > 0L) helpers += HELPER_COMEBACK
-        if (state.streak >= MOMENTUM_STREAK_THRESHOLD) helpers += HELPER_MOMENTUM
-
-        // One-time progression recognition is ledger-backed and therefore reload-safe.
         if (state.prestigeCount >= 1L && BONUS_FIRST_PRESTIGE !in p.awardedBonuses) bonuses += BONUS_FIRST_PRESTIGE
         if (state.ultraCount >= 1L && BONUS_FIRST_ULTRA !in p.awardedBonuses) bonuses += BONUS_FIRST_ULTRA
         if (state.prestigeCount >= VETERAN_PRESTIGE_THRESHOLD && BONUS_VETERAN !in p.awardedBonuses) bonuses += BONUS_VETERAN
         return Decision(helpers, bonuses)
+    }
+
+    fun markHelperUses(state: GameState, helperIds: Set<String>): GameState {
+        if (helperIds.isEmpty()) return state
+        val tick = state.traitProfile.totalGuessesObserved
+        val uses = state.traitProfile.helperUses.toMutableMap()
+        val cooldowns = state.traitProfile.helperCooldowns.toMutableMap()
+        helperIds.forEach { id ->
+            uses[id] = (uses[id] ?: 0L) + 1L
+            cooldowns[id] = tick + cooldownFor(id)
+        }
+        return state.copy(
+            traitProfile = state.traitProfile.copy(
+                helperUses = uses,
+                helperCooldowns = cooldowns
+            )
+        )
     }
 
     fun markBonusesAwarded(state: GameState, bonusIds: Set<String>): GameState {
@@ -98,9 +118,22 @@ object InvisibleTraitEngine {
         )
     }
 
+    private fun cooldownActive(profile: com.jarrlyyy.guessthenumber.domain.model.TraitProfile, id: String, tick: Long): Boolean =
+        (profile.helperCooldowns[id] ?: 0L) > tick
+
+    private fun cooldownFor(id: String): Long = when (id) {
+        HELPER_RANGE_SCOUT -> 5L
+        HELPER_MISTAKE_INSURANCE -> 3L
+        HELPER_STREAK_GUARD -> 10L
+        HELPER_COMEBACK -> 10L
+        HELPER_MOMENTUM -> 5L
+        else -> 5L
+    }
+
     private fun smoothScore(previous: Double, sample: Double): Double =
         (previous * SCORE_DECAY + sample * (1.0 - SCORE_DECAY)).coerceIn(0.0, 1.0)
 
+    const val MAX_HELPERS_PER_GUESS = 3
     const val LONG_STREAK_THRESHOLD = 10
     const val FAILURE_HELPER_THRESHOLD = 3L
     const val RANGE_HELPER_THRESHOLD = 5L
