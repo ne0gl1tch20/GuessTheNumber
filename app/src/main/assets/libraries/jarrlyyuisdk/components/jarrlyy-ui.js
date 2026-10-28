@@ -1,4 +1,6 @@
-/* Jarrlyy UI SDK: small, dependency-free behavior layer. */
+/* Generated from ../typescript/runtime/jarrlyy-ui.ts by TypeScript.
+ * Preserve the classic-script window.JarrlyyUI and window.JarrlyyUIMotion APIs.
+ */
 (function (global) {
   "use strict";
   const doc = global.document;
