@@ -29,7 +29,7 @@ type JarrlyyUIMotionApi = Readonly<{
   const doc = global.document;
   if (!doc) return;
   const $ = <T extends Element = HTMLElement>(selector: string, root: ParentNode = doc): T | null => root.querySelector<T>(selector);
-  const $ = <T extends Element = HTMLElement>(selector: string, root: ParentNode = doc): T[] => Array.from(root.querySelectorAll<T>(selector));
+  const $$ = <T extends Element = HTMLElement>(selector: string, root: ParentNode = doc): T[] => Array.from(root.querySelectorAll<T>(selector));
   let tourSequence = 0;
 
   function toast(message, duration = 2800) {
