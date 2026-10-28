@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "none",
+    "lib": ["ES2020", "DOM"],
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmitOnError": true,
+    "outFile": "../components/jarrlyy-ui-advanced.js"
+  },
+  "files": ["runtime/jarrlyy-ui-advanced.ts"]
+}
