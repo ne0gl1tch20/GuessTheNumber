@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "6058361679b6a17fa0dcdef040d9acaf069890fe",
+  "version": "289053649b2bc594a7df5ef29df36aff4ba29ffb",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -177,7 +177,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-advanced.js",
-      "sha256": "afb87687b64ba441bba4fd2f96bff9d42ed16f550af68f61edd25f7ac646ebd8"
+      "sha256": "f948cbdd32798451100bcabf2750c07b15227069c93e1866c455992b69eb735e"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-dom-utils.js",
@@ -217,7 +217,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/typescript/README.md",
-      "sha256": "b5793df65661beee6577fb321ebae48d30cf872aa9701c4c4d8010d1bcd760af"
+      "sha256": "686cb7e0d874ab947049345c2ec1f809cea31f00bd60c46f0147af064f618c61"
     },
     {
       "path": "libraries/jarrlyyuisdk/typescript/package.json",
