@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "profileId": "invisible_traits_v2",
+  "authority": "Kotlin",
+  "decisionLayer": "Lua",
+  "persistentLayer": "JSON",
+  "legacyCompatible": true,
+  "helpers": {
+    "range_scout": { "type": "RANGE_HINT", "maxStrength": 1.0, "cooldownGuesses": 5 },
+    "mistake_insurance": { "type": "MISS_PENALTY_REDUCTION", "maxRefundRate": 0.75, "cooldownGuesses": 3 },
+    "streak_guard": { "type": "STREAK_PROTECTION", "maxUsesPerSession": 3 },
+    "comeback_reward": { "type": "COMEBACK_BONUS", "maxMultiplier": 1.05, "cooldownGuesses": 10 },
+    "momentum_reward": { "type": "MOMENTUM_BONUS", "maxMultiplier": 1.03, "cooldownGuesses": 5 }
+  },
+  "progressionBonuses": {
+    "first_prestige_bonus": { "maxMultiplier": 1.10, "oneTime": true },
+    "first_ultra_bonus": { "maxMultiplier": 1.10, "oneTime": true },
+    "veteran_bonus": { "maxMultiplier": 1.10, "oneTime": true }
+  },
+  "limits": {
+    "maxHelpersPerGuess": 3,
+    "maxBonusMultiplier": 1.30,
+    "maxProfileEntries": 64
+  }
+}
