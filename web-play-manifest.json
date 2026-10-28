@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "fcc6f361ad7b3e7ecca616e0ba923957ba81a1e0",
+  "version": "75cd240c7368d11fd0ce4c657d488b47b74c100b",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -173,7 +173,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-particle-effects.js",
-      "sha256": "a7e3a392da2b2fdbc024e1e5cb1178e3e68dba7de1d1d7b81491bd6918f029c6"
+      "sha256": "e5746abd35a475425c1e0e361bd506915d80d71b21c910e1ed9f99efd217a338"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-advanced.js",
