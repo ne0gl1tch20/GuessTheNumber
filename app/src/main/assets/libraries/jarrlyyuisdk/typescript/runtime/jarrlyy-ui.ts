@@ -93,7 +93,7 @@ type JarrlyyUIMotionApi = Readonly<{
   function tour(steps: JarrlyyTourStep[], options: JarrlyyTourOptions = {}): HTMLDialogElement | null {
     const normalized = Array.isArray(steps) ? steps.filter((step) => step && (step.title || step.message || step.description)) : [];
     if (!normalized.length) return null;
-    const previousFocus = doc.activeElement;
+    const previousFocus = doc.activeElement as HTMLElement | null;
     const dialog = doc.createElement("dialog");
     dialog.className = "jui-dialog jui-tour-dialog";
     const heading = doc.createElement("h2");
