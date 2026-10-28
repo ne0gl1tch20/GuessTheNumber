@@ -85,17 +85,17 @@ class JarrlyyUiSdkTests(unittest.TestCase):
     def test_context_menu_keyboard_navigation_handles_multiple_items(self):
         js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
         self.assertIn('const items = $$("button:not(:disabled)", menu);', js)
-        self.assertIn('if (event.key === "Tab") { close(); return; }', js)
+        self.assertRegex(js, r'if \(event\.key === "Tab"\)\s*\{\s*close\(\);\s*return;\s*\}')
         self.assertIn('current < 0 ? 0 : (current + 1) % items.length', js)
         self.assertIn('current < 0 ? items.length - 1 : (current - 1 + items.length) % items.length', js)
-        self.assertIn('if (!menu) return;\n      button.dataset.juiMenuReady = "true";', js)
+        self.assertRegex(js, r'if \(!menu\)\s*return;\s*button\.dataset\.juiMenuReady = "true";')
 
     def test_timer_finishes_once_and_skips_interval_for_zero(self):
         js = (SDK / "components/jarrlyy-ui.js").read_text(encoding="utf-8")
         self.assertIn('let ended = false;', js)
         self.assertIn('if (!ended) {', js)
         self.assertIn('node.dispatchEvent(new global.CustomEvent("jui:timer-end"', js)
-        self.assertIn('if (!paint()) return;\n      const timer = global.setInterval', js)
+        self.assertRegex(js, r'if \(!paint\(\)\)\s*return;\s*const timer = global\.setInterval')
 
     def test_reduced_motion_covers_embedded_sdk_feedback(self):
         css = (SDK / "styles/jarrlyy-ui.css").read_text(encoding="utf-8")
@@ -114,8 +114,8 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         self.assertIn('body.setAttribute("aria-live", "polite")', js)
         self.assertIn('dialog.addEventListener("cancel", () => {', js)
         self.assertIn('progress.setAttribute("aria-live", "polite")', js)
-        self.assertIn('if (typeof options.onComplete === "function") options.onComplete()', js)
-        self.assertIn('if (typeof options.onSkip === "function") options.onSkip()', js)
+        self.assertRegex(js, r'if \(typeof options\.onComplete === "function"\)\s*options\.onComplete\(\)')
+        self.assertRegex(js, r'if \(typeof options\.onSkip === "function"\)\s*options\.onSkip\(\)')
         self.assertRegex(js, r'global\.JarrlyyUI = Object\.freeze\(\{ init, (?:enhance, )?toast, dialog: makeDialog, tour(?:, createKeyButton)? \}\);')
         self.assertIn('if (action === "tour") tour([', js)
 
