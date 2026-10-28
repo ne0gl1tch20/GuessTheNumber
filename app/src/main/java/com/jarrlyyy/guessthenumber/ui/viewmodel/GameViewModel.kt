@@ -96,6 +96,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val gameEngine = GameEngine()
     private val guessingBot = GuessingBot()
     private val independentBotGuessers = mutableMapOf<String, GuessingBot>()
+
+    private fun resetGuessingBots(min: Long, max: Long) {
+        guessingBot.reset(min, max)
+        independentBotGuessers.values.forEach { it.reset(min, max) }
+    }
     private val randomEventEngine = RandomEventEngine()
     private val luaRandomEventSelector by lazy { LuaRandomEventSelector(getApplication<Application>()) }
     private val commandExecutor = CommandExecutor()
@@ -237,7 +242,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
-            guessingBot.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+            resetGuessingBots(finalState.currentRangeMin, finalState.currentRangeMax)
             lastIncomeMeasurement = finalState.money
             _incomePerSecond.value = BigNumber.ZERO
 
@@ -302,7 +307,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     _hasAnySave.value = true
                     startAutoSave()
                     _gameState.value = freshState
-                    guessingBot.reset(freshState.currentRangeMin, freshState.currentRangeMax)
+                    resetGuessingBots(freshState.currentRangeMin, freshState.currentRangeMax)
                     lastIncomeMeasurement = freshState.money
                     _incomePerSecond.value = BigNumber.ZERO
                     WidgetRefresh.request(getApplication<Application>())
@@ -357,7 +362,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                         withContext(Dispatchers.Main) {
                             _activeSlot.value = slot
                             _gameState.value = sanitized
-                            guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                            resetGuessingBots(sanitized.currentRangeMin, sanitized.currentRangeMax)
                             lastIncomeMeasurement = sanitized.money
                             _incomePerSecond.value = BigNumber.ZERO
                         }
@@ -437,7 +442,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     val loaded = saveManager.loadGame(slot)
                     val sanitized = AntiCheatService.sanitizeCurrency(loaded)
                     _gameState.value = sanitized
-                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                    resetGuessingBots(sanitized.currentRangeMin, sanitized.currentRangeMax)
                     lastIncomeMeasurement = sanitized.money
                     _incomePerSecond.value = BigNumber.ZERO
                 }
@@ -459,7 +464,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     val fresh = GameState(settings = globalSettings, tutorialCompleted = globalSettings.tutorialCompleted, lastSaveTimestamp = System.currentTimeMillis())
                     saveManager.saveGame(fresh, slot)
                     _gameState.value = fresh
-                    guessingBot.reset(fresh.currentRangeMin, fresh.currentRangeMax)
+                    resetGuessingBots(fresh.currentRangeMin, fresh.currentRangeMax)
                     lastIncomeMeasurement = fresh.money
                     _incomePerSecond.value = BigNumber.ZERO
                 }
@@ -508,7 +513,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val result = processGuessWithTraits(currentState, guess)
         guessingBot.observeGuess(guess.coerceIn(currentState.currentRangeMin, currentState.currentRangeMax), result.feedback)
         if (result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT) {
-            guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
+            resetGuessingBots(result.newState.currentRangeMin, result.newState.currentRangeMax)
         }
         val isCorrect = result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
         val talentAdjustedState = applyTalentBonuses(currentState, result.newState, isCorrect)
@@ -619,7 +624,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 statistics = newStats,
                 prestigeCount = state.prestigeCount + 1
             )
-            guessingBot.reset(_gameState.value.currentRangeMin, _gameState.value.currentRangeMax)
+            resetGuessingBots(_gameState.value.currentRangeMin, _gameState.value.currentRangeMax)
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.PRESTIGE, "PRESTIGE_RESET", "Prestige reset performed (#${state.prestigeCount + 1}), awarded $reward Prestige.")
         }
@@ -642,7 +647,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 statistics = newStats,
                 ultraCount = state.ultraCount + 1
             )
-            guessingBot.reset(_gameState.value.currentRangeMin, _gameState.value.currentRangeMax)
+            resetGuessingBots(_gameState.value.currentRangeMin, _gameState.value.currentRangeMax)
             saveGameAsync()
             GameLogger.log(LogLevel.INFO, LoggerCategory.ULTRA, "ULTRA_RESET", "Ultra reset performed (#${state.ultraCount + 1}), awarded $reward Ultra.")
         }
@@ -892,7 +897,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val saved = saveManager.saveGame(updated, slot)
                 if (saved && _activeSlot.value == slot) {
                     _gameState.value = AntiCheatService.sanitizeCurrency(updated)
-                    guessingBot.reset(updated.currentRangeMin, updated.currentRangeMax)
+                    resetGuessingBots(updated.currentRangeMin, updated.currentRangeMax)
                     WidgetRefresh.request(getApplication<Application>())
                 }
                 saved
@@ -916,7 +921,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             streak = 0
         )
         _gameState.value = updated
-        guessingBot.reset(updated.currentRangeMin, updated.currentRangeMax)
+        resetGuessingBots(updated.currentRangeMin, updated.currentRangeMax)
         saveGameAsync()
         return true
     }
@@ -1020,7 +1025,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 withContext(Dispatchers.Main) {
                     _gameState.value = sanitized
                     _hasAnySave.value = true
-                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                    resetGuessingBots(sanitized.currentRangeMin, sanitized.currentRangeMax)
                     lastIncomeMeasurement = sanitized.money
                     _incomePerSecond.value = BigNumber.ZERO
                     onResult(true)
@@ -1051,7 +1056,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 withContext(Dispatchers.Main) {
                     _gameState.value = sanitized
                     _hasAnySave.value = true
-                    guessingBot.reset(sanitized.currentRangeMin, sanitized.currentRangeMax)
+                    resetGuessingBots(sanitized.currentRangeMin, sanitized.currentRangeMax)
                     lastIncomeMeasurement = sanitized.money
                     _incomePerSecond.value = BigNumber.ZERO
                     onResult(true)
@@ -1073,7 +1078,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 _hasAnySave.value = true
                 startAutoSave()
                 _gameState.value = fresh
-                guessingBot.reset(fresh.currentRangeMin, fresh.currentRangeMax)
+                resetGuessingBots(fresh.currentRangeMin, fresh.currentRangeMax)
                 lastIncomeMeasurement = fresh.money
                 _incomePerSecond.value = BigNumber.ZERO
             }
@@ -1187,7 +1192,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     val loaded = AntiCheatService.sanitizeCurrency(saveManager.loadGame(slot))
                     withContext(Dispatchers.Main) {
                         _gameState.value = loaded
-                        guessingBot.reset(loaded.currentRangeMin, loaded.currentRangeMax)
+                        resetGuessingBots(loaded.currentRangeMin, loaded.currentRangeMax)
                         lastIncomeMeasurement = loaded.money
                         _incomePerSecond.value = BigNumber.ZERO
                     }
@@ -1930,8 +1935,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                         val isCorrect = result.feedback == com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback.CORRECT
                         if (isCorrect) {
                             activeGuesser.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
-                            guessingBot.reset(result.newState.currentRangeMin, result.newState.currentRangeMax)
-                            independentBotGuessers.values.forEach { it.reset(result.newState.currentRangeMin, result.newState.currentRangeMax) }
+                            resetGuessingBots(result.newState.currentRangeMin, result.newState.currentRangeMax)
                         }
                         val talentAdjustedState = applyTalentBonuses(currentState, result.newState, isCorrect)
                         val progressedState = recordLootDrop(
