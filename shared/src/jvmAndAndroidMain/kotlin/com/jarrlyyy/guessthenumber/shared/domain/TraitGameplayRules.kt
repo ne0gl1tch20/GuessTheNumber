@@ -30,7 +30,12 @@ object TraitGameplayRules {
         if (guess !in stateBefore.currentRangeMin..stateBefore.currentRangeMax) return result
 
         val observedState = InvisibleTraitEngine.observeGuess(stateBefore, result)
-        val adaptive = InvisibleTraitEngine.evaluate(observedState)
+        val progressionObserved = InvisibleTraitEngine.observeProgression(
+            observedState,
+            previousPrestige = stateBefore.prestigeCount,
+            previousUltra = stateBefore.ultraCount
+        )
+        val adaptive = InvisibleTraitEngine.evaluate(progressionObserved)
         val effectTypes = activeTraitIds.flatMapTo(mutableSetOf()) { activeEffects[it].orEmpty() }
 
         val hasComboReward = "combo_momentum" in activeTraitIds || "COMBO_REWARD" in effectTypes || InvisibleTraitEngine.HELPER_MOMENTUM in adaptive.helperIds
@@ -39,7 +44,7 @@ object TraitGameplayRules {
         val hasRiskReward = "risk_reward" in activeTraitIds || "RISK_REWARD" in effectTypes
         val hasStreakProtection = "streak_guard" in activeTraitIds || "STREAK_PROTECTION" in effectTypes || InvisibleTraitEngine.HELPER_STREAK_GUARD in adaptive.helperIds
 
-        var nextState = result.newState.copy(traitProfile = observedState.traitProfile)
+        var nextState = result.newState.copy(traitProfile = progressionObserved.traitProfile)
         var reward = result.reward
         if (result.feedback == GuessFeedback.CORRECT) {
             var multiplier = 1.0
@@ -86,6 +91,8 @@ object TraitGameplayRules {
             }
             if (hasStreakProtection) nextState = nextState.copy(streak = stateBefore.streak)
         }
+
+        nextState = InvisibleTraitEngine.markHelperUses(nextState, adaptive.helperIds)
         return result.copy(reward = reward, newStreak = nextState.streak, newState = nextState)
     }
 
