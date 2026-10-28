@@ -877,7 +877,7 @@ private fun DeveloperUpdateToolsCard() {
                             }
                             UpdateChannelChecker.Result.Unavailable -> {
                                 updateMessage = locale.getString("update_unavailable", "Couldn't check for updates. Try again later.")
-                                updateErrorLogs = "Update check did not find a usable update source.\nChannel: \${BuildConfig.UPDATE_CHANNEL}\nApp version: \${BuildConfig.VERSION_NAME} (\${BuildConfig.VERSION_CODE})"
+                                updateErrorLogs = "Update check did not find a usable update source.\nChannel: ${BuildConfig.UPDATE_CHANNEL}\nApp version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
                             }
                             is UpdateChannelChecker.Result.Failed -> {
                                 updateMessage = locale.getString("update_unavailable", "Couldn't check for updates. Try again later.")
@@ -930,7 +930,7 @@ private fun DeveloperUpdateToolsCard() {
                             context.startActivity(
                                 Intent(
                                     android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                                    android.net.Uri.parse("package:\${context.packageName}")
+                                    android.net.Uri.parse("package:${context.packageName}")
                                 )
                             )
                             updateMessage = locale.getString(
@@ -973,10 +973,10 @@ private fun DeveloperUpdateToolsCard() {
                                     { error ->
                                         updateErrorLogs = buildString {
                                             appendLine("Update installation failed")
-                                            appendLine("App version: \${BuildConfig.VERSION_NAME} (\${BuildConfig.VERSION_CODE})")
-                                            appendLine("Channel: \${BuildConfig.UPDATE_CHANNEL}")
-                                            appendLine("Failure: \${error.javaClass.name}")
-                                            appendLine("Message: \${error.message ?: "(no message)"}")
+                                            appendLine("App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+                                            appendLine("Channel: ${BuildConfig.UPDATE_CHANNEL}")
+                                            appendLine("Failure: ${error.javaClass.name}")
+                                            appendLine("Message: ${error.message ?: "(no message)"}")
                                             appendLine()
                                             append(error.stackTraceToString().take(8000))
                                         }
