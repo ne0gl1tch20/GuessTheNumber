@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "12fb38610be1457291652c953b80cadda2a697eb",
+  "version": "fcc6f361ad7b3e7ecca616e0ba923957ba81a1e0",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -29,7 +29,7 @@
     },
     {
       "path": "web-play/styles.css",
-      "sha256": "1a585eb902395ccee75e44d23752f94deedb35a2a68902dd004f5c0afe771edc"
+      "sha256": "fb5d2c27fa058bb1cefb1dba3b15b283232a8d5da916cc53d856fd992fc38e21"
     },
     {
       "path": "web-play/trait-extension-host.js",
@@ -38,10 +38,6 @@
     {
       "path": "web-play/vue-bot-arena.js",
       "sha256": "1e0dee97d689d9f770ee46005eaad52bae218fcd74d1017c9e7eccd371f87b7b"
-    },
-    {
-      "path": "web-play/vue-canvas-effects.js",
-      "sha256": "aa7a56bd3a5b9931f0f908257dde1b09c1b1a3e269726074ac9a844d186ba67f"
     },
     {
       "path": "web-play/vue-jarrlyy-adapter.js",
