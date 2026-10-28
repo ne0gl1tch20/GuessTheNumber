@@ -18,7 +18,7 @@ const requestId=()=>`webplay_${Date.now()}_${++sequence}`,reducedMotion=()=>!!(l
 function toast(message){if(window.JarrlyyUI&&typeof window.JarrlyyUI.toast==='function'){window.JarrlyyUI.toast(message);return}el.toast.textContent=message;el.toast.classList.add('show');window.clearTimeout(toastTimer);toastTimer=window.setTimeout(()=>el.toast.classList.remove('show'),1900)}
 function celebrate(node){if(!node)return;node.classList.remove('reward-flash');void node.offsetWidth;node.classList.add('reward-flash');window.setTimeout(()=>node.classList.remove('reward-flash'),950);if(!reducedMotion()&&!(lastState&&lastState.settings&&lastState.settings.reduceFlashes))burst()}
 function bump(node){const card=node.closest('.stat-card,.currency-tile,.progression-mini-grid>div,.quest-metrics>div,.loot-items>div');if(!card||reducedMotion())return;card.classList.remove('bump');void card.offsetWidth;card.classList.add('bump')}
-function setText(node,value){if(!node)return;const next=String(value??0);if(node.textContent!==next){bump(node);node.textContent=next}}
+function setText(node,value){if(!node)return;const next=String(value??0);if(node.textContent!==next){bump(node);JarrlyyUIDOM.setTextContent(node,value,0)}}
 
 
 
