@@ -171,7 +171,7 @@ type JarrlyyUIMotionApi = Readonly<{
     $$("[data-jui-menu-toggle]").forEach((button) => {
       if (button.dataset.juiMenuReady) return;
       const id = button.getAttribute("aria-controls");
-      const menu = id ? doc.getElementById(id) : button.parentElement.querySelector(".jui-menu");
+      const menu = (id ? doc.getElementById(id) : button.parentElement?.querySelector<HTMLElement>(".jui-menu")) as HTMLElement | null;
       if (!menu) return;
       button.dataset.juiMenuReady = "true";
       button.setAttribute("aria-expanded", "false");
@@ -181,7 +181,7 @@ type JarrlyyUIMotionApi = Readonly<{
         const opening = menu.hidden;
         $$("[data-jui-menu-toggle]").forEach((other) => {
           const otherId = other.getAttribute("aria-controls");
-          const otherMenu = otherId ? doc.getElementById(otherId) : other.parentElement.querySelector(".jui-menu");
+          const otherMenu = (otherId ? doc.getElementById(otherId) : other.parentElement?.querySelector<HTMLElement>(".jui-menu")) as HTMLElement | null;
           if (otherMenu && otherMenu !== menu) {
             otherMenu.hidden = true;
             other.setAttribute("aria-expanded", "false");
@@ -192,10 +192,10 @@ type JarrlyyUIMotionApi = Readonly<{
         if (opening) ((menu.querySelector("button:not(:disabled)") as HTMLElement | null) || menu).focus({ preventScroll: true });
       });
       menu.addEventListener("click", (event) => {
-        if (event.target.closest("button")) close();
+        if ((event.target as Element | null)?.closest("button")) close();
       });
       menu.addEventListener("keydown", (event) => {
-        const items = $$("button:not(:disabled)", menu);
+        const items = $<HTMLButtonElement>("button:not(:disabled)", menu);
         if (!items.length) return;
         if (event.key === "Tab") { close(); return; }
         const current = items.indexOf(doc.activeElement);
@@ -209,7 +209,7 @@ type JarrlyyUIMotionApi = Readonly<{
         items[next].focus({ preventScroll: true });
       });
       doc.addEventListener("click", (event) => {
-        if (!button.contains(event.target) && !menu.contains(event.target)) close();
+        if (!(event.target instanceof Node) || (!button.contains(event.target) && !menu.contains(event.target))) close();
       });
       doc.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && !menu.hidden) { close(); button.focus(); }
@@ -227,7 +227,7 @@ type JarrlyyUIMotionApi = Readonly<{
       const render = () => {
         slides.forEach((slide, i) => { slide.hidden = i !== index; slide.setAttribute("aria-hidden", String(i !== index)); });
         if (count) count.textContent = slides.length ? (index + 1) + " / " + slides.length : "0 / 0";
-        $$("[data-jui-carousel-prev], [data-jui-carousel-next]", carousel).forEach((button) => { button.disabled = slides.length < 2; });
+        $<HTMLButtonElement>("[data-jui-carousel-prev], [data-jui-carousel-next]", carousel).forEach((button) => { button.disabled = slides.length < 2; });
       };
       $("[data-jui-carousel-prev]", carousel)?.addEventListener("click", () => { if (slides.length < 2) return; index = (index + slides.length - 1) % slides.length; render(); });
       $("[data-jui-carousel-next]", carousel)?.addEventListener("click", () => { if (slides.length < 2) return; index = (index + 1) % slides.length; render(); });
@@ -386,7 +386,7 @@ type JarrlyyUIMotionApi = Readonly<{
         ]);
       });
     });
-    $$("[data-jui-color-target]").forEach((input) => {
+    $<HTMLInputElement>("[data-jui-color-target]").forEach((input) => {
       if (input.dataset.juiColorReady) return;
       input.dataset.juiColorReady = "true";
       input.addEventListener("input", () => {
