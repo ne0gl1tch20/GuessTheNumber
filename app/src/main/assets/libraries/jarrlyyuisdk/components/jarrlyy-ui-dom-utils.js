@@ -10,6 +10,14 @@
       .join(' ');
   }
 
+  function setTextContent(node, value, fallback = 0) {
+    if (!node) return false;
+    const next = String(value ?? fallback);
+    if (node.textContent === next) return false;
+    node.textContent = next;
+    return true;
+  }
+
   function setIconButtonLabel(node, iconId, label) {
     if (!node) return;
     let svg = node.querySelector('svg');
@@ -30,5 +38,5 @@
     node.replaceChildren(svg, document.createTextNode(' ' + String(label ?? '')));
   }
 
-  root.JarrlyyUIDOM = Object.freeze({ humanize, setIconButtonLabel });
+  root.JarrlyyUIDOM = Object.freeze({ humanize, setTextContent, setIconButtonLabel });
 })(typeof window !== 'undefined' ? window : globalThis);
