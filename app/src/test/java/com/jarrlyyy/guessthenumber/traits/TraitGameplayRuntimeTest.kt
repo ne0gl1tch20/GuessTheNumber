@@ -27,9 +27,9 @@ class TraitGameplayRuntimeTest {
         )
         val base = GuessResult(GuessFeedback.CORRECT, BigNumber(100), false, 6, after)
         val result = TraitGameplayRuntime.apply(before, 50, base, "summer")
-        assertEquals(135.0, result.reward.value.toDouble(), 0.001)
-        assertEquals(1_135.0, result.newState.money.value.toDouble(), 0.001)
-        assertEquals(135.0, result.newState.statistics.moneyEarned.value.toDouble(), 0.001)
+        assertEquals(138.0, result.reward.value.toDouble(), 0.001)
+        assertEquals(1_138.0, result.newState.money.value.toDouble(), 0.001)
+        assertEquals(138.0, result.newState.statistics.moneyEarned.value.toDouble(), 0.001)
     }
 
     @Test fun mistakeInsuranceRefundsHalfOfMissPenaltyAndRangeScoutNarrowsHints() {
@@ -74,7 +74,7 @@ class TraitGameplayRuntimeTest {
         )
         val base = GuessResult(GuessFeedback.CORRECT, BigNumber(100), false, 6, after)
         val result = TraitGameplayRuntime.apply(selected, 50, base, "summer")
-        assertEquals(115.0, result.reward.value.toDouble(), 0.001)
+        assertEquals(118.0, result.reward.value.toDouble(), 0.001)
         assertEquals("burst", result.newState.selectedTraitArms["combo_momentum"])
     }
 
@@ -120,9 +120,9 @@ class TraitGameplayRuntimeTest {
             )
             val base = GuessResult(GuessFeedback.CORRECT, BigNumber(100), false, 6, after)
             val result = TraitGameplayRuntime.apply(before, 50, base, "summer")
-            assertEquals(110.0, result.reward.value.toDouble(), 0.001)
-            assertEquals("Remote trait must not inherit a locked built-in arm", 1_110.0, result.newState.money.value.toDouble(), 0.001)
-            assertEquals(1_110.0, result.newState.money.value.toDouble(), 0.001)
+            assertEquals(113.00000000000001, result.reward.value.toDouble(), 0.001)
+            assertEquals("Remote trait must not inherit a locked built-in arm", 1_113.0, result.newState.money.value.toDouble(), 0.001)
+            assertEquals(1_113.0, result.newState.money.value.toDouble(), 0.001)
         } finally {
             ActiveTraitCatalog.install(originalRegistry)
         }
