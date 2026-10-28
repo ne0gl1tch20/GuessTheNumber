@@ -7,7 +7,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "typecheck": "tsc --project tsconfig.json --noEmit",
-    "build": "tsc --project tsconfig.json"
+    "build": "npm run build:modules && npm run build:runtime",
+    "build:runtime": "tsc --project tsconfig.runtime.json",
+    "build:modules": "tsc --project tsconfig.json"
   },
   "devDependencies": {
     "typescript": "5.8.3"
