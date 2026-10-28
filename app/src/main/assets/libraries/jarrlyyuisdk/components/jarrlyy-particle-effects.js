@@ -19,7 +19,7 @@ const component={
   this.onBurst=null;
   this.onVisibility=null;
   this.context=this.canvas.getContext('2d',{alpha:true});
-  if(!this.context){window.gtnVueCanvasEffectsReady=false;return;}
+  if(!this.context){window.jarrlyyParticleEffectsReady=false;return;}
   this.resizeObserver=typeof ResizeObserver==='function'?new ResizeObserver(()=>this.resize()):null;
   this.onResize=()=>this.resize();
   this.onBurst=event=>this.burst(event);
@@ -32,7 +32,7 @@ const component={
   window.jarrlyyParticleEffectsReady=true;
  },
  beforeUnmount(){
-  window.gtnVueCanvasEffectsReady=false;
+  window.jarrlyyParticleEffectsReady=false;
   window.removeEventListener('jarrlyy:particle-burst',this.onBurst);
   window.removeEventListener('resize',this.onResize);
   document.removeEventListener('visibilitychange',this.onVisibility);
