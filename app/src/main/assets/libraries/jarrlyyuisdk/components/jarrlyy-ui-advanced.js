@@ -166,8 +166,8 @@
   function setLoading(button, loading, label) {
     if (!button) return;
     if (loading) {
-      if (!button.dataset.juiOriginalLabel) button.dataset.juiOriginalLabel = button.textContent.trim();
-      if (!button.dataset.juiOriginalDisabled) button.dataset.juiOriginalDisabled = String(button.disabled);
+      if (button.dataset.juiOriginalLabel === undefined) button.dataset.juiOriginalLabel = button.textContent.trim();
+      if (button.dataset.juiOriginalDisabled === undefined) button.dataset.juiOriginalDisabled = String(button.disabled);
       button.disabled = true;
       button.setAttribute("aria-busy", "true");
       button.replaceChildren();
