@@ -16,6 +16,16 @@ The build emits ES2020 JavaScript modules and declaration files into `dist/`. Ge
 
 ## Public API
 
+Typed host integration and interactive helpers are also available:
+
+- `mountHost(options?, window?, document?)` initializes available SDK layers and returns theme/event helpers.
+- `setHostTheme(root, "light" | "dark" | "system")` applies or clears a theme override.
+- `isJarrlyyEventName(name)` validates namespaced `jui:*` events.
+- `setLoading(button, loading, label?, document?)` preserves and restores a button's label and disabled state.
+- `setProgress(element, value)` clamps progress to 0–100 and updates ARIA progress attributes.
+
+These typed implementations are being brought under tests before replacing their existing browser-global implementations. This keeps current app behavior stable during the migration.
+
 Import from the generated `dist/index.js`:
 
 - `humanize(value, fallback?)`
