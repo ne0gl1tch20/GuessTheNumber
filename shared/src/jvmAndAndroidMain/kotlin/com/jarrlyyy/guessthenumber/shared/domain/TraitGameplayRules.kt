@@ -25,7 +25,8 @@ object TraitGameplayRules {
         guess: Long,
         result: GuessResult,
         activeTraitIds: Set<String>,
-        activeEffects: Map<String, Set<String>> = emptyMap()
+        activeEffects: Map<String, Set<String>> = emptyMap(),
+        adaptiveDecisionProvider: (GameState) -> InvisibleTraitEngine.Decision = InvisibleTraitEngine::evaluate
     ): GuessResult {
         if (guess !in stateBefore.currentRangeMin..stateBefore.currentRangeMax) return result
 
@@ -35,7 +36,7 @@ object TraitGameplayRules {
             previousPrestige = stateBefore.prestigeCount,
             previousUltra = stateBefore.ultraCount
         )
-        val adaptive = InvisibleTraitEngine.evaluate(progressionObserved)
+        val adaptive = adaptiveDecisionProvider(progressionObserved)
         val effectTypes = activeTraitIds.flatMapTo(mutableSetOf()) { activeEffects[it].orEmpty() }
 
         val hasComboReward = "combo_momentum" in activeTraitIds || "COMBO_REWARD" in effectTypes || InvisibleTraitEngine.HELPER_MOMENTUM in adaptive.helperIds
