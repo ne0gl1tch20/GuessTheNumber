@@ -117,7 +117,7 @@ class JarrlyyUiSdkTests(unittest.TestCase):
         self.assertRegex(js, r'if \(typeof options\.onComplete === "function"\)\s*options\.onComplete\(\)')
         self.assertRegex(js, r'if \(typeof options\.onSkip === "function"\)\s*options\.onSkip\(\)')
         self.assertRegex(js, r'global\.JarrlyyUI = Object\.freeze\(\{ init, (?:enhance, )?toast, dialog: makeDialog, tour(?:, createKeyButton)? \}\);')
-        self.assertIn('if (action === "tour") tour([', js)
+        self.assertRegex(js, r'if \(action === "tour"\)\s*tour\(\[')
 
     def test_player_notifications_use_sdk_toast_with_legacy_fallback(self):
         js = (WEB / "app.js").read_text(encoding="utf-8")
