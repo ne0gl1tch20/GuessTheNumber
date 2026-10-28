@@ -36,7 +36,8 @@ object TraitGameplayRules {
             previousPrestige = stateBefore.prestigeCount,
             previousUltra = stateBefore.ultraCount
         )
-        val adaptive = adaptiveDecisionProvider(progressionObserved)
+        val requestedAdaptive = adaptiveDecisionProvider(progressionObserved)
+        val adaptive = InvisibleTraitEngine.validateDecision(progressionObserved, requestedAdaptive)
         val effectTypes = activeTraitIds.flatMapTo(mutableSetOf()) { activeEffects[it].orEmpty() }
 
         val hasComboReward = "combo_momentum" in activeTraitIds || "COMBO_REWARD" in effectTypes || InvisibleTraitEngine.HELPER_MOMENTUM in adaptive.helperIds
