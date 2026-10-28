@@ -23,14 +23,14 @@ local function traits_evaluate()
     local bonuses = {}
     local failed = number("failed_guesses")
     local correct = number("correct_guesses")
-    local best_streak = number("best_streak")
+    local long_streaks = number("long_streaks_observed")
     local current_streak = number("current_streak")
     local prestige = number("prestige_count")
     local ultra = number("ultra_count")
 
     if failed >= 3 then add_helper(helpers, "mistake_insurance") end
     if failed >= 5 and correct >= 10 then add_helper(helpers, "range_scout") end
-    if best_streak >= 10 then add_helper(helpers, "streak_guard") end
+    if long_streaks > 0 then add_helper(helpers, "streak_guard") end
     if failed >= 6 and correct > 0 then add_helper(helpers, "comeback_reward") end
     if current_streak >= 5 then add_helper(helpers, "momentum_reward") end
 
