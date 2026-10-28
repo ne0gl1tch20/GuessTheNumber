@@ -4,39 +4,43 @@
 
 local MAX_HELPERS = 3
 
+local function number(name)
+    return tonumber(gtn.input[name] or "0") or 0
+end
+
+local function boolean(name)
+    return gtn.input[name] == "1"
+end
+
 local function add_helper(out, id)
     if #out < MAX_HELPERS then
         out[#out + 1] = id
     end
 end
 
-function traits.evaluate(snapshot)
+local function traits_evaluate()
     local helpers = {}
     local bonuses = {}
+    local failed = number("failed_guesses")
+    local correct = number("correct_guesses")
+    local best_streak = number("best_streak")
+    local current_streak = number("current_streak")
+    local prestige = number("prestige_count")
+    local ultra = number("ultra_count")
 
-    if snapshot.failed_guesses >= 3 then
-        add_helper(helpers, "mistake_insurance")
-    end
-    if snapshot.failed_guesses >= 5 and snapshot.correct_guesses >= 10 then
-        add_helper(helpers, "range_scout")
-    end
-    if snapshot.best_streak >= 10 then
-        add_helper(helpers, "streak_guard")
-    end
-    if snapshot.failed_guesses >= 6 and snapshot.correct_guesses > 0 then
-        add_helper(helpers, "comeback_reward")
-    end
-    if snapshot.current_streak >= 5 then
-        add_helper(helpers, "momentum_reward")
-    end
+    if failed >= 3 then add_helper(helpers, "mistake_insurance") end
+    if failed >= 5 and correct >= 10 then add_helper(helpers, "range_scout") end
+    if best_streak >= 10 then add_helper(helpers, "streak_guard") end
+    if failed >= 6 and correct > 0 then add_helper(helpers, "comeback_reward") end
+    if current_streak >= 5 then add_helper(helpers, "momentum_reward") end
 
-    if snapshot.prestige_count >= 1 and not snapshot.first_prestige_awarded then
+    if prestige >= 1 and not boolean("first_prestige_awarded") then
         bonuses[#bonuses + 1] = "first_prestige_bonus"
     end
-    if snapshot.ultra_count >= 1 and not snapshot.first_ultra_awarded then
+    if ultra >= 1 and not boolean("first_ultra_awarded") then
         bonuses[#bonuses + 1] = "first_ultra_bonus"
     end
-    if snapshot.prestige_count >= 10 and not snapshot.veteran_awarded then
+    if prestige >= 10 and not boolean("veteran_awarded") then
         bonuses[#bonuses + 1] = "veteran_bonus"
     end
 
@@ -45,3 +49,5 @@ function traits.evaluate(snapshot)
         bonuses = bonuses
     }
 end
+
+return traits_evaluate()
