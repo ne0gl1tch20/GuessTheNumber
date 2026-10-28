@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "version": "5a92b60fca096dc22b674713f34b01e6da0b1c32",
+  "version": "7543598b9c4f5548b1c0871b9f79f4edfd09b6a7",
   "minAppVersionCode": 21,
   "files": [
     {
       "path": "web-play/app.js",
-      "sha256": "93555435b3ac0e7055f017131344e96d0293d1af8aabd512ea3a9ea49188623a"
+      "sha256": "999931ed7384cd1ab523e59b99549c9562a48be75283e427ae2475e51b7914c1"
     },
     {
       "path": "web-play/icons/guess-the-number.svg",
@@ -165,7 +165,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/README.md",
-      "sha256": "11854ba2003afc85e6f370290a57f0170f9230d6944f4ba4d231a5fde43c1b97"
+      "sha256": "59f9e7d3eb2af81aa77bfb367b958e28dddb5a88fb450fdcd7f08b9ce4f9622b"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/demo.js",
@@ -181,7 +181,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-dom-utils.js",
-      "sha256": "80594f72d4568ddc595ed470bba31277b53e33f17676e0669c90e093310e7df9"
+      "sha256": "62c34fb7926ebb036578f068f7c83809f7ae84d413eeec38a5c56d687d08bf37"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-host.js",
