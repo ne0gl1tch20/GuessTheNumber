@@ -39,6 +39,7 @@ import com.jarrlyyy.guessthenumber.domain.model.LiveOpsClaimDefinition
 import com.jarrlyyy.guessthenumber.domain.model.LiveOpsClaimPolicy
 import com.jarrlyyy.guessthenumber.domain.model.RandomEventEngine
 import com.jarrlyyy.guessthenumber.scripting.LuaRandomEventSelector
+import com.jarrlyyy.guessthenumber.scripting.LuaInvisibleTraitSelector
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
@@ -103,6 +104,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
     private val randomEventEngine = RandomEventEngine()
     private val luaRandomEventSelector by lazy { LuaRandomEventSelector(getApplication<Application>()) }
+    private val luaInvisibleTraitSelector by lazy { LuaInvisibleTraitSelector(getApplication<Application>()) }
     private val commandExecutor = CommandExecutor()
     private val backgroundMusicManager = BackgroundMusicManager(application)
 
@@ -488,7 +490,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         com.jarrlyyy.guessthenumber.traits.TraitGameplayRuntime.apply(
             stateBefore = state,
             guess = guess,
-            result = gameEngine.processGuess(state, guess)
+            result = gameEngine.processGuess(state, guess),
+            adaptiveDecisionProvider = luaInvisibleTraitSelector::evaluate
         )
 
     /**
