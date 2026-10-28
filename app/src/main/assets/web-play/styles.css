@@ -1315,6 +1315,10 @@ body.jui-game-compat .jui-dialog-actions { display:flex; flex-wrap:wrap; gap:.55
 .gtn-vue-canvas-effects{position:fixed;inset:0;z-index:10000;pointer-events:none;overflow:hidden;contain:strict}
 .gtn-vue-canvas-effects__canvas{display:block;width:100%;height:100%;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.gtn-vue-canvas-effects{display:none}}
+/* Play controls now live in the regular dashboard flow instead of a cramped fixed drawer. */
+.play-controls-drawer{position:static;margin:12px 0 16px}
+.play-controls-drawer>summary{display:none}
+.play-controls-drawer-content{display:contents}
 /* Nebula guessing-bot arena and accessible pull-up controls drawer */
 .bot-arena-card{position:relative;overflow:hidden;border:1px solid rgba(130,145,255,.22);border-radius:26px;padding:16px;margin:12px 0;background:linear-gradient(145deg,rgba(22,29,54,.96),rgba(9,14,30,.98));box-shadow:0 18px 45px rgba(0,0,0,.22)}
 .bot-arena-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.bot-arena-heading h2{margin:4px 0 0;font-size:20px;font-weight:900;letter-spacing:-.04em}.bot-arena-stage{position:relative;min-height:190px;border:1px solid rgba(146,164,255,.14);border-radius:20px;overflow:hidden;background:radial-gradient(ellipse at 50% 110%,rgba(83,100,210,.28),transparent 65%),linear-gradient(180deg,#0d142a,#080d1c)}
