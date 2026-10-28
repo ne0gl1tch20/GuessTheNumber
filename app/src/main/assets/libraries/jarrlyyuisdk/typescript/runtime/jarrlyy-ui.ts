@@ -353,7 +353,7 @@ type JarrlyyUIMotionApi = Readonly<{
     $$("[data-jui-dropzone]").forEach((zone) => {
       if (zone.dataset.juiDropzoneReady) return;
       zone.dataset.juiDropzoneReady = "true";
-      const input = $$<HTMLInputElement>("input[type=file]", zone);
+      const input = $<HTMLInputElement>("input[type=file]", zone);
       const status = $("[data-jui-drop-status]", zone);
       const showFiles = (files: FileList | null | undefined) => {
         if (!status) return;
