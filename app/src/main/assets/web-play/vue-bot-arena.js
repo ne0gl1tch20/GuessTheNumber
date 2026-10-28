@@ -23,6 +23,7 @@ const component={
  methods:{
   resize(){if(!this.canvas||!this.context)return;const r=mount.getBoundingClientRect();this.width=Math.max(1,r.width);this.height=Math.max(1,r.height);const dpr=Math.min(2,Math.max(1,window.devicePixelRatio||1));this.canvas.width=Math.round(this.width*dpr);this.canvas.height=Math.round(this.height*dpr);this.context.setTransform(dpr,0,0,dpr,0,0);this.draw();},
   onVisibility(){if(document.hidden&&this.frame){cancelAnimationFrame(this.frame);this.frame=0;}else this.draw();},
+  roundedRect(c,x,y,w,h,r){if(typeof c.roundRect==='function')c.roundRect(x,y,w,h,r);else c.rect(x,y,w,h)},
   acceptState(next){
    const oldSequence=this.state.sequence;this.state={...this.state,...next};
    if(this.state.sequence!==oldSequence&&this.state.guess&&this.state.active&&!this.state.reducedMotion&&!document.hidden){this.displayGuess='';this.typingIndex=0;this.typingStartedAt=0;this.animate();}
@@ -51,16 +52,16 @@ const component={
     const color=bot.id==='bot_byte'?'#53e0b3':bot.id==='bot_pixel'?'#ffb86b':'#a99aff';
     c.save();c.translate(x,baseY+bob);
     c.fillStyle='rgba(0,0,0,.22)';c.beginPath();c.ellipse(0,35,27,6,0,0,Math.PI*2);c.fill();
-    c.fillStyle=color;c.beginPath();c.roundRect(-22,-31,44,42,12);c.fill();
-    c.fillStyle='#10172c';c.beginPath();c.roundRect(-16,-24,32,21,7);c.fill();
+    c.fillStyle=color;c.beginPath();this.roundedRect(c,-22,-31,44,42,12);c.fill();
+    c.fillStyle='#10172c';c.beginPath();this.roundedRect(c,-16,-24,32,21,7);c.fill();
     c.fillStyle='#dff6ff';c.beginPath();c.arc(-7,-14,3,0,Math.PI*2);c.arc(7,-14,3,0,Math.PI*2);c.fill();
     c.strokeStyle=color;c.lineWidth=4;c.beginPath();c.moveTo(-15,11);c.lineTo(-20,22);c.moveTo(15,11);c.lineTo(20,22);c.stroke();
-    c.fillStyle=color;c.beginPath();c.roundRect(-16,13,10,18,4);c.roundRect(6,13,10,18,4);c.fill();
+    c.fillStyle=color;c.beginPath();this.roundedRect(c,-16,13,10,18,4);this.roundedRect(c,6,13,10,18,4);c.fill();
     c.strokeStyle=color;c.lineWidth=3;c.beginPath();c.moveTo(0,-31);c.lineTo(0,-40);c.stroke();c.beginPath();c.arc(0,-43,3,0,Math.PI*2);c.fill();
     c.fillStyle='#e8edff';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText(bot.name||bot.id,0,48);
     if(isActive){
      const text=this.displayGuess||'…',bubbleW=Math.max(52,Math.min(120,text.length*9+20)),bubbleY=-66;
-     c.fillStyle='#f3f5ff';c.beginPath();c.roundRect(-bubbleW/2,bubbleY,bubbleW,22,8);c.fill();
+     c.fillStyle='#f3f5ff';c.beginPath();this.roundedRect(c,-bubbleW/2,bubbleY,bubbleW,22,8);c.fill();
      c.fillStyle='#171d35';c.font='bold 11px monospace';c.fillText(this.typingIndex<String(this.state.guess||'').length?'⌨ '+text:text,0,bubbleY+15);
      c.fillStyle='#f3f5ff';c.beginPath();c.moveTo(-4,bubbleY+22);c.lineTo(3,bubbleY+22);c.lineTo(0,bubbleY+28);c.fill();
      if(this.typingIndex>=String(this.state.guess||'').length&&this.state.feedback){c.fillStyle=this.state.feedback==='CORRECT'?'#63f5a4':this.state.feedback==='TOO_LOW'?'#62e8ff':'#ffb86b';c.font='bold 9px sans-serif';c.fillText(this.state.feedback.replace('_',' '),0,-75);}
