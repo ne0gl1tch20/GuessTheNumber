@@ -48,6 +48,8 @@ const html = fs.readFileSync(path.join(__dirname, '../app/src/main/assets/web-pl
 assert.ok(html.indexOf('jarrlyy-ui-dom-utils.js') < html.indexOf('app.js'), 'utility loads before app.js');
 assert.ok(!/function\s+humanize\s*\(/.test(app), 'humanize implementation lives in the SDK');
 assert.ok(!/function\s+setIconButtonLabel\s*\(/.test(app), 'icon button implementation lives in the SDK');
+assert.ok(!/function\s+setTextContent\s*\(/.test(app), 'text helper implementation lives in the SDK');
 assert.ok(app.includes('JarrlyyUIDOM.humanize('));
 assert.ok(app.includes('JarrlyyUIDOM.setIconButtonLabel('));
+assert.ok(app.includes('JarrlyyUIDOM.setTextContent('));
 console.log('Jarrlyy UI DOM utility tests passed.');
