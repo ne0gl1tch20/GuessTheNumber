@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
 
-const source = fs.readFileSync("app/src/main/assets/web-play/vue-canvas-effects.js", "utf8");
+const source = fs.readFileSync("app/src/main/assets/libraries/jarrlyyuisdk/components/jarrlyy-particle-effects.js", "utf8");
 const listeners = new Map();
 const calls = { fillRect: 0, clearRect: 0, cancel: 0, resizeDisconnect: 0 };
 const rafQueue = new Map();
@@ -43,7 +43,7 @@ const document = {
   hidden: false,
   documentElement: { clientWidth: 320, clientHeight: 640 },
   body: {},
-  getElementById(id) { return id === "gtnVueCanvasEffects" ? mount : null; },
+  querySelector(selector) { return selector === "[data-jarrlyy-particle-effects]" ? mount : null; },
   addEventListener(type, fn) {
     const list = documentListeners.get(type) || [];
     list.push(fn);
@@ -96,12 +96,12 @@ const context = {
   },
   console,
 };
-vm.runInNewContext(source, context, { filename: "vue-canvas-effects.js" });
-assert.equal(window.gtnVueCanvasEffectsReady, true, "Vue effect layer should mount");
+vm.runInNewContext(source, context, { filename: "jarrlyy-particle-effects.js" });
+assert.equal(window.jarrlyyParticleEffectsReady, true, "Vue effect layer should mount");
 assert.equal(canvas.width, 640, "drawing buffer should cap DPR at 2");
 assert.equal(canvas.height, 1280, "drawing buffer should cap DPR at 2");
 
-window.dispatchEvent({ type: "gtn:canvas-burst", detail: { x: 90, y: 120 } });
+window.dispatchEvent({ type: "jarrlyy:particle-burst", detail: { x: 90, y: 120 } });
 assert.ok(rafQueue.size > 0, "burst should schedule a frame");
 const [frameId, frame] = rafQueue.entries().next().value;
 rafQueue.delete(frameId);
@@ -125,22 +125,22 @@ const version = fs.readFileSync("app/src/main/assets/libraries/vue/VERSION.txt",
 const styles = fs.readFileSync("app/src/main/assets/web-play/styles.css", "utf8");
 const vueTag = html.indexOf('src="../libraries/vue/vue.global.prod.js"');
 const adapterTag = html.indexOf('src="vue-jarrlyy-adapter.js"');
-const effectsTag = html.indexOf('src="vue-canvas-effects.js"');
+const effectsTag = html.indexOf('src="../libraries/jarrlyyuisdk/components/jarrlyy-particle-effects.js"');
 const appTag = html.indexOf('src="app.js"');
 assert.ok(vueTag >= 0 && adapterTag > vueTag && effectsTag > adapterTag && appTag > effectsTag, "Vue runtime, SDK adapter and Canvas module must load before app.js");
 assert.match(html, /script-src 'self'/, "script CSP must stay local-only");
 assert.match(html, /connect-src 'none'/, "runtime network access must remain disabled");
 assert.match(vueRuntime, /vue v3\.5\.22/i, "vendored runtime must match the pinned Vue version");
 assert.match(version, /Vue 3\.5\.22/, "runtime version metadata must match");
-assert.match(html, /id="gtnVueCanvasEffects"/, "Canvas layer mount point must exist");
+assert.match(html, /data-jarrlyy-particle-effects/, "Canvas layer mount point must exist");
 assert.doesNotMatch(html, /cdn\.jsdelivr\.net|unpkg\.com/i, "Vue must not be loaded from a CDN");
-assert.match(html, /id="gtnVueCanvasEffects"[^>]*aria-hidden="true"/, "Canvas layer must be hidden from assistive technology");
-assert.match(styles, /\.gtn-vue-canvas-effects\{[^}]*pointer-events:none/, "Canvas must not block UI input");
+assert.match(html, /data-jarrlyy-particle-effects[^>]*aria-hidden="true"/, "Canvas layer must be hidden from assistive technology");
+assert.match(styles, /\.jarrlyy-particle-effects\{[^}]*pointer-events:none/, "Canvas must not block UI input");
 assert.match(styles, /prefers-reduced-motion:reduce/, "Canvas layer must honor reduced-motion preferences");
 assert.match(source, /if\(reducedMotion\(\)\|\|document\.hidden\|\|!this\.context\)return/, "Canvas animation must skip reduced-motion, hidden and unsupported states");
 
 const noVueWindow = {};
-const noVueDocument = { getElementById: () => ({}) };
+const noVueDocument = { querySelector: () => ({}) };
 vm.runInNewContext(source, { window: noVueWindow, document: noVueDocument });
 assert.equal(noVueWindow.gtnVueCanvasEffectsReady, false, "missing Vue should fail closed to the legacy celebration");
 
