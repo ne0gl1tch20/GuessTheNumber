@@ -48,6 +48,22 @@ class InvisibleTraitEngineTest {
     }
 
     @Test
+    fun kotlinRejectsIneligibleScriptIntents() {
+        val requested = InvisibleTraitEngine.Decision(
+            helperIds = setOf(
+                InvisibleTraitEngine.HELPER_MISTAKE_INSURANCE,
+                InvisibleTraitEngine.HELPER_RANGE_SCOUT
+            ),
+            bonusIds = setOf(InvisibleTraitEngine.BONUS_FIRST_PRESTIGE)
+        )
+
+        val validated = InvisibleTraitEngine.validateDecision(GameState(), requested)
+
+        assertTrue(validated.helperIds.isEmpty())
+        assertTrue(validated.bonusIds.isEmpty())
+    }
+
+    @Test
     fun gameplayRulePersistsProfileThroughGuessTransition() {
         val before = GameState(targetNumber = 50L, currentRangeMin = 1L, currentRangeMax = 100L)
         val raw = GuessResult(
