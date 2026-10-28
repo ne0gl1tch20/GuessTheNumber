@@ -1020,6 +1020,7 @@ fun ProductionWebPlayScreen(
                                             .put("prestige", game.prestige.format())
                                             .put("ultra", game.ultra.format())
                                             .put("nebula", game.nebula.format())
+                                            .put("autoClickerActive", game.autoClickerActive)
                                             .put("lastBotGuess", game.lastBotGuess?.toString() ?: "")
                                             .put("lastBotFeedback", game.lastBotFeedback ?: "")
                                             .put("lastBotId", game.lastBotId ?: "")
