@@ -1,4 +1,4 @@
-/* Jarrlyy UI SDK · optional interactive component layer */
+/* Generated from typescript/runtime/jarrlyy-ui-advanced.ts by TypeScript. */
 (function (global) {
   "use strict";
   const doc = global.document;
@@ -157,7 +157,7 @@
       button.addEventListener("click", () => {
         const banner = button.closest(".jui-banner");
         if (!banner) return;
-        banner.dispatchEvent(new global.CustomEvent("jui:dismiss", { bubbles: true }));
+        emit(banner, "jui:dismiss");
         banner.remove();
       });
     });
@@ -187,8 +187,9 @@
   }
 
   function setProgress(node, value) {
-    if (!node) return;
-    const progress = Math.max(0, Math.min(100, Number(value) || 0));
+    if (!node) return null;
+    const numeric = Number(value);
+    const progress = Math.max(0, Math.min(100, Number.isFinite(numeric) ? numeric : 0));
     node.style.setProperty("--jui-progress-value", String(progress));
     node.setAttribute("role", "progressbar");
     node.setAttribute("aria-valuemin", "0");
@@ -196,6 +197,7 @@
     node.setAttribute("aria-valuenow", String(progress));
     const label = $(".jui-circular-progress-value", node);
     if (label) label.textContent = Math.round(progress) + "%";
+    return progress;
   }
 
   function init() {
