@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "5b35427798ef51e363ad2c453d1f97e90a3867d1",
+  "version": "2867630bfb0e8c2a8944410313e6097a1c671898",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -224,6 +224,10 @@
       "sha256": "142144839e00501f661fae7a604513fc45b6fcc551b92a8220b91f38568f0f36"
     },
     {
+      "path": "libraries/jarrlyyuisdk/typescript/src/advanced-utils.ts",
+      "sha256": "a6b0ccd81885946eb25ad0b89688a8ddc2fcd388abbeb7002e9d61e52a280f92"
+    },
+    {
       "path": "libraries/jarrlyyuisdk/typescript/src/dom-utils.ts",
       "sha256": "310ad3173d43ce921b328f232ed8972c26185b75d420d0c7c8de60af3428d21a"
     },
@@ -233,7 +237,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/typescript/src/index.ts",
-      "sha256": "7223fd6e3812cb9a11d9d0b18a641bbca57a1e606b34044145ecf907695ce41d"
+      "sha256": "4bb2928efa507455d955f308a79b2e19d0c60796381cfe3b3ee0c6f236b59741"
     },
     {
       "path": "libraries/jarrlyyuisdk/typescript/tsconfig.json",
