@@ -29,6 +29,23 @@ class LuaInvisibleTraitSelectorTest {
     }
 
     @Test
+    fun instructionBudgetFailureFallsBackToKotlinPolicy() {
+        val state = GameState(
+            traitProfile = TraitProfile(
+                totalGuessesObserved = 3L,
+                failedGuessesObserved = 3L
+            )
+        )
+
+        val decision = LuaInvisibleTraitSelector.evaluateWithSource(
+            state = state,
+            loadSource = { "while true do local x = 1 + 1 end" }
+        )
+
+        assertTrue(InvisibleTraitEngine.HELPER_MISTAKE_INSURANCE in decision.helperIds)
+    }
+
+    @Test
     fun LuaOutputIsFilteredAndHelperCountIsBounded() {
         val decision = LuaInvisibleTraitSelector.evaluateWithSource(
             state = GameState(),
