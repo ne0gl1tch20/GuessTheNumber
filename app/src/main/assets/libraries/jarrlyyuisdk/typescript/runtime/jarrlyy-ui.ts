@@ -198,7 +198,7 @@ type JarrlyyUIMotionApi = Readonly<{
         const items = $$<HTMLButtonElement>("button:not(:disabled)", menu);
         if (!items.length) return;
         if (event.key === "Tab") { close(); return; }
-        const current = items.indexOf(doc.activeElement);
+        const current = items.indexOf(doc.activeElement as HTMLButtonElement);
         let next = current;
         if (event.key === "ArrowDown") next = current < 0 ? 0 : (current + 1) % items.length;
         else if (event.key === "ArrowUp") next = current < 0 ? items.length - 1 : (current - 1 + items.length) % items.length;
