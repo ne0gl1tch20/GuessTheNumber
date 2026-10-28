@@ -1439,3 +1439,6 @@ body.jui-game-compat .jui-dialog-actions { display:flex; flex-wrap:wrap; gap:.55
 }
 
 .about-update-progress{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.035)}.about-update-progress-head{font-size:11px;line-height:1.55;color:var(--muted);overflow-wrap:anywhere;margin-bottom:9px}.about-update-progress-track{height:8px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.09)}.about-update-progress-track span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .18s ease}
+
+@keyframes about-update-indeterminate{0%{transform:translateX(-110%)}100%{transform:translateX(320%)}}.about-update-progress-track span.is-indeterminate{width:38%;animation:about-update-indeterminate 1.25s ease-in-out infinite;transition:none}
+@media(prefers-reduced-motion:reduce){.about-update-progress-track span.is-indeterminate{animation:none;width:100%;opacity:.75}}
