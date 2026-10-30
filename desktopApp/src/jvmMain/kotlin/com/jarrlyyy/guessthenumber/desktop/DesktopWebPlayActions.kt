@@ -105,8 +105,12 @@ internal object DesktopWebPlayActions {
             is Boolean, is Number -> rawValue.toString()
             else -> null
         }
-        fun boolean(): Boolean? = rawValue as? Boolean
-        fun decimal(): Float? = (rawValue as? Number)?.toFloat()?.takeIf { it.isFinite() && it in 0f..1f }
+        fun boolean(): Boolean? = when (rawValue) {
+            is Boolean -> rawValue
+            is String -> when (rawValue.lowercase()) { "true" -> true; "false" -> false; else -> null }
+            else -> null
+        }
+        fun decimal(): Float? = text()?.toFloatOrNull()?.takeIf { it.isFinite() && it in 0f..1f }
         val value = text() ?: return null
         return when (key) {
             "musicEnabled" -> boolean()?.let { settings.copy(musicEnabled = it) }
