@@ -16,25 +16,29 @@ val appLogoPng = rootProject.file("GTN_APP_LOGO.png")
 val generatedDesktopResources = layout.buildDirectory.dir("generated/desktopLogoResources")
 val generatedWindowsIcon = layout.buildDirectory.file("generated/windowsIcon/GTN_APP_LOGO.ico")
 val generatedDesktopBuildConfig = layout.buildDirectory.dir("generated/desktopBuildConfig")
+val desktopDebugToolsBuildAllowed = providers.gradleProperty("gtn.desktop.debugToolsBuild")
+    .map { it.equals("true", ignoreCase = true) }
+    .orElse(false)
+val desktopLiveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl")
+    .orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-LiveOps/main/manifest.json")
+val desktopLiveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64")
+    .map { value -> value.filterNot(Char::isWhitespace) }
+    .orElse("")
 val generateDesktopBuildConfig = tasks.register("generateDesktopBuildConfig") {
     val outputFile = generatedDesktopBuildConfig.map { it.file("desktop-build.properties") }
+    inputs.property("debugToolsBuildAllowed", desktopDebugToolsBuildAllowed)
+    inputs.property("liveOpsManifestUrl", desktopLiveOpsManifestUrl)
+    inputs.property("liveOpsPublicKeyBase64", desktopLiveOpsPublicKey)
     outputs.file(outputFile)
     doLast {
-        val allowDeveloperTools = providers.gradleProperty("gtn.desktop.debugToolsBuild")
-            .orElse("false").get().equals("true", ignoreCase = true)
-        val liveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl")
-            .orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-LiveOps/main/manifest.json").get()
-        val liveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64")
-            .orElse("").get().filterNot(Char::isWhitespace)
-        outputFile.get().asFile.apply {
-            parentFile.mkdirs()
-            writeText(
-                "debugToolsBuildAllowed=$allowDeveloperTools\n" +
-                    "liveOpsManifestUrl=$liveOpsManifestUrl\n" +
-                    "liveOpsPublicKeyBase64=$liveOpsPublicKey\n" +
-                    "appVersionCode=24\n"
-            )
-        }
+        val output = outputFile.get().asFile
+        output.parentFile.mkdirs()
+        output.writeText(
+            "debugToolsBuildAllowed=${desktopDebugToolsBuildAllowed.get()}\n" +
+                "liveOpsManifestUrl=${desktopLiveOpsManifestUrl.get()}\n" +
+                "liveOpsPublicKeyBase64=${desktopLiveOpsPublicKey.get()}\n" +
+                "appVersionCode=24\n"
+        )
     }
 }
 
