@@ -64,6 +64,7 @@ fun DesktopSettingsScreen(
     onResetData: () -> Unit,
     navigationPosition: DesktopNavigationPosition,
     onNavigationPositionChange: (DesktopNavigationPosition) -> Unit,
+    onGlobalPreferencesImported: () -> Unit = {},
     onBack: () -> Unit
 ) {
     val settings = state.settings
@@ -317,7 +318,8 @@ fun DesktopSettingsScreen(
                             val imported = withContext(Dispatchers.IO) {
                                 runCatching { DesktopGlobalPreferencesBackup.importBundle(Files.readAllBytes(source)) }.getOrDefault(false)
                             }
-                            backupStatus = if (imported) "Global preferences restored. Reopen the profile or navigation screen to refresh it." else "Backup rejected. Existing preferences were kept."
+                            if (imported) onGlobalPreferencesImported()
+                            backupStatus = if (imported) "Global preferences restored." else "Backup rejected. Existing preferences were kept."
                         }
                     }
                 }) { Text("Import backup") }
