@@ -15,15 +15,14 @@ import java.util.zip.ZipOutputStream
 
 class WindowsDebugUpdateTest {
     @Test
-    fun discoversNewerBuildFromPublicDebugLatestRelease() {
+    fun discoversNewestSuccessfulMasterActionsArtifact() {
         val update = clientForRun(6).findLatestUpdate("1.0.5")
         assertNotNull(update)
         assertEquals("1.0.6", update?.version)
-        assertEquals("windows-debug-6-1", update?.tagName)
-        assertEquals("$RELEASE_DOWNLOAD_PREFIX$ARCHIVE_NAME", update?.downloadUrl)
-        assertEquals("$RELEASE_DOWNLOAD_PREFIX$MANIFEST_NAME", update?.manifestUrl)
+        assertEquals("windows-debug-6-2", update?.tagName)
+        assertEquals("$ARTIFACT_DOWNLOAD_PREFIX/600", update?.artifactDownloadUrl)
         assertEquals(6L, update?.runNumber)
-        assertEquals(1L, update?.runAttempt)
+        assertEquals(2L, update?.runAttempt)
     }
 
     @Test
@@ -33,9 +32,11 @@ class WindowsDebugUpdateTest {
     }
 
     @Test
-    fun rejectsManifestWithUnexpectedAssetUrlOrInvalidTag() {
+    fun skipsExpiredArtifactAndOlderRuns() {
         val responses = standardResponses(6).toMutableMap()
-        responses[MANIFEST_URL] = manifest(6).replace("windows-debug-6-1", "windows-debug-5-1")
+        responses[ARTIFACTS_URL] = """{"artifacts":[
+            {"name":"GuessTheNumber-Windows-Debug","expired":true,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX/600"}
+        ]}"""
         val client = WindowsDebugUpdateClient { url ->
             StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
         }
@@ -120,15 +121,15 @@ class WindowsDebugUpdateTest {
     }
 
     private fun standardResponses(runNumber: Long): Map<String, String> = mapOf(
-        RELEASE_API to """{"assets":[
-            {"name":"$ARCHIVE_NAME","browser_download_url":"$RELEASE_DOWNLOAD_PREFIX$ARCHIVE_NAME"},
-            {"name":"$MANIFEST_NAME","browser_download_url":"$RELEASE_DOWNLOAD_PREFIX$MANIFEST_NAME"}
+        WORKFLOW_RUNS_URL to """{"workflow_runs":[
+            {"id":600,"run_number":$runNumber,"run_attempt":2,"event":"push","head_branch":"master","status":"completed","conclusion":"success"},
+            {"id":599,"run_number":5,"run_attempt":1,"event":"push","head_branch":"master","status":"completed","conclusion":"success"},
+            {"id":598,"run_number":7,"run_attempt":1,"event":"pull_request","head_branch":"feature","status":"completed","conclusion":"success"}
         ]}""",
-        MANIFEST_URL to manifest(runNumber)
+        ARTIFACTS_URL to """{"artifacts":[
+            {"name":"GuessTheNumber-Windows-Debug","expired":false,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX/600"}
+        ]}"""
     )
-
-    private fun manifest(runNumber: Long) =
-        """{"channel":"windows-debug","version":"1.0.$runNumber","runNumber":"$runNumber","runAttempt":"1","commit":"0123456789abcdef0123456789abcdef01234567","assetName":"$ARCHIVE_NAME","sha256":"${"a".repeat(64)}","tag":"windows-debug-$runNumber-1"}"""
 
     private fun createZip(vararg entries: Pair<String, ByteArray>): java.nio.file.Path {
         val path = Files.createTempFile("gtn-test-", ".zip")
@@ -151,12 +152,11 @@ class WindowsDebugUpdateTest {
     }
 
     private companion object {
-        const val RELEASE_API =
-            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/releases/tags/debug-latest"
-        const val RELEASE_DOWNLOAD_PREFIX =
-            "https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/debug-latest/"
-        const val ARCHIVE_NAME = "GuessTheNumber-Windows-Desktop.zip"
-        const val MANIFEST_NAME = "windows-debug-manifest.json"
-        const val MANIFEST_URL = "$RELEASE_DOWNLOAD_PREFIX$MANIFEST_NAME"
+        const val WORKFLOW_RUNS_URL =
+            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/workflows/windows-desktop.yml/runs?branch=master&status=success&per_page=20"
+        const val ARTIFACTS_URL =
+            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/runs/600/artifacts"
+        const val ARTIFACT_DOWNLOAD_PREFIX =
+            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/runs/600/artifacts"
     }
 }
