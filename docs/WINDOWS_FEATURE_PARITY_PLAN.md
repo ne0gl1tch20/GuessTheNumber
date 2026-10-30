@@ -156,7 +156,8 @@ The port is complete only when every Android player-facing screen and reachable 
 - [ ] Verify mastery effects, all progression routes and Endless Rift interactions in a current Windows runtime.
 - [x] Add bundled Lua activity discovery/execution for the canonical `scripts/manifest.json` catalog, with source-size and instruction budgets, strict output validation, and no save/currency/reward/filesystem/network host capabilities.
 - [x] Port signed HTTPS LiveOps bundle refresh, RSA signature verification, app/host compatibility checks, script SHA-256 validation, staged atomic activation, high-water version protection, verified cache reads and rollback to a prior verified bundle. Remote scripts use the same restricted Lua sandbox and fail closed when no public key is configured.
-- [ ] Complete feature-flagged LiveOps event presentation, eligibility checks and Kotlin-owned reward claims on Windows.
+- [x] Add feature-flagged LiveOps event presentation from the canonical Android manifest, date/status refresh, progression requirement display and active-save reward claims through the shared Kotlin `LiveOpsClaimPolicy`; refresh flags and recheck event window/eligibility at claim time.
+- [ ] Add remote signed event-manifest delivery (current signed LiveOps transport covers Lua scripts; events currently use the canonical bundled manifest).
 - [ ] Verify locked/unlocked/completed states, explanatory requirements and localized feedback.
 
 **Exit:** Player-facing progression systems are accessible and state-consistent on Windows.
@@ -168,7 +169,8 @@ The port is complete only when every Android player-facing screen and reachable 
 - [ ] Verify all five minigame win/loss outcomes, localization, reward multipliers and save/reload on Windows.
 - [x] Add the bundled Number Rush Lua activity to the Windows Activity Hub with Android-equivalent payload limits, one-answer lifecycle and Kotlin-owned UI state.
 - [x] Add verified remote LiveOps script discovery/refresh to the Activity Hub; signed bundles are HTTPS-only, hash-checked and rollback-protected.
-- [ ] Complete shared event feature flags, event presentation, eligibility validation and reward claims.
+- [x] Connect the canonical `feature_flags.json` and LiveOps event manifest to a Windows event screen; claims use the shared Android/Windows Kotlin policy and active-slot persistence.
+- [ ] Add signed remote event-manifest delivery and verify Windows runtime parity.
 - [ ] Verify offline event availability, reward validation and missing optional content/audio failure behavior.
 
 **Exit:** Supported activities work offline, and scripted content cannot bypass Kotlin-owned reward/state validation.
@@ -329,7 +331,7 @@ This inventory was checked against Android sources on 2026-10-15 and records the
 | Arcade | Stage 3 | Not implemented on Windows; rewards must go through validated game-state actions. |
 | Activity Hub (`lua_hub`) | Stage 3 | Not implemented on Windows; Android gates it with the Lua scripting feature flag. |
 | Lucky Stake | Stage 3 | Not implemented on Windows; settlement must preserve authoritative economy rules. |
-| Live Ops (`live_ops` route) | Stage 3 | Separate NavGraph route, not a `Screen.kt` object; Android gates it with Live Ops and seasonal-reward flags. Not implemented on Windows. |
+| Live Ops (`live_ops` route) | Stage 3 | Separate route; Windows now reads the canonical event manifest and feature flags, displays event windows/requirements/claim counts and persists claims through the shared Kotlin policy. Signed remote event-manifest delivery and runtime parity remain open. |
 | Settings | Stage 4 | Not implemented on Windows; desktop-native equivalents are required rather than copying Android APIs. |
 | Save Slots | Stage 4 | Not implemented on Windows. Android's source defines 10 slots, active-slot selection, slot metadata, backup/recovery and legacy-save migration. |
 | Music Player | Stage 4 | Not implemented on Windows; confirm desktop audio support and document any approved platform difference. |
