@@ -136,6 +136,8 @@ function updateLivePlaytime(){if(!lastState)return;const node=$('statPlaytime');
 function renderMusicPlayer(s){
  const music=s.musicPlayer||{},library=Array.isArray(music.library)?music.library:[],queue=Array.isArray(music.queue)?music.queue:[],playlists=music.playlists&&typeof music.playlists==='object'?music.playlists:{};
  const current=library.find(track=>track.id===music.currentTrackId);
+ const status=$('musicPlayerStatus');
+ if(status)status.textContent=music.status||uiText('music_player_status','Your music preference is saved with your game.');
  const title=$('musicCurrentTitle'),artist=$('musicCurrentArtist'),play=$('musicPlayPause'),seek=$('musicSeek'),time=$('musicTime');
  if(title)title.textContent=current?.title||uiText('music_no_track','No track selected');
  if(artist)artist.textContent=current?[current.artist,current.album].filter(Boolean).join(' · '):uiText('music_empty_library','Your music library is empty. Add audio from this device to get started.');
