@@ -304,10 +304,10 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
         val cspMeta = Regex("""(?i)<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]*>""")
             .find(original)
             ?: throw IOException("Shared web UI index.html has no Content Security Policy.")
-        val scriptTag = "<script src=\\"desktop-host.js\\"></script>"
+        val scriptTag = """<script src="desktop-host.js"></script>"""
         val patched = original.replaceRange(
             cspMeta.range,
-            cspMeta.value + "\\n  " + scriptTag
+            cspMeta.value + System.lineSeparator() + "  " + scriptTag
         )
         Files.writeString(index, patched)
         return index
