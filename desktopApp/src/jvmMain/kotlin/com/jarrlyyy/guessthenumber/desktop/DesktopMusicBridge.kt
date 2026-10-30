@@ -21,7 +21,7 @@ import kotlin.math.log10
 internal object DesktopMusicBridge {
     private val preferences = Preferences.userRoot().node("GuessTheNumber/music")
     private var clip: Clip? = null
-    private var currentPath: String? = null
+    private var currentPath: String? = preferences.get("currentPath", null)
     private var paused = false
     private var shuffle = preferences.getBoolean("shuffle", false)
     private var repeatMode = preferences.get("repeatMode", "OFF")
@@ -115,7 +115,7 @@ internal object DesktopMusicBridge {
                 }
                 "remove_track" -> {
                     val path = resolveTrack(settings, request.optString("trackId"))
-                    if (currentPath == path) stopPlayback()
+                    if (currentPath == path) { stopPlayback(); currentPath = null; preferences.remove("currentPath") }
                     persist(settings.copy(
                         musicLibraryPaths = settings.musicLibraryPaths - path,
                         musicQueuePaths = settings.musicQueuePaths - path,
@@ -219,6 +219,8 @@ internal object DesktopMusicBridge {
             stopPlayback()
             clip = next
             currentPath = path
+            preferences.put("currentPath", path)
+            preferences.flush()
             paused = false
             setVolume(volume)
             next.addLineListener { event ->
