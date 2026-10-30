@@ -60,6 +60,15 @@ fun DesktopSettingsScreen(
     val settings = state.settings
     var showResetDialog by remember { mutableStateOf(false) }
     var resetConfirmed by remember { mutableStateOf(false) }
+    var showFeatureTour by remember { mutableStateOf(false) }
+    var featureTourPage by remember { mutableStateOf(0) }
+    val featureTourPages = listOf(
+        "Play" to "Make guesses, follow feedback and build your streak. Your accepted actions are saved locally.",
+        "Upgrades and shop" to "Spend Money on upgrades and Nebula on permanent shop unlocks. Batch buying respects the shared economy rules.",
+        "Progression" to "Explore worlds, bosses, relics, mastery, achievements and the Codex as your save advances.",
+        "Activities and events" to "Arcade games, the Lua Activity Hub and seasonal events are optional. Rewards are validated by Kotlin before saving.",
+        "Saves and settings" to "Use ten local save slots, recovery backups and portable backup bundles. Tune appearance, audio and accessibility in Settings."
+    )
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
@@ -210,6 +219,17 @@ fun DesktopSettingsScreen(
             }
         }
 
+        SettingsCard("Windows Feature Tour") {
+            Text(
+                "Replay a short guide to the main game systems, progression, activities and save tools.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall
+            )
+            Button(onClick = { featureTourPage = 0; showFeatureTour = true }) {
+                Text("Replay feature tour")
+            }
+        }
+
         SettingsCard("Developer & Save Preferences") {
             SettingsSwitch("Save Logs to Storage", "Keep this preference aligned with the Android settings model.", settings.saveLogsToStorage) {
                 onUpdateSettings(settings.copy(saveLogsToStorage = it))
@@ -230,6 +250,32 @@ fun DesktopSettingsScreen(
                 enabled = !isSaving
             ) { Text("Reset All Game Data") }
         }
+    }
+
+    if (showFeatureTour) {
+        val page = featureTourPages[featureTourPage]
+        AlertDialog(
+            onDismissRequest = { showFeatureTour = false },
+            title = { Text("Feature tour · ${featureTourPage + 1} / ${featureTourPages.size}") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(page.first, style = MaterialTheme.typography.titleLarge)
+                    Text(page.second)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (featureTourPage == featureTourPages.lastIndex) {
+                        showFeatureTour = false
+                    } else {
+                        featureTourPage++
+                    }
+                }) { Text(if (featureTourPage == featureTourPages.lastIndex) "Finish" else "Next") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showFeatureTour = false }) { Text("Close tour") }
+            }
+        )
     }
 
     if (showResetDialog) {
