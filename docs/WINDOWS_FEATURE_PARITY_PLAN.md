@@ -196,6 +196,7 @@ The port is complete only when every Android player-facing screen and reachable 
 
 ### W7. Updates, packaging and release readiness
 
+- [ ] **Current gap:** `WindowsDebugUpdateClient` still discovers the `debug-latest` GitHub Release. Migrate it to the successful `Windows Desktop CI` run's `GuessTheNumber-Windows-Debug` artifact; the workflow already uploads the ZIP and manifest with seven-day retention. The updater must not treat the release asset as the authoritative debug source.
 - [ ] Keep debug update discovery/install separate from production releases.
 - [ ] **Windows Debug update source:** discover builds from the repository's Windows Desktop CI GitHub Actions workflow runs and their attached artifacts, not GitHub Releases.
 - [ ] **Windows Debug package format:** the CI artifact consumed by the updater must be a ZIP containing the built Windows MSI. Keep the artifact name, run number/attempt, commit SHA, package version and checksum metadata consistent and verifiable.
