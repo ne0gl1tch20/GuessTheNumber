@@ -93,7 +93,8 @@ class DesktopSharedWebAssetsTest {
         assertTrue(DesktopGameSection.CODEX.sharedHtmlScreen == "codex")
         assertTrue(DesktopGameSection.ENDGAME.sharedHtmlScreen == "journey")
         assertTrue(DesktopGameSection.STATS.sharedHtmlScreen == "stats")
-        assertTrue(DesktopGameSection.ARCADE.sharedHtmlScreen == "arcade")
+        // Arcade remains a native activity hub on both hosts until minigame launch/input contracts are shared.
+        assertTrue(DesktopGameSection.ARCADE.sharedHtmlScreen == null)
         assertTrue(DesktopGameSection.LUCKY_STAKE.sharedHtmlScreen == "stake")
         assertTrue(DesktopGameSection.SETTINGS.sharedHtmlScreen == "settings")
     }

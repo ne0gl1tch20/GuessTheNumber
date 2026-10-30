@@ -4,20 +4,30 @@
 
 **Starting point:** PR #256 merged the Upgrades and Shop route into Android's `app/src/main/assets/web-play/` bundle. Android's `ProductionWebPlayScreen` loads that bundle through Android WebView. A Windows JavaFX WebView host has now been added and is wired into Play, Upgrades and Shop. The remaining player screens and runtime/distribution verification are not complete.
 
+## Player-facing experience contract
+
+The app must feel like one game, not an Android edition and a separate Windows edition.
+
+- **First launch:** Choose Player Profile → Save Slots → Loading Save Data → the shared HTML app. The profile and save-selection steps may use platform-appropriate native layouts because they own identity/save selection and recovery, but they must preserve the same choices, labels, consequences and save rules.
+- **Returning launch:** restore the last active profile and save slot, show a clear loading state, then open the shared HTML app at the expected player destination.
+- **After loading:** every player-facing game screen uses the exact same canonical `app/src/main/assets/web-play/` HTML/CSS/JavaScript and shared UI SDK assets on Android and Windows. Do not create a Windows-only copy or rebuild a player-facing screen in Compose.
+- **Platform differences:** native code is limited to the desktop/mobile shell, profile and save boot/recovery, OS integration, input adaptation and host services such as audio or updates. These adapters must power the same HTML controls and explain unavailable capabilities in plain language.
+- **Usability:** use consistent names, navigation order, feedback, tutorials, empty/loading/error states and localization. Desktop may rearrange layout for a resizable window, mouse and keyboard, but must not change what a screen means or remove its actions.
+
 ## Workstream A: Windows shared HTML host
 
 1. Evaluate and select a maintained Windows embedded browser integration. WebView2 is the preferred candidate, but do not claim it is implemented until a buildable host proves it. Document runtime prerequisites, missing-runtime behavior, licensing, MSI distribution and offline operation before changing installer behavior.
 2. **Implemented in this batch:** embed JavaFX WebView in the Compose Desktop shell, unpack the canonical packaged `web-play/` files locally, support resize and cleanup, and load without requiring a network connection.
 3. **Initial bridge implemented:** bounded versioned requests, request ID deduplication and an explicit allow-list for guesses, multiplier selection, upgrade/shop actions, daily quests and chests. Kotlin transactions remain authoritative. Tighten local navigation/origin tests and broaden route actions.
 4. Adapt platform-specific input and lifecycle behavior without maintaining a second HTML/CSS/JS copy.
-5. Add host/bridge automated tests and verify the packaged app on Windows. Play, Upgrades, Shop, More, Changelog and About now use the host. About check/install/open-update actions route through the Windows updater adapter; external links open in the system browser. Music, save management and remaining Compose routes stay native until their required host bridge actions are implemented.
+5. Add host/bridge automated tests and verify the packaged app on Windows. Play, Upgrades, Shop, More, Changelog and About already use the host. Music now uses the same HTML route with a Windows Java Sound adapter. The desktop host packages the complete canonical web asset trees and opens the selected initial route. About updater actions route through the Windows updater adapter; external links open in the system browser. Save-slot boot/recovery and OS/developer surfaces remain native.
 
 ## Workstream B: complete the shared player-facing screens
 
 Migrate in cohesive, testable batches, reusing canonical catalogs and existing Kotlin transactions:
 1. Prestige, Ultra and talent progression.
 2. Home Base, Relics, Codex, Endgame and remaining world/boss details.
-3. More, Changelog and About/update UI are now shared routes. Continue with settings, statistics, achievements, tutorial and save-management presentation.
+3. More, Changelog, About/update UI and Music are now shared routes. Arcade remains native until minigame launch and input contracts are shared. Continue with settings, statistics, achievements, tutorial and save-management presentation.
 4. Arcade/minigames and player-facing Live Ops surfaces where platform contracts allow sharing.
 
 Keep developer tools and OS-owned/system surfaces native. Save-slot boot and crash recovery remain native until a shared implementation is justified and parity can be proved.
