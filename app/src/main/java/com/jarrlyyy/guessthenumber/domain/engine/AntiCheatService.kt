@@ -5,18 +5,18 @@ import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.shared.rules.GuessRateLimitRules
 
 object AntiCheatService {
-    private var lastGuessTimestamp = 0L
-    private const val MIN_GUESS_INTERVAL_MS = 50L // 50ms rate limit against auto-clicker script abuse outside built-in auto-clicker
+    private var lastGuessTimestampNanos = 0L
 
     fun validateGuessRate(): Boolean {
-        val now = System.currentTimeMillis()
-        if (now - lastGuessTimestamp < MIN_GUESS_INTERVAL_MS) {
+        val now = System.nanoTime()
+        if (GuessRateLimitRules.isRateLimited(lastGuessTimestampNanos, now)) {
             GameLogger.log(LogLevel.WARN, LoggerCategory.GAME, "ANTICHEAT_RATE_LIMIT", "Suspicious high-frequency guess attempt blocked.")
             return false
         }
-        lastGuessTimestamp = now
+        lastGuessTimestampNanos = now
         return true
     }
 
