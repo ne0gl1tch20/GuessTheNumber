@@ -6,6 +6,7 @@ import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.ShopItemDef
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
+import com.jarrlyyy.guessthenumber.shared.domain.InvisibleTraitEngine
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
@@ -131,7 +132,7 @@ object DesktopEconomyTransactions {
         if (state.money < requirement || reward <= BigNumber.ZERO) {
             return rejected(state, "Prestige requirement not met.")
         }
-        val next = state.copy(
+        val resetState = state.copy(
             money = engine.prestigeStartingCapital(state),
             prestige = state.prestige + reward,
             upgradeLevels = emptyMap(),
@@ -139,6 +140,11 @@ object DesktopEconomyTransactions {
             currentRangeMax = Difficulty.rangeMax(state.difficultyId, 0),
             statistics = state.statistics.copy(prestigesCount = state.statistics.prestigesCount + 1),
             prestigeCount = state.prestigeCount + 1
+        )
+        val next = InvisibleTraitEngine.observeProgression(
+            resetState,
+            previousPrestige = state.prestigeCount,
+            previousUltra = state.ultraCount
         )
         return accepted(next, "Prestige reset complete. Earned $reward Prestige.")
     }
@@ -149,7 +155,7 @@ object DesktopEconomyTransactions {
         if (state.money < requirement || state.prestige < BigNumber(1_000) || reward <= BigNumber.ZERO) {
             return rejected(state, "Ultra requires enough Money and at least 1,000 Prestige.")
         }
-        val next = state.copy(
+        val resetState = state.copy(
             money = engine.prestigeStartingCapital(state),
             prestige = BigNumber.ZERO,
             ultra = state.ultra + reward,
@@ -157,6 +163,11 @@ object DesktopEconomyTransactions {
             prestigeUpgradeLevels = emptyMap(),
             statistics = state.statistics.copy(ultrasCount = state.statistics.ultrasCount + 1),
             ultraCount = state.ultraCount + 1
+        )
+        val next = InvisibleTraitEngine.observeProgression(
+            resetState,
+            previousPrestige = state.prestigeCount,
+            previousUltra = state.ultraCount
         )
         return accepted(next, "Ultra reset complete. Earned $reward Ultra.")
     }
