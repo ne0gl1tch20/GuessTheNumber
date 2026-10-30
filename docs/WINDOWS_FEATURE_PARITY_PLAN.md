@@ -170,7 +170,8 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Add the bundled Number Rush Lua activity to the Windows Activity Hub with Android-equivalent payload limits, one-answer lifecycle and Kotlin-owned UI state.
 - [x] Add verified remote LiveOps script discovery/refresh to the Activity Hub; signed bundles are HTTPS-only, hash-checked and rollback-protected.
 - [x] Connect the canonical `feature_flags.json` and LiveOps event manifest to a Windows event screen; claims use the shared Android/Windows Kotlin policy and active-slot persistence.
-- [x] Add signed remote event-manifest delivery through the existing HTTPS/RSA bundle; content repo PR #4 published signed bundle v3 and app PR #388 passed Android, Windows and LiveOps reliability CI. [ ] Verify actual online refresh, offline fallback and claim behavior on Windows runtime.
+- [x] Add signed remote event-manifest delivery through the existing HTTPS/RSA bundle; content repo PR #4 published signed bundle v3 and app PR #388 passed Android, Windows and LiveOps reliability CI.
+- [ ] Verify actual online refresh, offline fallback and claim behavior on Windows runtime.
 - [ ] Verify offline event availability, reward validation and missing optional content/audio failure behavior.
 
 **Exit:** Supported activities work offline, and scripted content cannot bypass Kotlin-owned reward/state validation.
