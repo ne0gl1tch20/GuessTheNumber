@@ -68,11 +68,18 @@ class DesktopSharedWebAssetsTest {
         assertTrue(state.has("codexRewardClaimed"))
         assertTrue(state.has("settings"))
         assertTrue(state.getJSONObject("settings").has("reducedMotion"))
+        assertTrue(state.has("appVersion"))
+        assertTrue(state.has("appVersionCode"))
+        assertTrue(state.getString("updateChannel") == "debug")
+        assertTrue(state.getBoolean("debugBuild"))
     }
 
     @Test
     fun desktopDestinationsSelectTheirMatchingSharedHtmlScreen() {
         assertTrue(DesktopGameSection.PLAY.sharedHtmlScreen == "play")
+        assertTrue(DesktopGameSection.MORE.sharedHtmlScreen == "more")
+        assertTrue(DesktopGameSection.CHANGELOG.sharedHtmlScreen == "changelog")
+        assertTrue(DesktopGameSection.ABOUT.sharedHtmlScreen == "about")
         assertTrue(DesktopGameSection.UPGRADES.sharedHtmlScreen == "upgrades")
         assertTrue(DesktopGameSection.SHOP.sharedHtmlScreen == "shop")
         assertTrue(DesktopGameSection.PRESTIGE.sharedHtmlScreen == "prestige")
@@ -142,6 +149,20 @@ class DesktopSharedWebAssetsTest {
     }
 
     @Test
+    fun sharedAboutScreenUsesTheWindowsUpdateHostActions() {
+        val html = asset("web-play/index.html")
+        val script = asset("web-play/app.js")
+
+        assertTrue(html.contains("data-bridge-action=\"check_updates\""))
+        assertTrue(html.contains("data-bridge-action=\"install_update\""))
+        assertTrue(html.contains("data-bridge-action=\"open_update_page\""))
+        assertTrue(script.contains("send('check_updates')"))
+        assertTrue(script.contains("send('install_update')"))
+        assertTrue(script.contains("send('open_update_page')"))
+        assertTrue(script.contains("m.type==='update_result'"))
+    }
+
+    @Test
     fun everySupportedLocaleContainsSharedSettingsTranslations() {
         val locales = listOf(
             "ar.json", "de.json", "en_gb.json", "en_us.json", "es.json", "fil_ph.json",
@@ -173,6 +194,9 @@ class DesktopSharedWebAssetsTest {
         val styles = asset("web-play/styles.css")
 
         assertTrue(html.contains("id=\"screen-play\""))
+        assertTrue(html.contains("id=\"screen-more\""))
+        assertTrue(html.contains("id=\"screen-changelog\""))
+        assertTrue(html.contains("id=\"screen-about\""))
         assertTrue(html.contains("id=\"screen-upgrades\""))
         assertTrue(html.contains("id=\"screen-shop\""))
         assertTrue(html.contains("id=\"screen-homebase\""))
