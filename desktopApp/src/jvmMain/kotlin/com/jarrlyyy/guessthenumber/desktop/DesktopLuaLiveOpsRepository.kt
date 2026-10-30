@@ -44,6 +44,13 @@ private data class DesktopLuaRemoteScript(
     val capabilities: List<String> = listOf("log")
 )
 
+private fun desktopLuaBuildConfigValue(name: String): String = runCatching {
+    val properties = Properties()
+    DesktopLuaLiveOpsRepository::class.java.classLoader
+        .getResourceAsStream("desktop-build.properties")?.use(properties::load)
+    properties.getProperty(name).orEmpty()
+}.getOrDefault("")
+
 internal sealed interface DesktopLuaLiveOpsRefreshResult {
     data class Updated(val version: Int, val scriptCount: Int) : DesktopLuaLiveOpsRefreshResult
     data class Unchanged(val version: Int, val scriptCount: Int) : DesktopLuaLiveOpsRefreshResult
@@ -53,9 +60,9 @@ internal sealed interface DesktopLuaLiveOpsRefreshResult {
 /** Signed, HTTPS-only LiveOps cache. A blank public key fails closed. */
 internal class DesktopLuaLiveOpsRepository(
     private val root: Path = defaultDesktopSaveDirectory().parent.resolve("lua-liveops"),
-    private val manifestUrl: String = buildConfigValue("liveOpsManifestUrl"),
-    private val publicKeyBase64: String = buildConfigValue("liveOpsPublicKeyBase64"),
-    private val appVersionCode: Int = buildConfigValue("appVersionCode").toIntOrNull() ?: 24
+    private val manifestUrl: String = desktopLuaBuildConfigValue("liveOpsManifestUrl"),
+    private val publicKeyBase64: String = desktopLuaBuildConfigValue("liveOpsPublicKeyBase64"),
+    private val appVersionCode: Int = desktopLuaBuildConfigValue("appVersionCode").toIntOrNull() ?: 24
 ) {
     private val json = Json { ignoreUnknownKeys = false }
     private val activePointer = root.resolve("active_bundle.txt")
@@ -309,12 +316,6 @@ internal class DesktopLuaLiveOpsRepository(
     private fun sha256(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
 
-    private fun buildConfigValue(name: String): String = runCatching {
-        val properties = Properties()
-        DesktopLuaLiveOpsRepository::class.java.classLoader
-            .getResourceAsStream("desktop-build.properties")?.use(properties::load)
-        properties.getProperty(name).orEmpty()
-    }.getOrDefault("")
 
     private companion object {
         const val MAX_MANIFEST_BYTES = 256 * 1024
