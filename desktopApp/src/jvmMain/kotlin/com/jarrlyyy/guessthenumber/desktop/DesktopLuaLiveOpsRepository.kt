@@ -68,7 +68,8 @@ internal class DesktopLuaLiveOpsRepository(
     private val activePointer = root.resolve("active_bundle.txt")
     private val highestVersionFile = root.resolve("highest_bundle_version.txt")
 
-    fun refresh(): DesktopLuaLiveOpsRefreshResult = try {
+    fun refresh(): DesktopLuaLiveOpsRefreshResult {
+        return try {
         require(publicKeyBase64.isNotBlank()) {
             "LiveOps signing key is not configured. Bundled activities remain available."
         }
@@ -109,8 +110,9 @@ internal class DesktopLuaLiveOpsRepository(
         writeVersionAtomically(highestVersionFile, payload.bundleVersion)
         writeVersionAtomically(activePointer, payload.bundleVersion)
         DesktopLuaLiveOpsRefreshResult.Updated(payload.bundleVersion, payload.scripts.size)
-    } catch (error: Exception) {
-        DesktopLuaLiveOpsRefreshResult.Unavailable(error.message?.take(240) ?: "LiveOps refresh failed.")
+        } catch (error: Exception) {
+            DesktopLuaLiveOpsRefreshResult.Unavailable(error.message?.take(240) ?: "LiveOps refresh failed.")
+        }
     }
 
     fun loadVerifiedCachedEntries(): List<DesktopLuaScriptEntry> {
