@@ -27,7 +27,6 @@ class DesktopGameSectionRouteTest {
             DesktopGameSection.CODEX to "codex",
             DesktopGameSection.ENDGAME to "journey",
             DesktopGameSection.STATS to "stats",
-            DesktopGameSection.ARCADE to "arcade",
             DesktopGameSection.LUCKY_STAKE to "stake"
         )
 
@@ -64,5 +63,6 @@ class DesktopGameSectionRouteTest {
     @Test
     fun nativeShellAndSaveManagementSectionsDoNotPretendToBeSharedWebRoutes() {
         assertNull(DesktopGameSection.SAVE_SLOTS.sharedHtmlScreen)
+        assertNull(DesktopGameSection.ARCADE.sharedHtmlScreen)
     }
 }
