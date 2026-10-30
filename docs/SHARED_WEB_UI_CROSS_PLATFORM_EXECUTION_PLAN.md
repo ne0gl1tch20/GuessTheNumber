@@ -17,7 +17,7 @@
 Migrate in cohesive, testable batches, reusing canonical catalogs and existing Kotlin transactions:
 1. Prestige, Ultra and talent progression.
 2. Home Base, Relics, Codex, Endgame and remaining world/boss details.
-3. More, Changelog, About/update UI and Music are now shared routes. Continue with settings, statistics, achievements, tutorial and save-management presentation.
+3. More, Changelog, About/update UI and Music are now shared routes. Arcade remains native until minigame launch and input contracts are shared. Continue with settings, statistics, achievements, tutorial and save-management presentation.
 4. Arcade/minigames and player-facing Live Ops surfaces where platform contracts allow sharing.
 
 Keep developer tools and OS-owned/system surfaces native. Save-slot boot and crash recovery remain native until a shared implementation is justified and parity can be proved.
