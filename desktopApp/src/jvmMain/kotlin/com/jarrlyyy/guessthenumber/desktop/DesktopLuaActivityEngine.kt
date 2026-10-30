@@ -194,7 +194,7 @@ internal class DesktopLuaActivityEngine {
     }
 }
 
-private class DesktopLuaSandbox {
+internal class DesktopLuaSandbox {
     companion object {
         private const val MAX_SOURCE_CHARS = 32_768
         private const val MAX_INSTRUCTIONS = 100_000
