@@ -19,6 +19,7 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicReference
+import javax.swing.SwingUtilities
 import javax.swing.JPanel
 
 /**
@@ -51,7 +52,11 @@ internal fun DesktopSharedWebView(
 
 private class DesktopSharedWebViewController(initialScreenValue: String) {
     val panel = JPanel(BorderLayout())
-    private val fxPanel = JFXPanel()
+    private val isWindowsDesktop = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
+    private val edgeController = if (isWindowsDesktop) {
+        DesktopEdgeWebViewController(initialScreenValue, ::unpackWebAssets)
+    } else null
+    private lateinit var fxPanel: JFXPanel
     private val handler = AtomicReference<((String, (String) -> Unit) -> Unit)>()
     private val initialScreen = AtomicReference(initialScreenValue.also {
         require(it in setOf("play", "more", "changelog", "about", "music", "upgrades", "shop", "prestige", "ultra", "talent", "settings", "rewards", "worlds", "mutators", "relics", "homebase", "codex", "journey", "stats", "arcade", "stake"))
@@ -63,8 +68,12 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
     private var localRoot: Path? = null
 
     init {
-        panel.add(fxPanel, BorderLayout.CENTER)
-        Platform.runLater {
+        if (edgeController != null) {
+            SwingUtilities.invokeLater { if (!disposed) edgeController.start() }
+        } else {
+            fxPanel = JFXPanel()
+            panel.add(fxPanel, BorderLayout.CENTER)
+            Platform.runLater {
             if (disposed) return@runLater
             try {
                 val index = unpackWebAssets()
@@ -212,6 +221,7 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                 )
             }
         }
+        }
     }
 
     private fun showStartupFailure(title: String, detail: String) {
@@ -236,21 +246,27 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
 
     fun setRequestHandler(value: (String, (String) -> Unit) -> Unit) {
         handler.set(value)
+        edgeController?.setRequestHandler(value)
     }
 
     fun setNavigationPositionHandler(value: (DesktopNavigationPosition) -> Unit) {
         navigationPositionHandler.set(value)
+        edgeController?.setNavigationPositionHandler(value)
     }
 
     fun dispose() {
         disposed = true
         handler.set(null)
-        Platform.runLater {
-            runCatching { engine?.load("about:blank") }
-            engine = null
-            localRoot?.let(::deleteResourceTree)
-            localRoot = null
-            localIndex = null
+        if (edgeController != null) {
+            SwingUtilities.invokeLater { edgeController.dispose() }
+        } else {
+            Platform.runLater {
+                runCatching { engine?.load("about:blank") }
+                engine = null
+                localRoot?.let(::deleteResourceTree)
+                localRoot = null
+                localIndex = null
+            }
         }
     }
 
