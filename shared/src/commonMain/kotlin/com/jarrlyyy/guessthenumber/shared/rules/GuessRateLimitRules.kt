@@ -11,11 +11,11 @@ object GuessRateLimitRules {
     const val MIN_INTERVAL_NANOS: Long = 50_000_000L
 
     fun isRateLimited(
-        lastSubmissionNanos: Long,
+        lastSubmissionNanos: Long?,
         nowNanos: Long,
         minimumIntervalNanos: Long = MIN_INTERVAL_NANOS
     ): Boolean {
-        if (lastSubmissionNanos == 0L) return false
+        if (lastSubmissionNanos == null) return false
         if (minimumIntervalNanos <= 0L) return false
         if (nowNanos < lastSubmissionNanos) return true
         return nowNanos - lastSubmissionNanos < minimumIntervalNanos
