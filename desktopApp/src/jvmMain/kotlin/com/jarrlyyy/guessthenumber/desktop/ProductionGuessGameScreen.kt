@@ -375,6 +375,17 @@ fun ProductionGuessGameScreen(
                         }
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
+                        if (type == "open_arcade") {
+                            if (request.length() != 3) {
+                                sendError("invalid_request")
+                            } else {
+                                onOpenParityDestination(DesktopDestination.ARCADE)
+                                reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                    .put("type", "state")
+                                    .put("state", org.json.JSONObject().put("accepted", true)).toString())
+                            }
+                            return@launch
+                        }
                         if (type == "music_state") {
                             val musicSettings = state?.settings
                             if (musicSettings == null) {
