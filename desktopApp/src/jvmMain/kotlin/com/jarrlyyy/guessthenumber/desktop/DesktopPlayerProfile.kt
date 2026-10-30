@@ -69,6 +69,11 @@ internal object DesktopPlayerProfileStore {
         preferences.flush()
     }
 
+    fun clear() {
+        preferences.remove(profileKey)
+        preferences.flush()
+    }
+
     fun chooseAndImportAvatar(): String? = runCatching {
         val chooser = JFileChooser().apply {
             dialogTitle = "Choose a profile picture"

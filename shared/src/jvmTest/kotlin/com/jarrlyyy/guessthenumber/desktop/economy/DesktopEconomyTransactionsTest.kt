@@ -905,4 +905,78 @@ class DesktopEconomyTransactionsTest {
         assertFalse(negativePayout.accepted)
         assertEquals(initial, negativePayout.state)
     }
+    @Test
+    fun masteryUpgradeUsesAndroidCostAndAwardsLevelFiveMilestone() {
+        val initial = GameState(
+            nebula = BigNumber(50),
+            unlockedWorldIds = setOf("verdant_grove"),
+            defeatedBossIds = setOf("verdant_guardian"),
+            worldMasteryLevels = mapOf("verdant_grove" to 4)
+        )
+
+        val cost = DesktopEconomyTransactions.worldMasteryUpgradeCost(initial, "verdant_grove")
+        assertTrue(cost != null)
+        assertEquals(0, BigNumber(50).compareTo(cost!!))
+        val result = DesktopEconomyTransactions.upgradeWorldMastery(initial, "verdant_grove")
+
+        assertTrue(result.accepted)
+        assertEquals(5, result.state.worldMasteryLevels["verdant_grove"])
+        assertEquals(0, BigNumber(25).compareTo(result.state.nebula))
+        assertTrue("mastery:verdant_grove:5" in result.state.codexEntries)
+        assertEquals(25L, result.state.statistics.nebulaEarned)
+    }
+
+    @Test
+    fun masteryUpgradeAppliesSecretSanctuaryAndFullRelicDiscounts() {
+        val initial = GameState(
+            nebula = BigNumber(12),
+            unlockedWorldIds = setOf("crystal_caverns"),
+            defeatedBossIds = setOf("crystal_golem"),
+            worldMasteryLevels = mapOf("crystal_caverns" to 1),
+            discoveredSecretIds = setOf("shard_archive"),
+            homeBaseLevel = 20,
+            equippedRelicIds = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        )
+
+        val cost = DesktopEconomyTransactions.worldMasteryUpgradeCost(initial, "crystal_caverns")
+        assertTrue(cost != null)
+        assertEquals(0, BigNumber(12).compareTo(cost!!))
+        val result = DesktopEconomyTransactions.upgradeWorldMastery(initial, "crystal_caverns")
+        assertTrue(result.accepted)
+        assertEquals(2, result.state.worldMasteryLevels["crystal_caverns"])
+        assertEquals(0, result.state.nebula.compareTo(BigNumber.ZERO))
+    }
+
+    @Test
+    fun masteryUpgradeRejectsLockedWorldAndUnaffordablePurchaseAtomically() {
+        val locked = GameState(nebula = BigNumber(100))
+        val lockedResult = DesktopEconomyTransactions.upgradeWorldMastery(locked, "crystal_caverns")
+        assertFalse(lockedResult.accepted)
+        assertEquals(locked, lockedResult.state)
+
+        val poor = GameState(
+            nebula = BigNumber(19),
+            unlockedWorldIds = setOf("verdant_grove"),
+            defeatedBossIds = setOf("verdant_guardian"),
+            worldMasteryLevels = mapOf("verdant_grove" to 1)
+        )
+        val poorResult = DesktopEconomyTransactions.upgradeWorldMastery(poor, "verdant_grove")
+        assertFalse(poorResult.accepted)
+        assertEquals(poor, poorResult.state)
+    }
+
+    @Test
+    fun masteryCannotExceedLevelTen() {
+        val state = GameState(
+            nebula = BigNumber(1_000),
+            unlockedWorldIds = setOf("nebula_rift"),
+            defeatedBossIds = setOf("nebula_titan"),
+            worldMasteryLevels = mapOf("nebula_rift" to 10)
+        )
+        assertEquals(null, DesktopEconomyTransactions.worldMasteryUpgradeCost(state, "nebula_rift"))
+        val result = DesktopEconomyTransactions.upgradeWorldMastery(state, "nebula_rift")
+        assertFalse(result.accepted)
+        assertEquals(state, result.state)
+    }
+
 }

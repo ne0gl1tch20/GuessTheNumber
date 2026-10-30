@@ -73,8 +73,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import java.io.File
+import java.nio.file.Files
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileNameExtensionFilter
 import kotlin.random.Random
 import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
+import com.jarrlyyy.guessthenumber.shared.rules.GuessRateLimitRules
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackCard
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackIcon
 import com.jarrlyyy.guessthenumber.shared.ui.toSharedFeedbackIcon
@@ -92,6 +97,7 @@ fun ProductionGuessGameScreen(
     onBackFromSettings: () -> Unit = {},
     navigationPosition: DesktopNavigationPosition = DesktopNavigationPosition.LEFT,
     onNavigationPositionChange: (DesktopNavigationPosition) -> Unit = {},
+    onGlobalPreferencesImported: () -> Unit = {},
     onOpenParityDestination: (DesktopDestination) -> Unit = {},
     onOpenPlayerProfile: () -> Unit = {},
     onThemeSettingsLoaded: (
@@ -117,7 +123,7 @@ fun ProductionGuessGameScreen(
     var activeSaveSlot by remember { mutableStateOf(1) }
     var saveSlotSummaries by remember { mutableStateOf<List<DesktopSaveSlotSummary>>(emptyList()) }
     var guessText by remember { mutableStateOf("") }
-    var lastGuessTimestampNanos by remember { mutableStateOf(0L) }
+    var lastGuessTimestampNanos by remember { mutableStateOf<Long?>(null) }
     var selectedShopCategory by remember { mutableStateOf("all") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
     var feedbackStatus by remember { mutableStateOf(GuessGameStatus.READY) }
@@ -254,7 +260,8 @@ fun ProductionGuessGameScreen(
 
         val guess = autoClicker.nextGuess(snapshot.currentRangeMin, snapshot.currentRangeMax)
         isSaving = true
-        val result = engine.processGuess(snapshot, guess)
+        val rawResult = engine.processGuess(snapshot, guess)
+        val result = TraitGameplayRules.apply(snapshot, guess, rawResult, TraitGameplayRules.activeGameplayTraitIds(snapshot))
         val correct = result.feedback == GuessFeedback.CORRECT
         val bonusAdjustedState = DesktopEconomyTransactions.applyGuessBonuses(
             before = snapshot,
@@ -435,43 +442,55 @@ fun ProductionGuessGameScreen(
                             if (guess == null || before == null || guess !in before.currentRangeMin..before.currentRangeMax) {
                                 accepted = false
                                 message = "Enter a whole number inside the displayed range."
-                            } else if (isSaving) {
-                                accepted = false
-                                message = "Please wait for the current save to finish."
                             } else {
-                                isSaving = true
-                                val rawResult = engine.processGuess(before, guess)
-                                val result = TraitGameplayRules.apply(before, guess, rawResult, TraitGameplayRules.activeGameplayTraitIds(before))
-                                val correct = result.feedback == GuessFeedback.CORRECT
-                                val bonusAdjusted = DesktopEconomyTransactions.applyGuessBonuses(before, result.newState, correct)
-                                val progressed = DesktopEconomyTransactions.recordGuessProgress(
-                                    before = before,
-                                    after = bonusAdjusted,
-                                    correct = correct,
-                                    today = LocalDate.now().toString(),
-                                    lootRoll = if (correct) Random.nextInt(1000) else null
-                                )
-                                val finalState = DesktopEconomyTransactions.evaluateAchievements(
-                                    DesktopEconomyTransactions.recordBossGuess(progressed, correct)
-                                )
-                                val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
-                                if (saved) {
-                                    state = finalState
-                                    nextState = finalState
-                                    guessStatus = result.feedback.name
-                                    webLastGuessStatus = guessStatus
-                                    autoClicker.observeGuess(guess, result.feedback)
-                                    if (correct) autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
-                                    message = when (result.feedback) {
-                                        GuessFeedback.TOO_LOW -> "Too low. Try again!"
-                                        GuessFeedback.TOO_HIGH -> "Too high. Try again!"
-                                        GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - before.money} Money."
+                                val submittedAtNanos = System.nanoTime()
+                                when {
+                                    GuessRateLimitRules.isRateLimited(lastGuessTimestampNanos, submittedAtNanos) -> {
+                                        accepted = false
+                                        message = "Please wait a moment before guessing again."
+                                        guessStatus = "rate_limited"
                                     }
-                                } else {
-                                    accepted = false
-                                    message = "Could not save that guess. Your previous save is intact."
+                                    isSaving -> {
+                                        accepted = false
+                                        message = "Please wait for the current save to finish."
+                                    }
+                                    else -> {
+                                        lastGuessTimestampNanos = submittedAtNanos
+                                        isSaving = true
+                                        val rawResult = engine.processGuess(before, guess)
+                                        val result = TraitGameplayRules.apply(before, guess, rawResult, TraitGameplayRules.activeGameplayTraitIds(before))
+                                        val correct = result.feedback == GuessFeedback.CORRECT
+                                        val bonusAdjusted = DesktopEconomyTransactions.applyGuessBonuses(before, result.newState, correct)
+                                        val progressed = DesktopEconomyTransactions.recordGuessProgress(
+                                            before = before,
+                                            after = bonusAdjusted,
+                                            correct = correct,
+                                            today = LocalDate.now().toString(),
+                                            lootRoll = if (correct) Random.nextInt(1000) else null
+                                        )
+                                        val finalState = DesktopEconomyTransactions.evaluateAchievements(
+                                            DesktopEconomyTransactions.recordBossGuess(progressed, correct)
+                                        )
+                                        val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
+                                        if (saved) {
+                                            state = finalState
+                                            nextState = finalState
+                                            guessStatus = result.feedback.name
+                                            webLastGuessStatus = guessStatus
+                                            autoClicker.observeGuess(guess, result.feedback)
+                                            if (correct) autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+                                            message = when (result.feedback) {
+                                                GuessFeedback.TOO_LOW -> "Too low. Try again!"
+                                                GuessFeedback.TOO_HIGH -> "Too high. Try again!"
+                                                GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - before.money} Money."
+                                            }
+                                        } else {
+                                            accepted = false
+                                            message = "Could not save that guess. Your previous save is intact."
+                                        }
+                                        isSaving = false
+                                    }
                                 }
-                                isSaving = false
                             }
                         } else if (type != "read_state") {
                             val before = state
@@ -779,6 +798,88 @@ fun ProductionGuessGameScreen(
                             feedback = if (restored) "Restored the previous backup for slot $target." else "Could not restore a valid backup for that slot."
                             saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
                         }
+                    },
+                    onExportSlot = { target ->
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Export save slot $target as JSON"
+                            selectedFile = File("guessthenumber-slot-$target.json")
+                            fileFilter = FileNameExtensionFilter("GuessTheNumber save (*.json)", "json")
+                        }
+                        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val destination = chooser.selectedFile.toPath()
+                            scope.launch {
+                                val raw = withContext(Dispatchers.IO) { saveStore.exportSlotJson(target) }
+                                val exported = raw != null && runCatching {
+                                    Files.writeString(destination, raw)
+                                }.isSuccess
+                                feedback = if (exported) "Exported slot $target as a plain JSON backup." else "Could not export slot $target."
+                            }
+                        }
+                    },
+                    onImportSlot = { target ->
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Import JSON into save slot $target"
+                            fileFilter = FileNameExtensionFilter("GuessTheNumber save (*.json)", "json")
+                        }
+                        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val source = chooser.selectedFile.toPath()
+                            scope.launch {
+                                isSaving = true
+                                val imported = withContext(Dispatchers.IO) {
+                                    runCatching { Files.readString(source) }.getOrNull()?.let { saveStore.importSlotJson(target, it) } ?: false
+                                }
+                                if (imported && target == activeSaveSlot) {
+                                    state = withContext(Dispatchers.IO) { saveStore.load(target) }
+                                    state?.let { autoClicker.reset(it.currentRangeMin, it.currentRangeMax) }
+                                }
+                                feedback = if (imported) "Imported and validated JSON into slot $target." else "Import rejected. The existing save was left intact."
+                                saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                                isSaving = false
+                            }
+                        }
+                    },
+                    onExportAllSlots = {
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Export all GuessTheNumber save slots"
+                            selectedFile = File("guessthenumber-all-slots.zip")
+                            fileFilter = FileNameExtensionFilter("GuessTheNumber backup bundle (*.zip)", "zip")
+                        }
+                        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val destination = chooser.selectedFile.toPath()
+                            scope.launch {
+                                val bundle = withContext(Dispatchers.IO) { saveStore.exportAllSlotsBundle() }
+                                val exported = bundle != null && runCatching {
+                                    Files.write(destination, bundle)
+                                }.isSuccess
+                                feedback = if (exported) "Exported all populated slots as a portable ZIP bundle." else "Could not export the save bundle."
+                            }
+                        }
+                    },
+                    onImportAllSlots = {
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Import all GuessTheNumber save slots"
+                            fileFilter = FileNameExtensionFilter("GuessTheNumber backup bundle (*.zip)", "zip")
+                        }
+                        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val source = chooser.selectedFile.toPath()
+                            scope.launch {
+                                isSaving = true
+                                val imported = withContext(Dispatchers.IO) {
+                                    runCatching { Files.readAllBytes(source) }.getOrNull()
+                                        ?.let { saveStore.importAllSlotsBundle(it) } ?: false
+                                }
+                                if (imported) {
+                                    activeSaveSlot = withContext(Dispatchers.IO) { saveStore.activeSlot() }
+                                    state = withContext(Dispatchers.IO) { saveStore.load(activeSaveSlot) }
+                                    state?.let { autoClicker.reset(it.currentRangeMin, it.currentRangeMax) }
+                                    feedback = "Imported and validated the all-slot backup bundle."
+                                } else {
+                                    feedback = "Bundle import rejected. Existing saves were kept intact."
+                                }
+                                saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                                isSaving = false
+                            }
+                        }
                     }
                 )
             }
@@ -829,6 +930,11 @@ fun ProductionGuessGameScreen(
                                 "boss" -> DesktopEconomyTransactions.toggleBossBattle(before, worldId)
                                 else -> EconomyTransaction(before, false, "That world action is not supported yet.")
                             }
+                        }
+                    },
+                    onMasteryUpgrade = { worldId ->
+                        commitTransaction { before ->
+                            DesktopEconomyTransactions.upgradeWorldMastery(before, worldId)
                         }
                     }
                 )
@@ -982,13 +1088,14 @@ fun ProductionGuessGameScreen(
                     } else if (guess !in currentState.currentRangeMin..currentState.currentRangeMax) {
                         feedbackStatus = GuessGameStatus.INVALID_INPUT
                         feedback = "Choose a number within the displayed range."
-                    } else if (!isSaving && lastGuessTimestampNanos != 0L && System.nanoTime() - lastGuessTimestampNanos < 50_000_000L) {
+                    } else if (!isSaving && GuessRateLimitRules.isRateLimited(lastGuessTimestampNanos, System.nanoTime())) {
                         feedbackStatus = GuessGameStatus.READY
                         feedback = "Please wait a moment before guessing again."
                     } else if (!isSaving) {
                         lastGuessTimestampNanos = System.nanoTime()
                         isSaving = true
-                        val result = engine.processGuess(currentState, guess)
+                        val rawResult = engine.processGuess(currentState, guess)
+                        val result = TraitGameplayRules.apply(currentState, guess, rawResult, TraitGameplayRules.activeGameplayTraitIds(currentState))
                         val correct = result.feedback == GuessFeedback.CORRECT
                         val bonusAdjustedState = DesktopEconomyTransactions.applyGuessBonuses(
                             before = currentState,
@@ -1485,7 +1592,20 @@ fun ProductionGuessGameScreen(
                         onResetData = ::resetAllGameData,
                         navigationPosition = navigationPosition,
                         onNavigationPositionChange = onNavigationPositionChange,
+                        onGlobalPreferencesImported = onGlobalPreferencesImported,
                         onBack = onBackFromSettings
+                    )
+                }
+            }
+
+            if (section == DesktopGameSection.MUSIC_PLAYER) {
+                if (currentState == null) {
+                    CircularProgressIndicator()
+                } else {
+                    DesktopMusicPlayerContent(
+                        settings = currentState.settings,
+                        onUpdateSettings = ::updateSettings,
+                        onBack = { onOpenParityDestination(DesktopDestination.MORE) }
                     )
                 }
             }
@@ -1503,7 +1623,7 @@ fun ProductionGuessGameScreen(
                         Button(onClick = onOpenAbout) { Text("About and updates") }
                         Text("More Windows destinations", style = MaterialTheme.typography.titleMedium)
                         Text("These routes are being brought into parity with Android in stages. A connected route does not mean every Android interaction is complete yet.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        val parityDestinations = listOf(DesktopDestination.WORLD_MAP, DesktopDestination.MUTATORS, DesktopDestination.SAVE_SLOTS, DesktopDestination.RELICS, DesktopDestination.HOME_BASE, DesktopDestination.CODEX, DesktopDestination.ENDGAME, DesktopDestination.LUCKY_STAKE, DesktopDestination.MUSIC_PLAYER, DesktopDestination.ARCADE, DesktopDestination.ACTIVITY_HUB, DesktopDestination.LUA_TESTING_HUB, DesktopDestination.CHANGELOG, DesktopDestination.LIVE_OPS, DesktopDestination.DEVELOPER_SETTINGS, DesktopDestination.DEVELOPER_CONSOLE, DesktopDestination.PROCESS_INSPECTOR)
+                        val parityDestinations = DesktopDebugToolsPolicy.visibleDestinations(listOf(DesktopDestination.WORLD_MAP, DesktopDestination.MUTATORS, DesktopDestination.SAVE_SLOTS, DesktopDestination.RELICS, DesktopDestination.HOME_BASE, DesktopDestination.CODEX, DesktopDestination.ENDGAME, DesktopDestination.LUCKY_STAKE, DesktopDestination.MUSIC_PLAYER, DesktopDestination.ARCADE, DesktopDestination.ACTIVITY_HUB, DesktopDestination.LUA_TESTING_HUB, DesktopDestination.CHANGELOG, DesktopDestination.LIVE_OPS, DesktopDestination.DEVELOPER_SETTINGS, DesktopDestination.DEVELOPER_CONSOLE, DesktopDestination.PROCESS_INSPECTOR))
                         parityDestinations.chunked(2).forEach { destinations ->
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 destinations.forEach { destination -> Button(onClick = { onOpenParityDestination(destination) }, modifier = Modifier.weight(1f)) { Text(destination.label) } }

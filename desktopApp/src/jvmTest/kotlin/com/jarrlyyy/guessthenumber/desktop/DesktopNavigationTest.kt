@@ -132,6 +132,51 @@ class DesktopNavigationTest {
     }
 
     @Test
+    fun developerDestinationsAreHiddenAndBlockedByDefault() {
+        val previous = System.getProperty(DesktopDebugToolsPolicy.ENABLE_PROPERTY)
+        try {
+            System.clearProperty(DesktopDebugToolsPolicy.ENABLE_PROPERTY)
+            val destinations = listOf(
+                DesktopDestination.PLAY,
+                DesktopDestination.DEVELOPER_CONSOLE,
+                DesktopDestination.LUA_TESTING_HUB,
+                DesktopDestination.ACTIVITY_HUB
+            )
+            assertEquals(
+                listOf(DesktopDestination.PLAY, DesktopDestination.ACTIVITY_HUB),
+                DesktopDebugToolsPolicy.visibleDestinations(destinations)
+            )
+            val shell = DesktopShellController()
+            shell.navigate(DesktopDestination.DEVELOPER_CONSOLE)
+            assertEquals(DesktopDestination.PLAY, shell.state.destination)
+            assertEquals("Developer tools are disabled in this build.", shell.state.message)
+        } finally {
+            if (previous == null) System.clearProperty(DesktopDebugToolsPolicy.ENABLE_PROPERTY)
+            else System.setProperty(DesktopDebugToolsPolicy.ENABLE_PROPERTY, previous)
+        }
+    }
+
+    @Test
+    fun launchFlagAloneCannotEnableDeveloperDestinationsInPackagedBuilds() {
+        assertFalse(DesktopDebugToolsPolicy.isEnabled(buildAllowsDeveloperTools = false, launchFlag = "true"))
+        assertFalse(DesktopDebugToolsPolicy.isEnabled(buildAllowsDeveloperTools = true, launchFlag = "false"))
+        assertTrue(DesktopDebugToolsPolicy.isEnabled(buildAllowsDeveloperTools = true, launchFlag = "true"))
+    }
+
+    @Test
+    fun developerDestinationsAppearOnlyWhenBothBuildAndLaunchFlagsAllowThem() {
+        val destinations = listOf(DesktopDestination.PLAY, DesktopDestination.DEVELOPER_CONSOLE)
+        assertEquals(
+            listOf(DesktopDestination.PLAY),
+            DesktopDebugToolsPolicy.visibleDestinations(destinations, allowDeveloperTools = false)
+        )
+        assertEquals(
+            destinations,
+            DesktopDebugToolsPolicy.visibleDestinations(destinations, allowDeveloperTools = true)
+        )
+    }
+
+    @Test
     fun shortcutsRequireControlAndIgnoreUnknownKeys() {
         assertNull(DesktopDestination.fromShortcut(Key.One, ctrlPressed = false))
         assertNull(DesktopDestination.fromShortcut(Key.Six, ctrlPressed = true))

@@ -15,6 +15,22 @@ val windowsPackageVersion = providers.environmentVariable("GTN_WINDOWS_PACKAGE_V
 val appLogoPng = rootProject.file("GTN_APP_LOGO.png")
 val generatedDesktopResources = layout.buildDirectory.dir("generated/desktopLogoResources")
 val generatedWindowsIcon = layout.buildDirectory.file("generated/windowsIcon/GTN_APP_LOGO.ico")
+val generatedDesktopBuildConfig = layout.buildDirectory.dir("generated/desktopBuildConfig")
+val desktopDebugToolsBuildAllowed = providers.gradleProperty("gtn.desktop.debugToolsBuild")
+    .map { it.equals("true", ignoreCase = true) }
+    .orElse(false)
+val desktopLiveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl")
+    .orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-LiveOps/main/manifest.json")
+val desktopLiveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64")
+    .map { value -> value.filterNot(Char::isWhitespace) }
+    .orElse("")
+val generateDesktopBuildConfig = tasks.register<org.gradle.api.tasks.WriteProperties>("generateDesktopBuildConfig") {
+    destinationFile = generatedDesktopBuildConfig.get().file("desktop-build.properties").asFile
+    property("debugToolsBuildAllowed", desktopDebugToolsBuildAllowed.get().toString())
+    property("liveOpsManifestUrl", desktopLiveOpsManifestUrl.get())
+    property("liveOpsPublicKeyBase64", desktopLiveOpsPublicKey.get())
+    property("appVersionCode", "24")
+}
 
 val generateDesktopLogoAssets = tasks.register<GenerateDesktopLogoAssets>("generateDesktopLogoAssets") {
     inputLogo.set(appLogoPng)
@@ -29,6 +45,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             resources.srcDir(generatedDesktopResources)
+            resources.srcDir(generatedDesktopBuildConfig)
             // Consume the canonical game configuration instead of maintaining desktop copies.
             resources.srcDir(rootProject.file("app/src/main/assets/game"))
             // Share the canonical Android changelog with the Windows app bundle.
@@ -47,6 +64,7 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.luaj.jme)
                 implementation("net.java.dev.jna:jna:5.17.0")
                 implementation("net.java.dev.jna:jna-platform:5.17.0")
                 implementation("org.json:json:20250517")
@@ -71,11 +89,11 @@ kotlin {
 }
 
 tasks.matching { it.name == "jvmProcessResources" }.configureEach {
-    dependsOn(generateDesktopLogoAssets)
+    dependsOn(generateDesktopLogoAssets, generateDesktopBuildConfig)
 }
 tasks.configureEach {
     if (name.startsWith("package", ignoreCase = true) || name.contains("Distributable", ignoreCase = true)) {
-        dependsOn(generateDesktopLogoAssets)
+        dependsOn(generateDesktopLogoAssets, generateDesktopBuildConfig)
     }
 }
 

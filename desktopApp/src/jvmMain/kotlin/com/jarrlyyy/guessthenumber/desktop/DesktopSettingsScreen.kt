@@ -14,6 +14,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -23,12 +24,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileNameExtensionFilter
 
 private val desktopLanguageOptions = listOf(
     "en-US" to "English (US)", "en-GB" to "English (UK)", "fil-PH" to "Filipino",
@@ -55,11 +65,25 @@ fun DesktopSettingsScreen(
     onResetData: () -> Unit,
     navigationPosition: DesktopNavigationPosition,
     onNavigationPositionChange: (DesktopNavigationPosition) -> Unit,
+    onGlobalPreferencesImported: () -> Unit = {},
     onBack: () -> Unit
 ) {
     val settings = state.settings
     var showResetDialog by remember { mutableStateOf(false) }
     var resetConfirmed by remember { mutableStateOf(false) }
+    var showFeatureTour by remember { mutableStateOf(false) }
+    var featureTourPage by remember { mutableStateOf(0) }
+    var backupStatus by remember { mutableStateOf<String?>(null) }
+    var pendingGlobalImport by remember { mutableStateOf<Path?>(null) }
+    var showGlobalImportConfirm by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val featureTourPages = listOf(
+        "Play" to "Make guesses, follow feedback and build your streak. Your accepted actions are saved locally.",
+        "Upgrades and shop" to "Spend Money on upgrades and Nebula on permanent shop unlocks. Batch buying respects the shared economy rules.",
+        "Progression" to "Explore worlds, bosses, relics, mastery, achievements and the Codex as your save advances.",
+        "Activities and events" to "Arcade games, the Lua Activity Hub and seasonal events are optional. Rewards are validated by Kotlin before saving.",
+        "Saves and settings" to "Use ten local save slots, recovery backups and portable backup bundles. Tune appearance, audio and accessibility in Settings."
+    )
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
@@ -210,6 +234,54 @@ fun DesktopSettingsScreen(
             }
         }
 
+        SettingsCard("Global Windows Preferences Backup") {
+            Text(
+                "Export or restore the Windows navigation position and player profile, including a custom avatar. Per-save game settings and progress are handled by Save Slots backups.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = {
+                    val chooser = JFileChooser().apply {
+                        dialogTitle = "Export global Windows preferences"
+                        selectedFile = File("guessthenumber-global-preferences.zip")
+                        fileFilter = FileNameExtensionFilter("GuessTheNumber preferences backup (*.zip)", "zip")
+                    }
+                    if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                        val destination = chooser.selectedFile.toPath()
+                        scope.launch {
+                            val exported = withContext(Dispatchers.IO) {
+                                runCatching { Files.write(destination, DesktopGlobalPreferencesBackup.exportBundle()) }.isSuccess
+                            }
+                            backupStatus = if (exported) "Global preferences backup exported." else "Could not export global preferences."
+                        }
+                    }
+                }) { Text("Export preferences") }
+                OutlinedButton(onClick = {
+                    val chooser = JFileChooser().apply {
+                        dialogTitle = "Import global Windows preferences"
+                        fileFilter = FileNameExtensionFilter("GuessTheNumber preferences backup (*.zip)", "zip")
+                    }
+                    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                        pendingGlobalImport = chooser.selectedFile.toPath()
+                        showGlobalImportConfirm = true
+                    }
+                }) { Text("Import preferences") }
+            }
+            backupStatus?.let { Text(it, color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodySmall) }
+        }
+
+        SettingsCard("Windows Feature Tour") {
+            Text(
+                "Replay a short guide to the main game systems, progression, activities and save tools.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall
+            )
+            Button(onClick = { featureTourPage = 0; showFeatureTour = true }) {
+                Text("Replay feature tour")
+            }
+        }
+
         SettingsCard("Developer & Save Preferences") {
             SettingsSwitch("Save Logs to Storage", "Keep this preference aligned with the Android settings model.", settings.saveLogsToStorage) {
                 onUpdateSettings(settings.copy(saveLogsToStorage = it))
@@ -230,6 +302,59 @@ fun DesktopSettingsScreen(
                 enabled = !isSaving
             ) { Text("Reset All Game Data") }
         }
+    }
+
+    if (showGlobalImportConfirm) {
+        AlertDialog(
+            onDismissRequest = { showGlobalImportConfirm = false; pendingGlobalImport = null },
+            title = { Text("Replace global preferences?") },
+            text = { Text("This replaces the Windows navigation position and player profile. Your game saves and per-save settings are not changed.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    val source = pendingGlobalImport
+                    showGlobalImportConfirm = false
+                    pendingGlobalImport = null
+                    if (source != null) {
+                        scope.launch {
+                            val imported = withContext(Dispatchers.IO) {
+                                runCatching { DesktopGlobalPreferencesBackup.importBundle(Files.readAllBytes(source)) }.getOrDefault(false)
+                            }
+                            if (imported) onGlobalPreferencesImported()
+                            backupStatus = if (imported) "Global preferences restored." else "Backup rejected. Existing preferences were kept."
+                        }
+                    }
+                }) { Text("Import backup") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showGlobalImportConfirm = false; pendingGlobalImport = null }) { Text("Cancel") }
+            }
+        )
+    }
+
+    if (showFeatureTour) {
+        val page = featureTourPages[featureTourPage]
+        AlertDialog(
+            onDismissRequest = { showFeatureTour = false },
+            title = { Text("Feature tour · ${featureTourPage + 1} / ${featureTourPages.size}") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(page.first, style = MaterialTheme.typography.titleLarge)
+                    Text(page.second)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (featureTourPage == featureTourPages.lastIndex) {
+                        showFeatureTour = false
+                    } else {
+                        featureTourPage++
+                    }
+                }) { Text(if (featureTourPage == featureTourPages.lastIndex) "Finish" else "Next") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showFeatureTour = false }) { Text("Close tour") }
+            }
+        )
     }
 
     if (showResetDialog) {

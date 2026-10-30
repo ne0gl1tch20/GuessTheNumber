@@ -6,13 +6,24 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.shared.domain.SaveProfileRules
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 private const val MAX_SAVE_SLOTS = 10
+private const val MAX_BUNDLE_BYTES = 20 * 1024 * 1024
+private const val MAX_SLOT_JSON_BYTES = 2 * 1024 * 1024
+private const val MAX_MANIFEST_BYTES = 16 * 1024
 
 data class DesktopSaveSlotSummary(val slot: Int, val state: GameState?, val isEmpty: Boolean, val hasBackup: Boolean, val isCorrupt: Boolean)
 
@@ -160,6 +171,132 @@ class DesktopSaveStore internal constructor(
         val sourceBackup = readValidJson(backupPath(source))
         if (sourceBackup != null) runCatching { writeAtomically(backupPath(target), sourceBackup) }
         return true
+    }
+
+    /**
+     * Exports one slot as the same plain GameState JSON accepted by Android's
+     * legacy single-save importer. The file is not encrypted; callers must label it clearly.
+     */
+    suspend fun exportSlotJson(slot: Int): String? {
+        val state = load(slot) ?: return null
+        return json.encodeToString(state)
+    }
+
+    /**
+     * Imports a single-slot JSON backup only after decoding and validating the
+     * complete state. save() keeps the previous valid state as a recovery backup.
+     */
+    suspend fun importSlotJson(slot: Int, rawJson: String): Boolean {
+        if (rawJson.isBlank() || rawJson.length > 2_000_000) return false
+        val imported = runCatching { json.decodeFromString<GameState>(rawJson) }.getOrNull() ?: return false
+        if (!validate(imported)) return false
+        return save(slot, imported)
+    }
+
+    /** Exports every populated slot plus the active-slot selection as one plain JSON ZIP bundle. */
+    suspend fun exportAllSlotsBundle(): ByteArray? {
+        val populated = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+            exportSlotJson(slot)?.let { slot to it }
+        }
+        if (populated.isEmpty()) return null
+        val active = activeSlot()
+        val manifest = """{"schemaVersion":1,"activeSlot":$active,"slots":[${populated.joinToString(",") { it.first.toString() }}]}"""
+        val output = ByteArrayOutputStream()
+        ZipOutputStream(output).use { zip ->
+            zip.putNextEntry(ZipEntry("manifest.json"))
+            zip.write(manifest.toByteArray(Charsets.UTF_8))
+            zip.closeEntry()
+            populated.forEach { (slot, rawJson) ->
+                zip.putNextEntry(ZipEntry("slot-$slot.json"))
+                zip.write(rawJson.toByteArray(Charsets.UTF_8))
+                zip.closeEntry()
+            }
+        }
+        return output.toByteArray().takeIf { it.size <= MAX_BUNDLE_BYTES }
+    }
+
+    /**
+     * Validates the complete bundle before replacing any slot. The previous primary,
+     * recovery and active-slot files are restored if a write fails.
+     */
+    suspend fun importAllSlotsBundle(rawBundle: ByteArray): Boolean {
+        if (rawBundle.isEmpty() || rawBundle.size > MAX_BUNDLE_BYTES) return false
+        val files = linkedMapOf<String, ByteArray>()
+        try {
+            ZipInputStream(ByteArrayInputStream(rawBundle)).use { zip ->
+                while (true) {
+                    val entry = zip.nextEntry ?: break
+                    val name = entry.name.replace(92.toChar(), '/')
+                    if (entry.isDirectory || name.startsWith("/") ||
+                        name.split('/').any { it == ".." } ||
+                        !(name == "manifest.json" || name.matches(Regex("slot-(?:[1-9]|10)\\.json")))
+                    ) return false
+                    if (files.containsKey(name)) return false
+                    val maximum = if (name == "manifest.json") MAX_MANIFEST_BYTES else MAX_SLOT_JSON_BYTES
+                    val output = ByteArrayOutputStream()
+                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                    var total = 0
+                    while (true) {
+                        val count = zip.read(buffer)
+                        if (count < 0) break
+                        total += count
+                        if (total > maximum) return false
+                        output.write(buffer, 0, count)
+                    }
+                    files[name] = output.toByteArray()
+                    zip.closeEntry()
+                }
+            }
+            val manifestRaw = files["manifest.json"]?.toString(Charsets.UTF_8) ?: return false
+            val manifest = json.parseToJsonElement(manifestRaw).jsonObject
+            if (manifest["schemaVersion"]?.jsonPrimitive?.content?.toIntOrNull() != 1) return false
+            val active = manifest["activeSlot"]?.jsonPrimitive?.content?.toIntOrNull() ?: return false
+            if (active !in 1..MAX_SAVE_SLOTS) return false
+            val slots = manifest["slots"]?.jsonArray?.map {
+                it.jsonPrimitive.content.toIntOrNull() ?: return false
+            } ?: return false
+            if (slots.isEmpty() || slots.size != slots.distinct().size || slots.any { it !in 1..MAX_SAVE_SLOTS }) return false
+            val expectedFiles = slots.map { "slot-$it.json" }.toSet() + "manifest.json"
+            if (files.keys != expectedFiles) return false
+            val imported = slots.associateWith { slot ->
+                val raw = files.getValue("slot-$slot.json").toString(Charsets.UTF_8)
+                if (raw.isBlank()) return false
+                val state = json.decodeFromString<GameState>(raw)
+                if (!validate(state)) return false
+                state
+            }
+            val previousActive = activeSlot()
+            val previousFiles = (1..MAX_SAVE_SLOTS).flatMap { slot ->
+                listOf(primaryPath(slot), backupPath(slot))
+            }.associateWith { path ->
+                if (fileOps.exists(path)) fileOps.read(path) else null
+            }
+            try {
+                for (slot in 1..MAX_SAVE_SLOTS) {
+                    val state = imported[slot]
+                    if (state != null) {
+                        check(save(slot, state)) { "Could not write imported save slot $slot." }
+                    } else {
+                        fileOps.deleteIfExists(primaryPath(slot))
+                        fileOps.deleteIfExists(backupPath(slot))
+                    }
+                }
+                val selectedActive = active.takeIf { it in imported } ?: imported.keys.minOrNull()!!
+                check(setActiveSlot(selectedActive)) { "Could not restore the active save slot." }
+                return true
+            } catch (_: Exception) {
+                previousFiles.forEach { (path, raw) ->
+                    runCatching {
+                        if (raw == null) fileOps.deleteIfExists(path)
+                        else writeAtomically(path, raw)
+                    }
+                }
+                runCatching { setActiveSlot(previousActive) }
+                return false
+            }
+        } catch (_: Exception) {
+            return false
+        }
     }
 
     suspend fun restoreBackup(slot: Int): Boolean {

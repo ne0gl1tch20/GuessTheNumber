@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.domain.engine
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
+import com.jarrlyyy.guessthenumber.shared.domain.TraitGameplayRules
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -76,6 +77,28 @@ class PermanentUpgradeEffectsTest {
     }
 
     @Test
+    fun desktopGuessPathCanApplyTheSameUnlockedTraitRulesAsAndroid() {
+        val state = GameState(
+            targetNumber = 50,
+            correctGuesses = 25,
+            streak = 5,
+            bestStreak = 5,
+            selectedTraitArms = mapOf("combo_momentum" to "burst")
+        )
+        val raw = GameEngine(Random(7)).processGuess(state, 50)
+        val traitAdjusted = TraitGameplayRules.apply(
+            stateBefore = state,
+            guess = 50,
+            result = raw,
+            activeTraitIds = TraitGameplayRules.activeGameplayTraitIds(state)
+        )
+
+        assertTrue(traitAdjusted.newState.money > raw.newState.money)
+        assertEquals(1L, traitAdjusted.newState.traitProfile.totalGuessesObserved)
+        assertEquals(1L, traitAdjusted.newState.traitProfile.correctGuessesObserved)
+    }
+
+    @Test
     fun desktopPrestigeAndUltraResetsGrantEndowmentBeforeResettingUpgradeLevels() {
         val prestigeState = GameState(
             money = engine.calculatePrestigeRequirement(0),
@@ -84,6 +107,8 @@ class PermanentUpgradeEffectsTest {
         val prestige = DesktopEconomyTransactions.prestigeReset(prestigeState, engine)
         assertTrue(prestige.accepted)
         assertEquals(0, prestige.state.money.compareTo(BigNumber(2_000)))
+        assertEquals(1L, prestige.state.traitProfile.prestigesObserved)
+        assertEquals(0L, prestige.state.traitProfile.ultrasObserved)
 
         val ultraState = GameState(
             money = engine.calculateUltraRequirement(0) * BigNumber(100),
@@ -94,6 +119,8 @@ class PermanentUpgradeEffectsTest {
         assertTrue(ultra.accepted)
         assertEquals(0, ultra.state.money.compareTo(BigNumber(3_000)))
         assertTrue(ultra.state.prestigeUpgradeLevels.isEmpty())
+        assertEquals(0L, ultra.state.traitProfile.prestigesObserved)
+        assertEquals(1L, ultra.state.traitProfile.ultrasObserved)
     }
 
     @Test

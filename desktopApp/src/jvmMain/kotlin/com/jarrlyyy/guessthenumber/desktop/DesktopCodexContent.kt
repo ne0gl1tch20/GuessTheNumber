@@ -15,14 +15,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 
-private data class DesktopCodexEntry(val id: String, val title: String)
+internal data class DesktopCodexEntry(val id: String, val title: String)
 
 private val desktopCodexEntries = listOf(
     DesktopCodexEntry("world:verdant_grove", "Verdant Grove"),
@@ -39,13 +44,24 @@ private val desktopCodexEntries = listOf(
     DesktopCodexEntry("secret:lost_observatory", "Lost Observatory")
 )
 
+internal fun filterDesktopCodexEntries(query: String): List<DesktopCodexEntry> {
+    val normalized = query.trim()
+    if (normalized.isEmpty()) return desktopCodexEntries
+    return desktopCodexEntries.filter {
+        it.title.contains(normalized, ignoreCase = true) ||
+            it.id.contains(normalized, ignoreCase = true)
+    }
+}
+
 @Composable
 internal fun DesktopCodexContent(
     state: GameState,
     onBack: () -> Unit,
     onClaimCompletionReward: () -> Unit
 ) {
+    var searchQuery by remember { mutableStateOf("") }
     val discovered = desktopCodexEntries.count { it.id in state.codexEntries }
+    val visibleEntries = filterDesktopCodexEntries(searchQuery)
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             OutlinedButton(onClick = onBack) { Text("Back to More") }
@@ -68,7 +84,18 @@ internal fun DesktopCodexContent(
                 }
             }
         }
-        desktopCodexEntries.forEach { entry ->
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it.take(80) },
+            label = { Text("Search Codex entries") },
+            placeholder = { Text("World, boss or secret area") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+        if (visibleEntries.isEmpty()) {
+            Text("No Codex entries match “$searchQuery”.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        visibleEntries.forEach { entry ->
             val found = entry.id in state.codexEntries
             Card(modifier = Modifier.fillMaxWidth()) {
                 Row(

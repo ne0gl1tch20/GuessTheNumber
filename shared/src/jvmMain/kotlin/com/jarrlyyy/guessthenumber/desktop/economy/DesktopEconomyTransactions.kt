@@ -6,6 +6,7 @@ import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.ShopItemDef
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
+import com.jarrlyyy.guessthenumber.shared.domain.InvisibleTraitEngine
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
@@ -131,7 +132,7 @@ object DesktopEconomyTransactions {
         if (state.money < requirement || reward <= BigNumber.ZERO) {
             return rejected(state, "Prestige requirement not met.")
         }
-        val next = state.copy(
+        val resetState = state.copy(
             money = engine.prestigeStartingCapital(state),
             prestige = state.prestige + reward,
             upgradeLevels = emptyMap(),
@@ -139,6 +140,11 @@ object DesktopEconomyTransactions {
             currentRangeMax = Difficulty.rangeMax(state.difficultyId, 0),
             statistics = state.statistics.copy(prestigesCount = state.statistics.prestigesCount + 1),
             prestigeCount = state.prestigeCount + 1
+        )
+        val next = InvisibleTraitEngine.observeProgression(
+            resetState,
+            previousPrestige = state.prestigeCount,
+            previousUltra = state.ultraCount
         )
         return accepted(next, "Prestige reset complete. Earned $reward Prestige.")
     }
@@ -149,7 +155,7 @@ object DesktopEconomyTransactions {
         if (state.money < requirement || state.prestige < BigNumber(1_000) || reward <= BigNumber.ZERO) {
             return rejected(state, "Ultra requires enough Money and at least 1,000 Prestige.")
         }
-        val next = state.copy(
+        val resetState = state.copy(
             money = engine.prestigeStartingCapital(state),
             prestige = BigNumber.ZERO,
             ultra = state.ultra + reward,
@@ -157,6 +163,11 @@ object DesktopEconomyTransactions {
             prestigeUpgradeLevels = emptyMap(),
             statistics = state.statistics.copy(ultrasCount = state.statistics.ultrasCount + 1),
             ultraCount = state.ultraCount + 1
+        )
+        val next = InvisibleTraitEngine.observeProgression(
+            resetState,
+            previousPrestige = state.prestigeCount,
+            previousUltra = state.ultraCount
         )
         return accepted(next, "Ultra reset complete. Earned $reward Ultra.")
     }
@@ -778,6 +789,60 @@ object DesktopEconomyTransactions {
                 statistics = state.statistics.copy(moneySpent = state.statistics.moneySpent + cost)
             ),
             "Sanctuary restored to level ${level + 1}."
+        )
+    }
+
+    private val WORLD_BOSS_IDS = mapOf(
+        "verdant_grove" to "verdant_guardian",
+        "crystal_caverns" to "crystal_golem",
+        "ember_summit" to "ember_dragon",
+        "nebula_rift" to "nebula_titan"
+    )
+
+    private val WORLD_SECRET_IDS = mapOf(
+        "verdant_grove" to "whispering_hollow",
+        "crystal_caverns" to "shard_archive",
+        "ember_summit" to "ashen_vault",
+        "nebula_rift" to "lost_observatory"
+    )
+
+    fun worldMasteryUpgradeCost(state: GameState, worldId: String): BigNumber? {
+        val bossId = WORLD_BOSS_IDS[worldId] ?: return null
+        if (worldId !in state.unlockedWorldIds || bossId !in state.defeatedBossIds) return null
+        val current = state.worldMasteryLevels[worldId] ?: 1
+        if (current >= 10) return null
+        val secretDiscount = if (WORLD_SECRET_IDS[worldId]?.let { it in state.discoveredSecretIds } == true) 0.20 else 0.0
+        val sanctuaryDiscount = (state.homeBaseLevel * 0.01).coerceAtMost(0.20)
+        val fullRelicSet = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        val relicDiscount = if (state.equippedRelicIds.containsAll(fullRelicSet)) 0.10 else 0.0
+        val discount = (secretDiscount + sanctuaryDiscount + relicDiscount).coerceAtMost(0.40)
+        return BigNumber(10L * (current + 1L)) * BigNumber(1.0 - discount)
+    }
+
+    fun upgradeWorldMastery(state: GameState, worldId: String): EconomyTransaction {
+        val cost = worldMasteryUpgradeCost(state, worldId)
+            ?: return rejected(state, "World mastery cannot be upgraded yet.")
+        if (state.nebula < cost) return rejected(state, "Not enough Nebula for this mastery upgrade.")
+        val current = state.worldMasteryLevels[worldId] ?: 1
+        val nextLevel = current + 1
+        val milestoneReward = when (nextLevel) {
+            5 -> 25L
+            10 -> 100L
+            else -> 0L
+        }
+        val codexEntries = if (nextLevel == 5 || nextLevel == 10) {
+            state.codexEntries + "mastery:$worldId:$nextLevel"
+        } else state.codexEntries
+        return accepted(
+            state.copy(
+                nebula = state.nebula - cost + BigNumber(milestoneReward),
+                worldMasteryLevels = state.worldMasteryLevels + (worldId to nextLevel),
+                codexEntries = codexEntries,
+                statistics = state.statistics.copy(
+                    nebulaEarned = state.statistics.nebulaEarned + milestoneReward
+                )
+            ),
+            "World mastery increased to level $nextLevel."
         )
     }
 

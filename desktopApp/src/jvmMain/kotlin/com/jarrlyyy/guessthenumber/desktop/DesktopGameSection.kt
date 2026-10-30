@@ -20,7 +20,8 @@ enum class DesktopGameSection {
     CODEX,
     ENDGAME,
     LUCKY_STAKE,
-    ARCADE
+    ARCADE,
+    MUSIC_PLAYER
 }
 
 

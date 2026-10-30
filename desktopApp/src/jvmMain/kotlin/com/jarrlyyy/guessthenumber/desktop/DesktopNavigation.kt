@@ -106,6 +106,10 @@ class DesktopShellController(
         private set
 
     fun navigate(destination: DesktopDestination) {
+        if (DesktopDebugToolsPolicy.isDeveloperOnly(destination) && !DesktopDebugToolsPolicy.enabled()) {
+            state = state.copy(message = "Developer tools are disabled in this build.")
+            return
+        }
         state = state.copy(destination = destination, message = null)
     }
 

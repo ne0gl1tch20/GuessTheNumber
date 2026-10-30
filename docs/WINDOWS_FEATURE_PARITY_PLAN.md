@@ -1,14 +1,14 @@
 # Windows Feature Parity Plan
 
-**Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
-**Reviewed:** 2026-10-17
+**Status (2026-10-30):** Stage 2 implementation is substantially present in the Windows host; the Stage 2 exit gate remains open for current-candidate automated verification and hands-on runtime evidence.
+**Reviewed:** 2026-10-30
 
-**Latest increment (2026-10-16):** PR #220 merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f` with Android and Windows CI passing. PR #221 then merged the five Android Arcade minigames for Windows, using the canonical `minigames.json` and shared `DesktopEconomyTransactions.awardArcadeReward` transaction. PR #222 fixed a nested vertical-scroll crash in the Windows Arcade route; Android Validation and Windows Desktop CI passed on its exact head, and the owner confirmed Arcade opens successfully in the Windows app. Broader runtime verification of the five games, reward effects/save persistence and PR #220's upgrades/navigation remains open.
+**Latest implementation snapshot (2026-10-30):** Windows now hosts the canonical `web-play/` bundle through `DesktopSharedWebView` for 17 player-facing routes (Play, Upgrades, Shop, Prestige, Ultra, Talent, Settings, Rewards, Worlds, Mutators, Relics, Home Base, Codex, Journey, Statistics, Arcade and Lucky Stake). Kotlin handles state, validation, rewards and persistence through the desktop bridge and shared production engine/transactions. Android and Windows now share the monotonic 50 ms guess-rate policy; every Windows guess path applies shared trait rules, and desktop Prestige/Ultra resets record the same invisible-trait progression as Android. The Windows route mapping, rate-limit boundaries and reset/trait behavior have focused automated tests. This is source-level progress, not proof of current-candidate CI or full Windows runtime/visual parity.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
 
-**Locked product and architecture direction: Windows must deliver the same GuessTheNumber experience as Android, not a smaller desktop edition.** The chosen implementation target is one shared HTML/CSS/JavaScript frontend for player-facing screens, Kotlin/KMP as the authoritative game engine, and native host adapters for platform services, with Compose retained for native/system surfaces and the desktop shell. This changes the preferred UI technology, not the exact-parity requirement. The target is chosen; implementation remains unstarted until the prototype and exit gates pass.
+**Locked product and architecture direction: Windows must deliver the same GuessTheNumber experience as Android, not a smaller desktop edition.** The chosen implementation target is one shared HTML/CSS/JavaScript frontend for player-facing screens, Kotlin/KMP as the authoritative game engine, and native host adapters for platform services, with Compose retained for native/system surfaces and the desktop shell. This changes the preferred UI technology, not the exact-parity requirement. The target is chosen and implementation is underway. Route-by-route runtime, accessibility, localization and distribution verification remain open.
 
 Port the Android experience screen by screen: same features, screen hierarchy, information, labels, controls, menus, dialogs, navigation destinations, locked/unlocked states, loading/empty/error states, and interaction outcomes. Adapt only the presentation and input where desktop requires it (resizable window, keyboard, mouse, focus, hover and desktop conventions). Desktop adaptations must preserve the Android screen's content and meaning; any deliberate feature difference needs an explicit reason and documentation.
 
@@ -35,7 +35,7 @@ The locked target is an **exact Windows experience of GuessTheNumber with shared
 - For each slice, name the Android reference screen/component, describe the Windows counterpart, cover relevant state/action paths, identify shared code/assets and host-specific adapters, and update the matrix in the same PR.
 - Keep **source implemented**, **CI passed**, **automated behavior tested**, **Windows runtime verified**, **screenshot compared** and **installer tested** distinct. One does not imply the others.
 - Use evidence from the exact candidate commit. If Windows runtime testing is unavailable, keep the row unverified and state that plainly; do not infer a pass from compilation, CI or a route placeholder.
-- Keep the five stages below sequential. Stage 2 remains open until its remaining core gameplay/economy gaps have evidence. Do not start Stage 3 implementation ahead of the Stage 2 exit gate.
+- Stage exit claims remain sequential: Stage 2 must pass its evidence gate before overall parity can be declared. Owner-directed implementation work for Stages 3–5 may proceed in parallel, but must not be described as verified or complete while earlier runtime gates or the stage's own requirements remain open.
 - Declare overall parity complete only when every required row is verified with evidence, explicitly approved as platform-specific, or excluded by documented agreement, and all release blockers are resolved.
 
 Roadmap coordination: [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) records the product direction and broader planned work. The chosen [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md) defines the web/Kotlin bridge and migration gates. This document alone owns Windows parity stages, the screen-by-screen matrix and its verification status.
@@ -119,6 +119,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Windows Play reuses Android's shared status-colored guess feedback card and semantic status-to-icon mapping; visual/runtime comparison remains unverified.
 - [x] Correct/incorrect rewards, attempts, streaks and Frenzy flow through the shared production engine.
 - [x] Expose the four shared mutators on Windows, recalculate the range/target on toggle, and hide direction hints for Blind.
+- [x] Use one `commonMain` monotonic 50 ms rate-limit policy for Android manual guesses, Windows native input and Windows shared-web bridge submissions; common tests cover first use, boundary timing and clock-origin edge cases.
 - [ ] Verify rate limiting and the full set of invalid, boundary, post-solve and mutator runtime cases.
 - [x] Add 1/10/100/MAX quick-buy selection with exact combined costs and atomic bulk purchase transactions for Money, Prestige and Ultra upgrades.
 - [x] Persist/reload a run through the desktop save adapter; user reported the focused restart/save check passed.
@@ -133,8 +134,9 @@ The port is complete only when every Android player-facing screen and reachable 
 
 - [x] Prestige and Ultra flows enforce shared requirements/rewards and now require confirmation before reset.
 - [x] Load talent costs and prerequisites from the canonical catalog; PR #218 makes both purchase validation and Talent Web parent gating read the bundled catalog rather than a second hardcoded rule map. Its Android and Windows CI passed before merge. The visible Windows labels/descriptions still use the Android fallback copy, and locale-aware rendering/runtime parity remain open.
+- [x] Apply the shared `TraitGameplayRules` to Windows manual, shared-web and Auto Clicker guess paths; desktop Prestige/Ultra resets now also record progression through `InvisibleTraitEngine`, matching Android's reset observation.
 - [x] Implement all six permanent Prestige/Ultra upgrade effects in shared rules for Android and Windows, driven by each canonical catalog's `effectPerLevel`: Prestige Wealth adds 0.5× per level to its money multiplier; Cosmic Wealth adds 2× per level to its money multiplier; the two money multipliers stack multiplicatively; Prestige Catalyst multiplies reset Prestige by 1 + 0.2× level; Prestige Endowment grants 1,000 Money per level after Prestige or Ultra reset using the pre-reset level; Eternal Expansion multiplies Ultra reset reward by 1 + 0.5× level while preserving the 2,000 cap; Nebula Resonance multiplies achievement/Arcade Nebula payouts by 1 + level and stacks with the existing `nebula_boost` shop item. Shared achievement unlock/reward logic is now used by both hosts.
-- [ ] Verify all six effects and reset/save persistence in the merged Windows build. The Windows Arcade screen is now implemented; the owner confirmed it opens without the nested-scroll crash fixed in PR #222. Verify individual minigame outcomes, Nebula/Money reward multipliers and save/reload persistence separately. The Music Player remains a placeholder.
+- [ ] Verify all six effects and reset/save persistence in the merged Windows build. The Windows Arcade screen is now implemented; the owner confirmed it opens without the nested-scroll crash fixed in PR #222. Verify individual minigame outcomes, Nebula/Money reward multipliers and save/reload persistence separately. The Music Player now has native local-file playback controls; supported formats depend on Windows Java Sound.
 - [ ] Verify large-number display and calculations across representative Android-matching cases.
 - [x] Add deterministic exact-cost bulk-purchase tests and retain reset-preservation/duplicate-reward tests.
 - [ ] Verify all reset preservation and boundary cases on the current candidate.
@@ -143,59 +145,82 @@ The port is complete only when every Android player-facing screen and reachable 
 
 ### W3. Progression and collection
 
-- [x] Achievement milestone unlocks and one-time Nebula rewards use the shared engine on Android and Windows; the Ultra Nebula upgrade applies to achievement payouts.
-- [ ] Verify the desktop achievements screen's presentation and reward feedback against Android; add claimable reward parity where the Android flow requires it.
-- [ ] Daily/weekly challenges and claim-state persistence.
-- [ ] Statistics and progression summaries.
-- [ ] World map, world unlocks, bosses, relic inventory/sets and mastery.
-- [ ] Secret discoveries, Home Base, Codex and Endless Rift.
-- [ ] Locked/unlocked/completed states and explanatory requirements.
+- [x] Source implementation: achievements load the canonical catalog, reflect saved unlocks/progress, expose tier/reward details and filters; milestone rewards use shared Kotlin rules.
+- [x] Source implementation: world catalog, unlock/select actions, boss progress, boss battle transactions and guess-driven boss damage/rewards are connected to Kotlin-owned state.
+- [x] Source implementation: relic inventory, boss-gated claims, equip/unequip limits and set-bonus previews use desktop transactions.
+- [x] Source implementation: Home Base upgrade progression and Codex discovery/completion reward are persisted through desktop transactions; Endgame exposes progression goals and Endless Rift state.
+- [x] Shared challenge reward eligibility and duplicate-claim protection exist in Kotlin; desktop mutator/challenge UI and transaction code are present.
+- [ ] Verify progression routes, challenge claims, relic effects, mastery, bosses and save/reload against Android on a current Windows runtime.
+- [x] Add Android-matching world mastery upgrade transactions, including secret/Sanctuary/full-relic discounts, level caps and level-5/10 Nebula + Codex milestones; expose mastery purchase from the Windows world map.
+- [x] Add searchable Codex entries by title and stable ID with empty-result feedback.
+- [ ] Verify mastery effects, all progression routes and Endless Rift interactions in a current Windows runtime.
+- [x] Add bundled Lua activity discovery/execution for the canonical `scripts/manifest.json` catalog, with source-size and instruction budgets, strict output validation, and no save/currency/reward/filesystem/network host capabilities.
+- [x] Port signed HTTPS LiveOps bundle refresh, RSA signature verification, app/host compatibility checks, script SHA-256 validation, staged atomic activation, high-water version protection, verified cache reads and rollback to a prior verified bundle. Remote scripts use the same restricted Lua sandbox and fail closed when no public key is configured.
+- [x] Add feature-flagged LiveOps event presentation from the canonical Android manifest, date/status refresh, progression requirement display and active-save reward claims through the shared Kotlin `LiveOpsClaimPolicy`; refresh flags and recheck event window/eligibility at claim time.
+- [ ] Add remote signed event-manifest delivery (current signed LiveOps transport covers Lua scripts; events currently use the canonical bundled manifest).
+- [ ] Verify locked/unlocked/completed states, explanatory requirements and localized feedback.
 
 **Exit:** Player-facing progression systems are accessible and state-consistent on Windows.
 
 ### W4. Activities and events
 
-- [x] Port the five catalog-backed Android Arcade minigames (Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush) to Windows and route payouts through the shared economy transaction. CI enforces that the packaged desktop minigame catalog matches Android's canonical asset.
-- [x] Confirm the Windows Arcade route opens without the nested-scroll exception (PR #222; owner-reported runtime verification).
-- [ ] Verify all five minigames' win/loss behavior, localized strings, reward multipliers and reward/save persistence on Windows.
-- [ ] Random events, challenge/mutator setup and staking where in agreed release scope.
-- [ ] Number Rush and bundled LuaJ activities using existing sandbox/validation boundaries.
-- [ ] Offline event availability and reward validation.
-- [ ] Missing optional content or audio fails gracefully instead of crashing.
+- [x] Source implementation: five catalog-backed Android Arcade minigames (Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush) route payouts through Kotlin-owned transactions.
+- [x] Source implementation: Lucky Stake settlement uses desktop transactions with stake validation and saved statistics.
+- [ ] Verify all five minigame win/loss outcomes, localization, reward multipliers and save/reload on Windows.
+- [x] Add the bundled Number Rush Lua activity to the Windows Activity Hub with Android-equivalent payload limits, one-answer lifecycle and Kotlin-owned UI state.
+- [x] Add verified remote LiveOps script discovery/refresh to the Activity Hub; signed bundles are HTTPS-only, hash-checked and rollback-protected.
+- [x] Connect the canonical `feature_flags.json` and LiveOps event manifest to a Windows event screen; claims use the shared Android/Windows Kotlin policy and active-slot persistence.
+- [ ] Add signed remote event-manifest delivery and verify Windows runtime parity.
+- [ ] Verify offline event availability, reward validation and missing optional content/audio failure behavior.
 
 **Exit:** Supported activities work offline, and scripted content cannot bypass Kotlin-owned reward/state validation.
 
 ### W5. Player utilities and data
 
-- [ ] Settings, theme, locale and desktop-supported accessibility options.
-- [ ] Save slots, slot switching, backup/export/import and recovery appropriate to Windows.
-- [ ] Tutorial/feature tours and replay entry points.
+- [x] Wire Windows game settings for theme mode/presets, number notation, locale preference, sound toggles/volume, reduced motion, reduce flashes and navigation preferences into the saved settings model.
+- [ ] Complete actual locale-aware Windows rendering and Windows notification delivery; several current settings are stored preferences rather than active OS integrations.
+- [x] Add validated single-slot JSON import/export to Windows Save Slots. Imports reject malformed, oversized and invalid states and preserve the previous save as a recovery backup; raw GameState JSON is also accepted by Android's legacy single-save import path. These files are plain JSON, not encrypted, and do not include global settings or all slots in one bundle.
+- [x] Implement ten independent desktop save slots, switching, duplication, recovery-backup restore and validated per-slot JSON import/export.
+- [x] Add a validated portable all-slot ZIP bundle with manifest, active-slot selection, full preflight validation and rollback of previous slot files if an import write fails. The bundle contains all populated slots and their per-save settings.
+- [x] Add a separate portable global-app-preferences ZIP bundle for Windows navigation and player profile, including custom avatar bytes; imports validate schema, entry names, sizes and image content before replacing preferences.
+- [ ] Add optional passphrase encryption for portable save and global-preferences backups; current ZIP/JSON exports are not encrypted.
+- [x] Add a replayable five-step Windows feature tour covering Play, upgrades/shop, progression, activities/events and save/settings tools; the tour is available from Settings.
 - [ ] About, player-facing error states and crash recovery surfaces.
-- [ ] Music controls where Windows audio support exists; document intentional differences. The Windows Music Player route remains a placeholder.
+- [x] Add native local Music Player controls, saved file library/queue paths, playback, pause/resume, stop and volume. Windows Java Sound support is format-dependent; WAV/AIFF/AU are the expected supported formats, while Android-only media integrations remain intentionally unavailable.
 - [ ] Localize all visible strings and accessible labels.
 
 **Exit:** Players can configure, save, restore and understand Windows without Android-only screens.
 
 ### W6. Developer tooling
 
+- [x] Hide Windows Developer Settings, Developer Console, Process Inspector and Lua Testing Hub by default; packaged builds require a build-time opt-in (`-Pgtn.desktop.debugToolsBuild=true`) and a separate launch flag (`-Dgtn.desktop.debugTools=true`). The default Windows CI MSI build is not opted in.
+- [x] Add a Windows typed developer-command allowlist with bounded in-session output history. Supported commands are limited to inspection and validated currency/upgrade/automation adjustments; shell execution, arbitrary code, filesystem and network commands are not exposed.
+- [x] Add local JVM/runtime and heap diagnostics without enumerating other processes, capturing command-line arguments or transmitting telemetry.
+- [x] Move the pure Kotlin command parser, registry and autocomplete definitions into shared KMP code; Windows now uses the same parser while applying a stricter desktop-safe command allowlist.
+- [ ] Add the remaining deterministic game test helpers and port the rest of Android's debug-only command catalog where safe.
+- [x] Add a build-time developer-tools resource gate so a launch argument alone cannot expose developer routes in the default packaged build.
+- [ ] Verify the built MSI itself remains blocked when launched with the debug system property.
+
 - [ ] Console, state inspection, test helpers and verbose logs are debug-only.
 - [ ] Developer commands are not exposed unintentionally in production.
-- [ ] Add deterministic tests for common rules and desktop adapters.
+- [x] Add deterministic tests for command build/launch gating, command input validation, currency bounds, upgrade IDs/levels, automation limits and process diagnostic snapshots.
 
 **Exit:** Debug tools aid diagnosis and are absent or disabled in production packages.
 
 ### W7. Updates, packaging and release readiness
 
-- [ ] Keep debug update discovery/install separate from production releases.
-- [ ] **Windows Debug update source:** discover builds from the repository's Windows Desktop CI GitHub Actions workflow runs and their attached artifacts, not GitHub Releases.
-- [ ] **Windows Debug package format:** the CI artifact consumed by the updater must be a ZIP containing the built Windows MSI. Keep the artifact name, run number/attempt, commit SHA, package version and checksum metadata consistent and verifiable.
-- [ ] Update the Windows Debug updater to find the latest eligible successful CI run, locate/download its ZIP artifact, verify the expected channel/version/checksum, extract the MSI to a controlled temporary location and launch the existing install/upgrade flow.
-- [ ] Handle missing artifacts, expired CI artifacts, failed/in-progress runs, checksum mismatch, invalid ZIP/missing MSI and incompatible versions with clear errors; never fall back to production releases or install an unverified package.
-- [ ] Confirm the intended public-repository download path works without embedding a personal access token in the app. Document the Actions artifact retention window and explain when a build has expired.
-- [ ] Keep production update discovery and installer flow separate from the debug CI-artifact flow.
-- [ ] Test clean MSI install, in-place upgrade, repeated upgrade, failed-upgrade recovery, downgrade and uninstall.
+- [x] Remove GitHub Release publishing from Windows Desktop CI; the Windows Debug update channel no longer depends on `debug-latest`.
+- [x] Discover the latest successful `push` run on `master`, require the named `GuessTheNumber-Windows-Debug` artifact and reject expired/missing artifacts with a seven-day retention message.
+- [x] Bind update metadata to the CI run number, attempt and commit SHA; validate the canonical Actions artifact ZIP URL, manifest channel/version/attempt/commit, inner installer ZIP SHA-256 and expected MSI entry.
+- [x] Extract only the expected artifact files and MSI into a controlled temporary directory with path traversal, duplicate/unknown-entry and size checks.
+- [x] Keep the debug updater isolated from production release discovery and remove unnecessary workflow `contents: write` permission.
+- [ ] Verify public-repository artifact download works without credentials from a clean Windows install; confirm the actual seven-day expiry response.
+- [ ] Add end-to-end artifact download/install tests for missing artifacts, invalid outer ZIP, checksum mismatch, invalid MSI ZIP and expired artifacts.
+- [x] Keep production update discovery and installer flow separate from the debug CI-artifact flow; the debug client is explicitly pinned to the Windows Desktop CI artifact API.
+- [x] Add Windows CI MSI lifecycle coverage for clean legacy install, in-place upgrade, repeated upgrade, invalid-installer failure recovery, version/product registration and uninstall; verify a user-data marker survives upgrades and uninstall. Current workflow execution must pass before treating this as verified.
+- [ ] Test downgrade behavior and recovery from a genuine interrupted MSI transaction.
 - [ ] Preserve the verified MSI UpgradeCode and user-data location; do not change identifiers blindly.
-- [ ] Verify saves survive restart and supported upgrades.
+- [ ] Verify a real GameState save survives application restart and supported MSI upgrades (CI currently checks APPDATA user-data preservation with a marker file).
 - [ ] Align version metadata, locale assets and changelog.
 
 **Exit:** Windows packages install/update predictably and preserve user data; the debug channel installs only a verified MSI ZIP from Windows Desktop CI artifacts, while production updates remain isolated.
@@ -288,7 +313,7 @@ A shared component or green CI is not proof that a complete feature works end-to
 
 ### Source-backed Android destination and data-operation inventory
 
-This inventory was checked against `Screen.kt`, `NavGraph.kt`, `MainActivity.kt`, `GameViewModel.kt`, `SaveManager.kt`, `LocaleManager.kt` and `SAVE_SCHEMA_AND_MIGRATION.md` on 2026-10-15. The stage labels below are sequencing targets, not a claim that the Windows implementation exists. On Windows, only the initial Play/About shell is present; Play still embeds the demo pilot and About is informational, so neither counts as production feature parity.
+This inventory was checked against Android sources on 2026-10-15 and records the original baseline only. Its Windows-status cells are historical and are superseded by the 2026-10-30 implementation snapshot below; do not use those old cells to describe the current desktop host.
 
 | Android destination or route | Planned stage | Windows status / notes |
 |---|---|---|
@@ -310,7 +335,7 @@ This inventory was checked against `Screen.kt`, `NavGraph.kt`, `MainActivity.kt`
 | Arcade | Stage 3 | Not implemented on Windows; rewards must go through validated game-state actions. |
 | Activity Hub (`lua_hub`) | Stage 3 | Not implemented on Windows; Android gates it with the Lua scripting feature flag. |
 | Lucky Stake | Stage 3 | Not implemented on Windows; settlement must preserve authoritative economy rules. |
-| Live Ops (`live_ops` route) | Stage 3 | Separate NavGraph route, not a `Screen.kt` object; Android gates it with Live Ops and seasonal-reward flags. Not implemented on Windows. |
+| Live Ops (`live_ops` route) | Stage 3 | Separate route; Windows now reads the canonical event manifest and feature flags, displays event windows/requirements/claim counts and persists claims through the shared Kotlin policy. Signed remote event-manifest delivery and runtime parity remain open. |
 | Settings | Stage 4 | Not implemented on Windows; desktop-native equivalents are required rather than copying Android APIs. |
 | Save Slots | Stage 4 | Not implemented on Windows. Android's source defines 10 slots, active-slot selection, slot metadata, backup/recovery and legacy-save migration. |
 | Music Player | Stage 4 | Not implemented on Windows; confirm desktop audio support and document any approved platform difference. |
@@ -319,6 +344,22 @@ This inventory was checked against `Screen.kt`, `NavGraph.kt`, `MainActivity.kt`
 | Lua Testing Hub | Stage 4, debug-only | Android route exists only in debug builds and is feature-flag gated. Must never leak into production. |
 | Dev Settings | Stage 4, debug-only | Android route exists only in debug builds and is feature-flag gated. Must never leak into production. |
 | Process Inspector | Stage 4, debug-only | Android route exists only in debug builds. Must never leak into production. |
+
+### Current Windows implementation snapshot (2026-10-30)
+
+Source audit of `DesktopGameSection.kt`, `Main.kt`, `ProductionGuessGameScreen.kt`, `DesktopEconomyTransactions.kt` and the shared web bridge confirms:
+
+| Area | Current source implementation | Still open |
+|---|---|---|
+| Shared player UI | 17 sections map to canonical `web-play/` routes and load through `DesktopSharedWebView`; no separate Windows HTML/CSS/JS copy. | Current Windows runtime, resize, focus, IME, screen-reader and screenshot comparison |
+| Guessing/economy | Shared production `GameEngine` / `GameState`; desktop transactions apply guess bonuses, daily progress, boss progress and achievements before save. | Invalid/range/post-solve/rate-limit and mutator scenarios on a real Windows build |
+| Upgrades/shop | Canonical catalog and desktop transaction handlers support purchase/equip/multiplier actions. | Catalog effect review, affordability/max-level/ownership edge cases and save/reload runtime checks |
+| Prestige/Ultra/Talent | Shared HTML routes call Kotlin reset and talent transaction handlers; shared engine computes requirements and rewards. | Six permanent effects, talent effect outcomes, reset preservation and large-number runtime checks |
+| Mutators/challenges | Shared HTML route and Kotlin mutator/challenge transactions. | Challenge builder, all mutator combinations and daily/weekly claim-state runtime parity |
+| Rewards/Arcade | Shared reward/quest/chest state and canonical Arcade catalog; Arcade payouts use Kotlin transactions. | All five minigame outcomes, reward multipliers and persisted claims in Windows runtime |
+| Save management | Native desktop store has ten slots, active-slot selection, duplicate/create and backup recovery. | Import/export, destructive reset parity, Android-save compatibility and complete recovery QA |
+
+The route mapping is guarded by `DesktopGameSectionRouteTest`; the shared 50 ms monotonic rate-limit policy is covered by `GuessRateLimitRulesTest` and used by both Android and Windows. These tests do not establish full parity or a Windows runtime pass.
 
 #### Cross-cutting Android behavior that Windows must account for
 

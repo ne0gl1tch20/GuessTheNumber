@@ -13,6 +13,15 @@ Historical evidence below refers to the commits named in each row and is not aut
 - PR #218's catalog-driven talent validation is merged; Android Validation and Windows Desktop CI passed on its exact head. No runtime screenshot parity or full Windows runtime verification is claimed.
 - **Stage 2-D / Stage 2 exit gate: still open.** Earlier successful workflow runs listed below are historical evidence for their specific commits only.
 
+## Current candidate follow-up (2026-10-30)
+
+- Android `AntiCheatService` and the Windows production guess screen now call the same `commonMain` `GuessRateLimitRules` policy with host-provided monotonic timestamps. This removes the previous wall-clock-vs-monotonic implementation split while keeping the 50 ms threshold unchanged.
+- Every Windows guess path (shared-web manual submission, native fallback and Auto Clicker) now applies `TraitGameplayRules`, matching Android's trait/invisible-progression observation path. Windows Prestige and Ultra transactions now call `InvisibleTraitEngine.observeProgression` just as Android does; the reset regression test asserts the persisted trait counters advance with the corresponding reset.
+- `GuessRateLimitRulesTest` covers first submission, inside-window rejection, the exact 50 ms boundary, later acceptance, monotonic-clock regression and disabled-interval behavior.
+- `DesktopGameSectionRouteTest` locks the 17 player-facing desktop sections to the canonical shared HTML route names and asserts that the native More and Save Slots sections remain native.
+- `WINDOWS_FEATURE_PARITY_PLAN.md` and `SHARED_WEB_UI_MIGRATION_MATRIX.md` now describe the current shared-web desktop host rather than the outdated Compose-only baseline.
+- These are source changes and test additions only. No Android/Windows CI result or new interactive Windows runtime result is claimed for this candidate. The Stage 2 exit gate remains open.
+
 ## Evidence collected
 
 | Area | Evidence | Result |
