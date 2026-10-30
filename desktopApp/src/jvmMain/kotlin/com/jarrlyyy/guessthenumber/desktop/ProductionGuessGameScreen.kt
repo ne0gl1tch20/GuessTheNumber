@@ -118,7 +118,7 @@ fun ProductionGuessGameScreen(
     var activeSaveSlot by remember { mutableStateOf(1) }
     var saveSlotSummaries by remember { mutableStateOf<List<DesktopSaveSlotSummary>>(emptyList()) }
     var guessText by remember { mutableStateOf("") }
-    var lastGuessTimestampNanos by remember { mutableStateOf(0L) }
+    var lastGuessTimestampNanos by remember { mutableStateOf<Long?>(null) }
     var selectedShopCategory by remember { mutableStateOf("all") }
     var feedback by remember { mutableStateOf("Loading your saved game…") }
     var feedbackStatus by remember { mutableStateOf(GuessGameStatus.READY) }
