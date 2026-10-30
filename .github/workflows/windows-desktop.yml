@@ -10,6 +10,9 @@ on:
       - '!app/src/main/assets/web-play/**'
   pull_request:
     types:
+      - opened
+      - synchronize
+      - reopened
       - closed
     branches:
       - master
@@ -29,7 +32,7 @@ concurrency:
 
 jobs:
   build-windows:
-    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+    if: github.event_name != 'pull_request' || github.event.action != 'closed' || github.event.pull_request.merged == true
     name: Validate, test, and package Windows desktop app
     runs-on: windows-latest
     timeout-minutes: 40
