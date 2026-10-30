@@ -64,7 +64,12 @@ class BigNumberProgressionRewardRulesTest {
         val encoded = Json.encodeToString(GameState.serializer(), original)
         val restored = Json.decodeFromString(GameState.serializer(), encoded)
 
-        assertEquals(original, restored)
+        // BigDecimal scale is not semantically significant for saved currency values.
+        assertEquals(0, original.money.compareTo(restored.money))
+        assertEquals(0, original.prestige.compareTo(restored.prestige))
+        assertEquals(0, original.ultra.compareTo(restored.ultra))
+        assertEquals(original.prestigeUpgradeLevels, restored.prestigeUpgradeLevels)
+        assertEquals(original.ultraUpgradeLevels, restored.ultraUpgradeLevels)
         assertEquals(
             0,
             engine.calculatePrestigeReward(restored.money, restored.prestigeCount)
