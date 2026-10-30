@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.desktop
 
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import java.math.BigDecimal
 import java.util.concurrent.ThreadLocalRandom
 
 internal data class DesktopDeveloperCommandResult(
@@ -45,8 +46,12 @@ internal class DesktopDeveloperCommandExecutor(
             )
             "/give", "/set" -> {
                 if (args.size != 2) return DesktopDeveloperCommandResult("Usage: $command <money|prestige|ultra|nebula> <non-negative amount>")
-                val amount = runCatching { BigNumber(args[1]) }.getOrNull()
-                    ?: return DesktopDeveloperCommandResult("Amount is not a valid number.")
+                val decimal = runCatching { BigDecimal(args[1]) }.getOrNull()
+                    ?: return DesktopDeveloperCommandResult("Amount must be a plain decimal number.")
+                if (decimal.precision() > 100 || kotlin.math.abs(decimal.scale()) > 1_000) {
+                    return DesktopDeveloperCommandResult("Amount exceeds the supported precision limit.")
+                }
+                val amount = BigNumber(decimal)
                 if (amount < BigNumber.ZERO) return DesktopDeveloperCommandResult("Negative currency values are not allowed.")
                 val currency = args[0].lowercase()
                 val add = command == "/give"
