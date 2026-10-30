@@ -701,6 +701,7 @@ fun ProductionGuessGameScreen(
                             .put("type", "state").put("state", payload).toString())
                     }
                 },
+                onNavigationPositionChange = onNavigationPositionChange,
                 modifier = Modifier.fillMaxSize()
             )
             }
