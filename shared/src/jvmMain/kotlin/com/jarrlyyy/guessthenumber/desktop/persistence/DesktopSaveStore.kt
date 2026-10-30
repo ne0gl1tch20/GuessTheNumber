@@ -162,6 +162,26 @@ class DesktopSaveStore internal constructor(
         return true
     }
 
+    /**
+     * Exports one slot as the same plain GameState JSON accepted by Android's
+     * legacy single-save importer. The file is not encrypted; callers must label it clearly.
+     */
+    suspend fun exportSlotJson(slot: Int): String? {
+        val state = load(slot) ?: return null
+        return json.encodeToString(state)
+    }
+
+    /**
+     * Imports a single-slot JSON backup only after decoding and validating the
+     * complete state. save() keeps the previous valid state as a recovery backup.
+     */
+    suspend fun importSlotJson(slot: Int, rawJson: String): Boolean {
+        if (rawJson.isBlank() || rawJson.length > 2_000_000) return false
+        val imported = runCatching { json.decodeFromString<GameState>(rawJson) }.getOrNull() ?: return false
+        if (!validate(imported)) return false
+        return save(slot, imported)
+    }
+
     suspend fun restoreBackup(slot: Int): Boolean {
         val normalized = normalizeSlot(slot)
         val previous = readValid(backupPath(normalized)) ?: return false
