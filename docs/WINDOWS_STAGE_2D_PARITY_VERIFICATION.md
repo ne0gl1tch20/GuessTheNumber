@@ -16,6 +16,7 @@ Historical evidence below refers to the commits named in each row and is not aut
 ## Current candidate follow-up (2026-10-30)
 
 - Android `AntiCheatService` and the Windows production guess screen now call the same `commonMain` `GuessRateLimitRules` policy with host-provided monotonic timestamps. This removes the previous wall-clock-vs-monotonic implementation split while keeping the 50 ms threshold unchanged.
+- Every Windows guess path (shared-web manual submission, native fallback and Auto Clicker) now applies `TraitGameplayRules`, matching Android's trait/invisible-progression observation path. Windows Prestige and Ultra transactions now call `InvisibleTraitEngine.observeProgression` just as Android does; the reset regression test asserts the persisted trait counters advance with the corresponding reset.
 - `GuessRateLimitRulesTest` covers first submission, inside-window rejection, the exact 50 ms boundary, later acceptance, monotonic-clock regression and disabled-interval behavior.
 - `DesktopGameSectionRouteTest` locks the 17 player-facing desktop sections to the canonical shared HTML route names and asserts that the native More and Save Slots sections remain native.
 - `WINDOWS_FEATURE_PARITY_PLAN.md` and `SHARED_WEB_UI_MIGRATION_MATRIX.md` now describe the current shared-web desktop host rather than the outdated Compose-only baseline.
