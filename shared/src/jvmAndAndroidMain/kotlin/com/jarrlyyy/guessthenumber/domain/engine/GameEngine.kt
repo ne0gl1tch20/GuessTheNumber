@@ -8,7 +8,6 @@ import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeClaimRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
-import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRewardRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessCoreState
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessTransitionRules
@@ -277,11 +276,8 @@ class GameEngine(private val rng: Random = Random.Default) {
         return BigNumber(level.toLong() * 1_000L)
     }
 
-    fun calculatePrestigeReward(money: BigNumber, prestigeCount: Long): BigNumber {
-        val req = calculatePrestigeRequirement(prestigeCount).value.toDouble()
-        val m = money.value.toDouble()
-        return BigNumber(ProgressionRewardRules.prestigeRewardRatio(m, req)).floor()
-    }
+    fun calculatePrestigeReward(money: BigNumber, prestigeCount: Long): BigNumber =
+        BigNumberProgressionRewardRules.prestigeReward(money, calculatePrestigeRequirement(prestigeCount))
 
     fun calculatePrestigeReward(state: GameState): BigNumber {
         val baseReward = calculatePrestigeReward(state.money, state.prestigeCount)
@@ -289,11 +285,8 @@ class GameEngine(private val rng: Random = Random.Default) {
         return (baseReward * BigNumber(1.0 + level * 0.2)).floor()
     }
 
-    fun calculateUltraReward(money: BigNumber, ultraCount: Long): BigNumber {
-        val req = calculateUltraRequirement(ultraCount).value.toDouble()
-        val m = money.value.toDouble()
-        return BigNumber(ProgressionRewardRules.ultraRewardRatio(m, req)).floor()
-    }
+    fun calculateUltraReward(money: BigNumber, ultraCount: Long): BigNumber =
+        BigNumberProgressionRewardRules.ultraReward(money, calculateUltraRequirement(ultraCount))
 
     fun calculateUltraReward(state: GameState): BigNumber {
         val baseReward = calculateUltraReward(state.money, state.ultraCount)
