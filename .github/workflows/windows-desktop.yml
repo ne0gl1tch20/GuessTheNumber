@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-    # Match Stable Debug APK: skip web-player-only edits.
     paths:
       - '**'
       - '!app/src/main/assets/web-play/**'
@@ -124,7 +123,7 @@ jobs:
 
       - name: Build versioned Windows installer
         shell: pwsh
-        run: .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache -Pgtn.desktop.debugToolsBuild=true
+        run: .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache -P "gtn.desktop.debugToolsBuild=true"
 
       - name: Show packaged files
         shell: pwsh
@@ -171,8 +170,6 @@ jobs:
             Set-Content -Path $resourcePath -Value "version=$env:GTN_WINDOWS_PACKAGE_VERSION" -Encoding ascii
           }
 
-          # Simulate an existing player's save-data directory and verify that upgrades
-          # and uninstall never delete user-owned data under APPDATA.
           $userDataRoot = Join-Path (Join-Path $env:APPDATA "GuessTheNumber") "saves"
           New-Item -ItemType Directory -Path $userDataRoot -Force | Out-Null
           $userDataMarker = Join-Path $userDataRoot "ci-user-data-preservation.txt"
@@ -188,7 +185,6 @@ jobs:
             throw "Updated MSI installation failed with exit code $($updatedInstall.ExitCode)."
           }
 
-          # Reinstall the same package to cover repeated in-place upgrades.
           $repeatInstall = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$($updatedPackage.FullName)`" /qn /norestart" -Wait -PassThru
           if ($repeatInstall.ExitCode -notin @(0, 3010)) {
             throw "Repeated MSI upgrade failed with exit code $($repeatInstall.ExitCode)."
@@ -214,7 +210,6 @@ jobs:
             throw "Installed MSI version does not match the updated package version."
           }
 
-          # A corrupt installer must fail without removing or downgrading the working app.
           $invalidMsi = Join-Path $env:RUNNER_TEMP "GuessTheNumber-invalid-upgrade.msi"
           Set-Content -Path $invalidMsi -Value "not an MSI package" -Encoding ascii
           $failedUpgrade = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$invalidMsi`" /qn /norestart" -Wait -PassThru
