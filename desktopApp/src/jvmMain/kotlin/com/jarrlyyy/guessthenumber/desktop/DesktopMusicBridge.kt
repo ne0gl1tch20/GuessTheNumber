@@ -121,6 +121,8 @@ internal object DesktopMusicBridge {
                         musicQueuePaths = settings.musicQueuePaths - path,
                         backgroundMusicPath = if (settings.backgroundMusicPath == path) null else settings.backgroundMusicPath
                     ))
+                    writePlaylists(readPlaylists().mapValues { (_, paths) -> paths - path })
+                    durationCache.remove(path)
                 }
                 "clear_queue" -> persist(settings.copy(musicQueuePaths = emptyList()))
                 "remove_queue" -> {
@@ -136,7 +138,7 @@ internal object DesktopMusicBridge {
                     val queue = settings.musicQueuePaths.toMutableList()
                     require(from in queue.indices && to in queue.indices) { "Queue position is invalid." }
                     val item = queue.removeAt(from); queue.add(to, item)
-                    updateSettings(settings.copy(musicQueuePaths = queue))
+                    persist(settings.copy(musicQueuePaths = queue))
                 }
                 "seek" -> {
                     val active = clip ?: error("No track is playing.")
