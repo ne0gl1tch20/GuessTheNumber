@@ -14,9 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 internal fun DesktopActivityHubScreen(
@@ -26,7 +30,10 @@ internal fun DesktopActivityHubScreen(
     var activity by remember { mutableStateOf(engine.currentActivity()) }
     var feedback by remember { mutableStateOf<String?>(null) }
     var answered by remember { mutableStateOf(false) }
-    val scripts = remember { runCatching { engine.listScripts() } }
+    var scripts by remember { mutableStateOf(runCatching { engine.listScripts() }) }
+    var liveOpsStatus by remember { mutableStateOf<String?>(null) }
+    var isRefreshing by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -46,6 +53,28 @@ internal fun DesktopActivityHubScreen(
             "Small offline activities run in a restricted Lua sandbox. Scripts can provide activity content, but cannot edit saves, currency or rewards.",
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(
+                onClick = {
+                    scope.launch {
+                        isRefreshing = true
+                        val result = withContext(Dispatchers.IO) { engine.refreshLiveOps() }
+                        scripts = runCatching { engine.listScripts() }
+                        liveOpsStatus = when (result) {
+                            is DesktopLuaLiveOpsRefreshResult.Updated ->
+                                "LiveOps updated to bundle ${result.version} (${result.scriptCount} scripts)."
+                            is DesktopLuaLiveOpsRefreshResult.Unchanged ->
+                                "LiveOps is current at bundle ${result.version}."
+                            is DesktopLuaLiveOpsRefreshResult.Unavailable -> result.reason
+                        }
+                        isRefreshing = false
+                    }
+                },
+                enabled = !isRefreshing
+            ) { Text(if (isRefreshing) "Refreshing…" else "Refresh LiveOps") }
+            Text("Remote content is signature-verified; blank signing keys fail closed.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+        }
+        liveOpsStatus?.let { Text(it, color = if (it.startsWith("LiveOps updated") || it.startsWith("LiveOps is current")) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error) }
         if (scripts.isFailure) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Text(
@@ -60,7 +89,7 @@ internal fun DesktopActivityHubScreen(
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(entry.title, style = MaterialTheme.typography.titleMedium)
                         Text(entry.description, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("Bundled · Host API v${entry.hostApiVersion}", style = MaterialTheme.typography.labelSmall)
+                        Text("${if (entry.source == "liveops") "LiveOps" else "Bundled"} · Host API v${entry.hostApiVersion}", style = MaterialTheme.typography.labelSmall)
                         Button(
                             onClick = {
                                 when (val result = engine.start(entry.id)) {
