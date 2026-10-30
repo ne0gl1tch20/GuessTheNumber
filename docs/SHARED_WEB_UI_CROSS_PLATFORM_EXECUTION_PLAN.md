@@ -4,6 +4,16 @@
 
 **Starting point:** PR #256 merged the Upgrades and Shop route into Android's `app/src/main/assets/web-play/` bundle. Android's `ProductionWebPlayScreen` loads that bundle through Android WebView. A Windows JavaFX WebView host has now been added and is wired into Play, Upgrades and Shop. The remaining player screens and runtime/distribution verification are not complete.
 
+## Player-facing experience contract
+
+The app must feel like one game, not an Android edition and a separate Windows edition.
+
+- **First launch:** Choose Player Profile → Save Slots → Loading Save Data → the shared HTML app. The profile and save-selection steps may use platform-appropriate native layouts because they own identity/save selection and recovery, but they must preserve the same choices, labels, consequences and save rules.
+- **Returning launch:** restore the last active profile and save slot, show a clear loading state, then open the shared HTML app at the expected player destination.
+- **After loading:** every player-facing game screen uses the exact same canonical `app/src/main/assets/web-play/` HTML/CSS/JavaScript and shared UI SDK assets on Android and Windows. Do not create a Windows-only copy or rebuild a player-facing screen in Compose.
+- **Platform differences:** native code is limited to the desktop/mobile shell, profile and save boot/recovery, OS integration, input adaptation and host services such as audio or updates. These adapters must power the same HTML controls and explain unavailable capabilities in plain language.
+- **Usability:** use consistent names, navigation order, feedback, tutorials, empty/loading/error states and localization. Desktop may rearrange layout for a resizable window, mouse and keyboard, but must not change what a screen means or remove its actions.
+
 ## Workstream A: Windows shared HTML host
 
 1. Evaluate and select a maintained Windows embedded browser integration. WebView2 is the preferred candidate, but do not claim it is implemented until a buildable host proves it. Document runtime prerequisites, missing-runtime behavior, licensing, MSI distribution and offline operation before changing installer behavior.
