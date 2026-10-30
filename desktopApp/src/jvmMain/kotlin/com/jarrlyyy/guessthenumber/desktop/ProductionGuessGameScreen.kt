@@ -100,6 +100,7 @@ fun ProductionGuessGameScreen(
     onGlobalPreferencesImported: () -> Unit = {},
     onOpenParityDestination: (DesktopDestination) -> Unit = {},
     onOpenPlayerProfile: () -> Unit = {},
+    musicHost: DesktopMusicPlayerHost,
     onDesktopUpdateRequest: (String, String, (String) -> Unit) -> Unit = { _, requestId, reply ->
         reply(org.json.JSONObject().put("version", 1).put("id", requestId)
             .put("type", "update_result").put("status", "unavailable")
@@ -242,6 +243,13 @@ fun ProductionGuessGameScreen(
     }
 
     val currentState = state
+
+    LaunchedEffect(currentState?.settings?.musicEnabled) {
+        musicHost.setEnabled(currentState?.settings?.musicEnabled == true)
+    }
+    LaunchedEffect(currentState?.settings?.volume) {
+        currentState?.settings?.volume?.let(musicHost::setVolume)
+    }
 
     LaunchedEffect(currentState?.settings) {
         val settings = currentState?.settings ?: return@LaunchedEffect
@@ -418,7 +426,7 @@ fun ProductionGuessGameScreen(
                             onOpenPlayerProfile()
                             val visibleState = state
                             val payload = if (visibleState != null && catalog != null) {
-                                desktopWebPlayState(visibleState, catalog, true, webLastGuessStatus, "Opening player profile.", talentCatalog.orEmpty(), engine, section.sharedHtmlScreen ?: "play")
+                                desktopWebPlayState(visibleState, catalog, true, webLastGuessStatus, "Opening player profile.", talentCatalog.orEmpty(), engine, section.sharedHtmlScreen ?: "play", musicPlayer = musicHost.stateJson(visibleState.settings))
                             } else org.json.JSONObject().put("accepted", true).put("message", "Opening player profile.")
                             reply(org.json.JSONObject().put("version", 1).put("id", requestId)
                                 .put("type", "state").put("state", payload).toString())
@@ -439,6 +447,32 @@ fun ProductionGuessGameScreen(
                         }
                         if (type == "check_updates" || type == "install_update" || type == "open_update_page") {
                             onDesktopUpdateRequest(type, requestId, reply)
+                            return@launch
+                        }
+                        if (type == "music_state") {
+                            val musicSettings = state?.settings ?: GameSettings()
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "music_state").put("musicPlayer", musicHost.stateJson(musicSettings)).toString())
+                            return@launch
+                        }
+                        if (type == "music_action") {
+                            if (request.length() !in 4..9) {
+                                sendError("invalid_music_request")
+                                return@launch
+                            }
+                            val before = state
+                            if (before == null) {
+                                sendError("game_state_unavailable")
+                                return@launch
+                            }
+                            runCatching { musicHost.handleAction(request, before.settings, ::updateSettings) }
+                                .onFailure {
+                                    sendError("music_action_failed")
+                                    return@launch
+                                }
+                            val musicSettings = state?.settings ?: before.settings
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "music_state").put("musicPlayer", musicHost.stateJson(musicSettings)).toString())
                             return@launch
                         }
                         var accepted = true
@@ -557,6 +591,8 @@ fun ProductionGuessGameScreen(
                                         val value = if (rawValue == "true" || rawValue == "false") rawValue.toBoolean() else null
                                         val settings = when (key) {
                                             "musicEnabled" -> value?.let { before.settings.copy(musicEnabled = it) }
+                                            "volume" -> rawValue.toFloatOrNull()?.takeIf { it in 0f..1f }?.let { before.settings.copy(volume = it) }
+                                            "sfxVolume" -> rawValue.toFloatOrNull()?.takeIf { it in 0f..1f }?.let { before.settings.copy(sfxVolume = it) }
                                             "soundEnabled" -> value?.let { before.settings.copy(soundEnabled = it) }
                                             "vibrationEnabled" -> value?.let { before.settings.copy(vibrationEnabled = it) }
                                             "reducedMotion" -> value?.let { before.settings.copy(reducedMotion = it) }
@@ -704,7 +740,7 @@ fun ProductionGuessGameScreen(
                         }
                         val visibleState = nextState ?: state
                         val payload = if (visibleState != null && catalog != null) {
-                            desktopWebPlayState(visibleState, catalog, accepted, guessStatus, message, talentCatalog.orEmpty(), engine, section.sharedHtmlScreen ?: "play")
+                            desktopWebPlayState(visibleState, catalog, accepted, guessStatus, message, talentCatalog.orEmpty(), engine, section.sharedHtmlScreen ?: "play", musicPlayer = musicHost.stateJson(visibleState.settings))
                         } else org.json.JSONObject().put("accepted", false).put("message", "Loading game…")
                         reply(org.json.JSONObject().put("version", 1).put("id", requestId)
                             .put("type", "state").put("state", payload).toString())
@@ -1608,17 +1644,6 @@ fun ProductionGuessGameScreen(
                 }
             }
 
-            if (section == DesktopGameSection.MUSIC_PLAYER) {
-                if (currentState == null) {
-                    CircularProgressIndicator()
-                } else {
-                    DesktopMusicPlayerContent(
-                        settings = currentState.settings,
-                        onUpdateSettings = ::updateSettings,
-                        onBack = { onOpenParityDestination(DesktopDestination.MORE) }
-                    )
-                }
-            }
 
             Text(
                 "Your Windows run is saved locally after each accepted guess or economy transaction. A backup is kept for recovery if the primary save is damaged.",
