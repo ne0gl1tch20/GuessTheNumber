@@ -497,18 +497,60 @@ fun ProductionGuessGameScreen(
                             return@launch
                         }
                         if (type == "navigate") {
-                            val destination = when (request.optString("route")) {
+                            val route = request.optString("route")
+                            val destination = when (route) {
                                 "save_slots" -> DesktopDestination.SAVE_SLOTS
                                 "dev_settings" -> DesktopDestination.DEVELOPER_SETTINGS
                                 else -> null
                             }
-                            if (destination == null) {
-                                sendError("unsupported_native_destination")
-                            } else {
-                                onOpenParityDestination(destination)
-                                reply(org.json.JSONObject().put("version", 1).put("id", requestId)
-                                    .put("type", "state")
-                                    .put("state", org.json.JSONObject().put("accepted", true)).toString())
+                            when {
+                                destination != null -> {
+                                    onOpenParityDestination(destination)
+                                    reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                        .put("type", "state")
+                                        .put("state", org.json.JSONObject().put("accepted", true)).toString())
+                                }
+                                route.startsWith("color_picker_") || route.startsWith("menu_color_") -> {
+                                    val target = when {
+                                        route.endsWith("primary") -> "Primary"
+                                        route.endsWith("secondary") -> "Secondary"
+                                        route.endsWith("tertiary") -> "Tertiary"
+                                        else -> null
+                                    }
+                                    val currentSettings = state?.settings
+                                    if (target == null || currentSettings == null) {
+                                        sendError("invalid_color_target")
+                                    } else {
+                                        val currentColor = when (target) {
+                                            "Primary" -> currentSettings.customPrimaryColor
+                                            "Secondary" -> currentSettings.customSecondaryColor
+                                            else -> currentSettings.customTertiaryColor
+                                        }
+                                        javax.swing.SwingUtilities.invokeLater {
+                                            val selected = javax.swing.JColorChooser.showDialog(
+                                                null, "Choose $target theme color",
+                                                runCatching { java.awt.Color.decode(currentColor) }.getOrDefault(java.awt.Color.WHITE)
+                                            )
+                                            if (selected != null) {
+                                                val hex = String.format("#%02X%02X%02X", selected.red, selected.green, selected.blue)
+                                                val key = when (target) {
+                                                    "Primary" -> "customPrimaryColor"
+                                                    "Secondary" -> "customSecondaryColor"
+                                                    else -> "customTertiaryColor"
+                                                }
+                                                commitTransaction { before ->
+                                                    val updated = DesktopWebPlayActions.updateSetting(before.settings, key, hex)
+                                                    updated?.let { EconomyTransaction(before.copy(settings = it), true, "$target theme color updated.") }
+                                                        ?: EconomyTransaction(before, false, "Invalid theme color.")
+                                                }
+                                            }
+                                        }
+                                        reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                            .put("type", "state")
+                                            .put("state", org.json.JSONObject().put("accepted", true).put("message", "Opening color picker.")).toString())
+                                    }
+                                }
+                                else -> sendError("unsupported_native_destination")
                             }
                             return@launch
                         }
@@ -708,6 +750,7 @@ fun ProductionGuessGameScreen(
                                         val worldId = request.optString("worldId")
                                         when (request.optString("action")) {
                                             "unlock" -> DesktopEconomyTransactions.unlockWorld(before, worldId)
+                                            "select" -> DesktopEconomyTransactions.selectWorld(before, worldId)
                                             "boss" -> DesktopEconomyTransactions.toggleBossBattle(before, worldId)
                                             else -> null
                                         }
