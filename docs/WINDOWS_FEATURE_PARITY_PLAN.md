@@ -183,7 +183,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Implement ten independent desktop save slots, switching, duplication, recovery-backup restore and validated per-slot JSON import/export.
 - [x] Add a validated portable all-slot ZIP bundle with manifest, active-slot selection, full preflight validation and rollback of previous slot files if an import write fails. The bundle contains all populated slots and their per-save settings.
 - [ ] Encrypt portable backups or add a separate global-app-preferences bundle; current JSON and ZIP backups are not encrypted and desktop-only preferences remain outside the save data.
-- [ ] Tutorial/feature tours and replay entry points.
+- [x] Add a replayable five-step Windows feature tour covering Play, upgrades/shop, progression, activities/events and save/settings tools; the tour is available from Settings.
 - [ ] About, player-facing error states and crash recovery surfaces.
 - [x] Add native local Music Player controls, saved file library/queue paths, playback, pause/resume, stop and volume. Windows Java Sound support is format-dependent; WAV/AIFF/AU are the expected supported formats, while Android-only media integrations remain intentionally unavailable.
 - [ ] Localize all visible strings and accessible labels.
@@ -214,9 +214,10 @@ The port is complete only when every Android player-facing screen and reachable 
 - [ ] Verify public-repository artifact download works without credentials from a clean Windows install; confirm the actual seven-day expiry response.
 - [ ] Add end-to-end artifact download/install tests for missing artifacts, invalid outer ZIP, checksum mismatch, invalid MSI ZIP and expired artifacts.
 - [x] Keep production update discovery and installer flow separate from the debug CI-artifact flow; the debug client is explicitly pinned to the Windows Desktop CI artifact API.
-- [ ] Test clean MSI install, in-place upgrade, repeated upgrade, failed-upgrade recovery, downgrade and uninstall.
+- [x] Add Windows CI MSI lifecycle coverage for clean legacy install, in-place upgrade, repeated upgrade, invalid-installer failure recovery, version/product registration and uninstall; verify a user-data marker survives upgrades and uninstall. Current workflow execution must pass before treating this as verified.
+- [ ] Test downgrade behavior and recovery from a genuine interrupted MSI transaction.
 - [ ] Preserve the verified MSI UpgradeCode and user-data location; do not change identifiers blindly.
-- [ ] Verify saves survive restart and supported upgrades.
+- [ ] Verify a real GameState save survives application restart and supported MSI upgrades (CI currently checks APPDATA user-data preservation with a marker file).
 - [ ] Align version metadata, locale assets and changelog.
 
 **Exit:** Windows packages install/update predictably and preserve user data; the debug channel installs only a verified MSI ZIP from Windows Desktop CI artifacts, while production updates remain isolated.
