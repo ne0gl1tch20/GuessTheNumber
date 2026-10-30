@@ -301,12 +301,13 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                 "window.gtnDesktopLaunchAtStartup = $launchAtStartup;"
             )
         Files.writeString(hostScript, hostPatched)
-        val head = Regex("(?i)<head[^>]*>").find(original)
-            ?: throw IOException("Shared web UI index.html has no head element.")
+        val cspMeta = Regex("""(?i)<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]*>""")
+            .find(original)
+            ?: throw IOException("Shared web UI index.html has no Content Security Policy.")
         val scriptTag = "<script src=\\"desktop-host.js\\"></script>"
         val patched = original.replaceRange(
-            head.range,
-            head.value + "\\n  " + scriptTag
+            cspMeta.range,
+            cspMeta.value + "\\n  " + scriptTag
         )
         Files.writeString(index, patched)
         return index
