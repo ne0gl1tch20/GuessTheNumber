@@ -220,6 +220,7 @@ fun main() = application {
 
             suspend fun refreshUpdates() {
                 isBusy = true
+                availableUpdate = null
                 status = "Checking for Windows Debug updates…"
                 try {
                     availableUpdate = withContext(Dispatchers.IO) {
