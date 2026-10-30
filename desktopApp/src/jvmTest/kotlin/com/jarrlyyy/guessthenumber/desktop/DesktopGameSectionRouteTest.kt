@@ -46,6 +46,19 @@ class DesktopGameSectionRouteTest {
             ?.readText()
             ?: error("The canonical shared JavaScript bundle is missing from Windows resources.")
         org.junit.Assert.assertTrue("Desktop route activation must use the shared screen controller.", sharedScript.contains("window.gtnActivateScreen=activateScreen"))
+
+        listOf(
+            "web-play/trait-extension-host.js",
+            "web-play/vue-jarrlyy-adapter.js",
+            "web-play/vue-bot-arena.js",
+            "web-play/menu-studio.js",
+            "libraries/vue/vue.global.prod.js",
+            "libraries/jarrlyyuisdk/components/jarrlyy-ui-advanced.js",
+            "libraries/jarrlyyuisdk/components/jarrlyy-ui-host.js",
+            "fonts/Inter-VariableFont_opsz,wght.ttf"
+        ).forEach { resource ->
+            org.junit.Assert.assertNotNull("A required shared UI asset was not packaged: $resource", javaClass.classLoader.getResource(resource))
+        }
     }
 
     @Test
