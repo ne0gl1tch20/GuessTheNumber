@@ -170,6 +170,7 @@ The port is complete only when every Android player-facing screen and reachable 
 ### W5. Player utilities and data
 
 - [ ] Settings, theme, locale and desktop-supported accessibility options.
+- [x] Add validated single-slot JSON import/export to Windows Save Slots. Imports reject malformed, oversized and invalid states and preserve the previous save as a recovery backup; raw GameState JSON is also accepted by Android's legacy single-save import path. These files are plain JSON, not encrypted, and do not include global settings or all slots in one bundle.
 - [ ] Save slots, slot switching, backup/export/import and recovery appropriate to Windows.
 - [ ] Tutorial/feature tours and replay entry points.
 - [ ] About, player-facing error states and crash recovery surfaces.
