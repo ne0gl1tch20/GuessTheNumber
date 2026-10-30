@@ -340,7 +340,22 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
         val initialScreenJson = org.json.JSONObject.quote(initialScreen.get())
         val hostScript = webRoot.resolve("desktop-host.js")
         val hostOriginal = Files.readString(hostScript)
+        val debugToolsEnabled = javaClass.classLoader
+            .getResourceAsStream("desktop-build.properties")
+            ?.use { properties ->
+                java.util.Properties().apply { load(properties) }
+                    .getProperty("debugToolsBuildAllowed", "false")
+                    .equals("true", ignoreCase = true)
+            } ?: false
         val hostPatched = hostOriginal
+            .replace(
+                "window.gtnDesktopInitialScreen = window.gtnDesktopInitialScreen || 'play';",
+                "window.gtnDesktopInitialScreen = $initialScreenJson;"
+            )
+            .replace(
+                "window.gtnDesktopDebugTools = false;",
+                "window.gtnDesktopDebugTools = $debugToolsEnabled;"
+            )
             .replace(
                 "window.gtnDesktopInitialScreen = window.gtnDesktopInitialScreen || 'play';",
                 "window.gtnDesktopInitialScreen = $initialScreenJson;"
