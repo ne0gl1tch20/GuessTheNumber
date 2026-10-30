@@ -27,7 +27,8 @@ internal data class DesktopLuaScriptEntry(
     val title: String,
     val description: String,
     val featured: Boolean = false,
-    val hostApiVersion: Int = 1
+    val hostApiVersion: Int = 1,
+    val source: String = "bundled"
 )
 
 @Serializable
@@ -67,11 +68,19 @@ internal class DesktopLuaActivityEngine {
     }
 
     private val json = Json { ignoreUnknownKeys = false }
+    private val liveOps = DesktopLuaLiveOpsRepository()
     private var active: DesktopLuaActivityDefinition? = null
     private var answered: Boolean? = null
 
     @Synchronized
-    fun listScripts(): List<DesktopLuaScriptEntry> = loadCatalog()
+    fun listScripts(): List<DesktopLuaScriptEntry> {
+        val bundled = loadCatalog()
+        val bundledIds = bundled.map { it.id }.toSet()
+        return bundled + liveOps.loadVerifiedCachedEntries().filterNot { it.id in bundledIds }
+    }
+
+    @Synchronized
+    fun refreshLiveOps(): DesktopLuaLiveOpsRefreshResult = liveOps.refresh()
 
     @Synchronized
     fun currentActivity(): DesktopLuaActivityDefinition? = active
@@ -82,12 +91,15 @@ internal class DesktopLuaActivityEngine {
             return if (it.id == scriptId) DesktopLuaStartResult.Started(it)
             else DesktopLuaStartResult.Rejected("Another activity is already running.")
         }
-        val entry = loadCatalog().firstOrNull { it.id == scriptId }
+        val entry = listScripts().firstOrNull { it.id == scriptId }
             ?: return DesktopLuaStartResult.Rejected("Unknown activity.")
         return try {
-            val source = javaClass.classLoader.getResourceAsStream("scripts/${entry.file}")
-                ?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
-                ?: return DesktopLuaStartResult.Rejected("The bundled activity script is missing.")
+            val source = if (entry.source == "liveops") {
+                liveOps.readVerifiedCachedScript(entry)
+            } else {
+                javaClass.classLoader.getResourceAsStream("scripts/${entry.file}")
+                    ?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+            } ?: return DesktopLuaStartResult.Rejected("The verified activity script is missing.")
             val output = DesktopLuaSandbox().execute(entry.id, source)
             val activity = parseActivity(entry, output)
             active = activity
@@ -195,6 +207,14 @@ private class DesktopLuaSandbox {
         load(BaseLib())
         LoadState.install(this)
         LuaC.install(this)
+    }
+
+    fun validateSource(scriptId: String, source: String) {
+        require(scriptId.matches(Regex("[a-z0-9_-]{1,64}"))) { "Invalid Lua script ID." }
+        require(source.isNotBlank() && source.length <= MAX_SOURCE_CHARS) {
+            "Lua activity source is empty or exceeds the size limit."
+        }
+        compilerGlobals.load(source, scriptId, compilerGlobals)
     }
 
     fun execute(scriptId: String, source: String): LuaValue {
