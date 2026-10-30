@@ -1,9 +1,11 @@
 package com.jarrlyyy.guessthenumber.desktop
 
+import java.util.Properties
+
 /**
- * Developer-only Windows destinations stay hidden and unreachable unless the
- * JVM is explicitly launched with -Dgtn.desktop.debugTools=true.
- * The default is deliberately off for packaged/release builds.
+ * Packaged builds cannot enable developer destinations with a launch argument alone.
+ * The build must explicitly opt in with -Pgtn.desktop.debugToolsBuild=true, and the
+ * process must also be launched with -Dgtn.desktop.debugTools=true.
  */
 internal object DesktopDebugToolsPolicy {
     const val ENABLE_PROPERTY = "gtn.desktop.debugTools"
@@ -15,11 +17,28 @@ internal object DesktopDebugToolsPolicy {
         DesktopDestination.LUA_TESTING_HUB
     )
 
-    fun enabled(): Boolean = System.getProperty(ENABLE_PROPERTY) == "true"
+    fun enabled(): Boolean = isEnabled(
+        buildAllowsDeveloperTools(),
+        System.getProperty(ENABLE_PROPERTY)
+    )
+
+    internal fun isEnabled(buildAllowsDeveloperTools: Boolean, launchFlag: String?): Boolean =
+        buildAllowsDeveloperTools && launchFlag == "true"
+
+    private fun buildAllowsDeveloperTools(): Boolean = runCatching {
+        val properties = Properties()
+        DesktopDebugToolsPolicy::class.java.classLoader
+            .getResourceAsStream("desktop-build.properties")
+            ?.use(properties::load)
+        properties.getProperty("debugToolsBuildAllowed") == "true"
+    }.getOrDefault(false)
 
     fun isDeveloperOnly(destination: DesktopDestination): Boolean =
         destination in debugOnlyDestinations
 
-    fun visibleDestinations(destinations: List<DesktopDestination>): List<DesktopDestination> =
-        if (enabled()) destinations else destinations.filterNot(::isDeveloperOnly)
+    fun visibleDestinations(
+        destinations: List<DesktopDestination>,
+        allowDeveloperTools: Boolean = enabled()
+    ): List<DesktopDestination> =
+        if (allowDeveloperTools) destinations else destinations.filterNot(::isDeveloperOnly)
 }
