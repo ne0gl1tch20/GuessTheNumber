@@ -84,6 +84,8 @@ class PermanentUpgradeEffectsTest {
         val prestige = DesktopEconomyTransactions.prestigeReset(prestigeState, engine)
         assertTrue(prestige.accepted)
         assertEquals(0, prestige.state.money.compareTo(BigNumber(2_000)))
+        assertEquals(1L, prestige.state.traitProfile.prestigesObserved)
+        assertEquals(0L, prestige.state.traitProfile.ultrasObserved)
 
         val ultraState = GameState(
             money = engine.calculateUltraRequirement(0) * BigNumber(100),
@@ -94,6 +96,8 @@ class PermanentUpgradeEffectsTest {
         assertTrue(ultra.accepted)
         assertEquals(0, ultra.state.money.compareTo(BigNumber(3_000)))
         assertTrue(ultra.state.prestigeUpgradeLevels.isEmpty())
+        assertEquals(0L, ultra.state.traitProfile.prestigesObserved)
+        assertEquals(1L, ultra.state.traitProfile.ultrasObserved)
     }
 
     @Test
