@@ -915,7 +915,8 @@ class DesktopEconomyTransactionsTest {
         )
 
         val cost = DesktopEconomyTransactions.worldMasteryUpgradeCost(initial, "verdant_grove")
-        assertEquals(0, BigNumber(50).compareTo(cost))
+        assertTrue(cost != null)
+        assertEquals(0, BigNumber(50).compareTo(cost!!))
         val result = DesktopEconomyTransactions.upgradeWorldMastery(initial, "verdant_grove")
 
         assertTrue(result.accepted)
@@ -938,11 +939,12 @@ class DesktopEconomyTransactionsTest {
         )
 
         val cost = DesktopEconomyTransactions.worldMasteryUpgradeCost(initial, "crystal_caverns")
-        assertEquals(0, BigNumber(12).compareTo(cost))
+        assertTrue(cost != null)
+        assertEquals(0, BigNumber(12).compareTo(cost!!))
         val result = DesktopEconomyTransactions.upgradeWorldMastery(initial, "crystal_caverns")
         assertTrue(result.accepted)
         assertEquals(2, result.state.worldMasteryLevels["crystal_caverns"])
-        assertEquals(BigNumber.ZERO, result.state.nebula)
+        assertEquals(0, result.state.nebula.compareTo(BigNumber.ZERO))
     }
 
     @Test
