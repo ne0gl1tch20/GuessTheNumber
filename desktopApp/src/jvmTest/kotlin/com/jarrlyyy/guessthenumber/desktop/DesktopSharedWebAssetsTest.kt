@@ -149,6 +149,19 @@ class DesktopSharedWebAssetsTest {
     }
 
     @Test
+    fun sharedMusicScreenUsesTheCanonicalMusicBridgeProtocol() {
+        val html = asset("web-play/index.html")
+        val script = asset("web-play/app.js")
+
+        assertTrue(html.contains("id=\"screen-music\""))
+        assertTrue(script.contains("send('music_state')"))
+        assertTrue(script.contains("send('music_action',payload)"))
+        assertTrue(script.contains("action==='seek'"))
+        assertTrue(script.contains("create_playlist"))
+        assertTrue(script.contains("play_playlist"))
+    }
+
+    @Test
     fun sharedAboutScreenUsesTheWindowsUpdateHostActions() {
         val html = asset("web-play/index.html")
         val script = asset("web-play/app.js")
@@ -197,6 +210,7 @@ class DesktopSharedWebAssetsTest {
         assertTrue(html.contains("id=\"screen-more\""))
         assertTrue(html.contains("id=\"screen-changelog\""))
         assertTrue(html.contains("id=\"screen-about\""))
+        assertTrue(html.contains("id=\"screen-music\""))
         assertTrue(html.contains("id=\"screen-upgrades\""))
         assertTrue(html.contains("id=\"screen-shop\""))
         assertTrue(html.contains("id=\"screen-homebase\""))
