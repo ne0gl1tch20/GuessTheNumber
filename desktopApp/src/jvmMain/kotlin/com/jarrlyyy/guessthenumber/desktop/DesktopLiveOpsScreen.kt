@@ -47,11 +47,14 @@ internal fun DesktopLiveOpsScreen(onBack: () -> Unit) {
 
     LaunchedEffect(Unit) {
         val loaded = withContext(Dispatchers.IO) {
+            repository.refreshRemoteEvents()
+            val latestSnapshot = repository.load()
             val slot = saveStore.activeSlot()
-            slot to saveStore.load(slot)
+            Triple(slot, saveStore.load(slot), latestSnapshot)
         }
         activeSlot = loaded.first
         state = loaded.second
+        snapshot = loaded.third
         isLoading = false
     }
 
@@ -69,8 +72,13 @@ internal fun DesktopLiveOpsScreen(onBack: () -> Unit) {
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = {
-                snapshot = repository.load()
-                feedback = "LiveOps event catalog refreshed."
+                scope.launch {
+                    snapshot = withContext(Dispatchers.IO) {
+                        repository.refreshRemoteEvents()
+                        repository.load()
+                    }
+                    feedback = "LiveOps event catalog refreshed."
+                }
             }) { Text("Refresh events") }
             Text("Save slot $activeSlot", style = MaterialTheme.typography.labelLarge)
         }
