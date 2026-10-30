@@ -6,6 +6,9 @@ import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
+import com.jarrlyyy.guessthenumber.data.repository.LiveOpsContentValidator
+import com.jarrlyyy.guessthenumber.data.repository.LiveOpsEvent
+import com.jarrlyyy.guessthenumber.data.repository.LiveOpsManifest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -31,7 +34,9 @@ internal data class LuaRemotePayload(
     val minAppVersionCode: Int,
     val maxAppVersionCode: Int,
     val bundleVersion: Int,
-    val scripts: List<LuaRemoteScript>
+    val scripts: List<LuaRemoteScript>,
+    val eventManifestVersion: Int = 1,
+    val events: List<LiveOpsEvent> = emptyList()
 )
 
 @Serializable
@@ -156,6 +161,16 @@ class LuaLiveOpsRepository(private val context: Context) {
         }
     }
 
+    fun loadVerifiedCachedEventManifest(): LiveOpsManifest? {
+        val (payload, _) = activeVerifiedBundle() ?: return null
+        if (payload.events.isEmpty()) return null
+        return LiveOpsManifest(
+            schemaVersion = 1,
+            manifestVersion = payload.eventManifestVersion,
+            events = payload.events
+        ).also(LiveOpsContentValidator::validate)
+    }
+
     fun readVerifiedCachedScript(entry: LuaScriptEntry): String? {
         if (entry.source != "liveops") return null
         val (payload, bundleDir) = activeVerifiedBundle() ?: return null
@@ -243,6 +258,13 @@ class LuaLiveOpsRepository(private val context: Context) {
             "Invalid LiveOps app compatibility range."
         }
         require(payload.scripts.size in 1..MAX_SCRIPTS) { "LiveOps script count is outside the supported limit." }
+        require(payload.eventManifestVersion in 1..2) { "Unsupported LiveOps event manifest version." }
+        require(payload.events.size <= 32) { "LiveOps event count is outside the supported limit." }
+        if (payload.events.isNotEmpty()) {
+            LiveOpsContentValidator.validate(
+                LiveOpsManifest(schemaVersion = 1, manifestVersion = payload.eventManifestVersion, events = payload.events)
+            )
+        }
         require(payload.scripts.map { it.id }.distinct().size == payload.scripts.size) { "Duplicate LiveOps script IDs." }
         require(payload.scripts.map { it.fileName }.distinct().size == payload.scripts.size) {
             "Duplicate LiveOps script file names."
