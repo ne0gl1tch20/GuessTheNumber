@@ -792,6 +792,60 @@ object DesktopEconomyTransactions {
         )
     }
 
+    private val WORLD_BOSS_IDS = mapOf(
+        "verdant_grove" to "verdant_guardian",
+        "crystal_caverns" to "crystal_golem",
+        "ember_summit" to "ember_dragon",
+        "nebula_rift" to "nebula_titan"
+    )
+
+    private val WORLD_SECRET_IDS = mapOf(
+        "verdant_grove" to "whispering_hollow",
+        "crystal_caverns" to "shard_archive",
+        "ember_summit" to "ashen_vault",
+        "nebula_rift" to "lost_observatory"
+    )
+
+    fun worldMasteryUpgradeCost(state: GameState, worldId: String): BigNumber? {
+        val bossId = WORLD_BOSS_IDS[worldId] ?: return null
+        if (worldId !in state.unlockedWorldIds || bossId !in state.defeatedBossIds) return null
+        val current = state.worldMasteryLevels[worldId] ?: 1
+        if (current >= 10) return null
+        val secretDiscount = if (WORLD_SECRET_IDS[worldId] in state.discoveredSecretIds) 0.20 else 0.0
+        val sanctuaryDiscount = (state.homeBaseLevel * 0.01).coerceAtMost(0.20)
+        val fullRelicSet = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
+        val relicDiscount = if (state.equippedRelicIds.containsAll(fullRelicSet)) 0.10 else 0.0
+        val discount = (secretDiscount + sanctuaryDiscount + relicDiscount).coerceAtMost(0.40)
+        return BigNumber(10L * (current + 1L)) * BigNumber(1.0 - discount)
+    }
+
+    fun upgradeWorldMastery(state: GameState, worldId: String): EconomyTransaction {
+        val cost = worldMasteryUpgradeCost(state, worldId)
+            ?: return rejected(state, "World mastery cannot be upgraded yet.")
+        if (state.nebula < cost) return rejected(state, "Not enough Nebula for this mastery upgrade.")
+        val current = state.worldMasteryLevels[worldId] ?: 1
+        val nextLevel = current + 1
+        val milestoneReward = when (nextLevel) {
+            5 -> 25L
+            10 -> 100L
+            else -> 0L
+        }
+        val codexEntries = if (nextLevel == 5 || nextLevel == 10) {
+            state.codexEntries + "mastery:$worldId:$nextLevel"
+        } else state.codexEntries
+        return accepted(
+            state.copy(
+                nebula = state.nebula - cost + BigNumber(milestoneReward),
+                worldMasteryLevels = state.worldMasteryLevels + (worldId to nextLevel),
+                codexEntries = codexEntries,
+                statistics = state.statistics.copy(
+                    nebulaEarned = state.statistics.nebulaEarned + milestoneReward
+                )
+            ),
+            "World mastery increased to level $nextLevel."
+        )
+    }
+
     fun buyTalent(state: GameState, talentId: String, cost: Long): EconomyTransaction {
         val legacyParents = mapOf(
             "talent_speed_2" to "talent_speed_1",
