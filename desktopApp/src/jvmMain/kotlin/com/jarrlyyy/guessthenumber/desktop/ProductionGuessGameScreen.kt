@@ -238,6 +238,10 @@ fun ProductionGuessGameScreen(
 
     val currentState = state
 
+    LaunchedEffect(currentState?.settings?.volume, currentState?.settings?.musicEnabled) {
+        currentState?.settings?.let(DesktopMusicBridge::applySettings)
+    }
+
     LaunchedEffect(currentState?.settings) {
         val settings = currentState?.settings ?: return@LaunchedEffect
         onThemeSettingsLoaded(
