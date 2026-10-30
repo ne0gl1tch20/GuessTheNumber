@@ -1,6 +1,8 @@
 package com.jarrlyyy.guessthenumber.domain.engine
 
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import com.jarrlyyy.guessthenumber.domain.model.GameState
+import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -47,6 +49,27 @@ class BigNumberProgressionRewardRulesTest {
         assertEquals(BigNumber.ZERO, engine.calculatePrestigeReward(below, 0))
         assertEquals(BigNumber.ZERO, BigNumberProgressionRewardRules.prestigeReward(BigNumber.ONE, BigNumber.ZERO))
         assertEquals(BigNumber.ZERO, BigNumberProgressionRewardRules.ultraReward(BigNumber.ONE, BigNumber.ZERO))
+    }
+
+    @Test
+    fun hugeCurrencyAndPermanentProgressionLevelsSurviveSaveSerialization() {
+        val original = GameState(
+            money = BigNumber("1e100"),
+            prestige = BigNumber("2.5e80"),
+            ultra = BigNumber("3e60"),
+            prestigeUpgradeLevels = mapOf("prestige_money_boost" to 4, "prestige_gain_boost" to 5),
+            ultraUpgradeLevels = mapOf("ultra_money_boost" to 3, "ultra_gain_boost" to 2)
+        )
+
+        val encoded = Json.encodeToString(GameState.serializer(), original)
+        val restored = Json.decodeFromString(GameState.serializer(), encoded)
+
+        assertEquals(original, restored)
+        assertEquals(
+            0,
+            engine.calculatePrestigeReward(restored.money, restored.prestigeCount)
+                .compareTo(engine.calculatePrestigeReward(original.money, original.prestigeCount))
+        )
     }
 
     @Test
