@@ -60,6 +60,9 @@ internal class DesktopEdgeWebViewController(
             val browser = WebViewComponent.create(WebViewComponent.Mode.HEAVYWEIGHT)
             webView = browser
             browser.setDebug(false)
+            // This is a game surface, not a general-purpose browser. Suppress the
+            // native browser menu (Back / Refresh / Save as / Print / Inspect).
+            browser.setDefaultContextMenuEnabled(false)
             browser.setNavigationHandler(WebViewNavigationHandler { event ->
                 allowNavigation(event.url())
             })
@@ -77,6 +80,11 @@ internal class DesktopEdgeWebViewController(
                             window.gtnDesktopPostMessage(String(raw));
                         }
                     });
+                    // Belt-and-suspenders: never allow Chromium's page context menu.
+                    document.addEventListener('contextmenu', function (event) {
+                        event.preventDefault();
+                        event.stopImmediatePropagation();
+                    }, true);
                     window.addEventListener('load', function () {
                         window.gtnDesktopPageReady(location.href);
                     }, { once: true });
