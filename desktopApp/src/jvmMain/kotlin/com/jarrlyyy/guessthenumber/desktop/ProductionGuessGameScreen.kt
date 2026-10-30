@@ -418,7 +418,7 @@ fun ProductionGuessGameScreen(
                             "read_state", "read_changelog", "read_profile", "check_updates", "install_update", "open_update_page", "read_onboarding_state", "complete_nimmy_tutorial", "reset_everything", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
                             "read_feature_tutorial", "complete_feature_tutorial" -> 4
                             "navigate" -> 4
-                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
+                            "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "buy_prestige_upgrade", "buy_ultra_upgrade", "buy_prestige_shop_item", "buy_ultra_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
                             "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward", "select_trait_arm" -> 5
                             else -> -1
                         }
