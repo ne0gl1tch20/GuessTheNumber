@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.data.repository.LiveOpsEvent
 import com.jarrlyyy.guessthenumber.data.repository.LiveOpsRepository
+import com.jarrlyyy.guessthenumber.scripting.LuaEngine
 import com.jarrlyyy.guessthenumber.data.repository.FeatureFlagRepository
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.ui.theme.MoneyGold
@@ -41,6 +42,8 @@ fun LiveOpsScreen(
 
     LaunchedEffect(Unit) {
         scope.launch {
+            // A failed or unconfigured remote refresh leaves the bundled event catalog available.
+            runCatching { LuaEngine.get(context).refreshLiveOps() }
             val flags = FeatureFlagRepository(context).load()
             eventsEnabled = flags["live_ops"] == true && flags["seasonal_rewards"] == true
             val manifest = LiveOpsRepository(context).loadLiveOpsEvents()
