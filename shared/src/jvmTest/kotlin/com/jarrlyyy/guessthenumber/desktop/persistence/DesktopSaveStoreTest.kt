@@ -1,6 +1,9 @@
 package com.jarrlyyy.guessthenumber.desktop.persistence
 
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.runBlocking
 import java.nio.file.Files
 import java.nio.file.Path
@@ -91,6 +94,38 @@ class DesktopSaveStoreTest {
         assertTrue(store.duplicateSlot(1, 2))
         assertEquals(first.targetNumber, store.load(2)?.targetNumber)
         assertFalse(store.duplicateSlot(1, 2))
+    }
+
+    @Test
+    fun singleSlotJsonBackupExportsAndImportsWithRecoveryBackup() = runBlocking {
+        val directory = Files.createTempDirectory("gtn-portable-backup")
+        val store = DesktopSaveStore(directory)
+        val original = GameState(money = BigNumber(12_345), lastSaveTimestamp = 1_700_000_000_000L)
+        val replacement = GameState(money = BigNumber(98_765), lastSaveTimestamp = 1_700_000_000_100L)
+
+        assertTrue(store.save(1, original))
+        val exported = store.exportSlotJson(1)
+        assertNotNull(exported)
+        assertTrue(store.importSlotJson(1, Json.encodeToString(replacement)))
+        assertEquals(0, store.load(1)!!.money.compareTo(BigNumber(98_765)))
+        assertTrue(store.restoreBackup(1))
+        assertEquals(0, store.load(1)!!.money.compareTo(BigNumber(12_345)))
+        assertTrue(store.importSlotJson(2, exported))
+        assertEquals(0, store.load(2)!!.money.compareTo(BigNumber(12_345)))
+    }
+
+    @Test
+    fun singleSlotJsonImportRejectsMalformedOversizedAndInvalidState() = runBlocking {
+        val directory = Files.createTempDirectory("gtn-portable-backup-invalid")
+        val store = DesktopSaveStore(directory)
+        val original = GameState(money = BigNumber(500), lastSaveTimestamp = 1_700_000_000_000L)
+        assertTrue(store.save(1, original))
+
+        assertFalse(store.importSlotJson(1, "{not-json"))
+        assertFalse(store.importSlotJson(1, "x".repeat(2_000_001)))
+        val invalid = original.copy(money = BigNumber(-1))
+        assertFalse(store.importSlotJson(1, Json.encodeToString(invalid)))
+        assertEquals(0, store.load(1)!!.money.compareTo(BigNumber(500)))
     }
 
     @Test
