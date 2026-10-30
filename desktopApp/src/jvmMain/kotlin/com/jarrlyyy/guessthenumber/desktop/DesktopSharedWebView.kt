@@ -334,12 +334,6 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
         copyResourceTree("libraries", "libraries/jarrlyyuisdk/components/jarrlyy-ui.js", root)
         copyResourceTree("fonts", "fonts/Inter-VariableFont_opsz,wght.ttf", root)
         val index = webRoot.resolve("index.html")
-        val original = Files.readString(index)
-        val persistedNavigationPosition = DesktopNavigationPosition.load().name
-        val launchAtStartup = DesktopStartupLaunch.isEnabled()
-        val initialScreenJson = org.json.JSONObject.quote(initialScreen.get())
-        val hostScript = webRoot.resolve("desktop-host.js")
-        val hostOriginal = Files.readString(hostScript)
         val debugToolsEnabled = javaClass.classLoader
             .getResourceAsStream("desktop-build.properties")
             ?.use { properties ->
@@ -347,6 +341,16 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                     .getProperty("debugToolsBuildAllowed", "false")
                     .equals("true", ignoreCase = true)
             } ?: false
+        val originalBase = Files.readString(index)
+        // Developer JavaScript evaluation is permitted only in debug-tool packages.
+        val original = if (debugToolsEnabled) {
+            originalBase.replace("script-src 'self';", "script-src 'self' 'unsafe-eval';")
+        } else originalBase
+        val persistedNavigationPosition = DesktopNavigationPosition.load().name
+        val launchAtStartup = DesktopStartupLaunch.isEnabled()
+        val initialScreenJson = org.json.JSONObject.quote(initialScreen.get())
+        val hostScript = webRoot.resolve("desktop-host.js")
+        val hostOriginal = Files.readString(hostScript)
         val hostPatched = hostOriginal
             .replace(
                 "window.gtnDesktopInitialScreen = window.gtnDesktopInitialScreen || 'play';",
