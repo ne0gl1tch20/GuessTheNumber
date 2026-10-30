@@ -15,6 +15,19 @@ val windowsPackageVersion = providers.environmentVariable("GTN_WINDOWS_PACKAGE_V
 val appLogoPng = rootProject.file("GTN_APP_LOGO.png")
 val generatedDesktopResources = layout.buildDirectory.dir("generated/desktopLogoResources")
 val generatedWindowsIcon = layout.buildDirectory.file("generated/windowsIcon/GTN_APP_LOGO.ico")
+val generatedDesktopBuildConfig = layout.buildDirectory.dir("generated/desktopBuildConfig")
+val generateDesktopBuildConfig = tasks.register("generateDesktopBuildConfig") {
+    val outputFile = generatedDesktopBuildConfig.map { it.file("desktop-build.properties") }
+    outputs.file(outputFile)
+    doLast {
+        val allowDeveloperTools = providers.gradleProperty("gtn.desktop.debugToolsBuild")
+            .orElse("false").get().equals("true", ignoreCase = true)
+        outputFile.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText("debugToolsBuildAllowed=$allowDeveloperTools\\n")
+        }
+    }
+}
 
 val generateDesktopLogoAssets = tasks.register<GenerateDesktopLogoAssets>("generateDesktopLogoAssets") {
     inputLogo.set(appLogoPng)
@@ -29,6 +42,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             resources.srcDir(generatedDesktopResources)
+            resources.srcDir(generatedDesktopBuildConfig)
             // Consume the canonical game configuration instead of maintaining desktop copies.
             resources.srcDir(rootProject.file("app/src/main/assets/game"))
             // Share the canonical Android changelog with the Windows app bundle.
@@ -72,11 +86,11 @@ kotlin {
 }
 
 tasks.matching { it.name == "jvmProcessResources" }.configureEach {
-    dependsOn(generateDesktopLogoAssets)
+    dependsOn(generateDesktopLogoAssets, generateDesktopBuildConfig)
 }
 tasks.configureEach {
     if (name.startsWith("package", ignoreCase = true) || name.contains("Distributable", ignoreCase = true)) {
-        dependsOn(generateDesktopLogoAssets)
+        dependsOn(generateDesktopLogoAssets, generateDesktopBuildConfig)
     }
 }
 
