@@ -21,7 +21,8 @@ enum class DesktopGameSection {
     ENDGAME,
     LUCKY_STAKE,
     ARCADE,
-    MUSIC_PLAYER
+    MUSIC_PLAYER,
+    CHANGELOG
 }
 
 
@@ -29,6 +30,8 @@ enum class DesktopGameSection {
 internal val DesktopGameSection.sharedHtmlScreen: String?
     get() = when (this) {
         DesktopGameSection.PLAY -> "play"
+        DesktopGameSection.MORE -> "more"
+        DesktopGameSection.CHANGELOG -> "changelog"
         DesktopGameSection.UPGRADES -> "upgrades"
         DesktopGameSection.SHOP -> "shop"
         DesktopGameSection.PRESTIGE -> "prestige"
