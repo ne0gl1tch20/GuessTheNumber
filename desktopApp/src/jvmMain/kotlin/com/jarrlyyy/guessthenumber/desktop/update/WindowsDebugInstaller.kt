@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream
 internal class WindowsDebugInstaller {
     fun downloadVerifyAndLaunch(update: WindowsDebugUpdate) {
         require(update.artifactDownloadUrl.matches(
-            Regex("https://api\\.github\\.com/repos/ne0gl1tch20/GuessTheNumber/actions/runs/\\d+/artifacts/\\d+")
+            Regex("https://api\\.github\\.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/\\d+/zip")
         )) {
             "The Windows Debug download is not a GitHub Actions artifact URL."
         }
