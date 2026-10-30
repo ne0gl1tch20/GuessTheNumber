@@ -24,22 +24,12 @@ val desktopLiveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl"
 val desktopLiveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64")
     .map { value -> value.filterNot(Char::isWhitespace) }
     .orElse("")
-val generateDesktopBuildConfig = tasks.register("generateDesktopBuildConfig") {
-    val outputFile = generatedDesktopBuildConfig.map { it.file("desktop-build.properties") }
-    inputs.property("debugToolsBuildAllowed", desktopDebugToolsBuildAllowed)
-    inputs.property("liveOpsManifestUrl", desktopLiveOpsManifestUrl)
-    inputs.property("liveOpsPublicKeyBase64", desktopLiveOpsPublicKey)
-    outputs.file(outputFile)
-    doLast {
-        val output = outputFile.get().asFile
-        output.parentFile.mkdirs()
-        output.writeText(
-            "debugToolsBuildAllowed=${desktopDebugToolsBuildAllowed.get()}\n" +
-                "liveOpsManifestUrl=${desktopLiveOpsManifestUrl.get()}\n" +
-                "liveOpsPublicKeyBase64=${desktopLiveOpsPublicKey.get()}\n" +
-                "appVersionCode=24\n"
-        )
-    }
+val generateDesktopBuildConfig = tasks.register<org.gradle.api.tasks.WriteProperties>("generateDesktopBuildConfig") {
+    outputFile = generatedDesktopBuildConfig.get().file("desktop-build.properties").asFile
+    property("debugToolsBuildAllowed", desktopDebugToolsBuildAllowed.get().toString())
+    property("liveOpsManifestUrl", desktopLiveOpsManifestUrl.get())
+    property("liveOpsPublicKeyBase64", desktopLiveOpsPublicKey.get())
+    property("appVersionCode", "24")
 }
 
 val generateDesktopLogoAssets = tasks.register<GenerateDesktopLogoAssets>("generateDesktopLogoAssets") {
