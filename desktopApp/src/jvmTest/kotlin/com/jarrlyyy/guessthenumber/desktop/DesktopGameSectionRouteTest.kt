@@ -12,6 +12,7 @@ class DesktopGameSectionRouteTest {
             DesktopGameSection.MORE to "more",
             DesktopGameSection.CHANGELOG to "changelog",
             DesktopGameSection.ABOUT to "about",
+            DesktopGameSection.MUSIC_PLAYER to "music",
             DesktopGameSection.UPGRADES to "upgrades",
             DesktopGameSection.SHOP to "shop",
             DesktopGameSection.PRESTIGE to "prestige",
