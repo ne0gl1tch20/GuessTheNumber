@@ -118,9 +118,9 @@ internal object DesktopWebPlayActions {
             "notificationEventsEnabled" -> boolean()?.let { settings.copy(notificationEventsEnabled = it) }
             "notificationIntervalHours" -> value.toLongOrNull()?.takeIf { it in 1L..168L }
                 ?.let { settings.copy(notificationIntervalHours = it) }
-            "themeMode" -> value.takeIf { it in setOf("System", "Light", "Dark") }
+            "themeMode" -> value.takeIf { it in setOf("System", "Light", "Dark", "AMOLED") }
                 ?.let { settings.copy(themeMode = it) }
-            "numberNotation" -> value.takeIf { it in setOf("Standard", "Scientific", "Engineering", "Compact") }
+            "numberNotation" -> value.takeIf { it in setOf("Standard", "Scientific", "Engineering") }
                 ?.let { settings.copy(numberNotation = it) }
             "locale" -> value.takeIf(::isDesktopWebLocaleSupported)?.let { settings.copy(locale = it) }
             "reducedMotion" -> boolean()?.let { settings.copy(reducedMotion = it) }
