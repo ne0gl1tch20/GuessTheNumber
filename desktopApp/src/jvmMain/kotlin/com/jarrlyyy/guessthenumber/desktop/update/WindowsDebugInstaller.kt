@@ -40,7 +40,7 @@ internal class WindowsDebugInstaller {
         ZipInputStream(Files.newInputStream(artifact)).use { zip ->
             while (true) {
                 val entry = zip.nextEntry ?: break
-                val name = entry.name.replace('\\\\', '/')
+                val name = entry.name.replace(92.toChar(), '/')
                 if (name.startsWith("/") || Regex("^[A-Za-z]:").containsMatchIn(name) ||
                     name.split('/').any { it == ".." }
                 ) throw IllegalStateException("The Actions artifact contains an unsafe path.")
