@@ -39,7 +39,7 @@ class DesktopGameSectionRouteTest {
             ?.readText()
             ?: error("The canonical shared HTML bundle is missing from Windows resources.")
         expected.values.forEach { route ->
-            org.junit.Assert.assertTrue("The canonical HTML bundle is missing route $route", sharedHtml.contains("data-screen=\\"$route\\""))
+            org.junit.Assert.assertTrue("The canonical HTML bundle is missing route $route", sharedHtml.contains("data-screen=\"" + route + "\""))
         }
 
         val sharedScript = javaClass.classLoader.getResource("web-play/app.js")
