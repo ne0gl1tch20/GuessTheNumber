@@ -155,9 +155,31 @@ internal class DesktopEdgeWebViewController(
         }
     }
 
+    /**
+     * SwingWebView's JavaScript callback can deliver a JSON string either as the
+     * original object text or as a JSON-encoded string, depending on the native
+     * WebView backend. Normalize only those two representations before the
+     * shared request handler validates the protocol.
+     */
+    private fun normalizeBridgeRequest(raw: String): String? {
+        if (raw.length > 32_768) return null
+        val candidate = raw.trim()
+        if (candidate.isEmpty()) return null
+
+        if (runCatching { JSONObject(candidate) }.isSuccess) return candidate
+
+        val decoded = runCatching {
+            org.json.JSONTokener(candidate).nextValue() as? String
+        }.getOrNull()?.trim()?.takeIf { it.isNotEmpty() && it.length <= 16_384 }
+            ?: return null
+
+        return decoded.takeIf { runCatching { JSONObject(it) }.isSuccess }
+    }
+
     private fun handleRequest(raw: String) {
         val currentHandler = handler.get()
-        val request = runCatching { JSONObject(raw) }.getOrNull()
+        val normalized = normalizeBridgeRequest(raw)
+        val request = normalized?.let { runCatching { JSONObject(it) }.getOrNull() }
         val replyToPage: (String) -> Unit = { response ->
             if (!disposed) {
                 val encoded = JSONObject.quote(response)
@@ -177,6 +199,17 @@ internal class DesktopEdgeWebViewController(
         val settingValue = setting?.opt("value")
 
         when {
+            normalized == null || request == null -> {
+                if (javaClass.classLoader.getResourceAsStream("desktop-build.properties")?.use { stream ->
+                        java.util.Properties().apply { load(stream) }.getProperty("debugToolsBuildAllowed", "false")
+                            .equals("true", ignoreCase = true)
+                    } == true
+                ) {
+                    System.err.println("GuessTheNumber desktop bridge rejected malformed callback payload: ${raw.take(512)}")
+                }
+                replyToPage(JSONObject().put("version", 1)
+                    .put("id", "").put("type", "error").put("error", "invalid_request").toString())
+            }
             settingKey == "desktopNavigationPosition" && settingValue is String -> {
                 val position = DesktopNavigationPosition.entries.firstOrNull {
                     it.name == settingValue.uppercase()
@@ -215,9 +248,9 @@ internal class DesktopEdgeWebViewController(
                 }
                 replyToPage(response.toString())
             }
-            currentHandler != null && raw.length <= 16384 -> currentHandler(raw, replyToPage)
+            currentHandler != null && normalized.length <= 16384 -> currentHandler(normalized, replyToPage)
             else -> {
-                val id = request?.optString("id", "").orEmpty()
+                val id = request.optString("id", "")
                 replyToPage(JSONObject().put("version", 1).put("id", id)
                     .put("type", "error").put("error", "host_unavailable").toString())
             }
