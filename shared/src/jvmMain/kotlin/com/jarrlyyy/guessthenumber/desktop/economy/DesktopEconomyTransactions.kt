@@ -811,7 +811,7 @@ object DesktopEconomyTransactions {
         if (worldId !in state.unlockedWorldIds || bossId !in state.defeatedBossIds) return null
         val current = state.worldMasteryLevels[worldId] ?: 1
         if (current >= 10) return null
-        val secretDiscount = if (WORLD_SECRET_IDS[worldId] in state.discoveredSecretIds) 0.20 else 0.0
+        val secretDiscount = if (WORLD_SECRET_IDS[worldId]?.let { it in state.discoveredSecretIds } == true) 0.20 else 0.0
         val sanctuaryDiscount = (state.homeBaseLevel * 0.01).coerceAtMost(0.20)
         val fullRelicSet = setOf("verdant_guardian", "crystal_golem", "ember_dragon", "nebula_titan")
         val relicDiscount = if (state.equippedRelicIds.containsAll(fullRelicSet)) 0.10 else 0.0
