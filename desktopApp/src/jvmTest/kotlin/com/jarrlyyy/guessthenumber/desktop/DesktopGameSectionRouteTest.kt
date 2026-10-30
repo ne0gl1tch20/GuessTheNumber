@@ -64,7 +64,7 @@ class DesktopGameSectionRouteTest {
         listOf("LEFT", "RIGHT", "TOP", "BOTTOM").forEach { position ->
             org.junit.Assert.assertTrue(
                 "The shared HTML navigation is missing the $position desktop layout.",
-                sharedStyles.contains("""data-desktop-navigation-position="$position"""")
+                sharedStyles.contains("data-desktop-navigation-position=" + '"' + position + '"' )
             )
         }
 
