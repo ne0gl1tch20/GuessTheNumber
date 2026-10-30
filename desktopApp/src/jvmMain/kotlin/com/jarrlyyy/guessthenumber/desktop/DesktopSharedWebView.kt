@@ -31,8 +31,7 @@ internal fun DesktopSharedWebView(
     onNavigationPositionChange: (DesktopNavigationPosition) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val controller = remember { DesktopSharedWebViewController() }
-    controller.setInitialScreen(initialScreen)
+    val controller = remember(initialScreen) { DesktopSharedWebViewController(initialScreen) }
     controller.setRequestHandler(onRequest)
     controller.setNavigationPositionHandler(onNavigationPositionChange)
     DisposableEffect(controller) {
@@ -42,18 +41,19 @@ internal fun DesktopSharedWebView(
         factory = { controller.panel },
         modifier = modifier.fillMaxSize(),
         update = {
-            controller.setInitialScreen(initialScreen)
             controller.setRequestHandler(onRequest)
             controller.setNavigationPositionHandler(onNavigationPositionChange)
         }
     )
 }
 
-private class DesktopSharedWebViewController {
+private class DesktopSharedWebViewController(initialScreenValue: String) {
     val panel = JPanel(BorderLayout())
     private val fxPanel = JFXPanel()
     private val handler = AtomicReference<((String, (String) -> Unit) -> Unit)>()
-    private val initialScreen = AtomicReference("play")
+    private val initialScreen = AtomicReference(initialScreenValue.also {
+        require(it in setOf("play", "more", "changelog", "about", "music", "upgrades", "shop", "prestige", "ultra", "talent", "settings", "rewards", "worlds", "mutators", "relics", "homebase", "codex", "journey", "stats", "arcade", "stake"))
+    })
     private val navigationPositionHandler = AtomicReference<(DesktopNavigationPosition) -> Unit>({})
     @Volatile private var disposed = false
     private var engine: javafx.scene.web.WebEngine? = null
@@ -159,11 +159,6 @@ private class DesktopSharedWebViewController {
                 fxPanel.scene = Scene(javafx.scene.layout.StackPane(fallback))
             }
         }
-    }
-
-    fun setInitialScreen(value: String) {
-        require(value in setOf("play", "more", "changelog", "about", "music", "upgrades", "shop", "prestige", "ultra", "talent", "settings", "rewards", "worlds", "mutators", "relics", "homebase", "codex", "journey", "stats", "arcade", "stake"))
-        initialScreen.set(value)
     }
 
     fun setRequestHandler(value: (String, (String) -> Unit) -> Unit) {
