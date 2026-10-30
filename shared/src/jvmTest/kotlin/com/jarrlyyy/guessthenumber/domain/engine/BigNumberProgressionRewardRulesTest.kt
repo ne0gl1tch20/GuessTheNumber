@@ -19,6 +19,17 @@ class BigNumberProgressionRewardRulesTest {
     }
 
     @Test
+    fun prestigeRewardDoesNotRoundValuesJustBelowPerfectSquaresUp() {
+        val justBelowFour = BigNumber("3.999999999999999999999999999999999999")
+        val justAboveFour = BigNumber("4.000000000000000000000000000000000001")
+
+        assertEquals(0, BigNumberProgressionRewardRules.prestigeReward(justBelowFour, BigNumber.ONE)
+            .compareTo(BigNumber.ONE))
+        assertEquals(0, BigNumberProgressionRewardRules.prestigeReward(justAboveFour, BigNumber.ONE)
+            .compareTo(BigNumber(2)))
+    }
+
+    @Test
     fun ultraRewardUsesRatioExponentWithoutConvertingHugeCurrenciesToDouble() {
         val requirement = engine.calculateUltraRequirement(0)
         val moneyForThousand = requirement * BigNumber("1e10")
