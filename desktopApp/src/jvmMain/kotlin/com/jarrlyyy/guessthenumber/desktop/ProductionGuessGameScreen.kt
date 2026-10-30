@@ -836,6 +836,49 @@ fun ProductionGuessGameScreen(
                                 isSaving = false
                             }
                         }
+                    },
+                    onExportAllSlots = {
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Export all GuessTheNumber save slots"
+                            selectedFile = File("guessthenumber-all-slots.zip")
+                            fileFilter = FileNameExtensionFilter("GuessTheNumber backup bundle (*.zip)", "zip")
+                        }
+                        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val destination = chooser.selectedFile.toPath()
+                            scope.launch {
+                                val bundle = withContext(Dispatchers.IO) { saveStore.exportAllSlotsBundle() }
+                                val exported = bundle != null && runCatching {
+                                    Files.write(destination, bundle)
+                                }.isSuccess
+                                feedback = if (exported) "Exported all populated slots as a portable ZIP bundle." else "Could not export the save bundle."
+                            }
+                        }
+                    },
+                    onImportAllSlots = {
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Import all GuessTheNumber save slots"
+                            fileFilter = FileNameExtensionFilter("GuessTheNumber backup bundle (*.zip)", "zip")
+                        }
+                        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val source = chooser.selectedFile.toPath()
+                            scope.launch {
+                                isSaving = true
+                                val imported = withContext(Dispatchers.IO) {
+                                    runCatching { Files.readAllBytes(source) }.getOrNull()
+                                        ?.let { saveStore.importAllSlotsBundle(it) } ?: false
+                                }
+                                if (imported) {
+                                    activeSaveSlot = withContext(Dispatchers.IO) { saveStore.activeSlot() }
+                                    state = withContext(Dispatchers.IO) { saveStore.load(activeSaveSlot) }
+                                    state?.let { autoClicker.reset(it.currentRangeMin, it.currentRangeMax) }
+                                    feedback = "Imported and validated the all-slot backup bundle."
+                                } else {
+                                    feedback = "Bundle import rejected. Existing saves were kept intact."
+                                }
+                                saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                                isSaving = false
+                            }
+                        }
                     }
                 )
             }
