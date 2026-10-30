@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 
-private data class DesktopCodexEntry(val id: String, val title: String)
+internal data class DesktopCodexEntry(val id: String, val title: String)
 
 private val desktopCodexEntries = listOf(
     DesktopCodexEntry("world:verdant_grove", "Verdant Grove"),
