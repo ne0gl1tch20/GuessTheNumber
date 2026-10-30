@@ -316,17 +316,10 @@ fun main() = application {
                         }
                     }
 
-                    if (!usesSharedHtmlSurface && navigationPosition == DesktopNavigationPosition.TOP) {
-                        DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
-                    }
-
                     Row(
                         modifier = Modifier.weight(1f).fillMaxWidth(),
                         horizontalArrangement = if (usesSharedHtmlSurface) Arrangement.Start else Arrangement.spacedBy(12.dp)
                     ) {
-                        if (!usesSharedHtmlSurface && navigationPosition == DesktopNavigationPosition.LEFT) {
-                            DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
-                        }
 
                     AnimatedContent(
                         modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -527,13 +520,6 @@ fun main() = application {
 
                     }
                     }
-                        if (!usesSharedHtmlSurface && navigationPosition == DesktopNavigationPosition.RIGHT) {
-                            DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
-                        }
-                    }
-
-                    if (!usesSharedHtmlSurface && navigationPosition == DesktopNavigationPosition.BOTTOM) {
-                        DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
                     }
                 }
             }
