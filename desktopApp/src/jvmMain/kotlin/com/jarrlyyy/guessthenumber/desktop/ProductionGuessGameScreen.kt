@@ -436,43 +436,55 @@ fun ProductionGuessGameScreen(
                             if (guess == null || before == null || guess !in before.currentRangeMin..before.currentRangeMax) {
                                 accepted = false
                                 message = "Enter a whole number inside the displayed range."
-                            } else if (isSaving) {
-                                accepted = false
-                                message = "Please wait for the current save to finish."
                             } else {
-                                isSaving = true
-                                val rawResult = engine.processGuess(before, guess)
-                                val result = TraitGameplayRules.apply(before, guess, rawResult, TraitGameplayRules.activeGameplayTraitIds(before))
-                                val correct = result.feedback == GuessFeedback.CORRECT
-                                val bonusAdjusted = DesktopEconomyTransactions.applyGuessBonuses(before, result.newState, correct)
-                                val progressed = DesktopEconomyTransactions.recordGuessProgress(
-                                    before = before,
-                                    after = bonusAdjusted,
-                                    correct = correct,
-                                    today = LocalDate.now().toString(),
-                                    lootRoll = if (correct) Random.nextInt(1000) else null
-                                )
-                                val finalState = DesktopEconomyTransactions.evaluateAchievements(
-                                    DesktopEconomyTransactions.recordBossGuess(progressed, correct)
-                                )
-                                val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
-                                if (saved) {
-                                    state = finalState
-                                    nextState = finalState
-                                    guessStatus = result.feedback.name
-                                    webLastGuessStatus = guessStatus
-                                    autoClicker.observeGuess(guess, result.feedback)
-                                    if (correct) autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
-                                    message = when (result.feedback) {
-                                        GuessFeedback.TOO_LOW -> "Too low. Try again!"
-                                        GuessFeedback.TOO_HIGH -> "Too high. Try again!"
-                                        GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - before.money} Money."
+                                val submittedAtNanos = System.nanoTime()
+                                when {
+                                    GuessRateLimitRules.isRateLimited(lastGuessTimestampNanos, submittedAtNanos) -> {
+                                        accepted = false
+                                        message = "Please wait a moment before guessing again."
+                                        guessStatus = "rate_limited"
                                     }
-                                } else {
-                                    accepted = false
-                                    message = "Could not save that guess. Your previous save is intact."
+                                    isSaving -> {
+                                        accepted = false
+                                        message = "Please wait for the current save to finish."
+                                    }
+                                    else -> {
+                                        lastGuessTimestampNanos = submittedAtNanos
+                                        isSaving = true
+                                        val rawResult = engine.processGuess(before, guess)
+                                        val result = TraitGameplayRules.apply(before, guess, rawResult, TraitGameplayRules.activeGameplayTraitIds(before))
+                                        val correct = result.feedback == GuessFeedback.CORRECT
+                                        val bonusAdjusted = DesktopEconomyTransactions.applyGuessBonuses(before, result.newState, correct)
+                                        val progressed = DesktopEconomyTransactions.recordGuessProgress(
+                                            before = before,
+                                            after = bonusAdjusted,
+                                            correct = correct,
+                                            today = LocalDate.now().toString(),
+                                            lootRoll = if (correct) Random.nextInt(1000) else null
+                                        )
+                                        val finalState = DesktopEconomyTransactions.evaluateAchievements(
+                                            DesktopEconomyTransactions.recordBossGuess(progressed, correct)
+                                        )
+                                        val saved = withContext(Dispatchers.IO) { saveStore.save(activeSaveSlot, finalState) }
+                                        if (saved) {
+                                            state = finalState
+                                            nextState = finalState
+                                            guessStatus = result.feedback.name
+                                            webLastGuessStatus = guessStatus
+                                            autoClicker.observeGuess(guess, result.feedback)
+                                            if (correct) autoClicker.reset(finalState.currentRangeMin, finalState.currentRangeMax)
+                                            message = when (result.feedback) {
+                                                GuessFeedback.TOO_LOW -> "Too low. Try again!"
+                                                GuessFeedback.TOO_HIGH -> "Too high. Try again!"
+                                                GuessFeedback.CORRECT -> "Correct! You earned ${finalState.money - before.money} Money."
+                                            }
+                                        } else {
+                                            accepted = false
+                                            message = "Could not save that guess. Your previous save is intact."
+                                        }
+                                        isSaving = false
+                                    }
                                 }
-                                isSaving = false
                             }
                         } else if (type != "read_state") {
                             val before = state
