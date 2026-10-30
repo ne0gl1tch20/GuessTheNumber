@@ -160,10 +160,10 @@ fun ProductionGuessGameScreen(
                     )
                 )
             } else loaded
-            val persisted = earnedOffline <= BigNumber.ZERO ||
-                withContext(Dispatchers.IO) { saveStore.save(selectedSlot, resumedState) }
+            val stampedState = resumedState.copy(lastSaveTimestamp = System.currentTimeMillis())
+            val persisted = withContext(Dispatchers.IO) { saveStore.save(selectedSlot, stampedState) }
             if (persisted) {
-                state = resumedState
+                state = stampedState
                 offlineGains = earnedOffline.takeIf { it > BigNumber.ZERO }
                 offlineRewardDismissed = false
                 feedback = if (earnedOffline > BigNumber.ZERO) {
