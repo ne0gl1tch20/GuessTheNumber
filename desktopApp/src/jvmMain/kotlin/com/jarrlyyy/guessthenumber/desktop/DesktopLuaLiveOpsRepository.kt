@@ -137,8 +137,12 @@ internal class DesktopLuaLiveOpsRepository(
         }
     }
 
-    fun loadVerifiedCachedEvents(): List<DesktopLiveOpsEvent> =
-        activeVerifiedBundle()?.first?.events.orEmpty()
+    fun loadVerifiedCachedEventManifest(): DesktopLiveOpsManifest? = activeVerifiedBundle()?.first?.let { payload ->
+        if (payload.events.isEmpty()) null else DesktopLiveOpsManifest(
+            manifestVersion = payload.eventManifestVersion,
+            events = payload.events
+        )
+    }
 
     fun readVerifiedCachedScript(entry: DesktopLuaScriptEntry): String? {
         if (entry.source != "liveops") return null
@@ -198,7 +202,7 @@ internal class DesktopLuaLiveOpsRepository(
         require(payload.scripts.size in 1..MAX_SCRIPTS) { "LiveOps script count is outside the supported limit." }
         require(payload.eventManifestVersion in 1..2) { "Unsupported LiveOps event manifest version." }
         require(payload.events.size <= 32) { "LiveOps event count is outside the supported limit." }
-        if (payload.events.isNotEmpty()) DesktopLiveOpsRepository.validateRemoteEvents(payload.eventManifestVersion, payload.events)
+        if (payload.events.isNotEmpty()) DesktopLiveOpsRepository().validateRemoteEvents(payload.eventManifestVersion, payload.events)
         require(payload.scripts.map { it.id }.distinct().size == payload.scripts.size) { "Duplicate LiveOps script IDs." }
         require(payload.scripts.map { it.fileName }.distinct().size == payload.scripts.size) {
             "Duplicate LiveOps script file names."
