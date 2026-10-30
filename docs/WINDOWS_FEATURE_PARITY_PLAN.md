@@ -182,7 +182,8 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Add validated single-slot JSON import/export to Windows Save Slots. Imports reject malformed, oversized and invalid states and preserve the previous save as a recovery backup; raw GameState JSON is also accepted by Android's legacy single-save import path. These files are plain JSON, not encrypted, and do not include global settings or all slots in one bundle.
 - [x] Implement ten independent desktop save slots, switching, duplication, recovery-backup restore and validated per-slot JSON import/export.
 - [x] Add a validated portable all-slot ZIP bundle with manifest, active-slot selection, full preflight validation and rollback of previous slot files if an import write fails. The bundle contains all populated slots and their per-save settings.
-- [ ] Encrypt portable backups or add a separate global-app-preferences bundle; current JSON and ZIP backups are not encrypted and desktop-only preferences remain outside the save data.
+- [x] Add a separate portable global-app-preferences ZIP bundle for Windows navigation and player profile, including custom avatar bytes; imports validate schema, entry names, sizes and image content before replacing preferences.
+- [ ] Add optional passphrase encryption for portable save and global-preferences backups; current ZIP/JSON exports are not encrypted.
 - [x] Add a replayable five-step Windows feature tour covering Play, upgrades/shop, progression, activities/events and save/settings tools; the tour is available from Settings.
 - [ ] About, player-facing error states and crash recovery surfaces.
 - [x] Add native local Music Player controls, saved file library/queue paths, playback, pause/resume, stop and volume. Windows Java Sound support is format-dependent; WAV/AIFF/AU are the expected supported formats, while Android-only media integrations remain intentionally unavailable.
