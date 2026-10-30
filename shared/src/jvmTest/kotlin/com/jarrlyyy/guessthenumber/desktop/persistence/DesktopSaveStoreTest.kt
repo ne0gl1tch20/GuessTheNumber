@@ -104,8 +104,7 @@ class DesktopSaveStoreTest {
         val replacement = GameState(money = BigNumber(98_765), lastSaveTimestamp = 1_700_000_000_100L)
 
         assertTrue(store.save(1, original))
-        val exported = store.exportSlotJson(1)
-        assertNotNull(exported)
+        val exported = assertNotNull(store.exportSlotJson(1))
         assertTrue(store.importSlotJson(1, Json.encodeToString(replacement)))
         assertEquals(0, store.load(1)!!.money.compareTo(BigNumber(98_765)))
         assertTrue(store.restoreBackup(1))
