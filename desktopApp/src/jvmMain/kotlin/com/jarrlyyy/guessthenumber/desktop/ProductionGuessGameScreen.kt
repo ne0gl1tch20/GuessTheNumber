@@ -350,6 +350,7 @@ fun ProductionGuessGameScreen(
         if (section.sharedHtmlScreen != null) {
             key(section) {
             DesktopSharedWebView(
+                initialScreen = section.sharedHtmlScreen!!,
                 onRequest = { raw, reply ->
                     scope.launch {
                         val request = runCatching { org.json.JSONObject(raw) }.getOrNull()
