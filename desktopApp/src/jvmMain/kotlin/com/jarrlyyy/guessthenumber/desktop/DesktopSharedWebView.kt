@@ -301,13 +301,22 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                 "window.gtnDesktopLaunchAtStartup = $launchAtStartup;"
             )
         Files.writeString(hostScript, hostPatched)
-        val cspMeta = Regex("""(?i)<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]*>""")
-            .find(original)
-            ?: throw IOException("Shared web UI index.html has no Content Security Policy.")
+        val cspMarker = "Content-Security-Policy"
+        val cspMarkerIndex = original.indexOf(cspMarker, ignoreCase = true)
+        if (cspMarkerIndex < 0) {
+            throw IOException("Shared web UI index.html has no Content Security Policy.")
+        }
+        val cspMetaStart = original.lastIndexOf("<meta", cspMarkerIndex, ignoreCase = true)
+        val cspMetaEnd = original.indexOf('>', cspMarkerIndex)
+        if (cspMetaStart < 0 || cspMetaEnd < 0) {
+            throw IOException("Shared web UI Content Security Policy meta tag is malformed.")
+        }
         val scriptTag = """<script src="desktop-host.js"></script>"""
         val patched = original.replaceRange(
-            cspMeta.range,
-            cspMeta.value + System.lineSeparator() + "  " + scriptTag
+            cspMetaStart,
+            cspMetaEnd + 1,
+            original.substring(cspMetaStart, cspMetaEnd + 1) +
+                System.lineSeparator() + "  " + scriptTag
         )
         Files.writeString(index, patched)
         return index
