@@ -124,7 +124,7 @@ jobs:
 
       - name: Build versioned Windows installer
         shell: pwsh
-        run: .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache
+        run: .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache -Pgtn.desktop.debugToolsBuild=true
 
       - name: Show packaged files
         shell: pwsh
