@@ -243,6 +243,10 @@ fun ProductionGuessGameScreen(
 
     val currentState = state
 
+    LaunchedEffect(currentState?.settings?.volume, currentState?.settings?.musicEnabled) {
+        currentState?.settings?.let(DesktopMusicBridge::applySettings)
+    }
+
     LaunchedEffect(currentState?.settings) {
         val settings = currentState?.settings ?: return@LaunchedEffect
         onThemeSettingsLoaded(
@@ -348,6 +352,7 @@ fun ProductionGuessGameScreen(
         if (section.sharedHtmlScreen != null) {
             key(section) {
             DesktopSharedWebView(
+                initialScreen = section.sharedHtmlScreen!!,
                 onRequest = { raw, reply ->
                     scope.launch {
                         val request = runCatching { org.json.JSONObject(raw) }.getOrNull()
@@ -370,6 +375,34 @@ fun ProductionGuessGameScreen(
                         }
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
+                        if (type == "music_state") {
+                            val musicSettings = state?.settings
+                            if (musicSettings == null) {
+                                sendError("game_not_ready")
+                            } else {
+                                reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                    .put("type", "music_state")
+                                    .put("musicPlayer", DesktopMusicBridge.state(musicSettings)).toString())
+                            }
+                            return@launch
+                        }
+                        if (type == "music_action") {
+                            val musicSettings = state?.settings
+                            if (musicSettings == null) {
+                                sendError("game_not_ready")
+                            } else {
+                                val musicState = DesktopMusicBridge.perform(
+                                    request.optString("action"),
+                                    request,
+                                    musicSettings,
+                                    ::updateSettings
+                                )
+                                reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                    .put("type", "music_state")
+                                    .put("musicPlayer", musicState).toString())
+                            }
+                            return@launch
+                        }
                         val expectedKeys = when (type) {
                             "read_state", "read_changelog", "read_profile", "check_updates", "install_update", "open_update_page", "read_onboarding_state", "complete_nimmy_tutorial", "read_feature_tutorial", "complete_feature_tutorial", "reset_everything", "navigate", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
@@ -1604,18 +1637,6 @@ fun ProductionGuessGameScreen(
                         onNavigationPositionChange = onNavigationPositionChange,
                         onGlobalPreferencesImported = onGlobalPreferencesImported,
                         onBack = onBackFromSettings
-                    )
-                }
-            }
-
-            if (section == DesktopGameSection.MUSIC_PLAYER) {
-                if (currentState == null) {
-                    CircularProgressIndicator()
-                } else {
-                    DesktopMusicPlayerContent(
-                        settings = currentState.settings,
-                        onUpdateSettings = ::updateSettings,
-                        onBack = { onOpenParityDestination(DesktopDestination.MORE) }
                     )
                 }
             }
