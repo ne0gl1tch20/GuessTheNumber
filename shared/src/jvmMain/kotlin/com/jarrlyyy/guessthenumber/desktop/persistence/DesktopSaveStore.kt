@@ -229,7 +229,7 @@ class DesktopSaveStore internal constructor(
                     val name = entry.name.replace(92.toChar(), '/')
                     if (entry.isDirectory || name.startsWith("/") ||
                         name.split('/').any { it == ".." } ||
-                        !(name == "manifest.json" || name.matches(Regex("slot-(?:[1-9]|10)\\\\.json")))
+                        !(name == "manifest.json" || name.matches(Regex("slot-(?:[1-9]|10)\\.json")))
                     ) return false
                     if (files.containsKey(name)) return false
                     val maximum = if (name == "manifest.json") MAX_MANIFEST_BYTES else MAX_SLOT_JSON_BYTES
@@ -269,7 +269,7 @@ class DesktopSaveStore internal constructor(
             val previousFiles = (1..MAX_SAVE_SLOTS).flatMap { slot ->
                 listOf(primaryPath(slot), backupPath(slot))
             }.associateWith { path ->
-                runCatching { if (fileOps.exists(path)) fileOps.read(path) else null }.getOrNull()
+                if (fileOps.exists(path)) fileOps.read(path) else null
             }
             try {
                 for (slot in 1..MAX_SAVE_SLOTS) {
