@@ -99,6 +99,9 @@ internal class WindowsDebugInstaller {
         require(manifest["runAttempt"]?.jsonPrimitive?.content == update.runAttempt.toString()) {
             "The Windows Debug run attempt does not match."
         }
+        require(manifest["commit"]?.jsonPrimitive?.content == update.commitSha) {
+            "The Windows Debug commit SHA does not match the successful CI run."
+        }
         require(manifest["tag"]?.jsonPrimitive?.content == update.tagName) {
             "The Windows Debug build tag does not match."
         }
