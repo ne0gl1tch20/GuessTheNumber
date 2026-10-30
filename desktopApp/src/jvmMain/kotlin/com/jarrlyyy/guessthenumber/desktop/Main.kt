@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -212,6 +213,10 @@ fun main() = application {
             val shellFocusRequester = remember { FocusRequester() }
             val shell = remember { DesktopShellController() }
             val shellState = shell.state
+            val musicHost = remember { DesktopMusicPlayerHost() }
+            DisposableEffect(musicHost) {
+                onDispose { musicHost.close() }
+            }
             val updateClient = remember { WindowsDebugUpdateClient() }
             val installer = remember { WindowsDebugInstaller() }
             var availableUpdate by remember { mutableStateOf<WindowsDebugUpdate?>(null) }
@@ -365,6 +370,7 @@ fun main() = application {
                         DesktopDestination.ABOUT -> {
                             Column(modifier = Modifier.fillMaxSize()) {
                                 ProductionGuessGameScreen(
+                                    musicHost = musicHost,
                                     section = when (destination) {
                                         DesktopDestination.UPGRADES -> DesktopGameSection.UPGRADES
                                         DesktopDestination.SHOP -> DesktopGameSection.SHOP
