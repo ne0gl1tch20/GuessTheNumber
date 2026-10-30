@@ -224,6 +224,7 @@ internal class DesktopEdgeWebViewController(
                 hasBody: !!document.body,
                 bodyChildren: document.body ? document.body.children.length : 0,
                 hasScreenActivator: typeof window.gtnActivateScreen === 'function',
+                hasDesktopBridge: !!(window.gtnHost && window.gtnDesktopBridge),
                 url: location.href
             });
             """.trimIndent()
@@ -233,7 +234,9 @@ internal class DesktopEdgeWebViewController(
                 if (disposed || webView !== browser) return@invokeLater
                 val state = if (error == null) runCatching { JSONObject(result) }.getOrNull() else null
                 System.err.println("GuessTheNumber Edge WebView2 loaded: ${state ?: (error?.message ?: "no document state")}")
-                if (state == null || !state.optBoolean("hasBody") ||
+                // Release any page requests queued before the native bridge finished attaching.
+                browser.eval("window.gtnHost && window.gtnHost.flush && window.gtnHost.flush()")
+                if (state == null || !state.optBoolean("hasBody") || !state.optBoolean("hasDesktopBridge") ||
                     state.optInt("bodyChildren") == 0 || !state.optBoolean("hasScreenActivator")
                 ) {
                     showStartupFailure(
