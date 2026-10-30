@@ -28,7 +28,7 @@ class DesktopGameSectionRouteTest {
         )
 
         expected.forEach { (section, route) ->
-            assertEquals(route, section.sharedHtmlScreen, "Unexpected shared route for $section")
+            org.junit.Assert.assertTrue("Unexpected shared route for $section: expected=$route actual=${section.sharedHtmlScreen}", route == section.sharedHtmlScreen)
         }
     }
 
