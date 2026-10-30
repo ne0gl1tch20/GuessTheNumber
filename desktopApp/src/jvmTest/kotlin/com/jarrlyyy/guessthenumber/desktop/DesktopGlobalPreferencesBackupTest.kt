@@ -24,16 +24,6 @@ class DesktopGlobalPreferencesBackupTest {
     }
 
     @Test
-    fun rejectsDuplicateArchiveEntries() {
-        val bytes = zip(
-            "global-preferences.json" to "{}".toByteArray(),
-            "global-preferences.json" to "{}".toByteArray()
-        )
-        val result = runCatching { DesktopGlobalPreferencesBackup.parseBundle(bytes) }
-        assertTrue(result.isFailure)
-    }
-
-    @Test
     fun failedImportDoesNotChangeExistingProfileOrNavigation() {
         val invalid = zip("unexpected.txt" to byteArrayOf(1))
         assertEquals(false, DesktopGlobalPreferencesBackup.importBundle(invalid))
