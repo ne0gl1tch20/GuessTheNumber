@@ -13,7 +13,6 @@ on:
       - opened
       - synchronize
       - reopened
-      - closed
     branches:
       - master
     paths:
@@ -35,7 +34,6 @@ concurrency:
 
 jobs:
   build-windows:
-    if: github.event_name != 'pull_request' || github.event.action != 'closed' || github.event.pull_request.merged == true
     name: Validate, test, and package Windows desktop app
     runs-on: windows-latest
     timeout-minutes: 40
@@ -239,7 +237,7 @@ jobs:
           }
 
       - name: Prepare debug channel package
-        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
         shell: pwsh
         run: |
           $msi = Get-ChildItem -Path "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File | Select-Object -First 1
