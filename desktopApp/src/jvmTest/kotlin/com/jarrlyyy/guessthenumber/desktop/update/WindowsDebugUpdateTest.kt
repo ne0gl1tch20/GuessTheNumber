@@ -122,7 +122,7 @@ class WindowsDebugUpdateTest {
 
     private fun standardResponses(runNumber: Long): Map<String, String> = mapOf(
         WORKFLOW_RUNS_URL to """{"workflow_runs":[
-            {"id":600,"run_number":$runNumber,"run_attempt":2,"event":"push","head_branch":"master","status":"completed","conclusion":"success"},
+            {"id":600,"run_number":$runNumber,"run_attempt":2,"head_sha":"0123456789abcdef0123456789abcdef01234567","event":"push","head_branch":"master","status":"completed","conclusion":"success"},
             {"id":599,"run_number":5,"run_attempt":1,"event":"push","head_branch":"master","status":"completed","conclusion":"success"},
             {"id":598,"run_number":7,"run_attempt":1,"event":"pull_request","head_branch":"feature","status":"completed","conclusion":"success"}
         ]}""",
