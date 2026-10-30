@@ -27,7 +27,9 @@ internal fun DesktopSaveSlotsContent(
     onSwitchSlot: (Int) -> Unit,
     onCreateSlot: (Int) -> Unit,
     onDuplicateSlot: (Int, Int) -> Unit,
-    onRestoreBackup: (Int) -> Unit
+    onRestoreBackup: (Int) -> Unit,
+    onExportSlot: (Int) -> Unit,
+    onImportSlot: (Int) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -36,6 +38,7 @@ internal fun DesktopSaveSlotsContent(
             OutlinedButton(onClick = onRefresh) { Text("Refresh") }
         }
         Text("Ten independent local saves. Switching saves the current slot first. Valid previous saves can be restored.")
+        Text("Portable backups are plain JSON files compatible with Android single-save import. They are not encrypted.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
         slots.forEach { slot ->
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -55,6 +58,10 @@ internal fun DesktopSaveSlotsContent(
                         if (data.lastSaveTimestamp > 0L) Text("Last saved: ${DateFormat.getDateTimeInstance().format(Date(data.lastSaveTimestamp))}")
                     }
                     if (slot.hasBackup) Text("A valid recovery backup is available.", color = MaterialTheme.colorScheme.primary)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (!slot.isEmpty && !slot.isCorrupt) OutlinedButton(onClick = { onExportSlot(slot.slot) }) { Text("Export JSON") }
+                        OutlinedButton(onClick = { onImportSlot(slot.slot) }) { Text("Import JSON") }
+                    }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (slot.isEmpty) {
                             Button(onClick = { onCreateSlot(slot.slot) }) { Text("Create slot") }
