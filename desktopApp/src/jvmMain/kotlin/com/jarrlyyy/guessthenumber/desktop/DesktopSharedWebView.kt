@@ -72,10 +72,30 @@ private class DesktopSharedWebViewController {
                             }
                         }
                     }
-                    if (currentHandler != null && raw.length <= 512) {
+
+                    val request = runCatching { org.json.JSONObject(raw) }.getOrNull()
+                    val desktopNavigationPosition = request
+                        ?.takeIf { it.optInt("version", -1) == 1 && it.optString("type") == "update_setting" }
+                        ?.takeIf { it.length() == 5 && it.optString("key") == "desktopNavigationPosition" }
+                        ?.optString("value")
+                        ?.let { value -> DesktopNavigationPosition.entries.firstOrNull { it.name == value } }
+
+                    if (desktopNavigationPosition != null) {
+                        DesktopNavigationPosition.save(desktopNavigationPosition)
+                        replyToPage(
+                            org.json.JSONObject()
+                                .put("version", 1)
+                                .put("id", request?.optString("id", "").orEmpty())
+                                .put("type", "state")
+                                .put("state", org.json.JSONObject()
+                                    .put("accepted", true)
+                                    .put("message", "Navigation position saved."))
+                                .toString()
+                        )
+                    } else if (currentHandler != null && raw.length <= 512) {
                         currentHandler(raw, replyToPage)
                     } else {
-                        val id = runCatching { org.json.JSONObject(raw).optString("id", "") }.getOrDefault("")
+                        val id = request?.optString("id", "").orEmpty()
                         replyToPage(org.json.JSONObject().put("version", 1).put("id", id)
                             .put("type", "error").put("error", "host_unavailable").toString())
                     }
@@ -163,8 +183,10 @@ private class DesktopSharedWebViewController {
         }
         val index = webRoot.resolve("index.html")
         val original = Files.readString(index)
+        val persistedNavigationPosition = DesktopNavigationPosition.load().name
         val shim = """
             <script>
+            window.gtnDesktopNavigationPosition = '$persistedNavigationPosition';
             window.gtnHost = {
               onmessage: null,
               queue: [],
@@ -181,6 +203,46 @@ private class DesktopSharedWebViewController {
                 if (typeof this.onmessage === 'function') this.onmessage({data: String(raw)});
               }
             };
+            (function() {
+              function applyNavigationPosition(position) {
+                var value = String(position || 'LEFT').toUpperCase();
+                if (!['LEFT','RIGHT','TOP','BOTTOM'].includes(value)) value = 'LEFT';
+                document.documentElement.dataset.desktopNavigationPosition = value;
+                document.body.dataset.desktopNavigationPosition = value;
+              }
+              function requestPosition(value) {
+                applyNavigationPosition(value);
+                window.gtnHost.postMessage(JSON.stringify({
+                  version: 1,
+                  id: 'desktop-nav-' + Date.now(),
+                  type: 'update_setting',
+                  key: 'desktopNavigationPosition',
+                  value: String(value).toUpperCase()
+                }));
+              }
+              function installDesktopNavigationSetting() {
+                var screen = document.querySelector('[data-screen="settings"]');
+                if (!screen || screen.querySelector('[data-desktop-navigation-setting]')) return;
+                var group = document.createElement('div');
+                group.className = 'settings-group desktop-navigation-setting';
+                group.dataset.desktopNavigationSetting = 'true';
+                group.innerHTML = '<h3>Windows Navigation</h3>' +
+                  '<p class="settings-description">Choose which edge holds the desktop navigation bar. Left is the default.</p>' +
+                  '<label class="jui-field-label" for="desktopNavigationPosition">Navigation Bar Position</label>' +
+                  '<select id="desktopNavigationPosition" class="jui-field" aria-label="Navigation Bar Position">' +
+                  '<option value="LEFT">Left</option><option value="TOP">Top</option><option value="RIGHT">Right</option><option value="BOTTOM">Bottom</option>' +
+                  '</select>';
+                screen.querySelector('.catalog-panel')?.appendChild(group);
+                var select = group.querySelector('select');
+                select.value = String(window.gtnDesktopNavigationPosition || 'LEFT').toUpperCase();
+                select.addEventListener('change', function() { requestPosition(select.value); });
+              }
+              applyNavigationPosition(window.gtnDesktopNavigationPosition);
+              if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installDesktopNavigationSetting);
+              else installDesktopNavigationSetting();
+              new MutationObserver(installDesktopNavigationSetting).observe(document.documentElement, {childList:true,subtree:true});
+              window.gtnDesktopApplyNavigationPosition = applyNavigationPosition;
+            })();
             </script>
         """.trimIndent()
         val head = Regex("(?i)<head[^>]*>").find(original)
