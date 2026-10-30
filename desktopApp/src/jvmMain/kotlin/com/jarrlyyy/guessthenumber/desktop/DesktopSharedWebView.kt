@@ -145,6 +145,29 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                             runCatching {
                                 (webEngine.executeScript("window") as JSObject).setMember("gtnDesktopBridge", bridge)
                                 webEngine.executeScript("window.gtnHost && window.gtnHost.flush()")
+                            }.onFailure { error ->
+                                System.err.println("GuessTheNumber desktop bridge initialization failed: ${error.message ?: error.javaClass.simpleName}")
+                            }
+                            if (state == Worker.State.SUCCEEDED) {
+                                val startupCheck = runCatching {
+                                    webEngine.executeScript(
+                                        "(function(){return JSON.stringify({" +
+                                            "ready:document.readyState," +
+                                            "hasBody:!!document.body," +
+                                            "bodyChildren:document.body?document.body.children.length:0," +
+                                            "hasScreenActivator:typeof window.gtnActivateScreen==='function'," +
+                                            "url:location.href" +
+                                        "});})()"
+                                    )?.toString()
+                                }.getOrNull()
+                                System.err.println("GuessTheNumber desktop WebView loaded: $startupCheck")
+                                if (startupCheck == null || startupCheck.contains("\\\"hasBody\\\":false") ||
+                                    startupCheck.contains("\\\"bodyChildren\\\":0")) {
+                                    showStartupFailure(
+                                        "The shared game page loaded without rendering its interface.",
+                                        startupCheck ?: "The WebView could not inspect the loaded document."
+                                    )
+                                }
                             }
                         }
                         Worker.State.FAILED -> {
@@ -152,17 +175,9 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                             val detail = failure?.let { it.message ?: it.javaClass.simpleName }
                                 ?: "The browser did not provide an error message."
                             System.err.println("GuessTheNumber desktop WebView failed to load ${webEngine.location}: $detail")
-                            val message = javafx.scene.control.Label(
-                                "The shared game interface could not be loaded.\n\n$detail\n\n" +
-                                    "Check that the Windows WebView assets are installed correctly, then restart GuessTheNumber."
-                            ).apply {
-                                isWrapText = true
-                                style = "-fx-font-size: 14px; -fx-text-fill: #f7f8ff; -fx-padding: 32px;"
-                            }
-                            fxPanel.scene = Scene(
-                                javafx.scene.layout.StackPane(message).apply {
-                                    style = "-fx-background-color: #080b16;"
-                                }
+                            showStartupFailure(
+                                "The shared game interface could not be loaded.",
+                                "$detail\n\nCheck that the Windows WebView assets are installed correctly, then restart GuessTheNumber."
                             )
                         }
                         else -> Unit
@@ -188,14 +203,35 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                 }
                 fxPanel.scene = Scene(webView)
                 webEngine.load(index.toUri().toString())
-            } catch (error: Exception) {
-                val fallback = javafx.scene.control.Label(
-                    "The shared HTML interface could not start. Check the bundled web assets and JavaFX runtime. " +
+            } catch (error: Throwable) {
+                System.err.println("GuessTheNumber desktop WebView startup failed: ${error.stackTraceToString()}")
+                showStartupFailure(
+                    "The shared HTML interface could not start.",
+                    "Check the bundled web assets and JavaFX runtime.\n\n" +
                         (error.message ?: error.javaClass.simpleName)
                 )
-                fxPanel.scene = Scene(javafx.scene.layout.StackPane(fallback))
             }
         }
+    }
+
+    private fun showStartupFailure(title: String, detail: String) {
+        if (disposed) return
+        val heading = javafx.scene.control.Label(title).apply {
+            isWrapText = true
+            style = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #f7f8ff;"
+        }
+        val message = javafx.scene.control.Label(detail).apply {
+            isWrapText = true
+            style = "-fx-font-size: 13px; -fx-text-fill: #d5def5;"
+        }
+        val content = javafx.scene.layout.VBox(12.0, heading, message).apply {
+            style = "-fx-background-color: #101522; -fx-padding: 32px;"
+        }
+        fxPanel.scene = Scene(
+            javafx.scene.layout.StackPane(content).apply {
+                style = "-fx-background-color: #101522;"
+            }
+        )
     }
 
     fun setRequestHandler(value: (String, (String) -> Unit) -> Unit) {
