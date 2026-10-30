@@ -36,6 +36,18 @@ The RSA signature is `SHA256withRSA` over the decoded `payloadBase64` bytes. Do 
 
 Each script entry contains `id`, `fileName`, `title`, `description`, `sha256`, `featured`, `hostApiVersion` and `capabilities`. IDs must match `[a-z0-9_-]{1,64}`; file names must be plain `.lua` names without directories; the initial allowed capability is only `log`. Each script must return a bounded activity table with `title`, `description`, `prompt`, `options`, `correct_option`, `success_message` and `failure_message`, matching the bundled Number Rush sample. `options` must contain 2–6 answers and `correct_option` is a 1-based index. Remote scripts cannot grant rewards or modify saves.
 
+## Signed seasonal event catalog
+
+The same signed payload may also contain a declarative event catalog. This keeps Lua activity metadata and seasonal offers on one authenticated, versioned publication path while leaving event execution and rewards in Kotlin.
+
+Optional payload fields:
+- `eventManifestVersion`: currently `1` or `2`; this version is independent of `bundleVersion`.
+- `events`: zero to 32 event definitions. Each event contains `id`, `title`, `description`, `status`, `startDate`, `endDate`, `currencyName`, `maxClaims`, `rewardNebula`, `permanentBoostPerClaim`, `minCorrectGuesses`, `minPrestigeCount` and `minUltraCount`.
+
+The publisher and both clients validate event IDs, unique IDs, display text lengths, status values, timezone-aware start/end dates, claim limits, rewards and progression requirements before activation. A malformed or unavailable remote catalog is ignored; the bundled event catalog remains the offline fallback. The signed event data is declarative only: Kotlin still checks event dates, feature flags, eligibility, claim limits, reward values and active-save persistence at claim time.
+
+Opening Seasonal Events attempts a signed bundle refresh. If the signing key is not configured or the network is unavailable, the screen continues with the bundled catalog. Existing signed script-only payloads remain compatible because the event fields are optional.
+
 ## Signing key setup
 
 Generate an RSA signing key outside the repository and keep the private key in a protected secret store:
