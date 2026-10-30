@@ -2,7 +2,7 @@
 
 **Owner decision:** Use the same bundled HTML/CSS/JavaScript presentation for player-facing UI on Android and Windows. Kotlin/KMP remains the authority for game state, costs, purchases, progression, rewards, validation and persistence.
 
-**Starting point:** PR #256 merged the Upgrades and Shop route into Android's `app/src/main/assets/web-play/` bundle. Android's `ProductionWebPlayScreen` loads that bundle through Android WebView. A Windows JavaFX WebView host has now been added and is wired into Play, Upgrades and Shop. The remaining player screens and runtime/distribution verification are not complete.
+**Starting point:** PR #256 merged the Upgrades and Shop route into Android's `app/src/main/assets/web-play/` bundle. Android's `ProductionWebPlayScreen` loads that bundle through Android WebView. A Windows JavaFX WebView host has now been added and is wired into the canonical player-facing routes. It packages the complete `web-play/`, `libraries/` and `fonts/` trees, opens the requested initial route, and keeps the player-facing HTML identical across platforms. Runtime/distribution verification remains open.
 
 ## Workstream A: Windows shared HTML host
 
