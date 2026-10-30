@@ -23,6 +23,7 @@ internal class WindowsDebugInstaller {
             val archivePath = temporaryDirectory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME)
             val manifestPath = temporaryDirectory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME)
             downloadFile(update.artifactDownloadUrl, artifactPath, MAX_ARTIFACT_BYTES)
+            WindowsDebugArchiveValidator.verifySha256(artifactPath, update.artifactSha256)
             WindowsDebugArtifactValidator.extractArtifactFiles(artifactPath, archivePath, manifestPath)
             verifyManifest(manifestPath, archivePath, update)
             val msiPath = temporaryDirectory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
