@@ -69,6 +69,7 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
 
     init {
         if (edgeController != null) {
+            panel.add(edgeController.panel, BorderLayout.CENTER)
             SwingUtilities.invokeLater { if (!disposed) edgeController.start() }
         } else {
             fxPanel = JFXPanel()
