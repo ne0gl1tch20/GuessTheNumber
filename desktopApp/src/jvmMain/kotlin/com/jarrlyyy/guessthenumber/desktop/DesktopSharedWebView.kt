@@ -161,8 +161,8 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                                     )?.toString()
                                 }.getOrNull()
                                 System.err.println("GuessTheNumber desktop WebView loaded: $startupCheck")
-                                if (startupCheck == null || startupCheck.contains("\\\"hasBody\\\":false") ||
-                                    startupCheck.contains("\\\"bodyChildren\\\":0")) {
+                                if (startupCheck == null || startupCheck.contains("\"hasBody\":false") ||
+                                    startupCheck.contains("\"bodyChildren\":0") || startupCheck.contains("\"hasScreenActivator\":false")) {
                                     showStartupFailure(
                                         "The shared game page loaded without rendering its interface.",
                                         startupCheck ?: "The WebView could not inspect the loaded document."
