@@ -220,6 +220,8 @@ fun main() = application {
 
             suspend fun refreshUpdates() {
                 isBusy = true
+                isBusy = true
+                availableUpdate = null
                 status = "Checking for Windows Debug updates…"
                 try {
                     availableUpdate = withContext(Dispatchers.IO) {
@@ -360,147 +362,8 @@ fun main() = application {
                         DesktopDestination.LUCKY_STAKE,
                         DesktopDestination.ARCADE,
                         DesktopDestination.MUSIC_PLAYER,
-                        DesktopDestination.CHANGELOG -> {
-                            Column(modifier = Modifier.fillMaxSize()) {
-                                ProductionGuessGameScreen(
-                                    section = when (destination) {
-                                        DesktopDestination.UPGRADES -> DesktopGameSection.UPGRADES
-                                        DesktopDestination.SHOP -> DesktopGameSection.SHOP
-                                        DesktopDestination.MORE -> DesktopGameSection.MORE
-                                        DesktopDestination.PRESTIGE -> DesktopGameSection.PRESTIGE
-                                        DesktopDestination.ULTRA -> DesktopGameSection.ULTRA
-                                        DesktopDestination.TALENT -> DesktopGameSection.TALENT
-                                        DesktopDestination.STATS -> DesktopGameSection.STATS
-                                        DesktopDestination.SETTINGS -> DesktopGameSection.SETTINGS
-                                        DesktopDestination.ACHIEVEMENTS -> DesktopGameSection.ACHIEVEMENTS
-                                        DesktopDestination.WORLD_MAP -> DesktopGameSection.WORLD_MAP
-                                        DesktopDestination.MUTATORS -> DesktopGameSection.MUTATORS
-                                        DesktopDestination.SAVE_SLOTS -> DesktopGameSection.SAVE_SLOTS
-                                        DesktopDestination.RELICS -> DesktopGameSection.RELICS
-                                        DesktopDestination.HOME_BASE -> DesktopGameSection.HOME_BASE
-                                        DesktopDestination.CODEX -> DesktopGameSection.CODEX
-                                        DesktopDestination.ENDGAME -> DesktopGameSection.ENDGAME
-                                        DesktopDestination.LUCKY_STAKE -> DesktopGameSection.LUCKY_STAKE
-                                        DesktopDestination.ARCADE -> DesktopGameSection.ARCADE
-                                        DesktopDestination.MUSIC_PLAYER -> DesktopGameSection.MUSIC_PLAYER
-                                        DesktopDestination.CHANGELOG -> DesktopGameSection.CHANGELOG
-                                        else -> DesktopGameSection.PLAY
-                                    },
-                                    onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
-                                    onOpenPrestige = { shell.navigate(DesktopDestination.PRESTIGE) },
-                                    onOpenUltra = { shell.navigate(DesktopDestination.ULTRA) },
-                                    onOpenTalent = { shell.navigate(DesktopDestination.TALENT) },
-                                    onOpenStats = { shell.navigate(DesktopDestination.STATS) },
-                                    onOpenSettings = { shell.navigate(DesktopDestination.SETTINGS) },
-                                    navigationPosition = navigationPosition,
-                                    onNavigationPositionChange = { selected ->
-                                        navigationPosition = selected
-                                        DesktopNavigationPosition.save(selected)
-                                    },
-                                    onOpenParityDestination = { shell.navigate(it) },
-                                    onGlobalPreferencesImported = {
-                                        playerProfile = DesktopPlayerProfileStore.load()
-                                        navigationPosition = DesktopNavigationPosition.load()
-                                    },
-                                    onOpenPlayerProfile = { viewingPlayerProfile = true; editingPlayerProfile = false },
-                                    onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
-                                    onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
-                                        themeMode = mode
-                                        primaryHex = primary
-                                        secondaryHex = secondary
-                                        tertiaryHex = tertiary
-                                        reducedMotion = reduced
-                                    }
-                                )
-                            }
-                        }
+                        DesktopDestination.CHANGELOG,
 
-                        DesktopDestination.ACTIVITY_HUB -> DesktopActivityHubScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
-                        DesktopDestination.LIVE_OPS -> DesktopLiveOpsScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
-                        DesktopDestination.DEVELOPER_CONSOLE -> DesktopDeveloperConsoleScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
-                        DesktopDestination.PROCESS_INSPECTOR -> DesktopProcessInspectorScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
-
-                        DesktopDestination.SAVE_SLOTS,
-                        DesktopDestination.RELICS,
-                        DesktopDestination.DEVELOPER_SETTINGS,
-                        DesktopDestination.LUA_TESTING_HUB -> DesktopParityScreen(destination = destination, onBack = { shell.navigate(DesktopDestination.MORE) }, onNavigate = { shell.navigate(it) })
-
-                        DesktopDestination.ABOUT -> {
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Text("Windows Debug updates", style = MaterialTheme.typography.titleMedium)
-                                    Text("Installed version: ${WindowsBuildVersion.current}")
-                                    Text(
-                                        status,
-                                        color = if (
-                                            classifyDesktopUpdateStatus(
-                                                status = status,
-                                                isBusy = isBusy,
-                                                hasUpdate = availableUpdate != null
-                                            ) == DesktopUpdateStatusKind.ERROR
-                                        ) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.semantics {
-                                            liveRegion = LiveRegionMode.Polite
-                                        }
-                                    )
-                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        Button(
-                                            onClick = { scope.launch { refreshUpdates() } },
-                                            enabled = !isBusy
-                                        ) {
-                                            Text("Check again")
-                                        }
-                                        val update = availableUpdate
-                                        if (update != null) {
-                                            Button(
-                                                onClick = {
-                                                    scope.launch {
-                                                        isBusy = true
-                                                        status = "Downloading and verifying version ${update.version}…"
-                                                        try {
-                                                            withContext(Dispatchers.IO) {
-                                                                installer.downloadVerifyAndLaunch(update)
-                                                            }
-                                                            status = "Windows Installer is opening. GuessTheNumber will close for the update."
-                                                            exitApplication()
-                                                        } catch (error: Exception) {
-                                                            status = "Update failed: ${error.message ?: "installer error"}"
-                                                            isBusy = false
-                                                        }
-                                                    }
-                                                },
-                                                enabled = !isBusy
-                                            ) {
-                                                Text("Install update")
-                                            }
-                                        }
-                                        if (isBusy) {
-                                            CircularProgressIndicator(modifier = Modifier.semantics { contentDescription = status })
-                                        }
-                                    }
-                                    Text(
-                                        "Debug builds are separate from production releases. Windows may ask for permission to install the MSI.",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            }
-
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(24.dp),
-                                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    Text("About Guess The Number", style = MaterialTheme.typography.headlineSmall)
-                                    Text("Windows desktop edition")
-                                    Text("Designed for offline play. No ads, analytics or accounts.")
-                                    Text("This Windows build is under active development. Some Android features are not available on Windows yet.")
-                                    Text("Installed version: ${WindowsBuildVersion.current}")
-                                }
-                            }
-                        }
                     }
                     }
                         if (navigationPosition == DesktopNavigationPosition.RIGHT) {
