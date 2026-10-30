@@ -357,10 +357,6 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                 "window.gtnDesktopDebugTools = $debugToolsEnabled;"
             )
             .replace(
-                "window.gtnDesktopInitialScreen = window.gtnDesktopInitialScreen || 'play';",
-                "window.gtnDesktopInitialScreen = $initialScreenJson;"
-            )
-            .replace(
                 "window.gtnDesktopNavigationPosition = 'LEFT';",
                 "window.gtnDesktopNavigationPosition = '$persistedNavigationPosition';"
             )
