@@ -20,10 +20,10 @@ internal class WindowsDebugInstaller {
         val temporaryDirectory = Files.createTempDirectory("gtn-windows-debug-update-")
         try {
             val artifactPath = temporaryDirectory.resolve(EXPECTED_ARTIFACT_NAME)
-            val archivePath = temporaryDirectory.resolve(EXPECTED_ARCHIVE_NAME)
-            val manifestPath = temporaryDirectory.resolve(EXPECTED_MANIFEST_NAME)
+            val archivePath = temporaryDirectory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME)
+            val manifestPath = temporaryDirectory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME)
             downloadFile(update.artifactDownloadUrl, artifactPath, MAX_ARTIFACT_BYTES)
-            extractArtifactFiles(artifactPath, archivePath, manifestPath)
+            WindowsDebugArtifactValidator.extractArtifactFiles(artifactPath, archivePath, manifestPath)
             verifyManifest(manifestPath, archivePath, update)
             val msiPath = temporaryDirectory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
             WindowsDebugArchiveValidator.extractExpectedMsi(archivePath, msiPath)
@@ -31,43 +31,6 @@ internal class WindowsDebugInstaller {
         } catch (error: Exception) {
             deleteTree(temporaryDirectory)
             throw error
-        }
-    }
-
-    private fun extractArtifactFiles(artifact: Path, archive: Path, manifest: Path) {
-        var archiveFound = false
-        var manifestFound = false
-        ZipInputStream(Files.newInputStream(artifact)).use { zip ->
-            while (true) {
-                val entry = zip.nextEntry ?: break
-                val name = entry.name.replace(92.toChar(), '/')
-                if (name.startsWith("/") || Regex("^[A-Za-z]:").containsMatchIn(name) ||
-                    name.split('/').any { it == ".." }
-                ) throw IllegalStateException("The Actions artifact contains an unsafe path.")
-                if (entry.isDirectory) {
-                    zip.closeEntry()
-                    continue
-                }
-                val destination = when (name) {
-                    EXPECTED_ARCHIVE_NAME -> {
-                        if (archiveFound) throw IllegalStateException("The Actions artifact contains duplicate installer archives.")
-                        archiveFound = true
-                        archive
-                    }
-                    EXPECTED_MANIFEST_NAME -> {
-                        if (manifestFound) throw IllegalStateException("The Actions artifact contains duplicate manifests.")
-                        manifestFound = true
-                        manifest
-                    }
-                    else -> throw IllegalStateException("The Actions artifact contains an unexpected file.")
-                }
-                val maximum = if (name == EXPECTED_ARCHIVE_NAME) MAX_ARCHIVE_BYTES else MAX_MANIFEST_BYTES
-                writeEntry(zip, destination, maximum)
-                zip.closeEntry()
-            }
-        }
-        if (!archiveFound || !manifestFound || Files.size(archive) == 0L || Files.size(manifest) == 0L) {
-            throw IllegalStateException("The Actions artifact is missing its installer archive or manifest.")
         }
     }
 
@@ -105,7 +68,7 @@ internal class WindowsDebugInstaller {
         require(manifest["tag"]?.jsonPrimitive?.content == update.tagName) {
             "The Windows Debug build tag does not match."
         }
-        require(manifest["assetName"]?.jsonPrimitive?.content == EXPECTED_ARCHIVE_NAME) {
+        require(manifest["assetName"]?.jsonPrimitive?.content == WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME) {
             "The Windows Debug manifest names an unexpected installer archive."
         }
         val checksum = manifest["sha256"]?.jsonPrimitive?.content
@@ -173,10 +136,6 @@ internal class WindowsDebugInstaller {
 
     private companion object {
         const val EXPECTED_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug.zip"
-        const val EXPECTED_ARCHIVE_NAME = "GuessTheNumber-Windows-Desktop.zip"
-        const val EXPECTED_MANIFEST_NAME = "windows-debug-manifest.json"
         const val MAX_ARTIFACT_BYTES = 400L * 1024 * 1024
-        const val MAX_ARCHIVE_BYTES = 350L * 1024 * 1024
-        const val MAX_MANIFEST_BYTES = 64L * 1024
     }
 }
