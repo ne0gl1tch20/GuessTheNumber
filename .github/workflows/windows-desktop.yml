@@ -162,6 +162,23 @@ jobs:
             throw "Updated MSI installation failed with exit code $($updatedInstall.ExitCode)."
           }
 
+          # Simulate an existing player's save-data directory and verify that upgrades
+          # and uninstall never delete user-owned data under APPDATA.
+          $userDataRoot = Join-Path $env:APPDATA "GuessTheNumber\\saves"
+          New-Item -ItemType Directory -Path $userDataRoot -Force | Out-Null
+          $userDataMarker = Join-Path $userDataRoot "ci-user-data-preservation.txt"
+          Set-Content -Path $userDataMarker -Value "preserve-this-data" -Encoding ascii
+          if (-not (Test-Path $userDataMarker)) { throw "Could not prepare the user-data preservation marker." }
+
+          # Reinstall the same package to cover repeated in-place upgrades.
+          $repeatInstall = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$($updatedPackage.FullName)`" /qn /norestart" -Wait -PassThru
+          if ($repeatInstall.ExitCode -notin @(0, 3010)) {
+            throw "Repeated MSI upgrade failed with exit code $($repeatInstall.ExitCode)."
+          }
+          if (-not (Test-Path $userDataMarker)) {
+            throw "Repeated MSI upgrade removed existing user data."
+          }
+
           $uninstallRoots = @(
             "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
             "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*",
@@ -182,6 +199,9 @@ jobs:
           $remove = Start-Process -FilePath "msiexec.exe" -ArgumentList "/x `"$installedProductCode`" /qn /norestart" -Wait -PassThru
           if ($remove.ExitCode -notin @(0, 1605, 3010)) {
             throw "CI cleanup of the test installation failed with exit code $($remove.ExitCode)."
+          }
+          if (-not (Test-Path $userDataMarker)) {
+            throw "MSI uninstall removed player data from APPDATA."
           }
 
       - name: Prepare debug channel package
