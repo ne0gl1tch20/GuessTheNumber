@@ -153,6 +153,14 @@ jobs:
             Set-Content -Path $resourcePath -Value "version=$env:GTN_WINDOWS_PACKAGE_VERSION" -Encoding ascii
           }
 
+          # Simulate an existing player's save-data directory and verify that upgrades
+          # and uninstall never delete user-owned data under APPDATA.
+          $userDataRoot = Join-Path (Join-Path $env:APPDATA "GuessTheNumber") "saves"
+          New-Item -ItemType Directory -Path $userDataRoot -Force | Out-Null
+          $userDataMarker = Join-Path $userDataRoot "ci-user-data-preservation.txt"
+          Set-Content -Path $userDataMarker -Value "preserve-this-data" -Encoding ascii
+          if (-not (Test-Path $userDataMarker)) { throw "Could not prepare the user-data preservation marker." }
+
           Remove-Item -Path (Join-Path $msiDir "*.msi") -Force -ErrorAction SilentlyContinue
           .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache --rerun-tasks --no-daemon
           $updatedPackage = Get-ChildItem -Path $msiDir -Filter "GuessTheNumber-$($env:GTN_WINDOWS_PACKAGE_VERSION).msi" -File | Select-Object -First 1
@@ -161,14 +169,6 @@ jobs:
           if ($updatedInstall.ExitCode -notin @(0, 3010)) {
             throw "Updated MSI installation failed with exit code $($updatedInstall.ExitCode)."
           }
-
-          # Simulate an existing player's save-data directory and verify that upgrades
-          # and uninstall never delete user-owned data under APPDATA.
-          $userDataRoot = Join-Path (Join-Path $env:APPDATA "GuessTheNumber") "saves"
-          New-Item -ItemType Directory -Path $userDataRoot -Force | Out-Null
-          $userDataMarker = Join-Path $userDataRoot "ci-user-data-preservation.txt"
-          Set-Content -Path $userDataMarker -Value "preserve-this-data" -Encoding ascii
-          if (-not (Test-Path $userDataMarker)) { throw "Could not prepare the user-data preservation marker." }
 
           # Reinstall the same package to cover repeated in-place upgrades.
           $repeatInstall = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$($updatedPackage.FullName)`" /qn /norestart" -Wait -PassThru
