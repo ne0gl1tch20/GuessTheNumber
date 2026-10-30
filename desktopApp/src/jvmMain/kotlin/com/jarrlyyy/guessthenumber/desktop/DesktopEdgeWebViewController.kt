@@ -59,10 +59,17 @@ internal class DesktopEdgeWebViewController(
             }
             val browser = WebViewComponent.create(WebViewComponent.Mode.HEAVYWEIGHT)
             webView = browser
-            browser.setDebug(false)
-            // This is a game surface, not a general-purpose browser. Suppress the
-            // native browser menu (Back / Refresh / Save as / Print / Inspect).
-            browser.setDefaultContextMenuEnabled(false)
+            val debugToolsEnabled = javaClass.classLoader
+                .getResourceAsStream("desktop-build.properties")
+                ?.use { properties ->
+                    java.util.Properties().apply { load(properties) }
+                        .getProperty("debugToolsBuildAllowed", "false")
+                        .equals("true", ignoreCase = true)
+                } ?: false
+            // WebView2 exposes Inspect Element only in developer-enabled builds.
+            // Release packages keep the embedded game surface locked down.
+            browser.setDebug(debugToolsEnabled)
+            browser.setDefaultContextMenuEnabled(debugToolsEnabled)
             browser.setNavigationHandler(WebViewNavigationHandler { event ->
                 allowNavigation(event.url())
             })
@@ -80,11 +87,14 @@ internal class DesktopEdgeWebViewController(
                             window.gtnDesktopPostMessage(String(raw));
                         }
                     });
-                    // Belt-and-suspenders: never allow Chromium's page context menu.
-                    document.addEventListener('contextmenu', function (event) {
-                        event.preventDefault();
-                        event.stopImmediatePropagation();
-                    }, true);
+                    // Release packages suppress page and native context menus.
+                    // Debug packages retain Edge's native menu so Inspect is available.
+                    if (!${debugToolsEnabled}) {
+                        document.addEventListener('contextmenu', function (event) {
+                            event.preventDefault();
+                            event.stopImmediatePropagation();
+                        }, true);
+                    }
                     window.addEventListener('load', function () {
                         window.gtnDesktopPageReady(location.href);
                     }, { once: true });
