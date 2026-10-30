@@ -47,6 +47,7 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.luaj.jme)
                 implementation("net.java.dev.jna:jna:5.17.0")
                 implementation("net.java.dev.jna:jna-platform:5.17.0")
                 implementation("org.json:json:20250517")
