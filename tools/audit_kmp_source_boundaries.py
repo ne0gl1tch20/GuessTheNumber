@@ -16,15 +16,12 @@ COMMON = ROOT / "shared" / "src" / "commonMain"
 SHARED_BUILD = ROOT / "shared" / "build.gradle.kts"
 
 FORBIDDEN_IMPORTS = re.compile(
-    r"^\\s*import\\s+(?:"
-    r"java\\.|javax\\.|android\\.|androidx\\.|"
-    r"com\\.android\\.|org\\.jvm\.)",
+    r"^\s*import\s+(?:java\.|javax\.|android\.|androidx\.|com\.android\.|org\.jvm\.)",
     re.MULTILINE,
 )
 FORBIDDEN_REFERENCES = re.compile(
-    r"\\b(?:System\\.(?:currentTimeMillis|nanoTime|out|err)|"
-    r"java\\.io\\.|java\\.nio\\.|java\\.math\\.|"
-    r"android\\.|androidx\\.)"
+    r"\b(?:System\.(?:currentTimeMillis|nanoTime|out|err)|"
+    r"java\.io\.|java\.nio\.|java\.math\.|android\.|androidx\.)"
 )
 
 
