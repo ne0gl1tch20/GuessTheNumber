@@ -89,6 +89,10 @@ jobs:
         shell: pwsh
         run: python tools/preflight_compile_check.py
 
+      - name: Audit KMP source-set boundaries
+        shell: pwsh
+        run: python tools/audit_kmp_source_boundaries.py
+
       - name: Build Preflight
         shell: pwsh
         run: python tools/build_preflight.py
