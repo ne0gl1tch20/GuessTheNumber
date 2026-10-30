@@ -205,7 +205,7 @@ internal class DesktopEdgeWebViewController(
                 }
                 replyToPage(response.toString())
             }
-            currentHandler != null && raw.length <= 512 -> currentHandler(raw, replyToPage)
+            currentHandler != null && raw.length <= 16384 -> currentHandler(raw, replyToPage)
             else -> {
                 val id = request?.optString("id", "").orEmpty()
                 replyToPage(JSONObject().put("version", 1).put("id", id)
