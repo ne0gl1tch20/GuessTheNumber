@@ -136,7 +136,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Load talent costs and prerequisites from the canonical catalog; PR #218 makes both purchase validation and Talent Web parent gating read the bundled catalog rather than a second hardcoded rule map. Its Android and Windows CI passed before merge. The visible Windows labels/descriptions still use the Android fallback copy, and locale-aware rendering/runtime parity remain open.
 - [x] Apply the shared `TraitGameplayRules` to Windows manual, shared-web and Auto Clicker guess paths; desktop Prestige/Ultra resets now also record progression through `InvisibleTraitEngine`, matching Android's reset observation.
 - [x] Implement all six permanent Prestige/Ultra upgrade effects in shared rules for Android and Windows, driven by each canonical catalog's `effectPerLevel`: Prestige Wealth adds 0.5× per level to its money multiplier; Cosmic Wealth adds 2× per level to its money multiplier; the two money multipliers stack multiplicatively; Prestige Catalyst multiplies reset Prestige by 1 + 0.2× level; Prestige Endowment grants 1,000 Money per level after Prestige or Ultra reset using the pre-reset level; Eternal Expansion multiplies Ultra reset reward by 1 + 0.5× level while preserving the 2,000 cap; Nebula Resonance multiplies achievement/Arcade Nebula payouts by 1 + level and stacks with the existing `nebula_boost` shop item. Shared achievement unlock/reward logic is now used by both hosts.
-- [ ] Verify all six effects and reset/save persistence in the merged Windows build. The Windows Arcade screen is now implemented; the owner confirmed it opens without the nested-scroll crash fixed in PR #222. Verify individual minigame outcomes, Nebula/Money reward multipliers and save/reload persistence separately. The Music Player remains a placeholder.
+- [ ] Verify all six effects and reset/save persistence in the merged Windows build. The Windows Arcade screen is now implemented; the owner confirmed it opens without the nested-scroll crash fixed in PR #222. Verify individual minigame outcomes, Nebula/Money reward multipliers and save/reload persistence separately. The Music Player now has native local-file playback controls; supported formats depend on Windows Java Sound.
 - [ ] Verify large-number display and calculations across representative Android-matching cases.
 - [x] Add deterministic exact-cost bulk-purchase tests and retain reset-preservation/duplicate-reward tests.
 - [ ] Verify all reset preservation and boundary cases on the current candidate.
@@ -155,7 +155,8 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Add searchable Codex entries by title and stable ID with empty-result feedback.
 - [ ] Verify mastery effects, all progression routes and Endless Rift interactions in a current Windows runtime.
 - [ ] Complete feature-flagged LiveOps/event presentation and reward claims on Windows.
-- [ ] Port supported Lua activity discovery/execution with Android-equivalent sandbox resource and permission limits.
+- [x] Add bundled Lua activity discovery/execution for the canonical `scripts/manifest.json` catalog, with source-size and instruction budgets, strict output validation, and no save/currency/reward/filesystem/network host capabilities.
+- [ ] Port signed LiveOps manifest refresh, verified cache/rollback and remote Lua script support; the current Windows Activity Hub is bundled/offline only.
 - [ ] Verify locked/unlocked/completed states, explanatory requirements and localized feedback.
 
 **Exit:** Player-facing progression systems are accessible and state-consistent on Windows.
@@ -166,29 +167,32 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Source implementation: Lucky Stake settlement uses desktop transactions with stake validation and saved statistics.
 - [ ] Verify all five minigame win/loss outcomes, localization, reward multipliers and save/reload on Windows.
 - [ ] Complete Activity Hub and LiveOps discovery/claim handling with shared feature flags and eligibility checks.
-- [ ] Port supported Lua activities with the same sandbox/resource boundaries as Android.
+- [x] Add the bundled Number Rush Lua activity to the Windows Activity Hub with Android-equivalent payload limits, one-answer lifecycle and Kotlin-owned UI state.
+- [ ] Port signed LiveOps script discovery/refresh and remote activity execution with verified cache/rollback.
 - [ ] Verify offline event availability, reward validation and missing optional content/audio failure behavior.
 
 **Exit:** Supported activities work offline, and scripted content cannot bypass Kotlin-owned reward/state validation.
 
 ### W5. Player utilities and data
 
-- [ ] Settings, theme, locale and desktop-supported accessibility options.
+- [x] Wire Windows game settings for theme mode/presets, number notation, locale preference, sound toggles/volume, reduced motion, reduce flashes and navigation preferences into the saved settings model.
+- [ ] Complete actual locale-aware Windows rendering and Windows notification delivery; several current settings are stored preferences rather than active OS integrations.
 - [x] Add validated single-slot JSON import/export to Windows Save Slots. Imports reject malformed, oversized and invalid states and preserve the previous save as a recovery backup; raw GameState JSON is also accepted by Android's legacy single-save import path. These files are plain JSON, not encrypted, and do not include global settings or all slots in one bundle.
 - [ ] Save slots, slot switching, backup/export/import and recovery appropriate to Windows.
 - [ ] Tutorial/feature tours and replay entry points.
 - [ ] About, player-facing error states and crash recovery surfaces.
-- [ ] Music controls where Windows audio support exists; document intentional differences. The Windows Music Player route remains a placeholder.
+- [x] Add native local Music Player controls, saved file library/queue paths, playback, pause/resume, stop and volume. Windows Java Sound support is format-dependent; WAV/AIFF/AU are the expected supported formats, while Android-only media integrations remain intentionally unavailable.
 - [ ] Localize all visible strings and accessible labels.
 
 **Exit:** Players can configure, save, restore and understand Windows without Android-only screens.
 
 ### W6. Developer tooling
 
-- [x] Hide Windows Developer Settings, Developer Console, Process Inspector and Lua Testing Hub by default; both More-menu visibility and direct shell navigation require explicit `-Dgtn.desktop.debugTools=true`.
+- [x] Hide Windows Developer Settings, Developer Console, Process Inspector and Lua Testing Hub by default; packaged builds require a build-time opt-in (`-Pgtn.desktop.debugToolsBuild=true`) and a separate launch flag (`-Dgtn.desktop.debugTools=true`). The default Windows CI MSI build is not opted in.
 - [ ] Port the shared validated developer command executor and output history.
 - [ ] Port privacy-conscious process diagnostics and deterministic test helpers.
-- [ ] Verify release packages cannot enable developer destinations through build configuration or external launch arguments.
+- [x] Add a build-time developer-tools resource gate so a launch argument alone cannot expose developer routes in the default packaged build.
+- [ ] Verify the built MSI itself remains blocked when launched with the debug system property.
 
 - [ ] Console, state inspection, test helpers and verbose logs are debug-only.
 - [ ] Developer commands are not exposed unintentionally in production.
@@ -205,7 +209,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Keep the debug updater isolated from production release discovery and remove unnecessary workflow `contents: write` permission.
 - [ ] Verify public-repository artifact download works without credentials from a clean Windows install; confirm the actual seven-day expiry response.
 - [ ] Add end-to-end artifact download/install tests for missing artifacts, invalid outer ZIP, checksum mismatch, invalid MSI ZIP and expired artifacts.
-- [ ] Keep production update discovery and installer flow separate from the debug CI-artifact flow.
+- [x] Keep production update discovery and installer flow separate from the debug CI-artifact flow; the debug client is explicitly pinned to the Windows Desktop CI artifact API.
 - [ ] Test clean MSI install, in-place upgrade, repeated upgrade, failed-upgrade recovery, downgrade and uninstall.
 - [ ] Preserve the verified MSI UpgradeCode and user-data location; do not change identifiers blindly.
 - [ ] Verify saves survive restart and supported upgrades.
