@@ -21,6 +21,53 @@ class DesktopLiveOpsRepositoryTest {
         assertTrue(snapshot.events.any { it.id == "holiday_neon_rush" })
     }
 
+
+    @Test
+    fun validatesSignedRemoteEventCatalogWithTheSameRulesAsBundledEvents() {
+        val repository = DesktopLiveOpsRepository()
+        repository.validateRemoteEvents(
+            manifestVersion = 2,
+            events = listOf(
+                DesktopLiveOpsEvent(
+                    id = "winter_event",
+                    title = "Winter Event",
+                    description = "Seasonal rewards",
+                    status = "UPCOMING",
+                    startDate = "2026-11-01T00:00:00Z",
+                    endDate = "2026-12-31T23:59:59Z",
+                    currencyName = "Nebula",
+                    maxClaims = 5,
+                    rewardNebula = 10,
+                    permanentBoostPerClaim = 1,
+                    minCorrectGuesses = 100
+                )
+            )
+        )
+    }
+
+    @Test
+    fun rejectsInvalidSignedRemoteEventDates() {
+        val repository = DesktopLiveOpsRepository()
+        val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            repository.validateRemoteEvents(
+                manifestVersion = 2,
+                events = listOf(
+                    DesktopLiveOpsEvent(
+                        id = "bad_event",
+                        title = "Bad Event",
+                        description = "Invalid dates",
+                        status = "ACTIVE",
+                        startDate = "2026-12-31T00:00:00Z",
+                        endDate = "2026-11-01T00:00:00Z",
+                        currencyName = "Nebula",
+                        maxClaims = 5
+                    )
+                )
+            )
+        }
+        assertTrue(error.message.orEmpty().contains("dates are invalid"))
+    }
+
     @Test
     fun sharedClaimPolicyAwardsConfiguredEventReward() {
         val event = DesktopLiveOpsRepository().load().events.first { it.id == "season_1_cyber_guess" }
