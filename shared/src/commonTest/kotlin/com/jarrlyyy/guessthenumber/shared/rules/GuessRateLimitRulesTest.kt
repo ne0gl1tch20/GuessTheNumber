@@ -7,7 +7,7 @@ import kotlin.test.assertTrue
 class GuessRateLimitRulesTest {
     @Test
     fun firstGuessIsNeverRateLimited() {
-        assertFalse(GuessRateLimitRules.isRateLimited(lastSubmissionNanos = 0L, nowNanos = 1L))
+        assertFalse(GuessRateLimitRules.isRateLimited(lastSubmissionNanos = null, nowNanos = 1L))
     }
 
     @Test
