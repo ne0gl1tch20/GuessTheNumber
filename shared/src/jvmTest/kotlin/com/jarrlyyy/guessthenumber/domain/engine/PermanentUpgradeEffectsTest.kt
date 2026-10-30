@@ -3,6 +3,7 @@ package com.jarrlyyy.guessthenumber.domain.engine
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
+import com.jarrlyyy.guessthenumber.shared.domain.TraitGameplayRules
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -73,6 +74,28 @@ class PermanentUpgradeEffectsTest {
             ultraUpgradeLevels = mapOf("ultra_gain_boost" to 10)
         )
         assertEquals(0, engine.calculateUltraReward(maxed).compareTo(BigNumber(2_000)))
+    }
+
+    @Test
+    fun desktopGuessPathCanApplyTheSameUnlockedTraitRulesAsAndroid() {
+        val state = GameState(
+            targetNumber = 50,
+            correctGuesses = 25,
+            streak = 5,
+            bestStreak = 5,
+            selectedTraitArms = mapOf("combo_momentum" to "burst")
+        )
+        val raw = GameEngine(Random(7)).processGuess(state, 50)
+        val traitAdjusted = TraitGameplayRules.apply(
+            stateBefore = state,
+            guess = 50,
+            result = raw,
+            activeTraitIds = TraitGameplayRules.activeGameplayTraitIds(state)
+        )
+
+        assertTrue(traitAdjusted.newState.money > raw.newState.money)
+        assertEquals(1L, traitAdjusted.newState.traitProfile.totalGuessesObserved)
+        assertEquals(1L, traitAdjusted.newState.traitProfile.correctGuessesObserved)
     }
 
     @Test
