@@ -58,6 +58,16 @@ class DesktopGameSectionRouteTest {
             ?: error("The canonical shared JavaScript bundle is missing from Windows resources.")
         org.junit.Assert.assertTrue("Desktop route activation must use the shared screen controller.", sharedScript.contains("window.gtnActivateScreen=activateScreen"))
 
+        val sharedStyles = javaClass.classLoader.getResource("web-play/styles.css")
+            ?.readText()
+            ?: error("The canonical shared stylesheet is missing from Windows resources.")
+        listOf("LEFT", "RIGHT", "TOP", "BOTTOM").forEach { position ->
+            org.junit.Assert.assertTrue(
+                "The shared HTML navigation is missing the $position desktop layout.",
+                sharedStyles.contains("""data-desktop-navigation-position="$position"""")
+            )
+        }
+
         val desktopHost = javaClass.classLoader.getResource("web-play/desktop-host.js")
             ?.readText()
             ?: error("The Windows-only desktop host shim is missing from packaged resources.")
