@@ -41,8 +41,8 @@ class DesktopGameSectionRouteTest {
             org.junit.Assert.assertTrue("The canonical HTML bundle is missing route $route", sharedHtml.contains("data-screen=\"" + route + "\""))
         }
 
-        val contentSecurityPolicy = Regex("""<meta[^>]+Content-Security-Policy[^>]+content="([^"]+)"""")
-            .find(sharedHtml)?.groupValues?.get(1)
+        val contentSecurityPolicy = sharedHtml.lineSequence()
+            .firstOrNull { it.contains("Content-Security-Policy") }
             ?: error("The shared HTML bundle must declare its Content Security Policy.")
         org.junit.Assert.assertTrue(
             "The desktop host shim must be loaded as a local script allowed by CSP.",
@@ -50,7 +50,7 @@ class DesktopGameSectionRouteTest {
         )
         org.junit.Assert.assertFalse(
             "The canonical shared HTML must not rely on CSP-blocked inline scripts.",
-            Regex("""<script(?![^>]*\\bsrc=)[^>]*>""", RegexOption.IGNORE_CASE).containsMatchIn(sharedHtml)
+            Regex("""<script(?![^>]*\bsrc=)[^>]*>""", RegexOption.IGNORE_CASE).containsMatchIn(sharedHtml)
         )
 
         val sharedScript = javaClass.classLoader.getResource("web-play/app.js")
