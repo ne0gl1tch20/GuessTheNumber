@@ -17,14 +17,15 @@ class DesktopStartupLaunchTest {
 
     @Test
     fun startupCommandQuotesPackagedPathsWithSpaces() {
+        val executable = Path.of("Program Files", "Guess The Number", "GuessTheNumber.exe")
         assertEquals(
-            "\"C:\\Program Files\\Guess The Number\\GuessTheNumber.exe\"",
-            DesktopStartupLaunch.startupCommand(Path.of("C:\\Program Files\\Guess The Number\\GuessTheNumber.exe"))
+            "\"" + executable.toAbsolutePath().normalize().toString() + "\"",
+            DesktopStartupLaunch.startupCommand(executable)
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun startupCommandRejectsNonExecutableTargets() {
-        DesktopStartupLaunch.startupCommand(Path.of("C:\\Program Files\\Guess The Number\\app.jar"))
+        DesktopStartupLaunch.startupCommand(Path.of("Program Files", "Guess The Number", "app.jar"))
     }
 }
