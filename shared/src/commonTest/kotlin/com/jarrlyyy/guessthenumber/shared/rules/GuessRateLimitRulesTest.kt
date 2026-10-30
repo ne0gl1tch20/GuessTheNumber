@@ -11,6 +11,26 @@ class GuessRateLimitRulesTest {
     }
 
     @Test
+    fun zeroIsAValidMonotonicTimestampRatherThanAnUninitializedSentinel() {
+        assertTrue(
+            GuessRateLimitRules.isRateLimited(
+                lastSubmissionNanos = 0L,
+                nowNanos = 1L
+            )
+        )
+    }
+
+    @Test
+    fun negativeMonotonicOriginsAreHandledCorrectly() {
+        assertTrue(
+            GuessRateLimitRules.isRateLimited(
+                lastSubmissionNanos = -100_000_000L,
+                nowNanos = -60_000_001L
+            )
+        )
+    }
+
+    @Test
     fun submissionInsideFiftyMillisecondWindowIsBlocked() {
         assertTrue(
             GuessRateLimitRules.isRateLimited(
