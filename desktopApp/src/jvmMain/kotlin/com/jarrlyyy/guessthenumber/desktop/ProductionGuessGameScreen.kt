@@ -1553,6 +1553,18 @@ fun ProductionGuessGameScreen(
                 }
             }
 
+            if (section == DesktopGameSection.MUSIC_PLAYER) {
+                if (currentState == null) {
+                    CircularProgressIndicator()
+                } else {
+                    DesktopMusicPlayerContent(
+                        settings = currentState.settings,
+                        onUpdateSettings = ::updateSettings,
+                        onBack = { onOpenParityDestination(DesktopDestination.MORE) }
+                    )
+                }
+            }
+
             if (section == DesktopGameSection.MORE) {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
