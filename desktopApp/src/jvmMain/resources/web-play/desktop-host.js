@@ -27,7 +27,7 @@
   window.addEventListener('error', function (event) {
     var target = event.target;
     var detail = event.message || (target && (target.src || target.href)) || 'Unknown JavaScript or asset loading error';
-    if (event.filename) detail += '\\n' + event.filename + (event.lineno ? ':' + event.lineno : '');
+    if (event.filename) detail += '\n' + event.filename + (event.lineno ? ':' + event.lineno : '');
     showDesktopStartupError('The shared game interface encountered an error', detail);
   }, true);
   window.addEventListener('unhandledrejection', function (event) {
