@@ -6,7 +6,6 @@ import ca.weblite.webview.swing.WebViewComponent
 import org.json.JSONObject
 import java.awt.BorderLayout
 import java.awt.Desktop
-import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -33,9 +32,7 @@ internal class DesktopEdgeWebViewController(
     val panel = JPanel(BorderLayout())
     private val handler = AtomicReference<((String, (String) -> Unit) -> Unit)>()
     private val navigationPositionHandler = AtomicReference<(DesktopNavigationPosition) -> Unit>({})
-    private val initialScreen = initialScreen
     @Volatile private var disposed = false
-    private var localIndex: Path? = null
     private var localRoot: Path? = null
     private var webView: WebViewComponent? = null
     private var readyTimer: Timer? = null
@@ -55,9 +52,11 @@ internal class DesktopEdgeWebViewController(
         if (disposed || webView != null) return
         try {
             val index = unpackWebAssets()
-            localIndex = index
             localRoot = index.parent.parent.toAbsolutePath().normalize()
 
+            check(WebViewComponent.isNavigationHandlerSupported()) {
+                "The bundled Edge WebView2 bridge does not support navigation restrictions."
+            }
             val browser = WebViewComponent.create(WebViewComponent.Mode.HEAVYWEIGHT)
             webView = browser
             browser.setDebug(false)
@@ -65,7 +64,7 @@ internal class DesktopEdgeWebViewController(
                 allowNavigation(event.url())
             })
             browser.addJavascriptCallback("gtnDesktopPostMessage", WebView.JavascriptCallback { raw ->
-                if (!disposed && raw.length <= 512) handleRequest(raw)
+                if (!disposed) handleRequest(raw)
             })
             browser.addJavascriptCallback("gtnDesktopPageReady", WebView.JavascriptCallback {
                 if (!disposed) onPageReady()
@@ -198,7 +197,7 @@ internal class DesktopEdgeWebViewController(
                 }
                 replyToPage(response.toString())
             }
-            currentHandler != null -> currentHandler(raw, replyToPage)
+            currentHandler != null && raw.length <= 512 -> currentHandler(raw, replyToPage)
             else -> {
                 val id = request?.optString("id", "").orEmpty()
                 replyToPage(JSONObject().put("version", 1).put("id", id)
@@ -280,7 +279,6 @@ internal class DesktopEdgeWebViewController(
         panel.removeAll()
         localRoot?.let(::deleteResourceTree)
         localRoot = null
-        localIndex = null
     }
 
     private fun deleteResourceTree(root: Path) {
