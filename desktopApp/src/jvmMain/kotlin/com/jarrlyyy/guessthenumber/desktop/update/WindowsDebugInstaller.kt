@@ -7,6 +7,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.Comparator
 import java.util.zip.ZipInputStream
 
 internal class WindowsDebugInstaller {
