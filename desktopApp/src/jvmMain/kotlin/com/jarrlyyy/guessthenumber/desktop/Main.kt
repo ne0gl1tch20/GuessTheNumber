@@ -71,6 +71,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import java.awt.Dimension
+import java.awt.Desktop
+import java.net.URI
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsBuildVersion
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugInstaller
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdate
@@ -360,7 +362,8 @@ fun main() = application {
                         DesktopDestination.LUCKY_STAKE,
                         DesktopDestination.ARCADE,
                         DesktopDestination.MUSIC_PLAYER,
-                        DesktopDestination.CHANGELOG -> {
+                        DesktopDestination.CHANGELOG,
+                        DesktopDestination.ABOUT -> {
                             Column(modifier = Modifier.fillMaxSize()) {
                                 ProductionGuessGameScreen(
                                     section = when (destination) {
@@ -384,6 +387,7 @@ fun main() = application {
                                         DesktopDestination.ARCADE -> DesktopGameSection.ARCADE
                                         DesktopDestination.MUSIC_PLAYER -> DesktopGameSection.MUSIC_PLAYER
                                         DesktopDestination.CHANGELOG -> DesktopGameSection.CHANGELOG
+                                        DesktopDestination.ABOUT -> DesktopGameSection.ABOUT
                                         else -> DesktopGameSection.PLAY
                                     },
                                     onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
@@ -403,6 +407,78 @@ fun main() = application {
                                         navigationPosition = DesktopNavigationPosition.load()
                                     },
                                     onOpenPlayerProfile = { viewingPlayerProfile = true; editingPlayerProfile = false },
+                                    onDesktopUpdateRequest = { action, requestId, reply ->
+                                        scope.launch {
+                                            when (action) {
+                                                "check_updates" -> {
+                                                    isBusy = true
+                                                    status = "Checking for Windows Debug updates…"
+                                                    val result = runCatching {
+                                                        withContext(Dispatchers.IO) {
+                                                            updateClient.findLatestUpdate(WindowsBuildVersion.current)
+                                                        }
+                                                    }
+                                                    isBusy = false
+                                                    result.onSuccess { update ->
+                                                        availableUpdate = update
+                                                        status = if (update == null) {
+                                                            "You're using the latest available Windows Debug CI artifact."
+                                                        } else {
+                                                            "Version " + update.version + " is ready to install."
+                                                        }
+                                                        reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                                            .put("type", "update_result")
+                                                            .put("status", if (update == null) "up_to_date" else "available")
+                                                            .put("title", update?.version ?: "")
+                                                            .put("details", update?.let { "Windows Debug build from master, CI run #" + it.runNumber + "." } ?: "")
+                                                            .put("message", status).toString())
+                                                    }.onFailure { error ->
+                                                        status = "Update check failed: " + (error.message ?: "network error")
+                                                        reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                                            .put("type", "update_result").put("status", "unavailable")
+                                                            .put("message", status).toString())
+                                                    }
+                                                }
+                                                "install_update" -> {
+                                                    val update = availableUpdate
+                                                    if (update == null) {
+                                                        reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                                            .put("type", "update_result").put("status", "unavailable")
+                                                            .put("message", "No verified Windows update is available.").toString())
+                                                    } else {
+                                                        isBusy = true
+                                                        status = "Downloading and verifying version " + update.version + "…"
+                                                        try {
+                                                            withContext(Dispatchers.IO) { installer.downloadVerifyAndLaunch(update) }
+                                                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                                                .put("type", "update_result").put("status", "install_started")
+                                                                .put("message", "Windows Installer is opening. GuessTheNumber will close for the update.").toString())
+                                                            delay(700)
+                                                            exitApplication()
+                                                        } catch (error: Exception) {
+                                                            isBusy = false
+                                                            status = "Update failed: " + (error.message ?: "installer error")
+                                                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                                                .put("type", "update_result").put("status", "install_failed")
+                                                                .put("message", status).toString())
+                                                        }
+                                                    }
+                                                }
+                                                "open_update_page" -> {
+                                                    val opened = runCatching {
+                                                        if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                                                            error("The system browser is unavailable.")
+                                                        }
+                                                        Desktop.getDesktop().browse(URI("https://github.com/ne0gl1tch20/GuessTheNumber/actions"))
+                                                    }.isSuccess
+                                                    reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                                        .put("type", "update_result")
+                                                        .put("status", if (opened) "page_opened" else "unavailable")
+                                                        .put("message", if (opened) "Opened Windows build history in your browser." else "Could not open the update page.").toString())
+                                                }
+                                            }
+                                        }
+                                    },
                                     onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
                                     onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
                                         themeMode = mode
@@ -425,82 +501,7 @@ fun main() = application {
                         DesktopDestination.DEVELOPER_SETTINGS,
                         DesktopDestination.LUA_TESTING_HUB -> DesktopParityScreen(destination = destination, onBack = { shell.navigate(DesktopDestination.MORE) }, onNavigate = { shell.navigate(it) })
 
-                        DesktopDestination.ABOUT -> {
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Text("Windows Debug updates", style = MaterialTheme.typography.titleMedium)
-                                    Text("Installed version: ${WindowsBuildVersion.current}")
-                                    Text(
-                                        status,
-                                        color = if (
-                                            classifyDesktopUpdateStatus(
-                                                status = status,
-                                                isBusy = isBusy,
-                                                hasUpdate = availableUpdate != null
-                                            ) == DesktopUpdateStatusKind.ERROR
-                                        ) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.semantics {
-                                            liveRegion = LiveRegionMode.Polite
-                                        }
-                                    )
-                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        Button(
-                                            onClick = { scope.launch { refreshUpdates() } },
-                                            enabled = !isBusy
-                                        ) {
-                                            Text("Check again")
-                                        }
-                                        val update = availableUpdate
-                                        if (update != null) {
-                                            Button(
-                                                onClick = {
-                                                    scope.launch {
-                                                        isBusy = true
-                                                        status = "Downloading and verifying version ${update.version}…"
-                                                        try {
-                                                            withContext(Dispatchers.IO) {
-                                                                installer.downloadVerifyAndLaunch(update)
-                                                            }
-                                                            status = "Windows Installer is opening. GuessTheNumber will close for the update."
-                                                            exitApplication()
-                                                        } catch (error: Exception) {
-                                                            status = "Update failed: ${error.message ?: "installer error"}"
-                                                            isBusy = false
-                                                        }
-                                                    }
-                                                },
-                                                enabled = !isBusy
-                                            ) {
-                                                Text("Install update")
-                                            }
-                                        }
-                                        if (isBusy) {
-                                            CircularProgressIndicator(modifier = Modifier.semantics { contentDescription = status })
-                                        }
-                                    }
-                                    Text(
-                                        "Debug builds are separate from production releases. Windows may ask for permission to install the MSI.",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            }
 
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(24.dp),
-                                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    Text("About Guess The Number", style = MaterialTheme.typography.headlineSmall)
-                                    Text("Windows desktop edition")
-                                    Text("Designed for offline play. No ads, analytics or accounts.")
-                                    Text("This Windows build is under active development. Some Android features are not available on Windows yet.")
-                                    Text("Installed version: ${WindowsBuildVersion.current}")
-                                }
-                            }
-                        }
                     }
                     }
                         if (navigationPosition == DesktopNavigationPosition.RIGHT) {
