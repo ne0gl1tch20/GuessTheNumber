@@ -157,7 +157,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Add bundled Lua activity discovery/execution for the canonical `scripts/manifest.json` catalog, with source-size and instruction budgets, strict output validation, and no save/currency/reward/filesystem/network host capabilities.
 - [x] Port signed HTTPS LiveOps bundle refresh, RSA signature verification, app/host compatibility checks, script SHA-256 validation, staged atomic activation, high-water version protection, verified cache reads and rollback to a prior verified bundle. Remote scripts use the same restricted Lua sandbox and fail closed when no public key is configured.
 - [x] Add feature-flagged LiveOps event presentation from the canonical Android manifest, date/status refresh, progression requirement display and active-save reward claims through the shared Kotlin `LiveOpsClaimPolicy`; refresh flags and recheck event window/eligibility at claim time.
-- [ ] Add remote signed event-manifest delivery (current signed LiveOps transport covers Lua scripts; events currently use the canonical bundled manifest).
+- [x] Add remote signed event-manifest delivery through the existing RSA-signed LiveOps bundle. PR #388 extends the optional payload with a versioned event catalog, validates it on Android and Windows, and keeps bundled manifests as offline/invalid-content fallback; the content-repository publisher now validates and publishes bundle v3. Android tests, Windows shared tests/build/package/MSI lifecycle and LiveOps reliability checks passed on the merged candidate. Runtime refresh on a clean Windows install and device remains unverified.
 - [ ] Verify locked/unlocked/completed states, explanatory requirements and localized feedback.
 
 **Exit:** Player-facing progression systems are accessible and state-consistent on Windows.
@@ -170,7 +170,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Add the bundled Number Rush Lua activity to the Windows Activity Hub with Android-equivalent payload limits, one-answer lifecycle and Kotlin-owned UI state.
 - [x] Add verified remote LiveOps script discovery/refresh to the Activity Hub; signed bundles are HTTPS-only, hash-checked and rollback-protected.
 - [x] Connect the canonical `feature_flags.json` and LiveOps event manifest to a Windows event screen; claims use the shared Android/Windows Kotlin policy and active-slot persistence.
-- [ ] Add signed remote event-manifest delivery and verify Windows runtime parity.
+- [x] Add signed remote event-manifest delivery through the existing HTTPS/RSA bundle; content repo PR #4 published signed bundle v3 and app PR #388 passed Android, Windows and LiveOps reliability CI. [ ] Verify actual online refresh, offline fallback and claim behavior on Windows runtime.
 - [ ] Verify offline event availability, reward validation and missing optional content/audio failure behavior.
 
 **Exit:** Supported activities work offline, and scripted content cannot bypass Kotlin-owned reward/state validation.
