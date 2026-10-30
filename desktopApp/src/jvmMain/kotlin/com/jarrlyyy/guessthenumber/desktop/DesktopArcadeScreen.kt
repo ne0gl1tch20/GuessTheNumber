@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.desktop.economy.DesktopMinigameDef
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.engine.ArcadeRewardRules
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -179,10 +180,39 @@ private fun ReactionTestArcadeDialog(onDismiss: () -> Unit, isRewarding: Boolean
     LaunchedEffect(Unit) { delay(Random.nextLong(1_000, 3_000)); if (phase == "wait") { phase = "ready"; startTime = System.currentTimeMillis() } }
     AlertDialog(onDismissRequest = onDismiss, title = { Text("Reaction Test") }, text = {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            when (phase) { "wait" -> Text("Wait for green…", color = MaterialTheme.colorScheme.error, fontSize = 20.sp); "ready" -> Text("TAP NOW!", color = MaterialTheme.colorScheme.primary, fontSize = 24.sp); else -> Text(if (reactionTime == 9_999L) "Too early!" else "Reaction: ${reactionTime}ms", fontSize = 20.sp) }
+            when (phase) {
+                "wait" -> Text("Wait for green…", color = MaterialTheme.colorScheme.error, fontSize = 20.sp)
+                "ready" -> Text("TAP NOW!", color = MaterialTheme.colorScheme.primary, fontSize = 24.sp)
+                else -> Text(
+                    if (reactionTime == ArcadeRewardRules.TOO_EARLY_REACTION_SENTINEL) "Too early!"
+                    else "Reaction: " + reactionTime + "ms",
+                    fontSize = 20.sp
+                )
+            }
         }
     }, confirmButton = {
-        Button(onClick = { when (phase) { "wait" -> { reactionTime = 9_999L; phase = "clicked" }; "ready" -> { reactionTime = System.currentTimeMillis() - startTime; phase = "clicked" }; else -> onReward(1L, BigNumber(2_000)) } }, enabled = phase != "clicked" || !isRewarding) { Text(if (phase == "clicked") if (isRewarding) "Saving…" else "Claim reward" else "Tap") }
+        Button(
+            onClick = {
+                when (phase) {
+                    "wait" -> { reactionTime = ArcadeRewardRules.TOO_EARLY_REACTION_SENTINEL; phase = "clicked" }
+                    "ready" -> { reactionTime = System.currentTimeMillis() - startTime; phase = "clicked" }
+                    else -> {
+                        if (ArcadeRewardRules.isReactionTestRewardEligible(reactionTime)) onReward(1L, BigNumber(2_000))
+                        else onDismiss()
+                    }
+                }
+            },
+            enabled = phase != "clicked" || !isRewarding
+        ) {
+            Text(
+                when {
+                    phase != "clicked" -> "Tap"
+                    !ArcadeRewardRules.isReactionTestRewardEligible(reactionTime) -> "Close"
+                    isRewarding -> "Saving…"
+                    else -> "Claim reward"
+                }
+            )
+        }
     }, dismissButton = { TextButton(onClick = onDismiss) { Text("Close") } })
 }
 
