@@ -56,11 +56,11 @@ internal class WindowsDebugUpdateClient(
         }
         val archiveUrl = artifact["archive_download_url"]?.jsonPrimitive?.content
             ?: throw IllegalStateException("The latest Windows Debug artifact has no download URL.")
-        if (!isArtifactDownloadUrl(archiveUrl, runId)) {
+        if (!isArtifactDownloadUrl(archiveUrl)) {
             throw IllegalStateException("GitHub returned an unexpected Windows Debug artifact URL.")
         }
         val version = "1.0.$runNumber"
-        if (!version.matches(Regex("1\\\\.0\\\\.\\\\d+"))) {
+        if (!version.matches(Regex("1\\.0\\.\\d+"))) {
             throw IllegalStateException("The latest Windows Debug build has an incompatible version.")
         }
         if (compareVersions(version, installedVersion) <= 0) return null
@@ -79,7 +79,7 @@ internal class WindowsDebugUpdateClient(
         return response["artifacts"]?.jsonArray?.mapNotNull { it as? JsonObject }
     }
 
-    private fun isArtifactDownloadUrl(value: String, runId: Long): Boolean =
+    private fun isArtifactDownloadUrl(value: String): Boolean =
         value.matches(Regex("https://api\\.github\\.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/\\d+/zip"))
 
     private fun getJson(url: URL) = connectionFactory(url).run {
