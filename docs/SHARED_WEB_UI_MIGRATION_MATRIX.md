@@ -1,8 +1,8 @@
 # Shared Web UI Migration Matrix
 
-**Status (2026-10-18):** Android routes the main player-facing surface through the shared `web-play/` HTML/CSS/JS bundle by default. The bundle now includes Play, Worlds, Rewards, Journey, Upgrades and Shop. Windows still renders its player UI with Compose Desktop; the shared HTML bundle is not hosted there yet.
+**Status (2026-10-30):** Android and Windows both load the canonical `web-play/` bundle. Windows routes 17 player-facing sections through `DesktopSharedWebView`; Compose remains for the desktop shell and native/system surfaces. This source-level route coverage does not mean every screen has passed runtime or visual parity checks.
 
-**Reviewed:** 2026-10-18  
+**Reviewed:** 2026-10-30  
 **Architecture authority:** [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md)  
 **Execution plan:** [Cross-platform migration execution plan](SHARED_WEB_UI_CROSS_PLATFORM_EXECUTION_PLAN.md)  
 **Product roadmap:** [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md)
@@ -17,22 +17,21 @@ A screen counts as migrated only when its real interactions, localization, loadi
 
 | Surface | Android | Windows | Remaining acceptance work |
 |---|---|---|---|
-| Play / Worlds / Rewards / Journey | Shared HTML route | Shared HTML host for Play; other shared screens remain in the bundle but Windows navigation/parity is incomplete | Wire all intended HTML routes through the desktop bridge and verify localization, keyboard/IME, accessibility and resize behavior |
-| Upgrades | Shared HTML route, wired to Kotlin purchase bridge | Shared HTML route, wired to desktop Kotlin transactions | Verify multipliers, purchase results, max-level/affordability states and save/reload on both |
-| Shop | Shared HTML route, wired to Kotlin purchase/equip bridge | Shared HTML route, wired to desktop Kotlin transactions | Verify currency, ownership, purchase/equip behavior, error states and save/reload on both |
-| Prestige / Ultra / talents | Migration pending or existing native route | Compose UI | Add real shared screens and authoritative transaction actions |
-| World Map / bosses | World presentation and bridge actions in shared bundle | Partial Compose implementation | Add complete shared route coverage and verify battle progression/rewards |
-| Home Base / Relics / Codex / Endgame / Endless Rift | Migration pending | Partial Compose implementations | Build shared routes and bridge-backed state/actions; preserve transaction and unlock rules |
-| Achievements / Daily quests | HTML presentation for progress, quests and chest actions | Partial/route-specific Compose UI | Unify state and interactions through the shared bundle |
-| Settings / Music / Save management / Statistics / Changelog / Tutorial | Native/system or migration pending | Partial Compose UI | Migrate player-facing presentation; retain OS-owned capabilities in native adapters |
-| Arcade / minigames / Live Ops player surfaces | Migration pending or existing native feature | Partial Compose UI | Share presentation where supported; keep sandboxing, validation and platform integrations native |
-| Developer-only surfaces | Native | Native/partial | Remain native unless a concrete cross-platform requirement justifies migration |
-| First-run save selection / crash recovery | Native Compose | Desktop-specific recovery not fully verified | Keep native/system-owned; verify recovery and save compatibility on both |
+| Play / Upgrades / Shop | Canonical shared HTML routes with Kotlin bridge actions | Same routes via `DesktopSharedWebView`; Kotlin desktop transactions remain authoritative | Verify input validation, purchase affordability/max-level/ownership states, rate limiting and save/reload on a current Windows build |
+| Prestige / Ultra / Talent | Shared HTML routes and Android production callbacks | Same shared routes; desktop bridge calls shared engine/desktop transactions | Verify reset preservation, six permanent effects, talent prerequisites/effects and large-number cases |
+| Mutators / Challenges | Shared HTML route and Kotlin-owned state/actions | Same shared route and desktop mutator/challenge transactions | Exercise every mutator combination, builder gating and daily/weekly claim persistence |
+| Worlds / Rewards / Journey / Relics / Home Base / Codex / Statistics / Arcade / Lucky Stake | Shared HTML bundle and Android bridge | Shared HTML routes for `worlds`, `rewards`, `journey`, `relics`, `homebase`, `codex`, `stats`, `arcade` and `stake` | Verify each route's locked/loading/error states, actions, rewards, localization and save/reload; full world/boss/activity scope follows Stage 3 sequencing |
+| Settings | Shared HTML route with host-owned settings persistence | Shared HTML route with desktop-owned settings persistence and theme callback | Verify every setting meaning, persistence, theme, locale and desktop-only input adaptations |
+| More / Save Slots / Music / Changelog / About / update UI | Native or route-specific Android surfaces | Compose/native desktop surfaces and desktop save adapter | Complete feature-specific parity; Music requires a desktop audio implementation; save import/export/reset and recovery need explicit tests |
+| Developer-only surfaces | Native, debug gated | Native/partial, must remain debug gated | Verify production builds cannot expose developer routes or commands |
+| First-run save selection / crash recovery | Native Compose + DataStore | Desktop-native save recovery | Preserve compatibility and verify failure/recovery on both platforms |
+
+The 17 shared Windows player routes are locked by `DesktopGameSectionRouteTest`; the desktop host bridge is implemented in `ProductionGuessGameScreen.kt`. A route mapping assertion proves only that a section selects a shared route. It does not prove that every bridge action, state, localization string or runtime interaction is complete.
 
 ## Completion gates
 
-- [x] One canonical packaged `web-play/` frontend is loaded by Android and by the Windows host for Play, Upgrades and Shop. No separate Windows copy of the UI.
-- [ ] Expand the Windows host to all intended shared HTML routes; document runtime/distribution behavior and add lifecycle/origin tests.
+- [x] One canonical packaged `web-play/` frontend is loaded by Android and Windows; Windows source maps 17 player-facing routes to the same bundle. No separate Windows copy of the UI.
+- [ ] Complete route-by-route Windows bridge, lifecycle/origin, runtime and distribution verification; do not count route mapping alone as completion.
 - [ ] All player-facing routes listed above have real state, interactions and localized loading/empty/error/locked states.
 - [ ] Host bridges use a strict versioned allow-list. JavaScript cannot directly write saves or decide costs/rewards.
 - [ ] Existing saves, offline behavior, recovery and no-ads/no-analytics/no-accounts requirements are preserved.
@@ -42,4 +41,4 @@ A screen counts as migrated only when its real interactions, localization, loadi
 
 ## Current milestone
 
-PR #256 added Upgrades and Shop to Android. The Windows host implementation now renders Play, Upgrades and Shop from the same bundle and routes core gameplay, upgrade/shop transactions, multiplier changes, daily quest claims and loot chest rewards through Kotlin. This is a first migration batch, not full UI parity. Remaining Windows routes, other Android screens, CI and runtime verification are tracked in the [cross-platform execution plan](SHARED_WEB_UI_CROSS_PLATFORM_EXECUTION_PLAN.md).
+Windows now loads 17 player-facing sections from the same bundle as Android, with Kotlin bridge handlers for gameplay, economy, progression, rewards, settings and supported activities. The Windows route mapping and shared guess rate-limit policy have focused tests. This is not full UI parity: bridge-action coverage, Windows runtime, localization, accessibility, responsive behavior, save recovery and later parity stages remain open. Follow the [Windows Feature Parity Plan](WINDOWS_FEATURE_PARITY_PLAN.md) for stage order and acceptance.
