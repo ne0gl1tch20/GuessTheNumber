@@ -164,7 +164,7 @@ jobs:
 
           # Simulate an existing player's save-data directory and verify that upgrades
           # and uninstall never delete user-owned data under APPDATA.
-          $userDataRoot = Join-Path $env:APPDATA "GuessTheNumber\\saves"
+          $userDataRoot = Join-Path (Join-Path $env:APPDATA "GuessTheNumber") "saves"
           New-Item -ItemType Directory -Path $userDataRoot -Force | Out-Null
           $userDataMarker = Join-Path $userDataRoot "ci-user-data-preservation.txt"
           Set-Content -Path $userDataMarker -Value "preserve-this-data" -Encoding ascii
