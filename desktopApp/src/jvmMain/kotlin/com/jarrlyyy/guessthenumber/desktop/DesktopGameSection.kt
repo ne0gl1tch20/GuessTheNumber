@@ -49,7 +49,6 @@ internal val DesktopGameSection.sharedHtmlScreen: String?
         DesktopGameSection.CODEX -> "codex"
         DesktopGameSection.ENDGAME -> "journey"
         DesktopGameSection.STATS -> "stats"
-        DesktopGameSection.ARCADE -> "arcade"
         DesktopGameSection.LUCKY_STAKE -> "stake"
         else -> null
     }
