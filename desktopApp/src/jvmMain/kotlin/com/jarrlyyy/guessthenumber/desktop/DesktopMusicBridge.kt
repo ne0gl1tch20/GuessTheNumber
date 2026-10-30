@@ -4,7 +4,7 @@ import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import java.util.Base64
+import java.security.MessageDigest
 import java.util.prefs.Preferences
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
@@ -13,7 +13,6 @@ import javax.swing.JFileChooser
 import javax.swing.SwingUtilities
 import javax.swing.filechooser.FileNameExtensionFilter
 import kotlin.math.log10
-import kotlin.random.Random
 
 /**
  * Windows audio host for the canonical shared HTML music screen.
@@ -79,9 +78,12 @@ internal object DesktopMusicBridge {
                 }
                 "play" -> {
                     if (!settings.musicEnabled) error("Enable background music in Settings first.")
-                    val path = currentPath ?: settings.musicQueuePaths.firstOrNull() ?: settings.musicLibraryPaths.firstOrNull()
-                        ?: error("Add an audio file from this device first.")
-                    playPath(path, settings.volume)
+                    if (paused && clip != null) { clip?.start(); paused = false }
+                    else {
+                        val path = currentPath ?: settings.musicQueuePaths.firstOrNull() ?: settings.musicLibraryPaths.firstOrNull()
+                            ?: error("Add an audio file from this device first.")
+                        playPath(path, settings.volume)
+                    }
                 }
                 "pause" -> { clip?.stop(); paused = true }
                 "stop" -> stopPlayback()
