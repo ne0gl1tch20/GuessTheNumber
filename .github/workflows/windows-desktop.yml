@@ -16,6 +16,9 @@ on:
       - closed
     branches:
       - master
+    paths:
+      - '**'
+      - '!app/src/main/assets/web-play/**'
   workflow_dispatch:
     inputs:
       source_ref:
