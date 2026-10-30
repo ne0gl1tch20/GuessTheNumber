@@ -8,9 +8,9 @@
 
 1. Evaluate and select a maintained Windows embedded browser integration. WebView2 is the preferred candidate, but do not claim it is implemented until a buildable host proves it. Document runtime prerequisites, missing-runtime behavior, licensing, MSI distribution and offline operation before changing installer behavior.
 2. **Implemented in this batch:** embed JavaFX WebView in the Compose Desktop shell, unpack the canonical packaged `web-play/` files locally, support resize and cleanup, and load without requiring a network connection.
-3. **Initial bridge implemented:** bounded versioned requests, request ID deduplication and an explicit allow-list for guesses, multiplier selection, upgrade/shop actions, daily quests and chests. Kotlin transactions remain authoritative. Tighten local navigation/origin tests and broaden route actions.
+3. **Initial bridge implemented:** bounded versioned requests, request ID deduplication and an explicit allow-list for guesses, multiplier selection, upgrade/shop actions, daily quests and chests. Kotlin transactions remain authoritative. Tighten local navigation/origin tests and broaden route actions, including music playback and Windows updater requests.
 4. Adapt platform-specific input and lifecycle behavior without maintaining a second HTML/CSS/JS copy.
-5. Add host/bridge automated tests and verify the packaged app on Windows. Play, Upgrades, Shop, More and Changelog now use the host; About, Music, save management and remaining Compose routes stay native until their required host bridge actions are implemented.
+5. Add host/bridge automated tests and verify the packaged app on Windows. Play, Upgrades, Shop, More and Changelog now use the host; About, Save management and remaining OS/developer Compose routes stay native until their shared contracts and recovery behavior are implemented.
 
 ## Workstream B: complete the shared player-facing screens
 
