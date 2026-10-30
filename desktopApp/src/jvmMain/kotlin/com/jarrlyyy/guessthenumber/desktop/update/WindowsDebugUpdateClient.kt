@@ -12,6 +12,7 @@ internal data class WindowsDebugUpdate(
     val version: String,
     val tagName: String,
     val artifactDownloadUrl: String,
+    val commitSha: String,
     val runNumber: Long,
     val runAttempt: Long
 )
@@ -37,6 +38,8 @@ internal class WindowsDebugUpdateClient(
             val runId = run["id"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
             val runNumber = run["run_number"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
             val runAttempt = run["run_attempt"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
+            val commitSha = run["head_sha"]?.jsonPrimitive?.content ?: continue
+            if (!commitSha.matches(Regex("[0-9a-fA-F]{40}"))) continue
             val artifacts = runArtifacts(runId) ?: continue
             val artifact = artifacts.firstOrNull {
                 it["name"]?.jsonPrimitive?.content == WINDOWS_ARTIFACT_NAME &&
@@ -53,6 +56,7 @@ internal class WindowsDebugUpdateClient(
                 version = version,
                 tagName = "windows-debug-$runNumber-$runAttempt",
                 artifactDownloadUrl = archiveUrl,
+                commitSha = commitSha,
                 runNumber = runNumber,
                 runAttempt = runAttempt
             )
