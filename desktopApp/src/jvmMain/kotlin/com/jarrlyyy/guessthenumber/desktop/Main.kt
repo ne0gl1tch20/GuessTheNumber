@@ -361,6 +361,136 @@ fun main() = application {
                         DesktopDestination.ARCADE,
                         DesktopDestination.MUSIC_PLAYER,
                         DesktopDestination.CHANGELOG,
+                        DesktopDestination.ABOUT -> {
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                ProductionGuessGameScreen(
+                                    section = when (destination) {
+                                        DesktopDestination.UPGRADES -> DesktopGameSection.UPGRADES
+                                        DesktopDestination.SHOP -> DesktopGameSection.SHOP
+                                        DesktopDestination.MORE -> DesktopGameSection.MORE
+                                        DesktopDestination.PRESTIGE -> DesktopGameSection.PRESTIGE
+                                        DesktopDestination.ULTRA -> DesktopGameSection.ULTRA
+                                        DesktopDestination.TALENT -> DesktopGameSection.TALENT
+                                        DesktopDestination.STATS -> DesktopGameSection.STATS
+                                        DesktopDestination.SETTINGS -> DesktopGameSection.SETTINGS
+                                        DesktopDestination.ACHIEVEMENTS -> DesktopGameSection.ACHIEVEMENTS
+                                        DesktopDestination.WORLD_MAP -> DesktopGameSection.WORLD_MAP
+                                        DesktopDestination.MUTATORS -> DesktopGameSection.MUTATORS
+                                        DesktopDestination.SAVE_SLOTS -> DesktopGameSection.SAVE_SLOTS
+                                        DesktopDestination.RELICS -> DesktopGameSection.RELICS
+                                        DesktopDestination.HOME_BASE -> DesktopGameSection.HOME_BASE
+                                        DesktopDestination.CODEX -> DesktopGameSection.CODEX
+                                        DesktopDestination.ENDGAME -> DesktopGameSection.ENDGAME
+                                        DesktopDestination.LUCKY_STAKE -> DesktopGameSection.LUCKY_STAKE
+                                        DesktopDestination.ARCADE -> DesktopGameSection.ARCADE
+                                        DesktopDestination.MUSIC_PLAYER -> DesktopGameSection.MUSIC_PLAYER
+                                        DesktopDestination.CHANGELOG -> DesktopGameSection.CHANGELOG
+                                        DesktopDestination.ABOUT -> DesktopGameSection.ABOUT
+                                        else -> DesktopGameSection.PLAY
+                                    },
+                                    onOpenAbout = { shell.navigate(DesktopDestination.ABOUT) },
+                                    onOpenPrestige = { shell.navigate(DesktopDestination.PRESTIGE) },
+                                    onOpenUltra = { shell.navigate(DesktopDestination.ULTRA) },
+                                    onOpenTalent = { shell.navigate(DesktopDestination.TALENT) },
+                                    onOpenStats = { shell.navigate(DesktopDestination.STATS) },
+                                    onOpenSettings = { shell.navigate(DesktopDestination.SETTINGS) },
+                                    navigationPosition = navigationPosition,
+                                    onNavigationPositionChange = { selected ->
+                                        navigationPosition = selected
+                                        DesktopNavigationPosition.save(selected)
+                                    },
+                                    onOpenParityDestination = { shell.navigate(it) },
+                                    onGlobalPreferencesImported = {
+                                        playerProfile = DesktopPlayerProfileStore.load()
+                                        navigationPosition = DesktopNavigationPosition.load()
+                                    },
+                                    onOpenPlayerProfile = { viewingPlayerProfile = true; editingPlayerProfile = false },
+                                    onDesktopUpdateRequest = { type, requestId, reply ->
+                                        scope.launch {
+                                            fun sendUpdateResult(
+                                                resultStatus: String,
+                                                message: String,
+                                                update: WindowsDebugUpdate? = null
+                                            ) {
+                                                val response = org.json.JSONObject()
+                                                    .put("version", 1)
+                                                    .put("id", requestId)
+                                                    .put("type", "update_result")
+                                                    .put("status", resultStatus)
+                                                    .put("message", message)
+                                                if (update != null) {
+                                                    response.put("title", "Windows Debug " + update.version)
+                                                    response.put("details", "Build #" + update.runNumber + " · commit " + update.commitSha.take(7))
+                                                }
+                                                reply(response.toString())
+                                            }
+
+                                            when (type) {
+                                                "check_updates" -> {
+                                                    refreshUpdates()
+                                                    val update = availableUpdate
+                                                    when {
+                                                        update != null -> sendUpdateResult(
+                                                            "available",
+                                                            "Version " + update.version + " is ready to install.",
+                                                            update
+                                                        )
+                                                        status.startsWith("Update check failed:") -> sendUpdateResult("unavailable", status)
+                                                        else -> sendUpdateResult("up_to_date", status)
+                                                    }
+                                                }
+                                                "install_update" -> {
+                                                    val update = availableUpdate
+                                                    if (update == null) {
+                                                        sendUpdateResult("unavailable", "Check for updates before installing.")
+                                                    } else {
+                                                        isBusy = true
+                                                        status = "Downloading and verifying version " + update.version + "…"
+                                                        try {
+                                                            withContext(Dispatchers.IO) {
+                                                                installer.downloadVerifyAndLaunch(update)
+                                                            }
+                                                            sendUpdateResult(
+                                                                "install_started",
+                                                                "Windows Installer is opening. GuessTheNumber will close for the update."
+                                                            )
+                                                            exitApplication()
+                                                        } catch (error: Exception) {
+                                                            isBusy = false
+                                                            status = "Update failed: " + (error.message ?: "installer error")
+                                                            sendUpdateResult("install_failed", status)
+                                                        }
+                                                    }
+                                                }
+                                                "open_update_page" -> {
+                                                    try {
+                                                        check(java.awt.Desktop.isDesktopSupported()) {
+                                                            "Your Windows environment cannot open an external browser."
+                                                        }
+                                                        java.awt.Desktop.getDesktop().browse(
+                                                            java.net.URI("https://github.com/ne0gl1tch20/GuessTheNumber/actions/workflows/windows-desktop.yml")
+                                                        )
+                                                        sendUpdateResult("page_opened", "Opened the Windows update workflow in your browser.")
+                                                    } catch (error: Exception) {
+                                                        sendUpdateResult("unavailable", error.message ?: "Could not open the update page.")
+                                                    }
+                                                }
+                                                else -> sendUpdateResult("unavailable", "Unknown update action.")
+                                            }
+                                        }
+                                    },
+                                    onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
+                                    onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
+                                        themeMode = mode
+                                        primaryHex = primary
+                                        secondaryHex = secondary
+                                        tertiaryHex = tertiary
+                                        reducedMotion = reduced
+                                    }
+                                )
+                            }
+                        }
+
                         DesktopDestination.ACTIVITY_HUB -> DesktopActivityHubScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
                         DesktopDestination.LIVE_OPS -> DesktopLiveOpsScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
                         DesktopDestination.DEVELOPER_CONSOLE -> DesktopDeveloperConsoleScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
@@ -371,82 +501,6 @@ fun main() = application {
                         DesktopDestination.DEVELOPER_SETTINGS,
                         DesktopDestination.LUA_TESTING_HUB -> DesktopParityScreen(destination = destination, onBack = { shell.navigate(DesktopDestination.MORE) }, onNavigate = { shell.navigate(it) })
 
-                        DesktopDestination.ABOUT -> {
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Text("Windows Debug updates", style = MaterialTheme.typography.titleMedium)
-                                    Text("Installed version: ${WindowsBuildVersion.current}")
-                                    Text(
-                                        status,
-                                        color = if (
-                                            classifyDesktopUpdateStatus(
-                                                status = status,
-                                                isBusy = isBusy,
-                                                hasUpdate = availableUpdate != null
-                                            ) == DesktopUpdateStatusKind.ERROR
-                                        ) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.semantics {
-                                            liveRegion = LiveRegionMode.Polite
-                                        }
-                                    )
-                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        Button(
-                                            onClick = { scope.launch { refreshUpdates() } },
-                                            enabled = !isBusy
-                                        ) {
-                                            Text("Check again")
-                                        }
-                                        val update = availableUpdate
-                                        if (update != null) {
-                                            Button(
-                                                onClick = {
-                                                    scope.launch {
-                                                        isBusy = true
-                                                        status = "Downloading and verifying version ${update.version}…"
-                                                        try {
-                                                            withContext(Dispatchers.IO) {
-                                                                installer.downloadVerifyAndLaunch(update)
-                                                            }
-                                                            status = "Windows Installer is opening. GuessTheNumber will close for the update."
-                                                            exitApplication()
-                                                        } catch (error: Exception) {
-                                                            status = "Update failed: ${error.message ?: "installer error"}"
-                                                            isBusy = false
-                                                        }
-                                                    }
-                                                },
-                                                enabled = !isBusy
-                                            ) {
-                                                Text("Install update")
-                                            }
-                                        }
-                                        if (isBusy) {
-                                            CircularProgressIndicator(modifier = Modifier.semantics { contentDescription = status })
-                                        }
-                                    }
-                                    Text(
-                                        "Debug builds are separate from production releases. Windows may ask for permission to install the MSI.",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            }
-
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(24.dp),
-                                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    Text("About Guess The Number", style = MaterialTheme.typography.headlineSmall)
-                                    Text("Windows desktop edition")
-                                    Text("Designed for offline play. No ads, analytics or accounts.")
-                                    Text("This Windows build is under active development. Some Android features are not available on Windows yet.")
-                                    Text("Installed version: ${WindowsBuildVersion.current}")
-                                }
-                            }
-                        }
                     }
                     }
                         if (navigationPosition == DesktopNavigationPosition.RIGHT) {
