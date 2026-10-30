@@ -183,6 +183,11 @@ The port is complete only when every Android player-facing screen and reachable 
 
 ### W6. Developer tooling
 
+- [x] Hide Windows Developer Settings, Developer Console, Process Inspector and Lua Testing Hub by default; both More-menu visibility and direct shell navigation require explicit `-Dgtn.desktop.debugTools=true`.
+- [ ] Port the shared validated developer command executor and output history.
+- [ ] Port privacy-conscious process diagnostics and deterministic test helpers.
+- [ ] Verify release packages cannot enable developer destinations through build configuration or external launch arguments.
+
 - [ ] Console, state inspection, test helpers and verbose logs are debug-only.
 - [ ] Developer commands are not exposed unintentionally in production.
 - [ ] Add deterministic tests for common rules and desktop adapters.
