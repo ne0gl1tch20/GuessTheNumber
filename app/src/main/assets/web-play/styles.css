@@ -1442,3 +1442,109 @@ body.jui-game-compat .jui-dialog-actions { display:flex; flex-wrap:wrap; gap:.55
 
 @keyframes about-update-indeterminate{0%{transform:translateX(-110%)}100%{transform:translateX(320%)}}.about-update-progress-track span.is-indeterminate{width:38%;animation:about-update-indeterminate 1.25s ease-in-out infinite;transition:none}
 @media(prefers-reduced-motion:reduce){.about-update-progress-track span.is-indeterminate{animation:none;width:100%;opacity:.75}}
+
+
+/* Windows desktop navigation belongs to the shared HTML surface, never the Compose shell. */
+@media (min-width: 720px) {
+  html[data-desktop-navigation-position="LEFT"] .screen-nav,
+  body[data-desktop-navigation-position="LEFT"] .screen-nav,
+  html[data-desktop-navigation-position="RIGHT"] .screen-nav,
+  body[data-desktop-navigation-position="RIGHT"] .screen-nav {
+    position: fixed;
+    top: 50%;
+    bottom: auto;
+    left: 12px;
+    right: auto;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    width: 168px;
+    grid-template-columns: none;
+    gap: 6px;
+    margin: 0;
+    padding: 8px;
+  }
+
+  html[data-desktop-navigation-position="RIGHT"] .screen-nav,
+  body[data-desktop-navigation-position="RIGHT"] .screen-nav {
+    left: auto;
+    right: 12px;
+  }
+
+  html[data-desktop-navigation-position="LEFT"] .screen-nav button,
+  body[data-desktop-navigation-position="LEFT"] .screen-nav button,
+  html[data-desktop-navigation-position="RIGHT"] .screen-nav button,
+  body[data-desktop-navigation-position="RIGHT"] .screen-nav button {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  html[data-desktop-navigation-position="LEFT"] .screen-nav button b,
+  body[data-desktop-navigation-position="LEFT"] .screen-nav button b,
+  html[data-desktop-navigation-position="RIGHT"] .screen-nav button b,
+  body[data-desktop-navigation-position="RIGHT"] .screen-nav button b {
+    width: auto;
+    max-width: none;
+    overflow: visible;
+    font-size: 11px;
+    text-align: left;
+  }
+
+  html[data-desktop-navigation-position="LEFT"] .app,
+  body[data-desktop-navigation-position="LEFT"] .app {
+    width: min(1120px, calc(100% - 202px));
+    margin: 0 12px 0 190px;
+    padding-bottom: 36px;
+  }
+
+  html[data-desktop-navigation-position="RIGHT"] .app,
+  body[data-desktop-navigation-position="RIGHT"] .app {
+    width: min(1120px, calc(100% - 202px));
+    margin: 0 190px 0 12px;
+    padding-bottom: 36px;
+  }
+
+  html[data-desktop-navigation-position="TOP"] .screen-nav,
+  body[data-desktop-navigation-position="TOP"] .screen-nav {
+    top: 10px;
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(1000px, calc(100% - 24px));
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    flex-direction: row;
+  }
+
+  html[data-desktop-navigation-position="TOP"] .app,
+  body[data-desktop-navigation-position="TOP"] .app {
+    width: min(1120px, calc(100% - 24px));
+    margin: 0 auto;
+    padding-top: 78px;
+    padding-bottom: 36px;
+  }
+
+  html[data-desktop-navigation-position="BOTTOM"] .screen-nav,
+  body[data-desktop-navigation-position="BOTTOM"] .screen-nav {
+    top: auto;
+    bottom: 6px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(1000px, calc(100% - 24px));
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    flex-direction: row;
+  }
+
+  html[data-desktop-navigation-position="BOTTOM"] .app,
+  body[data-desktop-navigation-position="BOTTOM"] .app {
+    width: min(1120px, calc(100% - 24px));
+    margin: 0 auto;
+    padding-bottom: 78px;
+  }
+}
