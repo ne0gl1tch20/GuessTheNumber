@@ -102,15 +102,218 @@ internal class WindowsDebugInstaller {
         val msiLiteral = powershellLiteral(msiPath.toAbsolutePath().toString())
         val directoryLiteral = powershellLiteral(temporaryDirectory.toAbsolutePath().toString())
         val script = """
-            $ErrorActionPreference = 'Stop'
-            $msiPath = '$msiLiteral'
-            $temporaryDirectory = '$directoryLiteral'
+            ${'
+        Files.writeString(scriptPath, script)
+        try {
+            ProcessBuilder(
+                "powershell.exe", "-NoProfile", "-NonInteractive",
+                "-ExecutionPolicy", "Bypass", "-File", scriptPath.toAbsolutePath().toString()
+            ).start()
+        } catch (error: Exception) {
+            deleteTree(temporaryDirectory)
+            throw IllegalStateException("Could not start the Windows MSI installer.", error)
+        }
+    }
+
+    private fun powershellLiteral(value: String): String = value.replace("'", "''")
+
+    private fun deleteTree(root: Path) {
+        if (!Files.exists(root)) return
+        Files.walk(root).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { path ->
+                runCatching { Files.deleteIfExists(path) }
+            }
+        }
+    }
+
+    private companion object {
+        const val EXPECTED_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug.zip"
+        const val MAX_ARTIFACT_BYTES = 400L * 1024 * 1024
+    }
+}
+}ErrorActionPreference = 'Stop'
+            ${'
+        Files.writeString(scriptPath, script)
+        try {
+            ProcessBuilder(
+                "powershell.exe", "-NoProfile", "-NonInteractive",
+                "-ExecutionPolicy", "Bypass", "-File", scriptPath.toAbsolutePath().toString()
+            ).start()
+        } catch (error: Exception) {
+            deleteTree(temporaryDirectory)
+            throw IllegalStateException("Could not start the Windows MSI installer.", error)
+        }
+    }
+
+    private fun powershellLiteral(value: String): String = value.replace("'", "''")
+
+    private fun deleteTree(root: Path) {
+        if (!Files.exists(root)) return
+        Files.walk(root).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { path ->
+                runCatching { Files.deleteIfExists(path) }
+            }
+        }
+    }
+
+    private companion object {
+        const val EXPECTED_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug.zip"
+        const val MAX_ARTIFACT_BYTES = 400L * 1024 * 1024
+    }
+}
+}msiPath = '$msiLiteral'
+            ${'
+        Files.writeString(scriptPath, script)
+        try {
+            ProcessBuilder(
+                "powershell.exe", "-NoProfile", "-NonInteractive",
+                "-ExecutionPolicy", "Bypass", "-File", scriptPath.toAbsolutePath().toString()
+            ).start()
+        } catch (error: Exception) {
+            deleteTree(temporaryDirectory)
+            throw IllegalStateException("Could not start the Windows MSI installer.", error)
+        }
+    }
+
+    private fun powershellLiteral(value: String): String = value.replace("'", "''")
+
+    private fun deleteTree(root: Path) {
+        if (!Files.exists(root)) return
+        Files.walk(root).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { path ->
+                runCatching { Files.deleteIfExists(path) }
+            }
+        }
+    }
+
+    private companion object {
+        const val EXPECTED_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug.zip"
+        const val MAX_ARTIFACT_BYTES = 400L * 1024 * 1024
+    }
+}
+}temporaryDirectory = '$directoryLiteral'
             try {
-                $installer = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/i', ('"{0}"' -f $msiPath)) -Wait -PassThru
-                exit $installer.ExitCode
+                ${'
+        Files.writeString(scriptPath, script)
+        try {
+            ProcessBuilder(
+                "powershell.exe", "-NoProfile", "-NonInteractive",
+                "-ExecutionPolicy", "Bypass", "-File", scriptPath.toAbsolutePath().toString()
+            ).start()
+        } catch (error: Exception) {
+            deleteTree(temporaryDirectory)
+            throw IllegalStateException("Could not start the Windows MSI installer.", error)
+        }
+    }
+
+    private fun powershellLiteral(value: String): String = value.replace("'", "''")
+
+    private fun deleteTree(root: Path) {
+        if (!Files.exists(root)) return
+        Files.walk(root).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { path ->
+                runCatching { Files.deleteIfExists(path) }
+            }
+        }
+    }
+
+    private companion object {
+        const val EXPECTED_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug.zip"
+        const val MAX_ARTIFACT_BYTES = 400L * 1024 * 1024
+    }
+}
+}installer = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/i', ('"{0}"' -f ${'
+        Files.writeString(scriptPath, script)
+        try {
+            ProcessBuilder(
+                "powershell.exe", "-NoProfile", "-NonInteractive",
+                "-ExecutionPolicy", "Bypass", "-File", scriptPath.toAbsolutePath().toString()
+            ).start()
+        } catch (error: Exception) {
+            deleteTree(temporaryDirectory)
+            throw IllegalStateException("Could not start the Windows MSI installer.", error)
+        }
+    }
+
+    private fun powershellLiteral(value: String): String = value.replace("'", "''")
+
+    private fun deleteTree(root: Path) {
+        if (!Files.exists(root)) return
+        Files.walk(root).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { path ->
+                runCatching { Files.deleteIfExists(path) }
+            }
+        }
+    }
+
+    private companion object {
+        const val EXPECTED_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug.zip"
+        const val MAX_ARTIFACT_BYTES = 400L * 1024 * 1024
+    }
+}
+}msiPath)) -Wait -PassThru
+                exit ${'
+        Files.writeString(scriptPath, script)
+        try {
+            ProcessBuilder(
+                "powershell.exe", "-NoProfile", "-NonInteractive",
+                "-ExecutionPolicy", "Bypass", "-File", scriptPath.toAbsolutePath().toString()
+            ).start()
+        } catch (error: Exception) {
+            deleteTree(temporaryDirectory)
+            throw IllegalStateException("Could not start the Windows MSI installer.", error)
+        }
+    }
+
+    private fun powershellLiteral(value: String): String = value.replace("'", "''")
+
+    private fun deleteTree(root: Path) {
+        if (!Files.exists(root)) return
+        Files.walk(root).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { path ->
+                runCatching { Files.deleteIfExists(path) }
+            }
+        }
+    }
+
+    private companion object {
+        const val EXPECTED_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug.zip"
+        const val MAX_ARTIFACT_BYTES = 400L * 1024 * 1024
+    }
+}
+}installer.ExitCode
             } finally {
                 Start-Sleep -Seconds 2
-                Remove-Item -LiteralPath $temporaryDirectory -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -LiteralPath ${'
+        Files.writeString(scriptPath, script)
+        try {
+            ProcessBuilder(
+                "powershell.exe", "-NoProfile", "-NonInteractive",
+                "-ExecutionPolicy", "Bypass", "-File", scriptPath.toAbsolutePath().toString()
+            ).start()
+        } catch (error: Exception) {
+            deleteTree(temporaryDirectory)
+            throw IllegalStateException("Could not start the Windows MSI installer.", error)
+        }
+    }
+
+    private fun powershellLiteral(value: String): String = value.replace("'", "''")
+
+    private fun deleteTree(root: Path) {
+        if (!Files.exists(root)) return
+        Files.walk(root).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { path ->
+                runCatching { Files.deleteIfExists(path) }
+            }
+        }
+    }
+
+    private companion object {
+        const val EXPECTED_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug.zip"
+        const val MAX_ARTIFACT_BYTES = 400L * 1024 * 1024
+    }
+}
+}temporaryDirectory -Recurse -Force -ErrorAction SilentlyContinue
             }
         """.trimIndent()
         Files.writeString(scriptPath, script)
