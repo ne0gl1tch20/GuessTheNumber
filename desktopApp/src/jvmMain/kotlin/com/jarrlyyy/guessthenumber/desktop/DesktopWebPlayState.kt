@@ -55,7 +55,8 @@ internal fun desktopWebPlayState(
     talents: List<DesktopTalentDef> = DesktopEconomyRepository().talents(),
     engine: GameEngine = GameEngine(),
     initialScreen: String = "play",
-    minigames: List<DesktopMinigameDef> = DesktopEconomyRepository().minigames()
+    minigames: List<DesktopMinigameDef> = DesktopEconomyRepository().minigames(),
+    musicPlayer: JSONObject = JSONObject()
 ): JSONObject {
     val upgrades = JSONArray()
     catalog.upgrades.forEach { upgrade ->
@@ -207,6 +208,7 @@ internal fun desktopWebPlayState(
         .put("appVersionCode", com.jarrlyyy.guessthenumber.desktop.update.WindowsBuildVersion.current.substringAfterLast('.').toIntOrNull() ?: 0)
         .put("updateChannel", "debug")
         .put("debugBuild", true)
+        .put("musicPlayer", musicPlayer)
         .put("initialScreen", initialScreen)
         .put("uiStrings", desktopWebUiStrings(game.settings.locale))
         .put("buyMultiplier", game.buyMultiplier)
