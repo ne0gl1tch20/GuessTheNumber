@@ -60,6 +60,7 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
     @Volatile private var disposed = false
     private var engine: javafx.scene.web.WebEngine? = null
     private var localIndex: Path? = null
+    private var localRoot: Path? = null
 
     init {
         panel.add(fxPanel, BorderLayout.CENTER)
@@ -68,6 +69,7 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
             try {
                 val index = unpackWebAssets()
                 localIndex = index
+                localRoot = index.parent.parent
                 val webView = WebView()
                 webView.isContextMenuEnabled = true
                 val webEngine = webView.engine
@@ -189,6 +191,19 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
         Platform.runLater {
             runCatching { engine?.load("about:blank") }
             engine = null
+            localRoot?.let(::deleteResourceTree)
+            localRoot = null
+            localIndex = null
+        }
+    }
+
+    private fun deleteResourceTree(root: Path) {
+        runCatching {
+            if (Files.exists(root)) {
+                Files.walk(root).use { paths ->
+                    paths.sorted(Comparator.reverseOrder()).forEach(Files::deleteIfExists)
+                }
+            }
         }
     }
 
