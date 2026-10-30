@@ -43,6 +43,22 @@ class BigNumberProgressionRewardRulesTest {
     }
 
     @Test
+    fun ultraRewardDoesNotRoundValuesJustBelowAnIntegerBoundaryUp() {
+        val justBelowCap = BigNumber("99999999999999999999")
+
+        assertEquals(
+            0,
+            BigNumberProgressionRewardRules.ultraReward(justBelowCap, BigNumber.ONE)
+                .compareTo(BigNumber(1_999))
+        )
+        assertEquals(
+            0,
+            BigNumberProgressionRewardRules.ultraReward(BigNumber("1e20"), BigNumber.ONE)
+                .compareTo(BigNumber(2_000))
+        )
+    }
+
+    @Test
     fun progressionRewardsRejectAmountsBelowRequirementAndHandleZeroRequirement() {
         val requirement = engine.calculatePrestigeRequirement(0)
         val below = requirement - BigNumber.ONE
