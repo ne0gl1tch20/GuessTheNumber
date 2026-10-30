@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -80,7 +81,7 @@ internal object DesktopWorldCatalog {
 }
 
 @Composable
-internal fun DesktopWorldMapContent(state: GameState, onBack: () -> Unit, onWorldAction: (String, String) -> Unit) {
+internal fun DesktopWorldMapContent(state: GameState, onBack: () -> Unit, onWorldAction: (String, String) -> Unit, onMasteryUpgrade: (String) -> Unit) {
     val catalogResult = remember { runCatching { DesktopWorldCatalog.load() } }
     val worlds = catalogResult.getOrNull()
     var selectedId by remember(state.activeWorldId) { mutableStateOf(state.activeWorldId) }
@@ -226,7 +227,21 @@ internal fun DesktopWorldMapContent(state: GameState, onBack: () -> Unit, onWorl
                         } else {
                             if (world.id != state.activeWorldId) Button(onClick = { onWorldAction(world.id, "select") }, enabled = !state.endlessRiftActive) { Text("Make active world") }
                             if (defeated) {
-                                Text("Boss defeated · World mastery ${state.worldMasteryLevels[world.id] ?: 1}")
+                                val mastery = state.worldMasteryLevels[world.id] ?: 1
+                                val masteryCost = DesktopEconomyTransactions.worldMasteryUpgradeCost(state, world.id)
+                                Text("Boss defeated · World mastery $mastery")
+                                Text("+${mastery * 2}% Money per correct guess in this world", color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodySmall)
+                                if (masteryCost != null) {
+                                    Button(
+                                        onClick = { onMasteryUpgrade(world.id) },
+                                        enabled = state.nebula >= masteryCost
+                                    ) {
+                                        Text("Increase mastery · $masteryCost Nebula")
+                                    }
+                                    Text("Secret, Sanctuary and full-relic discounts can reduce the cost.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                } else {
+                                    Text("Maximum mastery reached", style = MaterialTheme.typography.labelMedium)
+                                }
                             } else {
                                 Text("Boss HP: ${(bossHp - damage).coerceAtLeast(0)} / $bossHp")
                                 LinearProgressIndicator(progress = { (damage.toFloat() / bossHp.toFloat()).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth())
