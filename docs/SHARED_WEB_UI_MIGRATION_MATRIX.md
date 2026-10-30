@@ -27,7 +27,7 @@ A screen counts as migrated only when its real interactions, localization, loadi
 | Developer-only surfaces | Native, debug gated | Native/partial, must remain debug gated | Verify production builds cannot expose developer routes or commands |
 | First-run save selection / crash recovery | Native Compose + DataStore | Desktop-native save recovery | Preserve compatibility and verify failure/recovery on both platforms |
 
-The 21 shared Windows player routes are locked by `DesktopGameSectionRouteTest`; the desktop host bridge is implemented in `ProductionGuessGameScreen.kt`. A route mapping assertion proves only that a section selects a shared route. It does not prove that every bridge action, state, localization string or runtime interaction is complete.
+The 20 shared Windows player routes are locked by `DesktopGameSectionRouteTest`; the desktop host bridge is implemented in `ProductionGuessGameScreen.kt`. A route mapping assertion proves only that a section selects a shared route. It does not prove that every bridge action, state, localization string or runtime interaction is complete.
 
 ## Completion gates
 
