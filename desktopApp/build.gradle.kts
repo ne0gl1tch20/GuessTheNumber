@@ -39,7 +39,7 @@ val generateDesktopLogoAssets = tasks.register<GenerateDesktopLogoAssets>("gener
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
     jvm()
 
     sourceSets {
