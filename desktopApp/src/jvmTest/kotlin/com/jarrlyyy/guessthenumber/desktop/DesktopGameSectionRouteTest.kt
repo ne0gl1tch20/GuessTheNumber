@@ -9,6 +9,8 @@ class DesktopGameSectionRouteTest {
     fun playerFacingSectionsResolveToTheCanonicalSharedWebRoutes() {
         val expected = mapOf(
             DesktopGameSection.PLAY to "play",
+            DesktopGameSection.MORE to "more",
+            DesktopGameSection.CHANGELOG to "changelog",
             DesktopGameSection.UPGRADES to "upgrades",
             DesktopGameSection.SHOP to "shop",
             DesktopGameSection.PRESTIGE to "prestige",
@@ -34,7 +36,6 @@ class DesktopGameSectionRouteTest {
 
     @Test
     fun nativeShellAndSaveManagementSectionsDoNotPretendToBeSharedWebRoutes() {
-        assertNull(DesktopGameSection.MORE.sharedHtmlScreen)
         assertNull(DesktopGameSection.SAVE_SLOTS.sharedHtmlScreen)
     }
 }
