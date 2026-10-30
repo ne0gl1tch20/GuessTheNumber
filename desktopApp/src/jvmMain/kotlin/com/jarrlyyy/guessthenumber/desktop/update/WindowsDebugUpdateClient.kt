@@ -72,6 +72,7 @@ internal class WindowsDebugUpdateClient(
             runNumber = runNumber,
             runAttempt = runAttempt
         )
+    }
 
     private fun runArtifacts(runId: Long): List<JsonObject>? {
         val response = getJson(URL("$ACTIONS_API/$runId/artifacts")).jsonObject
