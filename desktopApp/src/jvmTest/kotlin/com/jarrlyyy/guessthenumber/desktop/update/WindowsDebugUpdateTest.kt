@@ -31,8 +31,8 @@ class WindowsDebugUpdateTest {
         assertNull(clientForRun(6).findLatestUpdate("1.0.7"))
     }
 
-    @Test
-    fun skipsExpiredArtifactAndOlderRuns() {
+    @Test(expected = IllegalStateException::class)
+    fun rejectsExpiredLatestArtifactInsteadOfFallingBackToAnOlderBuild() {
         val responses = standardResponses(6).toMutableMap()
         responses[ARTIFACTS_URL] = """{"artifacts":[
             {"name":"GuessTheNumber-Windows-Debug","expired":true,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX"}
@@ -40,7 +40,7 @@ class WindowsDebugUpdateTest {
         val client = WindowsDebugUpdateClient { url ->
             StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
         }
-        assertNull(client.findLatestUpdate("1.0.5"))
+        client.findLatestUpdate("1.0.5")
     }
 
     @Test
