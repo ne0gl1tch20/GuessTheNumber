@@ -196,7 +196,8 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Hide Windows Developer Settings, Developer Console, Process Inspector and Lua Testing Hub by default; packaged builds require a build-time opt-in (`-Pgtn.desktop.debugToolsBuild=true`) and a separate launch flag (`-Dgtn.desktop.debugTools=true`). The default Windows CI MSI build is not opted in.
 - [x] Add a Windows typed developer-command allowlist with bounded in-session output history. Supported commands are limited to inspection and validated currency/upgrade/automation adjustments; shell execution, arbitrary code, filesystem and network commands are not exposed.
 - [x] Add local JVM/runtime and heap diagnostics without enumerating other processes, capturing command-line arguments or transmitting telemetry.
-- [ ] Reuse the Android command parser/executor directly and add the remaining deterministic game test helpers.
+- [x] Move the pure Kotlin command parser, registry and autocomplete definitions into shared KMP code; Windows now uses the same parser while applying a stricter desktop-safe command allowlist.
+- [ ] Add the remaining deterministic game test helpers and port the rest of Android's debug-only command catalog where safe.
 - [x] Add a build-time developer-tools resource gate so a launch argument alone cannot expose developer routes in the default packaged build.
 - [ ] Verify the built MSI itself remains blocked when launched with the debug system property.
 
