@@ -361,7 +361,7 @@ fun ProductionGuessGameScreen(
                             reply(org.json.JSONObject().put("version", 1).put("id", requestId)
                                 .put("type", "error").put("error", code).toString())
                         }
-                        if (request == null || raw.length > 512 ||
+                        if (request == null || raw.length > 16384 ||
                             request.optInt("version", -1) != 1 ||
                             !requestId.matches(Regex("[A-Za-z0-9_-]{1,48}")) ||
                             request.opt("type") !is String
