@@ -8,7 +8,7 @@ import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.shared.rules.GuessRateLimitRules
 
 object AntiCheatService {
-    private var lastGuessTimestampNanos = 0L
+    private var lastGuessTimestampNanos: Long? = null
 
     fun validateGuessRate(): Boolean {
         val now = System.nanoTime()
