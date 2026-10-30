@@ -19,14 +19,14 @@ SHARED_BUILD = ROOT / "shared" / "build.gradle.kts"
 # androidx.compose is supported by Compose Multiplatform in commonMain.
 # Other AndroidX libraries are not assumed to have common targets.
 FORBIDDEN_IMPORTS = re.compile(
-    r"^\\s*import\\s+(?:java\\.|javax\\.|android\\.|"
-    r"androidx\\.(?!compose(?:\\.|$))|com\\.android\\.|org\\.jvm\\.)",
+    r"^\s*import\s+(?:java\.|javax\.|android\.|"
+    r"androidx\.(?!compose(?:\.|$))|com\.android\.|org\.jvm\.)",
     re.MULTILINE,
 )
 FORBIDDEN_REFERENCES = re.compile(
-    r"\\b(?:System\\.(?:currentTimeMillis|nanoTime|out|err)|"
-    r"java\\.io\\.|java\\.nio\\.|java\\.math\\.|android\\.|"
-    r"androidx\\.(?!compose(?:\\.|$)))"
+    r"\b(?:System\.(?:currentTimeMillis|nanoTime|out|err)|"
+    r"java\.io\.|java\.nio\.|java\.math\.|android\.|"
+    r"androidx\.(?!compose(?:\.|$)))"
 )
 
 
