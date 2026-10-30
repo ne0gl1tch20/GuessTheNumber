@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.domain.engine
 
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.desktop.economy.DesktopEconomyTransactions
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -75,6 +76,55 @@ class BigNumberProgressionRewardRulesTest {
             engine.calculatePrestigeReward(restored.money, restored.prestigeCount)
                 .compareTo(engine.calculatePrestigeReward(original.money, original.prestigeCount))
         )
+    }
+
+
+    @Test
+    fun prestigeAndUltraResetResultsRoundTripWithoutLosingPermanentProgress() {
+        val prestigeInput = GameState(
+            money = engine.calculatePrestigeRequirement(0) * BigNumber("1e100"),
+            prestige = BigNumber("7e80"),
+            prestigeUpgradeLevels = mapOf(
+                "prestige_gain_boost" to 3,
+                "prestige_starting_capital" to 2
+            ),
+            ultraUpgradeLevels = mapOf("ultra_money_boost" to 4),
+            shopPurchases = setOf("nebula_boost")
+        )
+        val prestigeResult = DesktopEconomyTransactions.prestigeReset(prestigeInput, engine)
+        assertTrue(prestigeResult.accepted)
+        val restoredPrestige = Json.decodeFromString(
+            GameState.serializer(),
+            Json.encodeToString(GameState.serializer(), prestigeResult.state)
+        )
+        assertEquals(0, prestigeResult.state.money.compareTo(BigNumber(2_000)))
+        assertEquals(0, restoredPrestige.money.compareTo(prestigeResult.state.money))
+        assertEquals(0, restoredPrestige.prestige.compareTo(prestigeResult.state.prestige))
+        assertEquals(prestigeInput.prestigeUpgradeLevels, restoredPrestige.prestigeUpgradeLevels)
+        assertEquals(prestigeInput.ultraUpgradeLevels, restoredPrestige.ultraUpgradeLevels)
+        assertEquals(prestigeInput.shopPurchases, restoredPrestige.shopPurchases)
+        assertTrue(restoredPrestige.upgradeLevels.isEmpty())
+
+        val ultraInput = GameState(
+            money = engine.calculateUltraRequirement(0) * BigNumber("1e100"),
+            prestige = BigNumber(1_000),
+            prestigeUpgradeLevels = mapOf("prestige_starting_capital" to 3),
+            ultraUpgradeLevels = mapOf("ultra_gain_boost" to 2),
+            shopPurchases = setOf("nebula_boost")
+        )
+        val ultraResult = DesktopEconomyTransactions.ultraReset(ultraInput, engine)
+        assertTrue(ultraResult.accepted)
+        val restoredUltra = Json.decodeFromString(
+            GameState.serializer(),
+            Json.encodeToString(GameState.serializer(), ultraResult.state)
+        )
+        assertEquals(0, ultraResult.state.money.compareTo(BigNumber(3_000)))
+        assertEquals(BigNumber.ZERO, restoredUltra.prestige)
+        assertTrue(restoredUltra.ultra > BigNumber.ZERO)
+        assertTrue(restoredUltra.prestigeUpgradeLevels.isEmpty())
+        assertEquals(ultraInput.ultraUpgradeLevels, restoredUltra.ultraUpgradeLevels)
+        assertEquals(ultraInput.shopPurchases, restoredUltra.shopPurchases)
+        assertTrue(restoredUltra.upgradeLevels.isEmpty())
     }
 
     @Test
