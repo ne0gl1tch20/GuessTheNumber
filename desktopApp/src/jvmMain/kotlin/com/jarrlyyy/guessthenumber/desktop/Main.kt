@@ -212,6 +212,28 @@ fun main() = application {
             val shellFocusRequester = remember { FocusRequester() }
             val shell = remember { DesktopShellController() }
             val shellState = shell.state
+            val usesSharedHtmlSurface = shellState.destination in setOf(
+                DesktopDestination.PLAY,
+                DesktopDestination.UPGRADES,
+                DesktopDestination.SHOP,
+                DesktopDestination.MORE,
+                DesktopDestination.PRESTIGE,
+                DesktopDestination.ULTRA,
+                DesktopDestination.TALENT,
+                DesktopDestination.STATS,
+                DesktopDestination.SETTINGS,
+                DesktopDestination.ACHIEVEMENTS,
+                DesktopDestination.WORLD_MAP,
+                DesktopDestination.MUTATORS,
+                DesktopDestination.RELICS,
+                DesktopDestination.HOME_BASE,
+                DesktopDestination.CODEX,
+                DesktopDestination.ENDGAME,
+                DesktopDestination.LUCKY_STAKE,
+                DesktopDestination.MUSIC_PLAYER,
+                DesktopDestination.CHANGELOG,
+                DesktopDestination.ABOUT
+            )
             val updateClient = remember { WindowsDebugUpdateClient() }
             val installer = remember { WindowsDebugInstaller() }
             var availableUpdate by remember { mutableStateOf<WindowsDebugUpdate?>(null) }
@@ -265,7 +287,8 @@ fun main() = application {
                 color = MaterialTheme.colorScheme.background
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    modifier = Modifier.fillMaxSize()
+                        .then(if (usesSharedHtmlSurface) Modifier else Modifier.padding(16.dp))
                         .onPreviewKeyEvent { event ->
                             if (event.type != KeyEventType.KeyDown) {
                                 return@onPreviewKeyEvent false
@@ -281,9 +304,9 @@ fun main() = application {
                         }
                         .focusRequester(shellFocusRequester)
                         .focusable(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = if (usesSharedHtmlSurface) Arrangement.Top else Arrangement.spacedBy(12.dp)
                 ) {
-                    if (shellState.message != null) {
+                    if (!usesSharedHtmlSurface && shellState.message != null) {
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Text(
                                 shellState.message.orEmpty(),
@@ -293,15 +316,15 @@ fun main() = application {
                         }
                     }
 
-                    if (navigationPosition == DesktopNavigationPosition.TOP) {
+                    if (!usesSharedHtmlSurface && navigationPosition == DesktopNavigationPosition.TOP) {
                         DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
                     }
 
                     Row(
                         modifier = Modifier.weight(1f).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = if (usesSharedHtmlSurface) Arrangement.Start else Arrangement.spacedBy(12.dp)
                     ) {
-                        if (navigationPosition == DesktopNavigationPosition.LEFT) {
+                        if (!usesSharedHtmlSurface && navigationPosition == DesktopNavigationPosition.LEFT) {
                             DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
                         }
 
@@ -504,12 +527,12 @@ fun main() = application {
 
                     }
                     }
-                        if (navigationPosition == DesktopNavigationPosition.RIGHT) {
+                        if (!usesSharedHtmlSurface && navigationPosition == DesktopNavigationPosition.RIGHT) {
                             DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
                         }
                     }
 
-                    if (navigationPosition == DesktopNavigationPosition.BOTTOM) {
+                    if (!usesSharedHtmlSurface && navigationPosition == DesktopNavigationPosition.BOTTOM) {
                         DesktopNavigationBar(shellState.destination, navigationPosition, shell::navigate)
                     }
                 }
