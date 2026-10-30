@@ -13,9 +13,11 @@ internal data class DesktopDeveloperCommandResult(
  * Deliberately small typed command allowlist. It never evaluates code, invokes a shell,
  * reads arbitrary files or accesses the network. Destructive commands are intentionally absent.
  */
-internal class DesktopDeveloperCommandExecutor {
+internal class DesktopDeveloperCommandExecutor(
+    private val developerToolsEnabled: () -> Boolean = { DesktopDebugToolsPolicy.enabled() }
+) {
     fun execute(commandLine: String, state: GameState): DesktopDeveloperCommandResult {
-        if (!DesktopDebugToolsPolicy.enabled()) {
+        if (!developerToolsEnabled()) {
             return DesktopDeveloperCommandResult("Developer commands are disabled in this build.")
         }
         val clean = commandLine.trim()
