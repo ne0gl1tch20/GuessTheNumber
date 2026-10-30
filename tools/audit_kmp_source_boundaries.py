@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Guard the KMP source-set boundary used by Android and Windows Desktop.
 
-commonMain must stay genuinely platform-neutral. Android and Windows are both
-JVM consumers, so JVM/Android production models that rely on java.math (notably
-BigNumber and the serialized GameState graph) belong in jvmAndAndroidMain.
+commonMain must remain platform-neutral. Compose Multiplatform APIs are valid
+there; Android framework and JVM-only APIs are not. Android and Windows are
+both JVM consumers, so JVM production models that rely on java.math belong in
+jvmAndAndroidMain.
 """
 from __future__ import annotations
 
@@ -15,13 +16,17 @@ ROOT = Path(__file__).resolve().parents[1]
 COMMON = ROOT / "shared" / "src" / "commonMain"
 SHARED_BUILD = ROOT / "shared" / "build.gradle.kts"
 
+# androidx.compose is supported by Compose Multiplatform in commonMain.
+# Other AndroidX libraries are not assumed to have common targets.
 FORBIDDEN_IMPORTS = re.compile(
-    r"^\s*import\s+(?:java\.|javax\.|android\.|androidx\.|com\.android\.|org\.jvm\.)",
+    r"^\\s*import\\s+(?:java\\.|javax\\.|android\\.|"
+    r"androidx\\.(?!compose(?:\\.|$))|com\\.android\\.|org\\.jvm\\.)",
     re.MULTILINE,
 )
 FORBIDDEN_REFERENCES = re.compile(
-    r"\b(?:System\.(?:currentTimeMillis|nanoTime|out|err)|"
-    r"java\.io\.|java\.nio\.|java\.math\.|android\.|androidx\.)"
+    r"\\b(?:System\\.(?:currentTimeMillis|nanoTime|out|err)|"
+    r"java\\.io\\.|java\\.nio\\.|java\\.math\\.|android\\.|"
+    r"androidx\\.(?!compose(?:\\.|$)))"
 )
 
 
@@ -70,6 +75,7 @@ def main() -> int:
 
     print("KMP source-boundary audit passed.")
     print(" - commonMain contains no detected JVM/Android-only APIs.")
+    print(" - Compose Multiplatform common APIs are allowed.")
     print(" - Android and Desktop JVM source sets share jvmAndAndroidMain.")
     print(" - Production GameState remains in the shared JVM/Android source set.")
     return 0
