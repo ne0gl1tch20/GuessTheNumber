@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.desktop
 
+import com.jarrlyyy.guessthenumber.domain.command.CommandParser
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import java.math.BigDecimal
@@ -25,12 +26,13 @@ internal class DesktopDeveloperCommandExecutor(
         if (clean.length !in 2..256 || !clean.startsWith("/")) {
             return DesktopDeveloperCommandResult("Commands must start with '/' and stay under 256 characters.")
         }
-        val tokens = clean.split(Regex("\\s+"))
-        if (tokens.size > 4 || tokens.any { it.length > 80 }) {
+        val parsed = CommandParser.parse(clean)
+            ?: return DesktopDeveloperCommandResult("Invalid command. Commands must start with '/'.")
+        if (parsed.arguments.size > 3 || parsed.arguments.any { it.length > 80 }) {
             return DesktopDeveloperCommandResult("Command contains too many or oversized arguments.")
         }
-        val command = tokens[0].lowercase()
-        val args = tokens.drop(1)
+        val command = parsed.name
+        val args = parsed.arguments
         return when (command) {
             "/help" -> DesktopDeveloperCommandResult(
                 "Commands: /help, /version, /state, /stats, /give <money|prestige|ultra|nebula> <amount>, /set <currency> <amount>, /setlevel <upgradeId> <0..1000>, /autoclicker <on|off>, /speed <0.1..50>, /newnumber."
