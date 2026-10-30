@@ -1611,30 +1611,6 @@ fun ProductionGuessGameScreen(
                 }
             }
 
-            if (section == DesktopGameSection.MORE) {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("More", style = MaterialTheme.typography.titleLarge)
-                        Text("Choose a destination.")
-                        Button(onClick = onOpenPrestige) { Text("Prestige") }
-                        Button(onClick = onOpenUltra) { Text("Ultra") }
-                        Button(onClick = onOpenTalent) { Text("Talent Web") }
-                        Button(onClick = onOpenStats) { Text("Statistics") }
-                        Button(onClick = onOpenSettings) { Text("Settings & Save Management") }
-                        Button(onClick = onOpenAbout) { Text("About and updates") }
-                        Text("More Windows destinations", style = MaterialTheme.typography.titleMedium)
-                        Text("These routes are being brought into parity with Android in stages. A connected route does not mean every Android interaction is complete yet.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        val parityDestinations = DesktopDebugToolsPolicy.visibleDestinations(listOf(DesktopDestination.WORLD_MAP, DesktopDestination.MUTATORS, DesktopDestination.SAVE_SLOTS, DesktopDestination.RELICS, DesktopDestination.HOME_BASE, DesktopDestination.CODEX, DesktopDestination.ENDGAME, DesktopDestination.LUCKY_STAKE, DesktopDestination.MUSIC_PLAYER, DesktopDestination.ARCADE, DesktopDestination.ACTIVITY_HUB, DesktopDestination.LUA_TESTING_HUB, DesktopDestination.CHANGELOG, DesktopDestination.LIVE_OPS, DesktopDestination.DEVELOPER_SETTINGS, DesktopDestination.DEVELOPER_CONSOLE, DesktopDestination.PROCESS_INSPECTOR))
-                        parityDestinations.chunked(2).forEach { destinations ->
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                destinations.forEach { destination -> Button(onClick = { onOpenParityDestination(destination) }, modifier = Modifier.weight(1f)) { Text(destination.label) } }
-                                if (destinations.size == 1) Spacer(modifier = Modifier.weight(1f))
-                            }
-                        }
-                    }
-                }
-            }
-
             Text(
                 "Your Windows run is saved locally after each accepted guess or economy transaction. A backup is kept for recovery if the primary save is damaged.",
                 style = MaterialTheme.typography.bodySmall,
