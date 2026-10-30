@@ -12,6 +12,7 @@ internal data class WindowsDebugUpdate(
     val version: String,
     val tagName: String,
     val artifactDownloadUrl: String,
+    val artifactSha256: String,
     val commitSha: String,
     val runNumber: Long,
     val runAttempt: Long
@@ -59,6 +60,12 @@ internal class WindowsDebugUpdateClient(
         if (!isArtifactDownloadUrl(archiveUrl)) {
             throw IllegalStateException("GitHub returned an unexpected Windows Debug artifact URL.")
         }
+        val artifactDigest = artifact["digest"]?.jsonPrimitive?.content
+            ?.removePrefix("sha256:")
+            ?: throw IllegalStateException("GitHub did not provide an Actions artifact SHA-256 digest.")
+        require(artifactDigest.matches(Regex("[0-9a-fA-F]{64}"))) {
+            "GitHub returned an invalid Actions artifact SHA-256 digest."
+        }
         val version = "1.0.$runNumber"
         if (!version.matches(Regex("1\\.0\\.\\d+"))) {
             throw IllegalStateException("The latest Windows Debug build has an incompatible version.")
@@ -68,6 +75,7 @@ internal class WindowsDebugUpdateClient(
             version = version,
             tagName = "windows-debug-$runNumber-$runAttempt",
             artifactDownloadUrl = archiveUrl,
+            artifactSha256 = artifactDigest,
             commitSha = commitSha,
             runNumber = runNumber,
             runAttempt = runAttempt
