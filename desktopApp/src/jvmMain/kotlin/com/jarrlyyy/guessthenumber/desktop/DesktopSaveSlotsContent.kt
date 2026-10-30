@@ -29,7 +29,9 @@ internal fun DesktopSaveSlotsContent(
     onDuplicateSlot: (Int, Int) -> Unit,
     onRestoreBackup: (Int) -> Unit,
     onExportSlot: (Int) -> Unit,
-    onImportSlot: (Int) -> Unit
+    onImportSlot: (Int) -> Unit,
+    onExportAllSlots: () -> Unit,
+    onImportAllSlots: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -37,6 +39,11 @@ internal fun DesktopSaveSlotsContent(
             Text("Save Slots", style = MaterialTheme.typography.headlineSmall)
             OutlinedButton(onClick = onRefresh) { Text("Refresh") }
         }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick = onExportAllSlots) { Text("Export all slots") }
+            OutlinedButton(onClick = onImportAllSlots) { Text("Import all slots") }
+        }
+        Text("Importing an all-slot bundle replaces all ten local slots. A recovery copy of each previous save is kept where possible.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
         Text("Ten independent local saves. Switching saves the current slot first. Valid previous saves can be restored.")
         Text("Portable backups are plain JSON files compatible with Android single-save import. They are not encrypted.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
         slots.forEach { slot ->
