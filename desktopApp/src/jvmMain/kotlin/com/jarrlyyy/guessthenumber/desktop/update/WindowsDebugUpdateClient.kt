@@ -34,35 +34,44 @@ internal class WindowsDebugUpdateClient(
             }
             .sortedByDescending { it["run_number"]?.jsonPrimitive?.content?.toLongOrNull() ?: 0L }
 
-        for (run in candidates) {
-            val runId = run["id"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
-            val runNumber = run["run_number"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
-            val runAttempt = run["run_attempt"]?.jsonPrimitive?.content?.toLongOrNull() ?: continue
-            val commitSha = run["head_sha"]?.jsonPrimitive?.content ?: continue
-            if (!commitSha.matches(Regex("[0-9a-fA-F]{40}"))) continue
-            val artifacts = runArtifacts(runId) ?: continue
-            val artifact = artifacts.firstOrNull {
-                it["name"]?.jsonPrimitive?.content == WINDOWS_ARTIFACT_NAME &&
-                    it["expired"]?.jsonPrimitive?.content == "false"
-            } ?: continue
-            val archiveUrl = artifact["archive_download_url"]?.jsonPrimitive?.content ?: continue
-            if (!isArtifactDownloadUrl(archiveUrl, runId)) continue
-            val version = "1.0.$runNumber"
-            if (!version.matches(Regex("1\\.0\\.\\d+")) ||
-                compareVersions(version, installedVersion) <= 0
-            ) continue
-
-            return WindowsDebugUpdate(
-                version = version,
-                tagName = "windows-debug-$runNumber-$runAttempt",
-                artifactDownloadUrl = archiveUrl,
-                commitSha = commitSha,
-                runNumber = runNumber,
-                runAttempt = runAttempt
-            )
+        val latest = candidates.firstOrNull() ?: return null
+        val runId = latest["id"]?.jsonPrimitive?.content?.toLongOrNull()
+            ?: throw IllegalStateException("The latest successful Windows Desktop CI run has no run ID.")
+        val runNumber = latest["run_number"]?.jsonPrimitive?.content?.toLongOrNull()
+            ?: throw IllegalStateException("The latest successful Windows Desktop CI run has no run number.")
+        val runAttempt = latest["run_attempt"]?.jsonPrimitive?.content?.toLongOrNull()
+            ?: throw IllegalStateException("The latest successful Windows Desktop CI run has no run attempt.")
+        val commitSha = latest["head_sha"]?.jsonPrimitive?.content
+            ?: throw IllegalStateException("The latest successful Windows Desktop CI run has no commit SHA.")
+        require(commitSha.matches(Regex("[0-9a-fA-F]{40}"))) {
+            "The latest successful Windows Desktop CI run has an invalid commit SHA."
         }
-        return null
-    }
+        val artifacts = runArtifacts(runId)
+            ?: throw IllegalStateException("Could not read artifacts for the latest successful Windows Desktop CI run.")
+        val artifact = artifacts.firstOrNull {
+            it["name"]?.jsonPrimitive?.content == WINDOWS_ARTIFACT_NAME
+        } ?: throw IllegalStateException("The latest Windows Debug build artifact is missing.")
+        if (artifact["expired"]?.jsonPrimitive?.content != "false") {
+            throw IllegalStateException("The latest Windows Debug artifact has expired. CI artifacts are retained for seven days.")
+        }
+        val archiveUrl = artifact["archive_download_url"]?.jsonPrimitive?.content
+            ?: throw IllegalStateException("The latest Windows Debug artifact has no download URL.")
+        if (!isArtifactDownloadUrl(archiveUrl, runId)) {
+            throw IllegalStateException("GitHub returned an unexpected Windows Debug artifact URL.")
+        }
+        val version = "1.0.$runNumber"
+        if (!version.matches(Regex("1\\\\.0\\\\.\\\\d+"))) {
+            throw IllegalStateException("The latest Windows Debug build has an incompatible version.")
+        }
+        if (compareVersions(version, installedVersion) <= 0) return null
+        return WindowsDebugUpdate(
+            version = version,
+            tagName = "windows-debug-$runNumber-$runAttempt",
+            artifactDownloadUrl = archiveUrl,
+            commitSha = commitSha,
+            runNumber = runNumber,
+            runAttempt = runAttempt
+        )
 
     private fun runArtifacts(runId: Long): List<JsonObject>? {
         val response = getJson(URL("$ACTIONS_API/$runId/artifacts")).jsonObject
