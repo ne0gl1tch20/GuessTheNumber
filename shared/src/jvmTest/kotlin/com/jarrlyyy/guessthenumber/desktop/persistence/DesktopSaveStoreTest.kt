@@ -128,6 +128,79 @@ class DesktopSaveStoreTest {
     }
 
     @Test
+    fun allSlotBundleRoundTripsSlotsAndActiveSelection() = runBlocking {
+        val sourceDirectory = Files.createTempDirectory("gtn-all-slot-export")
+        val source = DesktopSaveStore(sourceDirectory)
+        val first = GameState(targetNumber = 17, lastSaveTimestamp = 1_700_000_000_000L)
+        val second = GameState(targetNumber = 83, lastSaveTimestamp = 1_700_000_000_100L)
+        assertTrue(source.save(1, first))
+        assertTrue(source.save(2, second))
+        assertTrue(source.setActiveSlot(2))
+        val bundle = assertNotNull(source.exportAllSlotsBundle())
+
+        val targetDirectory = Files.createTempDirectory("gtn-all-slot-import")
+        val target = DesktopSaveStore(targetDirectory)
+        val oldFirst = GameState(targetNumber = 22, lastSaveTimestamp = 1_700_000_000_200L)
+        val oldThird = GameState(targetNumber = 33, lastSaveTimestamp = 1_700_000_000_300L)
+        assertTrue(target.save(1, oldFirst))
+        assertTrue(target.save(3, oldThird))
+        assertTrue(target.setActiveSlot(3))
+
+        assertTrue(target.importAllSlotsBundle(bundle))
+        assertEquals(first.targetNumber, target.load(1)?.targetNumber)
+        assertEquals(second.targetNumber, target.load(2)?.targetNumber)
+        assertEquals(null, target.load(3))
+        assertEquals(2, target.activeSlot())
+        assertTrue(target.slotSummaries().first { it.slot == 1 }.hasBackup)
+        assertTrue(target.slotSummaries().first { it.slot == 3 }.isEmpty)
+    }
+
+    @Test
+    fun allSlotBundleRejectsMalformedAndOversizedArchivesWithoutMutation() = runBlocking {
+        val directory = Files.createTempDirectory("gtn-all-slot-invalid")
+        val store = DesktopSaveStore(directory)
+        val original = GameState(targetNumber = 44, lastSaveTimestamp = 1_700_000_000_000L)
+        assertTrue(store.save(1, original))
+
+        assertFalse(store.importAllSlotsBundle("not a zip".toByteArray()))
+        assertFalse(store.importAllSlotsBundle(ByteArray(20 * 1024 * 1024 + 1)))
+        assertEquals(original.targetNumber, store.load(1)?.targetNumber)
+        assertEquals(1, store.activeSlot())
+    }
+
+    @Test
+    fun failedAllSlotImportRestoresPreviouslyWrittenSlots() = runBlocking {
+        val sourceDirectory = Files.createTempDirectory("gtn-all-slot-failed-source")
+        val source = DesktopSaveStore(sourceDirectory)
+        assertTrue(source.save(1, GameState(targetNumber = 11, lastSaveTimestamp = 100L)))
+        assertTrue(source.save(2, GameState(targetNumber = 22, lastSaveTimestamp = 200L)))
+        val bundle = assertNotNull(source.exportAllSlotsBundle())
+
+        val targetDirectory = Files.createTempDirectory("gtn-all-slot-failed-target")
+        val target = DesktopSaveStore(targetDirectory)
+        val oldOne = GameState(targetNumber = 71, lastSaveTimestamp = 300L)
+        val oldTwo = GameState(targetNumber = 72, lastSaveTimestamp = 400L)
+        assertTrue(target.save(1, oldOne))
+        assertTrue(target.save(2, oldTwo))
+        assertTrue(target.setActiveSlot(2))
+
+        val failingOps = object : DesktopSaveFileOps by DefaultDesktopSaveFileOps {
+            override fun moveReplace(source: Path, destination: Path) {
+                if (destination.fileName.toString() == "slot-2.json") {
+                    throw IllegalStateException("injected bundle import failure")
+                }
+                DefaultDesktopSaveFileOps.moveReplace(source, destination)
+            }
+        }
+        val failingStore = DesktopSaveStore(targetDirectory, failingOps)
+
+        assertFalse(failingStore.importAllSlotsBundle(bundle))
+        assertEquals(oldOne.targetNumber, target.load(1)?.targetNumber)
+        assertEquals(oldTwo.targetNumber, target.load(2)?.targetNumber)
+        assertEquals(2, target.activeSlot())
+    }
+
+    @Test
     fun legacyJsonDefaultsRemainCompatible() = runBlocking {
         val directory = Files.createTempDirectory("gtn-save-legacy")
         Files.createDirectories(directory)
