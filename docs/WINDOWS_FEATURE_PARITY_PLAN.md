@@ -1,14 +1,14 @@
 # Windows Feature Parity Plan
 
-**Status:** In progress; Stage 2-D candidate evidence recorded, Stage 2 exit gate remains open.
-**Reviewed:** 2026-10-17
+**Status (2026-10-30):** Stage 2 implementation is substantially present in the Windows host; the Stage 2 exit gate remains open for current-candidate automated verification and hands-on runtime evidence.
+**Reviewed:** 2026-10-30
 
-**Latest increment (2026-10-16):** PR #220 merged as `e23f8be3e313ebb71d68bf92cc12844e18ffd36f` with Android and Windows CI passing. PR #221 then merged the five Android Arcade minigames for Windows, using the canonical `minigames.json` and shared `DesktopEconomyTransactions.awardArcadeReward` transaction. PR #222 fixed a nested vertical-scroll crash in the Windows Arcade route; Android Validation and Windows Desktop CI passed on its exact head, and the owner confirmed Arcade opens successfully in the Windows app. Broader runtime verification of the five games, reward effects/save persistence and PR #220's upgrades/navigation remains open.
+**Latest implementation snapshot (2026-10-30):** Windows now hosts the canonical `web-play/` bundle through `DesktopSharedWebView` for 17 player-facing routes (Play, Upgrades, Shop, Prestige, Ultra, Talent, Settings, Rewards, Worlds, Mutators, Relics, Home Base, Codex, Journey, Statistics, Arcade and Lucky Stake). Kotlin handles state, validation, rewards and persistence through the desktop bridge and shared production engine/transactions. A shared monotonic 50 ms guess-rate policy now serves Android and Windows. The Windows route mapping and common rate-limit boundaries have focused automated tests. This is source-level progress, not proof of current-candidate CI or full Windows runtime/visual parity.
 **Depends on:** [KMP Foundation Status](KMP_FOUNDATION_STATUS.md)
 
 ## Goal
 
-**Locked product and architecture direction: Windows must deliver the same GuessTheNumber experience as Android, not a smaller desktop edition.** The chosen implementation target is one shared HTML/CSS/JavaScript frontend for player-facing screens, Kotlin/KMP as the authoritative game engine, and native host adapters for platform services, with Compose retained for native/system surfaces and the desktop shell. This changes the preferred UI technology, not the exact-parity requirement. The target is chosen; implementation remains unstarted until the prototype and exit gates pass.
+**Locked product and architecture direction: Windows must deliver the same GuessTheNumber experience as Android, not a smaller desktop edition.** The chosen implementation target is one shared HTML/CSS/JavaScript frontend for player-facing screens, Kotlin/KMP as the authoritative game engine, and native host adapters for platform services, with Compose retained for native/system surfaces and the desktop shell. This changes the preferred UI technology, not the exact-parity requirement. The target is chosen and implementation is underway. Route-by-route runtime, accessibility, localization and distribution verification remain open.
 
 Port the Android experience screen by screen: same features, screen hierarchy, information, labels, controls, menus, dialogs, navigation destinations, locked/unlocked states, loading/empty/error states, and interaction outcomes. Adapt only the presentation and input where desktop requires it (resizable window, keyboard, mouse, focus, hover and desktop conventions). Desktop adaptations must preserve the Android screen's content and meaning; any deliberate feature difference needs an explicit reason and documentation.
 
@@ -288,7 +288,7 @@ A shared component or green CI is not proof that a complete feature works end-to
 
 ### Source-backed Android destination and data-operation inventory
 
-This inventory was checked against `Screen.kt`, `NavGraph.kt`, `MainActivity.kt`, `GameViewModel.kt`, `SaveManager.kt`, `LocaleManager.kt` and `SAVE_SCHEMA_AND_MIGRATION.md` on 2026-10-15. The stage labels below are sequencing targets, not a claim that the Windows implementation exists. On Windows, only the initial Play/About shell is present; Play still embeds the demo pilot and About is informational, so neither counts as production feature parity.
+This inventory was checked against Android sources on 2026-10-15 and records the original baseline only. Its Windows-status cells are historical and are superseded by the 2026-10-30 implementation snapshot below; do not use those old cells to describe the current desktop host.
 
 | Android destination or route | Planned stage | Windows status / notes |
 |---|---|---|
@@ -319,6 +319,22 @@ This inventory was checked against `Screen.kt`, `NavGraph.kt`, `MainActivity.kt`
 | Lua Testing Hub | Stage 4, debug-only | Android route exists only in debug builds and is feature-flag gated. Must never leak into production. |
 | Dev Settings | Stage 4, debug-only | Android route exists only in debug builds and is feature-flag gated. Must never leak into production. |
 | Process Inspector | Stage 4, debug-only | Android route exists only in debug builds. Must never leak into production. |
+
+### Current Windows implementation snapshot (2026-10-30)
+
+Source audit of `DesktopGameSection.kt`, `Main.kt`, `ProductionGuessGameScreen.kt`, `DesktopEconomyTransactions.kt` and the shared web bridge confirms:
+
+| Area | Current source implementation | Still open |
+|---|---|---|
+| Shared player UI | 17 sections map to canonical `web-play/` routes and load through `DesktopSharedWebView`; no separate Windows HTML/CSS/JS copy. | Current Windows runtime, resize, focus, IME, screen-reader and screenshot comparison |
+| Guessing/economy | Shared production `GameEngine` / `GameState`; desktop transactions apply guess bonuses, daily progress, boss progress and achievements before save. | Invalid/range/post-solve/rate-limit and mutator scenarios on a real Windows build |
+| Upgrades/shop | Canonical catalog and desktop transaction handlers support purchase/equip/multiplier actions. | Catalog effect review, affordability/max-level/ownership edge cases and save/reload runtime checks |
+| Prestige/Ultra/Talent | Shared HTML routes call Kotlin reset and talent transaction handlers; shared engine computes requirements and rewards. | Six permanent effects, talent effect outcomes, reset preservation and large-number runtime checks |
+| Mutators/challenges | Shared HTML route and Kotlin mutator/challenge transactions. | Challenge builder, all mutator combinations and daily/weekly claim-state runtime parity |
+| Rewards/Arcade | Shared reward/quest/chest state and canonical Arcade catalog; Arcade payouts use Kotlin transactions. | All five minigame outcomes, reward multipliers and persisted claims in Windows runtime |
+| Save management | Native desktop store has ten slots, active-slot selection, duplicate/create and backup recovery. | Import/export, destructive reset parity, Android-save compatibility and complete recovery QA |
+
+The route mapping is guarded by `DesktopGameSectionRouteTest`; the shared 50 ms monotonic rate-limit policy is covered by `GuessRateLimitRulesTest` and used by both Android and Windows. These tests do not establish full parity or a Windows runtime pass.
 
 #### Cross-cutting Android behavior that Windows must account for
 
