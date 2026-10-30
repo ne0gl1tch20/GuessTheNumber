@@ -20,7 +20,7 @@ class WindowsDebugUpdateTest {
         assertNotNull(update)
         assertEquals("1.0.6", update?.version)
         assertEquals("windows-debug-6-2", update?.tagName)
-        assertEquals("$ARTIFACT_DOWNLOAD_PREFIX/600", update?.artifactDownloadUrl)
+        assertEquals("$ARTIFACT_DOWNLOAD_PREFIX", update?.artifactDownloadUrl)
         assertEquals(6L, update?.runNumber)
         assertEquals(2L, update?.runAttempt)
     }
@@ -35,7 +35,7 @@ class WindowsDebugUpdateTest {
     fun skipsExpiredArtifactAndOlderRuns() {
         val responses = standardResponses(6).toMutableMap()
         responses[ARTIFACTS_URL] = """{"artifacts":[
-            {"name":"GuessTheNumber-Windows-Debug","expired":true,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX/600"}
+            {"name":"GuessTheNumber-Windows-Debug","expired":true,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX"}
         ]}"""
         val client = WindowsDebugUpdateClient { url ->
             StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
@@ -127,7 +127,7 @@ class WindowsDebugUpdateTest {
             {"id":598,"run_number":7,"run_attempt":1,"event":"pull_request","head_branch":"feature","status":"completed","conclusion":"success"}
         ]}""",
         ARTIFACTS_URL to """{"artifacts":[
-            {"name":"GuessTheNumber-Windows-Debug","expired":false,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX/600"}
+            {"name":"GuessTheNumber-Windows-Debug","expired":false,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX"}
         ]}"""
     )
 
@@ -157,6 +157,6 @@ class WindowsDebugUpdateTest {
         const val ARTIFACTS_URL =
             "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/runs/600/artifacts"
         const val ARTIFACT_DOWNLOAD_PREFIX =
-            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/runs/600/artifacts"
+            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/9000/zip"
     }
 }
