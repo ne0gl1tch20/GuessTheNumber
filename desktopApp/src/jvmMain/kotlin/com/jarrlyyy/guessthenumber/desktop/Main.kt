@@ -396,6 +396,10 @@ fun main() = application {
                                         DesktopNavigationPosition.save(selected)
                                     },
                                     onOpenParityDestination = { shell.navigate(it) },
+                                    onGlobalPreferencesImported = {
+                                        playerProfile = DesktopPlayerProfileStore.load()
+                                        navigationPosition = DesktopNavigationPosition.load()
+                                    },
                                     onOpenPlayerProfile = { viewingPlayerProfile = true; editingPlayerProfile = false },
                                     onBackFromSettings = { shell.navigate(DesktopDestination.MORE) },
                                     onThemeSettingsLoaded = { mode, primary, secondary, tertiary, reduced ->
