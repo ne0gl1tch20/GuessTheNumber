@@ -22,7 +22,7 @@ internal data class DesktopLiveOpsEvent(
 )
 
 @Serializable
-private data class DesktopLiveOpsManifest(
+internal data class DesktopLiveOpsManifest(
     val manifestVersion: Int,
     val events: List<DesktopLiveOpsEvent>,
     val schemaVersion: Int = 1
@@ -41,6 +41,7 @@ internal data class DesktopLiveOpsSnapshot(
 )
 
 internal class DesktopLiveOpsRepository {
+    private val remoteLiveOps = DesktopLuaLiveOpsRepository()
     private val json = Json { ignoreUnknownKeys = true }
 
     fun load(): DesktopLiveOpsSnapshot = try {
@@ -49,7 +50,8 @@ internal class DesktopLiveOpsRepository {
         val raw = javaClass.classLoader.getResourceAsStream("game/liveops_manifest.json")
             ?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
             ?: error("The canonical LiveOps manifest is missing.")
-        val manifest = json.decodeFromString<DesktopLiveOpsManifest>(raw)
+        val bundledManifest = json.decodeFromString<DesktopLiveOpsManifest>(raw)
+        val manifest = remoteLiveOps.loadVerifiedCachedEventManifest() ?: bundledManifest
         validate(manifest)
         val now = Instant.now()
         val events = manifest.events.map { event ->
@@ -90,6 +92,12 @@ internal class DesktopLiveOpsRepository {
         val config = json.decodeFromString<DesktopFeatureFlagConfig>(raw)
         require(config.schemaVersion == 1) { "Unsupported feature flag schema." }
         return defaults.mapValues { (key, default) -> config.flags[key] ?: default }
+    }
+
+    fun refreshRemoteEvents(): DesktopLuaLiveOpsRefreshResult = remoteLiveOps.refresh()
+
+    internal fun validateRemoteEvents(manifestVersion: Int, events: List<DesktopLiveOpsEvent>) {
+        validate(DesktopLiveOpsManifest(manifestVersion = manifestVersion, events = events))
     }
 
     private fun validate(manifest: DesktopLiveOpsManifest) {

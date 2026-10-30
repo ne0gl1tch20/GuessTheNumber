@@ -6,6 +6,7 @@ import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.scripting.LuaBudgetExceededError
 import com.jarrlyyy.guessthenumber.scripting.LuaSeasonalEventCatalog
+import com.jarrlyyy.guessthenumber.scripting.LuaLiveOpsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -97,6 +98,10 @@ class LiveOpsRepository(
     }
 
     private fun loadManifestWithFallback(): LiveOpsManifest {
+        runCatching { LuaLiveOpsRepository(appContext).loadVerifiedCachedEventManifest() }
+            .getOrNull()
+            ?.let { return it }
+
         try {
             return loadLuaManifest().also(LiveOpsContentValidator::validate)
         } catch (error: LuaBudgetExceededError) {

@@ -85,6 +85,73 @@ class LuaLiveOpsRepositoryTest {
     }
 
 
+
+    @Test
+    fun acceptsValidatedSignedEventManifestAlongsideLuaScripts() {
+        val repository = LuaLiveOpsRepository(RuntimeEnvironment.getApplication())
+        val payload = LuaRemotePayload(
+            schemaVersion = 1,
+            hostApiVersion = LuaEngine.HOST_API_VERSION,
+            minAppVersionCode = 19,
+            maxAppVersionCode = 999999,
+            bundleVersion = 5,
+            scripts = listOf(
+                LuaRemoteScript("welcome", "welcome.lua", "Welcome", "Welcome activity", "a".repeat(64))
+            ),
+            eventManifestVersion = 2,
+            events = listOf(
+                com.jarrlyyy.guessthenumber.data.repository.LiveOpsEvent(
+                    id = "winter_event",
+                    title = "Winter Event",
+                    description = "Seasonal rewards",
+                    status = "UPCOMING",
+                    startDate = "2026-11-01T00:00:00Z",
+                    endDate = "2026-12-31T23:59:59Z",
+                    currencyName = "Nebula",
+                    maxClaims = 5,
+                    rewardNebula = 10,
+                    permanentBoostPerClaim = 1,
+                    minCorrectGuesses = 100
+                )
+            )
+        )
+
+        repository.validatePayload(payload)
+    }
+
+    @Test
+    fun rejectsInvalidSignedEventManifestBeforeActivation() {
+        val repository = LuaLiveOpsRepository(RuntimeEnvironment.getApplication())
+        val payload = LuaRemotePayload(
+            schemaVersion = 1,
+            hostApiVersion = LuaEngine.HOST_API_VERSION,
+            minAppVersionCode = 19,
+            maxAppVersionCode = 999999,
+            bundleVersion = 6,
+            scripts = listOf(
+                LuaRemoteScript("welcome", "welcome.lua", "Welcome", "Welcome activity", "b".repeat(64))
+            ),
+            eventManifestVersion = 2,
+            events = listOf(
+                com.jarrlyyy.guessthenumber.data.repository.LiveOpsEvent(
+                    id = "bad_event",
+                    title = "Bad Event",
+                    description = "Invalid event dates",
+                    status = "ACTIVE",
+                    startDate = "2026-12-31T00:00:00Z",
+                    endDate = "2026-11-01T00:00:00Z",
+                    currencyName = "Nebula",
+                    maxClaims = 5
+                )
+            )
+        )
+
+        val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            repository.validatePayload(payload)
+        }
+        assertTrue(error.message.orEmpty().contains("ends before it starts"))
+    }
+
     @Test
     fun cachedEntriesFailClosedWhenNoVerifiedActiveBundleExists() {
         val context = RuntimeEnvironment.getApplication()
