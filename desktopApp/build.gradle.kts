@@ -68,7 +68,7 @@ kotlin {
                 implementation("net.java.dev.jna:jna:5.17.0")
                 implementation("net.java.dev.jna:jna-platform:5.17.0")
                 implementation("org.json:json:20250517")
-                implementation("ca.weblite:webview:1.0.10")
+                implementation("ca.weblite:webview:1.12.0")
                 val javafxPlatform = when {
                     System.getProperty("os.name").startsWith("Windows", ignoreCase = true) -> "win"
                     System.getProperty("os.name").startsWith("Mac", ignoreCase = true) -> "mac"

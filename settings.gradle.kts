@@ -19,6 +19,20 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        val webviewPackagesToken = System.getenv("GITHUB_TOKEN")
+        if (!webviewPackagesToken.isNullOrBlank()) {
+            maven {
+                name = "weblitecaGitHubPackages"
+                url = uri("https://maven.pkg.github.com/webliteca/swingwebview")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR") ?: "github-actions[bot]"
+                    password = webviewPackagesToken
+                }
+                content {
+                    includeGroup("ca.weblite")
+                }
+            }
+        }
     }
 }
 
