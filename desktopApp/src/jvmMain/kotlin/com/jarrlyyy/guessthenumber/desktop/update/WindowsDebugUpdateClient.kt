@@ -70,9 +70,7 @@ internal class WindowsDebugUpdateClient(
     }
 
     private fun isArtifactDownloadUrl(value: String, runId: Long): Boolean =
-        value == "$ACTIONS_API/$runId/artifacts" ||
-            value.startsWith("$ACTIONS_API/$runId/artifacts/") &&
-            value.matches(Regex("https://api\\.github\\.com/repos/ne0gl1tch20/GuessTheNumber/actions/runs/$runId/artifacts/\\d+"))
+        value.matches(Regex("https://api\\\\.github\\\\.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/\\\\d+/zip"))
 
     private fun getJson(url: URL) = connectionFactory(url).run {
         requestMethod = "GET"
