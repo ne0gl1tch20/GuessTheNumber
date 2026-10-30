@@ -157,18 +157,23 @@ class DesktopNavigationTest {
     }
 
     @Test
-    fun explicitDebugFlagAllowsDeveloperDestinations() {
-        val previous = System.getProperty(DesktopDebugToolsPolicy.ENABLE_PROPERTY)
-        try {
-            System.setProperty(DesktopDebugToolsPolicy.ENABLE_PROPERTY, "true")
-            val shell = DesktopShellController()
-            shell.navigate(DesktopDestination.DEVELOPER_CONSOLE)
-            assertEquals(DesktopDestination.DEVELOPER_CONSOLE, shell.state.destination)
-            assertNull(shell.state.message)
-        } finally {
-            if (previous == null) System.clearProperty(DesktopDebugToolsPolicy.ENABLE_PROPERTY)
-            else System.setProperty(DesktopDebugToolsPolicy.ENABLE_PROPERTY, previous)
-        }
+    fun launchFlagAloneCannotEnableDeveloperDestinationsInPackagedBuilds() {
+        assertFalse(DesktopDebugToolsPolicy.isEnabled(buildAllowsDeveloperTools = false, launchFlag = "true"))
+        assertFalse(DesktopDebugToolsPolicy.isEnabled(buildAllowsDeveloperTools = true, launchFlag = "false"))
+        assertTrue(DesktopDebugToolsPolicy.isEnabled(buildAllowsDeveloperTools = true, launchFlag = "true"))
+    }
+
+    @Test
+    fun developerDestinationsAppearOnlyWhenBothBuildAndLaunchFlagsAllowThem() {
+        val destinations = listOf(DesktopDestination.PLAY, DesktopDestination.DEVELOPER_CONSOLE)
+        assertEquals(
+            listOf(DesktopDestination.PLAY),
+            DesktopDebugToolsPolicy.visibleDestinations(destinations, allowDeveloperTools = false)
+        )
+        assertEquals(
+            destinations,
+            DesktopDebugToolsPolicy.visibleDestinations(destinations, allowDeveloperTools = true)
+        )
     }
 
     @Test
