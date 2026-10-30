@@ -65,6 +65,7 @@ internal object DesktopMusicBridge {
     fun perform(action: String, request: JSONObject, settings: GameSettings, updateSettings: (GameSettings) -> Unit): JSONObject {
         lastError = null
         try {
+            validateRequest(action, request)
             when (action) {
                 "import" -> {
                     val files = chooseAudioFiles()
@@ -132,8 +133,37 @@ internal object DesktopMusicBridge {
                     val active = clip ?: error("No track is playing.")
                     active.microsecondPosition = request.optLong("position", 0L).coerceIn(0L, active.microsecondLength)
                 }
-                "create_playlist", "delete_playlist", "play_playlist", "add_to_playlist", "remove_from_playlist" ->
-                    error("Playlists are not supported by the current Windows audio adapter yet.")
+                "create_playlist" -> {
+                    val name = request.optString("name").trim()
+                    require(name.length in 1..60 && name.none { it.isISOControl() }) { "Enter a valid playlist name." }
+                    val playlists = readPlaylists().toMutableMap()
+                    require(name !in playlists) { "A playlist with that name already exists." }
+                    playlists[name] = emptyList()
+                    writePlaylists(playlists)
+                }
+                "delete_playlist" -> {
+                    val name = request.optString("name")
+                    val playlists = readPlaylists().toMutableMap()
+                    require(playlists.remove(name) != null) { "Playlist not found." }
+                    writePlaylists(playlists)
+                }
+                "play_playlist" -> {
+                    val paths = readPlaylists()[request.optString("name")] ?: error("Playlist not found.")
+                    require(paths.isNotEmpty()) { "This playlist is empty." }
+                    updateSettings(settings.copy(musicQueuePaths = paths))
+                    playPath(paths.first(), settings.volume)
+                }
+                "add_to_playlist", "remove_from_playlist" -> {
+                    val name = request.optString("name")
+                    val path = resolveTrack(settings, request.optString("trackId"))
+                    val playlists = readPlaylists().toMutableMap()
+                    val existing = playlists[name]?.toMutableList() ?: error("Playlist not found.")
+                    if (action == "add_to_playlist") {
+                        if (path !in existing) existing.add(path)
+                    } else existing.remove(path)
+                    playlists[name] = existing
+                    writePlaylists(playlists)
+                }
                 else -> error("Unsupported music action.")
             }
         } catch (error: Exception) {
@@ -205,8 +235,38 @@ internal object DesktopMusicBridge {
         (settings.musicLibraryPaths + settings.musicQueuePaths).distinct().firstOrNull { trackId(it) == id }
             ?: error("That audio track is no longer in your library.")
 
-    private fun trackId(path: String): String =
-        "track_" + Base64.getUrlEncoder().withoutPadding().encodeToString(path.toByteArray(Charsets.UTF_8)).take(64)
+    private fun trackId(path: String): String {
+        val digest = MessageDigest.getInstance("SHA-256").digest(path.toByteArray(Charsets.UTF_8))
+        return "track_" + digest.take(24).joinToString("") { "%02x".format(it) }
+    }
+
+    private fun validateRequest(action: String, request: JSONObject) {
+        val allowedFields = setOf("version", "id", "type", "action", "trackId", "index", "toIndex", "position", "name")
+        require(request.keys().asSequence().all { it in allowedFields }) { "Invalid music request fields." }
+        val extra = when (action) {
+            "play", "pause", "stop", "next", "previous", "shuffle", "repeat", "import", "clear_queue" -> emptySet()
+            "play_track", "enqueue", "remove_track" -> setOf("trackId")
+            "remove_queue" -> setOf("index")
+            "move_queue" -> setOf("index", "toIndex")
+            "seek" -> setOf("position")
+            "create_playlist", "delete_playlist", "play_playlist" -> setOf("name")
+            "add_to_playlist", "remove_from_playlist" -> setOf("name", "trackId")
+            else -> error("Unsupported music action.")
+        }
+        require(request.length() == 4 + extra.size && extra.all(request::has)) { "Invalid fields for music action." }
+        if (extra.contains("trackId")) require(request.optString("trackId").matches(Regex("track_[a-f0-9]{48}"))) { "Invalid music track." }
+        if (extra.contains("index")) require(request.optInt("index", -1) in 0..1000) { "Invalid queue position." }
+        if (extra.contains("toIndex")) require(request.optInt("toIndex", -1) in 0..1000) { "Invalid queue position." }
+        if (extra.contains("position")) require(request.optLong("position", -1L) in 0L..86_400_000L) { "Invalid playback position." }
+        if (extra.contains("name")) require(request.optString("name").trim().length in 1..60) { "Invalid playlist name." }
+    }
+
+    private fun writePlaylists(playlists: Map<String, List<String>>) {
+        val json = JSONObject()
+        playlists.forEach { (name, paths) -> json.put(name, JSONArray(paths)) }
+        preferences.put("playlists", json.toString())
+        preferences.flush()
+    }
 
     private fun durationMillis(path: String): Long = runCatching {
         AudioSystem.getAudioInputStream(File(path)).use { stream ->
