@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.MinigameDef
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import com.jarrlyyy.guessthenumber.domain.engine.ArcadeRewardRules
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -203,7 +204,11 @@ fun ReactionTestDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Uni
                 when (state) {
                     "wait" -> Text(locale.getStringByEnglish("Wait for green..."), fontSize = 20.sp, color = MaterialTheme.colorScheme.error)
                     "ready" -> Text(locale.getStringByEnglish("TAP NOW!"), fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
-                    "clicked" -> Text(locale.getString("reaction_time_format", "Reaction: %dms", reactionTime), fontSize = 20.sp)
+                    "clicked" -> Text(
+                        if (reactionTime == ArcadeRewardRules.TOO_EARLY_REACTION_SENTINEL) locale.getStringByEnglish("Too early!")
+                        else locale.getString("reaction_time_format", "Reaction: %dms", reactionTime),
+                        fontSize = 20.sp
+                    )
                 }
             }
         },
@@ -217,7 +222,9 @@ fun ReactionTestDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Uni
                         reactionTime = 9999L
                         state = "clicked"
                     } else {
-                        onReward(1L, BigNumber(2000))
+                        if (ArcadeRewardRules.isReactionTestRewardEligible(reactionTime)) {
+                            onReward(1L, BigNumber(2000))
+                        }
                         onDismiss()
                     }
                 },
@@ -225,7 +232,15 @@ fun ReactionTestDialog(onDismiss: () -> Unit, onReward: (Long, BigNumber) -> Uni
                     containerColor = if (state == "ready") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                 )
             ) {
-                Text(if (state == "clicked") locale.getString("claim_reward_button", "Claim Reward") else locale.getString("tap", "TAP"))
+                Text(
+                    if (state == "clicked" && ArcadeRewardRules.isReactionTestRewardEligible(reactionTime)) {
+                        locale.getString("claim_reward_button", "Claim Reward")
+                    } else if (state == "clicked") {
+                        locale.getStringByEnglish("Close")
+                    } else {
+                        locale.getString("tap", "TAP")
+                    }
+                )
             }
         }
     )
