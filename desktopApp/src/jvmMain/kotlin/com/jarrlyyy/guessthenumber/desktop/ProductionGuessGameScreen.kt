@@ -75,6 +75,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import kotlin.random.Random
 import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
+import com.jarrlyyy.guessthenumber.shared.rules.GuessRateLimitRules
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackCard
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackIcon
 import com.jarrlyyy.guessthenumber.shared.ui.toSharedFeedbackIcon
@@ -982,7 +983,7 @@ fun ProductionGuessGameScreen(
                     } else if (guess !in currentState.currentRangeMin..currentState.currentRangeMax) {
                         feedbackStatus = GuessGameStatus.INVALID_INPUT
                         feedback = "Choose a number within the displayed range."
-                    } else if (!isSaving && lastGuessTimestampNanos != 0L && System.nanoTime() - lastGuessTimestampNanos < 50_000_000L) {
+                    } else if (!isSaving && GuessRateLimitRules.isRateLimited(lastGuessTimestampNanos, System.nanoTime())) {
                         feedbackStatus = GuessGameStatus.READY
                         feedback = "Please wait a moment before guessing again."
                     } else if (!isSaving) {
