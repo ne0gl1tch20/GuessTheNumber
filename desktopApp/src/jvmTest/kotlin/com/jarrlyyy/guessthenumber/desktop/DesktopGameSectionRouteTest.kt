@@ -34,6 +34,18 @@ class DesktopGameSectionRouteTest {
         expected.forEach { (section, route) ->
             org.junit.Assert.assertTrue("Unexpected shared route for $section: expected=$route actual=${section.sharedHtmlScreen}", route == section.sharedHtmlScreen)
         }
+
+        val sharedHtml = javaClass.classLoader.getResource("web-play/index.html")
+            ?.readText()
+            ?: error("The canonical shared HTML bundle is missing from Windows resources.")
+        expected.values.forEach { route ->
+            org.junit.Assert.assertTrue("The canonical HTML bundle is missing route $route", sharedHtml.contains("data-screen=\\"$route\\""))
+        }
+
+        val sharedScript = javaClass.classLoader.getResource("web-play/app.js")
+            ?.readText()
+            ?: error("The canonical shared JavaScript bundle is missing from Windows resources.")
+        org.junit.Assert.assertTrue("Desktop route activation must use the shared screen controller.", sharedScript.contains("window.gtnActivateScreen=activateScreen"))
     }
 
     @Test
