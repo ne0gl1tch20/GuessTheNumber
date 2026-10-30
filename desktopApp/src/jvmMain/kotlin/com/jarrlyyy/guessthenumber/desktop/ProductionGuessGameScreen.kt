@@ -62,6 +62,7 @@ import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveSlotSummary
 import com.jarrlyyy.guessthenumber.desktop.persistence.defaultDesktopSaveDirectory
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
+import com.jarrlyyy.guessthenumber.domain.engine.OfflineEarningsPolicy
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
@@ -134,6 +135,8 @@ fun ProductionGuessGameScreen(
     var feedbackStatus by remember { mutableStateOf(GuessGameStatus.READY) }
     var isSaving by remember { mutableStateOf(false) }
     var webLastGuessStatus by remember { mutableStateOf<String?>(null) }
+    var offlineGains by remember { mutableStateOf<BigNumber?>(null) }
+    var offlineRewardDismissed by remember { mutableStateOf(false) }
     val webRequestIds = remember { LinkedHashSet<String>() }
     var autoClickerFailurePaused by remember { mutableStateOf(false) }
     var pendingReset by remember { mutableStateOf<String?>(null) }
@@ -146,8 +149,30 @@ fun ProductionGuessGameScreen(
         val loaded = withContext(Dispatchers.IO) { saveStore.load(selectedSlot) }
         if (loaded != null) {
             autoClicker.reset(loaded.currentRangeMin, loaded.currentRangeMax)
-            state = loaded
-            feedback = "Saved game loaded."
+            val elapsedSeconds = ((System.currentTimeMillis() - loaded.lastSaveTimestamp) / 1000L)
+                .takeIf { it > 0L } ?: 0L
+            val earnedOffline = OfflineEarningsPolicy.calculate(loaded, elapsedSeconds)
+            val resumedState = if (earnedOffline > BigNumber.ZERO) {
+                loaded.copy(
+                    money = loaded.money + earnedOffline,
+                    statistics = loaded.statistics.copy(
+                        moneyEarned = loaded.statistics.moneyEarned + earnedOffline
+                    )
+                )
+            } else loaded
+            val persisted = earnedOffline <= BigNumber.ZERO ||
+                withContext(Dispatchers.IO) { saveStore.save(selectedSlot, resumedState) }
+            if (persisted) {
+                state = resumedState
+                offlineGains = earnedOffline.takeIf { it > BigNumber.ZERO }
+                offlineRewardDismissed = false
+                feedback = if (earnedOffline > BigNumber.ZERO) {
+                    "Welcome back! Your Auto Clicker earned $earnedOffline Money while you were away."
+                } else "Saved game loaded."
+            } else {
+                state = loaded
+                feedback = "Saved game loaded, but offline earnings could not be saved."
+            }
         } else {
             val fresh = GameState(
                 targetNumber = Random.nextLong(1L, 101L),
@@ -419,7 +444,8 @@ fun ProductionGuessGameScreen(
                             "read_feature_tutorial", "complete_feature_tutorial" -> 4
                             "navigate" -> 4
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "buy_prestige_upgrade", "buy_ultra_upgrade", "buy_prestige_shop_item", "buy_ultra_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
-                            "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward", "select_trait_arm" -> 5
+                            "claim_daily_reward", "dismiss_offline_gains" -> 3
+                            "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward", "select_trait_arm", "creative_update_value", "creative_update_range" -> 5
                             else -> -1
                         }
                         if (expectedKeys < 0 || request.length() != expectedKeys) {
@@ -615,17 +641,29 @@ fun ProductionGuessGameScreen(
                                     }
                                     "update_setting" -> {
                                         val key = request.optString("key")
-                                        val rawValue = request.optString("value")
-                                        val value = if (rawValue == "true" || rawValue == "false") rawValue.toBoolean() else null
-                                        val settings = when (key) {
-                                            "musicEnabled" -> value?.let { before.settings.copy(musicEnabled = it) }
-                                            "soundEnabled" -> value?.let { before.settings.copy(soundEnabled = it) }
-                                            "vibrationEnabled" -> value?.let { before.settings.copy(vibrationEnabled = it) }
-                                            "reducedMotion" -> value?.let { before.settings.copy(reducedMotion = it) }
-                                            "reduceFlashes" -> value?.let { before.settings.copy(reduceFlashes = it) }
-                                            else -> null
-                                        }
+                                        val settings = DesktopWebPlayActions.updateSetting(before.settings, key, request.opt("value"))
                                         settings?.let { EconomyTransaction(before.copy(settings = it), true, "Preference saved.") }
+                                    }
+                                    "claim_daily_reward" -> {
+                                        val updated = DesktopWebPlayActions.claimDailyReward(before)
+                                        updated?.let { EconomyTransaction(it, true, "Daily Nebula reward claimed.") }
+                                    }
+                                    "dismiss_offline_gains" -> {
+                                        offlineRewardDismissed = true
+                                        EconomyTransaction(before, true, "Offline earnings dismissed.")
+                                    }
+                                    "creative_update_range" -> {
+                                        val min = request.optString("min").toLongOrNull()
+                                        val max = request.optString("max").toLongOrNull()
+                                        if (min == null || max == null) null else
+                                            DesktopWebPlayActions.updateCreativeRange(before, min, max)
+                                                ?.let { EconomyTransaction(it, true, "Creative Mode range updated.") }
+                                    }
+                                    "creative_update_value" -> {
+                                        val key = request.optString("key")
+                                        val value = request.optString("value")
+                                        DesktopWebPlayActions.updateCreativeValue(before, key, value)
+                                            ?.let { EconomyTransaction(it, true, "Creative Mode value updated.") }
                                     }
                                     "update_multiplier" -> DesktopEconomyTransactions.setBuyMultiplier(before, request.optString("multiplier"))
                                     "buy_upgrade" -> {
@@ -766,7 +804,13 @@ fun ProductionGuessGameScreen(
                         }
                         val visibleState = nextState ?: state
                         val payload = if (visibleState != null && catalog != null) {
-                            desktopWebPlayState(visibleState, catalog, accepted, guessStatus, message, talentCatalog.orEmpty(), engine, section.sharedHtmlScreen ?: "play")
+                            desktopWebPlayState(
+                                visibleState, catalog, accepted, guessStatus, message,
+                                talentCatalog.orEmpty(), engine, section.sharedHtmlScreen ?: "play",
+                                minigameCatalog.orEmpty(),
+                                offlineGains = offlineGains,
+                                offlineRewardDismissed = offlineRewardDismissed
+                            )
                         } else org.json.JSONObject().put("accepted", false).put("message", "Loading game…")
                         reply(org.json.JSONObject().put("version", 1).put("id", requestId)
                             .put("type", "state").put("state", payload).toString())
