@@ -13,11 +13,6 @@ on:
     paths:
       - '**'
       - '!app/src/main/assets/web-play/**'
-  pull_request:
-    types:
-      - closed
-    branches:
-      - master
   workflow_dispatch:
     inputs:
       source_ref:
