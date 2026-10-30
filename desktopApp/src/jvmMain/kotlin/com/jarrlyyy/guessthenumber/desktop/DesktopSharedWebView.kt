@@ -13,6 +13,8 @@ import javafx.scene.Scene
 import javafx.scene.web.WebView
 import netscape.javascript.JSObject
 import java.awt.BorderLayout
+import java.awt.Desktop
+import java.net.URI
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -146,6 +148,18 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                 webEngine.locationProperty().addListener { _, _, location ->
                     val expected = localIndex?.toUri()?.toString()
                     if (!disposed && expected != null && location != expected && location != "about:blank") {
+                        val externalUri = runCatching { URI(location) }.getOrNull()
+                        if (
+                            externalUri != null &&
+                            externalUri.scheme in setOf("http", "https") &&
+                            !externalUri.host.isNullOrBlank()
+                        ) {
+                            runCatching {
+                                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                                    Desktop.getDesktop().browse(externalUri)
+                                }
+                            }
+                        }
                         Platform.runLater { if (!disposed) webEngine.load(expected) }
                     }
                 }
