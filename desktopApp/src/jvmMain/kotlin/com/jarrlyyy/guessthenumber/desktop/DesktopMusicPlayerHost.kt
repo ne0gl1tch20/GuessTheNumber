@@ -103,10 +103,16 @@ internal class DesktopMusicPlayerHost : AutoCloseable {
             }
             "play" -> {
                 require(settings.musicEnabled) { "Enable music in Settings before playing audio." }
-                val path = currentPath ?: settings.musicQueuePaths.firstOrNull { it in library }
-                    ?: library.firstOrNull()
-                    ?: throw IllegalArgumentException("Add audio files to your library first.")
-                playPath(path, settings.volume)
+                val active = clip
+                if (active != null) {
+                    isPlaying = true
+                    active.start()
+                } else {
+                    val path = currentPath ?: settings.musicQueuePaths.firstOrNull { it in library }
+                        ?: library.firstOrNull()
+                        ?: throw IllegalArgumentException("Add audio files to your library first.")
+                    playPath(path, settings.volume)
+                }
             }
             "pause" -> pausePlayback()
             "stop" -> stopPlayback()
@@ -128,7 +134,7 @@ internal class DesktopMusicPlayerHost : AutoCloseable {
             "play_track" -> {
                 val path = resolveTrack(trackId, library)
                 require(settings.musicEnabled) { "Enable music in Settings before playing audio." }
-                queueIndex = settings.musicQueuePaths.indexOf(path).coerceAtLeast(0)
+                queueIndex = settings.musicQueuePaths.indexOf(path)
                 playPath(path, settings.volume)
             }
             "enqueue" -> {
@@ -162,14 +168,17 @@ internal class DesktopMusicPlayerHost : AutoCloseable {
                     musicPlaylistPaths = settings.musicPlaylistPaths + (playlist to paths.filterNot { it == path })
                 ))
             }
-            "clear_queue" -> updateSettings(settings.copy(musicQueuePaths = emptyList()))
+            "clear_queue" -> {
+                queueIndex = 0
+                updateSettings(settings.copy(musicQueuePaths = emptyList()))
+            }
             "remove_queue" -> {
                 val queue = settings.musicQueuePaths.filter { it in library }
                 require(index != null && index in queue.indices) { "Queue position is invalid." }
                 val removed = queue.toMutableList().also { it.removeAt(index) }
                 queueIndex = when {
                     removed.isEmpty() -> 0
-                    index < queueIndex -> queueIndex - 1
+                    index <= queueIndex -> queueIndex - 1
                     else -> queueIndex
                 }.coerceIn(0, (removed.lastIndex).coerceAtLeast(0))
                 updateSettings(settings.copy(musicQueuePaths = removed))
@@ -203,7 +212,9 @@ internal class DesktopMusicPlayerHost : AutoCloseable {
                 val paths = settings.musicPlaylistPaths[playlist]?.filter { it in library }
                     ?: throw IllegalArgumentException("Playlist not found.")
                 require(settings.musicEnabled) { "Enable music in Settings before playing audio." }
-                updateSettings(settings.copy(musicQueuePaths = paths))
+                val updatedSettings = settings.copy(musicQueuePaths = paths)
+                currentSettings = updatedSettings
+                updateSettings(updatedSettings)
                 queueIndex = 0
                 paths.firstOrNull()?.let { playPath(it, settings.volume) } ?: stopPlayback()
             }
