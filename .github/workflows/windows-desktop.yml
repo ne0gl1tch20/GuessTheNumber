@@ -195,7 +195,24 @@ jobs:
           if ($installedEntries[0].DisplayVersion -ne $env:GTN_WINDOWS_PACKAGE_VERSION) {
             throw "Installed MSI version does not match the updated package version."
           }
-          $installedProductCode = $installedEntries[0].PSChildName
+
+          # A corrupt installer must fail without removing or downgrading the working app.
+          $invalidMsi = Join-Path $env:RUNNER_TEMP "GuessTheNumber-invalid-upgrade.msi"
+          Set-Content -Path $invalidMsi -Value "not an MSI package" -Encoding ascii
+          $failedUpgrade = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$invalidMsi`" /qn /norestart" -Wait -PassThru
+          if ($failedUpgrade.ExitCode -eq 0) {
+            throw "An invalid MSI unexpectedly reported a successful upgrade."
+          }
+          $afterFailedUpgrade = @(
+            $uninstallRoots |
+              ForEach-Object { Get-ItemProperty -Path $_ -ErrorAction SilentlyContinue } |
+              Where-Object { $_.DisplayName -like "*GuessTheNumber*" }
+          )
+          if ($afterFailedUpgrade.Count -ne 1 -or $afterFailedUpgrade[0].DisplayVersion -ne $env:GTN_WINDOWS_PACKAGE_VERSION) {
+            throw "The existing installation was not preserved after a failed upgrade attempt."
+          }
+
+          $installedProductCode = $afterFailedUpgrade[0].PSChildName
           $remove = Start-Process -FilePath "msiexec.exe" -ArgumentList "/x `"$installedProductCode`" /qn /norestart" -Wait -PassThru
           if ($remove.ExitCode -notin @(0, 1605, 3010)) {
             throw "CI cleanup of the test installation failed with exit code $($remove.ExitCode)."
