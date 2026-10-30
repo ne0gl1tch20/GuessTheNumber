@@ -215,7 +215,7 @@ private class DesktopLuaSandbox {
         val setHook = globals.get("debug").get("sethook")
         globals.set("debug", LuaValue.NIL)
         listOf(
-            "dofile", "loadfile", "load", "require", "collectgarbage",
+            "dofile", "loadfile", "load", "loadstring", "require", "collectgarbage",
             "getmetatable", "setmetatable", "rawset", "rawget"
         ).forEach { globals.set(it, LuaValue.NIL) }
         if (!globals.get("package").isnil()) globals.set("package", LuaValue.NIL)
