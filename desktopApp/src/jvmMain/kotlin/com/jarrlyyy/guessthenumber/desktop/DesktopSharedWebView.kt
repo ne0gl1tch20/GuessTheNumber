@@ -183,47 +183,57 @@ private class DesktopSharedWebViewController {
         }
     }
 
+    private fun copyResourceTree(prefix: String, sentinel: String, destination: Path) {
+        val classLoader = javaClass.classLoader
+        val resource = classLoader.getResource(sentinel)
+            ?: throw IOException("Missing bundled resource: $sentinel")
+        val targetRoot = destination.resolve(prefix)
+        Files.createDirectories(targetRoot)
+        if (resource.protocol == "jar") {
+            val connection = resource.openConnection() as java.net.JarURLConnection
+            val entries = connection.jarFile.entries()
+            val entryPrefix = prefix.trimEnd('/') + "/"
+            while (entries.hasMoreElements()) {
+                val entry = entries.nextElement()
+                if (!entry.name.startsWith(entryPrefix)) continue
+                val target = destination.resolve(entry.name)
+                if (entry.isDirectory) {
+                    Files.createDirectories(target)
+                } else {
+                    Files.createDirectories(target.parent)
+                    connection.jarFile.getInputStream(entry).use { input ->
+                        Files.copy(input, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+                    }
+                }
+            }
+        } else {
+            val suffixSegments = sentinel.removePrefix(prefix.trimEnd('/') + "/").split('/').size
+            var sourceRoot = Path.of(resource.toURI())
+            repeat(suffixSegments) {
+                sourceRoot = sourceRoot.parent ?: throw IOException("Invalid resource root: $sentinel")
+            }
+            Files.walk(sourceRoot).use { paths ->
+                paths.forEach { source ->
+                    val relative = sourceRoot.relativize(source)
+                    val target = targetRoot.resolve(relative.toString())
+                    if (Files.isDirectory(source)) {
+                        Files.createDirectories(target)
+                    } else {
+                        Files.createDirectories(target.parent)
+                        Files.copy(source, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+                    }
+                }
+            }
+        }
+    }
+
     private fun unpackWebAssets(): Path {
         val root = Files.createTempDirectory("gtn-shared-web-play-")
         root.toFile().deleteOnExit()
         val webRoot = root.resolve("web-play")
-        val files = listOf(
-            "web-play/index.html" to "web-play/index.html",
-            "web-play/app.js" to "web-play/app.js",
-            "web-play/styles.css" to "web-play/styles.css",
-            "web-play/icons/guess-the-number.svg" to "web-play/icons/guess-the-number.svg",
-            "web-play/icons/sparkle.svg" to "web-play/icons/sparkle.svg",
-            "web-play/icons/star.svg" to "web-play/icons/star.svg",
-            "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css" to "libraries/jarrlyyuisdk/styles/jarrlyy-ui.css",
-            "libraries/jarrlyyuisdk/components/jarrlyy-ui.js" to "libraries/jarrlyyuisdk/components/jarrlyy-ui.js",
-            "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg" to "libraries/jarrlyyuisdk/icons/jarrlyy-icons.svg"
-        )
-        for ((resourcePath, relativePath) in files) {
-            val resource = "/$resourcePath"
-            val input = javaClass.getResourceAsStream(resource)
-                ?: throw IOException("Missing bundled web UI resource: $resource")
-            val output = root.resolve(relativePath)
-            Files.createDirectories(output.parent)
-            input.use { Files.copy(it, output) }
-            output.toFile().deleteOnExit()
-        }
-        val fontFiles = listOf(
-            "Inter-Italic-VariableFont_opsz,wght.ttf",
-            "Inter-VariableFont_opsz,wght.ttf",
-            "JetBrainsMono-Italic-VariableFont_wght.ttf",
-            "JetBrainsMono-VariableFont_wght.ttf",
-            "Manrope-VariableFont_wght.ttf",
-            "SpaceGrotesk-VariableFont_wght.ttf"
-        )
-        for (font in fontFiles) {
-            val resource = "/fonts/$font"
-            val input = javaClass.getResourceAsStream(resource)
-                ?: throw IOException("Missing bundled font resource: $resource")
-            val output = root.resolve("fonts").resolve(font)
-            Files.createDirectories(output.parent)
-            input.use { Files.copy(it, output) }
-            output.toFile().deleteOnExit()
-        }
+        copyResourceTree("web-play", "web-play/index.html", root)
+        copyResourceTree("libraries", "libraries/jarrlyyuisdk/components/jarrlyy-ui.js", root)
+        copyResourceTree("fonts", "fonts/Inter-VariableFont_opsz,wght.ttf", root)
         val index = webRoot.resolve("index.html")
         val original = Files.readString(index)
         val persistedNavigationPosition = DesktopNavigationPosition.load().name
@@ -232,7 +242,8 @@ private class DesktopSharedWebViewController {
         val shim = """
             <script>
             // Capabilities are injected by the Windows host only.
-            window.gtnDesktopInitialScreen = $initialScreenJson; Android never sees this flag.
+            window.gtnDesktopInitialScreen = $initialScreenJson;
+            // Android never sees this flag.
             window.gtnDesktopFeatures = Object.freeze({
               navigationPosition: true,
               launchAtStartup: true
