@@ -35,7 +35,7 @@ The locked target is an **exact Windows experience of GuessTheNumber with shared
 - For each slice, name the Android reference screen/component, describe the Windows counterpart, cover relevant state/action paths, identify shared code/assets and host-specific adapters, and update the matrix in the same PR.
 - Keep **source implemented**, **CI passed**, **automated behavior tested**, **Windows runtime verified**, **screenshot compared** and **installer tested** distinct. One does not imply the others.
 - Use evidence from the exact candidate commit. If Windows runtime testing is unavailable, keep the row unverified and state that plainly; do not infer a pass from compilation, CI or a route placeholder.
-- Keep the five stages below sequential. Stage 2 remains open until its remaining core gameplay/economy gaps have evidence. Do not start Stage 3 implementation ahead of the Stage 2 exit gate.
+- Stage exit claims remain sequential: Stage 2 must pass its evidence gate before overall parity can be declared. Owner-directed implementation work for Stages 3–5 may proceed in parallel, but must not be described as verified or complete while earlier runtime gates or the stage's own requirements remain open.
 - Declare overall parity complete only when every required row is verified with evidence, explicitly approved as platform-specific, or excluded by documented agreement, and all release blockers are resolved.
 
 Roadmap coordination: [Joy Phase Roadmap](../.openai/docs/JOY_PHASE_ROADMAP.md) records the product direction and broader planned work. The chosen [Shared Web UI Architecture](SHARED_WEB_UI_ARCHITECTURE.md) defines the web/Kotlin bridge and migration gates. This document alone owns Windows parity stages, the screen-by-screen matrix and its verification status.
@@ -151,7 +151,9 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Source implementation: Home Base upgrade progression and Codex discovery/completion reward are persisted through desktop transactions; Endgame exposes progression goals and Endless Rift state.
 - [x] Shared challenge reward eligibility and duplicate-claim protection exist in Kotlin; desktop mutator/challenge UI and transaction code are present.
 - [ ] Verify progression routes, challenge claims, relic effects, mastery, bosses and save/reload against Android on a current Windows runtime.
-- [ ] Finish interactive world map presentation, Codex entry/search parity and complete Endless Rift/mastery interaction parity.
+- [x] Add Android-matching world mastery upgrade transactions, including secret/Sanctuary/full-relic discounts, level caps and level-5/10 Nebula + Codex milestones; expose mastery purchase from the Windows world map.
+- [x] Add searchable Codex entries by title and stable ID with empty-result feedback.
+- [ ] Verify mastery effects, all progression routes and Endless Rift interactions in a current Windows runtime.
 - [ ] Complete feature-flagged LiveOps/event presentation and reward claims on Windows.
 - [ ] Port supported Lua activity discovery/execution with Android-equivalent sandbox resource and permission limits.
 - [ ] Verify locked/unlocked/completed states, explanatory requirements and localized feedback.
@@ -196,13 +198,13 @@ The port is complete only when every Android player-facing screen and reachable 
 
 ### W7. Updates, packaging and release readiness
 
-- [ ] **Current gap:** `WindowsDebugUpdateClient` still discovers the `debug-latest` GitHub Release. Migrate it to the successful `Windows Desktop CI` run's `GuessTheNumber-Windows-Debug` artifact; the workflow already uploads the ZIP and manifest with seven-day retention. The updater must not treat the release asset as the authoritative debug source.
-- [ ] Keep debug update discovery/install separate from production releases.
-- [ ] **Windows Debug update source:** discover builds from the repository's Windows Desktop CI GitHub Actions workflow runs and their attached artifacts, not GitHub Releases.
-- [ ] **Windows Debug package format:** the CI artifact consumed by the updater must be a ZIP containing the built Windows MSI. Keep the artifact name, run number/attempt, commit SHA, package version and checksum metadata consistent and verifiable.
-- [ ] Update the Windows Debug updater to find the latest eligible successful CI run, locate/download its ZIP artifact, verify the expected channel/version/checksum, extract the MSI to a controlled temporary location and launch the existing install/upgrade flow.
-- [ ] Handle missing artifacts, expired CI artifacts, failed/in-progress runs, checksum mismatch, invalid ZIP/missing MSI and incompatible versions with clear errors; never fall back to production releases or install an unverified package.
-- [ ] Confirm the intended public-repository download path works without embedding a personal access token in the app. Document the Actions artifact retention window and explain when a build has expired.
+- [x] Remove GitHub Release publishing from Windows Desktop CI; the Windows Debug update channel no longer depends on `debug-latest`.
+- [x] Discover the latest successful `push` run on `master`, require the named `GuessTheNumber-Windows-Debug` artifact and reject expired/missing artifacts with a seven-day retention message.
+- [x] Bind update metadata to the CI run number, attempt and commit SHA; validate the canonical Actions artifact ZIP URL, manifest channel/version/attempt/commit, inner installer ZIP SHA-256 and expected MSI entry.
+- [x] Extract only the expected artifact files and MSI into a controlled temporary directory with path traversal, duplicate/unknown-entry and size checks.
+- [x] Keep the debug updater isolated from production release discovery and remove unnecessary workflow `contents: write` permission.
+- [ ] Verify public-repository artifact download works without credentials from a clean Windows install; confirm the actual seven-day expiry response.
+- [ ] Add end-to-end artifact download/install tests for missing artifacts, invalid outer ZIP, checksum mismatch, invalid MSI ZIP and expired artifacts.
 - [ ] Keep production update discovery and installer flow separate from the debug CI-artifact flow.
 - [ ] Test clean MSI install, in-place upgrade, repeated upgrade, failed-upgrade recovery, downgrade and uninstall.
 - [ ] Preserve the verified MSI UpgradeCode and user-data location; do not change identifiers blindly.
