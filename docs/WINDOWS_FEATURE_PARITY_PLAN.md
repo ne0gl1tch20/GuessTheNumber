@@ -154,9 +154,9 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Add Android-matching world mastery upgrade transactions, including secret/Sanctuary/full-relic discounts, level caps and level-5/10 Nebula + Codex milestones; expose mastery purchase from the Windows world map.
 - [x] Add searchable Codex entries by title and stable ID with empty-result feedback.
 - [ ] Verify mastery effects, all progression routes and Endless Rift interactions in a current Windows runtime.
-- [ ] Complete feature-flagged LiveOps/event presentation and reward claims on Windows.
 - [x] Add bundled Lua activity discovery/execution for the canonical `scripts/manifest.json` catalog, with source-size and instruction budgets, strict output validation, and no save/currency/reward/filesystem/network host capabilities.
-- [ ] Port signed LiveOps manifest refresh, verified cache/rollback and remote Lua script support; the current Windows Activity Hub is bundled/offline only.
+- [x] Port signed HTTPS LiveOps bundle refresh, RSA signature verification, app/host compatibility checks, script SHA-256 validation, staged atomic activation, high-water version protection, verified cache reads and rollback to a prior verified bundle. Remote scripts use the same restricted Lua sandbox and fail closed when no public key is configured.
+- [ ] Complete feature-flagged LiveOps event presentation, eligibility checks and Kotlin-owned reward claims on Windows.
 - [ ] Verify locked/unlocked/completed states, explanatory requirements and localized feedback.
 
 **Exit:** Player-facing progression systems are accessible and state-consistent on Windows.
@@ -166,9 +166,9 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Source implementation: five catalog-backed Android Arcade minigames (Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush) route payouts through Kotlin-owned transactions.
 - [x] Source implementation: Lucky Stake settlement uses desktop transactions with stake validation and saved statistics.
 - [ ] Verify all five minigame win/loss outcomes, localization, reward multipliers and save/reload on Windows.
-- [ ] Complete Activity Hub and LiveOps discovery/claim handling with shared feature flags and eligibility checks.
 - [x] Add the bundled Number Rush Lua activity to the Windows Activity Hub with Android-equivalent payload limits, one-answer lifecycle and Kotlin-owned UI state.
-- [ ] Port signed LiveOps script discovery/refresh and remote activity execution with verified cache/rollback.
+- [x] Add verified remote LiveOps script discovery/refresh to the Activity Hub; signed bundles are HTTPS-only, hash-checked and rollback-protected.
+- [ ] Complete shared event feature flags, event presentation, eligibility validation and reward claims.
 - [ ] Verify offline event availability, reward validation and missing optional content/audio failure behavior.
 
 **Exit:** Supported activities work offline, and scripted content cannot bypass Kotlin-owned reward/state validation.
