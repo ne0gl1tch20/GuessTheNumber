@@ -119,6 +119,7 @@ The port is complete only when every Android player-facing screen and reachable 
 - [x] Windows Play reuses Android's shared status-colored guess feedback card and semantic status-to-icon mapping; visual/runtime comparison remains unverified.
 - [x] Correct/incorrect rewards, attempts, streaks and Frenzy flow through the shared production engine.
 - [x] Expose the four shared mutators on Windows, recalculate the range/target on toggle, and hide direction hints for Blind.
+- [x] Use one `commonMain` monotonic 50 ms rate-limit policy for Android manual guesses, Windows native input and Windows shared-web bridge submissions; common tests cover first use, boundary timing and clock-origin edge cases.
 - [ ] Verify rate limiting and the full set of invalid, boundary, post-solve and mutator runtime cases.
 - [x] Add 1/10/100/MAX quick-buy selection with exact combined costs and atomic bulk purchase transactions for Money, Prestige and Ultra upgrades.
 - [x] Persist/reload a run through the desktop save adapter; user reported the focused restart/save check passed.
