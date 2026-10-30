@@ -52,7 +52,7 @@ internal object DesktopStartupLaunch {
     private fun resolvePackagedLauncher(): Path? {
         val configured = System.getProperty("jpackage.app-path")
             ?.takeIf(String::isNotBlank)
-            ?.let(Path::of)
+            ?.let { Path.of(it) }
             ?.toAbsolutePath()
             ?.normalize()
             ?.takeIf { Files.isRegularFile(it) && it.fileName.toString().endsWith(".exe", true) }
@@ -61,7 +61,7 @@ internal object DesktopStartupLaunch {
         // Never register java.exe/javaw.exe: that would break after an app/runtime update.
         return ProcessHandle.current().info().command()
             .filter(String::isNotBlank)
-            .map(Path::of)
+            .map { Path.of(it) }
             .map { it.toAbsolutePath().normalize() }
             .filter { Files.isRegularFile(it) && it.fileName.toString().equals("GuessTheNumber.exe", true) }
             .orElse(null)
