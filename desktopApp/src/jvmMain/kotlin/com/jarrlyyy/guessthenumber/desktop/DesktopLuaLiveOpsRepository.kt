@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.desktop
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import com.jarrlyyy.guessthenumber.desktop.persistence.defaultDesktopSaveDirectory
 import java.io.ByteArrayOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
