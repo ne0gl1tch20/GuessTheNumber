@@ -50,7 +50,7 @@ internal fun DesktopActivityHubScreen(
             Text("Activity Hub", style = MaterialTheme.typography.headlineSmall)
         }
         Text(
-            "Small offline activities run in a restricted Lua sandbox. Scripts can provide activity content, but cannot edit saves, currency or rewards.",
+            "Bundled and signature-verified remote activities run in a restricted Lua sandbox. Scripts can provide activity content, but cannot edit saves, currency or rewards.",
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
