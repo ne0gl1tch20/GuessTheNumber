@@ -31,7 +31,9 @@ private data class DesktopLuaRemotePayload(
     val minAppVersionCode: Int,
     val maxAppVersionCode: Int,
     val bundleVersion: Int,
-    val scripts: List<DesktopLuaRemoteScript>
+    val scripts: List<DesktopLuaRemoteScript>,
+    val eventManifestVersion: Int = 1,
+    val events: List<DesktopLiveOpsEvent> = emptyList()
 )
 
 @Serializable
@@ -135,6 +137,9 @@ internal class DesktopLuaLiveOpsRepository(
         }
     }
 
+    fun loadVerifiedCachedEvents(): List<DesktopLiveOpsEvent> =
+        activeVerifiedBundle()?.first?.events.orEmpty()
+
     fun readVerifiedCachedScript(entry: DesktopLuaScriptEntry): String? {
         if (entry.source != "liveops") return null
         val (payload, directory) = activeVerifiedBundle() ?: return null
@@ -191,6 +196,9 @@ internal class DesktopLuaLiveOpsRepository(
             payload.maxAppVersionCode >= payload.minAppVersionCode
         ) { "Invalid LiveOps bundle version or app compatibility range." }
         require(payload.scripts.size in 1..MAX_SCRIPTS) { "LiveOps script count is outside the supported limit." }
+        require(payload.eventManifestVersion in 1..2) { "Unsupported LiveOps event manifest version." }
+        require(payload.events.size <= 32) { "LiveOps event count is outside the supported limit." }
+        if (payload.events.isNotEmpty()) DesktopLiveOpsRepository.validateRemoteEvents(payload.eventManifestVersion, payload.events)
         require(payload.scripts.map { it.id }.distinct().size == payload.scripts.size) { "Duplicate LiveOps script IDs." }
         require(payload.scripts.map { it.fileName }.distinct().size == payload.scripts.size) {
             "Duplicate LiveOps script file names."
