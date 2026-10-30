@@ -36,6 +36,7 @@
   });
 
   window.gtnDesktopInitialScreen = window.gtnDesktopInitialScreen || 'play';
+  window.gtnDesktopDebugTools = false;
   window.gtnDesktopFeatures = Object.freeze({
     navigationPosition: true,
     launchAtStartup: true
