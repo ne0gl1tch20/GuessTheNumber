@@ -8,16 +8,16 @@
 
 1. Evaluate and select a maintained Windows embedded browser integration. WebView2 is the preferred candidate, but do not claim it is implemented until a buildable host proves it. Document runtime prerequisites, missing-runtime behavior, licensing, MSI distribution and offline operation before changing installer behavior.
 2. **Implemented in this batch:** embed JavaFX WebView in the Compose Desktop shell, unpack the canonical packaged `web-play/` files locally, support resize and cleanup, and load without requiring a network connection.
-3. **Initial bridge implemented:** bounded versioned requests, request ID deduplication and an explicit allow-list for guesses, multiplier selection, upgrade/shop actions, daily quests and chests. Kotlin transactions remain authoritative. Tighten local navigation/origin tests and broaden route actions, including music playback and Windows updater requests.
+3. **Initial bridge implemented:** bounded versioned requests, request ID deduplication and an explicit allow-list for gameplay, economy, progression, rewards, settings, music playback and Windows updater actions. Kotlin transactions remain authoritative. Tighten local navigation/origin tests and broaden route actions.
 4. Adapt platform-specific input and lifecycle behavior without maintaining a second HTML/CSS/JS copy.
-5. Add host/bridge automated tests and verify the packaged app on Windows. Play, Upgrades, Shop, More and Changelog now use the host; About, Save management and remaining OS/developer Compose routes stay native until their shared contracts and recovery behavior are implemented.
+5. Add host/bridge automated tests and verify the packaged app on Windows. Play, Upgrades, Shop, More, Changelog, About and Music now use the host. About updater actions route through the Windows update adapter; external links open in the system browser; music uses a Windows Java Sound adapter. Save-slot boot/recovery and OS/developer surfaces remain native.
 
 ## Workstream B: complete the shared player-facing screens
 
 Migrate in cohesive, testable batches, reusing canonical catalogs and existing Kotlin transactions:
 1. Prestige, Ultra and talent progression.
 2. Home Base, Relics, Codex, Endgame and remaining world/boss details.
-3. More and Changelog are now shared routes. Continue with About/update UI, settings, statistics, achievements, tutorial and save-management presentation.
+3. More, Changelog, About/update UI and Music are now shared routes. Continue with settings, statistics, achievements, tutorial and save-management presentation.
 4. Arcade/minigames and player-facing Live Ops surfaces where platform contracts allow sharing.
 
 Keep developer tools and OS-owned/system surfaces native. Save-slot boot and crash recovery remain native until a shared implementation is justified and parity can be proved.
