@@ -173,6 +173,12 @@ internal object DesktopMusicBridge {
     }
 
     @Synchronized
+    fun applySettings(settings: GameSettings) {
+        setVolume(settings.volume)
+        if (!settings.musicEnabled) stopPlayback()
+    }
+
+    @Synchronized
     fun setVolume(volume: Float) {
         val safe = volume.coerceIn(0f, 1f)
         val control = clip?.takeIf { it.isControlSupported(FloatControl.Type.MASTER_GAIN) }
