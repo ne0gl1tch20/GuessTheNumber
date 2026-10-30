@@ -379,13 +379,17 @@ fun ProductionGuessGameScreen(
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
                         val expectedKeys = when (type) {
-                            "read_state", "read_changelog", "read_profile", "check_updates", "install_update", "open_update_page", "read_onboarding_state", "complete_nimmy_tutorial", "read_feature_tutorial", "complete_feature_tutorial", "reset_everything", "navigate", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
+                            "read_state", "read_changelog", "read_profile", "music_state", "check_updates", "install_update", "open_update_page", "read_onboarding_state", "complete_nimmy_tutorial", "read_feature_tutorial", "complete_feature_tutorial", "reset_everything", "navigate", "homebase_upgrade", "codex_reward", "prestige_reset", "ultra_reset" -> 3
                             "submit_guess", "update_multiplier", "buy_upgrade", "buy_shop_item", "equip_cosmetic", "claim_daily_quest", "open_loot_chest", "buy_talent", "settle_stake" -> 4
                             "world_action", "relic_action", "update_setting", "set_mutator", "arcade_reward", "select_trait_arm" -> 5
                             else -> -1
                         }
-                        if (expectedKeys < 0 || request.length() != expectedKeys) {
+                        if (type != "music_action" && (expectedKeys < 0 || request.length() != expectedKeys)) {
                             sendError("unknown_action")
+                            return@launch
+                        }
+                        if (type == "music_action" && request.length() !in 4..9) {
+                            sendError("invalid_music_request")
                             return@launch
                         }
                         if (type == "read_feature_tutorial" || type == "complete_feature_tutorial") {
