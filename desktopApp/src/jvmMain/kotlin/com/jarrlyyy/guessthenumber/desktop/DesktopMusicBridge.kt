@@ -193,9 +193,20 @@ internal object DesktopMusicBridge {
     @Synchronized
     fun setVolume(volume: Float) {
         val safe = volume.coerceIn(0f, 1f)
-        val control = clip?.takeIf { it.isControlSupported(FloatControl.Type.MASTER_GAIN) }
-            ?.getControl(FloatControl.Type.MASTER_GAIN) as? FloatControl ?: return
-        control.value = (20f * log10(safe.coerceAtLeast(0.001f))).coerceIn(control.minimum, control.maximum)
+        val activeClip = clip ?: return
+        val control = when {
+            activeClip.isControlSupported(FloatControl.Type.MASTER_GAIN) ->
+                activeClip.getControl(FloatControl.Type.MASTER_GAIN) as? FloatControl
+            activeClip.isControlSupported(FloatControl.Type.VOLUME) ->
+                activeClip.getControl(FloatControl.Type.VOLUME) as? FloatControl
+            else -> null
+        } ?: return
+        val gain = if (control.type == FloatControl.Type.MASTER_GAIN) {
+            20f * log10(safe.coerceAtLeast(0.001f))
+        } else {
+            safe
+        }
+        control.value = gain.coerceIn(control.minimum, control.maximum)
     }
 
     @Synchronized
