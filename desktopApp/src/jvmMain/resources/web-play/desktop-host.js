@@ -2,6 +2,39 @@
 (function () {
   'use strict';
 
+  // Keep startup failures visible instead of leaving the desktop WebView on a blank page.
+  function showDesktopStartupError(title, detail) {
+    function render() {
+      if (!document.body || document.getElementById('gtnDesktopStartupError')) return;
+      var panel = document.createElement('section');
+      panel.id = 'gtnDesktopStartupError';
+      panel.setAttribute('role', 'alert');
+      panel.style.cssText = 'position:fixed;inset:0;z-index:2147483647;overflow:auto;padding:36px;box-sizing:border-box;background:#101522;color:#f4f6ff;font:14px/1.5 Segoe UI, sans-serif;';
+      var heading = document.createElement('h1');
+      heading.textContent = title || 'GuessTheNumber could not start';
+      heading.style.cssText = 'font-size:22px;margin:0 0 12px;';
+      var message = document.createElement('pre');
+      message.textContent = String(detail || 'No additional error details were provided.');
+      message.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.5 Consolas,monospace;color:#d5def5;';
+      panel.appendChild(heading);
+      panel.appendChild(message);
+      document.body.appendChild(panel);
+    }
+    if (document.body) render();
+    else document.addEventListener('DOMContentLoaded', render, { once: true });
+  }
+
+  window.addEventListener('error', function (event) {
+    var target = event.target;
+    var detail = event.message || (target && (target.src || target.href)) || 'Unknown JavaScript or asset loading error';
+    if (event.filename) detail += '\\n' + event.filename + (event.lineno ? ':' + event.lineno : '');
+    showDesktopStartupError('The shared game interface encountered an error', detail);
+  }, true);
+  window.addEventListener('unhandledrejection', function (event) {
+    var reason = event.reason;
+    showDesktopStartupError('The shared game interface failed during startup', reason && (reason.stack || reason.message) || String(reason || 'Unhandled promise rejection'));
+  });
+
   window.gtnDesktopInitialScreen = window.gtnDesktopInitialScreen || 'play';
   window.gtnDesktopFeatures = Object.freeze({
     navigationPosition: true,
@@ -96,10 +129,16 @@
   }
 
   function initialize() {
-    applyNavigationPosition(window.gtnDesktopNavigationPosition);
-    installDesktopSettings();
-    if (typeof window.gtnActivateScreen === 'function') {
+    try {
+      applyNavigationPosition(window.gtnDesktopNavigationPosition);
+      installDesktopSettings();
+      if (typeof window.gtnActivateScreen !== 'function') {
+        showDesktopStartupError('The game interface did not initialize', 'app.js did not register window.gtnActivateScreen. Check the earlier script-loading errors and packaged web assets.');
+        return;
+      }
       window.gtnActivateScreen(window.gtnDesktopInitialScreen || 'play');
+    } catch (error) {
+      showDesktopStartupError('The game interface could not open its first screen', error && (error.stack || error.message) || String(error));
     }
   }
 
