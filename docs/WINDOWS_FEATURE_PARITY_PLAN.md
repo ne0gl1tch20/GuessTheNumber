@@ -194,14 +194,15 @@ The port is complete only when every Android player-facing screen and reachable 
 ### W6. Developer tooling
 
 - [x] Hide Windows Developer Settings, Developer Console, Process Inspector and Lua Testing Hub by default; packaged builds require a build-time opt-in (`-Pgtn.desktop.debugToolsBuild=true`) and a separate launch flag (`-Dgtn.desktop.debugTools=true`). The default Windows CI MSI build is not opted in.
-- [ ] Port the shared validated developer command executor and output history.
-- [ ] Port privacy-conscious process diagnostics and deterministic test helpers.
+- [x] Add a Windows typed developer-command allowlist with bounded in-session output history. Supported commands are limited to inspection and validated currency/upgrade/automation adjustments; shell execution, arbitrary code, filesystem and network commands are not exposed.
+- [x] Add local JVM/runtime and heap diagnostics without enumerating other processes, capturing command-line arguments or transmitting telemetry.
+- [ ] Reuse the Android command parser/executor directly and add the remaining deterministic game test helpers.
 - [x] Add a build-time developer-tools resource gate so a launch argument alone cannot expose developer routes in the default packaged build.
 - [ ] Verify the built MSI itself remains blocked when launched with the debug system property.
 
 - [ ] Console, state inspection, test helpers and verbose logs are debug-only.
 - [ ] Developer commands are not exposed unintentionally in production.
-- [ ] Add deterministic tests for common rules and desktop adapters.
+- [x] Add deterministic tests for command build/launch gating, command input validation, currency bounds, upgrade IDs/levels, automation limits and process diagnostic snapshots.
 
 **Exit:** Debug tools aid diagnosis and are absent or disabled in production packages.
 
