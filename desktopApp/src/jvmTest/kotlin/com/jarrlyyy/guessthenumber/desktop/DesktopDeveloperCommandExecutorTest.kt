@@ -38,6 +38,13 @@ class DesktopDeveloperCommandExecutorTest {
     }
 
     @Test
+    fun rejectsMalformedOrExtremeCurrencyAmounts() {
+        val executor = DesktopDeveloperCommandExecutor { true }
+        assertNull(executor.execute("/give money not-a-number", GameState()).updatedState)
+        assertNull(executor.execute("/give money 1e100000000", GameState()).updatedState)
+    }
+
+    @Test
     fun validatesUpgradeIdsAndLevels() {
         val executor = DesktopDeveloperCommandExecutor { true }
 
