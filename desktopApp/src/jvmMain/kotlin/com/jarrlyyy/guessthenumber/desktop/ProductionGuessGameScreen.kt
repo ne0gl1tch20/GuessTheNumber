@@ -887,6 +887,11 @@ fun ProductionGuessGameScreen(
                                 else -> EconomyTransaction(before, false, "That world action is not supported yet.")
                             }
                         }
+                    },
+                    onMasteryUpgrade = { worldId ->
+                        commitTransaction { before ->
+                            DesktopEconomyTransactions.upgradeWorldMastery(before, worldId)
+                        }
                     }
                 )
             }
