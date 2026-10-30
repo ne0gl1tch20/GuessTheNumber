@@ -468,6 +468,22 @@ fun ProductionGuessGameScreen(
                                 .put("type", "state").put("state", payload).toString())
                             return@launch
                         }
+                        if (type == "navigate") {
+                            val destination = when (request.optString("route")) {
+                                "save_slots" -> DesktopDestination.SAVE_SLOTS
+                                "dev_settings" -> DesktopDestination.DEVELOPER_SETTINGS
+                                else -> null
+                            }
+                            if (destination == null) {
+                                sendError("unsupported_native_destination")
+                            } else {
+                                onOpenParityDestination(destination)
+                                reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                    .put("type", "state")
+                                    .put("state", org.json.JSONObject().put("accepted", true)).toString())
+                            }
+                            return@launch
+                        }
                         if (type == "read_changelog") {
                             val markdown = runCatching {
                                 val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("changelogs.md")
