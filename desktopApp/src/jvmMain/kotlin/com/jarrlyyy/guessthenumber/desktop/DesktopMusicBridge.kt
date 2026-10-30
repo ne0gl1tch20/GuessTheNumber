@@ -26,6 +26,8 @@ internal object DesktopMusicBridge {
     private var shuffle = preferences.getBoolean("shuffle", false)
     private var repeatMode = preferences.get("repeatMode", "OFF")
     private var lastError: String? = null
+    private var lastSettings: GameSettings? = null
+    private val durationCache = mutableMapOf<String, Long>()
 
     @Synchronized
     fun state(settings: GameSettings): JSONObject {
@@ -64,6 +66,13 @@ internal object DesktopMusicBridge {
     @Synchronized
     fun perform(action: String, request: JSONObject, settings: GameSettings, updateSettings: (GameSettings) -> Unit): JSONObject {
         lastError = null
+        var responseSettings = settings
+        lastSettings = settings
+        fun persist(updated: GameSettings) {
+            responseSettings = updated
+            lastSettings = updated
+            updateSettings(updated)
+        }
         try {
             validateRequest(action, request)
             when (action) {
@@ -73,7 +82,7 @@ internal object DesktopMusicBridge {
                         val added = files.map { it.absolutePath }
                         val library = (settings.musicLibraryPaths + added).distinct()
                         val queue = if (settings.musicQueuePaths.isEmpty()) added else (settings.musicQueuePaths + added).distinct()
-                        updateSettings(settings.copy(musicLibraryPaths = library, musicQueuePaths = queue))
+                        persist(settings.copy(musicLibraryPaths = library, musicQueuePaths = queue))
                         if (currentPath == null) currentPath = added.first()
                     }
                 }
@@ -102,24 +111,24 @@ internal object DesktopMusicBridge {
                 }
                 "enqueue" -> {
                     val path = resolveTrack(settings, request.optString("trackId"))
-                    updateSettings(settings.copy(musicQueuePaths = (settings.musicQueuePaths + path).distinct()))
+                    persist(settings.copy(musicQueuePaths = (settings.musicQueuePaths + path).distinct()))
                 }
                 "remove_track" -> {
                     val path = resolveTrack(settings, request.optString("trackId"))
                     if (currentPath == path) stopPlayback()
-                    updateSettings(settings.copy(
+                    persist(settings.copy(
                         musicLibraryPaths = settings.musicLibraryPaths - path,
                         musicQueuePaths = settings.musicQueuePaths - path,
                         backgroundMusicPath = if (settings.backgroundMusicPath == path) null else settings.backgroundMusicPath
                     ))
                 }
-                "clear_queue" -> updateSettings(settings.copy(musicQueuePaths = emptyList()))
+                "clear_queue" -> persist(settings.copy(musicQueuePaths = emptyList()))
                 "remove_queue" -> {
                     val index = request.optInt("index", -1)
                     val queue = settings.musicQueuePaths.toMutableList()
                     require(index in queue.indices) { "Queue item no longer exists." }
                     queue.removeAt(index)
-                    updateSettings(settings.copy(musicQueuePaths = queue))
+                    persist(settings.copy(musicQueuePaths = queue))
                 }
                 "move_queue" -> {
                     val from = request.optInt("index", -1)
@@ -150,7 +159,8 @@ internal object DesktopMusicBridge {
                 "play_playlist" -> {
                     val paths = readPlaylists()[request.optString("name")] ?: error("Playlist not found.")
                     require(paths.isNotEmpty()) { "This playlist is empty." }
-                    updateSettings(settings.copy(musicQueuePaths = paths))
+                    if (!settings.musicEnabled) error("Enable background music in Settings first.")
+                    persist(settings.copy(musicQueuePaths = paths))
                     playPath(paths.first(), settings.volume)
                 }
                 "add_to_playlist", "remove_from_playlist" -> {
@@ -169,7 +179,7 @@ internal object DesktopMusicBridge {
         } catch (error: Exception) {
             lastError = error.message ?: "The audio action could not be completed."
         }
-        return state(settings)
+        return state(responseSettings)
     }
 
     @Synchronized
@@ -198,6 +208,16 @@ internal object DesktopMusicBridge {
             currentPath = path
             paused = false
             setVolume(volume)
+            next.addLineListener { event ->
+                if (event.type == javax.sound.sampled.LineEvent.Type.STOP &&
+                    clip === next && !paused && next.microsecondPosition >= next.microsecondLength
+                ) {
+                    when (repeatMode) {
+                        "ONE" -> { next.framePosition = 0; next.start() }
+                        "ALL" -> lastSettings?.let { runCatching { moveTrack(it, 1) } }
+                    }
+                }
+            }
             next.start()
         } catch (error: Exception) {
             next.close()
@@ -207,12 +227,16 @@ internal object DesktopMusicBridge {
 
     @Synchronized
     private fun stopPlayback() {
-        clip?.let { runCatching { it.stop(); it.close() } }
+        val previous = clip
         clip = null
+        paused = true
+        previous?.let { runCatching { it.stop(); it.close() } }
         paused = false
     }
 
+    @Synchronized
     private fun moveTrack(settings: GameSettings, delta: Int) {
+        if (!settings.musicEnabled) error("Enable background music in Settings first.")
         val queue = settings.musicQueuePaths.ifEmpty { settings.musicLibraryPaths }
         if (queue.isEmpty()) error("Your music library is empty.")
         val currentIndex = queue.indexOf(currentPath).let { if (it < 0) 0 else it }
@@ -274,12 +298,14 @@ internal object DesktopMusicBridge {
         preferences.flush()
     }
 
-    private fun durationMillis(path: String): Long = runCatching {
-        AudioSystem.getAudioInputStream(File(path)).use { stream ->
-            if (stream.format.frameRate <= 0f) 0L
-            else (stream.frameLength / stream.format.frameRate * 1000.0).toLong().coerceAtLeast(0L)
-        }
-    }.getOrDefault(0L)
+    private fun durationMillis(path: String): Long = durationCache.getOrPut(path) {
+        runCatching {
+            AudioSystem.getAudioInputStream(File(path)).use { stream ->
+                if (stream.format.frameRate <= 0f) 0L
+                else (stream.frameLength / stream.format.frameRate * 1000.0).toLong().coerceAtLeast(0L)
+            }
+        }.getOrDefault(0L)
+    }
 
     private fun readPlaylists(): Map<String, List<String>> = runCatching {
         val json = JSONObject(preferences.get("playlists", "{}"))
