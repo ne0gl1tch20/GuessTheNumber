@@ -797,8 +797,7 @@ fun ProductionGuessGameScreen(
                             feedback = if (restored) "Restored the previous backup for slot $target." else "Could not restore a valid backup for that slot."
                             saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
                         }
-                    }
-                    ,
+                    },
                     onExportSlot = { target ->
                         val chooser = JFileChooser().apply {
                             dialogTitle = "Export save slot $target as JSON"
