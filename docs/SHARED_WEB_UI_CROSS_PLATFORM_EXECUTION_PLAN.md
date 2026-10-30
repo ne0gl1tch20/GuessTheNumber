@@ -10,14 +10,14 @@
 2. **Implemented in this batch:** embed JavaFX WebView in the Compose Desktop shell, unpack the canonical packaged `web-play/` files locally, support resize and cleanup, and load without requiring a network connection.
 3. **Initial bridge implemented:** bounded versioned requests, request ID deduplication and an explicit allow-list for guesses, multiplier selection, upgrade/shop actions, daily quests and chests. Kotlin transactions remain authoritative. Tighten local navigation/origin tests and broaden route actions.
 4. Adapt platform-specific input and lifecycle behavior without maintaining a second HTML/CSS/JS copy.
-5. Add host/bridge automated tests and verify the packaged app on Windows. Play, Upgrades, Shop, More and Changelog now use the host; About, Music, save management and remaining Compose routes stay native until their required host bridge actions are implemented.
+5. Add host/bridge automated tests and verify the packaged app on Windows. Play, Upgrades, Shop, More, Changelog and About now use the host. About check/install/open-update actions route through the Windows updater adapter; external links open in the system browser. Music, save management and remaining Compose routes stay native until their required host bridge actions are implemented.
 
 ## Workstream B: complete the shared player-facing screens
 
 Migrate in cohesive, testable batches, reusing canonical catalogs and existing Kotlin transactions:
 1. Prestige, Ultra and talent progression.
 2. Home Base, Relics, Codex, Endgame and remaining world/boss details.
-3. More and Changelog are now shared routes. Continue with About/update UI, settings, statistics, achievements, tutorial and save-management presentation.
+3. More, Changelog and About/update UI are now shared routes. Continue with settings, statistics, achievements, tutorial and save-management presentation.
 4. Arcade/minigames and player-facing Live Ops surfaces where platform contracts allow sharing.
 
 Keep developer tools and OS-owned/system surfaces native. Save-slot boot and crash recovery remain native until a shared implementation is justified and parity can be proved.

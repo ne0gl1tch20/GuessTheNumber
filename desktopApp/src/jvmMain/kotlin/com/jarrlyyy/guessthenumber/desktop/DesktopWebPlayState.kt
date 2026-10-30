@@ -203,6 +203,10 @@ internal fun desktopWebPlayState(
             .put("arms", armsJson))
     }
     return JSONObject()
+        .put("appVersion", com.jarrlyyy.guessthenumber.desktop.update.WindowsBuildVersion.current)
+        .put("appVersionCode", com.jarrlyyy.guessthenumber.desktop.update.WindowsBuildVersion.current.substringAfterLast('.').toIntOrNull() ?: 0)
+        .put("updateChannel", "debug")
+        .put("debugBuild", true)
         .put("initialScreen", initialScreen)
         .put("uiStrings", desktopWebUiStrings(game.settings.locale))
         .put("buyMultiplier", game.buyMultiplier)
