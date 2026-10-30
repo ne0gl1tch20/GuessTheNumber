@@ -24,6 +24,8 @@ private val webUiLocaleFiles = mapOf(
     "nl-NL" to "nl.json", "ar-SA" to "ar.json"
 )
 
+internal fun isDesktopWebLocaleSupported(localeTag: String): Boolean = localeTag in webUiLocaleFiles
+
 private fun desktopWebUiStrings(localeTag: String): JSONObject {
     val file = webUiLocaleFiles[localeTag] ?: "en_us.json"
     fun read(name: String): JSONObject? = runCatching {
@@ -55,7 +57,10 @@ internal fun desktopWebPlayState(
     talents: List<DesktopTalentDef> = DesktopEconomyRepository().talents(),
     engine: GameEngine = GameEngine(),
     initialScreen: String = "play",
-    minigames: List<DesktopMinigameDef> = DesktopEconomyRepository().minigames()
+    minigames: List<DesktopMinigameDef> = DesktopEconomyRepository().minigames(),
+    incomePerSecond: com.jarrlyyy.guessthenumber.domain.model.BigNumber = com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO,
+    offlineGains: com.jarrlyyy.guessthenumber.domain.model.BigNumber? = null,
+    offlineRewardDismissed: Boolean = false
 ): JSONObject {
     val upgrades = JSONArray()
     catalog.upgrades.forEach { upgrade ->
@@ -216,7 +221,27 @@ internal fun desktopWebPlayState(
         .put("ultraRequirement", engine.calculateUltraRequirement(game.ultraCount).format())
         .put("ultraReward", engine.calculateUltraReward(game.money, game.ultraCount).format())
         .put("canUltra", game.money >= engine.calculateUltraRequirement(game.ultraCount) && game.prestige >= com.jarrlyyy.guessthenumber.domain.model.BigNumber(1_000) && engine.calculateUltraReward(game.money, game.ultraCount) > com.jarrlyyy.guessthenumber.domain.model.BigNumber.ZERO)
-        .put("settings", JSONObject().put("musicEnabled", game.settings.musicEnabled).put("soundEnabled", game.settings.soundEnabled).put("vibrationEnabled", game.settings.vibrationEnabled).put("reducedMotion", game.settings.reducedMotion).put("reduceFlashes", game.settings.reduceFlashes))
+        .put("settings", JSONObject()
+            .put("musicEnabled", game.settings.musicEnabled)
+            .put("soundEnabled", game.settings.soundEnabled)
+            .put("vibrationEnabled", game.settings.vibrationEnabled)
+            .put("notificationsEnabled", game.settings.notificationsEnabled)
+            .put("notificationRemindersEnabled", game.settings.notificationRemindersEnabled)
+            .put("notificationProgressionEnabled", game.settings.notificationProgressionEnabled)
+            .put("notificationEventsEnabled", game.settings.notificationEventsEnabled)
+            .put("notificationIntervalHours", game.settings.notificationIntervalHours)
+            .put("themeMode", game.settings.themeMode)
+            .put("numberNotation", game.settings.numberNotation)
+            .put("locale", game.settings.locale)
+            .put("reducedMotion", game.settings.reducedMotion)
+            .put("reduceFlashes", game.settings.reduceFlashes)
+            .put("volume", game.settings.volume)
+            .put("sfxVolume", game.settings.sfxVolume)
+            .put("themePreset", game.settings.themePreset)
+            .put("customPrimaryColor", game.settings.customPrimaryColor)
+            .put("customSecondaryColor", game.settings.customSecondaryColor)
+            .put("customTertiaryColor", game.settings.customTertiaryColor)
+            .put("webMenuStudioLayout", game.settings.webMenuStudioLayout ?: JSONObject.NULL))
         .put("statistics", statistics)
         .put("minigames", minigamesJson)
         .put("streak", game.streak)
@@ -234,14 +259,26 @@ internal fun desktopWebPlayState(
         .put("streak", game.streak)
         .put("bestStreak", game.bestStreak)
         .put("accepted", accepted)
+        .put("creativeModeEnabled", game.creativeModeEnabled)
+        .put("offlineGains", if (offlineRewardDismissed) "" else offlineGains?.format() ?: "")
+        .put("dailyRewardAvailable", game.lastDailyRewardDate != java.time.LocalDate.now().toString())
+        .put("dailyRewardStreak", game.dailyRewardStreak)
+        .put("dailyRewardAmount", (com.jarrlyyy.guessthenumber.domain.model.DailyRewardPolicy.nextReward(game.lastDailyRewardDate, game.dailyRewardStreak, java.time.LocalDate.now().toString()) * if ("nebula_boost" in game.shopPurchases) 2L else 1L).toString())
+        .put("dailyRewardNextStreak", com.jarrlyyy.guessthenumber.domain.model.DailyRewardPolicy.nextStreak(game.lastDailyRewardDate, game.dailyRewardStreak, java.time.LocalDate.now().toString()))
+        .put("dailyRewardLastClaimDate", game.lastDailyRewardDate)
         .put("money", game.money.format())
-        .put("incomePerSecond", "0")
+        .put("incomePerSecond", incomePerSecond.format())
         .put("prestige", game.prestige.format())
         .put("ultra", game.ultra.format())
         .put("nebula", game.nebula.format())
         .put("prestigeCount", game.prestigeCount)
         .put("ultraCount", game.ultraCount)
         .put("activeWorldId", game.activeWorldId)
+        .put("autoClickerActive", game.autoClickerActive)
+        .put("lastBotGuess", game.lastBotGuess ?: JSONObject.NULL)
+        .put("lastBotFeedback", game.lastBotFeedback ?: "")
+        .put("lastBotId", game.lastBotId ?: "")
+        .put("botActionSequence", game.botActionSequence)
         .put("talents", talentsJson)
         .put("activeMutators", JSONArray(game.activeMutators.toList()))
         .put("gameplayTraits", gameplayTraits)
