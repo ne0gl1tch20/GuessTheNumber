@@ -252,7 +252,7 @@ private class DesktopSharedWebViewController {
                 var value = String(position || 'LEFT').toUpperCase();
                 if (!['LEFT','RIGHT','TOP','BOTTOM'].includes(value)) value = 'LEFT';
                 document.documentElement.dataset.desktopNavigationPosition = value;
-                document.body.dataset.desktopNavigationPosition = value;
+                if (document.body) document.body.dataset.desktopNavigationPosition = value;
               }
               function requestPosition(value) {
                 applyNavigationPosition(value);
