@@ -22,9 +22,18 @@ val generateDesktopBuildConfig = tasks.register("generateDesktopBuildConfig") {
     doLast {
         val allowDeveloperTools = providers.gradleProperty("gtn.desktop.debugToolsBuild")
             .orElse("false").get().equals("true", ignoreCase = true)
+        val liveOpsManifestUrl = providers.gradleProperty("luaLiveOpsManifestUrl")
+            .orElse("https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber-LiveOps/main/manifest.json").get()
+        val liveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase64")
+            .orElse("").get().filterNot(Char::isWhitespace)
         outputFile.get().asFile.apply {
             parentFile.mkdirs()
-            writeText("debugToolsBuildAllowed=$allowDeveloperTools\n")
+            writeText(
+                "debugToolsBuildAllowed=$allowDeveloperTools\n" +
+                    "liveOpsManifestUrl=$liveOpsManifestUrl\n" +
+                    "liveOpsPublicKeyBase64=$liveOpsPublicKey\n" +
+                    "appVersionCode=24\n"
+            )
         }
     }
 }
