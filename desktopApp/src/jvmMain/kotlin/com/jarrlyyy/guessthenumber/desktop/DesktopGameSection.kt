@@ -22,7 +22,8 @@ enum class DesktopGameSection {
     LUCKY_STAKE,
     ARCADE,
     MUSIC_PLAYER,
-    CHANGELOG
+    CHANGELOG,
+    ABOUT
 }
 
 
@@ -32,6 +33,8 @@ internal val DesktopGameSection.sharedHtmlScreen: String?
         DesktopGameSection.PLAY -> "play"
         DesktopGameSection.MORE -> "more"
         DesktopGameSection.CHANGELOG -> "changelog"
+        DesktopGameSection.ABOUT -> "about"
+        DesktopGameSection.MUSIC_PLAYER -> "music"
         DesktopGameSection.UPGRADES -> "upgrades"
         DesktopGameSection.SHOP -> "shop"
         DesktopGameSection.PRESTIGE -> "prestige"
