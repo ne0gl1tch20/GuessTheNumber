@@ -73,6 +73,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import java.io.File
+import java.nio.file.Files
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileNameExtensionFilter
 import kotlin.random.Random
 import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
 import com.jarrlyyy.guessthenumber.shared.rules.GuessRateLimitRules
@@ -792,6 +796,46 @@ fun ProductionGuessGameScreen(
                             }
                             feedback = if (restored) "Restored the previous backup for slot $target." else "Could not restore a valid backup for that slot."
                             saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    }
+                    ,
+                    onExportSlot = { target ->
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Export save slot $target as JSON"
+                            selectedFile = File("guessthenumber-slot-$target.json")
+                            fileFilter = FileNameExtensionFilter("GuessTheNumber save (*.json)", "json")
+                        }
+                        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val destination = chooser.selectedFile.toPath()
+                            scope.launch {
+                                val raw = withContext(Dispatchers.IO) { saveStore.exportSlotJson(target) }
+                                val exported = raw != null && runCatching {
+                                    Files.writeString(destination, raw)
+                                }.isSuccess
+                                feedback = if (exported) "Exported slot $target as a plain JSON backup." else "Could not export slot $target."
+                            }
+                        }
+                    },
+                    onImportSlot = { target ->
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Import JSON into save slot $target"
+                            fileFilter = FileNameExtensionFilter("GuessTheNumber save (*.json)", "json")
+                        }
+                        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val source = chooser.selectedFile.toPath()
+                            scope.launch {
+                                isSaving = true
+                                val imported = withContext(Dispatchers.IO) {
+                                    runCatching { Files.readString(source) }.getOrNull()?.let { saveStore.importSlotJson(target, it) } ?: false
+                                }
+                                if (imported && target == activeSaveSlot) {
+                                    state = withContext(Dispatchers.IO) { saveStore.load(target) }
+                                    state?.let { autoClicker.reset(it.currentRangeMin, it.currentRangeMax) }
+                                }
+                                feedback = if (imported) "Imported and validated JSON into slot $target." else "Import rejected. The existing save was left intact."
+                                saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                                isSaving = false
+                            }
                         }
                     }
                 )
