@@ -117,4 +117,43 @@ class DesktopLiveOpsRepositoryTest {
 
         assertEquals(null, updated)
     }
+    @Test
+    fun rejectsDuplicateOrInvalidRemoteEventCatalogEntries() {
+        val repository = DesktopLiveOpsRepository()
+        val event = DesktopLiveOpsEvent(
+            id = "same",
+            title = "Event",
+            description = "Test",
+            status = "ACTIVE",
+            startDate = "2026-01-01T00:00:00Z",
+            endDate = "2026-02-01T00:00:00Z",
+            currencyName = "Nebula",
+            maxClaims = 1,
+            rewardNebula = 10
+        )
+
+        val duplicateError = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            repository.validateRemoteEvents(manifestVersion = 2, events = listOf(event, event))
+        }
+        assertTrue(duplicateError.message.orEmpty().contains("duplicate event IDs"))
+
+        val invalidRewardError = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            repository.validateRemoteEvents(manifestVersion = 2, events = listOf(event.copy(id = "bad_reward", rewardNebula = -1)))
+        }
+        assertTrue(invalidRewardError.message.orEmpty().contains("reward or eligibility values"))
+
+        val invalidIdError = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            repository.validateRemoteEvents(manifestVersion = 2, events = listOf(event.copy(id = "Bad ID")))
+        }
+        assertTrue(invalidIdError.message.orEmpty().contains("event ID is invalid"))
+    }
+
+    @Test
+    fun rejectsUnsupportedRemoteEventManifestVersion() {
+        val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            DesktopLiveOpsRepository().validateRemoteEvents(manifestVersion = 3, events = emptyList())
+        }
+        assertTrue(error.message.orEmpty().contains("Unsupported LiveOps manifest version"))
+    }
+
 }
