@@ -255,7 +255,8 @@ fun ProductionGuessGameScreen(
 
         val guess = autoClicker.nextGuess(snapshot.currentRangeMin, snapshot.currentRangeMax)
         isSaving = true
-        val result = engine.processGuess(snapshot, guess)
+        val rawResult = engine.processGuess(snapshot, guess)
+        val result = TraitGameplayRules.apply(snapshot, guess, rawResult, TraitGameplayRules.activeGameplayTraitIds(snapshot))
         val correct = result.feedback == GuessFeedback.CORRECT
         val bonusAdjustedState = DesktopEconomyTransactions.applyGuessBonuses(
             before = snapshot,
@@ -1001,7 +1002,8 @@ fun ProductionGuessGameScreen(
                     } else if (!isSaving) {
                         lastGuessTimestampNanos = System.nanoTime()
                         isSaving = true
-                        val result = engine.processGuess(currentState, guess)
+                        val rawResult = engine.processGuess(currentState, guess)
+                        val result = TraitGameplayRules.apply(currentState, guess, rawResult, TraitGameplayRules.activeGameplayTraitIds(currentState))
                         val correct = result.feedback == GuessFeedback.CORRECT
                         val bonusAdjustedState = DesktopEconomyTransactions.applyGuessBonuses(
                             before = currentState,
