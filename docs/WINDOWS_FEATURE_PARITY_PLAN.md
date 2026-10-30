@@ -145,42 +145,27 @@ The port is complete only when every Android player-facing screen and reachable 
 
 ### W3. Progression and collection
 
-- [x] Source implementation: achievements load the canonical catalog, reflect saved unlocks/progress, expose tier/reward details and filters.
+- [x] Source implementation: achievements load the canonical catalog, reflect saved unlocks/progress, expose tier/reward details and filters; milestone rewards use shared Kotlin rules.
 - [x] Source implementation: world catalog, unlock/select actions, boss progress, boss battle transactions and guess-driven boss damage/rewards are connected to Kotlin-owned state.
 - [x] Source implementation: relic inventory, boss-gated claims, equip/unequip limits and set-bonus previews use desktop transactions.
 - [x] Source implementation: Home Base upgrade progression and Codex discovery/completion reward are persisted through desktop transactions; Endgame exposes progression goals and Endless Rift state.
-- [x] Source implementation: weekly/custom challenge reward rules and duplicate-claim protection exist in shared Kotlin; desktop mutator/challenge UI and transaction code exist.
-- [ ] Verify all progression routes, challenge claims, relic effects, mastery, bosses and save/reload against Android on a current Windows runtime.
+- [x] Shared challenge reward eligibility and duplicate-claim protection exist in Kotlin; desktop mutator/challenge UI and transaction code are present.
+- [ ] Verify progression routes, challenge claims, relic effects, mastery, bosses and save/reload against Android on a current Windows runtime.
 - [ ] Finish interactive world map presentation, Codex entry/search parity and complete Endless Rift/mastery interaction parity.
 - [ ] Complete feature-flagged LiveOps/event presentation and reward claims on Windows.
-- [ ] Supported Lua activity discovery/execution with the Android sandbox's resource and permission limits.
-
-- [x] Achievement milestone unlocks and one-time Nebula rewards use the shared engine on Android and Windows; the Ultra Nebula upgrade applies to achievement payouts.
-- [ ] Verify the desktop achievements screen's presentation and reward feedback against Android; add claimable reward parity where the Android flow requires it.
-- [ ] Daily/weekly challenges and claim-state persistence.
-- [ ] Statistics and progression summaries.
-- [ ] World map, world unlocks, bosses, relic inventory/sets and mastery.
-- [ ] Secret discoveries, Home Base, Codex and Endless Rift.
-- [ ] Locked/unlocked/completed states and explanatory requirements.
+- [ ] Port supported Lua activity discovery/execution with Android-equivalent sandbox resource and permission limits.
+- [ ] Verify locked/unlocked/completed states, explanatory requirements and localized feedback.
 
 **Exit:** Player-facing progression systems are accessible and state-consistent on Windows.
 
 ### W4. Activities and events
 
-- [x] Source implementation: five catalog-backed Android Arcade minigames and Kotlin-owned reward transactions are present on Windows.
+- [x] Source implementation: five catalog-backed Android Arcade minigames (Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush) route payouts through Kotlin-owned transactions.
 - [x] Source implementation: Lucky Stake settlement uses desktop transactions with stake validation and saved statistics.
 - [ ] Verify all five minigame win/loss outcomes, localization, reward multipliers and save/reload on Windows.
 - [ ] Complete Activity Hub and LiveOps discovery/claim handling with shared feature flags and eligibility checks.
 - [ ] Port supported Lua activities with the same sandbox/resource boundaries as Android.
-- [ ] Verify offline event availability and missing optional content/audio failure behavior.
-
-- [x] Port the five catalog-backed Android Arcade minigames (Quick Guess, Reaction Test, Lucky Number Box, Memory Digit Sequence and Number Rush) to Windows and route payouts through the shared economy transaction. CI enforces that the packaged desktop minigame catalog matches Android's canonical asset.
-- [x] Confirm the Windows Arcade route opens without the nested-scroll exception (PR #222; owner-reported runtime verification).
-- [ ] Verify all five minigames' win/loss behavior, localized strings, reward multipliers and reward/save persistence on Windows.
-- [ ] Random events, challenge/mutator setup and staking where in agreed release scope.
-- [ ] Number Rush and bundled LuaJ activities using existing sandbox/validation boundaries.
-- [ ] Offline event availability and reward validation.
-- [ ] Missing optional content or audio fails gracefully instead of crashing.
+- [ ] Verify offline event availability, reward validation and missing optional content/audio failure behavior.
 
 **Exit:** Supported activities work offline, and scripted content cannot bypass Kotlin-owned reward/state validation.
 
