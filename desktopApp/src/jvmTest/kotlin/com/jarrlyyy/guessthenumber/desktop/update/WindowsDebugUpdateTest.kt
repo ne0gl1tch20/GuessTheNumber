@@ -21,6 +21,7 @@ class WindowsDebugUpdateTest {
         assertEquals("1.0.6", update?.version)
         assertEquals("windows-debug-6-2", update?.tagName)
         assertEquals("$ARTIFACT_DOWNLOAD_PREFIX", update?.artifactDownloadUrl)
+        assertEquals("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", update?.artifactSha256)
         assertEquals(6L, update?.runNumber)
         assertEquals(2L, update?.runAttempt)
     }
@@ -35,7 +36,7 @@ class WindowsDebugUpdateTest {
     fun rejectsExpiredLatestArtifactInsteadOfFallingBackToAnOlderBuild() {
         val responses = standardResponses(6).toMutableMap()
         responses[ARTIFACTS_URL] = """{"artifacts":[
-            {"name":"GuessTheNumber-Windows-Debug","expired":true,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX"}
+            {"name":"GuessTheNumber-Windows-Debug","expired":true,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX","digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
         ]}"""
         val client = WindowsDebugUpdateClient { url ->
             StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
@@ -192,7 +193,7 @@ class WindowsDebugUpdateTest {
             {"id":598,"run_number":7,"run_attempt":1,"event":"pull_request","head_branch":"feature","status":"completed","conclusion":"success"}
         ]}""",
         ARTIFACTS_URL to """{"artifacts":[
-            {"name":"GuessTheNumber-Windows-Debug","expired":false,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX"}
+            {"name":"GuessTheNumber-Windows-Debug","expired":false,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX","digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
         ]}"""
     )
 
