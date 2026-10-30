@@ -412,12 +412,12 @@ fun main() = application {
                         DesktopDestination.CHANGELOG -> DesktopChangelogScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
                         DesktopDestination.ACTIVITY_HUB -> DesktopActivityHubScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
                         DesktopDestination.LIVE_OPS -> DesktopLiveOpsScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
+                        DesktopDestination.DEVELOPER_CONSOLE -> DesktopDeveloperConsoleScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
+                        DesktopDestination.PROCESS_INSPECTOR -> DesktopProcessInspectorScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
 
                         DesktopDestination.SAVE_SLOTS,
                         DesktopDestination.RELICS,
                         DesktopDestination.DEVELOPER_SETTINGS,
-                        DesktopDestination.DEVELOPER_CONSOLE,
-                        DesktopDestination.PROCESS_INSPECTOR,
                         DesktopDestination.LUA_TESTING_HUB -> DesktopParityScreen(destination = destination, onBack = { shell.navigate(DesktopDestination.MORE) }, onNavigate = { shell.navigate(it) })
 
                         DesktopDestination.ABOUT -> {
