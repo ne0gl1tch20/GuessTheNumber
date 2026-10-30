@@ -89,6 +89,71 @@ class WindowsDebugUpdateTest {
     }
 
     @Test
+    fun extractsExpectedFilesFromActionsArtifact() {
+        val archiveBytes = "inner-installer-zip".toByteArray()
+        val manifestBytes = """{"channel":"windows-debug"}""".toByteArray()
+        val artifact = createZip(
+            WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME to archiveBytes,
+            WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME to manifestBytes
+        )
+        val directory = Files.createTempDirectory("gtn-artifact-test-")
+        val archive = directory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME)
+        val manifest = directory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME)
+        try {
+            WindowsDebugArtifactValidator.extractArtifactFiles(artifact, archive, manifest)
+            assertArrayEquals(archiveBytes, Files.readAllBytes(archive))
+            assertArrayEquals(manifestBytes, Files.readAllBytes(manifest))
+        } finally {
+            Files.deleteIfExists(archive)
+            Files.deleteIfExists(manifest)
+            Files.deleteIfExists(directory)
+            Files.deleteIfExists(artifact)
+        }
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun rejectsUnexpectedFilesInActionsArtifact() {
+        val artifact = createZip(
+            WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME to byteArrayOf(1),
+            WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME to byteArrayOf(2),
+            "extra.txt" to byteArrayOf(3)
+        )
+        val directory = Files.createTempDirectory("gtn-artifact-test-")
+        try {
+            WindowsDebugArtifactValidator.extractArtifactFiles(
+                artifact,
+                directory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME),
+                directory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME)
+            )
+        } finally {
+            Files.deleteIfExists(directory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME))
+            Files.deleteIfExists(directory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME))
+            Files.deleteIfExists(directory)
+            Files.deleteIfExists(artifact)
+        }
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun rejectsPathTraversalInActionsArtifact() {
+        val artifact = createZip(
+            "../windows-debug-manifest.json" to byteArrayOf(1)
+        )
+        val directory = Files.createTempDirectory("gtn-artifact-test-")
+        try {
+            WindowsDebugArtifactValidator.extractArtifactFiles(
+                artifact,
+                directory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME),
+                directory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME)
+            )
+        } finally {
+            Files.deleteIfExists(directory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME))
+            Files.deleteIfExists(directory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME))
+            Files.deleteIfExists(directory)
+            Files.deleteIfExists(artifact)
+        }
+    }
+
+    @Test
     fun verifiesArchiveChecksum() {
         val archive = Files.createTempFile("gtn-test-", ".zip")
         val payload = "checksum-payload".toByteArray()
