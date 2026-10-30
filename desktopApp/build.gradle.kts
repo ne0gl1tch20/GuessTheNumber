@@ -24,7 +24,7 @@ val generateDesktopBuildConfig = tasks.register("generateDesktopBuildConfig") {
             .orElse("false").get().equals("true", ignoreCase = true)
         outputFile.get().asFile.apply {
             parentFile.mkdirs()
-            writeText("debugToolsBuildAllowed=$allowDeveloperTools\\n")
+            writeText("debugToolsBuildAllowed=$allowDeveloperTools\n")
         }
     }
 }
