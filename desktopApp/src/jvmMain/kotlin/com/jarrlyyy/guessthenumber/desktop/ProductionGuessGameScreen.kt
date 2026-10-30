@@ -100,6 +100,9 @@ fun ProductionGuessGameScreen(
     onGlobalPreferencesImported: () -> Unit = {},
     onOpenParityDestination: (DesktopDestination) -> Unit = {},
     onOpenPlayerProfile: () -> Unit = {},
+    onDesktopUpdateRequest: (String, String, (String) -> Unit) -> Unit = { _, _, reply ->
+        reply(org.json.JSONObject().put("version", 1).put("type", "error").put("error", "desktop_update_unavailable").toString())
+    },
     onThemeSettingsLoaded: (
         themeMode: String,
         primaryHex: String,
@@ -369,6 +372,10 @@ fun ProductionGuessGameScreen(
                         }
                         if (webRequestIds.size > 128) webRequestIds.remove(webRequestIds.first())
                         val type = request.getString("type")
+                        if (type in setOf("check_updates", "install_update", "open_update_page")) {
+                            onDesktopUpdateRequest(type, requestId, reply)
+                            return@launch
+                        }
                         if (type == "music_state") {
                             val musicSettings = state?.settings
                             if (musicSettings == null) {
