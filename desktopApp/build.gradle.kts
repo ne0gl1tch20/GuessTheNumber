@@ -25,7 +25,7 @@ val desktopLiveOpsPublicKey = providers.gradleProperty("luaLiveOpsPublicKeyBase6
     .map { value -> value.filterNot(Char::isWhitespace) }
     .orElse("")
 val generateDesktopBuildConfig = tasks.register<org.gradle.api.tasks.WriteProperties>("generateDesktopBuildConfig") {
-    outputFile = generatedDesktopBuildConfig.get().file("desktop-build.properties").asFile
+    destinationFile = generatedDesktopBuildConfig.get().file("desktop-build.properties").asFile
     property("debugToolsBuildAllowed", desktopDebugToolsBuildAllowed.get().toString())
     property("liveOpsManifestUrl", desktopLiveOpsManifestUrl.get())
     property("liveOpsPublicKeyBase64", desktopLiveOpsPublicKey.get())
