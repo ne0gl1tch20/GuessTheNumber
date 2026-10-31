@@ -35,8 +35,8 @@ enum class DesktopNavigationPosition(val label: String) {
 }
 
 /**
- * Windows-owned navigation contract. Native popup destinations are intentionally
- * excluded from the main navigation list because they belong to Compose layer 1.
+ * Windows-owned navigation contract.
+ * Native popup destinations are intentionally excluded from the main navigation list.
  */
 enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     PLAY("Play", Key.One),
@@ -77,7 +77,6 @@ enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
             PRESTIGE,
             ULTRA,
             SETTINGS,
-            ARCADE,
             MUSIC_PLAYER,
             STATS,
             WORLD_MAP,
