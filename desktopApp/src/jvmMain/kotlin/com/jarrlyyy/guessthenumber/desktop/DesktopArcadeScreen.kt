@@ -54,7 +54,7 @@ internal fun DesktopArcadeScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            OutlinedButton(onClick = onBack) { Text("Back to More") }
+            OutlinedButton(onClick = onBack) { Text("Close") }
             Text("Arcade", style = MaterialTheme.typography.headlineMedium)
         }
         Text(
