@@ -400,7 +400,6 @@ fun ProductionGuessGameScreen(
         }
 
         if (section.sharedHtmlScreen != null) {
-            key(section) {
             DesktopSharedWebView(
                 initialScreen = section.sharedHtmlScreen!!,
                 onRequest = { raw, reply ->
@@ -903,12 +902,13 @@ fun ProductionGuessGameScreen(
                 onNavigationPositionChange = onNavigationPositionChange,
                 modifier = Modifier.fillMaxSize()
             )
-            }
             return@Card
         }
 
         Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+            modifier = Modifier.fillMaxSize()
+                .then(if (section == DesktopGameSection.SAVE_SLOTS) Modifier else Modifier.verticalScroll(rememberScrollState()))
+                .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (section != DesktopGameSection.SAVE_SLOTS) {
