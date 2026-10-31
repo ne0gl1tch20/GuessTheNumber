@@ -2,6 +2,9 @@ package com.jarrlyyy.guessthenumber.desktop.persistence
 
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeEffect
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeEffectType
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.runBlocking
@@ -94,6 +97,36 @@ class DesktopSaveStoreTest {
         assertTrue(store.duplicateSlot(1, 2))
         assertEquals(first.targetNumber, store.load(2)?.targetNumber)
         assertFalse(store.duplicateSlot(1, 2))
+    }
+
+    @Test
+    fun creativeModeSavesRoundTripDuplicateExportImportAndReset() = runBlocking {
+        val sourceDirectory = Files.createTempDirectory("gtn-creative-save-source")
+        val source = DesktopSaveStore(sourceDirectory)
+        val base = GameState(targetNumber = 64, lastSaveTimestamp = 1_700_000_000_000L)
+        val creative = CreativeModeSave(
+            name = "Desktop Lab",
+            enabled = true,
+            rangeMin = 10L,
+            rangeMax = 500L,
+            effects = listOf(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, 2))
+        )
+        assertTrue(source.save(1, base))
+        assertTrue(source.saveCreativeModeSave(1, creative))
+        assertEquals(creative, source.loadCreativeModeSave(1))
+        assertTrue(source.duplicateSlot(1, 2))
+        assertEquals(creative, source.loadCreativeModeSave(2))
+
+        val bundle = assertNotNull(source.exportAllSlotsBundle())
+        val targetDirectory = Files.createTempDirectory("gtn-creative-save-target")
+        val target = DesktopSaveStore(targetDirectory)
+        assertTrue(target.importAllSlotsBundle(bundle))
+        assertEquals(creative, target.loadCreativeModeSave(1))
+        assertEquals(creative, target.loadCreativeModeSave(2))
+
+        assertTrue(target.reset(1, GameState(targetNumber = 20, lastSaveTimestamp = 1_700_000_000_100L)))
+        assertEquals(null, target.loadCreativeModeSave(1))
+        assertEquals(creative, target.loadCreativeModeSave(2))
     }
 
     @Test
