@@ -248,7 +248,7 @@ jobs:
           }
 
       - name: Prepare debug channel package
-        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && github.event.pull_request.number == 390)
         shell: pwsh
         run: |
           $msi = Get-ChildItem -Path "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File | Select-Object -First 1
@@ -290,7 +290,7 @@ jobs:
           retention-days: 7
 
       - name: Upload Windows Debug update artifact
-        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && github.event.pull_request.number == 390)
         uses: actions/upload-artifact@v4
         with:
           name: GuessTheNumber-Windows-Debug
@@ -301,7 +301,7 @@ jobs:
           retention-days: 7
 
       - name: Publish Windows Debug assets to debug-latest
-        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && github.event.pull_request.number == 390)
         env:
           GH_TOKEN: ${{ github.token }}
         shell: pwsh
