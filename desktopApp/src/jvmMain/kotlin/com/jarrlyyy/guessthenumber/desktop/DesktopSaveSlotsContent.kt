@@ -32,11 +32,12 @@ internal fun DesktopSaveSlotsContent(
     onImportSlot: (Int) -> Unit,
     onExportAllSlots: () -> Unit,
     onImportAllSlots: () -> Unit,
-    onContinueWithActiveSlot: (() -> Unit)? = null
+    onContinueWithActiveSlot: (() -> Unit)? = null,
+    showCloseButton: Boolean = true
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onBack) { Text("Close") }
+            if (showCloseButton) OutlinedButton(onClick = onBack) { Text("Close") }
             Text("Save Slots", style = MaterialTheme.typography.headlineSmall)
             OutlinedButton(onClick = onRefresh) { Text("Refresh") }
             if (onContinueWithActiveSlot != null) {
