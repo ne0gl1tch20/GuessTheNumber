@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.desktop
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -78,36 +79,79 @@ internal fun DesktopSaveSlotsContent(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // The window already says Save Slots. Keep this row action-focused.
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedButton(onClick = onRefresh) {
-                Icon(Icons.Filled.Refresh, contentDescription = null)
-                Spacer(Modifier.width(6.dp))
-                Text("Refresh")
-            }
-            OutlinedButton(onClick = onExportAllSlots) {
-                Icon(Icons.Filled.FileDownload, contentDescription = null)
-                Spacer(Modifier.width(6.dp))
-                Text("Export all")
-            }
-            OutlinedButton(onClick = onImportAllSlots) {
-                Icon(Icons.Filled.FileUpload, contentDescription = null)
-                Spacer(Modifier.width(6.dp))
-                Text("Import all")
-            }
-            Spacer(Modifier.weight(1f))
-            if (onContinueWithActiveSlot != null) {
-                Button(onClick = onContinueWithActiveSlot, enabled = activeState != null) {
-                    Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                    Spacer(Modifier.width(6.dp))
-                    Text("Continue")
+        // Keep the action bar usable when the user narrows the desktop popup.
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            if (maxWidth < 760.dp) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedButton(onClick = onRefresh, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Filled.Refresh, contentDescription = null)
+                            Spacer(Modifier.width(4.dp))
+                            Text("Refresh")
+                        }
+                        OutlinedButton(onClick = onExportAllSlots, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Filled.FileDownload, contentDescription = null)
+                            Spacer(Modifier.width(4.dp))
+                            Text("Export")
+                        }
+                        OutlinedButton(onClick = onImportAllSlots, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Filled.FileUpload, contentDescription = null)
+                            Spacer(Modifier.width(4.dp))
+                            Text("Import")
+                        }
+                    }
+                    if (onContinueWithActiveSlot != null) {
+                        Button(
+                            onClick = onContinueWithActiveSlot,
+                            enabled = activeState != null,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                            Spacer(Modifier.width(6.dp))
+                            Text("Continue with active save")
+                        }
+                    } else if (showCloseButton) {
+                        OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
+                            Text("Close")
+                        }
+                    }
                 }
-            } else if (showCloseButton) {
-                OutlinedButton(onClick = onBack) { Text("Close") }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedButton(onClick = onRefresh) {
+                        Icon(Icons.Filled.Refresh, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text("Refresh")
+                    }
+                    OutlinedButton(onClick = onExportAllSlots) {
+                        Icon(Icons.Filled.FileDownload, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text("Export all")
+                    }
+                    OutlinedButton(onClick = onImportAllSlots) {
+                        Icon(Icons.Filled.FileUpload, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text("Import all")
+                    }
+                    Spacer(Modifier.weight(1f))
+                    if (onContinueWithActiveSlot != null) {
+                        Button(onClick = onContinueWithActiveSlot, enabled = activeState != null) {
+                            Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                            Spacer(Modifier.width(6.dp))
+                            Text("Continue")
+                        }
+                    } else if (showCloseButton) {
+                        OutlinedButton(onClick = onBack) { Text("Close") }
+                    }
+                }
             }
         }
 
@@ -129,7 +173,7 @@ internal fun DesktopSaveSlotsContent(
                     it.difficultyId.replaceFirstChar(Char::uppercase) +
                         if (it.creativeModeEnabled) " · Creative Mode" else ""
                 },
-                metricItems = data?.takeUnless { slot.isCorrupt }?.let {
+                metricColumns = 3,\n                metricItems = data?.takeUnless { slot.isCorrupt }?.let {
                     listOf(
                         SharedSaveSlotMetric(SharedSaveSlotMetricIcon.TARGET, "Hidden number: ${it.targetNumber}"),
                         SharedSaveSlotMetric(SharedSaveSlotMetricIcon.MONEY, "Money: ${it.money}"),
