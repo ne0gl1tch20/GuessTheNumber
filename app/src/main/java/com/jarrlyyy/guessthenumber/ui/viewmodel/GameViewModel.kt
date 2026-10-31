@@ -20,7 +20,7 @@ import com.jarrlyyy.guessthenumber.data.store.exportSecureSave
 import com.jarrlyyy.guessthenumber.data.store.importSecureOrLegacySave
 import com.jarrlyyy.guessthenumber.data.store.exportPortableBackup
 import com.jarrlyyy.guessthenumber.data.store.importPortableOrLegacyBackup
-import com.jarrlyyy.guessthenumber.data.store.CreativeModeSave
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.store.SaveSlotMetadata
 import com.jarrlyyy.guessthenumber.domain.command.CommandExecutor
