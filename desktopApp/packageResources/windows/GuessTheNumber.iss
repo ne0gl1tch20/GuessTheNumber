@@ -72,9 +72,9 @@ begin
   begin
     DisplayName := '';
     UninstallString := '';
-    if RegQueryStringValue(RootKey, UninstallRoot + '\\' + Subkeys[Index], 'DisplayName', DisplayName) and
+    if RegQueryStringValue(RootKey, UninstallRoot + '\' + Subkeys[Index], 'DisplayName', DisplayName) and
        (Pos('GuessTheNumber', DisplayName) > 0) and
-       RegQueryStringValue(RootKey, UninstallRoot + '\\' + Subkeys[Index], 'UninstallString', UninstallString) and
+       RegQueryStringValue(RootKey, UninstallRoot + '\' + Subkeys[Index], 'UninstallString', UninstallString) and
        (Pos('msiexec', Lowercase(UninstallString)) > 0) then
     begin
       Result := UninstallString;
@@ -92,9 +92,11 @@ var
   ResultCode: Integer;
 begin
   Result := True;
-  UninstallString := FindLegacyMsiUninstallString(HKLM64, 'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall');
+  UninstallString := FindLegacyMsiUninstallString(HKLM64, 'Software\Microsoft\Windows\CurrentVersion\Uninstall');
   if UninstallString = '' then
-    UninstallString := FindLegacyMsiUninstallString(HKLM32, 'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall');
+    UninstallString := FindLegacyMsiUninstallString(HKLM32, 'Software\Microsoft\Windows\CurrentVersion\Uninstall');
+  if UninstallString = '' then
+    UninstallString := FindLegacyMsiUninstallString(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Uninstall');
   if UninstallString = '' then
     exit;
 
@@ -108,7 +110,7 @@ begin
   end;
 
   ProductCode := Copy(UninstallString, GuidStart, GuidEnd - GuidStart + 1);
-  if not Exec(ExpandConstant('{sys}\\msiexec.exe'), '/x ' + ProductCode + ' /qn /norestart', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) or
+  if not Exec(ExpandConstant('{sys}\msiexec.exe'), '/x ' + ProductCode + ' /qn /norestart', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) or
      not ((ResultCode = 0) or (ResultCode = 1605) or (ResultCode = 3010)) then
   begin
     MsgBox('GuessTheNumber could not remove the previous MSI installation. No application files were replaced. Your saves in AppData remain untouched.', mbError, MB_OK);
