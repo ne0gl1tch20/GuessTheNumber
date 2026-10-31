@@ -103,6 +103,33 @@ def main() -> int:
     require(desktop_host, '.put("id", request', "Windows replies must preserve request ID")
     require(desktop_adapter, "messageHandler({ data: message })", "Windows replies must reach the same event.data receiver")
 
+    # Desktop Settings must stay on the canonical HTML/JarrlyyUI surface.
+    desktop_fx_host = read("desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopSharedWebView.kt")
+    desktop_edge_host = read("desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopEdgeWebViewController.kt")
+    desktop_sections = read("desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopGameSection.kt")
+    require(desktop_sections, 'DesktopGameSection.SETTINGS -> "settings"', "Windows Settings must route to the shared HTML settings screen")
+    require(desktop_game, "if (section.sharedHtmlScreen != null)", "shared HTML destinations must be rendered before native fallbacks")
+    require(desktop_game, "DesktopSharedWebView(", "Windows Settings must render through the shared WebView")
+    require(desktop_adapter, 'class="setting-row jui-switch desktop-startup-setting"', "Windows startup toggle must reuse the shared JarrlyyUI switch component")
+    require(desktop_adapter, 'aria-label="Launch GuessTheNumber when Windows starts"', "Windows startup toggle must have an accessible name")
+    require(desktop_adapter, "class=\"jui-field\"", "Windows navigation position must reuse the shared JarrlyyUI field")
+
+    # The developer overlay is available in both package types, but JavaScript inspection stays debug-only.
+    require(desktop_adapter, "function installDebugOverlay()", "desktop developer overlay installer must exist")
+    require(desktop_adapter, "if (document.getElementById('gtnDesktopDebugRoot')) return;", "overlay availability must not depend on debug-tools permission")
+    require(desktop_adapter, "var canInspect = window.gtnDesktopDebugTools === true;", "inspection controls must be gated by the debug-tools flag")
+    require(desktop_adapter, "if (!canInspect || !window.gtnDesktopDebugTools) return;", "release builds must not execute developer-supplied JavaScript")
+    require(desktop_adapter, "Read-only desktop diagnostics.", "release builds must retain a read-only developer overlay")
+    require(desktop_host, "browser.setDefaultContextMenuEnabled(true)", "Windows WebView2 context menu must be enabled in every build")
+    require(desktop_fx_host, "webView.isContextMenuEnabled = true", "JavaFX WebView context menu must be enabled")
+    require(desktop_host, "browser.setDebug(debugToolsEnabled)", "WebView2 Inspect/DevTools must remain build-gated")
+
+    # Tutorial completion must always receive a matching response to release the shared bridge request.
+    require(web, "send('complete_feature_tutorial',{featureId:id})", "shared HTML must persist completed feature tutorials")
+    require(web, "if(m.type==='feature_tutorial_state')", "shared HTML must consume feature tutorial completion replies")
+    require(desktop_game, 'if (type == "read_feature_tutorial" || type == "complete_feature_tutorial")', "Windows must handle tutorial reads and completion")
+    require(desktop_game, '.put("type", "feature_tutorial_state")', "Windows must reply to tutorial completion and unlock the HTML bridge")
+
     print("WebView bridge contract checks passed.")
     print("- Shared HTML request/reply envelope")
     print("- Android origin, page, schema and size validation")
