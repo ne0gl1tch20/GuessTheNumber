@@ -56,7 +56,7 @@ internal object DesktopWebPlayAssetSyncer {
     }
 
     fun activeVersion(): String? = runCatching {
-        val value = activePointer.takeIf(Files::isRegularFile)?.let(Files::readString)?.trim()
+        val value = if (Files.isRegularFile(activePointer)) Files.readString(activePointer).trim() else null
         value?.takeIf { it.matches(Regex("[a-f0-9]{7,40}")) }
     }.getOrNull()
 
@@ -68,6 +68,7 @@ internal object DesktopWebPlayAssetSyncer {
                 paths.filter { Files.isDirectory(it) && it.fileName.toString() != current }
                     .filter { it.fileName.toString().matches(Regex("[a-f0-9]{7,40}")) }
                     .filter { runCatching { readAndValidateStoredManifest(it) }.isSuccess }
+                    .toList()
                     .maxByOrNull { Files.getLastModifiedTime(it).toMillis() }
             } ?: return@synchronized false
             writePointer(previous.fileName.toString())
