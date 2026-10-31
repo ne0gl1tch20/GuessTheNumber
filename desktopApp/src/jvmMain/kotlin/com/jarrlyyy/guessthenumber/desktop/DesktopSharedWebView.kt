@@ -97,14 +97,18 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                         }
                     }
 
-                    val request = runCatching { org.json.JSONObject(raw) }.getOrNull()
+                    val normalized = DesktopBridgePayload.normalize(raw)
+                    val request = normalized?.let { runCatching { org.json.JSONObject(it) }.getOrNull() }
                     val isDesktopSetting = request
                         ?.takeIf { it.optInt("version", -1) == 1 && it.optString("type") == "update_setting" }
                         ?.takeIf { it.length() == 5 }
                     val settingKey = isDesktopSetting?.optString("key").orEmpty()
                     val settingValue = isDesktopSetting?.opt("value")
 
-                    if (settingKey == "desktopNavigationPosition" && settingValue is String) {
+                    if (normalized == null || request == null) {
+                        replyToPage(org.json.JSONObject().put("version", 1).put("id", "")
+                            .put("type", "error").put("error", "invalid_request").toString())
+                    } else if (settingKey == "desktopNavigationPosition" && settingValue is String) {
                         val position = DesktopNavigationPosition.entries.firstOrNull {
                             it.name == settingValue.uppercase()
                         }
@@ -140,8 +144,8 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
                                 .put("message", result.exceptionOrNull()?.message ?: "Could not update Windows startup.")
                         }
                         replyToPage(response.toString())
-                    } else if (currentHandler != null && raw.length <= 512) {
-                        currentHandler(raw, replyToPage)
+                    } else if (currentHandler != null && normalized.length <= 16_384) {
+                        currentHandler(normalized, replyToPage)
                     } else {
                         val id = request?.optString("id", "").orEmpty()
                         replyToPage(org.json.JSONObject().put("version", 1).put("id", id)
