@@ -24,9 +24,9 @@ internal class WindowsDebugInstaller {
             downloadFile(update.manifestDownloadUrl, manifestPath, MAX_MANIFEST_BYTES)
             downloadFile(update.archiveDownloadUrl, archivePath, MAX_ARCHIVE_BYTES)
             verifyManifest(manifestPath, archivePath, update)
-            val msiPath = temporaryDirectory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
-            WindowsDebugArchiveValidator.extractExpectedMsi(archivePath, msiPath)
-            launchInstallerAndCleanup(msiPath, temporaryDirectory)
+            val installerPath = temporaryDirectory.resolve(WindowsDebugArchiveValidator.EXPECTED_INSTALLER_NAME)
+            WindowsDebugArchiveValidator.extractExpectedInstaller(archivePath, installerPath)
+            launchInstallerAndCleanup(installerPath, temporaryDirectory)
         } catch (error: Exception) {
             deleteTree(temporaryDirectory)
             throw error
@@ -103,17 +103,17 @@ internal class WindowsDebugInstaller {
         }
     }
 
-    private fun launchInstallerAndCleanup(msiPath: Path, temporaryDirectory: Path) {
+    private fun launchInstallerAndCleanup(installerPath: Path, temporaryDirectory: Path) {
         val scriptPath = temporaryDirectory.resolve("install-and-cleanup.ps1")
-        val msiLiteral = powershellLiteral(msiPath.toAbsolutePath().toString())
+        val installerLiteral = powershellLiteral(installerPath.toAbsolutePath().toString())
         val directoryLiteral = powershellLiteral(temporaryDirectory.toAbsolutePath().toString())
         val script = """
             ${'$'}ErrorActionPreference = 'Stop'
-            ${'$'}msiPath = '$msiLiteral'
+            ${'$'}installerPath = '$installerLiteral'
             ${'$'}temporaryDirectory = '$directoryLiteral'
             try {
-                ${'$'}installer = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/i', ('"{0}"' -f ${'$'}msiPath)) -Wait -PassThru
-                exit ${'$'}installer.ExitCode
+                ${'$'}setup = Start-Process -FilePath ${'$'}installerPath -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-') -Wait -PassThru
+                exit ${'$'}setup.ExitCode
             } finally {
                 Start-Sleep -Seconds 2
                 Remove-Item -LiteralPath ${'$'}temporaryDirectory -Recurse -Force -ErrorAction SilentlyContinue
@@ -127,7 +127,7 @@ internal class WindowsDebugInstaller {
             ).start()
         } catch (error: Exception) {
             deleteTree(temporaryDirectory)
-            throw IllegalStateException("Could not start the Windows MSI installer.", error)
+            throw IllegalStateException("Could not start the Windows Inno Setup installer.", error)
         }
     }
 
