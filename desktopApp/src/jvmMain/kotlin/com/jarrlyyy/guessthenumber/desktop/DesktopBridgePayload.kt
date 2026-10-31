@@ -26,10 +26,11 @@ internal object DesktopBridgePayload {
         parsed is JSONObject && tokener.nextClean() == '\u0000'
     }.getOrDefault(false)
 
-    private fun decodeSingleJsonString(value: String): String? = runCatching {
-        val tokener = JSONTokener(value)
-        val decoded = tokener.nextValue() as? String ?: return null
-        if (tokener.nextClean() != '\u0000') return null
-        decoded
-    }.getOrNull()
+    private fun decodeSingleJsonString(value: String): String? {
+        return runCatching {
+            val tokener = JSONTokener(value)
+            val decoded = tokener.nextValue() as? String
+            if (decoded == null || tokener.nextClean() != '\u0000') null else decoded
+        }.getOrNull()
+    }
 }
