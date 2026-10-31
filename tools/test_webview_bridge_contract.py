@@ -38,6 +38,9 @@ def main() -> int:
     require(web, "event.stopImmediatePropagation();const route=target.dataset.route", "native popup routes must be captured before bubbling handlers")
     require(web, "target.closest('.more-screen [data-route=\"player_profile\"],.more-links [data-route=\"save_slots\"]')", "Save Slots and Player Profile must use delegated native popup routing")
     require(web, "},true);", "native popup routing must run in the capture phase")
+    require(web, "queuedNativePopupRoute=null", "native popup routes must have a pending-request queue")
+    require(web, "function flushQueuedNativePopupRoute()", "queued popup routes must flush after the active bridge request")
+    require(web, "window.setTimeout(flushQueuedNativePopupRoute,0)", "queued popup routes must retry after replies and timeouts")
     if "document.querySelectorAll('[data-screen-target]').forEach(button=>button.addEventListener" in web:
         raise AssertionError("Global data-screen-target listener duplicates the scoped handlers and can override popup routes.")
 
