@@ -55,7 +55,7 @@ private fun WindowsUpdateToolsCard() {
         ) {
             Text("Windows Desktop Updater", style = MaterialTheme.typography.titleLarge)
             Text(
-                "Uses the verified Windows Debug manifest, archive checksum and MSI installer.",
+                "Uses the verified Windows Debug manifest, archive checksum and Inno Setup installer.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
