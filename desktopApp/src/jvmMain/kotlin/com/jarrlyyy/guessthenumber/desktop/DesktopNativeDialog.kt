@@ -32,6 +32,7 @@ internal class DesktopNativeDialogWindow(
 ) {
     private val composePanel = ComposePanel()
     private val dialog: JDialog
+    private var darkTitleBar = false
 
     init {
         if (SwingUtilities.isEventDispatchThread()) {
@@ -53,6 +54,10 @@ internal class DesktopNativeDialogWindow(
                 override fun windowClosing(event: WindowEvent) {
                     onDismissRequest()
                 }
+
+                override fun windowOpened(event: WindowEvent) {
+                    DesktopWindowChrome.apply(this@apply, darkTitleBar)
+                }
             })
         }
     }
@@ -62,6 +67,7 @@ internal class DesktopNativeDialogWindow(
     }
 
     fun applyTheme(isDark: Boolean) {
+        darkTitleBar = isDark
         DesktopWindowChrome.apply(dialog, isDark)
     }
 
