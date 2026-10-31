@@ -46,13 +46,13 @@ class WindowsDebugUpdateTest {
     }
 
     @Test
-    fun extractsOnlyExpectedMsi() {
-        val payload = "fake-msi-payload".toByteArray()
-        val archive = createZip(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME to payload)
+    fun extractsOnlyExpectedInnoInstaller() {
+        val payload = "fake-inno-setup-payload".toByteArray()
+        val archive = createZip(WindowsDebugArchiveValidator.EXPECTED_INSTALLER_NAME to payload)
         val destination = Files.createTempDirectory("gtn-test-")
-            .resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
+            .resolve(WindowsDebugArchiveValidator.EXPECTED_INSTALLER_NAME)
         try {
-            WindowsDebugArchiveValidator.extractExpectedMsi(archive, destination)
+            WindowsDebugArchiveValidator.extractExpectedInstaller(archive, destination)
             assertArrayEquals(payload, Files.readAllBytes(destination))
         } finally {
             Files.deleteIfExists(destination)
@@ -63,14 +63,14 @@ class WindowsDebugUpdateTest {
 
     @Test(expected = IllegalStateException::class)
     fun rejectsZipPathTraversal() {
-        val archive = createZip("../GuessTheNumber-Windows-Desktop.msi" to byteArrayOf(1))
+        val archive = createZip("../GuessTheNumber-Windows-Desktop-Setup.exe" to byteArrayOf(1))
         val directory = Files.createTempDirectory("gtn-test-")
         try {
-            WindowsDebugArchiveValidator.extractExpectedMsi(
-                archive, directory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
+            WindowsDebugArchiveValidator.extractExpectedInstaller(
+                archive, directory.resolve(WindowsDebugArchiveValidator.EXPECTED_INSTALLER_NAME)
             )
         } finally {
-            Files.deleteIfExists(directory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME))
+            Files.deleteIfExists(directory.resolve(WindowsDebugArchiveValidator.EXPECTED_INSTALLER_NAME))
             Files.deleteIfExists(directory)
             Files.deleteIfExists(archive)
         }
@@ -81,11 +81,11 @@ class WindowsDebugUpdateTest {
         val archive = createZip("unexpected.txt" to byteArrayOf(1))
         val directory = Files.createTempDirectory("gtn-test-")
         try {
-            WindowsDebugArchiveValidator.extractExpectedMsi(
-                archive, directory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
+            WindowsDebugArchiveValidator.extractExpectedInstaller(
+                archive, directory.resolve(WindowsDebugArchiveValidator.EXPECTED_INSTALLER_NAME)
             )
         } finally {
-            Files.deleteIfExists(directory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME))
+            Files.deleteIfExists(directory.resolve(WindowsDebugArchiveValidator.EXPECTED_INSTALLER_NAME))
             Files.deleteIfExists(directory)
             Files.deleteIfExists(archive)
         }
@@ -106,7 +106,7 @@ class WindowsDebugUpdateTest {
     }
 
     @Test(expected = IllegalStateException::class)
-    fun rejectsMismatchedArchiveChecksum() {
+    fun rejectsMismatchedInstallerArchiveChecksum() {
         val archive = Files.createTempFile("gtn-test-", ".zip")
         Files.write(archive, "wrong".toByteArray())
         try {
