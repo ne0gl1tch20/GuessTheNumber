@@ -2,8 +2,8 @@ package com.jarrlyyy.guessthenumber.desktop.update
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
@@ -15,40 +15,54 @@ import java.util.zip.ZipOutputStream
 
 class WindowsDebugUpdateTest {
     @Test
-    fun discoversNewestSuccessfulMasterActionsArtifact() {
-        val update = clientForRun(6).findLatestUpdate("1.0.5")
+    fun discoversWindowsAssetsFromPublicDebugLatestRelease() {
+        val update = client().findLatestUpdate("1.0.5")
         assertNotNull(update)
         assertEquals("1.0.6", update?.version)
         assertEquals("windows-debug-6-2", update?.tagName)
-        assertEquals("$ARTIFACT_DOWNLOAD_PREFIX", update?.artifactDownloadUrl)
-        assertEquals("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", update?.artifactSha256)
+        assertEquals(WINDOWS_ARCHIVE_URL, update?.archiveDownloadUrl)
+        assertEquals(WINDOWS_MANIFEST_URL, update?.manifestDownloadUrl)
+        assertEquals("a".repeat(64), update?.archiveSha256)
         assertEquals(6L, update?.runNumber)
         assertEquals(2L, update?.runAttempt)
+        assertEquals("0123456789abcdef0123456789abcdef01234567", update?.commitSha)
     }
 
     @Test
     fun doesNotOfferInstalledOrNewerVersion() {
-        assertNull(clientForRun(6).findLatestUpdate("1.0.6"))
-        assertNull(clientForRun(6).findLatestUpdate("1.0.7"))
+        assertNull(client().findLatestUpdate("1.0.6"))
+        assertNull(client().findLatestUpdate("1.0.7"))
     }
 
     @Test(expected = IllegalStateException::class)
-    fun rejectsExpiredLatestArtifactInsteadOfFallingBackToAnOlderBuild() {
-        val responses = standardResponses(6).toMutableMap()
-        responses[ARTIFACTS_URL] = """{"artifacts":[
-            {"name":"GuessTheNumber-Windows-Debug","expired":true,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX","digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+    fun rejectsReleaseWithoutWindowsManifest() {
+        val responses = standardResponses().toMutableMap()
+        responses[RELEASE_URL] = """{"assets":[
+            {"name":"GuessTheNumber-Windows-Desktop.zip","browser_download_url":"$WINDOWS_ARCHIVE_URL"}
         ]}"""
-        val client = WindowsDebugUpdateClient { url ->
+        WindowsDebugUpdateClient { url ->
             StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
-        }
-        client.findLatestUpdate("1.0.5")
+        }.findLatestUpdate("1.0.5")
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsActionsArtifactUrlsAsReleaseAssets() {
+        val responses = standardResponses().toMutableMap()
+        responses[RELEASE_URL] = """{"assets":[
+            {"name":"GuessTheNumber-Windows-Desktop.zip","browser_download_url":"https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/9000/zip"},
+            {"name":"windows-debug-manifest.json","browser_download_url":"$WINDOWS_MANIFEST_URL"}
+        ]}"""
+        WindowsDebugUpdateClient { url ->
+            StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
+        }.findLatestUpdate("1.0.5")
     }
 
     @Test
     fun extractsOnlyExpectedMsi() {
         val payload = "fake-msi-payload".toByteArray()
         val archive = createZip(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME to payload)
-        val destination = Files.createTempDirectory("gtn-test-").resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
+        val destination = Files.createTempDirectory("gtn-test-")
+            .resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
         try {
             WindowsDebugArchiveValidator.extractExpectedMsi(archive, destination)
             assertArrayEquals(payload, Files.readAllBytes(destination))
@@ -90,71 +104,6 @@ class WindowsDebugUpdateTest {
     }
 
     @Test
-    fun extractsExpectedFilesFromActionsArtifact() {
-        val archiveBytes = "inner-installer-zip".toByteArray()
-        val manifestBytes = """{"channel":"windows-debug"}""".toByteArray()
-        val artifact = createZip(
-            WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME to archiveBytes,
-            WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME to manifestBytes
-        )
-        val directory = Files.createTempDirectory("gtn-artifact-test-")
-        val archive = directory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME)
-        val manifest = directory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME)
-        try {
-            WindowsDebugArtifactValidator.extractArtifactFiles(artifact, archive, manifest)
-            assertArrayEquals(archiveBytes, Files.readAllBytes(archive))
-            assertArrayEquals(manifestBytes, Files.readAllBytes(manifest))
-        } finally {
-            Files.deleteIfExists(archive)
-            Files.deleteIfExists(manifest)
-            Files.deleteIfExists(directory)
-            Files.deleteIfExists(artifact)
-        }
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun rejectsUnexpectedFilesInActionsArtifact() {
-        val artifact = createZip(
-            WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME to byteArrayOf(1),
-            WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME to byteArrayOf(2),
-            "extra.txt" to byteArrayOf(3)
-        )
-        val directory = Files.createTempDirectory("gtn-artifact-test-")
-        try {
-            WindowsDebugArtifactValidator.extractArtifactFiles(
-                artifact,
-                directory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME),
-                directory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME)
-            )
-        } finally {
-            Files.deleteIfExists(directory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME))
-            Files.deleteIfExists(directory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME))
-            Files.deleteIfExists(directory)
-            Files.deleteIfExists(artifact)
-        }
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun rejectsPathTraversalInActionsArtifact() {
-        val artifact = createZip(
-            "../windows-debug-manifest.json" to byteArrayOf(1)
-        )
-        val directory = Files.createTempDirectory("gtn-artifact-test-")
-        try {
-            WindowsDebugArtifactValidator.extractArtifactFiles(
-                artifact,
-                directory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME),
-                directory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME)
-            )
-        } finally {
-            Files.deleteIfExists(directory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME))
-            Files.deleteIfExists(directory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME))
-            Files.deleteIfExists(directory)
-            Files.deleteIfExists(artifact)
-        }
-    }
-
-    @Test
     fun verifiesArchiveChecksum() {
         val archive = Files.createTempFile("gtn-test-", ".zip")
         val payload = "checksum-payload".toByteArray()
@@ -179,22 +128,29 @@ class WindowsDebugUpdateTest {
         }
     }
 
-    private fun clientForRun(runNumber: Long): WindowsDebugUpdateClient {
-        val responses = standardResponses(runNumber)
+    private fun client(): WindowsDebugUpdateClient {
+        val responses = standardResponses()
         return WindowsDebugUpdateClient { url ->
             StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
         }
     }
 
-    private fun standardResponses(runNumber: Long): Map<String, String> = mapOf(
-        WORKFLOW_RUNS_URL to """{"workflow_runs":[
-            {"id":600,"run_number":$runNumber,"run_attempt":2,"head_sha":"0123456789abcdef0123456789abcdef01234567","event":"push","head_branch":"master","status":"completed","conclusion":"success"},
-            {"id":599,"run_number":5,"run_attempt":1,"event":"push","head_branch":"master","status":"completed","conclusion":"success"},
-            {"id":598,"run_number":7,"run_attempt":1,"event":"pull_request","head_branch":"feature","status":"completed","conclusion":"success"}
+    private fun standardResponses(): Map<String, String> = mapOf(
+        RELEASE_URL to """{"assets":[
+            {"name":"GuessTheNumber-debug.zip","browser_download_url":"https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/debug-latest/GuessTheNumber-debug.zip"},
+            {"name":"GuessTheNumber-Windows-Desktop.zip","browser_download_url":"$WINDOWS_ARCHIVE_URL"},
+            {"name":"windows-debug-manifest.json","browser_download_url":"$WINDOWS_MANIFEST_URL"}
         ]}""",
-        ARTIFACTS_URL to """{"artifacts":[
-            {"name":"GuessTheNumber-Windows-Debug","expired":false,"archive_download_url":"$ARTIFACT_DOWNLOAD_PREFIX","digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
-        ]}"""
+        WINDOWS_MANIFEST_URL to """{
+            "channel":"windows-debug",
+            "version":"1.0.6",
+            "runNumber":"6",
+            "runAttempt":"2",
+            "commit":"0123456789abcdef0123456789abcdef01234567",
+            "assetName":"GuessTheNumber-Windows-Desktop.zip",
+            "sha256":"${"a".repeat(64)}",
+            "tag":"windows-debug-6-2"
+        }"""
     )
 
     private fun createZip(vararg entries: Pair<String, ByteArray>): java.nio.file.Path {
@@ -218,11 +174,11 @@ class WindowsDebugUpdateTest {
     }
 
     private companion object {
-        const val WORKFLOW_RUNS_URL =
-            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/workflows/windows-desktop.yml/runs?branch=master&status=success&per_page=20"
-        const val ARTIFACTS_URL =
-            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/runs/600/artifacts"
-        const val ARTIFACT_DOWNLOAD_PREFIX =
-            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/9000/zip"
+        const val RELEASE_URL =
+            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/releases/tags/debug-latest"
+        const val WINDOWS_ARCHIVE_URL =
+            "https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/debug-latest/GuessTheNumber-Windows-Desktop.zip"
+        const val WINDOWS_MANIFEST_URL =
+            "https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/debug-latest/windows-debug-manifest.json"
     }
 }
