@@ -26,7 +26,7 @@ Install Inno Setup 6, then build the Windows setup executable:
 
 The task builds the jpackage app-image and wraps it with `desktopApp/packageResources/windows/GuessTheNumber.iss`. Set `INNO_SETUP_COMPILER` if `ISCC.exe` is installed outside the default Inno Setup 6 directory.
 
-The installer uses a stable Inno Setup AppId so subsequent versions upgrade the existing installation. It also detects and removes the previous Inno Setup installation before installing the new package. Player saves remain under `%APPDATA%\GuessTheNumber\saves` and are not removed by installer uninstall.
+The installer uses a stable Inno Setup AppId so subsequent versions upgrade the existing installation. It removes a detected legacy MSI installation during the one-time migration, then lets the stable Inno Setup AppId handle future upgrades. Player saves remain under `%APPDATA%\GuessTheNumber\saves` and are not removed by installer uninstall.
 
 ## Shared web assets
 
