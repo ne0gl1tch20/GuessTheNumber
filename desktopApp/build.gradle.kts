@@ -100,6 +100,17 @@ tasks.configureEach {
     }
 }
 
+// Supply the custom WiX project only to the MSI packaging task. The JDK's
+// default template is retained for all other packaging targets.
+val windowsMsiResourceDir = layout.projectDirectory.dir("packageResources/windows")
+tasks.withType<org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask>().configureEach {
+    if (targetFormat == org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi) {
+        freeArgs.addAll(
+            listOf("--resource-dir", windowsMsiResourceDir.asFile.absolutePath)
+        )
+    }
+}
+
 compose.desktop {
     application {
         mainClass = "com.jarrlyyy.guessthenumber.desktop.MainKt"
@@ -116,6 +127,8 @@ compose.desktop {
                 menu = true
                 menuGroup = "GuessTheNumber"
                 shortcut = true
+                // Enables the WiX installer wizard and its Finish page.
+                dirChooser = true
             }
         }
     }
