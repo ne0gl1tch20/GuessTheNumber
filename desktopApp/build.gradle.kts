@@ -61,6 +61,8 @@ kotlin {
                 // Extended icons (FitScreen, ZoomIn, ZoomOut) are not in the core set.
                 implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
                 implementation(compose.ui)
+                // Swing-hosted native dialogs require the desktop AWT ComposePanel API.
+                implementation("org.jetbrains.compose.ui:ui-desktop:${libs.versions.composeMultiplatform.get()}")
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.coroutines.core)
