@@ -149,6 +149,8 @@ def main() -> int:
 
     # Tutorial completion must always receive a matching response to release the shared bridge request.
     require(web, "send('complete_feature_tutorial',{featureId:id})", "shared HTML must persist completed feature tutorials")
+    require(web, "window.setTimeout(flushQueuedFeatureTutorialCompletion,0)", "queued tutorial completions must be sent after the active bridge request finishes")
+    require(web, "function flushQueuedFeatureTutorialCompletion()", "tutorial completion must remain queued rather than being dropped while another request is pending")
     require(web, "if(m.type==='feature_tutorial_state')", "shared HTML must consume feature tutorial completion replies")
     require(desktop_game, 'if (type == "read_feature_tutorial" || type == "complete_feature_tutorial")', "Windows must handle tutorial reads and completion")
     require(desktop_game, '.put("type", "feature_tutorial_state")', "Windows must reply to tutorial completion and unlock the HTML bridge")
