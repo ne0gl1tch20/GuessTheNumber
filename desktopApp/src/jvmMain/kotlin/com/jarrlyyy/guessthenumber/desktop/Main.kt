@@ -26,6 +26,7 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Card
+import androidx.compose.ui.window.Dialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -67,6 +68,8 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.width
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
@@ -200,6 +203,7 @@ fun main() = application {
         var playerProfile by remember { mutableStateOf(DesktopPlayerProfileStore.load()) }
         var editingPlayerProfile by remember { mutableStateOf(false) }
         var viewingPlayerProfile by remember { mutableStateOf(false) }
+        var popupDestination by remember { mutableStateOf<DesktopDestination?>(null) }
 
         DesktopTheme(
             window = window,
@@ -267,7 +271,7 @@ fun main() = application {
                 shellFocusRequester.requestFocus()
             }
 
-            if (playerProfile?.setupComplete != true || editingPlayerProfile || viewingPlayerProfile) {
+            if (playerProfile?.setupComplete != true) {
                 DesktopPlayerProfileScreen(
                     profile = playerProfile,
                     viewOnly = viewingPlayerProfile && !editingPlayerProfile,
@@ -416,7 +420,14 @@ fun main() = application {
                                         navigationPosition = selected
                                         DesktopNavigationPosition.save(selected)
                                     },
-                                    onOpenParityDestination = { shell.navigate(it) },
+                                    onOpenParityDestination = { target ->
+                                        when (target) {
+                                            DesktopDestination.ARCADE,
+                                            DesktopDestination.SAVE_SLOTS,
+                                            DesktopDestination.DEVELOPER_SETTINGS -> popupDestination = target
+                                            else -> shell.navigate(target)
+                                        }
+                                    },
                                     onGlobalPreferencesImported = {
                                         playerProfile = DesktopPlayerProfileStore.load()
                                         navigationPosition = DesktopNavigationPosition.load()
@@ -520,6 +531,77 @@ fun main() = application {
 
                     }
                     }
+                    }
+                }
+            }
+
+                if (viewingPlayerProfile || editingPlayerProfile) {
+                    Dialog(onDismissRequest = {
+                        viewingPlayerProfile = false
+                        editingPlayerProfile = false
+                    }) {
+                        Surface(modifier = Modifier.width(720.dp).height(620.dp)) {
+                            DesktopPlayerProfileScreen(
+                                profile = playerProfile,
+                                viewOnly = viewingPlayerProfile && !editingPlayerProfile,
+                                onEdit = { viewingPlayerProfile = false; editingPlayerProfile = true },
+                                onSave = { savedProfile ->
+                                    runCatching { DesktopPlayerProfileStore.save(savedProfile) }
+                                        .onSuccess {
+                                            playerProfile = savedProfile
+                                            editingPlayerProfile = false
+                                        }
+                                },
+                                onCancel = {
+                                    editingPlayerProfile = false
+                                    viewingPlayerProfile = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                popupDestination?.let { target ->
+                    Dialog(onDismissRequest = { popupDestination = null }) {
+                        Surface(modifier = Modifier.width(980.dp).height(680.dp)) {
+                            when (target) {
+                                DesktopDestination.ARCADE,
+                                DesktopDestination.SAVE_SLOTS -> ProductionGuessGameScreen(
+                                    section = if (target == DesktopDestination.ARCADE) {
+                                        DesktopGameSection.ARCADE
+                                    } else {
+                                        DesktopGameSection.SAVE_SLOTS
+                                    },
+                                    onOpenParityDestination = { next ->
+                                        when (next) {
+                                            DesktopDestination.MORE,
+                                            DesktopDestination.PLAY -> popupDestination = null
+                                            DesktopDestination.ARCADE,
+                                            DesktopDestination.SAVE_SLOTS,
+                                            DesktopDestination.DEVELOPER_SETTINGS -> popupDestination = next
+                                            else -> {
+                                                popupDestination = null
+                                                shell.navigate(next)
+                                            }
+                                        }
+                                    },
+                                    onOpenPlayerProfile = {
+                                        popupDestination = null
+                                        viewingPlayerProfile = true
+                                        editingPlayerProfile = false
+                                    }
+                                )
+                                DesktopDestination.DEVELOPER_SETTINGS -> DesktopParityScreen(
+                                    destination = target,
+                                    onBack = { popupDestination = null },
+                                    onNavigate = { next ->
+                                        popupDestination = null
+                                        shell.navigate(next)
+                                    }
+                                )
+                                else -> popupDestination = null
+                            }
+                        }
                     }
                 }
             }
