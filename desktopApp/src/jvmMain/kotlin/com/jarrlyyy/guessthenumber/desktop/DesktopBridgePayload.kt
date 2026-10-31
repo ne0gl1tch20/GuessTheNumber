@@ -13,7 +13,9 @@ internal object DesktopBridgePayload {
         if (raw.length > MAX_CALLBACK_LENGTH) return null
         val candidate = raw.trim()
         if (candidate.isEmpty()) return null
-        val payload = unwrapWindowsCallback(candidate) ?: candidate
+        val payload = if (isWindowsCallbackEnvelope(candidate)) {
+            unwrapWindowsCallback(candidate) ?: return null
+        } else candidate
         if (payload.length > MAX_REQUEST_LENGTH) return null
         if (isSingleJsonObject(payload)) return payload
 
@@ -26,7 +28,9 @@ internal object DesktopBridgePayload {
     fun recoverRequestId(raw: String): String {
         if (raw.length > MAX_CALLBACK_LENGTH) return ""
         val candidate = raw.trim()
-        val payload = unwrapWindowsCallback(candidate) ?: candidate
+        val payload = if (isWindowsCallbackEnvelope(candidate)) {
+            unwrapWindowsCallback(candidate) ?: return ""
+        } else candidate
         val decoded = decodeSingleJsonString(payload)
         return sequenceOf(payload, decoded.orEmpty())
             .mapNotNull { value ->
@@ -35,6 +39,11 @@ internal object DesktopBridgePayload {
             .firstOrNull { it.matches(Regex("[A-Za-z0-9_-]{1,48}")) }
             .orEmpty()
     }
+
+    private fun isWindowsCallbackEnvelope(value: String): Boolean = runCatching {
+        val obj = JSONObject(value)
+        obj.has("name") || obj.has("seq") || obj.has("args")
+    }.getOrDefault(false)
 
     /**
      * SwingWebView's Windows WebView2 backend sends callback arguments inside
