@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   migrate:
-    if: github.event.head_commit.message != 'chore: apply desktop popup routing migration'
+    if: ${{ github.event.head_commit.message != 'chore: apply desktop popup routing migration' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,41 +18,61 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Apply systematic desktop popup routing
-        shell: python
         run: |
+          python3 - <<'PY'
           from pathlib import Path
+
           p = Path('desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt')
           s = p.read_text()
-
-          # Native popup destinations never belong to the shell/WebView destination layer.
-          s = s.replace('''                        DesktopDestination.MUTATORS,\n                        DesktopDestination.SAVE_SLOTS,\n                        DesktopDestination.RELICS,''', '''                        DesktopDestination.MUTATORS,\n                        DesktopDestination.RELICS,''')
-          s = s.replace('''                        DesktopDestination.LUCKY_STAKE,\n                        DesktopDestination.ARCADE,\n                        DesktopDestination.MUSIC_PLAYER,''', '''                        DesktopDestination.LUCKY_STAKE,\n                        DesktopDestination.MUSIC_PLAYER,''')
-
-          # First-boot profile completion immediately opens the native Save Slots popup.
-          old = '''                            .onSuccess {\n                                playerProfile = savedProfile\n                                editingPlayerProfile = false\n                            }'''
-          new = '''                            .onSuccess {\n                                playerProfile = savedProfile\n                                editingPlayerProfile = false\n                                viewingPlayerProfile = false\n                                popupDestination = DesktopDestination.SAVE_SLOTS\n                            }'''
+          s = s.replace(
+              '                        DesktopDestination.MUTATORS,\n                        DesktopDestination.SAVE_SLOTS,\n                        DesktopDestination.RELICS,',
+              '                        DesktopDestination.MUTATORS,\n                        DesktopDestination.RELICS,'
+          )
+          s = s.replace(
+              '                        DesktopDestination.LUCKY_STAKE,\n                        DesktopDestination.ARCADE,\n                        DesktopDestination.MUSIC_PLAYER,',
+              '                        DesktopDestination.LUCKY_STAKE,\n                        DesktopDestination.MUSIC_PLAYER,'
+          )
+          old = '''                            .onSuccess {
+                                playerProfile = savedProfile
+                                editingPlayerProfile = false
+                            }'''
+          new = '''                            .onSuccess {
+                                playerProfile = savedProfile
+                                editingPlayerProfile = false
+                                viewingPlayerProfile = false
+                                popupDestination = DesktopDestination.SAVE_SLOTS
+                            }'''
           if old not in s:
               raise SystemExit('first-boot save block not found')
-          s = s.replace(old, new, 1)
-
-          p.write_text(s)
+          p.write_text(s.replace(old, new, 1))
 
           nav = Path('desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigation.kt')
           ns = nav.read_text()
-          old_nav = '''            SETTINGS,\n            ARCADE,\n            MUSIC_PLAYER,'''
-          new_nav = '''            SETTINGS,\n            MUSIC_PLAYER,'''
+          old_nav = '''            SETTINGS,
+            ARCADE,
+            MUSIC_PLAYER,'''
+          new_nav = '''            SETTINGS,
+            MUSIC_PLAYER,'''
           if old_nav not in ns:
               raise SystemExit('Arcade navigation entry not found')
           nav.write_text(ns.replace(old_nav, new_nav, 1))
 
-          # Add a focused invariant test: popup-only destinations cannot be quick-access destinations.
           test = Path('desktopApp/src/jvmTest/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigationTest.kt')
           ts = test.read_text()
-          marker = '''    @Test\n    fun startsOnPlay() {'''
-          addition = '''    @Test\n    fun nativePopupDestinationsAreNeverShellQuickAccessDestinations() {\n        assertFalse(DesktopDestination.MAIN_NAVIGATION_ORDER.contains(DesktopDestination.SAVE_SLOTS))\n        assertFalse(DesktopDestination.MAIN_NAVIGATION_ORDER.contains(DesktopDestination.ARCADE))\n        assertFalse(DesktopDestination.MAIN_NAVIGATION_ORDER.contains(DesktopDestination.DEVELOPER_SETTINGS))\n    }\n\n'''
+          marker = '''    @Test
+    fun startsOnPlay() {'''
+          addition = '''    @Test
+    fun nativePopupDestinationsAreNeverShellQuickAccessDestinations() {
+        assertFalse(DesktopDestination.MAIN_NAVIGATION_ORDER.contains(DesktopDestination.SAVE_SLOTS))
+        assertFalse(DesktopDestination.MAIN_NAVIGATION_ORDER.contains(DesktopDestination.ARCADE))
+        assertFalse(DesktopDestination.MAIN_NAVIGATION_ORDER.contains(DesktopDestination.DEVELOPER_SETTINGS))
+    }
+
+'''
           if marker not in ts:
               raise SystemExit('test insertion marker not found')
           test.write_text(ts.replace(marker, addition + marker, 1))
+          PY
       - name: Commit migration
         run: |
           git config user.name 'github-actions[bot]'
