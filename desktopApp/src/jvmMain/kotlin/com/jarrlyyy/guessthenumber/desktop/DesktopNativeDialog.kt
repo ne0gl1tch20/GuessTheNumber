@@ -53,11 +53,6 @@ internal class DesktopNativeDialogWindow(
                 override fun windowClosing(event: WindowEvent) {
                     onDismissRequest()
                 }
-
-                override fun windowOpened(event: WindowEvent) {
-                    // Apply the same Windows title-bar treatment used by the main window.
-                    DesktopWindowChrome.apply(this@apply, false)
-                }
             })
         }
     }
