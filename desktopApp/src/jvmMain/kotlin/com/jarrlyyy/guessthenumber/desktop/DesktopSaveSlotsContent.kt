@@ -80,6 +80,8 @@ internal fun DesktopSaveSlotsContent(
     onImportSlot: (Int) -> Unit,
     onExportAllSlots: () -> Unit,
     onImportAllSlots: () -> Unit,
+    onExportAndroidBackup: () -> Unit,
+    onImportAndroidBackup: () -> Unit,
     onContinueWithActiveSlot: (() -> Unit)? = null,
     showCloseButton: Boolean = true
 ) {
@@ -227,6 +229,22 @@ internal fun DesktopSaveSlotsContent(
                         OutlinedButton(onClick = onBack) { Text("Close") }
                     }
                 }
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedButton(onClick = onExportAndroidBackup, modifier = Modifier.weight(1f)) {
+                Icon(Icons.Filled.FileDownload, contentDescription = null)
+                Spacer(Modifier.width(6.dp))
+                Text("Export Android backup")
+            }
+            OutlinedButton(onClick = onImportAndroidBackup, modifier = Modifier.weight(1f)) {
+                Icon(Icons.Filled.FileUpload, contentDescription = null)
+                Spacer(Modifier.width(6.dp))
+                Text("Import Android backup")
             }
         }
 
