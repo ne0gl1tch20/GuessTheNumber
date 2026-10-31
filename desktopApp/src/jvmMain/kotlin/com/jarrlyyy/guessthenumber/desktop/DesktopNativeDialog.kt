@@ -42,8 +42,7 @@ internal fun DesktopNativeDialogHost(
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
-                    shape = MaterialTheme.shapes.extraLarge,
-                    tonalElevation = 8.dp
+                    tonalElevation = 0.dp
                 ) {
                     content()
                 }
