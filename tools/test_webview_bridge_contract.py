@@ -50,7 +50,7 @@ def main() -> int:
     require(web, "let queuedScreenStateRead=false;", "screen state reads must queue behind an active bridge request")
     require(web, "if(pending)queuedScreenStateRead=true;else send('read_state');", "opening Beyond the Numbers or Stats during another request must not lose its state refresh")
     require(web, "window.setTimeout(flushQueuedScreenStateRead,0)", "queued screen state reads must retry after the active request completes")
-    require(web, "if(m.type==='state'||completedType==='read_state')queuedScreenStateRead=false;", "a returned state snapshot must clear the queued screen refresh and prevent duplicate request loops")
+    require(web, "if(completedType==='read_state')queuedScreenStateRead=false;", "only a completed game-state read may clear the queued screen refresh and prevent duplicate request loops")
     require(web, "Bridge timeout:", "shared HTML must expose a recoverable timeout diagnostic")
     require(web, "render(m.state)", "shared HTML must render complete Kotlin game snapshots")
     require(desktop_game, "fun currentNavigationPayload(message: String)", "desktop popup navigation must build a full Kotlin-backed snapshot")
