@@ -120,8 +120,8 @@ private fun WindowsAudioAdapterCard() {
         ) {
             Text("Desktop Audio Adapter", style = MaterialTheme.typography.titleLarge)
             Text(
-                "The Android Jarrlyy DSP test panel uses AAudio and is platform-specific. " +
-                    "Windows keeps its desktop audio path separate; this screen does not pretend to run the Android native test engine.",
+                "The Android Jarrlyy DSP test panel uses AAudio and is Android-specific. " +
+                    "A Windows DSP test adapter is not implemented yet, so this screen does not simulate or claim to run that native test engine.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
