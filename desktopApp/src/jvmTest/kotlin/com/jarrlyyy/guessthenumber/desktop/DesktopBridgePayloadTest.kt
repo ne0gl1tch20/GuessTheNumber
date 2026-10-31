@@ -8,6 +8,21 @@ import org.junit.Test
 class DesktopBridgePayloadTest {
     private val request = """{"version":1,"id":"bridge-test","type":"read_state"}"""
 
+
+    @Test fun recoversRequestIdFromRawJson() {
+        assertEquals("bridge-test", DesktopBridgePayload.recoverRequestId(request))
+    }
+
+    @Test fun recoversRequestIdFromJsonEncodedString() {
+        assertEquals("bridge-test", DesktopBridgePayload.recoverRequestId(JSONObject.quote(request)))
+    }
+
+    @Test fun rejectsInvalidOrUnrecoverableRequestIds() {
+        assertEquals("", DesktopBridgePayload.recoverRequestId("""{"version":1,"id":"bad id","type":"read_state"}"""))
+        assertEquals("", DesktopBridgePayload.recoverRequestId("not-json"))
+        assertEquals("", DesktopBridgePayload.recoverRequestId(" ".repeat(32_769)))
+    }
+
     @Test fun acceptsRawJsonObject() {
         assertEquals(request, DesktopBridgePayload.normalize(request))
     }
