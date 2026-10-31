@@ -369,9 +369,10 @@ class DesktopSaveStore internal constructor(
                         val backupState = importedBackups[slot]
                         if (backupState != null) {
                             writeAtomically(backupPath(slot), json.encodeToString(backupState))
-                        } else {
-                            fileOps.deleteIfExists(backupPath(slot))
                         }
+                        // When the bundle has no backup for this slot, keep the
+                        // destination's pre-import primary as the new recovery copy.
+                        // save() has already written it before replacing the primary.
                     } else {
                         fileOps.deleteIfExists(primaryPath(slot))
                         fileOps.deleteIfExists(backupPath(slot))
