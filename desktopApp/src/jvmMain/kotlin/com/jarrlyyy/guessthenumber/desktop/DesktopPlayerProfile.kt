@@ -152,7 +152,7 @@ internal fun DesktopPlayerProfileScreen(
                             Text(profile.bio.ifBlank { "No bio yet. Add a little introduction about yourself." }, style = MaterialTheme.typography.bodyLarge)
                         }
                         Button(onClick = onEdit, modifier = Modifier.fillMaxWidth()) { Text("Edit profile") }
-                        TextButton(onClick = onCancel) { Text("Back to game") }
+                        TextButton(onClick = onCancel) { Text("Close") }
                     }
                 }
             }
