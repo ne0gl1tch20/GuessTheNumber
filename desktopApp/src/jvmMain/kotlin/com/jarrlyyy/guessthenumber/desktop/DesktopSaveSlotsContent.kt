@@ -111,8 +111,8 @@ internal fun DesktopSaveSlotsContent(
 
         slots.sortedBy { it.slot }.forEach { slot ->
             val data = slot.state
-            val total = data?.statistics?.totalGuesses?.coerceAtLeast(data.attempts) ?: 0L
-            val correct = data?.statistics?.correctGuesses?.coerceAtLeast(data.correctGuesses) ?: 0L
+            val total = data?.let { it.statistics.totalGuesses.coerceAtLeast(it.attempts) } ?: 0L
+            val correct = data?.let { it.statistics.correctGuesses.coerceAtLeast(it.correctGuesses) } ?: 0L
             val accuracy = if (total > 0L) (correct * 100.0 / total).coerceIn(0.0, 100.0) else 0.0
             val model = SharedSaveSlotUiModel(
                 slotIndex = slot.slot,
