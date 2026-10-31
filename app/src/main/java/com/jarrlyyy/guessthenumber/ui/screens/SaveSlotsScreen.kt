@@ -46,6 +46,8 @@ import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
 import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotCard
 import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotUiModel
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetric
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetricIcon
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -766,13 +768,13 @@ fun SlotCard(
             locale.getString("save_slot_difficulty", "Difficulty") + ": " +
                 locale.getString(Difficulty.nameKey(it.difficultyId), "Classic")
         },
-        primaryMetric = saved?.let {
-            locale.getString("save_slot_money", "Money: %s", it.money)
-        },
-        secondaryMetrics = saved?.let {
+        metricItems = saved?.let {
             listOf(
-                locale.getString("save_slot_prestige_ultra", "Prestige: %s | Ultra: %s", it.prestige, it.ultra),
-                locale.getString("save_slot_attempts_correct", "Attempts: %d | Correct: %d", it.attempts, it.correctGuesses)
+                SharedSaveSlotMetric(SharedSaveSlotMetricIcon.MONEY, locale.getString("save_slot_money", "Money: %s", it.money)),
+                SharedSaveSlotMetric(SharedSaveSlotMetricIcon.PRESTIGE, locale.getString("save_slot_prestige", "Prestige: %s", it.prestige)),
+                SharedSaveSlotMetric(SharedSaveSlotMetricIcon.ULTRA, locale.getString("save_slot_ultra", "Ultra: %s", it.ultra)),
+                SharedSaveSlotMetric(SharedSaveSlotMetricIcon.ATTEMPTS, locale.getString("save_slot_attempts", "Attempts: %d", it.attempts)),
+                SharedSaveSlotMetric(SharedSaveSlotMetricIcon.CORRECT, locale.getString("save_slot_correct", "Correct: %d", it.correctGuesses))
             )
         }.orEmpty(),
         lastSavedLabel = saved?.takeIf { it.lastSaveTimestamp > 0L }?.let {
