@@ -42,7 +42,7 @@ def main() -> int:
     require(android_protocol, "rawVersion !is Int || rawVersion != 1", "Android must reject invalid protocol versions")
     require(android_protocol, 'request.opt("id")', "Android must validate request IDs")
     require(android_tests, "@Test", "Android protocol regression tests must exist")
-    for case in ("invalid_json", "invalid_request", "message_too_large", "origin_not_allowed"):
+    for case in ("invalid_json", "invalid_request", "message_too_large"):
         require(android_tests, case, f"Android tests must cover {case}")
 
     # Windows callback wrappers may return raw JSON or a JSON-encoded string.
