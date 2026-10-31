@@ -102,6 +102,7 @@ fun ProductionGuessGameScreen(
     onOpenParityDestination: (DesktopDestination) -> Unit = {},
     onOpenPlayerProfile: () -> Unit = {},
     onNativeSaveLoaded: () -> Unit = {},
+    startupSaveSlotSelection: Boolean = false,
     onDesktopUpdateRequest: (String, String, (String) -> Unit) -> Unit = { _, requestId, reply ->
         reply(org.json.JSONObject().put("version", 1).put("id", requestId)
             .put("type", "update_result").put("status", "unavailable")
@@ -932,6 +933,7 @@ fun ProductionGuessGameScreen(
                     activeSlot = activeSaveSlot,
                     slots = saveSlotSummaries,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onContinueWithActiveSlot = if (startupSaveSlotSelection) onNativeSaveLoaded else null,
                     onRefresh = { scope.launch { saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() } } },
                     onSwitchSlot = { targetSlot ->
                         val snapshot = state
