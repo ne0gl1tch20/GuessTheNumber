@@ -130,6 +130,8 @@ def main() -> int:
     require(desktop_asset_sync, "active-version.tmp", "Windows asset sync must atomically switch the active version pointer")
     require(desktop_asset_sync, "instanceFollowRedirects = false", "Windows asset sync must reject unexpected redirects")
     require(desktop_asset_sync, "applyActiveCache(sessionRoot)", "Windows must retain an offline cached asset fallback")
+    require(desktop_edge_host, "DesktopWebPlayAssetSyncer.rollbackToPrevious()", "Windows must roll back to a previous asset version after startup validation fails")
+    require(desktop_edge_host, "didAttemptAssetRollback", "Windows asset rollback must retry startup only once")
     require(desktop_adapter, 'class="setting-row jui-switch desktop-startup-setting"', "Windows startup toggle must reuse the shared JarrlyyUI switch component")
     require(desktop_adapter, 'class="jui-switch-track" aria-hidden="true"', "Windows startup toggle must include the SDK switch track required by its CSS")
     require(desktop_adapter, 'aria-label="Launch GuessTheNumber when Windows starts"', "Windows startup toggle must have an accessible name")
