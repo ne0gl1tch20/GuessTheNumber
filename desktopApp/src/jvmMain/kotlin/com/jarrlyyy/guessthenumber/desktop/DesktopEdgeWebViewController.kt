@@ -33,6 +33,7 @@ internal class DesktopEdgeWebViewController(
     private val handler = AtomicReference<((String, (String) -> Unit) -> Unit)>()
     private val navigationPositionHandler = AtomicReference<(DesktopNavigationPosition) -> Unit>({})
     @Volatile private var disposed = false
+    private var didAttemptAssetRollback = false
     private var localRoot: Path? = null
     private var webView: WebViewComponent? = null
     private var readyTimer: Timer? = null
@@ -290,6 +291,17 @@ internal class DesktopEdgeWebViewController(
 
     private fun showStartupFailure(title: String, detail: String) {
         if (disposed) return
+        if (!didAttemptAssetRollback) {
+            didAttemptAssetRollback = true
+            if (DesktopWebPlayAssetSyncer.rollbackToPrevious()) {
+                readyTimer?.stop()
+                webView?.let { browser -> runCatching { browser.dispose() } }
+                webView = null
+                panel.removeAll()
+                start()
+                return
+            }
+        }
         readyTimer?.stop()
         webView?.let { browser ->
             webView = null
