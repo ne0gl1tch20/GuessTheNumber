@@ -158,7 +158,10 @@ class DesktopSaveStore internal constructor(
     suspend fun createFreshSlot(slot: Int, state: GameState): Boolean {
         val normalized = normalizeSlot(slot)
         if (!validate(state)) return false
-        val occupied = runCatching { fileOps.exists(primaryPath(normalized)) || fileOps.exists(backupPath(normalized)) }.getOrDefault(true)
+        val occupied = runCatching {
+            fileOps.exists(primaryPath(normalized)) || fileOps.exists(backupPath(normalized)) ||
+                fileOps.exists(creativePath(normalized))
+        }.getOrDefault(true)
         return !occupied && save(normalized, state)
     }
 
@@ -167,14 +170,22 @@ class DesktopSaveStore internal constructor(
         val target = normalizeSlot(targetSlot)
         if (source == target) return false
         val sourceState = load(source) ?: return false
-        val occupied = runCatching { fileOps.exists(primaryPath(target)) || fileOps.exists(backupPath(target)) }.getOrDefault(true)
+        val occupied = runCatching {
+            fileOps.exists(primaryPath(target)) || fileOps.exists(backupPath(target)) ||
+                fileOps.exists(creativePath(target))
+        }.getOrDefault(true)
         if (occupied) return false
+        val sourceCreativeRaw = runCatching {
+            if (fileOps.exists(creativePath(source))) fileOps.read(creativePath(source)) else null
+        }.getOrNull()
+        val sourceCreative = sourceCreativeRaw?.let(CreativeModeSaveCodec::decodeAndMigrate)
+            ?: if (sourceCreativeRaw == null) null else return false
         val saved = save(target, sourceState.copy(lastSaveTimestamp = System.currentTimeMillis()))
         if (!saved) return false
-        val sourceCreative = runCatching { if (fileOps.exists(creativePath(source))) fileOps.read(creativePath(source)) else null }.getOrNull()
-        if (sourceCreative != null) {
-            val creative = CreativeModeSaveCodec.decodeAndMigrate(sourceCreative) ?: return false
-            if (!saveCreativeModeSave(target, creative)) return false
+        if (sourceCreative != null && !saveCreativeModeSave(target, sourceCreative)) {
+            runCatching { fileOps.deleteIfExists(primaryPath(target)) }
+            runCatching { fileOps.deleteIfExists(backupPath(target)) }
+            return false
         }
         val sourceBackup = readValidJson(backupPath(source))
         if (sourceBackup != null) runCatching { writeAtomically(backupPath(target), sourceBackup) }
