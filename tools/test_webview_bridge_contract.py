@@ -123,6 +123,7 @@ def main() -> int:
     require(desktop_game, "if (section.sharedHtmlScreen != null)", "shared HTML destinations must be rendered before native fallbacks")
     require(desktop_game, "DesktopSharedWebView(", "Windows Settings must render through the shared WebView")
     require(desktop_adapter, 'class="setting-row jui-switch desktop-startup-setting"', "Windows startup toggle must reuse the shared JarrlyyUI switch component")
+    require(desktop_adapter, 'class="jui-switch-track" aria-hidden="true"', "Windows startup toggle must include the SDK switch track required by its CSS")
     require(desktop_adapter, 'aria-label="Launch GuessTheNumber when Windows starts"', "Windows startup toggle must have an accessible name")
     require(desktop_adapter, "class=\"jui-field\"", "Windows navigation position must reuse the shared JarrlyyUI field")
 
