@@ -105,13 +105,13 @@ fun NavGraph(
     var showSaveSlots by remember { mutableStateOf(false) }
     var colorPickerTarget by remember { mutableStateOf<String?>(null) }
     var showExitConfirmation by remember { mutableStateOf(false) }
-    var showArcadeDialog by remember { mutableStateOf(false) }
+    var showArcadeScreen by remember { mutableStateOf(false) }
 
     LaunchedEffect(hostActivity) { hostActivity?.let(AndroidBackController::install) }
 
     BackHandler {
         when {
-            showArcadeDialog -> showArcadeDialog = false
+            showArcadeScreen -> showArcadeScreen = false
             showExitConfirmation -> showExitConfirmation = false
             colorPickerTarget != null -> colorPickerTarget = null
             showPlayerProfile -> { showPlayerProfile = false; editingPlayerProfile = false }
@@ -164,8 +164,10 @@ fun NavGraph(
         return
     }
     Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
-        CompositionLocalProvider(LocalAppLocaleManager provides locale) { ProductionWebPlayScreen(state = state, dailyRewardTestRequest = dailyRewardTestRequest, incomePerSecond = incomePerSecond, localeManager = locale, stateProvider = { viewModel.gameState.value }, offlineGains = offlineGains, onDismissOfflineGains = onDismissOfflineGains, onClaimDailyReward = viewModel::claimDailyReward, onResetData = onResetData, onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) }, onSelectTraitArm = viewModel::selectTraitArm, onClaimDailyQuest = viewModel::claimDailyQuest, onOpenLootChest = viewModel::openLootChest, onNavigateProgression = { progression -> when { progression == "arcade" -> showArcadeDialog = true; progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true; progression == "save_slots" -> showSaveSlots = true; progression == "player_profile" -> { showPlayerProfile = true; editingPlayerProfile = false }; progression == "color_picker_primary" -> colorPickerTarget = "Primary"; progression == "color_picker_secondary" -> colorPickerTarget = "Secondary"; progression == "color_picker_tertiary" -> colorPickerTarget = "Tertiary"; progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", ""); progression == "claim_codex" -> viewModel.progressionAction("claim_codex", ""); progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':')) } }, onWorldAction = viewModel::worldProgressAction, onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) }, onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) }, onBuyPrestigeUpgrade = viewModel::buyPrestigeUpgrade, onBuyPrestigeShopItem = viewModel::buyPrestigeShopItem, onBuyUltraUpgrade = viewModel::buyUltraUpgrade, onBuyUltraShopItem = viewModel::buyUltraShopItem, onEquipCosmetic = viewModel::equipCosmetic, onUpdateMultiplier = viewModel::updateBuyMultiplier, onUpdateSettings = viewModel::updateSettings, onCreativeUpdateRange = viewModel::updateCreativeRange, onCreativeUpdateValue = viewModel::updateCreativeValue, onPrestigeReset = viewModel::prestigeReset, onUltraReset = viewModel::ultraReset, onBuyTalent = viewModel::buyTalent, onSetMutatorActive = viewModel::setMutatorActive, onArcadeReward = viewModel::awardArcadeResult, onSettleStake = viewModel::settleRandomStake) }
-        if (BuildConfig.DEBUG && !showDevSettings && debugDestination == null && !showSaveSlots && !showPlayerProfile) {
+        if (!showArcadeScreen && !showPlayerProfile && !showDevSettings && debugDestination == null && !showSaveSlots) {
+            CompositionLocalProvider(LocalAppLocaleManager provides locale) { ProductionWebPlayScreen(state = state, dailyRewardTestRequest = dailyRewardTestRequest, incomePerSecond = incomePerSecond, localeManager = locale, stateProvider = { viewModel.gameState.value }, offlineGains = offlineGains, onDismissOfflineGains = onDismissOfflineGains, onClaimDailyReward = viewModel::claimDailyReward, onResetData = onResetData, onSubmitGuess = { guess -> viewModel.makeGuessWithResult(guess) }, onSelectTraitArm = viewModel::selectTraitArm, onClaimDailyQuest = viewModel::claimDailyQuest, onOpenLootChest = viewModel::openLootChest, onNavigateProgression = { progression -> when { progression == "arcade" -> showArcadeScreen = true; progression == "dev_settings" && BuildConfig.DEBUG -> showDevSettings = true; progression == "save_slots" -> showSaveSlots = true; progression == "player_profile" -> { showPlayerProfile = true; editingPlayerProfile = false }; progression == "color_picker_primary" -> colorPickerTarget = "Primary"; progression == "color_picker_secondary" -> colorPickerTarget = "Secondary"; progression == "color_picker_tertiary" -> colorPickerTarget = "Tertiary"; progression == "home_upgrade" -> viewModel.progressionAction("home_upgrade", ""); progression == "claim_codex" -> viewModel.progressionAction("claim_codex", ""); progression.startsWith("equip_relic:") -> viewModel.progressionAction("equip_relic", progression.substringAfter(':')) } }, onWorldAction = viewModel::worldProgressAction, onBuyUpgrade = { id, cost -> viewModel.buyUpgrade(id, cost) }, onBuyShopItem = { id, cost -> viewModel.buyShopItem(id, cost) }, onBuyPrestigeUpgrade = viewModel::buyPrestigeUpgrade, onBuyPrestigeShopItem = viewModel::buyPrestigeShopItem, onBuyUltraUpgrade = viewModel::buyUltraUpgrade, onBuyUltraShopItem = viewModel::buyUltraShopItem, onEquipCosmetic = viewModel::equipCosmetic, onUpdateMultiplier = viewModel::updateBuyMultiplier, onUpdateSettings = viewModel::updateSettings, onCreativeUpdateRange = viewModel::updateCreativeRange, onCreativeUpdateValue = viewModel::updateCreativeValue, onPrestigeReset = viewModel::prestigeReset, onUltraReset = viewModel::ultraReset, onBuyTalent = viewModel::buyTalent, onSetMutatorActive = viewModel::setMutatorActive, onArcadeReward = viewModel::awardArcadeResult, onSettleStake = viewModel::settleRandomStake) }
+        }
+        if (BuildConfig.DEBUG && !showDevSettings && debugDestination == null && !showSaveSlots && !showPlayerProfile && !showArcadeScreen) {
             androidx.compose.material3.SmallFloatingActionButton(
                 onClick = { showDevSettings = true },
                 modifier = androidx.compose.ui.Modifier
@@ -182,26 +184,14 @@ fun NavGraph(
         if (showSaveSlots) CompositionLocalProvider(LocalAppLocaleManager provides locale) { SaveSlotsScreen(viewModel = viewModel, onNavigateBack = { showSaveSlots = false }) }
         colorPickerTarget?.let { target -> val current = when (target) { "Primary" -> state.settings.customPrimaryColor; "Secondary" -> state.settings.customSecondaryColor; else -> state.settings.customTertiaryColor }; CompositionLocalProvider(LocalAppLocaleManager provides locale) { ReusableColorPickerDialog(initialHex = current, title = locale.getString("settings_custom_theme_color", "Custom Theme Color"), onDismiss = { colorPickerTarget = null }, onApply = { hex -> viewModel.updateSettings(when (target) { "Primary" -> state.settings.copy(themePreset = "Custom", customPrimaryColor = hex); "Secondary" -> state.settings.copy(themePreset = "Custom", customSecondaryColor = hex); else -> state.settings.copy(themePreset = "Custom", customTertiaryColor = hex) }); colorPickerTarget = null }) } }
         if (showPlayerProfile) CompositionLocalProvider(LocalAppLocaleManager provides locale) { PlayerProfileScreen(profile = playerProfile, firstLaunch = false, store = profileStore, viewOnly = !editingPlayerProfile, onEdit = { editingPlayerProfile = true }, onBack = { showPlayerProfile = false; editingPlayerProfile = false }) }
-        if (showArcadeDialog) {
-            Dialog(
-                onDismissRequest = { showArcadeDialog = false },
-                properties = DialogProperties(usePlatformDefaultWidth = false)
-            ) {
-                Surface(
-                    modifier = androidx.compose.ui.Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.92f),
-                    shape = androidx.compose.material3.MaterialTheme.shapes.extraLarge,
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.surface
-                ) {
-                    CompositionLocalProvider(LocalAppLocaleManager provides locale) {
-                        com.jarrlyyy.guessthenumber.ui.screens.ArcadeScreen(
-                            onEarnReward = onEarnMinigameReward,
-                            onBack = { showArcadeDialog = false },
-                            reducedMotion = state.settings.reducedMotion
-                        )
-                    }
-                }
+        if (showArcadeScreen) {
+            CompositionLocalProvider(LocalAppLocaleManager provides locale) {
+                com.jarrlyyy.guessthenumber.ui.screens.ArcadeScreen(
+                    onEarnReward = onEarnMinigameReward,
+                    onBack = { showArcadeScreen = false },
+                    reducedMotion = state.settings.reducedMotion,
+                    showBackButton = false
+                )
             }
         }
     }
