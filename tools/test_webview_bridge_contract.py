@@ -33,6 +33,13 @@ def main() -> int:
     # Shared frontend emits one versioned JSON-string envelope on both hosts.
     require(web, "JSON.stringify({version:1,id,type,...payload})", "shared HTML must serialize versioned requests")
     require(web, "host.onmessage=event=>receive(event.data)", "shared HTML must receive host replies")
+    require(web, "document.querySelectorAll('.screen-nav [data-screen-target]')", "main tabs must have one scoped navigation handler")
+    require(web, "document.querySelectorAll('.more-links [data-screen-target]')", "More links must have one scoped navigation handler")
+    require(web, "document.querySelectorAll('.more-links [data-route=\\"save_slots\\"]')", "Save Slots must route to the native popup")
+    require(web, "document.querySelectorAll('.more-screen [data-route=\\"player_profile\\"]')", "Player Profile must route to the native popup")
+    if "document.querySelectorAll('[data-screen-target]').forEach(button=>button.addEventListener" in web:
+        raise AssertionError("Global data-screen-target listener duplicates the scoped handlers and can override popup routes.")
+
     require(web, "send('read_onboarding_state')", "shared HTML must perform its initial bridge handshake")
     require(web, "pendingTimeout=window.setTimeout", "shared HTML must unlock a request when the host stops replying")
     require(web, "host.cancelMessage?.(id)", "shared HTML must cancel timed-out messages still waiting in the desktop queue")
