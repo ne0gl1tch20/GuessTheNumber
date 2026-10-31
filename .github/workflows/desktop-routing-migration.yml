@@ -1,0 +1,67 @@
+name: Desktop routing migration
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/desktop-routing-migration.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply systematic desktop routing
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt')
+          s = p.read_text()
+
+          old = '''            if (playerProfile?.setupComplete != true) {\n                DesktopPlayerProfileScreen(\n                    profile = playerProfile,\n                    viewOnly = viewingPlayerProfile && !editingPlayerProfile,\n                    onEdit = { viewingPlayerProfile = false; editingPlayerProfile = true },\n                    onSave = { savedProfile ->\n                        runCatching { DesktopPlayerProfileStore.save(savedProfile) }\n                            .onSuccess {\n                                playerProfile = savedProfile\n                                editingPlayerProfile = false\n                            }\n                    },\n                    onCancel = { editingPlayerProfile = false; viewingPlayerProfile = false }\n                )\n            } else {'''
+          new = '''            if (playerProfile?.setupComplete != true) {\n                Dialog(onDismissRequest = { /* first-launch profile is mandatory */ }) {\n                    Surface(modifier = Modifier.width(720.dp).height(620.dp)) {\n                        DesktopPlayerProfileScreen(\n                            profile = playerProfile,\n                            viewOnly = false,\n                            onEdit = { editingPlayerProfile = true },\n                            onSave = { savedProfile ->\n                                runCatching { DesktopPlayerProfileStore.save(savedProfile) }\n                                    .onSuccess {\n                                        playerProfile = savedProfile\n                                        editingPlayerProfile = false\n                                        viewingPlayerProfile = false\n                                        popupDestination = DesktopDestination.SAVE_SLOTS\n                                    }\n                            },\n                            onCancel = {\n                                if (playerProfile?.setupComplete == true) {\n                                    editingPlayerProfile = false\n                                    viewingPlayerProfile = false\n                                }\n                            }\n                        )\n                    }\n                }\n            } else {'''
+          if old not in s:
+              raise SystemExit('first-launch block not found')
+          s = s.replace(old, new, 1)
+
+          s = s.replace('''                        DesktopDestination.MUTATORS,\n                        DesktopDestination.SAVE_SLOTS,\n                        DesktopDestination.RELICS,''', '''                        DesktopDestination.MUTATORS,\n                        DesktopDestination.RELICS,''', 1)
+          s = s.replace('''                        DesktopDestination.ENDGAME,\n                        DesktopDestination.LUCKY_STAKE,\n                        DesktopDestination.ARCADE,\n                        DesktopDestination.MUSIC_PLAYER,''', '''                        DesktopDestination.ENDGAME,\n                        DesktopDestination.LUCKY_STAKE,\n                        DesktopDestination.MUSIC_PLAYER,''', 1)
+          s = s.replace('''                                        DesktopDestination.MUTATORS -> DesktopGameSection.MUTATORS\n                                        DesktopDestination.SAVE_SLOTS -> DesktopGameSection.SAVE_SLOTS\n                                        DesktopDestination.RELICS -> DesktopGameSection.RELICS,''', '''                                        DesktopDestination.MUTATORS -> DesktopGameSection.MUTATORS\n                                        DesktopDestination.RELICS -> DesktopGameSection.RELICS,''', 1)
+          s = s.replace('''                                        DesktopDestination.LUCKY_STAKE -> DesktopGameSection.LUCKY_STAKE\n                                        DesktopDestination.ARCADE -> DesktopGameSection.ARCADE\n                                        DesktopDestination.MUSIC_PLAYER -> DesktopGameSection.MUSIC_PLAYER,''', '''                                        DesktopDestination.LUCKY_STAKE -> DesktopGameSection.LUCKY_STAKE\n                                        DesktopDestination.MUSIC_PLAYER -> DesktopGameSection.MUSIC_PLAYER,''', 1)
+
+          old_nav = '''    fun navigate(destination: DesktopDestination) {\n        if (DesktopDebugToolsPolicy.isDeveloperOnly(destination) && !DesktopDebugToolsPolicy.enabled()) {'''
+          # DesktopShellController lives in DesktopNavigation.kt, so no change here.
+
+          # Native popup destinations must never become the HTML shell destination.
+          marker = '''                                    onOpenParityDestination = { target ->\n                                        when (target) {\n                                            DesktopDestination.ARCADE,\n                                            DesktopDestination.SAVE_SLOTS,\n                                            DesktopDestination.DEVELOPER_SETTINGS -> popupDestination = target\n                                            else -> shell.navigate(target)\n                                        }\n                                    },'''
+          if marker not in s:
+              raise SystemExit('parity routing marker not found')
+
+          p.write_text(s)
+
+          nav = Path('desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigation.kt')
+          ns = nav.read_text()
+          ns = ns.replace('''            SETTINGS,\n            ARCADE,\n            MUSIC_PLAYER,''', '''            SETTINGS,\n            MUSIC_PLAYER,''', 1)
+          nav.write_text(ns)
+
+          # Add an explicit regression test if the existing test file has the expected contract.
+          test = Path('desktopApp/src/jvmTest/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigationTest.kt')
+          if test.exists():
+              ts = test.read_text()
+              assertion = '''        assertFalse(DesktopDestination.SAVE_SLOTS in DesktopDestination.MAIN_NAVIGATION_ORDER)\n        assertFalse(DesktopDestination.ARCADE in DesktopDestination.MAIN_NAVIGATION_ORDER)\n        assertFalse(DesktopDestination.DEVELOPER_SETTINGS in DesktopDestination.MAIN_NAVIGATION_ORDER)\n'''
+              if 'SAVE_SLOTS in DesktopDestination.MAIN_NAVIGATION_ORDER' not in ts:
+                  ts += '\n@Test\nfun nativePopupDestinationsAreNotShellNavigation() {\n' + assertion + '}\n'
+                  test.write_text(ts)
+      - name: Commit migration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/Main.kt desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigation.kt desktopApp/src/jvmTest/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopNavigationTest.kt
+          git diff --cached --quiet && exit 0
+          git commit -m 'fix(desktop): route native screens through popup layer'
+          git push origin master
