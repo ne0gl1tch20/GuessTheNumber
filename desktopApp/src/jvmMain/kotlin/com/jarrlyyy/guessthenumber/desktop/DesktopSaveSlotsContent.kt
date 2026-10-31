@@ -1,23 +1,61 @@
 package com.jarrlyyy.guessthenumber.desktop
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.MilitaryTech
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.QueryStats
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveSlotSummary
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotCard
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotUiModel
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetric
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetricIcon
 import java.text.DateFormat
 import java.util.Date
 
+/**
+ * Compose-first desktop save manager. The layout intentionally mirrors the
+ * Android save-slot card hierarchy while using the desktop persistence callbacks.
+ */
 @Composable
 internal fun DesktopSaveSlotsContent(
     activeSlot: Int,
@@ -31,57 +69,158 @@ internal fun DesktopSaveSlotsContent(
     onExportSlot: (Int) -> Unit,
     onImportSlot: (Int) -> Unit,
     onExportAllSlots: () -> Unit,
-    onImportAllSlots: () -> Unit
+    onImportAllSlots: () -> Unit,
+    onContinueWithActiveSlot: (() -> Unit)? = null,
+    showCloseButton: Boolean = true
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onBack) { Text("Close") }
-            Text("Save Slots", style = MaterialTheme.typography.headlineSmall)
-            OutlinedButton(onClick = onRefresh) { Text("Refresh") }
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onExportAllSlots) { Text("Export all slots") }
-            OutlinedButton(onClick = onImportAllSlots) { Text("Import all slots") }
-        }
-        Text("Importing an all-slot bundle replaces all ten local slots. A recovery copy of each previous save is kept where possible.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-        Text("Ten independent local saves. Switching saves the current slot first. Valid previous saves can be restored.")
-        Text("Portable backups are plain JSON files compatible with Android single-save import. They are not encrypted.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-        slots.forEach { slot ->
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                        Text("Slot ${slot.slot}${if (slot.slot == activeSlot) " · Active" else ""}", style = MaterialTheme.typography.titleMedium)
-                        when {
-                            slot.isCorrupt -> Text("Needs recovery", color = MaterialTheme.colorScheme.error)
-                            slot.isEmpty -> Text("Empty", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            else -> Text("Saved", color = MaterialTheme.colorScheme.primary)
+    val activeState = slots.firstOrNull { it.slot == activeSlot }?.state
+
+    Column(
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        // Keep the action bar usable when the user narrows the desktop popup.
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            if (maxWidth < 760.dp) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedButton(onClick = onRefresh, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Filled.Refresh, contentDescription = null)
+                            Spacer(Modifier.width(4.dp))
+                            Text("Refresh")
+                        }
+                        OutlinedButton(onClick = onExportAllSlots, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Filled.FileDownload, contentDescription = null)
+                            Spacer(Modifier.width(4.dp))
+                            Text("Export")
+                        }
+                        OutlinedButton(onClick = onImportAllSlots, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Filled.FileUpload, contentDescription = null)
+                            Spacer(Modifier.width(4.dp))
+                            Text("Import")
                         }
                     }
-                    val data = slot.state
-                    if (data != null) {
-                        Text(data.profileName.ifBlank { "Player" } + " · " + data.difficultyId.replaceFirstChar { it.uppercase() })
-                        Text("Money ${data.money} · Prestige ${data.prestige} · Ultra ${data.ultra}")
-                        Text("Attempts ${data.attempts} · Correct ${data.correctGuesses}")
-                        if (data.lastSaveTimestamp > 0L) Text("Last saved: ${DateFormat.getDateTimeInstance().format(Date(data.lastSaveTimestamp))}")
-                    }
-                    if (slot.hasBackup) Text("A valid recovery backup is available.", color = MaterialTheme.colorScheme.primary)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (!slot.isEmpty && !slot.isCorrupt) OutlinedButton(onClick = { onExportSlot(slot.slot) }) { Text("Export JSON") }
-                        OutlinedButton(onClick = { onImportSlot(slot.slot) }) { Text("Import JSON") }
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (slot.isEmpty) {
-                            Button(onClick = { onCreateSlot(slot.slot) }) { Text("Create slot") }
-                            if (slots.firstOrNull { it.slot == activeSlot }?.state != null) OutlinedButton(onClick = { onDuplicateSlot(activeSlot, slot.slot) }) { Text("Duplicate active here") }
+                    if (onContinueWithActiveSlot != null) {
+                        Button(
+                            onClick = onContinueWithActiveSlot,
+                            enabled = activeState != null,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                            Spacer(Modifier.width(6.dp))
+                            Text("Continue with active save")
                         }
-                        else if (!slot.isCorrupt && slot.slot != activeSlot) Button(onClick = { onSwitchSlot(slot.slot) }) { Text("Switch to slot") }
-                        if (!slot.isEmpty && !slot.isCorrupt && slot.slot != activeSlot) {
-                            OutlinedButton(onClick = { onDuplicateSlot(activeSlot, slot.slot) }) { Text("Duplicate active here") }
+                    } else if (showCloseButton) {
+                        OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
+                            Text("Close")
                         }
-                        if (slot.hasBackup && !slot.isCorrupt) OutlinedButton(onClick = { onRestoreBackup(slot.slot) }) { Text("Restore backup") }
+                    }
+                }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedButton(onClick = onRefresh) {
+                        Icon(Icons.Filled.Refresh, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text("Refresh")
+                    }
+                    OutlinedButton(onClick = onExportAllSlots) {
+                        Icon(Icons.Filled.FileDownload, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text("Export all")
+                    }
+                    OutlinedButton(onClick = onImportAllSlots) {
+                        Icon(Icons.Filled.FileUpload, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text("Import all")
+                    }
+                    Spacer(Modifier.weight(1f))
+                    if (onContinueWithActiveSlot != null) {
+                        Button(onClick = onContinueWithActiveSlot, enabled = activeState != null) {
+                            Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                            Spacer(Modifier.width(6.dp))
+                            Text("Continue")
+                        }
+                    } else if (showCloseButton) {
+                        OutlinedButton(onClick = onBack) { Text("Close") }
                     }
                 }
             }
         }
+
+        slots.sortedBy { it.slot }.forEach { slot ->
+            val data = slot.state
+            val total = data?.let { it.statistics.totalGuesses.coerceAtLeast(it.attempts) } ?: 0L
+            val correct = data?.let { it.statistics.correctGuesses.coerceAtLeast(it.correctGuesses) } ?: 0L
+            val accuracy = if (total > 0L) (correct * 100.0 / total).coerceIn(0.0, 100.0) else 0.0
+            val model = SharedSaveSlotUiModel(
+                slotIndex = slot.slot,
+                isActive = slot.slot == activeSlot,
+                isEmpty = slot.isEmpty,
+                isCorrupt = slot.isCorrupt,
+                hasBackup = slot.hasBackup,
+                profileTitle = data?.takeUnless { slot.isCorrupt }?.let {
+                    "${it.profileIconId.takeIf(String::isNotBlank) ?: "🎮"}  ${it.profileName.ifBlank { "Player" }}"
+                },
+                difficultyLabel = data?.takeUnless { slot.isCorrupt }?.let {
+                    it.difficultyId.replaceFirstChar(Char::uppercase) +
+                        if (it.creativeModeEnabled) " · Creative Mode" else ""
+                },
+                metricColumns = 3,
+                metricItems = data?.takeUnless { slot.isCorrupt }?.let {
+                    listOf(
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.TARGET, "Hidden number: ${it.targetNumber}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.MONEY, "Money: ${it.money}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.PRESTIGE, "Prestige: ${it.prestige}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.ULTRA, "Ultra: ${it.ultra}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.NEBULA, "Nebula: ${it.nebula}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.ATTEMPTS, "Attempts: ${it.attempts}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.CORRECT, "Correct: ${it.correctGuesses}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.STREAK, "Streak: ${it.streak} · Best: ${it.bestStreak}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.STATISTICS, "Accuracy %.1f%% · Failed ${it.statistics.failedGuesses} · Playtime ${formatPlaytime(it.statistics.playtimeSeconds)}".format(accuracy))
+                    )
+                }.orEmpty(),
+                lastSavedLabel = data?.takeIf { !slot.isCorrupt && it.lastSaveTimestamp > 0L }?.let {
+                    "Saved ${DateFormat.getDateTimeInstance().format(Date(it.lastSaveTimestamp))}"
+                },
+                activeLabel = "Active",
+                emptyLabel = "Empty slot",
+                corruptLabel = "Needs recovery",
+                createLabel = "Create save",
+                resumeLabel = "Active save",
+                switchLabel = "Switch to save"
+            )
+
+            SharedSaveSlotCard(
+                model = model,
+                onSelect = {
+                    if (slot.isEmpty) onCreateSlot(slot.slot) else onSwitchSlot(slot.slot)
+                },
+                onCreate = { onCreateSlot(slot.slot) },
+                onDuplicate = if (slot.isEmpty && activeState != null) {
+                    { onDuplicateSlot(activeSlot, slot.slot) }
+                } else null,
+                onRestoreBackup = if (slot.hasBackup && !slot.isCorrupt) {
+                    { onRestoreBackup(slot.slot) }
+                } else null,
+                onExport = if (!slot.isEmpty && !slot.isCorrupt) {
+                    { onExportSlot(slot.slot) }
+                } else null,
+                onImport = { onImportSlot(slot.slot) }
+            )
+        }
     }
+}
+
+private fun formatPlaytime(seconds: Long): String {
+    val hours = seconds.coerceAtLeast(0L) / 3600L
+    val minutes = (seconds.coerceAtLeast(0L) % 3600L) / 60L
+    return "${hours}h ${minutes}m"
 }

@@ -102,6 +102,7 @@ fun ProductionGuessGameScreen(
     onOpenParityDestination: (DesktopDestination) -> Unit = {},
     onOpenPlayerProfile: () -> Unit = {},
     onNativeSaveLoaded: () -> Unit = {},
+    startupSaveSlotSelection: Boolean = false,
     onDesktopUpdateRequest: (String, String, (String) -> Unit) -> Unit = { _, requestId, reply ->
         reply(org.json.JSONObject().put("version", 1).put("id", requestId)
             .put("type", "update_result").put("status", "unavailable")
@@ -399,7 +400,6 @@ fun ProductionGuessGameScreen(
         }
 
         if (section.sharedHtmlScreen != null) {
-            key(section) {
             DesktopSharedWebView(
                 initialScreen = section.sharedHtmlScreen!!,
                 onRequest = { raw, reply ->
@@ -482,8 +482,20 @@ fun ProductionGuessGameScreen(
                             return@launch
                         }
                         if (type == "read_feature_tutorial" || type == "complete_feature_tutorial") {
-                            val featureId=request.optString("featureId"); val prefs=java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding")
-                            if(type=="complete_feature_tutorial") { prefs.putBoolean("nimmy_feature_$featureId",true); prefs.flush() } else reply(org.json.JSONObject().put("version",1).put("id",requestId).put("type","feature_tutorial_state").put("featureId",featureId).put("completed",prefs.getBoolean("nimmy_feature_$featureId",false)).toString())
+                            val featureId = request.optString("featureId")
+                            if (!featureId.matches(Regex("[A-Za-z0-9_-]{1,48}"))) {
+                                sendError("invalid_feature")
+                                return@launch
+                            }
+                            val completing = type == "complete_feature_tutorial"
+                            if (completing) DesktopOnboardingPreferences.completeFeatureTutorial(featureId)
+                            val completed = DesktopOnboardingPreferences.isFeatureTutorialCompleted(featureId)
+                            // Android always replies to both reads and completions. Without this reply,
+                            // the shared JS request remains pending and disables every later game action.
+                            reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                .put("type", "feature_tutorial_state")
+                                .put("featureId", featureId)
+                                .put("completed", completed).toString())
                             return@launch
                         }
                         if (type == "reset_everything") { resetAllGameData(); reply(org.json.JSONObject().put("version",1).put("id",requestId).put("type","state").put("state",org.json.JSONObject().put("accepted",true)).toString()); delay(1800); kotlin.system.exitProcess(0); return@launch }
@@ -491,7 +503,7 @@ fun ProductionGuessGameScreen(
                             val onboardingPrefs = java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding")
                             val firstLaunchAlreadySeen = onboardingPrefs.getBoolean("daily_reward_first_launch_seen", false)
                             if (!firstLaunchAlreadySeen) onboardingPrefs.putBoolean("daily_reward_first_launch_seen", true)
-                            val tutorialCompleted = onboardingPrefs.getBoolean("nimmy_tutorial_completed", false)
+                            val tutorialCompleted = DesktopOnboardingPreferences.isNimmyTutorialCompleted()
                             reply(org.json.JSONObject().put("version", 1).put("id", requestId)
                                 .put("type", "onboarding_state")
                                 .put("dailyRewardFirstLaunchSeen", firstLaunchAlreadySeen)
@@ -499,7 +511,7 @@ fun ProductionGuessGameScreen(
                             return@launch
                         }
                         if (type == "complete_nimmy_tutorial") {
-                            java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding").putBoolean("nimmy_tutorial_completed", true)
+                            DesktopOnboardingPreferences.completeNimmyTutorial()
                             reply(org.json.JSONObject().put("version", 1).put("id", requestId)
                                 .put("type", "onboarding_saved").toString())
                             return@launch
@@ -902,26 +914,29 @@ fun ProductionGuessGameScreen(
                 onNavigationPositionChange = onNavigationPositionChange,
                 modifier = Modifier.fillMaxSize()
             )
-            }
             return@Card
         }
 
         Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+            modifier = Modifier.fillMaxSize()
+                .then(if (section == DesktopGameSection.SAVE_SLOTS) Modifier else Modifier.verticalScroll(rememberScrollState()))
+                .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Guess The Number", style = MaterialTheme.typography.headlineMedium)
-            Text("Find the hidden number between ${currentState.currentRangeMin} and ${currentState.currentRangeMax}.")
-            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                CurrencySummary("Money", currentState.money.toString())
-                CurrencySummary("Prestige", currentState.prestige.toString())
-                CurrencySummary("Ultra", currentState.ultra.toString())
-                CurrencySummary("Nebula", currentState.nebula.toString())
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                CurrencySummary("Attempts", currentState.attempts.toString())
-                CurrencySummary("Correct", currentState.correctGuesses.toString())
-                CurrencySummary("Streak", currentState.streak.toString())
+            if (section != DesktopGameSection.SAVE_SLOTS) {
+                Text("Guess The Number", style = MaterialTheme.typography.headlineMedium)
+                Text("Find the hidden number between ${currentState.currentRangeMin} and ${currentState.currentRangeMax}.")
+                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    CurrencySummary("Money", currentState.money.toString())
+                    CurrencySummary("Prestige", currentState.prestige.toString())
+                    CurrencySummary("Ultra", currentState.ultra.toString())
+                    CurrencySummary("Nebula", currentState.nebula.toString())
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    CurrencySummary("Attempts", currentState.attempts.toString())
+                    CurrencySummary("Correct", currentState.correctGuesses.toString())
+                    CurrencySummary("Streak", currentState.streak.toString())
+                }
             }
 
             if (section == DesktopGameSection.SAVE_SLOTS) {
@@ -932,6 +947,8 @@ fun ProductionGuessGameScreen(
                     activeSlot = activeSaveSlot,
                     slots = saveSlotSummaries,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) },
+                    onContinueWithActiveSlot = if (startupSaveSlotSelection) onNativeSaveLoaded else null,
+                    showCloseButton = !startupSaveSlotSelection,
                     onRefresh = { scope.launch { saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() } } },
                     onSwitchSlot = { targetSlot ->
                         val snapshot = state

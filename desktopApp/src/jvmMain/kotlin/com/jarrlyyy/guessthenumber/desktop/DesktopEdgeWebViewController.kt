@@ -44,6 +44,20 @@ internal class DesktopEdgeWebViewController(
     fun setNavigationPositionHandler(value: (DesktopNavigationPosition) -> Unit) {
         navigationPositionHandler.set(value)
     }
+    fun navigateToScreen(screen: String) {
+        if (disposed) return
+        val encoded = JSONObject.quote(screen)
+        SwingUtilities.invokeLater {
+            if (!disposed) {
+                runCatching {
+                    webView?.eval("window.gtnActivateScreen && window.gtnActivateScreen($encoded)")
+                }.onFailure { error ->
+                    System.err.println("GuessTheNumber Edge screen navigation failed: ${error.message ?: error.javaClass.simpleName}")
+                }
+            }
+        }
+    }
+
 
     fun start() {
         check(SwingUtilities.isEventDispatchThread()) {
@@ -69,7 +83,7 @@ internal class DesktopEdgeWebViewController(
             // WebView2 exposes Inspect Element only in developer-enabled builds.
             // Release packages keep the embedded game surface locked down.
             browser.setDebug(debugToolsEnabled)
-            browser.setDefaultContextMenuEnabled(debugToolsEnabled)
+            browser.setDefaultContextMenuEnabled(true)
             browser.setNavigationHandler(WebViewNavigationHandler { event ->
                 allowNavigation(event.url())
             })
@@ -87,14 +101,8 @@ internal class DesktopEdgeWebViewController(
                             window.gtnDesktopPostMessage(String(raw));
                         }
                     });
-                    // Release packages suppress page and native context menus.
-                    // Debug packages retain Edge's native menu so Inspect is available.
-                    if (!${debugToolsEnabled}) {
-                        document.addEventListener('contextmenu', function (event) {
-                            event.preventDefault();
-                            event.stopImmediatePropagation();
-                        }, true);
-                    }
+                    // Keep the standard browser context menu available in every build.
+                    // WebView2 developer tools are still gated by browser.setDebug(debugToolsEnabled).
                     window.addEventListener('load', function () {
                         window.gtnDesktopPageReady(location.href);
                     }, { once: true });

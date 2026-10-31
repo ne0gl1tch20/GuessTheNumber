@@ -34,7 +34,8 @@ internal fun DesktopSharedWebView(
     onNavigationPositionChange: (DesktopNavigationPosition) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val controller = remember(initialScreen) { DesktopSharedWebViewController(initialScreen) }
+    val controller = remember { DesktopSharedWebViewController(initialScreen) }
+    controller.setInitialScreen(initialScreen)
     controller.setRequestHandler(onRequest)
     controller.setNavigationPositionHandler(onNavigationPositionChange)
     DisposableEffect(controller) {
@@ -62,6 +63,22 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
         require(it in setOf("play", "more", "changelog", "about", "music", "upgrades", "shop", "prestige", "ultra", "talent", "settings", "rewards", "worlds", "mutators", "relics", "homebase", "codex", "journey", "stats", "arcade", "stake"))
     })
     private val navigationPositionHandler = AtomicReference<(DesktopNavigationPosition) -> Unit>({})
+    fun setInitialScreen(value: String) {
+        require(value in setOf("play", "more", "changelog", "about", "music", "upgrades", "shop", "prestige", "ultra", "talent", "settings", "rewards", "worlds", "mutators", "relics", "homebase", "codex", "journey", "stats", "arcade", "stake"))
+        val previous = initialScreen.getAndSet(value)
+        if (previous == value) return
+        edgeController?.navigateToScreen(value) ?: Platform.runLater {
+            if (disposed) return@runLater
+            val target = engine ?: return@runLater
+            val encoded = org.json.JSONObject.quote(value)
+            runCatching {
+                target.executeScript("window.gtnActivateScreen && window.gtnActivateScreen($encoded)")
+            }.onFailure { error ->
+                System.err.println("GuessTheNumber desktop screen navigation failed: ${error.message ?: error.javaClass.simpleName}")
+            }
+        }
+    }
+
     @Volatile private var disposed = false
     private var engine: javafx.scene.web.WebEngine? = null
     private var localIndex: Path? = null

@@ -44,6 +44,10 @@ import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
 import com.jarrlyyy.guessthenumber.ui.viewmodel.GameViewModel
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotCard
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotUiModel
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetric
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetricIcon
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -750,127 +754,48 @@ fun SlotCard(
     reducedMotion: Boolean = false
 ) {
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
-    val slotContainerColor by animateColorAsState(
-        targetValue = if (isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-        animationSpec = if (reducedMotion) snap() else spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "save-slot-container"
+    val saved = metadata?.takeUnless { it.isEmpty }
+    val uiModel = SharedSaveSlotUiModel(
+        slotIndex = slotIndex,
+        isActive = isActive,
+        isEmpty = metadata == null || metadata.isEmpty,
+        hasBackup = metadata?.hasBackup == true,
+        profileTitle = saved?.let {
+            "${SaveProfile.iconSymbol(it.profileIconId)}  " +
+                it.profileName.ifBlank { locale.getString("save_slot_title", "Slot %d", slotIndex) }
+        },
+        difficultyLabel = saved?.let {
+            locale.getString("save_slot_difficulty", "Difficulty") + ": " +
+                locale.getString(Difficulty.nameKey(it.difficultyId), "Classic")
+        },
+        metricItems = saved?.let {
+            listOf(
+                SharedSaveSlotMetric(SharedSaveSlotMetricIcon.MONEY, locale.getString("save_slot_money", "Money: %s", it.money)),
+                SharedSaveSlotMetric(SharedSaveSlotMetricIcon.PRESTIGE, locale.getString("save_slot_prestige", "Prestige: %s", it.prestige)),
+                SharedSaveSlotMetric(SharedSaveSlotMetricIcon.ULTRA, locale.getString("save_slot_ultra", "Ultra: %s", it.ultra)),
+                SharedSaveSlotMetric(SharedSaveSlotMetricIcon.ATTEMPTS, locale.getString("save_slot_attempts", "Attempts: %d", it.attempts)),
+                SharedSaveSlotMetric(SharedSaveSlotMetricIcon.CORRECT, locale.getString("save_slot_correct", "Correct: %d", it.correctGuesses))
+            )
+        }.orEmpty(),
+        lastSavedLabel = saved?.takeIf { it.lastSaveTimestamp > 0L }?.let {
+            locale.getString("save_slot_last_saved", "Last Saved: %s", dateFormat.format(Date(it.lastSaveTimestamp)))
+        },
+        activeLabel = locale.getString("save_slot_active", "Active"),
+        emptyLabel = locale.getString("save_slot_empty", "Empty Slot"),
+        createLabel = locale.getString("save_slot_start_new", "Start New Game"),
+        resumeLabel = locale.getString("save_slot_resume", "Resume Game"),
+        switchLabel = locale.getString("save_slot_switch", "Switch to Slot")
     )
-    val slotScale by animateFloatAsState(
-        targetValue = if (isActive && !reducedMotion) 1.015f else 1f,
-        animationSpec = if (reducedMotion) snap() else spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "save-slot-scale"
+    SharedSaveSlotCard(
+        model = uiModel,
+        onSelect = onSelect,
+        onCreate = onSelect,
+        onEditProfile = saved?.let { onEditProfile },
+        onDuplicate = saved?.let { onDuplicate },
+        onRestoreBackup = saved?.takeIf { it.hasBackup }?.let { onRestoreBackup },
+        onReset = saved?.let { onReset },
+        reducedMotion = reducedMotion
     )
-    val slotActionInteractionSource = remember { MutableInteractionSource() }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .scale(slotScale)
-            .animateContentSize(),
-        colors = CardDefaults.cardColors(containerColor = slotContainerColor)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = locale.getString("save_slot_title", "Slot %d", slotIndex) + if (isActive) " ${locale.getString("save_slot_active", "(Active)")}" else "",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                if (metadata != null && !metadata.isEmpty) {
-                    Row {
-                        IconButton(onClick = onEditProfile) {
-                            Icon(Icons.Default.Edit, contentDescription = locale.getString("save_profile_edit", "Edit Profile"))
-                        }
-                        IconButton(onClick = onDuplicate) {
-                            Icon(Icons.Default.ContentCopy, contentDescription = locale.getString("save_slot_duplicate", "Duplicate Slot"))
-                        }
-                        if (metadata.hasBackup) {
-                            IconButton(onClick = onRestoreBackup) {
-                                Icon(Icons.Default.Restore, contentDescription = locale.getString("save_slot_restore", "Restore Backup"))
-                            }
-                        }
-                        IconButton(onClick = onReset) {
-                            Icon(Icons.Default.Delete, contentDescription = locale.getString("save_slot_reset", "Reset Slot"), tint = MaterialTheme.colorScheme.error)
-                        }
-                    }
-                }
-            }
-
-            if (metadata == null || metadata.isEmpty) {
-                Text(
-                    text = locale.getString("save_slot_empty", "Empty Slot"),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Button(
-                    onClick = onSelect,
-                    interactionSource = slotActionInteractionSource,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .expressivePressScale(
-                            interactionSource = slotActionInteractionSource,
-                            reducedMotion = reducedMotion
-                        )
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(locale.getString("save_slot_start_new", "Start New Game"))
-                }
-            } else {
-                val profileDisplayName = metadata.profileName.ifBlank {
-                    locale.getString("save_slot_title", "Slot %d", slotIndex)
-                }
-                Text(text = "${SaveProfile.iconSymbol(metadata.profileIconId)}  $profileDisplayName",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(text = locale.getString("save_slot_difficulty", "Difficulty") + ": " + locale.getString(Difficulty.nameKey(metadata.difficultyId), "Classic"), style = MaterialTheme.typography.bodyMedium)
-                Text(text = locale.getString("save_slot_money", "Money: %s", metadata.money), style = MaterialTheme.typography.bodyMedium)
-                Text(text = locale.getString("save_slot_prestige_ultra", "Prestige: %s | Ultra: %s", metadata.prestige, metadata.ultra), style = MaterialTheme.typography.bodySmall)
-                Text(text = locale.getString("save_slot_attempts_correct", "Attempts: %d | Correct: %d", metadata.attempts, metadata.correctGuesses), style = MaterialTheme.typography.bodySmall)
-                if (metadata.lastSaveTimestamp > 0) {
-                    Text(
-                        text = locale.getString("save_slot_last_saved", "Last Saved: %s", dateFormat.format(Date(metadata.lastSaveTimestamp))),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                Button(
-                    onClick = onSelect,
-                    interactionSource = slotActionInteractionSource,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .expressivePressScale(
-                            interactionSource = slotActionInteractionSource,
-                            reducedMotion = reducedMotion
-                        ),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
-                    )
-                ) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = null)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(if (isActive) locale.getString("save_slot_resume", "Resume Game") else locale.getString("save_slot_switch", "Switch to Slot"))
-                }
-            }
-        }
-    }
 }
 
 private fun makeResetChallenge(): Pair<String, Int> {

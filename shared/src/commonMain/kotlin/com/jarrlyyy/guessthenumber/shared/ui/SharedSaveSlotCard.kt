@@ -1,0 +1,257 @@
+package com.jarrlyyy.guessthenumber.shared.ui
+
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.MilitaryTech
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.QueryStats
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+
+/** Platform-neutral save-slot presentation model. Values are already formatted by the host. */
+data class SharedSaveSlotUiModel(
+    val slotIndex: Int,
+    val isActive: Boolean,
+    val isEmpty: Boolean,
+    val isCorrupt: Boolean = false,
+    val hasBackup: Boolean = false,
+    val profileTitle: String? = null,
+    val difficultyLabel: String? = null,
+    val primaryMetric: String? = null,
+    val secondaryMetrics: List<String> = emptyList(),
+    val metricItems: List<SharedSaveSlotMetric> = emptyList(),
+    val metricColumns: Int = 1,
+    val lastSavedLabel: String? = null,
+    val activeLabel: String = "ACTIVE",
+    val emptyLabel: String = "Empty slot",
+    val corruptLabel: String = "Needs recovery",
+    val createLabel: String = "Create save",
+    val resumeLabel: String = "Resume game",
+    val switchLabel: String = "Switch to save"
+)
+
+enum class SharedSaveSlotMetricIcon { TARGET, MONEY, PRESTIGE, ULTRA, NEBULA, ATTEMPTS, CORRECT, STREAK, STATISTICS }
+
+data class SharedSaveSlotMetric(val icon: SharedSaveSlotMetricIcon, val label: String)
+
+/**
+ * Canonical compact Save Slots card shared by Android and Windows.
+ * Persistence, validation and platform actions stay in the host callbacks.
+ */
+@Composable
+fun SharedSaveSlotCard(
+    model: SharedSaveSlotUiModel,
+    onSelect: () -> Unit,
+    onCreate: (() -> Unit)? = null,
+    onEditProfile: (() -> Unit)? = null,
+    onDuplicate: (() -> Unit)? = null,
+    onRestoreBackup: (() -> Unit)? = null,
+    onReset: (() -> Unit)? = null,
+    onExport: (() -> Unit)? = null,
+    onImport: (() -> Unit)? = null,
+    reducedMotion: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    val containerColor = animateColorAsState(
+        targetValue = if (model.isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+        animationSpec = if (reducedMotion) snap() else spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "shared-save-slot-container"
+    ).value
+
+    Card(
+        modifier = modifier.fillMaxWidth().then(if (reducedMotion) Modifier else Modifier.animateContentSize()),
+        colors = CardDefaults.cardColors(containerColor = containerColor)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        "Slot ${model.slotIndex}" + if (model.isActive) " (${model.activeLabel})" else "",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        when {
+                            model.isCorrupt -> model.corruptLabel
+                            model.isEmpty -> model.emptyLabel
+                            model.isActive -> "Currently active"
+                            else -> "Saved game"
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = when {
+                            model.isCorrupt -> MaterialTheme.colorScheme.error
+                            model.isActive -> MaterialTheme.colorScheme.primary
+                            else -> MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                    )
+                }
+                onEditProfile?.let {
+                    IconButton(onClick = it) {
+                        Icon(Icons.Default.Edit, contentDescription = "Edit profile")
+                    }
+                }
+                onDuplicate?.let {
+                    IconButton(onClick = it) {
+                        Icon(Icons.Default.ContentCopy, contentDescription = "Duplicate save")
+                    }
+                }
+                onRestoreBackup?.let {
+                    IconButton(onClick = it) {
+                        Icon(Icons.Default.Restore, contentDescription = "Restore backup")
+                    }
+                }
+                onReset?.let {
+                    IconButton(onClick = it) {
+                        Icon(Icons.Default.Delete, contentDescription = "Reset save",
+                            tint = MaterialTheme.colorScheme.error)
+                    }
+                }
+                if (model.isCorrupt) {
+                    Icon(Icons.Default.WarningAmber, contentDescription = model.corruptLabel,
+                        tint = MaterialTheme.colorScheme.error)
+                } else if (!model.isEmpty) {
+                    Icon(Icons.Default.CheckCircle, contentDescription = "Save is available",
+                        tint = MaterialTheme.colorScheme.primary)
+                }
+            }
+
+            if (model.isEmpty || model.isCorrupt) {
+                Text(
+                    if (model.isCorrupt) "This save could not be read. Restore a valid backup if available."
+                    else model.emptyLabel,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (model.isCorrupt) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                model.profileTitle?.let {
+                    Text(it, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                }
+                model.difficultyLabel?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                if (model.metricItems.isNotEmpty()) {
+                    val columns = model.metricColumns.coerceIn(1, 3)
+                    model.metricItems.chunked(columns).forEach { metricRow ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            metricRow.forEach { metric ->
+                                Row(
+                                    modifier = Modifier.weight(1f),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    val metricIcon = when (metric.icon) {
+                                        SharedSaveSlotMetricIcon.TARGET -> Icons.Default.Numbers
+                                        SharedSaveSlotMetricIcon.MONEY -> Icons.Default.AccountBalanceWallet
+                                        SharedSaveSlotMetricIcon.PRESTIGE -> Icons.Default.MilitaryTech
+                                        SharedSaveSlotMetricIcon.ULTRA -> Icons.Default.Star
+                                        SharedSaveSlotMetricIcon.NEBULA -> Icons.Default.AutoAwesome
+                                        SharedSaveSlotMetricIcon.ATTEMPTS -> Icons.Default.QueryStats
+                                        SharedSaveSlotMetricIcon.CORRECT -> Icons.Default.CheckCircle
+                                        SharedSaveSlotMetricIcon.STREAK -> Icons.Default.LocalFireDepartment
+                                        SharedSaveSlotMetricIcon.STATISTICS -> Icons.Default.QueryStats
+                                    }
+                                    Icon(metricIcon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                    Text(metric.label, style = MaterialTheme.typography.bodySmall)
+                                }
+                            }
+                            repeat(columns - metricRow.size) { Spacer(Modifier.weight(1f)) }
+                        }
+                    }
+                } else {
+                    model.primaryMetric?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                    model.secondaryMetrics.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
+                }
+                model.lastSavedLabel?.let {
+                    Text(it, style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            if (model.hasBackup && !model.isCorrupt) {
+                Text("A recovery backup is available.", style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary)
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                onExport?.let {
+                    IconButton(onClick = it) {
+                        Icon(Icons.Default.FileDownload, contentDescription = "Export save")
+                    }
+                }
+                onImport?.let {
+                    IconButton(onClick = it) {
+                        Icon(Icons.Default.FileUpload, contentDescription = "Import save")
+                    }
+                }
+                Spacer(Modifier.weight(1f))
+                Button(
+                    onClick = if (model.isEmpty) (onCreate ?: onSelect) else onSelect,
+                    enabled = !model.isCorrupt,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (model.isActive) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.secondary
+                    )
+                ) {
+                    Icon(if (model.isEmpty) Icons.Default.Add else Icons.Default.PlayArrow, contentDescription = null)
+                    Spacer(Modifier.width(4.dp))
+                    Text(if (model.isEmpty) model.createLabel else if (model.isActive) model.resumeLabel else model.switchLabel)
+                }
+            }
+        }
+    }
+}
