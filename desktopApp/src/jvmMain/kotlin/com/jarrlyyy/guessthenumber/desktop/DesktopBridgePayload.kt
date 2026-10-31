@@ -20,6 +20,18 @@ internal object DesktopBridgePayload {
         return decoded.takeIf(::isSingleJsonObject)
     }
 
+    fun recoverRequestId(raw: String): String {
+        if (raw.length > MAX_CALLBACK_LENGTH) return ""
+        val candidate = raw.trim()
+        val decoded = decodeSingleJsonString(candidate)
+        return sequenceOf(candidate, decoded.orEmpty())
+            .mapNotNull { value ->
+                runCatching { JSONObject(value).opt("id") as? String }.getOrNull()
+            }
+            .firstOrNull { it.matches(Regex("[A-Za-z0-9_-]{1,48}")) }
+            .orEmpty()
+    }
+
     private fun isSingleJsonObject(value: String): Boolean = runCatching {
         val tokener = JSONTokener(value)
         val parsed = tokener.nextValue()
