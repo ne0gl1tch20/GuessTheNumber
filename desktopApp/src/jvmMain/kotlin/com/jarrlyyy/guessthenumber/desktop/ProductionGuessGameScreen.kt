@@ -81,6 +81,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 import kotlin.random.Random
 import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
 import com.jarrlyyy.guessthenumber.shared.rules.GuessRateLimitRules
+import com.jarrlyyy.guessthenumber.shared.domain.SaveProfileRules
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackCard
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackIcon
 import com.jarrlyyy.guessthenumber.shared.ui.toSharedFeedbackIcon
@@ -1011,9 +1012,46 @@ fun ProductionGuessGameScreen(
                             val restored = withContext(Dispatchers.IO) { saveStore.restoreBackup(target) }
                             if (restored && target == activeSaveSlot) {
                                 val recovered = withContext(Dispatchers.IO) { saveStore.load(target) }
-                                if (recovered != null) state = recovered
+                                if (recovered != null) {
+                                    state = recovered
+                                    autoClicker.reset(recovered.currentRangeMin, recovered.currentRangeMax)
+                                }
                             }
                             feedback = if (restored) "Restored the previous backup for slot $target." else "Could not restore a valid backup for that slot."
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    },
+                    onEditProfile = { target, name, iconId ->
+                        scope.launch {
+                            val validIcon = SaveProfileRules.isValidIcon(iconId)
+                            val current = withContext(Dispatchers.IO) { saveStore.load(target) }
+                            val updated = current?.copy(
+                                profileName = name.trim().take(24),
+                                profileIconId = iconId
+                            )
+                            val saved = validIcon && updated != null &&
+                                withContext(Dispatchers.IO) { saveStore.save(target, updated) }
+                            if (saved && target == activeSaveSlot) state = updated
+                            feedback = if (saved) "Updated the profile for slot $target." else "Could not update that save profile."
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    },
+                    onResetSlot = { target ->
+                        scope.launch {
+                            val previous = withContext(Dispatchers.IO) { saveStore.load(target) }
+                            val settings = if (target == activeSaveSlot) state?.settings else previous?.settings
+                            val preservedSettings = settings ?: GameState().settings
+                            val fresh = GameState(
+                                settings = preservedSettings,
+                                tutorialCompleted = preservedSettings.tutorialCompleted,
+                                lastSaveTimestamp = System.currentTimeMillis()
+                            )
+                            val reset = withContext(Dispatchers.IO) { saveStore.reset(target, fresh) }
+                            if (reset && target == activeSaveSlot) {
+                                state = fresh
+                                autoClicker.reset(fresh.currentRangeMin, fresh.currentRangeMax)
+                            }
+                            feedback = if (reset) "Reset save slot $target." else "Could not safely reset save slot $target."
                             saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
                         }
                     },
