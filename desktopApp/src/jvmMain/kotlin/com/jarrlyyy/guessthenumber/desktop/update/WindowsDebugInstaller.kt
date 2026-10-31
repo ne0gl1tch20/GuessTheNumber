@@ -11,20 +11,18 @@ import java.util.Comparator
 
 internal class WindowsDebugInstaller {
     fun downloadVerifyAndLaunch(update: WindowsDebugUpdate) {
-        require(update.artifactDownloadUrl.matches(
-            Regex("https://api\\.github\\.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/\\d+/zip")
-        )) {
-            "The Windows Debug download is not a GitHub Actions artifact URL."
+        require(isDebugReleaseAssetUrl(update.archiveDownloadUrl) &&
+            isDebugReleaseAssetUrl(update.manifestDownloadUrl)
+        ) {
+            "The Windows Debug download must come from the public debug-latest release."
         }
 
         val temporaryDirectory = Files.createTempDirectory("gtn-windows-debug-update-")
         try {
-            val artifactPath = temporaryDirectory.resolve(EXPECTED_ARTIFACT_NAME)
             val archivePath = temporaryDirectory.resolve(WindowsDebugArtifactValidator.EXPECTED_ARCHIVE_NAME)
             val manifestPath = temporaryDirectory.resolve(WindowsDebugArtifactValidator.EXPECTED_MANIFEST_NAME)
-            downloadFile(update.artifactDownloadUrl, artifactPath, MAX_ARTIFACT_BYTES)
-            WindowsDebugArchiveValidator.verifySha256(artifactPath, update.artifactSha256)
-            WindowsDebugArtifactValidator.extractArtifactFiles(artifactPath, archivePath, manifestPath)
+            downloadFile(update.manifestDownloadUrl, manifestPath, MAX_MANIFEST_BYTES)
+            downloadFile(update.archiveDownloadUrl, archivePath, MAX_ARCHIVE_BYTES)
             verifyManifest(manifestPath, archivePath, update)
             val msiPath = temporaryDirectory.resolve(WindowsDebugArchiveValidator.EXPECTED_MSI_NAME)
             WindowsDebugArchiveValidator.extractExpectedMsi(archivePath, msiPath)
@@ -35,26 +33,16 @@ internal class WindowsDebugInstaller {
         }
     }
 
-    private fun writeEntry(input: java.io.InputStream, destination: Path, maximumBytes: Long) {
-        Files.newOutputStream(destination).use { output ->
-            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-            var total = 0L
-            while (true) {
-                val count = input.read(buffer)
-                if (count < 0) break
-                total += count
-                if (total > maximumBytes) {
-                    throw IllegalStateException("A Windows Debug artifact file exceeded the size limit.")
-                }
-                output.write(buffer, 0, count)
-            }
-        }
+    private fun isDebugReleaseAssetUrl(value: String): Boolean {
+        val uri = runCatching { java.net.URI(value) }.getOrNull() ?: return false
+        return uri.scheme == "https" && uri.host == "github.com" &&
+            uri.path.startsWith("/ne0gl1tch20/GuessTheNumber/releases/download/debug-latest/")
     }
 
     private fun verifyManifest(manifestPath: Path, archivePath: Path, update: WindowsDebugUpdate) {
         val manifest = Json.parseToJsonElement(Files.readString(manifestPath)).jsonObject
         require(manifest["channel"]?.jsonPrimitive?.content == "windows-debug") {
-            "The downloaded Actions artifact is not a Windows Debug build."
+            "The downloaded release asset is not a Windows Debug build."
         }
         require(manifest["version"]?.jsonPrimitive?.content == update.version) {
             "The Windows Debug package version does not match the update check."
@@ -66,7 +54,7 @@ internal class WindowsDebugInstaller {
             "The Windows Debug run attempt does not match."
         }
         require(manifest["commit"]?.jsonPrimitive?.content == update.commitSha) {
-            "The Windows Debug commit SHA does not match the successful CI run."
+            "The Windows Debug commit SHA does not match the release manifest."
         }
         require(manifest["tag"]?.jsonPrimitive?.content == update.tagName) {
             "The Windows Debug build tag does not match."
@@ -75,7 +63,10 @@ internal class WindowsDebugInstaller {
             "The Windows Debug manifest names an unexpected installer archive."
         }
         val checksum = manifest["sha256"]?.jsonPrimitive?.content
-            ?: throw IllegalStateException("The Windows Debug manifest has no SHA-256 checksum.")
+            ?: throw IllegalStateException("The Windows Debug release manifest has no SHA-256 checksum.")
+        require(checksum == update.archiveSha256) {
+            "The Windows Debug release manifest checksum changed after the update check."
+        }
         WindowsDebugArchiveValidator.verifySha256(archivePath, checksum)
     }
 
@@ -83,16 +74,30 @@ internal class WindowsDebugInstaller {
         val connection = URL(address).openConnection() as HttpURLConnection
         connection.connectTimeout = 10_000
         connection.readTimeout = 30_000
+        connection.instanceFollowRedirects = true
         connection.setRequestProperty("User-Agent", "GuessTheNumber-Windows-Debug-Updater")
-        connection.setRequestProperty("Accept", "application/vnd.github+json")
         try {
             if (connection.responseCode !in 200..299) {
-                throw IllegalStateException("GitHub Actions artifact download failed with HTTP ${connection.responseCode}.")
+                throw IllegalStateException("GitHub release asset download failed with HTTP ${connection.responseCode}.")
             }
             if (connection.contentLengthLong > maximumBytes) {
-                throw IllegalStateException("A Windows Debug Actions artifact exceeded the size limit.")
+                throw IllegalStateException("A Windows Debug release asset exceeded the size limit.")
             }
-            connection.inputStream.use { input -> writeEntry(input, destination, maximumBytes) }
+            Files.newOutputStream(destination).use { output ->
+                connection.inputStream.use { input ->
+                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                    var total = 0L
+                    while (true) {
+                        val count = input.read(buffer)
+                        if (count < 0) break
+                        total += count
+                        if (total > maximumBytes) {
+                            throw IllegalStateException("A Windows Debug release asset exceeded the size limit.")
+                        }
+                        output.write(buffer, 0, count)
+                    }
+                }
+            }
         } finally {
             connection.disconnect()
         }
@@ -138,7 +143,7 @@ internal class WindowsDebugInstaller {
     }
 
     private companion object {
-        const val EXPECTED_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug.zip"
-        const val MAX_ARTIFACT_BYTES = 400L * 1024 * 1024
+        const val MAX_ARCHIVE_BYTES = 400L * 1024 * 1024
+        const val MAX_MANIFEST_BYTES = 64L * 1024
     }
 }
