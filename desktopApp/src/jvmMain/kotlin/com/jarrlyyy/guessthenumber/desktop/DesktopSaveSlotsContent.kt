@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveSlotSummary
 import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotCard
 import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotUiModel
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetric
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetricIcon
 import java.text.DateFormat
 import java.util.Date
 
@@ -127,14 +129,17 @@ internal fun DesktopSaveSlotsContent(
                     it.difficultyId.replaceFirstChar(Char::uppercase) +
                         if (it.creativeModeEnabled) " · Creative Mode" else ""
                 },
-                primaryMetric = data?.takeUnless { slot.isCorrupt }?.let {
-                    "Hidden number: ${it.targetNumber} · Money: ${it.money}"
-                },
-                secondaryMetrics = data?.takeUnless { slot.isCorrupt }?.let {
+                metricItems = data?.takeUnless { slot.isCorrupt }?.let {
                     listOf(
-                        "Prestige: ${it.prestige} · Ultra: ${it.ultra} · Nebula: ${it.nebula}",
-                        "Attempts: ${it.attempts} · Correct: ${it.correctGuesses} · Streak: ${it.streak} (best ${it.bestStreak})",
-                        "Accuracy %.1f%% · Failed ${it.statistics.failedGuesses} · Playtime ${formatPlaytime(it.statistics.playtimeSeconds)}".format(accuracy)
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.TARGET, "Hidden number: ${it.targetNumber}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.MONEY, "Money: ${it.money}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.PRESTIGE, "Prestige: ${it.prestige}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.ULTRA, "Ultra: ${it.ultra}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.NEBULA, "Nebula: ${it.nebula}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.ATTEMPTS, "Attempts: ${it.attempts}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.CORRECT, "Correct: ${it.correctGuesses}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.STREAK, "Streak: ${it.streak} · Best: ${it.bestStreak}"),
+                        SharedSaveSlotMetric(SharedSaveSlotMetricIcon.STATISTICS, "Accuracy %.1f%% · Failed ${it.statistics.failedGuesses} · Playtime ${formatPlaytime(it.statistics.playtimeSeconds)}".format(accuracy))
                     )
                 }.orEmpty(),
                 lastSavedLabel = data?.takeIf { !slot.isCorrupt && it.lastSaveTimestamp > 0L }?.let {
