@@ -34,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -76,14 +75,14 @@ fun SharedSaveSlotCard(
     reducedMotion: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val containerColor by animateColorAsState(
+    val containerColor = animateColorAsState(
         targetValue = if (model.isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
         animationSpec = if (reducedMotion) snap() else spring(
             dampingRatio = Spring.DampingRatioNoBouncy,
             stiffness = Spring.StiffnessMedium
         ),
         label = "shared-save-slot-container"
-    )
+    ).value
 
     Card(
         modifier = modifier.fillMaxWidth().then(if (reducedMotion) Modifier else Modifier.animateContentSize()),
