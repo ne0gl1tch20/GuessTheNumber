@@ -118,7 +118,7 @@ jobs:
       - name: Install Inno Setup 6
         shell: pwsh
         run: |
-          $compiler = "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe"
+          $compiler = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
           if (-not (Test-Path $compiler)) {
             choco install innosetup --yes --no-progress
           }
