@@ -187,7 +187,7 @@ internal class DesktopEdgeWebViewController(
                     System.err.println("GuessTheNumber desktop bridge rejected malformed callback payload: ${raw.take(512)}")
                 }
                 replyToPage(JSONObject().put("version", 1)
-                    .put("id", "").put("type", "error").put("error", "invalid_request").toString())
+                    .put("id", recoverRequestId(raw)).put("type", "error").put("error", "invalid_request").toString())
             }
             settingKey == "desktopNavigationPosition" && settingValue is String -> {
                 val position = DesktopNavigationPosition.entries.firstOrNull {
@@ -234,6 +234,20 @@ internal class DesktopEdgeWebViewController(
                     .put("type", "error").put("error", "host_unavailable").toString())
             }
         }
+    }
+
+    private fun recoverRequestId(raw: String): String {
+        if (raw.length > 32_768) return ""
+        val candidate = raw.trim()
+        val decoded = runCatching {
+            org.json.JSONTokener(candidate).nextValue() as? String
+        }.getOrNull()
+        return sequenceOf(candidate, decoded.orEmpty())
+            .mapNotNull { value ->
+                runCatching { JSONObject(value).opt("id") as? String }.getOrNull()
+            }
+            .firstOrNull { it.matches(Regex("[A-Za-z0-9_-]{1,48}")) }
+            .orEmpty()
     }
 
     private fun onPageReady() {
