@@ -1,10 +1,13 @@
 package com.jarrlyyy.guessthenumber.desktop.persistence
 
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.shared.domain.SaveProfileRules
 import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
 import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSaveCodec
 import com.jarrlyyy.guessthenumber.shared.domain.SaveStateRules
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
@@ -17,6 +20,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
+import java.util.Base64
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -25,6 +29,18 @@ private const val MAX_SAVE_SLOTS = 10
 private const val MAX_BUNDLE_BYTES = 20 * 1024 * 1024
 private const val MAX_SLOT_JSON_BYTES = 2 * 1024 * 1024
 private const val MAX_MANIFEST_BYTES = 16 * 1024
+private const val MAX_ANDROID_BACKUP_CHARS = 32 * 1024 * 1024
+private const val ANDROID_BACKUP_XOR_KEY = 0x42
+
+@Serializable
+private data class AndroidCompatibleBackupBundle(
+    val formatVersion: Int = 3,
+    val appPreferencesJson: String,
+    val activeSlot: Int,
+    val slots: Map<Int, String> = emptyMap(),
+    val backups: Map<Int, String> = emptyMap(),
+    val creativeSlots: Map<Int, String> = emptyMap()
+)
 
 data class DesktopSaveSlotSummary(val slot: Int, val state: GameState?, val isEmpty: Boolean, val hasBackup: Boolean, val isCorrupt: Boolean)
 
@@ -243,6 +259,147 @@ class DesktopSaveStore internal constructor(
         val imported = CreativeModeSaveCodec.decodeAndMigrate(raw) ?: return false
         return saveCreativeModeSave(slot, imported)
     }
+
+    /**
+     * Exports the Android formatVersion=3 backup envelope. The XOR/Base64 layer
+     * intentionally matches Android's existing import format for compatibility;
+     * it is obfuscation, not cryptographic protection.
+     */
+    suspend fun exportAndroidCompatibleBackup(): String? = runCatching {
+        val slots = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+            readValidJson(primaryPath(slot))?.let { slot to it }
+        }.toMap()
+        val backups = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+            readValidJson(backupPath(slot))?.let { slot to it }
+        }.toMap()
+        val creativeSlots = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+            exportCreativeModeSave(slot)?.let { slot to it }
+        }.toMap()
+        if (slots.isEmpty() && backups.isEmpty() && creativeSlots.isEmpty()) return null
+        val settings = load(activeSlot())?.settings ?: GameSettings()
+        val bundle = AndroidCompatibleBackupBundle(
+            formatVersion = 3,
+            appPreferencesJson = json.encodeToString(settings),
+            activeSlot = activeSlot(),
+            slots = slots,
+            backups = backups,
+            creativeSlots = creativeSlots
+        )
+        encodeAndroidBackup(json.encodeToString(bundle))
+    }.getOrNull()
+
+    /**
+     * Imports Android's existing encrypted backup envelope, including global
+     * GameSettings, primary saves, recovery backups and Creative Mode records.
+     * Every entry is validated before any existing file is replaced.
+     */
+    suspend fun importAndroidCompatibleBackup(encoded: String): Boolean {
+        if (encoded.isBlank() || encoded.length > MAX_ANDROID_BACKUP_CHARS) return false
+        val raw = decodeAndroidBackup(encoded) ?: return false
+        if (raw.length > MAX_BUNDLE_BYTES) return false
+        val bundle = runCatching {
+            json.decodeFromString<AndroidCompatibleBackupBundle>(raw)
+        }.getOrNull() ?: return false
+        if (bundle.formatVersion !in 2..3 || bundle.activeSlot !in 1..MAX_SAVE_SLOTS) return false
+        if (bundle.appPreferencesJson.isBlank() || bundle.appPreferencesJson.length > MAX_SLOT_JSON_BYTES) return false
+        val importedSettings = runCatching {
+            json.decodeFromString<GameSettings>(bundle.appPreferencesJson)
+        }.getOrNull() ?: return false
+        if (bundle.slots.keys.any { it !in 1..MAX_SAVE_SLOTS } ||
+            bundle.backups.keys.any { it !in 1..MAX_SAVE_SLOTS } ||
+            bundle.creativeSlots.keys.any { it !in 1..MAX_SAVE_SLOTS }
+        ) return false
+        if (bundle.slots.isEmpty() && bundle.backups.isEmpty() && bundle.creativeSlots.isEmpty()) return false
+
+        val existingStates = (1..MAX_SAVE_SLOTS).associateWith { load(it) }
+        val importedSlots = linkedMapOf<Int, GameState>()
+        for ((slot, rawState) in bundle.slots) {
+            if (rawState.isBlank() || rawState.length > MAX_SLOT_JSON_BYTES) return false
+            val state = runCatching { json.decodeFromString<GameState>(rawState) }.getOrNull() ?: return false
+            if (!validate(state)) return false
+            importedSlots[slot] = preserveCreativeMode(existingStates[slot], state).copy(settings = importedSettings)
+        }
+        val importedBackups = linkedMapOf<Int, GameState>()
+        for ((slot, rawState) in bundle.backups) {
+            if (rawState.isBlank() || rawState.length > MAX_SLOT_JSON_BYTES) return false
+            val state = runCatching { json.decodeFromString<GameState>(rawState) }.getOrNull() ?: return false
+            if (!validate(state)) return false
+            importedBackups[slot] = preserveCreativeMode(existingStates[slot], state).copy(settings = importedSettings)
+        }
+        val importedCreative = linkedMapOf<Int, CreativeModeSave>()
+        for ((slot, rawSave) in bundle.creativeSlots) {
+            if (rawSave.isBlank() || rawSave.length > MAX_SLOT_JSON_BYTES) return false
+            importedCreative[slot] = CreativeModeSaveCodec.decodeAndMigrate(rawSave) ?: return false
+        }
+
+        val previousActive = activeSlot()
+        val previousFiles = (1..MAX_SAVE_SLOTS).flatMap { slot ->
+            listOf(primaryPath(slot), backupPath(slot), creativePath(slot))
+        }.associateWith { path ->
+            runCatching { if (fileOps.exists(path)) fileOps.read(path) else null }.getOrNull()
+        }
+        return try {
+            fileOps.createDirectories(rootDirectory)
+            for (slot in 1..MAX_SAVE_SLOTS) {
+                fileOps.deleteIfExists(primaryPath(slot))
+                fileOps.deleteIfExists(backupPath(slot))
+                fileOps.deleteIfExists(creativePath(slot))
+                importedSlots[slot]?.let { writeAtomically(primaryPath(slot), json.encodeToString(it)) }
+                importedBackups[slot]?.let { writeAtomically(backupPath(slot), json.encodeToString(it)) }
+                importedCreative[slot]?.let {
+                    check(saveCreativeModeSave(slot, it)) { "Could not import Creative Mode data for slot $slot." }
+                }
+            }
+            check(setActiveSlot(bundle.activeSlot)) { "Could not set the imported active slot." }
+            true
+        } catch (_: Exception) {
+            previousFiles.forEach { (path, content) ->
+                runCatching {
+                    if (content == null) fileOps.deleteIfExists(path) else writeAtomically(path, content)
+                }
+            }
+            runCatching { setActiveSlot(previousActive) }
+            false
+        }
+    }
+
+    private fun preserveCreativeMode(existing: GameState?, incoming: GameState): GameState {
+        if (existing?.creativeModeEnabled != true || incoming.creativeModeEnabled) return incoming
+        val min = existing.currentRangeMin.coerceAtLeast(1L)
+        val max = existing.currentRangeMax.coerceAtLeast(min)
+        return incoming.copy(
+            creativeModeEnabled = true,
+            currentRangeMin = min,
+            currentRangeMax = max,
+            targetNumber = incoming.targetNumber.coerceIn(min, max)
+        )
+    }
+
+    private fun encodeAndroidBackup(raw: String): String {
+        val salt = "GTN_ENC_2025_".toByteArray(Charsets.UTF_8)
+        val payload = raw.toByteArray(Charsets.UTF_8)
+        val combined = ByteArray(salt.size + payload.size)
+        System.arraycopy(salt, 0, combined, 0, salt.size)
+        for (index in payload.indices) {
+            combined[salt.size + index] = (payload[index].toInt() xor ANDROID_BACKUP_XOR_KEY).toByte()
+        }
+        return Base64.getEncoder().encodeToString(combined)
+    }
+
+    private fun decodeAndroidBackup(encoded: String): String? = runCatching {
+        val decoded = Base64.getDecoder().decode(encoded.trim())
+        val salt = "GTN_ENC_2025_".toByteArray(Charsets.UTF_8)
+        if (decoded.size <= salt.size) return null
+        val hasSalt = salt.indices.all { decoded[it] == salt[it] }
+        val payload = if (hasSalt) {
+            ByteArray(decoded.size - salt.size) { index ->
+                (decoded[salt.size + index].toInt() xor ANDROID_BACKUP_XOR_KEY).toByte()
+            }
+        } else {
+            decoded
+        }
+        payload.toString(Charsets.UTF_8)
+    }.getOrNull()
 
     /** Exports every populated game slot and its separate creative configuration. */
     suspend fun exportAllSlotsBundle(): ByteArray? {
