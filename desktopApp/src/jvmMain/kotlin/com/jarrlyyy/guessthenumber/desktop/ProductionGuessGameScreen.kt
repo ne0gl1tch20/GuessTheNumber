@@ -911,18 +911,20 @@ fun ProductionGuessGameScreen(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Guess The Number", style = MaterialTheme.typography.headlineMedium)
-            Text("Find the hidden number between ${currentState.currentRangeMin} and ${currentState.currentRangeMax}.")
-            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                CurrencySummary("Money", currentState.money.toString())
-                CurrencySummary("Prestige", currentState.prestige.toString())
-                CurrencySummary("Ultra", currentState.ultra.toString())
-                CurrencySummary("Nebula", currentState.nebula.toString())
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                CurrencySummary("Attempts", currentState.attempts.toString())
-                CurrencySummary("Correct", currentState.correctGuesses.toString())
-                CurrencySummary("Streak", currentState.streak.toString())
+            if (section != DesktopGameSection.SAVE_SLOTS) {
+                Text("Guess The Number", style = MaterialTheme.typography.headlineMedium)
+                Text("Find the hidden number between ${currentState.currentRangeMin} and ${currentState.currentRangeMax}.")
+                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    CurrencySummary("Money", currentState.money.toString())
+                    CurrencySummary("Prestige", currentState.prestige.toString())
+                    CurrencySummary("Ultra", currentState.ultra.toString())
+                    CurrencySummary("Nebula", currentState.nebula.toString())
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    CurrencySummary("Attempts", currentState.attempts.toString())
+                    CurrencySummary("Correct", currentState.correctGuesses.toString())
+                    CurrencySummary("Streak", currentState.streak.toString())
+                }
             }
 
             if (section == DesktopGameSection.SAVE_SLOTS) {
