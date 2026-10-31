@@ -268,6 +268,29 @@ fun ProductionGuessGameScreen(
 
     val currentState = state
 
+    /**
+     * Navigation acknowledgements are consumed by the shared HTML render() function.
+     * They must carry a complete game snapshot, not a partial { accepted: true } object,
+     * otherwise missing version/settings fields reset the visible UI to its defaults.
+     */
+    fun currentNavigationPayload(message: String): org.json.JSONObject? {
+        val snapshot = state ?: return null
+        val gameCatalog = catalog ?: return null
+        return desktopWebPlayState(
+            snapshot,
+            gameCatalog,
+            true,
+            webLastGuessStatus,
+            message,
+            talentCatalog.orEmpty(),
+            engine,
+            section.sharedHtmlScreen ?: "play",
+            minigameCatalog.orEmpty(),
+            offlineGains = offlineGains,
+            offlineRewardDismissed = offlineRewardDismissed
+        )
+    }
+
     LaunchedEffect(currentState?.settings?.volume, currentState?.settings?.musicEnabled) {
         currentState?.settings?.let(DesktopMusicBridge::applySettings)
     }
@@ -405,9 +428,14 @@ fun ProductionGuessGameScreen(
                                 sendError("invalid_request")
                             } else {
                                 onOpenParityDestination(DesktopDestination.ARCADE)
-                                reply(org.json.JSONObject().put("version", 1).put("id", requestId)
-                                    .put("type", "state")
-                                    .put("state", org.json.JSONObject().put("accepted", true)).toString())
+                                val payload = currentNavigationPayload("Opening Arcade.")
+                                if (payload == null) {
+                                    sendError("game_not_ready")
+                                } else {
+                                    reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                        .put("type", "state")
+                                        .put("state", payload).toString())
+                                }
                             }
                             return@launch
                         }
@@ -506,9 +534,20 @@ fun ProductionGuessGameScreen(
                             when {
                                 destination != null -> {
                                     onOpenParityDestination(destination)
-                                    reply(org.json.JSONObject().put("version", 1).put("id", requestId)
-                                        .put("type", "state")
-                                        .put("state", org.json.JSONObject().put("accepted", true)).toString())
+                                    val payload = currentNavigationPayload(
+                                        if (destination == DesktopDestination.DEVELOPER_SETTINGS) {
+                                            "Opening Developer Settings."
+                                        } else {
+                                            "Opening Save Slots."
+                                        }
+                                    )
+                                    if (payload == null) {
+                                        sendError("game_not_ready")
+                                    } else {
+                                        reply(org.json.JSONObject().put("version", 1).put("id", requestId)
+                                            .put("type", "state")
+                                            .put("state", payload).toString())
+                                    }
                                 }
                                 route.startsWith("color_picker_") || route.startsWith("menu_color_") -> {
                                     val target = when {
