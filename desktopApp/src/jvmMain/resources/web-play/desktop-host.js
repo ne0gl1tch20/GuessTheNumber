@@ -76,6 +76,12 @@
       queued.forEach(deliverResponse);
     },
     queue: [],
+    cancelMessage: function (id) {
+      var target = String(id || '');
+      this.queue = this.queue.filter(function (raw) {
+        try { return JSON.parse(String(raw)).id !== target; } catch (_) { return true; }
+      });
+    },
     postMessage: function (raw) {
       var message = String(raw);
       debugLog('JS → Kotlin  ' + message.slice(0, 220));
