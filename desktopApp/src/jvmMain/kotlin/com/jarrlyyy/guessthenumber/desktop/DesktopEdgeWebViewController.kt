@@ -155,30 +155,9 @@ internal class DesktopEdgeWebViewController(
         }
     }
 
-    /**
-     * SwingWebView's JavaScript callback can deliver a JSON string either as the
-     * original object text or as a JSON-encoded string, depending on the native
-     * WebView backend. Normalize only those two representations before the
-     * shared request handler validates the protocol.
-     */
-    private fun normalizeBridgeRequest(raw: String): String? {
-        if (raw.length > 32_768) return null
-        val candidate = raw.trim()
-        if (candidate.isEmpty()) return null
-
-        if (runCatching { JSONObject(candidate) }.isSuccess) return candidate
-
-        val decoded = runCatching {
-            org.json.JSONTokener(candidate).nextValue() as? String
-        }.getOrNull()?.trim()?.takeIf { it.isNotEmpty() && it.length <= 16_384 }
-            ?: return null
-
-        return decoded.takeIf { runCatching { JSONObject(it) }.isSuccess }
-    }
-
     private fun handleRequest(raw: String) {
         val currentHandler = handler.get()
-        val normalized = normalizeBridgeRequest(raw)
+        val normalized = DesktopBridgePayload.normalize(raw)
         val request = normalized?.let { runCatching { JSONObject(it) }.getOrNull() }
         val replyToPage: (String) -> Unit = { response ->
             if (!disposed) {
