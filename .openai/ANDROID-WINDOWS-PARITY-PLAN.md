@@ -2,8 +2,21 @@
 
 **Repository:** `ne0gl1tch20/GuessTheNumber`  
 **Target branch for this plan:** `master`  
-**Status:** Planning / implementation not yet started  
+**Status:** In progress on `feat/android-windows-parity-implementation`; draft PR #392. Phases 1–4 are the only phase numbering used.  
 **Architecture rule:** Android is the behavioral reference. The existing HTML + JarrlyyUI Settings experience is shared by Android and Windows. Kotlin owns authoritative state, validation, persistence and platform-neutral rules; platform adapters handle OS-specific APIs.
+
+## Implementation progress (2026-10-31)
+
+The work is being delivered through one consolidated draft PR: https://github.com/ne0gl1tch20/GuessTheNumber/pull/392
+
+- Phase 1: HTML + JarrlyyUI Settings remain the shared Settings UI. Windows-specific options stay inside that HTML screen. Desktop Save Slots callbacks, debug policy, context-menu and bridge-routing changes have been started; regression evidence still needs completion.
+- Phase 2: Desktop slot storage now has Creative Mode JSON persistence, backup-aware duplication, all-slot bundle import/export including recovery backups, and transaction rollback. Windows WebPlay sync has manifest/path/hash validation, staged activation, offline cache reuse and startup rollback. Android encrypted backup bundle compatibility and full field-by-field parity still need verification.
+- Phase 3: Inno Setup script, Gradle packaging, archive validation, updater and Windows workflow migration are in the branch. Tutorial/bridge and Beyond the Numbers regression verification remains in progress.
+- Phase 4: Current PR-head CI is running. HTML/CSS/JS checks are green; Android and Windows checks are not yet green. Do not merge until all finish criteria below are evidenced.
+
+**Important:** Static contract tests or a JVM compile do not count as Windows runtime/installer verification. Keep this PR draft until those checks pass.
+
+---
 
 ## Goal
 
