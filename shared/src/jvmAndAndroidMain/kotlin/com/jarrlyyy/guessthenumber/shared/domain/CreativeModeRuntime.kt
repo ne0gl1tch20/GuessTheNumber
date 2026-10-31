@@ -1,10 +1,6 @@
 package com.jarrlyyy.guessthenumber.shared.domain
 
 import java.util.UUID
-import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeEffectPolicy
-import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
-import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSaveCodec
-import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeRunSnapshot
 
 /**
  * Isolated, deterministic Creative Mode run state. This model deliberately has no currency,
