@@ -52,7 +52,14 @@ internal object DesktopWebPlayAssetSyncer {
     /** Apply a previously validated cache, then schedule a non-blocking refresh. */
     fun prepare(sessionRoot: Path) {
         applyActiveCache(sessionRoot)
-        executor.execute { runCatching { synchronize(sessionRoot) } }
+        executor.execute {
+            runCatching { synchronize(sessionRoot) }.onFailure { error ->
+                System.err.println(
+                    "GuessTheNumber desktop web asset sync kept the current version: " +
+                        (error.message ?: error.javaClass.simpleName)
+                )
+            }
+        }
     }
 
     fun activeVersion(): String? = runCatching {
