@@ -728,7 +728,15 @@ private fun DifficultySelector(
                 DropdownMenuItem(
                     text = { Text(locale.getString(Difficulty.nameKey(difficultyId), difficultyId)) },
                     onClick = {
-                        onDifficultyCha@Composable
+                        onDifficultyChange(difficultyId)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+@Composable
 fun SlotCard(
     slotIndex: Int,
     isActive: Boolean,
@@ -768,11 +776,7 @@ fun SlotCard(
             )
         }.orEmpty(),
         lastSavedLabel = saved?.takeIf { it.lastSaveTimestamp > 0L }?.let {
-            locale.getString(
-                "save_slot_last_saved",
-                "Last Saved: %s",
-                dateFormat.format(Date(it.lastSaveTimestamp))
-            )
+            locale.getString("save_slot_last_saved", "Last Saved: %s", dateFormat.format(Date(it.lastSaveTimestamp)))
         },
         activeLabel = locale.getString("save_slot_active", "Active"),
         emptyLabel = locale.getString("save_slot_empty", "Empty Slot"),
@@ -789,13 +793,6 @@ fun SlotCard(
         onRestoreBackup = saved?.takeIf { it.hasBackup }?.let { onRestoreBackup },
         onReset = saved?.let { onReset }
     )
-}
-
-e", "Resume Game") else locale.getString("save_slot_switch", "Switch to Slot"))
-                }
-            }
-        }
-    }
 }
 
 private fun makeResetChallenge(): Pair<String, Int> {
