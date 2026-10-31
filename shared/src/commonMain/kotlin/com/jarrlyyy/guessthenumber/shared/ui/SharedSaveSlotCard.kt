@@ -118,6 +118,27 @@ fun SharedSaveSlotCard(
                         }
                     )
                 }
+                onEditProfile?.let {
+                    IconButton(onClick = it) {
+                        Icon(Icons.Default.Edit, contentDescription = "Edit profile")
+                    }
+                }
+                onDuplicate?.let {
+                    IconButton(onClick = it) {
+                        Icon(Icons.Default.ContentCopy, contentDescription = "Duplicate save")
+                    }
+                }
+                onRestoreBackup?.let {
+                    IconButton(onClick = it) {
+                        Icon(Icons.Default.Restore, contentDescription = "Restore backup")
+                    }
+                }
+                onReset?.let {
+                    IconButton(onClick = it) {
+                        Icon(Icons.Default.Delete, contentDescription = "Reset save",
+                            tint = MaterialTheme.colorScheme.error)
+                    }
+                }
                 if (model.isCorrupt) {
                     Icon(Icons.Default.WarningAmber, contentDescription = model.corruptLabel,
                         tint = MaterialTheme.colorScheme.error)
@@ -165,27 +186,6 @@ fun SharedSaveSlotCard(
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                onEditProfile?.let {
-                    IconButton(onClick = it) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit profile")
-                    }
-                }
-                onDuplicate?.let {
-                    IconButton(onClick = it) {
-                        Icon(Icons.Default.ContentCopy, contentDescription = "Duplicate save")
-                    }
-                }
-                onRestoreBackup?.let {
-                    IconButton(onClick = it) {
-                        Icon(Icons.Default.Restore, contentDescription = "Restore backup")
-                    }
-                }
-                onReset?.let {
-                    IconButton(onClick = it) {
-                        Icon(Icons.Default.Delete, contentDescription = "Reset save",
-                            tint = MaterialTheme.colorScheme.error)
-                    }
-                }
                 onExport?.let {
                     IconButton(onClick = it) {
                         Icon(Icons.Default.FileDownload, contentDescription = "Export save")
