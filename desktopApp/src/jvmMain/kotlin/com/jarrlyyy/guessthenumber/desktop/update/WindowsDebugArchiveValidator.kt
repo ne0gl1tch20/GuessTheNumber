@@ -53,7 +53,7 @@ internal object WindowsDebugArchiveValidator {
                         val count = zip.read(buffer)
                         if (count < 0) break
                         total += count
-                        if (total > MAX_MSI_BYTES) {
+                        if (total > MAX_INSTALLER_BYTES) {
                             throw IllegalStateException("The Inno Setup installer exceeded the extraction size limit.")
                         }
                         output.write(buffer, 0, count)
