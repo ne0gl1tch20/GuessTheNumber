@@ -35,8 +35,8 @@ enum class DesktopNavigationPosition(val label: String) {
 }
 
 /**
- * Windows-owned navigation contract. Quick-access destinations may expose
- * partial screens while parity work continues; Android navigation stays platform-owned.
+ * Windows-owned navigation contract. Native popup destinations are intentionally
+ * excluded from the main navigation list because they belong to Compose layer 1.
  */
 enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     PLAY("Play", Key.One),
@@ -69,7 +69,7 @@ enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
     LIVE_OPS("Live Ops", null);
 
     companion object {
-        /** Desktop-only quick-access order; Android navigation is unchanged. */
+        /** Desktop-only quick-access order. Native popup routes are not listed here. */
         val MAIN_NAVIGATION_ORDER: List<DesktopDestination> = listOf(
             PLAY,
             UPGRADES,
@@ -79,7 +79,6 @@ enum class DesktopDestination(val label: String, val shortcutKey: Key?) {
             SETTINGS,
             ARCADE,
             MUSIC_PLAYER,
-            SAVE_SLOTS,
             STATS,
             WORLD_MAP,
             CHANGELOG,
