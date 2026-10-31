@@ -18,7 +18,7 @@ $uninstallRoots = @(
 $entry = @(
     $uninstallRoots |
         ForEach-Object { Get-ItemProperty -Path $_ -ErrorAction SilentlyContinue } |
-        Where-Object { $_.DisplayName -eq "GuessTheNumber" }
+        Where-Object { $_.DisplayName -like "*GuessTheNumber*" }
 ) | Select-Object -First 1
 if (-not $entry) { throw "Could not locate the installed GuessTheNumber MSI entry." }
 
