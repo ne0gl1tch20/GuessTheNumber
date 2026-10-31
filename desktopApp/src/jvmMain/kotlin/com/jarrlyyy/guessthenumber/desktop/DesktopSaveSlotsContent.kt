@@ -34,7 +34,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -150,7 +149,14 @@ internal fun DesktopSaveSlotsContent(
                             )
                         }
                         if (isActive && !slot.isCorrupt && !slot.isEmpty) {
-                            FilterChip(selected = true, onClick = {}, label = { Text("ACTIVE") })
+                            Surface(
+                                color = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                shape = MaterialTheme.shapes.small
+                            ) {
+                                Text("ACTIVE", modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                    style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                            }
                         } else if (slot.isCorrupt) {
                             Icon(Icons.Filled.WarningAmber, contentDescription = "Save needs recovery",
                                 tint = MaterialTheme.colorScheme.error)
