@@ -33,6 +33,9 @@ def main() -> int:
     require(web, "JSON.stringify({version:1,id,type,...payload})", "shared HTML must serialize versioned requests")
     require(web, "host.onmessage=event=>receive(event.data)", "shared HTML must receive host replies")
     require(web, "send('read_onboarding_state')", "shared HTML must perform its initial bridge handshake")
+    require(web, "pendingTimeout=window.setTimeout", "shared HTML must unlock a request when the host stops replying")
+    require(web, "host.cancelMessage?.(id)", "shared HTML must cancel timed-out messages still waiting in the desktop queue")
+    require(web, "Bridge timeout:", "shared HTML must expose a recoverable timeout diagnostic")
 
     # Android accepts only the expected local page/origin and parses raw message data.
     require(android_host, 'addWebMessageListener(this, "gtnHost", setOf(WEB_UI_ORIGIN)', "Android listener must be origin-scoped")
@@ -47,18 +50,23 @@ def main() -> int:
 
     # Windows callback wrappers may return raw JSON or a JSON-encoded string.
     require(desktop_adapter, "postMessage: function (raw)", "Windows adapter must expose postMessage")
+    require(desktop_adapter, "cancelMessage: function (id)", "Windows adapter must discard stale queued requests after a timeout")
     require(desktop_adapter, "JSON.stringify({ version: 1", "Windows-only settings requests must use the shared envelope")
     require(desktop_host, "DesktopBridgePayload.normalize(raw)", "Windows native host must normalize callback payloads")
     require(desktop_payload, "MAX_CALLBACK_LENGTH", "Windows callback size must be bounded")
     require(desktop_payload, "MAX_REQUEST_LENGTH", "Windows decoded request size must be bounded")
     require(desktop_payload, "isSingleJsonObject", "Windows must validate a complete JSON object")
     require(desktop_payload, "decodeSingleJsonString", "Windows must safely decode JSON-string callback payloads")
+    require(desktop_payload, "fun recoverRequestId", "Windows must preserve a recoverable request ID when rejecting malformed callbacks")
     for case in (
         "decodesJsonEncodedStringPayload",
         "rejectsTrailingGarbageAfterObject",
         "rejectsTrailingGarbageAfterEncodedString",
         "rejectsOversizedCallbackBeforeParsing",
         "rejectsOversizedDecodedRequest",
+        "recoversRequestIdFromRawJson",
+        "recoversRequestIdFromJsonEncodedString",
+        "rejectsInvalidOrUnrecoverableRequestIds",
     ):
         require(desktop_tests, case, f"Windows tests must cover {case}")
 
