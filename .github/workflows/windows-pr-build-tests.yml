@@ -34,7 +34,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
 
       - name: Prepare desktop build version resource
         shell: pwsh
@@ -98,7 +98,7 @@ jobs:
 
       - name: Build Windows installer without uploading it
         shell: pwsh
-        run: .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache
+        run: .\gradlew.bat :desktopApp:packageWindowsInnoSetup --no-configuration-cache
 
       - name: Verify Inno Setup installer was produced
         shell: pwsh
