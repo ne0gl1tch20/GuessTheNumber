@@ -406,13 +406,11 @@ fun main() = application {
                                         DesktopDestination.ACHIEVEMENTS -> DesktopGameSection.ACHIEVEMENTS
                                         DesktopDestination.WORLD_MAP -> DesktopGameSection.WORLD_MAP
                                         DesktopDestination.MUTATORS -> DesktopGameSection.MUTATORS
-                                        DesktopDestination.SAVE_SLOTS -> DesktopGameSection.SAVE_SLOTS
                                         DesktopDestination.RELICS -> DesktopGameSection.RELICS
                                         DesktopDestination.HOME_BASE -> DesktopGameSection.HOME_BASE
                                         DesktopDestination.CODEX -> DesktopGameSection.CODEX
                                         DesktopDestination.ENDGAME -> DesktopGameSection.ENDGAME
                                         DesktopDestination.LUCKY_STAKE -> DesktopGameSection.LUCKY_STAKE
-                                        DesktopDestination.ARCADE -> DesktopGameSection.ARCADE
                                         DesktopDestination.MUSIC_PLAYER -> DesktopGameSection.MUSIC_PLAYER
                                         DesktopDestination.CHANGELOG -> DesktopGameSection.CHANGELOG
                                         DesktopDestination.ABOUT -> DesktopGameSection.ABOUT
