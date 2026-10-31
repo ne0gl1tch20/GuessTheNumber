@@ -29,5 +29,5 @@ for (const marker of ['bot_byte', 'bot_pixel', 'bot_speed_upgrade', 'bot_logic_u
   if (!vm.includes(marker)) throw new Error('Missing authoritative bot behavior: ' + marker);
 }
 if (!screen.includes('.put("autoClickerActive", game.autoClickerActive)')) throw new Error('Missing automation state bridge field.');
-if (!/<div\\b[^>]*\\bclass="play-controls-drawer play-dashboard-sections"[^>]*\\bid="playControlsDrawer"/.test(html) || /<details\\b/.test(html)) throw new Error('Desktop Play controls must stay in normal document flow.');
+if (!/<div\b[^>]*\bclass="play-controls-drawer play-dashboard-sections"[^>]*\bid="playControlsDrawer"/.test(html) || /<details\b/.test(html)) throw new Error('Desktop Play controls must stay in normal document flow.');
 console.log('Nebula bot arena integration checks passed.');
