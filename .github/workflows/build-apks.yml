@@ -65,6 +65,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Run focused WebView bridge contract tests
+        run: |
+          python3 tools/test_webview_bridge_contract.py
+          ./gradlew testDebugUnitTest --tests com.jarrlyyy.guessthenumber.ui.screens.WebUiBridgeProtocolTest
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
