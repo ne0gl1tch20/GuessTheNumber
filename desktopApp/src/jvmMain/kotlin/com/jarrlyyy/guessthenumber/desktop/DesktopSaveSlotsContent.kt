@@ -243,7 +243,7 @@ internal fun DesktopSaveSlotsContent(
                 isCorrupt = slot.isCorrupt,
                 hasBackup = slot.hasBackup,
                 profileTitle = data?.takeUnless { slot.isCorrupt }?.let {
-                    "${it.profileIconId.takeIf(String::isNotBlank) ?: "🎮"}  ${it.profileName.ifBlank { "Player" }}"
+                    "${SaveProfileRules.iconSymbol(it.profileIconId)}  ${it.profileName.ifBlank { "Player" }}"
                 },
                 difficultyLabel = data?.takeUnless { slot.isCorrupt }?.let {
                     it.difficultyId.replaceFirstChar(Char::uppercase) +
