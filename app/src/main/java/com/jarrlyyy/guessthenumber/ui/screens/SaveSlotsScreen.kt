@@ -753,7 +753,7 @@ fun SlotCard(
 ) {
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
     val saved = metadata?.takeUnless { it.isEmpty }
-    val uiModel = com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotUiModel(
+    val uiModel = SharedSaveSlotUiModel(
         slotIndex = slotIndex,
         isActive = isActive,
         isEmpty = metadata == null || metadata.isEmpty,
@@ -784,7 +784,7 @@ fun SlotCard(
         resumeLabel = locale.getString("save_slot_resume", "Resume Game"),
         switchLabel = locale.getString("save_slot_switch", "Switch to Slot")
     )
-    com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotCard(
+    SharedSaveSlotCard(
         model = uiModel,
         onSelect = onSelect,
         onCreate = onSelect,
