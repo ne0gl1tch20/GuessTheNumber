@@ -166,6 +166,9 @@ internal fun DesktopSaveSlotsContent(
                 onImport = { onImportSlot(slot.slot) }
             )
         }
+    }
+}
+
 private fun formatPlaytime(seconds: Long): String {
     val hours = seconds.coerceAtLeast(0L) / 3600L
     val minutes = (seconds.coerceAtLeast(0L) % 3600L) / 60L
