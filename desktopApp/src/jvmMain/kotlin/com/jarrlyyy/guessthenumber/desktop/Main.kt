@@ -526,6 +526,10 @@ fun main() = application {
                             }
                         }
 
+                        // Popup-only destinations are rendered by the native Dialog below.
+                        DesktopDestination.SAVE_SLOTS,
+                        DesktopDestination.ARCADE -> Unit
+
                         DesktopDestination.ACTIVITY_HUB -> DesktopActivityHubScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
                         DesktopDestination.LIVE_OPS -> DesktopLiveOpsScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
                         DesktopDestination.DEVELOPER_CONSOLE -> DesktopDeveloperConsoleScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
