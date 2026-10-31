@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -159,113 +160,124 @@ internal fun DesktopPlayerProfileScreen(
         }
         return
     }
-    var username by remember(profile?.profileId) { mutableStateOf(profile?.username.orEmpty()) }
-    var bio by remember(profile?.profileId) { mutableStateOf(profile?.bio.orEmpty()) }
-    var avatarId by remember(profile?.profileId) { mutableStateOf(profile?.avatarId ?: "star") }
-    var customAvatarPath by remember(profile?.profileId) { mutableStateOf(profile?.customAvatarPath) }
-    var validationMessage by remember { mutableStateOf<String?>(null) }
+
     val firstLaunch = profile?.setupComplete != true
 
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().padding(24.dp)) {
-            Card(modifier = Modifier.fillMaxWidth().size(width = 680.dp, height = 620.dp)) {
-                Column(
-                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
-                    Text(
-                        if (firstLaunch) "Create your player profile" else "Player profile",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Text(
-                        if (firstLaunch) "Choose a username before opening your save slots. This profile stays on this Windows PC."
-                        else "Your offline profile is stored locally and does not affect game save slots.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        val avatarImage = remember(customAvatarPath, avatarId) {
-                            if (avatarId == "custom" && !customAvatarPath.isNullOrBlank()) {
-                                runCatching {
-                                    SkiaImage.makeFromEncoded(File(customAvatarPath!!).readBytes())
-                                        .toComposeImageBitmap()
-                                }.getOrNull()
-                            } else null
-                        }
-                        if (avatarImage != null) {
-                            Image(avatarImage, contentDescription = "Custom profile picture", modifier = Modifier.size(64.dp))
-                        } else {
-                            Text(desktopAvatarEmoji(avatarId), style = MaterialTheme.typography.displayMedium)
-                        }
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text("Profile picture", style = MaterialTheme.typography.titleMedium)
-                            OutlinedButton(onClick = {
-                                val chosen = DesktopPlayerProfileStore.chooseAndImportAvatar()
-                                if (chosen != null) {
-                                    customAvatarPath = chosen
-                                    avatarId = "custom"
-                                }
-                            }) { Text("Choose image…") }
-                        }
-                    }
-                    Text("Or pick a preset", style = MaterialTheme.typography.titleMedium)
-                    desktopAvatarPresets.chunked(4).forEach { group ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                            group.forEach { (id, emoji) ->
-                                val selected = avatarId == id
-                                OutlinedButton(
-                                    onClick = { avatarId = id },
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(if (selected) "✓ $emoji" else emoji)
-                                }
+    @Composable
+    fun Editor() {
+        var username by remember(profile?.profileId) { mutableStateOf(profile?.username.orEmpty()) }
+        var bio by remember(profile?.profileId) { mutableStateOf(profile?.bio.orEmpty()) }
+        var avatarId by remember(profile?.profileId) { mutableStateOf(profile?.avatarId ?: "star") }
+        var customAvatarPath by remember(profile?.profileId) { mutableStateOf(profile?.customAvatarPath) }
+        var validationMessage by remember { mutableStateOf<String?>(null) }
+
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().padding(24.dp)) {
+                Card(modifier = Modifier.fillMaxWidth().size(width = 680.dp, height = 620.dp)) {
+                    Column(
+                        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        Text(
+                            if (firstLaunch) "Create your player profile" else "Player profile",
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        Text(
+                            if (firstLaunch) "Choose a username before opening your save slots. This profile stays on this Windows PC."
+                            else "Your offline profile is stored locally and does not affect game save slots.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            val avatarImage = remember(customAvatarPath, avatarId) {
+                                if (avatarId == "custom" && !customAvatarPath.isNullOrBlank()) {
+                                    runCatching {
+                                        SkiaImage.makeFromEncoded(File(customAvatarPath!!).readBytes()).toComposeImageBitmap()
+                                    }.getOrNull()
+                                } else null
                             }
-                            repeat(4 - group.size) { Spacer(Modifier.weight(1f)) }
-                        }
-                    }
-                    OutlinedTextField(
-                        value = username,
-                        onValueChange = { username = it.take(20); validationMessage = null },
-                        label = { Text("Username") },
-                        supportingText = { Text("2–20 characters") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    OutlinedTextField(
-                        value = bio,
-                        onValueChange = { bio = it.take(120) },
-                        label = { Text("Bio (optional)") },
-                        supportingText = { Text("${bio.length}/120") },
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 2,
-                        maxLines = 3
-                    )
-                    validationMessage?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Button(onClick = {
-                            val cleanName = username.trim()
-                            if (cleanName.length !in 2..20) {
-                                validationMessage = "Username must be 2–20 characters."
+                            if (avatarImage != null) {
+                                Image(avatarImage, contentDescription = "Custom profile picture", modifier = Modifier.size(64.dp))
                             } else {
-                                onSave(
-                                    DesktopPlayerProfile(
-                                        username = cleanName,
-                                        bio = bio.trim(),
-                                        avatarId = avatarId,
-                                        customAvatarPath = customAvatarPath,
-                                        setupComplete = true,
-                                        profileId = profile?.profileId ?: UUID.randomUUID().toString()
-                                    )
-                                )
+                                Text(desktopAvatarEmoji(avatarId), style = MaterialTheme.typography.displayMedium)
                             }
-                        }) { Text("Save profile") }
-                        if (!firstLaunch) {
-                            TextButton(onClick = onCancel) { Text("Cancel") }
+                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text("Profile picture", style = MaterialTheme.typography.titleMedium)
+                                OutlinedButton(onClick = {
+                                    val chosen = DesktopPlayerProfileStore.chooseAndImportAvatar()
+                                    if (chosen != null) {
+                                        customAvatarPath = chosen
+                                        avatarId = "custom"
+                                    }
+                                }) { Text("Choose image…") }
+                            }
                         }
+                        Text("Or pick a preset", style = MaterialTheme.typography.titleMedium)
+                        desktopAvatarPresets.chunked(4).forEach { group ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                                group.forEach { (id, emoji) ->
+                                    val selected = avatarId == id
+                                    OutlinedButton(onClick = { avatarId = id }, modifier = Modifier.weight(1f)) {
+                                        Text(if (selected) "✓ $emoji" else emoji)
+                                    }
+                                }
+                                repeat(4 - group.size) { Spacer(Modifier.weight(1f)) }
+                            }
+                        }
+                        OutlinedTextField(
+                            value = username,
+                            onValueChange = { username = it.take(20); validationMessage = null },
+                            label = { Text("Username") },
+                            supportingText = { Text("2–20 characters") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        OutlinedTextField(
+                            value = bio,
+                            onValueChange = { bio = it.take(120) },
+                            label = { Text("Bio (optional)") },
+                            supportingText = { Text("${bio.length}/120") },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 2,
+                            maxLines = 3
+                        )
+                        validationMessage?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Button(onClick = {
+                                val cleanName = username.trim()
+                                if (cleanName.length !in 2..20) {
+                                    validationMessage = "Username must be 2–20 characters."
+                                } else {
+                                    onSave(
+                                        DesktopPlayerProfile(
+                                            username = cleanName,
+                                            bio = bio.trim(),
+                                            avatarId = avatarId,
+                                            customAvatarPath = customAvatarPath,
+                                            setupComplete = true,
+                                            profileId = profile?.profileId ?: UUID.randomUUID().toString()
+                                        )
+                                    )
+                                }
+                            }) { Text("Save profile") }
+                            if (!firstLaunch) {
+                                TextButton(onClick = onCancel) { Text("Cancel") }
+                            }
+                        }
+                        Spacer(Modifier.height(2.dp))
                     }
-                    Spacer(Modifier.height(2.dp))
                 }
             }
         }
+    }
+
+    if (firstLaunch) {
+        Dialog(onDismissRequest = {}) {
+            Surface(modifier = Modifier.widthIn(max = 760.dp).height(700.dp)) {
+                Editor()
+            }
+        }
+    } else {
+        Editor()
     }
 }
