@@ -8,7 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.luminance
-import org.jetbrains.compose.ui.awt.ComposePanel
+import androidx.compose.ui.awt.ComposePanel
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.Window
