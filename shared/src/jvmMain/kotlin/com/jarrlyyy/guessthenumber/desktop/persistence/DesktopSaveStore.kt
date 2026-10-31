@@ -245,12 +245,15 @@ class DesktopSaveStore internal constructor(
         val populated = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
             exportSlotJson(slot)?.let { slot to it }
         }
+        val backups = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+            readValidJson(backupPath(slot))?.let { slot to it }
+        }
         val creative = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
             exportCreativeModeSave(slot)?.let { slot to it }
         }
         if (populated.isEmpty()) return null
         val active = activeSlot()
-        val manifest = """{"schemaVersion":1,"activeSlot":$active,"slots":[${populated.joinToString(",") { it.first.toString() }}],"creativeSlots":[${creative.joinToString(",") { it.first.toString() }}]}"""
+        val manifest = """{"schemaVersion":1,"activeSlot":$active,"slots":[${populated.joinToString(",") { it.first.toString() }}],"backups":[${backups.joinToString(",") { it.first.toString() }}],"creativeSlots":[${creative.joinToString(",") { it.first.toString() }}]}"""
         val output = ByteArrayOutputStream()
         ZipOutputStream(output).use { zip ->
             zip.putNextEntry(ZipEntry("manifest.json"))
@@ -258,6 +261,11 @@ class DesktopSaveStore internal constructor(
             zip.closeEntry()
             populated.forEach { (slot, rawJson) ->
                 zip.putNextEntry(ZipEntry("slot-$slot.json"))
+                zip.write(rawJson.toByteArray(Charsets.UTF_8))
+                zip.closeEntry()
+            }
+            backups.forEach { (slot, rawJson) ->
+                zip.putNextEntry(ZipEntry("backup-slot-$slot.json"))
                 zip.write(rawJson.toByteArray(Charsets.UTF_8))
                 zip.closeEntry()
             }
@@ -284,7 +292,7 @@ class DesktopSaveStore internal constructor(
                     val name = entry.name.replace(92.toChar(), '/')
                     if (entry.isDirectory || name.startsWith("/") ||
                         name.split('/').any { it == ".." } ||
-                        !(name == "manifest.json" || name.matches(Regex("(?:slot|creative-slot)-(?:[1-9]|10)\\.json")))
+                        !(name == "manifest.json" || name.matches(Regex("(?:slot|backup-slot|creative-slot)-(?:[1-9]|10)\\.json")))
                     ) return false
                     if (files.containsKey(name)) return false
                     val maximum = if (name == "manifest.json") MAX_MANIFEST_BYTES else MAX_SLOT_JSON_BYTES
@@ -310,16 +318,29 @@ class DesktopSaveStore internal constructor(
             val slots = manifest["slots"]?.jsonArray?.map {
                 it.jsonPrimitive.content.toIntOrNull() ?: return false
             } ?: return false
+            val backups = manifest["backups"]?.jsonArray?.map {
+                it.jsonPrimitive.content.toIntOrNull() ?: return false
+            } ?: emptyList()
             val creativeSlots = manifest["creativeSlots"]?.jsonArray?.map {
                 it.jsonPrimitive.content.toIntOrNull() ?: return false
             } ?: emptyList()
             if (slots.isEmpty() || slots.size != slots.distinct().size || slots.any { it !in 1..MAX_SAVE_SLOTS }) return false
+            if (backups.size != backups.distinct().size || backups.any { it !in 1..MAX_SAVE_SLOTS }) return false
             if (creativeSlots.size != creativeSlots.distinct().size || creativeSlots.any { it !in 1..MAX_SAVE_SLOTS }) return false
+            if (backups.any { it !in slots }) return false
             val expectedFiles = slots.map { "slot-$it.json" }.toSet() +
+                backups.map { "backup-slot-$it.json" }.toSet() +
                 creativeSlots.map { "creative-slot-$it.json" }.toSet() + "manifest.json"
             if (files.keys != expectedFiles) return false
             val imported = slots.associateWith { slot ->
                 val raw = files.getValue("slot-$slot.json").toString(Charsets.UTF_8)
+                if (raw.isBlank()) return false
+                val state = json.decodeFromString<GameState>(raw)
+                if (!validate(state)) return false
+                state
+            }
+            val importedBackups = backups.associateWith { slot ->
+                val raw = files.getValue("backup-slot-$slot.json").toString(Charsets.UTF_8)
                 if (raw.isBlank()) return false
                 val state = json.decodeFromString<GameState>(raw)
                 if (!validate(state)) return false
@@ -341,6 +362,12 @@ class DesktopSaveStore internal constructor(
                     val state = imported[slot]
                     if (state != null) {
                         check(save(slot, state)) { "Could not write imported save slot $slot." }
+                        val backupState = importedBackups[slot]
+                        if (backupState != null) {
+                            writeAtomically(backupPath(slot), json.encodeToString(backupState))
+                        } else {
+                            fileOps.deleteIfExists(backupPath(slot))
+                        }
                     } else {
                         fileOps.deleteIfExists(primaryPath(slot))
                         fileOps.deleteIfExists(backupPath(slot))
