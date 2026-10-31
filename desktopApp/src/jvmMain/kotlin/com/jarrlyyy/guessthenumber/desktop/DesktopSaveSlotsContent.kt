@@ -173,7 +173,8 @@ internal fun DesktopSaveSlotsContent(
                     it.difficultyId.replaceFirstChar(Char::uppercase) +
                         if (it.creativeModeEnabled) " · Creative Mode" else ""
                 },
-                metricColumns = 3,\n                metricItems = data?.takeUnless { slot.isCorrupt }?.let {
+                metricColumns = 3,
+                metricItems = data?.takeUnless { slot.isCorrupt }?.let {
                     listOf(
                         SharedSaveSlotMetric(SharedSaveSlotMetricIcon.TARGET, "Hidden number: ${it.targetNumber}"),
                         SharedSaveSlotMetric(SharedSaveSlotMetricIcon.MONEY, "Money: ${it.money}"),
