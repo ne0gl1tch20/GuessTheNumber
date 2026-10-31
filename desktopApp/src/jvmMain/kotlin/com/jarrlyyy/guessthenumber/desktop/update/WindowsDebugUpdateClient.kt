@@ -11,98 +11,100 @@ import java.net.URL
 internal data class WindowsDebugUpdate(
     val version: String,
     val tagName: String,
-    val artifactDownloadUrl: String,
-    val artifactSha256: String,
+    val archiveDownloadUrl: String,
+    val manifestDownloadUrl: String,
+    val archiveSha256: String,
     val commitSha: String,
     val runNumber: Long,
     val runAttempt: Long
 )
 
-/** Finds the newest unexpired Windows Debug artifact from a successful master CI run. */
+/** Reads public assets from the replaceable debug-latest GitHub Release. */
 internal class WindowsDebugUpdateClient(
     private val connectionFactory: (URL) -> HttpURLConnection = {
         it.openConnection() as HttpURLConnection
     }
 ) {
     fun findLatestUpdate(installedVersion: String): WindowsDebugUpdate? {
-        val runs = getJson(URL(WORKFLOW_RUNS_API)).jsonObject["workflow_runs"]?.jsonArray ?: return null
-        val candidates = runs.mapNotNull { it as? JsonObject }
-            .filter {
-                it["event"]?.jsonPrimitive?.content == "push" &&
-                    it["head_branch"]?.jsonPrimitive?.content == "master" &&
-                    it["status"]?.jsonPrimitive?.content == "completed" &&
-                    it["conclusion"]?.jsonPrimitive?.content == "success"
-            }
-            .sortedByDescending { it["run_number"]?.jsonPrimitive?.content?.toLongOrNull() ?: 0L }
+        val release = getJson(URL(RELEASE_API)).jsonObject
+        val assets = release["assets"]?.jsonArray ?: return null
+        val assetUrls = assets.mapNotNull { it as? JsonObject }
+            .mapNotNull { asset ->
+                val name = asset["name"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                val url = asset["browser_download_url"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                name to url
+            }.toMap()
 
-        val latest = candidates.firstOrNull() ?: return null
-        val runId = latest["id"]?.jsonPrimitive?.content?.toLongOrNull()
-            ?: throw IllegalStateException("The latest successful Windows Desktop CI run has no run ID.")
-        val runNumber = latest["run_number"]?.jsonPrimitive?.content?.toLongOrNull()
-            ?: throw IllegalStateException("The latest successful Windows Desktop CI run has no run number.")
-        val runAttempt = latest["run_attempt"]?.jsonPrimitive?.content?.toLongOrNull()
-            ?: throw IllegalStateException("The latest successful Windows Desktop CI run has no run attempt.")
-        val commitSha = latest["head_sha"]?.jsonPrimitive?.content
-            ?: throw IllegalStateException("The latest successful Windows Desktop CI run has no commit SHA.")
+        val archiveUrl = assetUrls[WINDOWS_ARCHIVE_NAME]
+            ?: throw IllegalStateException("The latest debug-latest release has no Windows Debug installer archive.")
+        val manifestUrl = assetUrls[WINDOWS_MANIFEST_NAME]
+            ?: throw IllegalStateException("The latest debug-latest release has no Windows Debug update manifest.")
+        require(isPublicReleaseAssetUrl(archiveUrl) && isPublicReleaseAssetUrl(manifestUrl)) {
+            "GitHub returned an unexpected debug-latest release asset URL."
+        }
+
+        val manifest = getJson(URL(manifestUrl)).jsonObject
+        require(manifest["channel"]?.jsonPrimitive?.content == "windows-debug") {
+            "The debug-latest Windows asset is not a Windows Debug build."
+        }
+        val version = manifest["version"]?.jsonPrimitive?.content
+            ?: throw IllegalStateException("The Windows Debug release manifest has no version.")
+        require(version.matches(Regex("1\\.0\\.\\d+"))) {
+            "The latest Windows Debug release has an incompatible version."
+        }
+        val runNumber = manifest["runNumber"]?.jsonPrimitive?.content?.toLongOrNull()
+            ?: throw IllegalStateException("The Windows Debug release manifest has no run number.")
+        val runAttempt = manifest["runAttempt"]?.jsonPrimitive?.content?.toLongOrNull()
+            ?: throw IllegalStateException("The Windows Debug release manifest has no run attempt.")
+        val commitSha = manifest["commit"]?.jsonPrimitive?.content
+            ?: throw IllegalStateException("The Windows Debug release manifest has no commit SHA.")
         require(commitSha.matches(Regex("[0-9a-fA-F]{40}"))) {
-            "The latest successful Windows Desktop CI run has an invalid commit SHA."
+            "The Windows Debug release manifest has an invalid commit SHA."
         }
-        val artifacts = runArtifacts(runId)
-            ?: throw IllegalStateException("Could not read artifacts for the latest successful Windows Desktop CI run.")
-        val artifact = artifacts.firstOrNull {
-            it["name"]?.jsonPrimitive?.content == WINDOWS_ARTIFACT_NAME
-        } ?: throw IllegalStateException("The latest Windows Debug build artifact is missing.")
-        if (artifact["expired"]?.jsonPrimitive?.content != "false") {
-            throw IllegalStateException("The latest Windows Debug artifact has expired. CI artifacts are retained for seven days.")
+        require(manifest["assetName"]?.jsonPrimitive?.content == WINDOWS_ARCHIVE_NAME) {
+            "The Windows Debug release manifest names an unexpected archive."
         }
-        val archiveUrl = artifact["archive_download_url"]?.jsonPrimitive?.content
-            ?: throw IllegalStateException("The latest Windows Debug artifact has no download URL.")
-        if (!isArtifactDownloadUrl(archiveUrl)) {
-            throw IllegalStateException("GitHub returned an unexpected Windows Debug artifact URL.")
+        val checksum = manifest["sha256"]?.jsonPrimitive?.content
+            ?: throw IllegalStateException("The Windows Debug release manifest has no SHA-256 checksum.")
+        require(checksum.matches(Regex("[0-9a-fA-F]{64}"))) {
+            "The Windows Debug release manifest has an invalid SHA-256 checksum."
         }
-        val artifactDigest = artifact["digest"]?.jsonPrimitive?.content
-            ?.removePrefix("sha256:")
-            ?: throw IllegalStateException("GitHub did not provide an Actions artifact SHA-256 digest.")
-        require(artifactDigest.matches(Regex("[0-9a-fA-F]{64}"))) {
-            "GitHub returned an invalid Actions artifact SHA-256 digest."
-        }
-        val version = "1.0.$runNumber"
-        if (!version.matches(Regex("1\\.0\\.\\d+"))) {
-            throw IllegalStateException("The latest Windows Debug build has an incompatible version.")
-        }
+        val tagName = manifest["tag"]?.jsonPrimitive?.content
+            ?: throw IllegalStateException("The Windows Debug release manifest has no build tag.")
+
         if (compareVersions(version, installedVersion) <= 0) return null
         return WindowsDebugUpdate(
             version = version,
-            tagName = "windows-debug-$runNumber-$runAttempt",
-            artifactDownloadUrl = archiveUrl,
-            artifactSha256 = artifactDigest,
+            tagName = tagName,
+            archiveDownloadUrl = archiveUrl,
+            manifestDownloadUrl = manifestUrl,
+            archiveSha256 = checksum,
             commitSha = commitSha,
             runNumber = runNumber,
             runAttempt = runAttempt
         )
     }
 
-    private fun runArtifacts(runId: Long): List<JsonObject>? {
-        val response = getJson(URL("$ACTIONS_API/$runId/artifacts")).jsonObject
-        return response["artifacts"]?.jsonArray?.mapNotNull { it as? JsonObject }
+    private fun isPublicReleaseAssetUrl(value: String): Boolean {
+        val uri = runCatching { java.net.URI(value) }.getOrNull() ?: return false
+        return uri.scheme == "https" && uri.host == "github.com" &&
+            uri.path.startsWith("/$REPOSITORY/releases/download/$DEBUG_RELEASE_TAG/")
     }
-
-    private fun isArtifactDownloadUrl(value: String): Boolean =
-        value.matches(Regex("https://api\\.github\\.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/\\d+/zip"))
 
     private fun getJson(url: URL) = connectionFactory(url).run {
         requestMethod = "GET"
         connectTimeout = 10_000
-        readTimeout = 15_000
+        readTimeout = 20_000
+        instanceFollowRedirects = true
         setRequestProperty("Accept", "application/vnd.github+json")
         setRequestProperty("User-Agent", "GuessTheNumber-Windows-Debug-Updater")
         try {
             if (responseCode !in 200..299) {
-                throw IllegalStateException("GitHub returned HTTP $responseCode")
+                throw IllegalStateException("GitHub release update check returned HTTP $responseCode")
             }
             val body = inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
             if (body.length > MAX_RESPONSE_CHARS) {
-                throw IllegalStateException("GitHub response exceeded the size limit")
+                throw IllegalStateException("GitHub release response exceeded the size limit")
             }
             Json.parseToJsonElement(body)
         } finally {
@@ -122,11 +124,12 @@ internal class WindowsDebugUpdateClient(
     }
 
     private companion object {
-        const val WORKFLOW_RUNS_API =
-            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/workflows/windows-desktop.yml/runs?branch=master&status=success&per_page=20"
-        const val ACTIONS_API =
-            "https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/runs"
-        const val WINDOWS_ARTIFACT_NAME = "GuessTheNumber-Windows-Debug"
+        const val REPOSITORY = "ne0gl1tch20/GuessTheNumber"
+        const val DEBUG_RELEASE_TAG = "debug-latest"
+        const val RELEASE_API =
+            "https://api.github.com/repos/$REPOSITORY/releases/tags/$DEBUG_RELEASE_TAG"
+        const val WINDOWS_ARCHIVE_NAME = "GuessTheNumber-Windows-Desktop.zip"
+        const val WINDOWS_MANIFEST_NAME = "windows-debug-manifest.json"
         const val MAX_RESPONSE_CHARS = 1_000_000
     }
 }
