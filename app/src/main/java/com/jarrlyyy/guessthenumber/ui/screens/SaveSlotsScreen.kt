@@ -791,7 +791,8 @@ fun SlotCard(
         onEditProfile = saved?.let { onEditProfile },
         onDuplicate = saved?.let { onDuplicate },
         onRestoreBackup = saved?.takeIf { it.hasBackup }?.let { onRestoreBackup },
-        onReset = saved?.let { onReset }
+        onReset = saved?.let { onReset },
+        reducedMotion = reducedMotion
     )
 }
 
