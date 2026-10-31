@@ -167,7 +167,7 @@ jobs:
             Set-Content -Path $resourcePath -Value "version=1.0.0" -Encoding ascii
             $env:GTN_WINDOWS_PACKAGE_VERSION = "1.0.0"
             Remove-Item -Path (Join-Path $msiDir "*.msi") -Force -ErrorAction SilentlyContinue
-            .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache --rerun-tasks --no-daemon -P "gtn.desktop.debugToolsBuild=true"
+            .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache --rerun-tasks --no-daemon
             $legacyPackage = Get-ChildItem -Path $msiDir -Filter "GuessTheNumber-1.0.0.msi" -File | Select-Object -First 1
             if (-not $legacyPackage) { throw "Legacy baseline MSI was not produced." }
             Copy-Item $legacyPackage.FullName $baselineMsi
@@ -188,7 +188,7 @@ jobs:
           if (-not (Test-Path $userDataMarker)) { throw "Could not prepare the user-data preservation marker." }
 
           Remove-Item -Path (Join-Path $msiDir "*.msi") -Force -ErrorAction SilentlyContinue
-          .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache --rerun-tasks --no-daemon
+          .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache --rerun-tasks --no-daemon -P "gtn.desktop.debugToolsBuild=true"
           $updatedPackage = Get-ChildItem -Path $msiDir -Filter "GuessTheNumber-$($env:GTN_WINDOWS_PACKAGE_VERSION).msi" -File | Select-Object -First 1
           if (-not $updatedPackage) { throw "Updated MSI was not produced." }
           $updatedInstall = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$($updatedPackage.FullName)`" /qn /norestart" -Wait -PassThru
