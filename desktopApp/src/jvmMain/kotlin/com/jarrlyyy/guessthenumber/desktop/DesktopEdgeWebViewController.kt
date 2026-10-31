@@ -227,7 +227,17 @@ internal class DesktopEdgeWebViewController(
                 }
                 replyToPage(response.toString())
             }
-            currentHandler != null && normalized.length <= 16384 -> currentHandler(normalized, replyToPage)
+            currentHandler != null && normalized.length <= 16384 -> {
+                try {
+                    currentHandler(normalized, replyToPage)
+                } catch (error: Throwable) {
+                    val id = request.optString("id", "")
+                    System.err.println("GuessTheNumber desktop bridge handler failed for $id: ${error.stackTraceToString()}")
+                    replyToPage(JSONObject().put("version", 1).put("id", id)
+                        .put("type", "error").put("error", "host_handler_failed")
+                        .put("message", error.message ?: error.javaClass.simpleName).toString())
+                }
+            }
             else -> {
                 val id = request.optString("id", "")
                 replyToPage(JSONObject().put("version", 1).put("id", id)
