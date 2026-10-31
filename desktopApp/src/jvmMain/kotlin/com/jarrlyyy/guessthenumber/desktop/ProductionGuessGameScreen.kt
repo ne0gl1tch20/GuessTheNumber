@@ -101,6 +101,7 @@ fun ProductionGuessGameScreen(
     onGlobalPreferencesImported: () -> Unit = {},
     onOpenParityDestination: (DesktopDestination) -> Unit = {},
     onOpenPlayerProfile: () -> Unit = {},
+    onNativeSaveLoaded: () -> Unit = {},
     onDesktopUpdateRequest: (String, String, (String) -> Unit) -> Unit = { _, requestId, reply ->
         reply(org.json.JSONObject().put("version", 1).put("id", requestId)
             .put("type", "update_result").put("status", "unavailable")
@@ -948,6 +949,7 @@ fun ProductionGuessGameScreen(
                                         state = loaded
                                         autoClicker.reset(loaded.currentRangeMin, loaded.currentRangeMax)
                                         feedback = "Switched to save slot $targetSlot."
+                                        if (section == DesktopGameSection.SAVE_SLOTS) onNativeSaveLoaded()
                                     } else feedback = "That slot has no valid save. Create a new slot or recover its backup first."
                                 } else feedback = "Could not save the current slot. Switching was cancelled."
                                 isSaving = false
@@ -975,6 +977,7 @@ fun ProductionGuessGameScreen(
                                 state = fresh
                                 autoClicker.reset(fresh.currentRangeMin, fresh.currentRangeMax)
                                 feedback = "Created and switched to slot $targetSlot."
+                                if (section == DesktopGameSection.SAVE_SLOTS) onNativeSaveLoaded()
                             } else feedback = "Could not create that slot. It may already contain data."
                             saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
                         }

@@ -533,7 +533,6 @@ fun main() = application {
                         DesktopDestination.DEVELOPER_CONSOLE -> DesktopDeveloperConsoleScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
                         DesktopDestination.PROCESS_INSPECTOR -> DesktopProcessInspectorScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
 
-                        DesktopDestination.SAVE_SLOTS,
                         DesktopDestination.RELICS,
                         DesktopDestination.DEVELOPER_SETTINGS,
                         DesktopDestination.LUA_TESTING_HUB -> DesktopParityScreen(destination = destination, onBack = { shell.navigate(DesktopDestination.MORE) }, onNavigate = { shell.navigate(it) })
@@ -581,6 +580,7 @@ fun main() = application {
                                     } else {
                                         DesktopGameSection.SAVE_SLOTS
                                     },
+                                    onNativeSaveLoaded = { popupDestination = null },
                                     onOpenParityDestination = { next ->
                                         when (next) {
                                             DesktopDestination.MORE,
