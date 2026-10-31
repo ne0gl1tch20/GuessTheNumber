@@ -18,6 +18,8 @@ import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.SaveProfile
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSaveCodec
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
