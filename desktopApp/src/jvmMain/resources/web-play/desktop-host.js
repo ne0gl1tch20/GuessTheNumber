@@ -160,22 +160,23 @@
   }
 
   function installDebugOverlay() {
-    if (!window.gtnDesktopDebugTools || document.getElementById('gtnDesktopDebugRoot')) return;
+    if (document.getElementById('gtnDesktopDebugRoot')) return;
+    var canInspect = window.gtnDesktopDebugTools === true;
     var root = document.createElement('div');
     root.id = 'gtnDesktopDebugRoot';
     root.style.cssText = 'position:fixed;right:14px;top:14px;z-index:2147483000;font:12px/1.45 Consolas,monospace;color:#eef2ff;';
     var toggle = document.createElement('button');
     toggle.textContent = 'DEV';
+    toggle.setAttribute('aria-label', 'Open desktop developer overlay');
     toggle.style.cssText = 'border:1px solid #8b7cff;border-radius:9px;background:#17152b;color:#fff;padding:8px 13px;font-weight:800;cursor:pointer;box-shadow:0 4px 18px #0008;';
     var panel = document.createElement('section');
     panel.hidden = true;
+    panel.setAttribute('aria-label', 'Desktop developer diagnostics');
     panel.style.cssText = 'position:absolute;right:0;top:42px;width:min(520px,calc(100vw - 36px));max-height:min(72vh,650px);overflow:auto;box-sizing:border-box;padding:13px;border:1px solid #514b7b;border-radius:12px;background:#111522f5;box-shadow:0 12px 40px #000a;';
     panel.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font:700 14px Segoe UI,sans-serif">Desktop Developer Overlay</b><span id="gtnDesktopDebugCount">0</span></div>' +
       '<p id="gtnDesktopDebugStatus" style="color:#b9c3df;margin:8px 0">Bridge: checking…</p>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"><button data-dev-action="state">Read game state</button><button data-dev-action="page">Page info</button><button data-dev-action="clear">Clear log</button></div>' +
-      '<textarea id="gtnDesktopDebugCommand" rows="3" spellcheck="false" placeholder="JavaScript command…" style="box-sizing:border-box;width:100%;resize:vertical;background:#090d17;color:#e9edff;border:1px solid #414a65;border-radius:7px;padding:8px"></textarea>' +
-      '<button data-dev-action="run" style="margin:7px 0">Run JavaScript</button><pre id="gtnDesktopDebugResult" style="white-space:pre-wrap;overflow-wrap:anywhere;color:#c8f7d0"></pre>' +
-      '<pre id="gtnDesktopDebugLog" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:240px;overflow:auto;background:#080c14;padding:8px;border-radius:7px"></pre>';
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"><button data-dev-action="page">Page info</button>' + (canInspect ? '<button data-dev-action="state">Read game state</button><button data-dev-action="clear">Clear log</button>' : '') + '</div>' +
+      (canInspect ? '<textarea id="gtnDesktopDebugCommand" rows="3" spellcheck="false" placeholder="JavaScript command…" aria-label="JavaScript inspection command" style="box-sizing:border-box;width:100%;resize:vertical;background:#090d17;color:#e9edff;border:1px solid #414a65;border-radius:7px;padding:8px"></textarea><button data-dev-action="run" style="margin:7px 0">Run JavaScript</button><pre id="gtnDesktopDebugResult" style="white-space:pre-wrap;overflow-wrap:anywhere;color:#c8f7d0"></pre><pre id="gtnDesktopDebugLog" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:240px;overflow:auto;background:#080c14;padding:8px;border-radius:7px"></pre>' : '<p style="color:#b9c3df">Read-only desktop diagnostics. JavaScript inspection and DevTools are available in debug builds only.</p><pre id="gtnDesktopDebugResult" style="white-space:pre-wrap;overflow-wrap:anywhere;color:#c8f7d0"></pre>');
     Array.prototype.forEach.call(panel.querySelectorAll('button'), function (button) {
       button.style.cssText = 'border:1px solid #555d7c;border-radius:7px;background:#242a3d;color:#fff;padding:6px 9px;cursor:pointer';
     });
@@ -183,12 +184,24 @@
     panel.addEventListener('click', function (event) {
       var action = event.target && event.target.getAttribute('data-dev-action');
       if (!action) return;
-      if (action === 'clear') { debugEntries.length = 0; debugLog('Log cleared'); return; }
-      if (action === 'state') { window.gtnHost.postMessage(JSON.stringify({version:1,id:'desktop-dev-state-'+Date.now(),type:'read_state'})); return; }
+      if (action === 'clear') {
+        if (!canInspect) return;
+        debugEntries.length = 0;
+        debugLog('Log cleared');
+        return;
+      }
+      if (action === 'state') {
+        if (!canInspect) return;
+        window.gtnHost.postMessage(JSON.stringify({version:1,id:'desktop-dev-state-'+Date.now(),type:'read_state'}));
+        return;
+      }
       if (action === 'page') {
-        document.getElementById('gtnDesktopDebugResult').textContent = JSON.stringify({ title:document.title,url:location.href,readyState:document.readyState,host:typeof window.gtnHost,bridge:typeof window.gtnDesktopBridge,activateScreen:typeof window.gtnActivateScreen,screen:window.gtnDesktopInitialScreen },null,2); return;
+        var result = document.getElementById('gtnDesktopDebugResult');
+        if (result) result.textContent = JSON.stringify({ title:document.title,url:location.href,readyState:document.readyState,host:typeof window.gtnHost,bridge:typeof window.gtnDesktopBridge,activateScreen:typeof window.gtnActivateScreen,screen:window.gtnDesktopInitialScreen,inspectEnabled:canInspect },null,2);
+        return;
       }
       if (action === 'run') {
+        if (!canInspect || !window.gtnDesktopDebugTools) return;
         var source = document.getElementById('gtnDesktopDebugCommand').value;
         try {
           var result = (new Function(source))();
@@ -198,7 +211,9 @@
         }
       }
     });
-    root.appendChild(toggle); root.appendChild(panel); document.body.appendChild(root);
+    root.appendChild(toggle);
+    root.appendChild(panel);
+    document.body.appendChild(root);
     debugLog('Developer overlay attached');
     document.getElementById('gtnDesktopDebugStatus').textContent = 'Bridge: ' + (window.gtnDesktopBridge ? 'connected' : 'waiting') + ' · Kotlin handler: ready when request is received';
   }
