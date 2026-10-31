@@ -24,7 +24,6 @@ class DesktopNavigationTest {
                 DesktopDestination.PRESTIGE,
                 DesktopDestination.ULTRA,
                 DesktopDestination.SETTINGS,
-                DesktopDestination.ARCADE,
                 DesktopDestination.MUSIC_PLAYER,
                 DesktopDestination.STATS,
                 DesktopDestination.WORLD_MAP,
@@ -181,10 +180,10 @@ class DesktopNavigationTest {
         assertNull(DesktopDestination.fromShortcut(Key.One, ctrlPressed = false))
         assertNull(DesktopDestination.fromShortcut(Key.Six, ctrlPressed = true))
     }
-}
-@Test
-fun nativePopupDestinationsAreNotShellNavigation() {
+    @Test
+    fun nativePopupDestinationsAreNotShellNavigation() {
         assertFalse(DesktopDestination.SAVE_SLOTS in DesktopDestination.MAIN_NAVIGATION_ORDER)
         assertFalse(DesktopDestination.ARCADE in DesktopDestination.MAIN_NAVIGATION_ORDER)
         assertFalse(DesktopDestination.DEVELOPER_SETTINGS in DesktopDestination.MAIN_NAVIGATION_ORDER)
+    }
 }
