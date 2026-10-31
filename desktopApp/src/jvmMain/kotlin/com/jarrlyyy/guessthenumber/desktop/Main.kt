@@ -591,13 +591,8 @@ fun main() = application {
                                         editingPlayerProfile = false
                                     }
                                 )
-                                DesktopDestination.DEVELOPER_SETTINGS -> DesktopParityScreen(
-                                    destination = target,
-                                    onBack = { popupDestination = null },
-                                    onNavigate = { next ->
-                                        popupDestination = null
-                                        shell.navigate(next)
-                                    }
+                                DesktopDestination.DEVELOPER_SETTINGS -> DesktopDeveloperConsoleScreen(
+                                    onBack = { popupDestination = null }
                                 )
                                 else -> popupDestination = null
                             }
