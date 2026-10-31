@@ -1137,6 +1137,55 @@ fun ProductionGuessGameScreen(
                                 isSaving = false
                             }
                         }
+                    },
+                    onExportAndroidBackup = {
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Export Android-compatible GuessTheNumber backup"
+                            selectedFile = File("guessthenumber-android-backup.gtnbackup")
+                            fileFilter = FileNameExtensionFilter("Android-compatible backup (*.gtnbackup)", "gtnbackup")
+                        }
+                        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val destination = chooser.selectedFile.toPath()
+                            scope.launch {
+                                isSaving = true
+                                val encoded = withContext(Dispatchers.IO) { saveStore.exportAndroidCompatibleBackup() }
+                                val exported = encoded != null && runCatching {
+                                    Files.writeString(destination, encoded)
+                                }.isSuccess
+                                feedback = if (exported) {
+                                    "Exported an Android-compatible backup. Its Base64/XOR wrapper matches Android's existing format."
+                                } else {
+                                    "Could not export the Android-compatible backup."
+                                }
+                                isSaving = false
+                            }
+                        }
+                    },
+                    onImportAndroidBackup = {
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Import Android-compatible GuessTheNumber backup"
+                            fileFilter = FileNameExtensionFilter("Android-compatible backup (*.gtnbackup, *.txt)", "gtnbackup", "txt")
+                        }
+                        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val source = chooser.selectedFile.toPath()
+                            scope.launch {
+                                isSaving = true
+                                val imported = withContext(Dispatchers.IO) {
+                                    runCatching { Files.readString(source) }.getOrNull()
+                                        ?.let { saveStore.importAndroidCompatibleBackup(it) } ?: false
+                                }
+                                if (imported) {
+                                    activeSaveSlot = withContext(Dispatchers.IO) { saveStore.activeSlot() }
+                                    state = withContext(Dispatchers.IO) { saveStore.load(activeSaveSlot) }
+                                    state?.let { autoClicker.reset(it.currentRangeMin, it.currentRangeMax) }
+                                    feedback = "Imported the Android-compatible backup, including settings, recovery copies and Creative Mode data."
+                                } else {
+                                    feedback = "Android backup rejected. Existing saves were kept intact."
+                                }
+                                saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                                isSaving = false
+                            }
+                        }
                     }
                 )
             }
