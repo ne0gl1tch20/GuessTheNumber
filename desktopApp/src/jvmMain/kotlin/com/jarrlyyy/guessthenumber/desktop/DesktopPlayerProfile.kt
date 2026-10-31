@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -179,7 +178,7 @@ internal fun DesktopPlayerProfileScreen(
                         verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
                         Text(
-                            if (firstLaunch) "Create your player profile" else "Player profile",
+                            if (firstLaunch) "Choose your profile picture" else "Player profile",
                             style = MaterialTheme.typography.headlineMedium
                         )
                         Text(
@@ -271,13 +270,7 @@ internal fun DesktopPlayerProfileScreen(
         }
     }
 
-    if (firstLaunch) {
-        Dialog(onDismissRequest = {}) {
-            Surface(modifier = Modifier.widthIn(max = 760.dp).height(700.dp)) {
-                Editor()
-            }
-        }
-    } else {
-        Editor()
-    }
+    // The desktop entry point owns the native startup dialog. Do not create a nested
+    // Compose Dialog here, or first launch would stack two independent popup windows.
+    Editor()
 }
