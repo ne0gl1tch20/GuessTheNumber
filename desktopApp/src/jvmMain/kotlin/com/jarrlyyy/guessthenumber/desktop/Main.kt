@@ -275,7 +275,6 @@ fun main() = application {
 
             if (playerProfile?.setupComplete != true) {
                 DesktopNativeDialogHost(
-                    owner = window,
                     title = "Choose Profile Picture",
                     visible = true,
                     width = 760,
@@ -307,7 +306,6 @@ fun main() = application {
                 }
             } else if (!startupSetupComplete) {
                 DesktopNativeDialogHost(
-                    owner = window,
                     title = "Choose a Save Slot",
                     visible = true,
                     width = 1120,
@@ -578,8 +576,7 @@ fun main() = application {
 
                 if (viewingPlayerProfile || editingPlayerProfile) {
                     DesktopNativeDialogHost(
-                        owner = window,
-                        title = if (editingPlayerProfile) "Edit Player Profile" else "Player Profile",
+                            title = if (editingPlayerProfile) "Edit Player Profile" else "Player Profile",
                         visible = true,
                         width = 760,
                         height = 680,
@@ -612,8 +609,7 @@ fun main() = application {
 
                 popupDestination?.let { target ->
                     DesktopNativeDialogHost(
-                        owner = window,
-                        title = when (target) {
+                            title = when (target) {
                             DesktopDestination.ARCADE -> "Arcade"
                             DesktopDestination.SAVE_SLOTS -> "Save Slots"
                             DesktopDestination.DEVELOPER_SETTINGS -> "Developer Settings"
