@@ -207,13 +207,13 @@
   function initialize() {
     try {
       applyNavigationPosition(window.gtnDesktopNavigationPosition);
-      installDebugOverlay();
       installDesktopSettings();
       if (typeof window.gtnActivateScreen !== 'function') {
         showDesktopStartupError('The game interface did not initialize', 'app.js did not register window.gtnActivateScreen. Check the earlier script-loading errors and packaged web assets.');
         return;
       }
       window.gtnActivateScreen(window.gtnDesktopInitialScreen || 'play');
+      installDebugOverlay();
       window.gtnHost.flush();
     } catch (error) {
       showDesktopStartupError('The game interface could not open its first screen', error && (error.stack || error.message) || String(error));
@@ -222,6 +222,10 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });
   else initialize();
+  window.addEventListener('load', function () {
+    installDebugOverlay();
+    installDesktopSettings();
+  }, { once: true });
   new MutationObserver(installDesktopSettings).observe(document.documentElement, { childList: true, subtree: true });
   window.gtnDesktopApplyNavigationPosition = applyNavigationPosition;
 })();
