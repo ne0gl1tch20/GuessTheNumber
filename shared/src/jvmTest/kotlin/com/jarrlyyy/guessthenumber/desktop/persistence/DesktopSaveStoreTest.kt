@@ -117,7 +117,7 @@ class DesktopSaveStoreTest {
         assertTrue(source.duplicateSlot(1, 2))
         assertEquals(creative, source.loadCreativeModeSave(2))
 
-        val bundle = assertNotNull(source.exportAllSlotsBundle())
+        val bundle = source.exportAllSlotsBundle() ?: error("Creative save bundle should export.")
         val targetDirectory = Files.createTempDirectory("gtn-creative-save-target")
         val target = DesktopSaveStore(targetDirectory)
         assertTrue(target.importAllSlotsBundle(bundle))
