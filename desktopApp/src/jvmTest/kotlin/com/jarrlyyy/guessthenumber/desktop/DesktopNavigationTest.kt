@@ -182,3 +182,9 @@ class DesktopNavigationTest {
         assertNull(DesktopDestination.fromShortcut(Key.Six, ctrlPressed = true))
     }
 }
+@Test
+fun nativePopupDestinationsAreNotShellNavigation() {
+        assertFalse(DesktopDestination.SAVE_SLOTS in DesktopDestination.MAIN_NAVIGATION_ORDER)
+        assertFalse(DesktopDestination.ARCADE in DesktopDestination.MAIN_NAVIGATION_ORDER)
+        assertFalse(DesktopDestination.DEVELOPER_SETTINGS in DesktopDestination.MAIN_NAVIGATION_ORDER)
+}

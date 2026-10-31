@@ -272,19 +272,30 @@ fun main() = application {
             }
 
             if (playerProfile?.setupComplete != true) {
-                DesktopPlayerProfileScreen(
-                    profile = playerProfile,
-                    viewOnly = viewingPlayerProfile && !editingPlayerProfile,
-                    onEdit = { viewingPlayerProfile = false; editingPlayerProfile = true },
-                    onSave = { savedProfile ->
-                        runCatching { DesktopPlayerProfileStore.save(savedProfile) }
-                            .onSuccess {
-                                playerProfile = savedProfile
-                                editingPlayerProfile = false
+                Dialog(onDismissRequest = { /* first-launch profile is mandatory */ }) {
+                    Surface(modifier = Modifier.width(720.dp).height(620.dp)) {
+                        DesktopPlayerProfileScreen(
+                            profile = playerProfile,
+                            viewOnly = false,
+                            onEdit = { editingPlayerProfile = true },
+                            onSave = { savedProfile ->
+                                runCatching { DesktopPlayerProfileStore.save(savedProfile) }
+                                    .onSuccess {
+                                        playerProfile = savedProfile
+                                        editingPlayerProfile = false
+                                        viewingPlayerProfile = false
+                                        popupDestination = DesktopDestination.SAVE_SLOTS
+                                    }
+                            },
+                            onCancel = {
+                                if (playerProfile?.setupComplete == true) {
+                                    editingPlayerProfile = false
+                                    viewingPlayerProfile = false
+                                }
                             }
-                    },
-                    onCancel = { editingPlayerProfile = false; viewingPlayerProfile = false }
-                )
+                        )
+                    }
+                }
             } else {
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -373,13 +384,11 @@ fun main() = application {
                         DesktopDestination.ACHIEVEMENTS,
                         DesktopDestination.WORLD_MAP,
                         DesktopDestination.MUTATORS,
-                        DesktopDestination.SAVE_SLOTS,
                         DesktopDestination.RELICS,
                         DesktopDestination.HOME_BASE,
                         DesktopDestination.CODEX,
                         DesktopDestination.ENDGAME,
                         DesktopDestination.LUCKY_STAKE,
-                        DesktopDestination.ARCADE,
                         DesktopDestination.MUSIC_PLAYER,
                         DesktopDestination.CHANGELOG,
                         DesktopDestination.ABOUT -> {
