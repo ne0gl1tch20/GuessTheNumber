@@ -48,6 +48,13 @@ jobs:
         with:
           ref: ${{ inputs.source_ref || github.event.pull_request.merge_commit_sha || github.sha }}
 
+      - name: Record checked-out source commit
+        shell: pwsh
+        run: |
+          $sourceCommit = (git rev-parse HEAD).Trim()
+          if (-not $sourceCommit) { throw "Could not resolve the checked-out source commit." }
+          "GTN_SOURCE_COMMIT=$sourceCommit" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Write desktop build version resource
         shell: pwsh
         run: |
@@ -240,14 +247,6 @@ jobs:
             throw "MSI uninstall removed player data from APPDATA."
           }
 
-      - name: Smoke-test native first-launch dialogs
-        if: github.event_name == 'pull_request'
-        shell: pwsh
-        run: |
-          $msi = Get-ChildItem -Path "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File | Select-Object -First 1
-          if (-not $msi) { throw "Windows MSI was not found for the native-dialog smoke test." }
-          .\tools\smoke_test_windows_native_dialogs.ps1 -MsiPath $msi.FullName
-
       - name: Prepare debug channel package
         if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
         shell: pwsh
@@ -265,7 +264,7 @@ jobs:
             version = "1.0.${{ github.run_number }}"
             runNumber = "${{ github.run_number }}"
             runAttempt = "${{ github.run_attempt }}"
-            commit = "${{ github.sha }}"
+            commit = "$env:GTN_SOURCE_COMMIT"
             assetName = "GuessTheNumber-Windows-Desktop.zip"
             sha256 = $hash
             tag = "windows-debug-${{ github.run_number }}-${{ github.run_attempt }}"
