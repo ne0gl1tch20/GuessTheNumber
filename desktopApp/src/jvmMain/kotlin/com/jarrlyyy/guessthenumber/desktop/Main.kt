@@ -620,8 +620,8 @@ fun main() = application {
                             else -> target.label
                         },
                         visible = true,
-                        width = 980,
-                        height = 680,
+                        width = if (target == DesktopDestination.SAVE_SLOTS) 1120 else 980,
+                        height = if (target == DesktopDestination.SAVE_SLOTS) 820 else 680,
                         resizable = true,
                         colorScheme = MaterialTheme.colorScheme,
                         onDismissRequest = { popupDestination = null }
