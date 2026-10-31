@@ -651,8 +651,16 @@ fun main() = application {
                                         editingPlayerProfile = false
                                     }
                                 )
-                                DesktopDestination.DEVELOPER_SETTINGS -> DesktopDeveloperConsoleScreen(
-                                    onBack = { popupDestination = null }
+                                DesktopDestination.DEVELOPER_SETTINGS -> DesktopDeveloperSettingsScreen(
+                                    onBack = { popupDestination = null },
+                                    onNavigate = { route ->
+                                        popupDestination = null
+                                        when (route) {
+                                            "process_inspector" -> shell.navigate(DesktopDestination.PROCESS_INSPECTOR)
+                                            "advanced_dev_tools" -> shell.navigate(DesktopDestination.DEVELOPER_CONSOLE)
+                                            else -> shell.navigate(DesktopDestination.MORE)
+                                        }
+                                    }
                                 )
                                 else -> popupDestination = null
                             }
