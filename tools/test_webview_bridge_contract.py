@@ -117,7 +117,7 @@ def main() -> int:
     require(desktop_save_slots, "onReset = if (!slot.isEmpty && !slot.isCorrupt)", "Windows shared Save Slot cards must expose reset for valid saves")
     require(desktop_save_slots, "SaveProfileRules.isValidIcon(profileIconDraft)", "Windows profile editing must validate icons with the shared rule set")
     require(desktop_game, "onEditProfile = { target, name, iconId ->", "Windows profile editing must persist through the desktop save store")
-    require(desktop_game, "saveStore.save(target, updated)", "Windows profile edits must use validated save persistence")
+    require(desktop_game, "saveStore.save(target, profileToSave)", "Windows profile edits must use validated save persistence")
     require(desktop_game, "onResetSlot = { target ->", "Windows save reset must be wired to desktop persistence")
     require(desktop_game, "saveStore.reset(target, fresh)", "Windows reset must clear the old recovery backup and persist a fresh state")
     require(desktop_game, "if (section.sharedHtmlScreen != null)", "shared HTML destinations must be rendered before native fallbacks")
