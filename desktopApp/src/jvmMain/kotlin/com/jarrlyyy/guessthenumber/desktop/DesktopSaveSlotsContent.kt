@@ -35,7 +35,7 @@ internal fun DesktopSaveSlotsContent(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onBack) { Text("Back to More") }
+            OutlinedButton(onClick = onBack) { Text("Close") }
             Text("Save Slots", style = MaterialTheme.typography.headlineSmall)
             OutlinedButton(onClick = onRefresh) { Text("Refresh") }
         }
