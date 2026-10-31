@@ -28,6 +28,7 @@ def main() -> int:
     desktop_payload = read("desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopBridgePayload.kt")
     desktop_adapter = read("desktopApp/src/jvmMain/resources/web-play/desktop-host.js")
     desktop_tests = read("desktopApp/src/jvmTest/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopBridgePayloadTest.kt")
+    desktop_game = read("desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/ProductionGuessGameScreen.kt")
 
     # Shared frontend emits one versioned JSON-string envelope on both hosts.
     require(web, "JSON.stringify({version:1,id,type,...payload})", "shared HTML must serialize versioned requests")
@@ -36,6 +37,19 @@ def main() -> int:
     require(web, "pendingTimeout=window.setTimeout", "shared HTML must unlock a request when the host stops replying")
     require(web, "host.cancelMessage?.(id)", "shared HTML must cancel timed-out messages still waiting in the desktop queue")
     require(web, "Bridge timeout:", "shared HTML must expose a recoverable timeout diagnostic")
+    require(web, "render(m.state)", "shared HTML must render complete Kotlin game snapshots")
+    require(desktop_game, "fun currentNavigationPayload(message: String)", "desktop popup navigation must build a full Kotlin-backed snapshot")
+    require(desktop_game, "return desktopWebPlayState(", "desktop popup acknowledgements must preserve app version and saved theme")
+    for route in ('if (type == "open_arcade")', 'if (type == "navigate") {'):
+        start = desktop_game.find(route)
+        if start < 0:
+            raise AssertionError(f"Desktop popup route is missing: {route}")
+        end = desktop_game.find("return@launch", start)
+        branch = desktop_game[start:end if end >= 0 else len(desktop_game)]
+        require(branch, "currentNavigationPayload(", f"{route} must reply with a complete game snapshot")
+        if 'put("state", org.json.JSONObject().put("accepted", true))' in branch:
+            raise AssertionError(f"{route} must not send a partial state that resets the HTML UI")
+
 
     # Android accepts only the expected local page/origin and parses raw message data.
     require(android_host, 'addWebMessageListener(this, "gtnHost", setOf(WEB_UI_ORIGIN)', "Android listener must be origin-scoped")
