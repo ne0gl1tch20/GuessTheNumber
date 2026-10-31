@@ -7,6 +7,7 @@ import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,6 +57,7 @@ data class SharedSaveSlotUiModel(
     val primaryMetric: String? = null,
     val secondaryMetrics: List<String> = emptyList(),
     val metricItems: List<SharedSaveSlotMetric> = emptyList(),
+    val metricColumns: Int = 1,
     val lastSavedLabel: String? = null,
     val activeLabel: String = "ACTIVE",
     val emptyLabel: String = "Empty slot",
@@ -177,23 +179,34 @@ fun SharedSaveSlotCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 if (model.metricItems.isNotEmpty()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                        model.metricItems.forEach { metric ->
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                val metricIcon = when (metric.icon) {
-                                    SharedSaveSlotMetricIcon.TARGET -> Icons.Default.Numbers
-                                    SharedSaveSlotMetricIcon.MONEY -> Icons.Default.AccountBalanceWallet
-                                    SharedSaveSlotMetricIcon.PRESTIGE -> Icons.Default.MilitaryTech
-                                    SharedSaveSlotMetricIcon.ULTRA -> Icons.Default.Star
-                                    SharedSaveSlotMetricIcon.NEBULA -> Icons.Default.AutoAwesome
-                                    SharedSaveSlotMetricIcon.ATTEMPTS -> Icons.Default.QueryStats
-                                    SharedSaveSlotMetricIcon.CORRECT -> Icons.Default.CheckCircle
-                                    SharedSaveSlotMetricIcon.STREAK -> Icons.Default.LocalFireDepartment
-                                    SharedSaveSlotMetricIcon.STATISTICS -> Icons.Default.QueryStats
+                    val columns = model.metricColumns.coerceIn(1, 3)
+                    model.metricItems.chunked(columns).forEach { metricRow ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            metricRow.forEach { metric ->
+                                Row(
+                                    modifier = Modifier.weight(1f),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    val metricIcon = when (metric.icon) {
+                                        SharedSaveSlotMetricIcon.TARGET -> Icons.Default.Numbers
+                                        SharedSaveSlotMetricIcon.MONEY -> Icons.Default.AccountBalanceWallet
+                                        SharedSaveSlotMetricIcon.PRESTIGE -> Icons.Default.MilitaryTech
+                                        SharedSaveSlotMetricIcon.ULTRA -> Icons.Default.Star
+                                        SharedSaveSlotMetricIcon.NEBULA -> Icons.Default.AutoAwesome
+                                        SharedSaveSlotMetricIcon.ATTEMPTS -> Icons.Default.QueryStats
+                                        SharedSaveSlotMetricIcon.CORRECT -> Icons.Default.CheckCircle
+                                        SharedSaveSlotMetricIcon.STREAK -> Icons.Default.LocalFireDepartment
+                                        SharedSaveSlotMetricIcon.STATISTICS -> Icons.Default.QueryStats
+                                    }
+                                    Icon(metricIcon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                    Text(metric.label, style = MaterialTheme.typography.bodySmall)
                                 }
-                                Icon(metricIcon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                                Text(metric.label, style = MaterialTheme.typography.bodySmall)
                             }
+                            repeat(columns - metricRow.size) { Spacer(Modifier.weight(1f)) }
                         }
                     }
                 } else {
