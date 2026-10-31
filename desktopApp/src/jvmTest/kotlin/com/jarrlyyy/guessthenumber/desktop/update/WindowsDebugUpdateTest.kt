@@ -124,21 +124,12 @@ class WindowsDebugUpdateTest {
     }
 
     private fun standardResponses(): Map<String, String> = mapOf(
-        RELEASE_URL to """{"assets":[
-            {"name":"GuessTheNumber-debug.zip","browser_download_url":"https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/debug-latest/GuessTheNumber-debug.zip"},
-            {"name":"GuessTheNumber-Windows-Desktop.zip","browser_download_url":"$WINDOWS_ARCHIVE_URL"},
-            {"name":"windows-debug-manifest.json","browser_download_url":"$WINDOWS_MANIFEST_URL"}
-        ]}""",
-        WINDOWS_MANIFEST_URL to """{
-            "channel":"windows-debug",
-            "version":"1.0.6",
-            "runNumber":"6",
-            "runAttempt":"2",
-            "commit":"0123456789abcdef0123456789abcdef01234567",
-            "assetName":"GuessTheNumber-Windows-Desktop.zip",
-            "sha256":"${"a".repeat(64)}",
-            "tag":"windows-debug-6-2"
-        }"""
+        RELEASE_URL to "{\"assets\":[" +
+            "{\"name\":\"GuessTheNumber-debug.zip\",\"browser_download_url\":\"https://github.com/ne0gl1tch20/GuessTheNumber/releases/download/debug-latest/GuessTheNumber-debug.zip\"}," +
+            "{\"name\":\"GuessTheNumber-Windows-Desktop.zip\",\"browser_download_url\":\"$WINDOWS_ARCHIVE_URL\"}," +
+            "{\"name\":\"windows-debug-manifest.json\",\"browser_download_url\":\"$WINDOWS_MANIFEST_URL\"}" +
+            "]}",
+        WINDOWS_MANIFEST_URL to "{\"channel\":\"windows-debug\",\"version\":\"1.0.6\",\"runNumber\":\"6\",\"runAttempt\":\"2\",\"commit\":\"0123456789abcdef0123456789abcdef01234567\",\"assetName\":\"GuessTheNumber-Windows-Desktop.zip\",\"sha256\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"tag\":\"windows-debug-6-2\"}"
     )
 
     private fun createZip(vararg entries: Pair<String, ByteArray>): java.nio.file.Path {
