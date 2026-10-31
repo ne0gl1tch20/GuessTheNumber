@@ -64,7 +64,7 @@ internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onBack) { Text("Back to More") }
+            OutlinedButton(onClick = onBack) { Text("Close") }
             Text("Developer Console", style = MaterialTheme.typography.headlineSmall)
         }
         Text("Debug-only command allowlist · active save slot $activeSlot", color = MaterialTheme.colorScheme.onSurfaceVariant)
