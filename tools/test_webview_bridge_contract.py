@@ -35,8 +35,9 @@ def main() -> int:
     require(web, "host.onmessage=event=>receive(event.data)", "shared HTML must receive host replies")
     require(web, "document.querySelectorAll('.screen-nav [data-screen-target]')", "main tabs must have one scoped navigation handler")
     require(web, "document.querySelectorAll('.more-links [data-screen-target]')", "More links must have one scoped navigation handler")
-    require(web, 'document.querySelectorAll(\'.more-links [data-route="save_slots"]\')', "Save Slots must route to the native popup")
-    require(web, 'document.querySelectorAll(\'.more-screen [data-route="player_profile"]\')', "Player Profile must route to the native popup")
+    require(web, "event.stopImmediatePropagation();const route=target.dataset.route", "native popup routes must be captured before bubbling handlers")
+    require(web, "target.closest('.more-screen [data-route=\"player_profile\"],.more-links [data-route=\"save_slots\"]')", "Save Slots and Player Profile must use delegated native popup routing")
+    require(web, "},true);", "native popup routing must run in the capture phase")
     if "document.querySelectorAll('[data-screen-target]').forEach(button=>button.addEventListener" in web:
         raise AssertionError("Global data-screen-target listener duplicates the scoped handlers and can override popup routes.")
 
