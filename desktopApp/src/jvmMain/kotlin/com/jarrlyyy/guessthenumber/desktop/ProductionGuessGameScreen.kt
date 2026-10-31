@@ -934,6 +934,7 @@ fun ProductionGuessGameScreen(
                     slots = saveSlotSummaries,
                     onBack = { onOpenParityDestination(DesktopDestination.MORE) },
                     onContinueWithActiveSlot = if (startupSaveSlotSelection) onNativeSaveLoaded else null,
+                    showCloseButton = !startupSaveSlotSelection,
                     onRefresh = { scope.launch { saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() } } },
                     onSwitchSlot = { targetSlot ->
                         val snapshot = state
