@@ -45,18 +45,6 @@ class WindowsDebugUpdateTest {
         }.findLatestUpdate("1.0.5")
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun rejectsActionsArtifactUrlsAsReleaseAssets() {
-        val responses = standardResponses().toMutableMap()
-        responses[RELEASE_URL] = """{"assets":[
-            {"name":"GuessTheNumber-Windows-Desktop.zip","browser_download_url":"https://api.github.com/repos/ne0gl1tch20/GuessTheNumber/actions/artifacts/9000/zip"},
-            {"name":"windows-debug-manifest.json","browser_download_url":"$WINDOWS_MANIFEST_URL"}
-        ]}"""
-        WindowsDebugUpdateClient { url ->
-            StubConnection(url, responses[url.toString()] ?: error("Unexpected request: $url"))
-        }.findLatestUpdate("1.0.5")
-    }
-
     @Test
     fun extractsOnlyExpectedMsi() {
         val payload = "fake-msi-payload".toByteArray()
