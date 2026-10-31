@@ -113,6 +113,12 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Run focused WebView bridge contract tests
+        shell: pwsh
+        run: |
+          python tools/test_webview_bridge_contract.py
+          .\\gradlew.bat :desktopApp:jvmTest --tests com.jarrlyyy.guessthenumber.desktop.DesktopBridgePayloadTest
+
       - name: Run shared tests and compile desktop app
         shell: pwsh
         run: .\gradlew.bat :shared:jvmTest :desktopApp:jvmTest :desktopApp:compileKotlinJvm
