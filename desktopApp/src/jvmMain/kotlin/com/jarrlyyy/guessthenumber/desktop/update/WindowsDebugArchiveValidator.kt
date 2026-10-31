@@ -6,8 +6,8 @@ import java.security.MessageDigest
 import java.util.zip.ZipInputStream
 
 internal object WindowsDebugArchiveValidator {
-    const val EXPECTED_MSI_NAME = "GuessTheNumber-Windows-Desktop.msi"
-    private const val MAX_MSI_BYTES = 500L * 1024 * 1024
+    const val EXPECTED_INSTALLER_NAME = "GuessTheNumber-Windows-Desktop-Setup.exe"
+    private const val MAX_INSTALLER_BYTES = 500L * 1024 * 1024
 
     fun verifySha256(archive: Path, expected: String) {
         require(expected.matches(Regex("[0-9a-fA-F]{64}"))) {
@@ -28,7 +28,7 @@ internal object WindowsDebugArchiveValidator {
         }
     }
 
-    fun extractExpectedMsi(archive: Path, destination: Path) {
+    fun extractExpectedInstaller(archive: Path, destination: Path) {
         var found = false
         ZipInputStream(Files.newInputStream(archive)).use { zip ->
             while (true) {
@@ -43,7 +43,7 @@ internal object WindowsDebugArchiveValidator {
                     zip.closeEntry()
                     continue
                 }
-                if (name != EXPECTED_MSI_NAME || found) {
+                if (name != EXPECTED_INSTALLER_NAME || found) {
                     throw IllegalStateException("The debug archive contains an unexpected file.")
                 }
                 Files.newOutputStream(destination).use { output ->
@@ -54,7 +54,7 @@ internal object WindowsDebugArchiveValidator {
                         if (count < 0) break
                         total += count
                         if (total > MAX_MSI_BYTES) {
-                            throw IllegalStateException("The MSI exceeded the extraction size limit.")
+                            throw IllegalStateException("The Inno Setup installer exceeded the extraction size limit.")
                         }
                         output.write(buffer, 0, count)
                     }
@@ -64,7 +64,7 @@ internal object WindowsDebugArchiveValidator {
             }
         }
         if (!found || !Files.isRegularFile(destination) || Files.size(destination) == 0L) {
-            throw IllegalStateException("The expected Windows MSI was not found in the debug archive.")
+            throw IllegalStateException("The expected Inno Setup installer was not found in the debug archive.")
         }
     }
 }
