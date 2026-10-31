@@ -134,7 +134,7 @@ private interface DwmApi : StdCallLibrary {
  * Requests the Windows dark title-bar treatment without changing the user's system theme.
  * Windows 11 and recent Windows 10 builds use attribute 20; attribute 19 is the legacy fallback.
  */
-private object DesktopWindowChrome {
+internal object DesktopWindowChrome {
     private val dwmApi by lazy {
         Native.load("dwmapi", DwmApi::class.java) as DwmApi
     }
