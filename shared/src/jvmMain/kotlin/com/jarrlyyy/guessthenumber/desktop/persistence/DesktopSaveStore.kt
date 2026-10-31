@@ -265,28 +265,31 @@ class DesktopSaveStore internal constructor(
      * intentionally matches Android's existing import format for compatibility;
      * it is obfuscation, not cryptographic protection.
      */
-    suspend fun exportAndroidCompatibleBackup(): String? = runCatching {
-        val slots = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
-            readValidJson(primaryPath(slot))?.let { slot to it }
-        }.toMap()
-        val backups = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
-            readValidJson(backupPath(slot))?.let { slot to it }
-        }.toMap()
-        val creativeSlots = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
-            exportCreativeModeSave(slot)?.let { slot to it }
-        }.toMap()
-        if (slots.isEmpty() && backups.isEmpty() && creativeSlots.isEmpty()) return null
-        val settings = load(activeSlot())?.settings ?: GameSettings()
-        val bundle = AndroidCompatibleBackupBundle(
-            formatVersion = 3,
-            appPreferencesJson = json.encodeToString(settings),
-            activeSlot = activeSlot(),
-            slots = slots,
-            backups = backups,
-            creativeSlots = creativeSlots
-        )
-        encodeAndroidBackup(json.encodeToString(bundle))
-    }.getOrNull()
+    suspend fun exportAndroidCompatibleBackup(): String? {
+        return runCatching {
+            val slots = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+                readValidJson(primaryPath(slot))?.let { slot to it }
+            }.toMap()
+            val backups = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+                readValidJson(backupPath(slot))?.let { slot to it }
+            }.toMap()
+            val creativeSlots = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+                exportCreativeModeSave(slot)?.let { slot to it }
+            }.toMap()
+            if (slots.isEmpty() && backups.isEmpty() && creativeSlots.isEmpty()) return null
+            val active = activeSlot()
+            val settings = load(active)?.settings ?: GameSettings()
+            val bundle = AndroidCompatibleBackupBundle(
+                formatVersion = 3,
+                appPreferencesJson = json.encodeToString(settings),
+                activeSlot = active,
+                slots = slots,
+                backups = backups,
+                creativeSlots = creativeSlots
+            )
+            encodeAndroidBackup(json.encodeToString(bundle))
+        }.getOrNull()
+    }
 
     /**
      * Imports Android's existing encrypted backup envelope, including global
@@ -333,11 +336,13 @@ class DesktopSaveStore internal constructor(
         }
 
         val previousActive = activeSlot()
-        val previousFiles = (1..MAX_SAVE_SLOTS).flatMap { slot ->
-            listOf(primaryPath(slot), backupPath(slot), creativePath(slot))
-        }.associateWith { path ->
-            runCatching { if (fileOps.exists(path)) fileOps.read(path) else null }.getOrNull()
-        }
+        val previousFiles = runCatching {
+            (1..MAX_SAVE_SLOTS).flatMap { slot ->
+                listOf(primaryPath(slot), backupPath(slot), creativePath(slot))
+            }.associateWith { path ->
+                if (fileOps.exists(path)) fileOps.read(path) else null
+            }
+        }.getOrNull() ?: return false
         return try {
             fileOps.createDirectories(rootDirectory)
             for (slot in 1..MAX_SAVE_SLOTS) {
@@ -386,20 +391,22 @@ class DesktopSaveStore internal constructor(
         return Base64.getEncoder().encodeToString(combined)
     }
 
-    private fun decodeAndroidBackup(encoded: String): String? = runCatching {
-        val decoded = Base64.getDecoder().decode(encoded.trim())
-        val salt = "GTN_ENC_2025_".toByteArray(Charsets.UTF_8)
-        if (decoded.size <= salt.size) return null
-        val hasSalt = salt.indices.all { decoded[it] == salt[it] }
-        val payload = if (hasSalt) {
-            ByteArray(decoded.size - salt.size) { index ->
-                (decoded[salt.size + index].toInt() xor ANDROID_BACKUP_XOR_KEY).toByte()
+    private fun decodeAndroidBackup(encoded: String): String? {
+        return runCatching {
+            val decoded = Base64.getDecoder().decode(encoded.trim())
+            val salt = "GTN_ENC_2025_".toByteArray(Charsets.UTF_8)
+            require(decoded.size > salt.size) { "Backup payload is too short." }
+            val hasSalt = salt.indices.all { decoded[it] == salt[it] }
+            val payload = if (hasSalt) {
+                ByteArray(decoded.size - salt.size) { index ->
+                    (decoded[salt.size + index].toInt() xor ANDROID_BACKUP_XOR_KEY).toByte()
+                }
+            } else {
+                decoded
             }
-        } else {
-            decoded
-        }
-        payload.toString(Charsets.UTF_8)
-    }.getOrNull()
+            payload.toString(Charsets.UTF_8)
+        }.getOrNull()
+    }
 
     /** Exports every populated game slot and its separate creative configuration. */
     suspend fun exportAllSlotsBundle(): ByteArray? {
