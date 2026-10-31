@@ -608,4 +608,3 @@ fun main() = application {
             }
         }
     }
-}
