@@ -179,16 +179,21 @@ class DesktopSaveStore internal constructor(
         }.getOrNull()
         val sourceCreative = sourceCreativeRaw?.let(CreativeModeSaveCodec::decodeAndMigrate)
             ?: if (sourceCreativeRaw == null) null else return false
+        val sourceBackup = readValidJson(backupPath(source))
         val saved = save(target, sourceState.copy(lastSaveTimestamp = System.currentTimeMillis()))
         if (!saved) return false
-        if (sourceCreative != null && !saveCreativeModeSave(target, sourceCreative)) {
+        return runCatching {
+            if (sourceBackup != null) writeAtomically(backupPath(target), sourceBackup)
+            if (sourceCreative != null) {
+                check(saveCreativeModeSave(target, sourceCreative)) { "Could not duplicate creative mode data." }
+            }
+            true
+        }.getOrElse {
             runCatching { fileOps.deleteIfExists(primaryPath(target)) }
             runCatching { fileOps.deleteIfExists(backupPath(target)) }
-            return false
+            runCatching { fileOps.deleteIfExists(creativePath(target)) }
+            false
         }
-        val sourceBackup = readValidJson(backupPath(source))
-        if (sourceBackup != null) runCatching { writeAtomically(backupPath(target), sourceBackup) }
-        return true
     }
 
     /**
