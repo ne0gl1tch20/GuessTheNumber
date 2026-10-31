@@ -28,7 +28,6 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Card
-import androidx.compose.ui.window.Dialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -201,6 +200,9 @@ fun main() = application {
         var reducedMotion by remember { mutableStateOf(false) }
         var navigationPosition by remember { mutableStateOf(DesktopNavigationPosition.load()) }
         var playerProfile by remember { mutableStateOf(DesktopPlayerProfileStore.load()) }
+        var startupSetupComplete by remember {
+            mutableStateOf(DesktopStartupSetupStore.isComplete() && playerProfile?.setupComplete == true)
+        }
         var editingPlayerProfile by remember { mutableStateOf(false) }
         var viewingPlayerProfile by remember { mutableStateOf(false) }
         var popupDestination by remember { mutableStateOf<DesktopDestination?>(null) }
@@ -272,8 +274,16 @@ fun main() = application {
             }
 
             if (playerProfile?.setupComplete != true) {
-                Dialog(onDismissRequest = { /* first-launch profile is mandatory */ }) {
-                    Surface(modifier = Modifier.width(720.dp).height(620.dp)) {
+                DesktopNativeDialogHost(
+                    owner = window,
+                    title = "Choose Profile Picture",
+                    visible = true,
+                    width = 760,
+                    height = 700,
+                    colorScheme = MaterialTheme.colorScheme,
+                    onDismissRequest = { /* first-launch profile setup is mandatory */ }
+                ) {
+                    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                         DesktopPlayerProfileScreen(
                             profile = playerProfile,
                             viewOnly = false,
@@ -284,7 +294,6 @@ fun main() = application {
                                         playerProfile = savedProfile
                                         editingPlayerProfile = false
                                         viewingPlayerProfile = false
-                                        popupDestination = DesktopDestination.SAVE_SLOTS
                                     }
                             },
                             onCancel = {
@@ -292,6 +301,28 @@ fun main() = application {
                                     editingPlayerProfile = false
                                     viewingPlayerProfile = false
                                 }
+                            }
+                        )
+                    }
+                }
+            } else if (!startupSetupComplete) {
+                DesktopNativeDialogHost(
+                    owner = window,
+                    title = "Choose a Save Slot",
+                    visible = true,
+                    width = 980,
+                    height = 680,
+                    resizable = true,
+                    colorScheme = MaterialTheme.colorScheme,
+                    onDismissRequest = { /* first-launch save selection is mandatory */ }
+                ) {
+                    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                        ProductionGuessGameScreen(
+                            section = DesktopGameSection.SAVE_SLOTS,
+                            startupSaveSlotSelection = true,
+                            onNativeSaveLoaded = {
+                                runCatching { DesktopStartupSetupStore.markComplete() }
+                                    .onSuccess { startupSetupComplete = true }
                             }
                         )
                     }
@@ -546,11 +577,19 @@ fun main() = application {
             }
 
                 if (viewingPlayerProfile || editingPlayerProfile) {
-                    Dialog(onDismissRequest = {
-                        viewingPlayerProfile = false
-                        editingPlayerProfile = false
-                    }) {
-                        Surface(modifier = Modifier.width(720.dp).height(620.dp)) {
+                    DesktopNativeDialogHost(
+                        owner = window,
+                        title = if (editingPlayerProfile) "Edit Player Profile" else "Player Profile",
+                        visible = true,
+                        width = 760,
+                        height = 680,
+                        colorScheme = MaterialTheme.colorScheme,
+                        onDismissRequest = {
+                            viewingPlayerProfile = false
+                            editingPlayerProfile = false
+                        }
+                    ) {
+                        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                             DesktopPlayerProfileScreen(
                                 profile = playerProfile,
                                 viewOnly = viewingPlayerProfile && !editingPlayerProfile,
@@ -572,8 +611,22 @@ fun main() = application {
                 }
 
                 popupDestination?.let { target ->
-                    Dialog(onDismissRequest = { popupDestination = null }) {
-                        Surface(modifier = Modifier.width(980.dp).height(680.dp)) {
+                    DesktopNativeDialogHost(
+                        owner = window,
+                        title = when (target) {
+                            DesktopDestination.ARCADE -> "Arcade"
+                            DesktopDestination.SAVE_SLOTS -> "Save Slots"
+                            DesktopDestination.DEVELOPER_SETTINGS -> "Developer Settings"
+                            else -> target.label
+                        },
+                        visible = true,
+                        width = 980,
+                        height = 680,
+                        resizable = true,
+                        colorScheme = MaterialTheme.colorScheme,
+                        onDismissRequest = { popupDestination = null }
+                    ) {
+                        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                             when (target) {
                                 DesktopDestination.ARCADE,
                                 DesktopDestination.SAVE_SLOTS -> ProductionGuessGameScreen(
