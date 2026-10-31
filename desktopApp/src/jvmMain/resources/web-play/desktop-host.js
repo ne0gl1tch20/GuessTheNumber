@@ -135,8 +135,7 @@
     group.innerHTML = '<h3>Windows Desktop</h3><p class="settings-description">These options are available only in the Windows desktop app.</p>' +
       '<div data-desktop-navigation-setting><label class="jui-field-label" for="desktopNavigationPosition">Navigation Bar Position</label>' +
       '<select id="desktopNavigationPosition" class="jui-field" aria-label="Navigation Bar Position"><option value="LEFT">Left (default)</option><option value="TOP">Top</option><option value="RIGHT">Right</option><option value="BOTTOM">Bottom</option></select></div>' +
-      '<label class="desktop-startup-setting" for="desktopLaunchAtStartup"><input id="desktopLaunchAtStartup" type="checkbox" /> Launch GuessTheNumber when Windows starts</label>' +
-      '<p class="settings-description">Uses your Windows account startup registration. You can turn it off here at any time.</p>';
+      '<label class="setting-row jui-switch desktop-startup-setting" for="desktopLaunchAtStartup"><span><strong>Launch GuessTheNumber when Windows starts</strong><small>Start the game automatically when you sign in to Windows. You can turn this off here at any time.</small></span><input id="desktopLaunchAtStartup" type="checkbox" aria-label="Launch GuessTheNumber when Windows starts" /></label>';
     var target = screen.querySelector('.catalog-panel') || screen;
     target.appendChild(group);
     var select = group.querySelector('#desktopNavigationPosition');
