@@ -112,6 +112,7 @@ class DesktopSaveStoreTest {
             effects = listOf(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, 2))
         )
         assertTrue(source.save(1, base))
+        assertTrue(source.save(1, base.copy(targetNumber = 70, lastSaveTimestamp = 1_700_000_000_050L)))
         assertTrue(source.saveCreativeModeSave(1, creative))
         assertEquals(creative, source.loadCreativeModeSave(1))
         assertTrue(source.duplicateSlot(1, 2))
@@ -121,6 +122,9 @@ class DesktopSaveStoreTest {
         val targetDirectory = Files.createTempDirectory("gtn-creative-save-target")
         val target = DesktopSaveStore(targetDirectory)
         assertTrue(target.importAllSlotsBundle(bundle))
+        assertEquals(70L, target.load(1)?.targetNumber)
+        assertTrue(target.restoreBackup(1))
+        assertEquals(64L, target.load(1)?.targetNumber)
         assertEquals(creative, target.loadCreativeModeSave(1))
         assertEquals(creative, target.loadCreativeModeSave(2))
 
