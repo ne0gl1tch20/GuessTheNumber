@@ -26,7 +26,6 @@ class DesktopNavigationTest {
                 DesktopDestination.SETTINGS,
                 DesktopDestination.ARCADE,
                 DesktopDestination.MUSIC_PLAYER,
-                DesktopDestination.SAVE_SLOTS,
                 DesktopDestination.STATS,
                 DesktopDestination.WORLD_MAP,
                 DesktopDestination.CHANGELOG,
@@ -34,6 +33,7 @@ class DesktopNavigationTest {
             ),
             DesktopDestination.MAIN_NAVIGATION_ORDER
         )
+        assertFalse(DesktopDestination.MAIN_NAVIGATION_ORDER.contains(DesktopDestination.SAVE_SLOTS))
     }
 
     @Test
