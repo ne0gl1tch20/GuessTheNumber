@@ -1,11 +1,10 @@
 package com.jarrlyyy.guessthenumber.desktop.persistence
 
-import com.jarrlyyy.guessthenumber.domain.model.BigNumber
-import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.shared.domain.SaveProfileRules
 import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
 import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSaveCodec
+import com.jarrlyyy.guessthenumber.shared.domain.SaveStateRules
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
@@ -408,47 +407,7 @@ class DesktopSaveStore internal constructor(
     }
 
     fun validate(state: GameState): Boolean =
-        Difficulty.isValid(state.difficultyId) &&
-            state.money.value >= BigNumber.ZERO.value &&
-            state.prestige.value >= BigNumber.ZERO.value &&
-            state.ultra.value >= BigNumber.ZERO.value &&
-            state.nebula.value >= BigNumber.ZERO.value &&
-            state.currentRangeMin >= 1L &&
-            state.currentRangeMin <= state.currentRangeMax &&
-            state.targetNumber in state.currentRangeMin..state.currentRangeMax &&
-            state.attempts >= 0L &&
-            state.correctGuesses >= 0L &&
-            state.streak >= 0 &&
-            state.bestStreak >= 0 &&
-            state.statistics.totalGuesses >= 0L &&
-            state.statistics.correctGuesses >= 0L &&
-            state.statistics.failedGuesses >= 0L &&
-            state.statistics.moneyEarned.value >= BigNumber.ZERO.value &&
-            state.statistics.moneySpent.value >= BigNumber.ZERO.value &&
-            state.statistics.prestigesCount >= 0L &&
-            state.statistics.ultrasCount >= 0L &&
-            state.statistics.nebulaEarned >= 0L &&
-            state.statistics.playtimeSeconds >= 0L &&
-            state.statistics.arcadePlayed >= 0L &&
-            state.statistics.randomEventsTriggered >= 0L &&
-            state.statistics.arcadeBestScores.values.all { it >= 0 } &&
-            state.upgradeLevels.values.all { it >= 0 } &&
-            state.prestigeUpgradeLevels.values.all { it >= 0 } &&
-            state.ultraUpgradeLevels.values.all { it >= 0 } &&
-            state.liveOpsClaims.values.all { it >= 0 } &&
-            state.permanentEventBoosts >= 0 &&
-            state.dailyQuestGuesses >= 0 &&
-            state.dailyQuestCorrectGuesses >= 0 &&
-            state.dailyQuestBestStreak >= 0 &&
-            state.dailyQuestUpgradePurchases >= 0 &&
-            state.lootCommonChests >= 0 &&
-            state.lootRareChests >= 0 &&
-            state.lootEpicChests >= 0 &&
-            state.lootDropsFound >= 0L &&
-            state.lootChestsOpened >= 0L &&
-            state.endlessRiftTier >= 0 &&
-            state.endlessRiftBestTier >= 0 &&
-            state.lastSaveTimestamp > 0L &&
+        SaveStateRules.validate(state) &&
             state.profileName.length <= 24 &&
             SaveProfileRules.isValidIcon(state.profileIconId)
 
