@@ -68,7 +68,7 @@ internal object DesktopWebPlayAssetSyncer {
                 paths.filter { Files.isDirectory(it) && it.fileName.toString() != current }
                     .filter { it.fileName.toString().matches(Regex("[a-f0-9]{7,40}")) }
                     .filter { runCatching { readAndValidateStoredManifest(it) }.isSuccess }
-                    .toList()
+                    .iterator().asSequence().toList()
                     .maxByOrNull { Files.getLastModifiedTime(it).toMillis() }
             } ?: return@synchronized false
             writePointer(previous.fileName.toString())
