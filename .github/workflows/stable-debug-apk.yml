@@ -6,13 +6,11 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  push:
+  pull_request:
     branches:
       - master
-    # Web-player-only edits do not need to rebuild/publish the debug APK.
-    paths:
-      - '**'
-      - '!app/src/main/assets/web-play/**'
+    types:
+      - closed
   workflow_dispatch:
     inputs:
       source_ref:
