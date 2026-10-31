@@ -14,6 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.MilitaryTech
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.QueryStats
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
@@ -48,6 +55,7 @@ data class SharedSaveSlotUiModel(
     val difficultyLabel: String? = null,
     val primaryMetric: String? = null,
     val secondaryMetrics: List<String> = emptyList(),
+    val metricItems: List<SharedSaveSlotMetric> = emptyList(),
     val lastSavedLabel: String? = null,
     val activeLabel: String = "ACTIVE",
     val emptyLabel: String = "Empty slot",
@@ -56,6 +64,10 @@ data class SharedSaveSlotUiModel(
     val resumeLabel: String = "Resume game",
     val switchLabel: String = "Switch to save"
 )
+
+enum class SharedSaveSlotMetricIcon { TARGET, MONEY, PRESTIGE, ULTRA, NEBULA, ATTEMPTS, CORRECT, STREAK, STATISTICS }
+
+data class SharedSaveSlotMetric(val icon: SharedSaveSlotMetricIcon, val label: String)
 
 /**
  * Canonical compact Save Slots card shared by Android and Windows.
@@ -164,11 +176,29 @@ fun SharedSaveSlotCard(
                     Text(it, style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                model.primaryMetric?.let {
-                    Text(it, style = MaterialTheme.typography.bodyMedium)
-                }
-                model.secondaryMetrics.forEach {
-                    Text(it, style = MaterialTheme.typography.bodySmall)
+                if (model.metricItems.isNotEmpty()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                        model.metricItems.forEach { metric ->
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                val metricIcon = when (metric.icon) {
+                                    SharedSaveSlotMetricIcon.TARGET -> Icons.Default.Numbers
+                                    SharedSaveSlotMetricIcon.MONEY -> Icons.Default.AccountBalanceWallet
+                                    SharedSaveSlotMetricIcon.PRESTIGE -> Icons.Default.MilitaryTech
+                                    SharedSaveSlotMetricIcon.ULTRA -> Icons.Default.Star
+                                    SharedSaveSlotMetricIcon.NEBULA -> Icons.Default.AutoAwesome
+                                    SharedSaveSlotMetricIcon.ATTEMPTS -> Icons.Default.QueryStats
+                                    SharedSaveSlotMetricIcon.CORRECT -> Icons.Default.CheckCircle
+                                    SharedSaveSlotMetricIcon.STREAK -> Icons.Default.LocalFireDepartment
+                                    SharedSaveSlotMetricIcon.STATISTICS -> Icons.Default.QueryStats
+                                }
+                                Icon(metricIcon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                Text(metric.label, style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
+                } else {
+                    model.primaryMetric?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                    model.secondaryMetrics.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
                 }
                 model.lastSavedLabel?.let {
                     Text(it, style = MaterialTheme.typography.labelSmall,
