@@ -1,24 +1,22 @@
 package com.jarrlyyy.guessthenumber.desktop
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import java.awt.Window
+import androidx.compose.ui.window.DialogWindow
+import androidx.compose.ui.window.rememberDialogState
 
 /**
- * Compose-owned desktop popup. The dialog surface and every control inside it
- * are Compose UI; no SwingPanel or ComposePanel is used for popup content.
+ * Compose-owned desktop popup. Compose renders the complete surface and controls;
+ * the platform window supplies only its normal title bar and window behavior.
  */
 @Composable
 internal fun DesktopNativeDialogHost(
-    owner: Window,
     title: String,
     visible: Boolean,
     width: Int,
@@ -28,17 +26,13 @@ internal fun DesktopNativeDialogHost(
     onDismissRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    @Suppress("UNUSED_VARIABLE")
-    val desktopOwner = owner
-    @Suppress("UNUSED_VARIABLE")
-    val dialogTitle = title
-    @Suppress("UNUSED_VARIABLE")
-    val canResize = resizable
-
     if (visible) {
-        Dialog(
-            onDismissRequest = onDismissRequest,
-            properties = DialogProperties(usePlatformDefaultWidth = false)
+        DialogWindow(
+            onCloseRequest = onDismissRequest,
+            state = rememberDialogState(size = DpSize(width.dp, height.dp)),
+            title = title,
+            resizable = resizable,
+            visible = true
         ) {
             MaterialTheme(
                 colorScheme = colorScheme,
@@ -46,14 +40,12 @@ internal fun DesktopNativeDialogHost(
                 typography = DesktopThemePalette.typography
             ) {
                 Surface(
-                    modifier = Modifier.size(width = width.dp, height = height.dp),
+                    modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                     shape = MaterialTheme.shapes.extraLarge,
                     tonalElevation = 8.dp
                 ) {
-                    androidx.compose.foundation.layout.Box(Modifier.fillMaxSize()) {
-                        content()
-                    }
+                    content()
                 }
             }
         }
