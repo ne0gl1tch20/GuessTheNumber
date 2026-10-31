@@ -499,7 +499,10 @@ fun ProductionGuessGameScreen(
                             return@launch
                         }
                         if (type == "complete_nimmy_tutorial") {
-                            java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding").putBoolean("nimmy_tutorial_completed", true)
+                            java.util.prefs.Preferences.userRoot().node("GuessTheNumber/web-play-onboarding").apply {
+                                putBoolean("nimmy_tutorial_completed", true)
+                                flush()
+                            }
                             reply(org.json.JSONObject().put("version", 1).put("id", requestId)
                                 .put("type", "onboarding_saved").toString())
                             return@launch
