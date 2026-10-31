@@ -52,7 +52,7 @@
 
 ## Unreleased (Windows Progression Parity)
 
-- 🔄 **Windows Debug updates**: The About menu now checks the latest successful Windows Desktop CI run on `master`, downloads its short-lived Actions artifact, verifies the bundled manifest and SHA-256 checksum, and launches the MSI installer. The channel remains separate from production releases; interactive update/install testing is still pending.
+- 🔄 **Windows Debug updates**: The About menu now checks the latest successful Windows Desktop CI run on `master`, downloads its short-lived Actions artifact, verifies the bundled manifest and SHA-256 checksum, and launches the Inno Setup installer. The channel remains separate from production releases; interactive update/install testing is still pending.
 - 🌳 **Windows Talent Web**: Replaced the flat talent catalog with a connected six-node tree, selectable node details, zoom controls, drag/pinch navigation, parent-lock feedback and transaction-backed unlocks. Runtime screenshot parity remains unverified.
 - 🗺️ **World and boss progression**: Added Windows boss battle start/leave actions and connected guesses to shared boss damage, miss regression and victory-reward transactions. The interactive map canvas and Windows runtime parity checks remain unfinished.
 - 💎 **Relic transactions**: Relic claiming now checks boss unlock requirements and duplicate ownership; equip/unequip actions validate ownership and the four-slot limit through shared transactions.
