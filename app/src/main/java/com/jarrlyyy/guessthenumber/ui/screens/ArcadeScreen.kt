@@ -30,7 +30,8 @@ import kotlin.random.Random
 fun ArcadeScreen(
     onEarnReward: (Long, BigNumber) -> Unit,
     onBack: () -> Unit,
-    reducedMotion: Boolean = false
+    reducedMotion: Boolean = false,
+    showBackButton: Boolean = true
 ) {
     val context = LocalContext.current
     val locale = LocalAppLocaleManager.current
@@ -43,8 +44,10 @@ fun ArcadeScreen(
             TopAppBar(
                 title = { Text(locale.getString("arcade_title", "Arcade Minigames")) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
+                    if (showBackButton) {
+                        IconButton(onClick = onBack) {
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = locale.getString("back", "Back"))
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
