@@ -52,13 +52,33 @@ jobs:
           PY
       - name: Publish manifest commit on master
         if: github.event_name == 'push'
+        shell: bash
         run: |
-          if [ -z "$(git status --porcelain -- web-play-manifest.json)" ]; then
-            echo "Manifest already current"
-            exit 0
-          fi
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add web-play-manifest.json
-          git commit -m "chore: refresh web-play asset manifest [skip ci]"
-          git push origin HEAD:master
+
+          # A normal source commit can land while this workflow is generating the
+          # manifest. Rebase by regenerating from the newest master, not by
+          # pushing a stale manifest commit.
+          for attempt in 1 2 3 4 5; do
+            git fetch origin master
+            git checkout -B master origin/master
+            python tools/generate_web_play_manifest.py --output web-play-manifest.json --version "$(git rev-parse HEAD)"
+
+            if [ -z "$(git status --porcelain -- web-play-manifest.json)" ]; then
+              echo "Manifest already current"
+              exit 0
+            fi
+
+            git add web-play-manifest.json
+            git commit -m "chore: refresh web-play asset manifest [skip ci]"
+            if git push origin HEAD:master; then
+              exit 0
+            fi
+
+            echo "master moved during manifest publication (attempt $attempt); retrying from latest master"
+          done
+
+          echo "Could not publish the manifest after 5 attempts."
+          exit 1
