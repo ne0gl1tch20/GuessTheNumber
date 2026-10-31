@@ -57,7 +57,7 @@ internal fun DesktopParityScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onBack) { Text("Back to More") }
+            OutlinedButton(onClick = onBack) { Text("Close") }
             OutlinedButton(onClick = { onNavigate(DesktopDestination.SETTINGS) }) { Text("Settings") }
         }
         Text(destination.label, style = MaterialTheme.typography.headlineMedium)
