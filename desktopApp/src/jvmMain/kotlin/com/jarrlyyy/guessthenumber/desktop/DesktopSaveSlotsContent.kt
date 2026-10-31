@@ -44,6 +44,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveSlotSummary
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotCard
+import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotUiModel
 import java.text.DateFormat
 import java.util.Date
 
@@ -109,203 +111,61 @@ internal fun DesktopSaveSlotsContent(
 
         slots.sortedBy { it.slot }.forEach { slot ->
             val data = slot.state
-            val isActive = slot.slot == activeSlot
-            val container = if (isActive) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.surfaceContainerLow
+            val total = data?.statistics?.totalGuesses?.coerceAtLeast(data.attempts) ?: 0L
+            val correct = data?.statistics?.correctGuesses?.coerceAtLeast(data.correctGuesses) ?: 0L
+            val accuracy = if (total > 0L) (correct * 100.0 / total).coerceIn(0.0, 100.0) else 0.0
+            val model = SharedSaveSlotUiModel(
+                slotIndex = slot.slot,
+                isActive = slot.slot == activeSlot,
+                isEmpty = slot.isEmpty,
+                isCorrupt = slot.isCorrupt,
+                hasBackup = slot.hasBackup,
+                profileTitle = data?.takeUnless { slot.isCorrupt }?.let {
+                    "${it.profileIconId.takeIf(String::isNotBlank) ?: "🎮"}  ${it.profileName.ifBlank { "Player" }}"
+                },
+                difficultyLabel = data?.takeUnless { slot.isCorrupt }?.let {
+                    it.difficultyId.replaceFirstChar(Char::uppercase) +
+                        if (it.creativeModeEnabled) " · Creative Mode" else ""
+                },
+                primaryMetric = data?.takeUnless { slot.isCorrupt }?.let {
+                    "Hidden number: ${it.targetNumber} · Money: ${it.money}"
+                },
+                secondaryMetrics = data?.takeUnless { slot.isCorrupt }?.let {
+                    listOf(
+                        "Prestige: ${it.prestige} · Ultra: ${it.ultra} · Nebula: ${it.nebula}",
+                        "Attempts: ${it.attempts} · Correct: ${it.correctGuesses} · Streak: ${it.streak} (best ${it.bestStreak})",
+                        "Accuracy %.1f%% · Failed ${it.statistics.failedGuesses} · Playtime ${formatPlaytime(it.statistics.playtimeSeconds)}".format(accuracy)
+                    )
+                }.orEmpty(),
+                lastSavedLabel = data?.takeIf { !slot.isCorrupt && it.lastSaveTimestamp > 0L }?.let {
+                    "Saved ${DateFormat.getDateTimeInstance().format(Date(it.lastSaveTimestamp))}"
+                },
+                activeLabel = "Active",
+                emptyLabel = "Empty slot",
+                corruptLabel = "Needs recovery",
+                createLabel = "Create save",
+                resumeLabel = "Active save",
+                switchLabel = "Switch to save"
+            )
 
-            ElevatedCard(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.elevatedCardColors(containerColor = container)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text(
-                                "Slot ${slot.slot}",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                when {
-                                    slot.isCorrupt -> "Needs recovery"
-                                    slot.isEmpty -> "Empty slot"
-                                    isActive -> "Currently active"
-                                    else -> "Saved game"
-                                },
-                                style = MaterialTheme.typography.labelMedium,
-                                color = when {
-                                    slot.isCorrupt -> MaterialTheme.colorScheme.error
-                                    isActive -> MaterialTheme.colorScheme.primary
-                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                }
-                            )
-                        }
-                        if (isActive && !slot.isCorrupt && !slot.isEmpty) {
-                            Surface(
-                                color = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary,
-                                shape = MaterialTheme.shapes.small
-                            ) {
-                                Text("ACTIVE", modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                                    style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                            }
-                        } else if (slot.isCorrupt) {
-                            Icon(Icons.Filled.WarningAmber, contentDescription = "Save needs recovery",
-                                tint = MaterialTheme.colorScheme.error)
-                        } else if (!slot.isEmpty) {
-                            Icon(Icons.Filled.CheckCircle, contentDescription = "Save is available",
-                                tint = MaterialTheme.colorScheme.primary)
-                        }
-                    }
-
-                    if (data != null && !slot.isCorrupt) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(data.profileIconId.takeIf { it.isNotBlank() } ?: "🎮", style = MaterialTheme.typography.titleMedium)
-                            Spacer(Modifier.width(8.dp))
-                            Column {
-                                Text(data.profileName.ifBlank { "Player" }, fontWeight = FontWeight.SemiBold)
-                                Text(data.difficultyId.replaceFirstChar { it.uppercase() } +
-                                    if (data.creativeModeEnabled) " · Creative Mode" else "",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            SaveSlotMetric(Icons.Filled.Numbers, "Hidden number", data.targetNumber.toString(), Modifier.weight(1f))
-                            SaveSlotMetric(Icons.Filled.AccountBalanceWallet, "Money", data.money.toString(), Modifier.weight(1f))
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            SaveSlotMetric(Icons.Filled.MilitaryTech, "Prestige", data.prestige.toString(), Modifier.weight(1f))
-                            SaveSlotMetric(Icons.Filled.AutoAwesome, "Ultra", data.ultra.toString(), Modifier.weight(1f))
-                            SaveSlotMetric(Icons.Filled.AutoAwesome, "Nebula", data.nebula.toString(), Modifier.weight(1f))
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            SaveSlotMetric(Icons.Filled.QueryStats, "Attempts", data.attempts.toString(), Modifier.weight(1f))
-                            SaveSlotMetric(Icons.Filled.CheckCircle, "Correct", data.correctGuesses.toString(), Modifier.weight(1f))
-                            SaveSlotMetric(Icons.Filled.LocalFireDepartment, "Streak", "${data.streak} · best ${data.bestStreak}", Modifier.weight(1f))
-                        }
-                        val total = data.statistics.totalGuesses.coerceAtLeast(data.attempts)
-                        val correct = data.statistics.correctGuesses.coerceAtLeast(data.correctGuesses)
-                        val accuracy = if (total > 0L) (correct * 100.0 / total).coerceIn(0.0, 100.0) else 0.0
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Filled.QueryStats, contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
-                            Text("Accuracy %.1f%%".format(accuracy), style = MaterialTheme.typography.labelMedium)
-                            Text("Failed ${data.statistics.failedGuesses}", style = MaterialTheme.typography.labelMedium)
-                            Text("Playtime ${formatPlaytime(data.statistics.playtimeSeconds)}",
-                                style = MaterialTheme.typography.labelMedium)
-                        }
-                        if (data.lastSaveTimestamp > 0L) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.Schedule, contentDescription = null,
-                                    modifier = Modifier.size(15.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Spacer(Modifier.width(5.dp))
-                                Text(
-                                    "Saved ${DateFormat.getDateTimeInstance().format(Date(data.lastSaveTimestamp))}",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    } else if (slot.isCorrupt) {
-                        Text("This save could not be read. Restore its valid backup if one is available.",
-                            color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
-                    } else {
-                        Text("Ready for a new game.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-
-                    if (slot.hasBackup) {
-                        Text("A recovery backup is available.", style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary)
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (slot.isEmpty) {
-                            Button(onClick = { onCreateSlot(slot.slot) }) {
-                                Icon(Icons.Filled.Add, contentDescription = null)
-                                Spacer(Modifier.width(5.dp))
-                                Text("Create save")
-                            }
-                            if (activeState != null) {
-                                OutlinedButton(onClick = { onDuplicateSlot(activeSlot, slot.slot) }) {
-                                    Icon(Icons.Filled.ContentCopy, contentDescription = null)
-                                    Spacer(Modifier.width(5.dp))
-                                    Text("Duplicate active")
-                                }
-                            }
-                        } else if (!slot.isCorrupt) {
-                            Button(onClick = { onSwitchSlot(slot.slot) }, enabled = !isActive) {
-                                Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                                Spacer(Modifier.width(5.dp))
-                                Text(if (isActive) "Active save" else "Switch to save")
-                            }
-                            OutlinedButton(onClick = { onExportSlot(slot.slot) }) {
-                                Icon(Icons.Filled.FileDownload, contentDescription = null)
-                                Spacer(Modifier.width(5.dp))
-                                Text("Export")
-                            }
-                        }
-                        OutlinedButton(onClick = { onImportSlot(slot.slot) }) {
-                            Icon(Icons.Filled.FileUpload, contentDescription = null)
-                            Spacer(Modifier.width(5.dp))
-                            Text("Import")
-                        }
-                        if (slot.hasBackup && !slot.isCorrupt) {
-                            IconButton(onClick = { onRestoreBackup(slot.slot) }) {
-                                Icon(Icons.Filled.Restore, contentDescription = "Restore backup")
-                            }
-                        }
-                    }
-                }
-            }
+            SharedSaveSlotCard(
+                model = model,
+                onSelect = {
+                    if (slot.isEmpty) onCreateSlot(slot.slot) else onSwitchSlot(slot.slot)
+                },
+                onCreate = { onCreateSlot(slot.slot) },
+                onDuplicate = if (slot.isEmpty && activeState != null) {
+                    { onDuplicateSlot(activeSlot, slot.slot) }
+                } else null,
+                onRestoreBackup = if (slot.hasBackup && !slot.isCorrupt) {
+                    { onRestoreBackup(slot.slot) }
+                } else null,
+                onExport = if (!slot.isEmpty && !slot.isCorrupt) {
+                    { onExportSlot(slot.slot) }
+                } else null,
+                onImport = { onImportSlot(slot.slot) }
+            )
         }
-    }
-}
-
-@Composable
-private fun SaveSlotMetric(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    // Android's Save Slots screen keeps progression details as compact text rows.
-    // Match that density instead of turning every value into a separate desktop card.
-    Row(
-        modifier = modifier.padding(vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(5.dp)
-    ) {
-        Icon(
-            icon,
-            contentDescription = null,
-            modifier = Modifier.size(14.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            "$label: $value",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1
-        )
-    }
-}
-
 private fun formatPlaytime(seconds: Long): String {
     val hours = seconds.coerceAtLeast(0L) / 3600L
     val minutes = (seconds.coerceAtLeast(0L) % 3600L) / 60L
