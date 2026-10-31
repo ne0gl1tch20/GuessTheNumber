@@ -1029,9 +1029,10 @@ fun ProductionGuessGameScreen(
                                 profileName = name.trim().take(24),
                                 profileIconId = iconId
                             )
-                            val saved = validIcon && updated != null &&
-                                withContext(Dispatchers.IO) { saveStore.save(target, updated) }
-                            if (saved && target == activeSaveSlot) state = updated
+                            val profileToSave = updated
+                            val saved = validIcon && profileToSave != null &&
+                                withContext(Dispatchers.IO) { saveStore.save(target, profileToSave) }
+                            if (saved && target == activeSaveSlot) state = profileToSave
                             feedback = if (saved) "Updated the profile for slot $target." else "Could not update that save profile."
                             saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
                         }
