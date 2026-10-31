@@ -354,6 +354,9 @@ private class DesktopSharedWebViewController(initialScreenValue: String) {
         copyResourceTree("web-play", "web-play/desktop-host.js", root)
         copyResourceTree("libraries", "libraries/jarrlyyuisdk/components/jarrlyy-ui.js", root)
         copyResourceTree("fonts", "fonts/Inter-VariableFont_opsz,wght.ttf", root)
+        // Apply the last validated remote version before loading the WebView.
+        // A new sync runs in the background and becomes active on the next launch.
+        DesktopWebPlayAssetSyncer.prepare(root)
         val index = webRoot.resolve("index.html")
         val debugToolsEnabled = javaClass.classLoader
             .getResourceAsStream("desktop-build.properties")
