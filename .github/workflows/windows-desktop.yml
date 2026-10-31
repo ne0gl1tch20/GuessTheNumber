@@ -240,6 +240,14 @@ jobs:
             throw "MSI uninstall removed player data from APPDATA."
           }
 
+      - name: Smoke-test native first-launch dialogs
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        run: |
+          $msi = Get-ChildItem -Path "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File | Select-Object -First 1
+          if (-not $msi) { throw "Windows MSI was not found for the native-dialog smoke test." }
+          .\tools\smoke_test_windows_native_dialogs.ps1 -MsiPath $msi.FullName
+
       - name: Prepare debug channel package
         if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
         shell: pwsh
