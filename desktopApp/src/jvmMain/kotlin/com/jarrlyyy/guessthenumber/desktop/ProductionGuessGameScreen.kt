@@ -65,6 +65,7 @@ import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
 import com.jarrlyyy.guessthenumber.domain.engine.OfflineEarningsPolicy
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.shared.domain.TraitGameplayRules
 import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
@@ -981,7 +982,7 @@ fun ProductionGuessGameScreen(
                     onCreateSlot = { targetSlot, options ->
                         val current = state
                         if (current != null) scope.launch {
-                            val target = Random.nextLong(options.rangeMin, options.rangeMax + 1L)
+                            val target = (options.rangeMin + ((options.rangeMax - options.rangeMin) / 2L)).coerceAtLeast(options.rangeMin)
                             val fresh = GameState(
                                 difficultyId = options.difficultyId,
                                 profileName = options.name,
