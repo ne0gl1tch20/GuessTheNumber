@@ -78,7 +78,7 @@ fun SharedDeveloperSettingsScreen(
                         Column {
                             Text("Developer Playground", style = MaterialTheme.typography.titleMedium)
                             Text(
-                                "Core Process, Web Process, test suites, UI tools, save lab and diagnostics.",
+                                "Core Process, Web Process, runtime checks, UI tools, save lab and diagnostics.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
