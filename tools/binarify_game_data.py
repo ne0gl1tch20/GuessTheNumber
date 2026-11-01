@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import json
 import shutil
+import subprocess
 import zipfile
 from pathlib import Path
 from typing import Iterable
@@ -142,11 +143,22 @@ def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BY
     if version is None:
         version_payload = json.dumps(file_entries, sort_keys=True, separators=(",", ":")).encode("utf-8")
         version = hashlib.sha256(version_payload).hexdigest()[:20]
+    try:
+        source_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
+        source_commit_timestamp = int(subprocess.check_output(
+            ["git", "show", "-s", "--format=%ct", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip())
+    except (OSError, subprocess.CalledProcessError, ValueError):
+        source_commit, source_commit_timestamp = "unknown", 0
     manifest = {
         "schemaVersion": 1,
         "archiveFormatVersion": FORMAT_VERSION,
         "minAppVersionCode": 24,
         "version": version,
+        "sourceCommit": source_commit,
+        "sourceCommitTimestamp": source_commit_timestamp,
         "keyId": KEY_ID,
         "cipher": "AES-256-GCM",
         "compression": "ZIP-DEFLATE",
