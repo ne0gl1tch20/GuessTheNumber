@@ -24,6 +24,16 @@ class BinarifyGameDataTest(unittest.TestCase):
             try:
                 output = root / "out"
                 manifest = builder.build(output, "test-version", 65536)
+                second_output = root / "out-second"
+                builder.build(second_output, "test-version", 65536)
+                self.assertEqual(
+                    sorted(path.read_bytes() for path in output.glob("*.bin")),
+                    sorted(path.read_bytes() for path in second_output.glob("*.bin")),
+                )
+                self.assertEqual(
+                    (output / "manifest.json").read_bytes(),
+                    (second_output / "manifest.json").read_bytes(),
+                )
             finally:
                 builder.ASSETS = previous
 
