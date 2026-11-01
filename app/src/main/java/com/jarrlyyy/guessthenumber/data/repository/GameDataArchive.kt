@@ -21,6 +21,8 @@ object GameDataArchive {
     private const val ROOT_ASSET = "game_data"
     private const val MAGIC = "GTNGBIN1"
     private const val FORMAT_VERSION = 1
+    private const val APP_VERSION_CODE = 24
+    private const val KEY_ID = "gtn-assets-v1"
     private const val MAX_CHUNK_BYTES = 16 * 1024 * 1024
     private const val MAX_EXTRACTED_BYTES = 256L * 1024 * 1024
     private const val MANIFEST_URL = "https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/game_data/manifest.json"
@@ -65,6 +67,8 @@ object GameDataArchive {
             versions.mkdirs()
             val manifest = manifestSource().bufferedReader().use { JSONObject(it.readText()) }
             require(manifest.optInt("schemaVersion") == 1 && manifest.optInt("archiveFormatVersion") == FORMAT_VERSION)
+            require(manifest.optInt("minAppVersionCode", Int.MAX_VALUE) <= APP_VERSION_CODE)
+            require(manifest.optString("keyId") == KEY_ID)
             require(manifest.optString("cipher") == "AES-256-GCM")
             val version = manifest.getString("version")
             require(version.matches(Regex("[a-zA-Z0-9._-]{1,80}")))
