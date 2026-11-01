@@ -55,7 +55,7 @@ fun ArcadeCanvasGame(
     val cards = remember(gameId) { (listOf(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8)).shuffled() }
     val selected = remember(gameId) { mutableStateListOf<Int>() }
     val matched = remember(gameId) { mutableStateListOf<Int>() }
-    var startTime by remember(gameId) { mutableStateOf(System.currentTimeMillis()) }
+    var startTime by remember(gameId) { mutableStateOf(System.nanoTime()) }
     var moves by remember(gameId) { mutableStateOf(0) }
 
     LaunchedEffect(gameId) {
@@ -82,7 +82,7 @@ fun ArcadeCanvasGame(
         }
     }
 
-    val elapsed = ((System.currentTimeMillis() - startTime) / 1_000L).toInt().coerceAtLeast(1)
+    val elapsed = ((System.nanoTime() - startTime) / 1_000_000_000L).toInt().coerceAtLeast(1)
     val rewardNebula = ArcadeRewardRules.calculateNebulaReward(elapsed.toLong(), score)
     val rewardMoney = ArcadeRewardRules.calculateMoneyReward(elapsed.toLong(), score)
 
