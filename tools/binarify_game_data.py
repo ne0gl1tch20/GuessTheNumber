@@ -145,6 +145,7 @@ def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BY
     manifest = {
         "schemaVersion": 1,
         "archiveFormatVersion": FORMAT_VERSION,
+        "minAppVersionCode": 24,
         "version": version,
         "keyId": KEY_ID,
         "cipher": "AES-256-GCM",
