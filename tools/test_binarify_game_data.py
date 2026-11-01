@@ -8,6 +8,7 @@ from io import BytesIO
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 import binarify_game_data as builder
+import validate_game_data_apk as apk_validator
 
 
 class BinarifyGameDataTest(unittest.TestCase):
@@ -70,6 +71,27 @@ class BinarifyGameDataTest(unittest.TestCase):
                 builder.ASSETS = previous
             self.assertRegex(first["version"], r"^[a-f0-9]{20}$")
             self.assertEqual(first["version"], second["version"])
+
+    def test_apk_payload_validator_accepts_generated_archive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            assets = root / "assets"
+            (assets / "game").mkdir(parents=True)
+            (assets / "game" / "config.json").write_text('{"value":2}')
+            previous = builder.ASSETS
+            builder.ASSETS = assets
+            try:
+                output = root / "game_data"
+                builder.build(output, None, 65536)
+            finally:
+                builder.ASSETS = previous
+            apk = root / "test.apk"
+            with zipfile.ZipFile(apk, "w") as archive:
+                for path in output.iterdir():
+                    archive.write(path, f"assets/game_data/{path.name}")
+            chunks, files = apk_validator.validate(apk)
+            self.assertEqual(chunks, 1)
+            self.assertEqual(files, 1)
 
     def test_rejects_too_small_chunk_limit(self):
         with tempfile.TemporaryDirectory() as temporary:
