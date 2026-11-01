@@ -30,6 +30,18 @@
       "name": "Number Rush",
       "description": "Tap numbers in ascending order from 1 to 5 as fast as you can.",
       "rewardMultiplier": 3.5
+    },
+    {
+      "id": "math_blitz",
+      "name": "Math Blitz",
+      "description": "Solve quick arithmetic challenges in a 60-second round. Score combos for extra Nebula.",
+      "rewardMultiplier": 1
+    },
+    {
+      "id": "memory_grid",
+      "name": "Memory Grid",
+      "description": "Flip a 4×4 grid, find all eight matching pairs and build your score before time runs out.",
+      "rewardMultiplier": 1
     }
   ]
 }
