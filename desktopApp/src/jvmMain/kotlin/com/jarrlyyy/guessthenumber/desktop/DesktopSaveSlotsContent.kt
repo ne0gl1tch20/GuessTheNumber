@@ -325,6 +325,12 @@ internal fun DesktopSaveSlotsContent(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        Text("Save Slots", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Text(
+            "Select a save slot to play or manage your games. Your progress stays separate between slots.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         // Keep the action bar usable when the user narrows the desktop popup.
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             if (maxWidth < 760.dp) {
