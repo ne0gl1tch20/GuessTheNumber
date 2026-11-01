@@ -190,8 +190,8 @@ object GameDataArchive {
             val file = File(root, path)
             if (!file.isFile || file.length() != entry.getLong("size") || sha256(file) != entry.getString("sha256")) return false
         }
-        val actualPaths = root.walkTopDown().filter { it.isFile && it.name != CACHE_MANIFEST }
-            .map { it.relativeTo(root).invariantSeparatorsPath }.toSet()
+        val actualPaths = root.walkTopDown().filter { it.isFile }
+            .map { it.relativeTo(root).invariantSeparatorsPath }.filter { it != CACHE_MANIFEST }.toSet()
         actualPaths == expectedPaths
     }.getOrDefault(false)
 
