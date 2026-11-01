@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Exec
 
 plugins {
     alias(libs.plugins.android.application)
@@ -10,6 +11,19 @@ plugins {
 }
 
 val generatedWebPlayAssets = layout.buildDirectory.dir("generated/webPlayAssets")
+val generatedGameDataAssets = layout.buildDirectory.dir("generated/gameDataAssets")
+val pythonExecutable = System.getenv("PYTHON") ?: if (System.getProperty("os.name").startsWith("Windows")) "python" else "python3"
+val generateGameDataAssets by tasks.registering(Exec::class) {
+    inputs.dir(rootProject.file("app/src/main/assets"))
+    inputs.file(rootProject.file("tools/binarify_game_data.py"))
+    outputs.dir(generatedGameDataAssets)
+    commandLine(
+        pythonExecutable,
+        rootProject.file("tools/binarify_game_data.py").absolutePath,
+        "--output", generatedGameDataAssets.get().dir("game_data").asFile.absolutePath,
+        "--version", System.getenv("GITHUB_SHA") ?: "local"
+    )
+}
 val generatedDebugBuildInfo = layout.buildDirectory.dir("generated/buildInfo/debug")
 val generatedReleaseBuildInfo = layout.buildDirectory.dir("generated/buildInfo/release")
 val appVersionName = "3.3.0"
@@ -128,11 +142,12 @@ android {
         }
     }
     sourceSets.getByName("main").assets.srcDir(generatedWebPlayAssets.get().asFile)
+    sourceSets.getByName("main").assets.srcDir(generatedGameDataAssets.get().asFile)
     sourceSets.getByName("debug").assets.srcDir(generatedDebugBuildInfo.get().asFile)
     sourceSets.getByName("release").assets.srcDir(generatedReleaseBuildInfo.get().asFile)
     sourceSets.getByName("main").res.srcDir(generatedLauncherIconRes.get().asFile)
     tasks.matching { it.name == "preBuild" || it.name.endsWith("PreBuild") }
-        .configureEach { dependsOn(prepareWebPlayBrandAsset, prepareLauncherIcon) }
+        .configureEach { dependsOn(prepareWebPlayBrandAsset, prepareLauncherIcon, generateGameDataAssets) }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -161,10 +176,10 @@ tasks.named("preBuild").configure {
 }
 
 tasks.matching { it.name == "preDebugBuild" || it.name == "mergeDebugAssets" }.configureEach {
-    dependsOn(generateDebugBuildInfo)
+    dependsOn(generateDebugBuildInfo, generateGameDataAssets)
 }
 tasks.matching { it.name == "preReleaseBuild" || it.name == "mergeReleaseAssets" }.configureEach {
-    dependsOn(generateReleaseBuildInfo)
+    dependsOn(generateReleaseBuildInfo, generateGameDataAssets)
 }
 
 kotlin {
