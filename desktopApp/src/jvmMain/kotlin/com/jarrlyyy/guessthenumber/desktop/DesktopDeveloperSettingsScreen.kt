@@ -114,7 +114,10 @@ private fun WindowsUpdateToolsCard() {
 @Composable
 private fun WindowsAudioAdapterCard() {
     var devices by remember {
-        mutableStateOf(javax.sound.sampled.AudioSystem.getMixerInfo().toList())
+        mutableStateOf(
+            runCatching { javax.sound.sampled.AudioSystem.getMixerInfo().toList() }
+                .getOrDefault(emptyList())
+        )
     }
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -128,7 +131,7 @@ private fun WindowsAudioAdapterCard() {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             OutlinedButton(onClick = {
-                devices = javax.sound.sampled.AudioSystem.getMixerInfo().toList()
+                devices = runCatching { javax.sound.sampled.AudioSystem.getMixerInfo().toList() }.getOrDefault(emptyList())
             }) { Text("Refresh audio devices") }
             if (devices.isEmpty()) {
                 Text("No audio devices were reported by the desktop audio provider.")
