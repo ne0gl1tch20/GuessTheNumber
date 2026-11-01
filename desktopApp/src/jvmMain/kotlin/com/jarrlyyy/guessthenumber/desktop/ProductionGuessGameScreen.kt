@@ -1202,6 +1202,35 @@ fun ProductionGuessGameScreen(
                             }
                         }
                     },
+                    onResetEverything = {
+                        scope.launch {
+                            isSaving = true
+                            val resetAll = withContext(Dispatchers.IO) {
+                                var success = true
+                                for (slot in 1..10) {
+                                    val previous = saveStore.load(slot)
+                                    val preservedSettings = if (slot == activeSaveSlot) state?.settings else previous?.settings
+                                    val settings = preservedSettings ?: GameState().settings
+                                    val fresh = GameState(
+                                        settings = settings,
+                                        tutorialCompleted = settings.tutorialCompleted,
+                                        lastSaveTimestamp = System.currentTimeMillis()
+                                    )
+                                    if (!saveStore.reset(slot, fresh)) success = false
+                                }
+                                success
+                            }
+                            if (resetAll) {
+                                state = withContext(Dispatchers.IO) { saveStore.load(activeSaveSlot) }
+                                state?.let { autoClicker.reset(it.currentRangeMin, it.currentRangeMax) }
+                                feedback = "All save slots were reset."
+                            } else {
+                                feedback = "Some slots could not be reset. Refresh and inspect the affected slots."
+                            }
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                            isSaving = false
+                        }
+                    },
                     onImportAndroidBackup = {
                         val chooser = JFileChooser().apply {
                             dialogTitle = "Import Android-compatible GuessTheNumber backup"
