@@ -67,6 +67,9 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.shared.domain.TraitGameplayRules
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeEffect
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeEffectType
 import kotlinx.coroutines.Job
 import com.jarrlyyy.guessthenumber.domain.model.UpgradeDef
 import kotlinx.coroutines.Dispatchers
@@ -975,20 +978,39 @@ fun ProductionGuessGameScreen(
                             }
                         }
                     },
-                    onCreateSlot = { targetSlot ->
+                    onCreateSlot = { targetSlot, options ->
                         val current = state
                         if (current != null) scope.launch {
+                            val target = Random.nextLong(options.rangeMin, options.rangeMax + 1L)
                             val fresh = GameState(
-                                targetNumber = Random.nextLong(1L, 101L),
-                                currentRangeMin = 1L,
-                                currentRangeMax = 100L,
+                                difficultyId = options.difficultyId,
+                                profileName = options.name,
+                                profileIconId = options.iconId,
+                                creativeModeEnabled = options.creativeMode,
+                                creativeAttemptLimit = options.attemptLimit,
+                                targetNumber = target,
+                                currentRangeMin = options.rangeMin,
+                                currentRangeMax = options.rangeMax,
                                 settings = current.settings,
                                 tutorialCompleted = current.tutorialCompleted,
-                                profileName = "Slot $targetSlot",
                                 lastSaveTimestamp = System.currentTimeMillis()
                             )
                             val created = withContext(Dispatchers.IO) {
-                                saveStore.createFreshSlot(targetSlot, fresh) && saveStore.setActiveSlot(targetSlot)
+                                val slotCreated = saveStore.createFreshSlot(targetSlot, fresh)
+                                val creativeSaved = !options.creativeMode || saveStore.saveCreativeModeSave(
+                                    targetSlot,
+                                    CreativeModeSave(
+                                        name = options.name.ifBlank { "Creative Save $targetSlot" }.take(40),
+                                        enabled = options.creativeMode,
+                                        rangeMin = options.rangeMin,
+                                        rangeMax = options.rangeMax,
+                                        effects = buildList {
+                                            if (options.extraHints > 0) add(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, options.extraHints))
+                                            if (options.attemptLimit > 0) add(CreativeModeEffect("attempt-cap", CreativeEffectType.ATTEMPT_LIMIT, options.attemptLimit))
+                                        }
+                                    )
+                                )
+                                slotCreated && creativeSaved && saveStore.setActiveSlot(targetSlot)
                             }
                             if (created) {
                                 activeSaveSlot = targetSlot
@@ -996,7 +1018,7 @@ fun ProductionGuessGameScreen(
                                 autoClicker.reset(fresh.currentRangeMin, fresh.currentRangeMax)
                                 feedback = "Created and switched to slot $targetSlot."
                                 if (section == DesktopGameSection.SAVE_SLOTS) onNativeSaveLoaded()
-                            } else feedback = "Could not create that slot. It may already contain data."
+                            } else feedback = "Could not create that save or persist its Creative Mode settings."
                             saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
                         }
                     },
@@ -1159,6 +1181,35 @@ fun ProductionGuessGameScreen(
                                 }
                                 isSaving = false
                             }
+                        }
+                    },
+                    onResetEverything = {
+                        scope.launch {
+                            isSaving = true
+                            val resetAll = withContext(Dispatchers.IO) {
+                                var success = true
+                                for (slot in 1..10) {
+                                    val previous = saveStore.load(slot)
+                                    val preservedSettings = if (slot == activeSaveSlot) state?.settings else previous?.settings
+                                    val settings = preservedSettings ?: GameState().settings
+                                    val fresh = GameState(
+                                        settings = settings,
+                                        tutorialCompleted = settings.tutorialCompleted,
+                                        lastSaveTimestamp = System.currentTimeMillis()
+                                    )
+                                    if (!saveStore.reset(slot, fresh)) success = false
+                                }
+                                success
+                            }
+                            if (resetAll) {
+                                state = withContext(Dispatchers.IO) { saveStore.load(activeSaveSlot) }
+                                state?.let { autoClicker.reset(it.currentRangeMin, it.currentRangeMax) }
+                                feedback = "All save slots were reset."
+                            } else {
+                                feedback = "Some slots could not be reset. Refresh and inspect the affected slots."
+                            }
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                            isSaving = false
                         }
                     },
                     onImportAndroidBackup = {
