@@ -47,7 +47,7 @@ const component={
    const bots=Array.isArray(this.state.bots)?this.state.bots:[];if(!bots.length)return;
    const gap=w/(bots.length+1),activeId=String(this.state.activeBotId||'');
    bots.slice(0,4).forEach((bot,index)=>{
-    const x=gap*(index+1),baseY=hgt*.68,isActive=bot.id===activeId;
+    const x=gap*(index+1),baseY=hgt*.55,isActive=bot.id===activeId;
     const bob=isActive&&this.state.active?Math.sin(Date.now()/170)*2:0;
     const color=bot.id==='bot_byte'?'#53e0b3':bot.id==='bot_pixel'?'#ffb86b':'#a99aff';
     c.save();c.translate(x,baseY+bob);
