@@ -58,8 +58,8 @@ class MainActivity : ComponentActivity() {
             .takeIf { it in 1..MAX_SAVE_SLOTS }
         setContent {
             LaunchedEffect(Unit) {
-                // Prepare the bundled encrypted chunks during save loading, then run the existing web update.
-                // A damaged/missing archive falls back to the original APK assets and never blocks saves.
+                // Prepare bundled chunks, check for a newer published bundle, then run the Web Play update.
+                // Failed downloads keep the last verified cache and never block save initialization.
                 withContext(Dispatchers.IO) {
                     GameDataArchive.prepare(applicationContext)
                     GameDataArchive.syncRemote(applicationContext)
