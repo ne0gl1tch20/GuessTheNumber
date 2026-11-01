@@ -25,6 +25,8 @@ import com.jarrlyyy.guessthenumber.shared.ui.SharedDeveloperSettingsScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.sound.sampled.AudioFormat
+import javax.sound.sampled.AudioSystem
 
 @Composable
 internal fun DesktopDeveloperSettingsScreen(
