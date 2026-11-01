@@ -561,7 +561,7 @@ fun main() = application {
 
                         DesktopDestination.ACTIVITY_HUB -> DesktopActivityHubScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
                         DesktopDestination.LIVE_OPS -> DesktopLiveOpsScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
-                        DesktopDestination.DEVELOPER_CONSOLE -> DesktopDeveloperConsoleScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
+                        DesktopDestination.DEVELOPER_CONSOLE -> DesktopDeveloperConsoleScreen(onBack = { shell.navigate(DesktopDestination.MORE) }, onOpenProcessInspector = { shell.navigate(DesktopDestination.PROCESS_INSPECTOR) })
                         DesktopDestination.PROCESS_INSPECTOR -> DesktopProcessInspectorScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
 
                         DesktopDestination.RELICS,

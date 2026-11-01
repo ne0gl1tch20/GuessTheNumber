@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -26,6 +28,10 @@ import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveStore
 import com.jarrlyyy.guessthenumber.desktop.persistence.defaultDesktopSaveDirectory
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameSettings
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,7 +39,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit) {
+internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit, onOpenProcessInspector: () -> Unit = {}) {
     val store = remember { DesktopSaveStore(defaultDesktopSaveDirectory()) }
     val executor = remember { DesktopDeveloperCommandExecutor() }
     val scope = rememberCoroutineScope()
@@ -43,6 +49,12 @@ internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit) {
     var isLoading by remember { mutableStateOf(true) }
     var isSaving by remember { mutableStateOf(false) }
     var output by remember { mutableStateOf(listOf("Windows developer console · typed commands only · no shell or arbitrary code execution.")) }
+    var saveJson by remember { mutableStateOf("") }
+    var settingsJson by remember { mutableStateOf("") }
+    var settingsJsonStatus by remember { mutableStateOf("Load the active save settings to inspect their JSON.") }
+    val settingsJsonCodec = remember { Json { ignoreUnknownKeys = true; prettyPrint = true } }
+    var jsonStatus by remember { mutableStateOf("Load the active slot to inspect its validated JSON.") }
+    var processSnapshot by remember { mutableStateOf(DesktopProcessDiagnostics.capture()) }
 
     LaunchedEffect(Unit) {
         val loaded = withContext(Dispatchers.IO) {
@@ -68,6 +80,26 @@ internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit) {
             Text("Developer Console", style = MaterialTheme.typography.headlineSmall)
         }
         Text("Debug-only command allowlist · active save slot $activeSlot", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        OutlinedButton(onClick = onOpenProcessInspector) { Text("Open Developer Playground & Process Inspector") }
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Active Save Overview", style = MaterialTheme.typography.titleLarge)
+                state?.let { current ->
+                    Text("${current.profileName.ifBlank { "Slot $activeSlot" }} · ${current.difficultyId} · ${if (current.creativeModeEnabled) "Creative Mode" else "Standard"}")
+                    Text("Range: ${current.currentRangeMin}–${current.currentRangeMax} · Attempts: ${current.attempts} · Correct: ${current.correctGuesses}")
+                    Text("Streak: ${current.streak} · Best: ${current.bestStreak} · Upgrades: ${current.upgradeLevels.size} · Traits: ${current.discoveredTraitIds.size}")
+                    Text("Money: ${current.money} · Prestige: ${current.prestige} · Ultra: ${current.ultra} · Nebula: ${current.nebula}")
+                } ?: Text(if (isLoading) "Loading…" else "No valid active save.", color = MaterialTheme.colorScheme.error)
+            }
+        }
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Quick Commands", style = MaterialTheme.typography.titleLarge)
+                listOf("/help", "/version", "/state", "/stats", "/newnumber", "/autoclicker on", "/autoclicker off").forEach { quick ->
+                    OutlinedButton(onClick = { command = quick }, enabled = !isSaving) { Text(quick) }
+                }
+            }
+        }
         if (isLoading) {
             Text("Loading active save…")
         } else if (state == null) {
@@ -121,6 +153,113 @@ internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit) {
                 }
             }
             OutlinedButton(onClick = { output = emptyList() }, enabled = !isSaving) { Text("Clear output") }
+        }
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Settings JSON Inspector", style = MaterialTheme.typography.titleLarge)
+                Text("Inspect and update the active save's shared GameSettings model. JSON is decoded with unknown-key tolerance and written through the desktop save store.")
+                OutlinedButton(onClick = {
+                    val current = state
+                    if (current == null) {
+                        settingsJsonStatus = "No active save is available."
+                    } else {
+                        settingsJson = settingsJsonCodec.encodeToString(current.settings)
+                        settingsJsonStatus = "Loaded settings from slot $activeSlot."
+                    }
+                }, enabled = !isLoading && !isSaving) { Text("Load settings JSON") }
+                OutlinedTextField(
+                    value = settingsJson,
+                    onValueChange = { settingsJson = it.take(256_000) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("GameSettings JSON") },
+                    minLines = 6,
+                    maxLines = 12,
+                    textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace)
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        val current = state
+                        val decoded = runCatching { settingsJsonCodec.decodeFromString<GameSettings>(settingsJson) }.getOrNull()
+                        if (current == null || decoded == null) {
+                            settingsJsonStatus = "Invalid settings JSON. The current save was not changed."
+                        } else {
+                            scope.launch {
+                                isSaving = true
+                                val updated = current.copy(settings = decoded)
+                                val saved = withContext(Dispatchers.IO) {
+                                    store.save(activeSlot, updated.copy(lastSaveTimestamp = System.currentTimeMillis()))
+                                }
+                                if (saved) {
+                                    state = updated
+                                    settingsJsonStatus = "Settings JSON validated and saved to slot $activeSlot."
+                                    append("Applied settings JSON to slot $activeSlot.")
+                                } else {
+                                    settingsJsonStatus = "Could not save settings. The previous save remains available."
+                                }
+                                isSaving = false
+                            }
+                        }
+                    }, enabled = settingsJson.isNotBlank() && !isSaving) { Text("Validate & Apply") }
+                    OutlinedButton(onClick = { settingsJson = ""; settingsJsonStatus = "Editor cleared." }, enabled = !isSaving) { Text("Clear") }
+                }
+                Text(settingsJsonStatus, style = MaterialTheme.typography.bodySmall)
+                HorizontalDivider()
+                Text("Save JSON Inspector", style = MaterialTheme.typography.titleLarge)
+                Text("Inspect or apply the active slot JSON through the desktop save validator. Rejected imports leave the current save untouched.")
+                OutlinedButton(onClick = {
+                    scope.launch {
+                        jsonStatus = "Loading active save…"
+                        val raw = withContext(Dispatchers.IO) { store.exportSlotJson(activeSlot) }
+                        if (raw == null) jsonStatus = "No valid JSON for slot $activeSlot."
+                        else { saveJson = raw; jsonStatus = "Loaded slot $activeSlot." }
+                    }
+                }, enabled = !isLoading && !isSaving) { Text("Load active save JSON") }
+                OutlinedTextField(
+                    value = saveJson,
+                    onValueChange = { saveJson = it.take(1_000_000) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Save JSON") },
+                    minLines = 7,
+                    maxLines = 14,
+                    textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace)
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        scope.launch {
+                            isSaving = true
+                            val imported = withContext(Dispatchers.IO) { store.importSlotJson(activeSlot, saveJson) }
+                            if (imported) {
+                                state = withContext(Dispatchers.IO) { store.load(activeSlot) }
+                                jsonStatus = "Validated and saved slot $activeSlot."
+                                append("Applied validated JSON to slot $activeSlot.")
+                            } else {
+                                jsonStatus = "Import rejected. Existing save was left intact."
+                            }
+                            isSaving = false
+                        }
+                    }, enabled = saveJson.isNotBlank() && !isSaving) { Text("Validate & Apply") }
+                    OutlinedButton(onClick = { saveJson = ""; jsonStatus = "Editor cleared." }, enabled = !isSaving) { Text("Clear") }
+                }
+                Text(jsonStatus, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("WebPlay Asset Diagnostics", style = MaterialTheme.typography.titleLarge)
+                Text("Active validated cache: ${DesktopWebPlayAssetSyncer.activeVersion() ?: "Bundled assets"}")
+                Text("The desktop sync checks the manifest at startup, validates SHA-256 hashes and activates a complete version on the next launch.")
+            }
+        }
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Runtime & Memory Diagnostics", style = MaterialTheme.typography.titleLarge)
+                OutlinedButton(onClick = { processSnapshot = DesktopProcessDiagnostics.capture() }) { Text("Refresh diagnostics") }
+                Text("OS: ${processSnapshot.osName} ${processSnapshot.osVersion}")
+                Text("Architecture: ${processSnapshot.architecture} · JVM: ${processSnapshot.javaVersion}")
+                Text("Processors: ${processSnapshot.availableProcessors} · Uptime: ${processSnapshot.uptimeMillis / 1000}s")
+                Text("Heap: ${processSnapshot.heapUsedBytes / (1024 * 1024)} MB used / ${processSnapshot.heapMaxBytes / (1024 * 1024)} MB max")
+                Text("Non-heap: ${processSnapshot.nonHeapUsedBytes / (1024 * 1024)} MB")
+            }
         }
     }
 }
