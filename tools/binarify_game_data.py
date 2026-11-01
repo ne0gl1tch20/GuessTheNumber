@@ -112,11 +112,12 @@ def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BY
     for group, files in grouped_files().items():
         for group_chunk in split_group(group, files, max_chunk_bytes):
             archive_bytes = make_zip(group_chunk)
-            associated_data = f"{FORMAT_VERSION}:{group}:{chunk_number}".encode()
+            name = f"{chunk_number:02d}.bin"
+            chunk_id = name[:-4]
+            associated_data = f"{FORMAT_VERSION}:{group}:{chunk_id}".encode()
             # Deterministic per plaintext chunk: unchanged assets publish byte-identical bundles.
             nonce = hashlib.sha256(b"gtn-game-data-nonce-v1:" + associated_data + archive_bytes).digest()[:12]
             encrypted = aes.encrypt(nonce, archive_bytes, associated_data)
-            name = f"{chunk_number:02d}.bin"
             blob = MAGIC + bytes([FORMAT_VERSION]) + nonce + encrypted
             target = output / name
             target.write_bytes(blob)
