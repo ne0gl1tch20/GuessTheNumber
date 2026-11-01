@@ -9,6 +9,7 @@ import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeClaimRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessCoreState
+import com.jarrlyyy.guessthenumber.shared.rules.GuessSourceContext
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
 import com.jarrlyyy.guessthenumber.shared.rules.GuessTransitionRules
 import com.jarrlyyy.guessthenumber.shared.engine.NativeGameplayOptimizer
@@ -90,6 +91,11 @@ class GameEngine(private val rng: Random = Random.Default) {
     }
 
     fun processGuess(state: GameState, guess: Long): GuessResult {
+        // The bot marks the next synchronous engine call. This keeps automation out of
+        // player attempts/correct/streak/stat counters without weakening the authoritative
+        // gameplay transition, rewards, target generation or boss progression.
+        val botGuess = GuessSourceContext.consumeBotGuess()
+
         // Map the existing Android save model into the shared guessing-state slice.
         // Keep currency, statistics, upgrades and persistence in the Android engine.
         val transition = GuessStateRules.applyGuess(
@@ -112,7 +118,7 @@ class GameEngine(private val rng: Random = Random.Default) {
             )
             val critChance = when {
                 "ultra_universal_harmony" in state.ultraShopPurchases -> 1.0
-                "golden_guess" in state.shopPurchases &&
+                !botGuess && "golden_guess" in state.shopPurchases &&
                     (state.statistics.totalGuesses + 1L) % 10L == 0L -> 1.0
                 "prestige_luck_charm" in state.prestigeShopPurchases ->
                     (baseCritChance + PRESTIGE_LUCK_CHARM_BONUS).coerceAtMost(1.0)
@@ -169,12 +175,12 @@ class GameEngine(private val rng: Random = Random.Default) {
             val calculatedReward = baseReward * streakMultiplier * frenzyMult * critMultiplier * upgradeMult * talentMult * mutatorMult * difficultyMultiplier * shopRewardMultiplier
             val totalReward = maxOf(BigNumber(economyDecision.minimumGuessReward), calculatedReward) * moneyEarningMultiplier(state)
             val newMoney = state.money + totalReward
-            val newStreak = transition.streak
-            val bestStreak = transition.bestStreak
+            val newStreak = if (botGuess) state.streak else transition.streak
+            val bestStreak = if (botGuess) state.bestStreak else transition.bestStreak
 
             val newStats = state.statistics.copy(
-                totalGuesses = state.statistics.totalGuesses + 1,
-                correctGuesses = state.statistics.correctGuesses + 1,
+                totalGuesses = if (botGuess) state.statistics.totalGuesses else state.statistics.totalGuesses + 1,
+                correctGuesses = if (botGuess) state.statistics.correctGuesses else state.statistics.correctGuesses + 1,
                 moneyEarned = state.statistics.moneyEarned + totalReward
             )
             val nextCoreState = decision.nextState
@@ -183,10 +189,13 @@ class GameEngine(private val rng: Random = Random.Default) {
                 currentRangeMin = nextCoreState.rangeMin,
                 currentRangeMax = nextCoreState.rangeMax,
                 targetNumber = nextCoreState.targetNumber,
-                attempts = nextCoreState.attempts,
-                correctGuesses = nextCoreState.correctGuesses,
-                streak = nextCoreState.streak,
-                bestStreak = nextCoreState.bestStreak,
+                attempts = if (botGuess) state.attempts else nextCoreState.attempts,
+                correctGuesses = if (botGuess) state.correctGuesses else nextCoreState.correctGuesses,
+                streak = newStreak,
+                bestStreak = bestStreak,
+                botTotalGuesses = if (botGuess) state.botTotalGuesses + 1L else state.botTotalGuesses,
+                botCorrectGuesses = if (botGuess) state.botCorrectGuesses + 1L else state.botCorrectGuesses,
+                botIncorrectGuesses = state.botIncorrectGuesses,
                 statistics = newStats
             )
             return GuessResult(feedback, totalReward, isCrit, newStreak, updatedState)
@@ -215,8 +224,8 @@ class GameEngine(private val rng: Random = Random.Default) {
             val taxPenalty = if (taxPenaltyRate > 0.0) state.money * BigNumber(taxPenaltyRate) else BigNumber.ZERO
             val newMoney = maxOf(BigNumber.ZERO, state.money - difficultyPenalty - taxPenalty)
             val newStats = state.statistics.copy(
-                totalGuesses = state.statistics.totalGuesses + 1,
-                failedGuesses = state.statistics.failedGuesses + 1
+                totalGuesses = if (botGuess) state.statistics.totalGuesses else state.statistics.totalGuesses + 1,
+                failedGuesses = if (botGuess) state.statistics.failedGuesses else state.statistics.failedGuesses + 1
             )
             val nextCoreState = decision.nextState
             val updatedState = state.copy(
@@ -224,10 +233,13 @@ class GameEngine(private val rng: Random = Random.Default) {
                 targetNumber = nextCoreState.targetNumber,
                 currentRangeMin = nextCoreState.rangeMin,
                 currentRangeMax = nextCoreState.rangeMax,
-                attempts = newAttempts,
-                correctGuesses = nextCoreState.correctGuesses,
-                streak = nextCoreState.streak,
-                bestStreak = nextCoreState.bestStreak,
+                attempts = if (botGuess) state.attempts else newAttempts,
+                correctGuesses = if (botGuess) state.correctGuesses else nextCoreState.correctGuesses,
+                streak = if (botGuess) state.streak else nextCoreState.streak,
+                bestStreak = state.bestStreak,
+                botTotalGuesses = if (botGuess) state.botTotalGuesses + 1L else state.botTotalGuesses,
+                botCorrectGuesses = state.botCorrectGuesses,
+                botIncorrectGuesses = if (botGuess) state.botIncorrectGuesses + 1L else state.botIncorrectGuesses,
                 statistics = newStats
             )
             return GuessResult(feedback, BigNumber.ZERO, false, 0, updatedState)
