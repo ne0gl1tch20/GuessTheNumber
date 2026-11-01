@@ -28,6 +28,10 @@ import androidx.compose.ui.unit.dp
 import com.jarrlyyy.guessthenumber.desktop.persistence.DesktopSaveStore
 import com.jarrlyyy.guessthenumber.desktop.persistence.defaultDesktopSaveDirectory
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameSettings
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,6 +50,9 @@ internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit, onOpenProcessInsp
     var isSaving by remember { mutableStateOf(false) }
     var output by remember { mutableStateOf(listOf("Windows developer console · typed commands only · no shell or arbitrary code execution.")) }
     var saveJson by remember { mutableStateOf("") }
+    var settingsJson by remember { mutableStateOf("") }
+    var settingsJsonStatus by remember { mutableStateOf("Load the active save settings to inspect their JSON.") }
+    val settingsJsonCodec = remember { Json { ignoreUnknownKeys = true; prettyPrint = true } }
     var jsonStatus by remember { mutableStateOf("Load the active slot to inspect its validated JSON.") }
     var processSnapshot by remember { mutableStateOf(DesktopProcessDiagnostics.capture()) }
 
