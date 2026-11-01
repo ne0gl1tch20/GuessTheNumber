@@ -2,10 +2,17 @@ package com.jarrlyyy.guessthenumber.domain
 
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
 import com.jarrlyyy.guessthenumber.domain.engine.GuessingBot
+import com.jarrlyyy.guessthenumber.shared.rules.GuessSourceContext
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class GuessingBotTest {
+
+    @After
+    fun clearPendingBotGuessMarker() {
+        GuessSourceContext.clearBotGuess()
+    }
 
     @Test
     fun binarySearchBotFindsTargetUsingOnlyFeedback() {
@@ -43,6 +50,7 @@ class GuessingBotTest {
         guess > target -> GuessFeedback.TOO_HIGH
         else -> GuessFeedback.CORRECT
     }
+
     @Test
     fun separatelyOwnedBotsKeepIndependentSearchIntervals() {
         val botOne = GuessingBot()
@@ -56,5 +64,4 @@ class GuessingBotTest {
         assertEquals(75L, botOne.nextGuess(1L, 100L))
         assertEquals(50L, botTwo.nextGuess(1L, 100L))
     }
-
 }
