@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "c1ff481da0126b28d82f7303c269cbed68b3b2ac",
+  "version": "b608706324926e82002aff66b4ba8cee739ca9e2",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -97,7 +97,7 @@
     },
     {
       "path": "locales/fr.json",
-      "sha256": "75d0bd6372b8f51ba0d1014055f7a3fc685d36be3f169a9b10249f6f5e3e324c"
+      "sha256": "eb1ebd2495463b7bca16037d4d413a93a057b8eae156f09256bd4b170f0a2fc9"
     },
     {
       "path": "locales/hi_in.json",
