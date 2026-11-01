@@ -38,6 +38,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,6 +65,7 @@ import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetric
 import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetricIcon
 import java.text.DateFormat
 import java.util.Date
+import kotlinx.coroutines.delay
 
 internal data class DesktopSaveCreationOptions(
     val name: String, val iconId: String, val difficultyId: String,
@@ -112,7 +115,15 @@ internal fun DesktopSaveSlotsContent(
     var showResetEverything by remember { mutableStateOf(false) }
     var resetEverythingAcknowledged by remember { mutableStateOf(false) }
     var resetChallengeAnswer by remember { mutableStateOf("") }
+    var resetSecondsRemaining by remember { mutableIntStateOf(45) }
     val resetChallenge = remember { (12..48).random() to (2..19).random() }
+
+    LaunchedEffect(showResetEverything) {
+        while (showResetEverything && resetSecondsRemaining > 0) {
+            delay(1_000)
+            resetSecondsRemaining--
+        }
+    }
 
     if (editingSlot != null) {
         AlertDialog(
@@ -241,9 +252,10 @@ internal fun DesktopSaveSlotsContent(
                     showResetEverything = false
                     resetEverythingAcknowledged = false
                     resetChallengeAnswer = ""
-                }, enabled = resetEverythingAcknowledged &&
+                }, enabled = resetEverythingAcknowledged && resetSecondsRemaining == 0 &&
                     resetChallengeAnswer.toIntOrNull() == resetChallenge.first + resetChallenge.second) {
-                    Text("Reset everything", color = MaterialTheme.colorScheme.error)
+                    Text(if (resetSecondsRemaining > 0) "Wait ${resetSecondsRemaining}s" else "Reset everything",
+                        color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = { TextButton(onClick = { showResetEverything = false }) { Text("Cancel") } }
@@ -455,7 +467,8 @@ internal fun DesktopSaveSlotsContent(
                 Text("Erase all save slots and their recovery backups. An extra confirmation is required.",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Button(onClick = {
-                    resetChallengeAnswer = ""; resetEverythingAcknowledged = false; showResetEverything = true
+                    resetChallengeAnswer = ""; resetEverythingAcknowledged = false
+                    resetSecondsRemaining = 45; showResetEverything = true
                 }, modifier = Modifier.fillMaxWidth()) { Text("Reset Everything") }
             }
         }
