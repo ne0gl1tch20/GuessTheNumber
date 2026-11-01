@@ -101,6 +101,11 @@ jobs:
         # Clean Android's incremental APK packaging state before the publishable build.
         # Keep stack traces in CI so packaging failures expose their real cause.
         run: ./gradlew clean assembleDebug --no-daemon --stacktrace
+      - name: Validate encrypted game-data payload
+        run: |
+          apk="$(find app/build/outputs/apk/debug -maxdepth 1 -name '*.apk' -print -quit)"
+          test -n "$apk"
+          python3 tools/validate_game_data_apk.py "$apk"
       - name: Validate embedded APK build metadata
         run: |
           version_name="$(grep -E '^[[:space:]]*val appVersionName = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *"//; s/"$//')"
