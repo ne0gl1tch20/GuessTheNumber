@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "21f105f0692fcd7347a60506d09d189d0364e157",
+  "version": "b20b2446605a14ce774fcfe464662572cbdb28a3",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -37,7 +37,7 @@
     },
     {
       "path": "web-play/vue-bot-arena.js",
-      "sha256": "f19a5b79b5891b8bde8cb2880694b7a2cda178ebc37f02e57972469a79acb799"
+      "sha256": "3a152661826a2d6546c08258b245637cc82e7003aa4dac0d17bcc847904bb154"
     },
     {
       "path": "web-play/vue-jarrlyy-adapter.js",
