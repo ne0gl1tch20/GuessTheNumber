@@ -57,6 +57,7 @@ import com.jarrlyyy.guessthenumber.data.repository.WorldConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.LocaleManager
 import com.jarrlyyy.guessthenumber.data.audio.BackgroundMusicManager
+import com.jarrlyyy.guessthenumber.audio.JarrlyyDspEngine
 import com.jarrlyyy.guessthenumber.traits.BuiltInTraits
 import com.jarrlyyy.guessthenumber.traits.ActiveTraitCatalog
 import com.jarrlyyy.guessthenumber.traits.TraitGameplayCatalog
