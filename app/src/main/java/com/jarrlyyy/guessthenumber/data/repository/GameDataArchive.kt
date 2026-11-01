@@ -23,6 +23,7 @@ object GameDataArchive {
     private const val FORMAT_VERSION = 1
     private const val APP_VERSION_CODE = 24
     private const val KEY_ID = "gtn-assets-v1"
+    private const val CACHE_MANIFEST = ".game-data-manifest.json"
     private const val MAX_CHUNK_BYTES = 16 * 1024 * 1024
     private const val MAX_EXTRACTED_BYTES = 256L * 1024 * 1024
     private const val MANIFEST_URL = "https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/game_data/manifest.json"
@@ -72,6 +73,19 @@ object GameDataArchive {
             require(manifest.optString("cipher") == "AES-256-GCM")
             val version = manifest.getString("version")
             require(version.matches(Regex("[a-zA-Z0-9._-]{1,80}")))
+            val incomingTimestamp = manifest.optLong("sourceCommitTimestamp", 0L)
+            require(incomingTimestamp >= 0L)
+            val activeName = activeVersion(pointer)
+            val activeDir = activeName?.let { File(versions, it) }
+            val activeManifestFile = activeDir?.let { File(it, CACHE_MANIFEST) }
+            val activeManifest = runCatching {
+                activeManifestFile?.takeIf { it.isFile }?.let { JSONObject(it.readText()) }
+            }.getOrNull()
+            if (activeDir?.isDirectory == true && activeManifest != null &&
+                filesValid(activeDir, activeManifest) &&
+                activeManifest.optLong("sourceCommitTimestamp", 0L) > incomingTimestamp) {
+                return PrepareResult(true, activeName, "Kept a newer verified game-data cache")
+            }
             val finalDir = File(versions, version)
             if (finalDir.isDirectory && filesValid(finalDir, manifest)) {
                 activate(pointer, version)
@@ -124,6 +138,7 @@ object GameDataArchive {
                         }
                     }
                 }
+                File(staging, CACHE_MANIFEST).writeText(manifest.toString())
                 require(filesValid(staging, manifest)) { "Extracted game data failed validation" }
                 if (finalDir.exists()) finalDir.deleteRecursively()
                 check(staging.renameTo(finalDir))
@@ -161,6 +176,10 @@ object GameDataArchive {
         }
 
     private fun filesValid(root: File, manifest: JSONObject): Boolean = runCatching {
+        val metadataFile = File(root, CACHE_MANIFEST)
+        if (!metadataFile.isFile) return false
+        val metadata = JSONObject(metadataFile.readText())
+        if (metadata.optString("version") != manifest.optString("version")) return false
         val files = manifest.getJSONArray("files")
         if (files.length() !in 1..10000) return false
         val expectedPaths = mutableSetOf<String>()
@@ -171,7 +190,7 @@ object GameDataArchive {
             val file = File(root, path)
             if (!file.isFile || file.length() != entry.getLong("size") || sha256(file) != entry.getString("sha256")) return false
         }
-        val actualPaths = root.walkTopDown().filter { it.isFile }
+        val actualPaths = root.walkTopDown().filter { it.isFile && it.name != CACHE_MANIFEST }
             .map { it.relativeTo(root).invariantSeparatorsPath }.toSet()
         actualPaths == expectedPaths
     }.getOrDefault(false)
