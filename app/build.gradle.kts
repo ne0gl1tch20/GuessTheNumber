@@ -20,8 +20,7 @@ val generateGameDataAssets by tasks.registering(Exec::class) {
     commandLine(
         pythonExecutable,
         rootProject.file("tools/binarify_game_data.py").absolutePath,
-        "--output", generatedGameDataAssets.get().dir("game_data").asFile.absolutePath,
-        "--version", System.getenv("GITHUB_SHA") ?: "local"
+        "--output", generatedGameDataAssets.get().dir("game_data").asFile.absolutePath
     )
 }
 val generatedDebugBuildInfo = layout.buildDirectory.dir("generated/buildInfo/debug")
