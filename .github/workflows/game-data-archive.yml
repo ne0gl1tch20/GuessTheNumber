@@ -34,7 +34,7 @@ jobs:
         run: python -m unittest discover -s tools -p 'test_binarify_game_data.py' -v
       - name: Build and verify repository game-data chunks
         run: |
-          python tools/binarify_game_data.py --output "$RUNNER_TEMP/game_data" --version "$GITHUB_SHA"
+          python tools/binarify_game_data.py --output "$RUNNER_TEMP/game_data"
           python - <<'PY'
           import hashlib, json, os, pathlib
           root = pathlib.Path(os.environ["RUNNER_TEMP"]) / "game_data"
