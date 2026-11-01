@@ -142,7 +142,7 @@ object GameDataArchive {
                 require(filesValid(staging, manifest)) { "Extracted game data failed validation" }
                 if (finalDir.exists()) finalDir.deleteRecursively()
                 check(staging.renameTo(finalDir))
-                activate(pointer, version, root)
+                activate(pointer, version)
                 versions.listFiles()?.filter { it.isDirectory && it.name != version }
                     ?.sortedByDescending { it.lastModified() }?.drop(1)?.forEach { it.deleteRecursively() }
                 PrepareResult(true, version, "Prepared " + manifest.getJSONArray("files").length() + " game-data files")
