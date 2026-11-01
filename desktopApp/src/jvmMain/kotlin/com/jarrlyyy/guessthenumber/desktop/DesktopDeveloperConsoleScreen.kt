@@ -156,6 +156,54 @@ internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit, onOpenProcessInsp
         }
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Settings JSON Inspector", style = MaterialTheme.typography.titleLarge)
+                Text("Inspect and update the active save's shared GameSettings model. JSON is decoded with unknown-key tolerance and written through the desktop save store.")
+                OutlinedButton(onClick = {
+                    val current = state
+                    if (current == null) {
+                        settingsJsonStatus = "No active save is available."
+                    } else {
+                        settingsJson = settingsJsonCodec.encodeToString(current.settings)
+                        settingsJsonStatus = "Loaded settings from slot $activeSlot."
+                    }
+                }, enabled = !isLoading && !isSaving) { Text("Load settings JSON") }
+                OutlinedTextField(
+                    value = settingsJson,
+                    onValueChange = { settingsJson = it.take(256_000) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("GameSettings JSON") },
+                    minLines = 6,
+                    maxLines = 12,
+                    textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace)
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        val current = state
+                        val decoded = runCatching { settingsJsonCodec.decodeFromString<GameSettings>(settingsJson) }.getOrNull()
+                        if (current == null || decoded == null) {
+                            settingsJsonStatus = "Invalid settings JSON. The current save was not changed."
+                        } else {
+                            scope.launch {
+                                isSaving = true
+                                val updated = current.copy(settings = decoded)
+                                val saved = withContext(Dispatchers.IO) {
+                                    store.save(activeSlot, updated.copy(lastSaveTimestamp = System.currentTimeMillis()))
+                                }
+                                if (saved) {
+                                    state = updated
+                                    settingsJsonStatus = "Settings JSON validated and saved to slot $activeSlot."
+                                    append("Applied settings JSON to slot $activeSlot.")
+                                } else {
+                                    settingsJsonStatus = "Could not save settings. The previous save remains available."
+                                }
+                                isSaving = false
+                            }
+                        }
+                    }, enabled = settingsJson.isNotBlank() && !isSaving) { Text("Validate & Apply") }
+                    OutlinedButton(onClick = { settingsJson = ""; settingsJsonStatus = "Editor cleared." }, enabled = !isSaving) { Text("Clear") }
+                }
+                Text(settingsJsonStatus, style = MaterialTheme.typography.bodySmall)
+                HorizontalDivider()
                 Text("Save JSON Inspector", style = MaterialTheme.typography.titleLarge)
                 Text("Inspect or apply the active slot JSON through the desktop save validator. Rejected imports leave the current save untouched.")
                 OutlinedButton(onClick = {
