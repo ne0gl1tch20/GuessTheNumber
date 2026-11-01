@@ -10,7 +10,7 @@ class DesktopArcadeCatalogTest {
         val games = DesktopEconomyRepository().minigames()
 
         assertEquals(
-            listOf("quick_guess", "reaction_test", "lucky_number", "memory_match", "number_rush"),
+            listOf("quick_guess", "reaction_test", "lucky_number", "memory_match", "number_rush", "math_blitz", "memory_grid"),
             games.map { it.id }
         )
         assertEquals("Quick Guess", games.first().name)
