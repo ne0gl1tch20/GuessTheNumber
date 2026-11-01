@@ -24,6 +24,7 @@ class DesktopGuessingBot {
     }
 
     fun observeGuess(guess: Long, feedback: GuessFeedback) {
+        GuessSourceContext.clearBotGuess()
         when (feedback) {
             GuessFeedback.TOO_LOW -> lowerBound = maxOf(lowerBound, guess + 1L)
             GuessFeedback.TOO_HIGH -> upperBound = minOf(upperBound, guess - 1L)
