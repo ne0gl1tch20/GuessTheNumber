@@ -36,9 +36,11 @@ internal object DesktopJarrlyyDsp {
     fun play(preset: Int, volume: Float): Boolean {
         val pcm = renderPcm(preset, volume) ?: return false
         return runCatching {
-            activeClips.removeAll { clip ->
-                if (!clip.isRunning) runCatching { clip.close() }
-                !clip.isRunning
+            // Work on a snapshot: closing a completed Clip can synchronously emit STOP
+            // and invoke its listener, which also removes that clip from activeClips.
+            activeClips.toList().filter { !it.isRunning }.forEach { finished ->
+                activeClips.remove(finished)
+                runCatching { finished.close() }
             }
             while (activeClips.size >= MAX_STREAMS) {
                 val oldest = activeClips.removeAt(0)
