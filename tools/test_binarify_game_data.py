@@ -17,6 +17,7 @@ class BinarifyGameDataTest(unittest.TestCase):
             assets = root / "assets"
             (assets / "game").mkdir(parents=True)
             (assets / "traits" / "seasonal").mkdir(parents=True)
+            (assets / "changelogs.md").write_text("release notes")
             (assets / "game" / "config.json").write_text('{"schemaVersion":1}')
             (assets / "traits" / "seasonal" / "rule.lua").write_text("return {}")
             previous = builder.ASSETS
@@ -39,7 +40,7 @@ class BinarifyGameDataTest(unittest.TestCase):
 
             self.assertEqual(manifest["schemaVersion"], 1)
             self.assertEqual({entry["path"] for entry in manifest["files"]},
-                             {"game/config.json", "traits/seasonal/rule.lua"})
+                             {"game/config.json", "traits/seasonal/rule.lua", "changelogs.md"})
             self.assertTrue((output / "01.bin").is_file())
             self.assertTrue((output / "manifest.json").is_file())
 
@@ -53,6 +54,22 @@ class BinarifyGameDataTest(unittest.TestCase):
                 plaintext = AESGCM(builder.KEY).decrypt(nonce, blob[21:], associated_data)
                 with zipfile.ZipFile(BytesIO(plaintext)) as archive:
                     self.assertTrue(archive.namelist())
+
+    def test_content_addressed_version_is_stable(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            assets = root / "assets"
+            (assets / "game").mkdir(parents=True)
+            (assets / "game" / "config.json").write_text('{"value":1}')
+            previous = builder.ASSETS
+            builder.ASSETS = assets
+            try:
+                first = builder.build(root / "first", None, 65536)
+                second = builder.build(root / "second", None, 65536)
+            finally:
+                builder.ASSETS = previous
+            self.assertRegex(first["version"], r"^[a-f0-9]{20}$")
+            self.assertEqual(first["version"], second["version"])
 
     def test_rejects_too_small_chunk_limit(self):
         with tempfile.TemporaryDirectory() as temporary:
