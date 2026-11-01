@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.content.Intent
 import com.jarrlyyy.guessthenumber.data.store.MAX_SAVE_SLOTS
 import com.jarrlyyy.guessthenumber.data.repository.WebPlayAssetSyncer
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import com.jarrlyyy.guessthenumber.traits.ActiveTraitCatalog
 import com.jarrlyyy.guessthenumber.traits.TraitLiveOpsRepository
 import kotlinx.coroutines.Dispatchers
@@ -57,8 +58,12 @@ class MainActivity : ComponentActivity() {
             .takeIf { it in 1..MAX_SAVE_SLOTS }
         setContent {
             LaunchedEffect(Unit) {
-                // Start the optional web UI update during save loading; never block save initialization.
-                withContext(Dispatchers.IO) { WebPlayAssetSyncer(applicationContext).sync() }
+                // Prepare the bundled encrypted chunks during save loading, then run the existing web update.
+                // A damaged/missing archive falls back to the original APK assets and never blocks saves.
+                withContext(Dispatchers.IO) {
+                    GameDataArchive.prepare(applicationContext)
+                    WebPlayAssetSyncer(applicationContext).sync()
+                }
             }
             LaunchedEffect(Unit) {
                 // Refresh signed trait data in the background; offline catalog remains available on failure.
