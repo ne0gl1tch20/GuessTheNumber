@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
                 // A damaged/missing archive falls back to the original APK assets and never blocks saves.
                 withContext(Dispatchers.IO) {
                     GameDataArchive.prepare(applicationContext)
+                    GameDataArchive.syncRemote(applicationContext)
                     WebPlayAssetSyncer(applicationContext).sync()
                 }
             }
