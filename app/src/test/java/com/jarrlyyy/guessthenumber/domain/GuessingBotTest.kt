@@ -43,4 +43,18 @@ class GuessingBotTest {
         guess > target -> GuessFeedback.TOO_HIGH
         else -> GuessFeedback.CORRECT
     }
+    @Test
+    fun separatelyOwnedBotsKeepIndependentSearchIntervals() {
+        val botOne = GuessingBot()
+        val botTwo = GuessingBot()
+        botOne.reset(1L, 100L)
+        botTwo.reset(1L, 100L)
+
+        val firstGuess = botOne.nextGuess(1L, 100L)
+        botOne.observeGuess(firstGuess, GuessFeedback.TOO_LOW)
+
+        assertEquals(75L, botOne.nextGuess(1L, 100L))
+        assertEquals(50L, botTwo.nextGuess(1L, 100L))
+    }
+
 }
