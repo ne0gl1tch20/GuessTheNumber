@@ -47,6 +47,7 @@ jobs:
           assert manifest["chunks"] and manifest["files"]
           assets = pathlib.Path("app/src/main/assets")
           expected = {p.relative_to(assets).as_posix() for p in assets.rglob("*") if p.is_file()}
+          expected.add("web-play/gtn-app-logo.png")
           actual_list = [entry["path"] for entry in manifest["files"]]
           assert len(actual_list) == len(set(actual_list)), "Duplicate manifest file paths"
           assert set(actual_list) == expected, f"Asset coverage mismatch: missing={expected-set(actual_list)}, extra={set(actual_list)-expected}"
