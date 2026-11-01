@@ -113,18 +113,38 @@ private fun WindowsUpdateToolsCard() {
 
 @Composable
 private fun WindowsAudioAdapterCard() {
+    var devices by remember {
+        mutableStateOf(javax.sound.sampled.AudioSystem.getMixerInfo().toList())
+    }
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Desktop Audio Adapter", style = MaterialTheme.typography.titleLarge)
+            Text("Windows Audio Device Diagnostics", style = MaterialTheme.typography.titleLarge)
             Text(
-                "The Android Jarrlyy DSP test panel uses AAudio and is Android-specific. " +
-                    "A Windows DSP test adapter is not implemented yet, so this screen does not simulate or claim to run that native test engine.",
+                "Lists audio devices exposed by the Windows Java Sound adapter. Playback and capture line counts are read-only diagnostics; this does not pretend to run Android's AAudio DSP engine.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            OutlinedButton(onClick = {
+                devices = javax.sound.sampled.AudioSystem.getMixerInfo().toList()
+            }) { Text("Refresh audio devices") }
+            if (devices.isEmpty()) {
+                Text("No audio devices were reported by the desktop audio provider.")
+            } else {
+                devices.forEach { info ->
+                    val lines = runCatching {
+                        val mixer = javax.sound.sampled.AudioSystem.getMixer(info)
+                        "Playback lines: ${mixer.sourceLineInfo.size} · Capture lines: ${mixer.targetLineInfo.size}"
+                    }.getOrElse { "Device details unavailable: ${it.message ?: "unknown error"}" }
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(info.name, style = MaterialTheme.typography.titleSmall)
+                        Text(info.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(lines, style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
         }
     }
 }
