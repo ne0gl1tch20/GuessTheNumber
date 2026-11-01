@@ -3,6 +3,7 @@
 **Repository:** `ne0gl1tch20/GuessTheNumber`  
 **Target:** `master`  
 **Phases:** 1–4 only  
+**Status:** COMPLETE — PR #392 was merged to `master` after the final six PR-head workflows passed.  
 **Architecture rule:** Android is the behavioral reference. HTML + JarrlyyUI remains the player-facing Settings UI on both platforms. Kotlin/shared KMP owns authoritative state, validation, persistence and platform-neutral rules. Android and Windows only provide platform adapters.
 
 ## Phase 1 — Audit, shared UI and Settings parity
@@ -74,7 +75,7 @@ Review the final diff for placeholder implementations, accidental schema/data lo
 - [x] Long navigation text uses accessible truncation patterns already present in the shared HTML surface.
 - [x] Inno Setup is the Windows packaging/update path and MSI/WiX assumptions are removed.
 - [x] Windows CI verifies install, upgrade, uninstall and data preservation.
-- [x] All six PR-head GitHub Actions workflows pass on the final implementation commit.
-- [x] One consolidated PR is ready to merge to `master`.
+- [x] All six PR-head GitHub Actions workflows passed on the final implementation commit.
+- [x] Consolidated PR #392 was merged to `master`.
 
-**Clear finish:** merge PR #392 only after the final PR head remains green. No phase is complete merely because code compiles.
+**Clear finish:** Phases 1–4 are complete. The implementation is merged to `master` and the required CI/runtime/installer checks passed before merge.
