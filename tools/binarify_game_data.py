@@ -48,40 +48,52 @@ def safe_files(folder: Path) -> list[Path]:
     return result
 
 
-def grouped_files() -> dict[str, list[Path]]:
-    groups: dict[str, list[Path]] = {}
+def grouped_files(extra_files: list[tuple[Path, str]] | None = None) -> dict[str, list[tuple[Path, str]]]:
+    groups: dict[str, list[tuple[Path, str]]] = {}
     for name in GROUPS:
         files = safe_files(ASSETS / name)
         if files:
-            groups[name] = files
+            groups[name] = [(path, path.relative_to(ASSETS).as_posix()) for path in files]
     root_files = [path for path in sorted(ASSETS.iterdir()) if path.is_file()]
     if root_files:
-        groups["core"] = root_files
+        groups["core"] = [(path, path.relative_to(ASSETS).as_posix()) for path in root_files]
+    seen = {relative for files in groups.values() for _, relative in files}
+    for source, relative in extra_files or []:
+        if not source.is_file():
+            raise ValueError(f"Extra game-data asset does not exist: {source}")
+        parts = relative.split("/")
+        if relative.startswith("/") or chr(92) in relative or any(part in ("", ".", "..") for part in parts):
+            raise ValueError(f"Unsafe extra asset path: {relative}")
+        if relative in seen:
+            raise ValueError(f"Duplicate game-data asset path: {relative}")
+        group = parts[0]
+        groups.setdefault(group, []).append((source, relative))
+        seen.add(relative)
     if not groups:
         raise ValueError(f"No game data found under {ASSETS}")
     return groups
 
 
-def make_zip(files: Iterable[Path]) -> bytes:
+def make_zip(files: Iterable[tuple[Path, str]]) -> bytes:
     from io import BytesIO
     output = BytesIO()
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-        for path in files:
-            info = zipfile.ZipInfo(path.relative_to(ASSETS).as_posix(), date_time=(1980, 1, 1, 0, 0, 0))
+        for source, relative in files:
+            info = zipfile.ZipInfo(relative, date_time=(1980, 1, 1, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             info.create_system = 3
             info.external_attr = 0o100600 << 16
-            archive.writestr(info, path.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+            archive.writestr(info, source.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
     return output.getvalue()
 
 
-def split_group(name: str, files: list[Path], max_bytes: int) -> list[list[Path]]:
+def split_group(name: str, files: list[tuple[Path, str]], max_bytes: int) -> list[list[tuple[Path, str]]]:
     # Split by estimated uncompressed bytes so a single subsystem can be fetched
     # in small independently verifiable units.
-    chunks: list[list[Path]] = []
-    current: list[Path] = []
+    chunks: list[list[tuple[Path, str]]] = []
+    current: list[tuple[Path, str]] = []
     current_size = 0
-    for path in files:
+    for path, _ in files:
         size = path.stat().st_size
         if size > max_bytes:
             raise ValueError(f"Asset exceeds configured chunk size ({size} > {max_bytes}): {path}")
@@ -95,7 +107,7 @@ def split_group(name: str, files: list[Path], max_bytes: int) -> list[list[Path]
     return chunks
 
 
-def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BYTES) -> dict:
+def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BYTES, extra_files: list[tuple[Path, str]] | None = None) -> dict:
     if max_chunk_bytes < 64 * 1024:
         raise ValueError("Chunk size must be at least 64 KiB")
     output.mkdir(parents=True, exist_ok=True)
@@ -109,7 +121,7 @@ def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BY
     file_entries = []
     chunk_entries = []
     chunk_number = 1
-    for group, files in grouped_files().items():
+    for group, files in grouped_files(extra_files).items():
         for group_chunk in split_group(group, files, max_chunk_bytes):
             archive_bytes = make_zip(group_chunk)
             name = f"{chunk_number:02d}.bin"
@@ -130,8 +142,7 @@ def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BY
                 "nonceBytes": len(nonce),
                 "fileCount": len(group_chunk),
             })
-            for path in group_chunk:
-                relative = path.relative_to(ASSETS).as_posix()
+            for path, relative in group_chunk:
                 data = path.read_bytes()
                 file_entries.append({
                     "path": relative,
@@ -176,8 +187,15 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=OUTPUT)
     parser.add_argument("--version", default=None)
     parser.add_argument("--max-chunk-bytes", type=int, default=MAX_CHUNK_BYTES)
+    parser.add_argument("--extra-file", action="append", default=[], metavar="SOURCE=ASSET_PATH")
     args = parser.parse_args()
-    manifest = build(args.output, args.version, args.max_chunk_bytes)
+    extra_files = []
+    for specification in args.extra_file:
+        if "=" not in specification:
+            parser.error("--extra-file must use SOURCE=ASSET_PATH")
+        source, relative = specification.split("=", 1)
+        extra_files.append((Path(source), relative))
+    manifest = build(args.output, args.version, args.max_chunk_bytes, extra_files)
     print(f"Built {len(manifest['chunks'])} encrypted chunks containing {len(manifest['files'])} files at {args.output}")
 
 
