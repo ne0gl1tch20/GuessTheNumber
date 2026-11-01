@@ -1941,7 +1941,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                         } else {
                             independentBotGuessers.getOrPut(botId) { GuessingBot() }
                         }
-                        val guess = activeGuesser.nextGuess(
+                        // Every bot owns a private feedback-driven search interval over the
+                        // configured run range. The shared game interval still bounds submissions.
+                        val assignedMin = 1L
+                        val assignedMax = gameEngine.getRangeMax(currentState)
+                        val proposedGuess = activeGuesser.nextGuess(assignedMin, assignedMax)
+                        val guess = proposedGuess.coerceIn(
                             currentState.currentRangeMin,
                             currentState.currentRangeMax
                         )
