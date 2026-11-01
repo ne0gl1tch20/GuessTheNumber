@@ -980,9 +980,9 @@ fun ProductionGuessGameScreen(
                         }
                     },
                     onCreateSlot = { options ->
-                        val current = state
+                        val current = state ?: GameState()
                         val targetSlot = options.slot
-                        if (current != null) scope.launch {
+                        scope.launch {
                             val rangeMin = if (options.creativeModeEnabled) options.rangeMin else 1L
                             val rangeMax = if (options.creativeModeEnabled) {
                                 options.rangeMax
