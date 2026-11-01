@@ -80,6 +80,7 @@ object GameDataArchive {
                 val chunks = manifest.getJSONArray("chunks")
                 require(chunks.length() in 1..512)
                 var total = 0L
+                val extractedPaths = mutableSetOf<String>()
                 for (index in 0 until chunks.length()) {
                     val entry = chunks.getJSONObject(index)
                     val id = entry.getString("id")
@@ -99,6 +100,7 @@ object GameDataArchive {
                             val item = zip.nextEntry ?: break
                             require(safePath(item.name))
                             if (!item.isDirectory) {
+                                require(extractedPaths.add(item.name)) { "Duplicate game-data archive path" }
                                 val target = File(staging, item.name)
                                 target.parentFile?.mkdirs()
                                 var fileSize = 0L
@@ -157,14 +159,17 @@ object GameDataArchive {
     private fun filesValid(root: File, manifest: JSONObject): Boolean = runCatching {
         val files = manifest.getJSONArray("files")
         if (files.length() !in 1..10000) return false
+        val expectedPaths = mutableSetOf<String>()
         for (index in 0 until files.length()) {
             val entry = files.getJSONObject(index)
             val path = entry.getString("path")
-            if (!safePath(path)) return false
+            if (!safePath(path) || !expectedPaths.add(path)) return false
             val file = File(root, path)
             if (!file.isFile || file.length() != entry.getLong("size") || sha256(file) != entry.getString("sha256")) return false
         }
-        true
+        val actualPaths = root.walkTopDown().filter { it.isFile }
+            .map { it.relativeTo(root).invariantSeparatorsPath }.toSet()
+        actualPaths == expectedPaths
     }.getOrDefault(false)
 
     private fun activate(pointer: File, version: String) {
