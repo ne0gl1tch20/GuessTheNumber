@@ -48,3 +48,45 @@ jobs:
               assert data[:8] == b"GTNGBIN1"
           print(f"Verified {len(manifest['chunks'])} chunks / {len(manifest['files'])} files")
           PY
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: archive
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install archive builder dependency
+        run: python -m pip install -r tools/requirements-game-data.txt
+      - name: Generate publishable game-data chunks
+        run: python tools/binarify_game_data.py --output game_data
+      - name: Publish chunks and manifest to master
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin master
+            git checkout -B master origin/master
+            python tools/binarify_game_data.py --output game_data
+            git add game_data
+            if [ -z "$(git status --porcelain -- game_data)" ]; then
+              echo "Published game-data archive is already current"
+              exit 0
+            fi
+            git commit -m "chore: publish encrypted game data chunks [skip ci]"
+            if git push origin HEAD:master; then
+              exit 0
+            fi
+            echo "master moved during publication (attempt $attempt); retrying"
+          done
+          echo "Could not publish game-data archive after 5 attempts."
+          exit 1
