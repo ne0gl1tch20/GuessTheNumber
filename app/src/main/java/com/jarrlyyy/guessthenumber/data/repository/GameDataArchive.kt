@@ -7,6 +7,9 @@ import java.io.File
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 import java.util.zip.ZipInputStream
 import javax.crypto.Cipher
@@ -67,7 +70,7 @@ object GameDataArchive {
             require(version.matches(Regex("[a-zA-Z0-9._-]{1,80}")))
             val finalDir = File(versions, version)
             if (finalDir.isDirectory && filesValid(finalDir, manifest)) {
-                activate(pointer, version, root)
+                activate(pointer, version)
                 return PrepareResult(true, version, "Game data cache is current")
             }
             val staging = File(root, "staging-$version")
@@ -164,10 +167,19 @@ object GameDataArchive {
         true
     }.getOrDefault(false)
 
-    private fun activate(pointer: File, version: String, root: File) {
-        val temporary = File(root, "active-version.tmp")
+    private fun activate(pointer: File, version: String) {
+        val temporary = File(pointer.parentFile, "active-version.tmp")
         temporary.writeText(version)
-        check(temporary.renameTo(pointer)) { "Could not atomically activate game-data version" }
+        try {
+            Files.move(
+                temporary.toPath(),
+                pointer.toPath(),
+                StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.ATOMIC_MOVE
+            )
+        } catch (_: AtomicMoveNotSupportedException) {
+            Files.move(temporary.toPath(), pointer.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        }
     }
 
     private fun activeVersion(pointer: File): String? = runCatching {
