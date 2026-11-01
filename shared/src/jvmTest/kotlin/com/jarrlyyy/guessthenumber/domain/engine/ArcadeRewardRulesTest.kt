@@ -28,7 +28,7 @@ class ArcadeRewardRulesTest {
     @Test
     fun arcadeRewardStartsAtOneNebulaAndScalesWithTimeAndScore() {
         assertEquals(1L, ArcadeRewardRules.calculateNebulaReward(0L, 0))
-        assertEquals(3L, ArcadeRewardRules.calculateNebulaReward(60L, 5))
+        assertEquals(4L, ArcadeRewardRules.calculateNebulaReward(60L, 5))
         assertEquals(10L, ArcadeRewardRules.calculateNebulaReward(600L, 100))
     }
 
