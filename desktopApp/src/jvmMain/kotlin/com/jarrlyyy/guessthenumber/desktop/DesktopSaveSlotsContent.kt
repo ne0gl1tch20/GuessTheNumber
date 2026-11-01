@@ -31,12 +31,20 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.jarrlyyy.guessthenumber.shared.domain.SaveProfileRules
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,14 +74,83 @@ internal fun DesktopSaveSlotsContent(
     onCreateSlot: (Int) -> Unit,
     onDuplicateSlot: (Int, Int) -> Unit,
     onRestoreBackup: (Int) -> Unit,
+    onEditProfile: (Int, String, String) -> Unit,
+    onResetSlot: (Int) -> Unit,
     onExportSlot: (Int) -> Unit,
     onImportSlot: (Int) -> Unit,
     onExportAllSlots: () -> Unit,
     onImportAllSlots: () -> Unit,
+    onExportAndroidBackup: () -> Unit,
+    onImportAndroidBackup: () -> Unit,
     onContinueWithActiveSlot: (() -> Unit)? = null,
     showCloseButton: Boolean = true
 ) {
     val activeState = slots.firstOrNull { it.slot == activeSlot }?.state
+    var editingSlot by remember { mutableStateOf<Int?>(null) }
+    var profileNameDraft by remember { mutableStateOf("") }
+    var profileIconDraft by remember { mutableStateOf(SaveProfileRules.DEFAULT_ICON) }
+    var resettingSlot by remember { mutableStateOf<Int?>(null) }
+
+    if (editingSlot != null) {
+        AlertDialog(
+            onDismissRequest = { editingSlot = null },
+            title = { Text("Edit save profile") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedTextField(
+                        value = profileNameDraft,
+                        onValueChange = { profileNameDraft = it.take(24) },
+                        label = { Text("Profile name") },
+                        singleLine = true
+                    )
+                    Text("Profile icon")
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        SaveProfileRules.iconIds.forEach { iconId ->
+                            OutlinedButton(
+                                onClick = { profileIconDraft = iconId },
+                                enabled = profileIconDraft != iconId
+                            ) {
+                                Text(SaveProfileRules.iconSymbol(iconId))
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val slot = editingSlot ?: return@TextButton
+                        onEditProfile(slot, profileNameDraft.trim().take(24), profileIconDraft)
+                        editingSlot = null
+                    },
+                    enabled = SaveProfileRules.isValidIcon(profileIconDraft)
+                ) { Text("Save") }
+            },
+            dismissButton = {
+                TextButton(onClick = { editingSlot = null }) { Text("Cancel") }
+            }
+        )
+    }
+
+    if (resettingSlot != null) {
+        val slot = resettingSlot!!
+        AlertDialog(
+            onDismissRequest = { resettingSlot = null },
+            title = { Text("Reset Slot $slot?") },
+            text = { Text("This permanently resets the selected save slot. Its current progress and recovery backup will be replaced.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onResetSlot(slot)
+                        resettingSlot = null
+                    }
+                ) { Text("Reset", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { resettingSlot = null }) { Text("Cancel") }
+            }
+        )
+    }
 
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
@@ -155,6 +232,22 @@ internal fun DesktopSaveSlotsContent(
             }
         }
 
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedButton(onClick = onExportAndroidBackup, modifier = Modifier.weight(1f)) {
+                Icon(Icons.Filled.FileDownload, contentDescription = null)
+                Spacer(Modifier.width(6.dp))
+                Text("Export Android backup")
+            }
+            OutlinedButton(onClick = onImportAndroidBackup, modifier = Modifier.weight(1f)) {
+                Icon(Icons.Filled.FileUpload, contentDescription = null)
+                Spacer(Modifier.width(6.dp))
+                Text("Import Android backup")
+            }
+        }
+
         slots.sortedBy { it.slot }.forEach { slot ->
             val data = slot.state
             val total = data?.let { it.statistics.totalGuesses.coerceAtLeast(it.attempts) } ?: 0L
@@ -167,7 +260,7 @@ internal fun DesktopSaveSlotsContent(
                 isCorrupt = slot.isCorrupt,
                 hasBackup = slot.hasBackup,
                 profileTitle = data?.takeUnless { slot.isCorrupt }?.let {
-                    "${it.profileIconId.takeIf(String::isNotBlank) ?: "🎮"}  ${it.profileName.ifBlank { "Player" }}"
+                    "${SaveProfileRules.iconSymbol(it.profileIconId)}  ${it.profileName.ifBlank { "Player" }}"
                 },
                 difficultyLabel = data?.takeUnless { slot.isCorrupt }?.let {
                     it.difficultyId.replaceFirstChar(Char::uppercase) +
@@ -204,6 +297,17 @@ internal fun DesktopSaveSlotsContent(
                     if (slot.isEmpty) onCreateSlot(slot.slot) else onSwitchSlot(slot.slot)
                 },
                 onCreate = { onCreateSlot(slot.slot) },
+                onEditProfile = if (!slot.isEmpty && !slot.isCorrupt) {
+                    {
+                        profileNameDraft = data?.profileName.orEmpty()
+                        profileIconDraft = data?.profileIconId?.takeIf(SaveProfileRules::isValidIcon)
+                            ?: SaveProfileRules.DEFAULT_ICON
+                        editingSlot = slot.slot
+                    }
+                } else null,
+                onReset = if (!slot.isEmpty && !slot.isCorrupt) {
+                    { resettingSlot = slot.slot }
+                } else null,
                 onDuplicate = if (slot.isEmpty && activeState != null) {
                     { onDuplicateSlot(activeSlot, slot.slot) }
                 } else null,

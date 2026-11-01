@@ -98,37 +98,50 @@ tasks.configureEach {
     }
 }
 
-// Supply the custom WiX project only to the MSI packaging task. The JDK's
-// default template is retained for all other packaging targets.
-val windowsMsiResourceDir = layout.projectDirectory.dir("packageResources/windows")
-tasks.withType<org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask>().configureEach {
-    if (targetFormat == org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi) {
-        freeArgs.addAll(
-            listOf("--resource-dir", windowsMsiResourceDir.asFile.absolutePath)
-        )
-    }
-}
-
 compose.desktop {
     application {
         mainClass = "com.jarrlyyy.guessthenumber.desktop.MainKt"
 
         nativeDistributions {
-            targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi)
             packageName = "GuessTheNumber"
             packageVersion = windowsPackageVersion.get()
 
             windows {
                 iconFile.set(generatedWindowsIcon.get().asFile)
-                // Preserve the UpgradeCode embedded in the existing Windows MSI.
-                upgradeUuid = "6178B622-7859-39F2-8ED0-E0466C715DD1"
-                menu = true
-                menuGroup = "GuessTheNumber"
-                shortcut = true
-                // Enables the WiX installer wizard and its Finish page.
-                dirChooser = true
             }
         }
+    }
+}
+
+// Build a jpackage app-image, then wrap it with Inno Setup. No MSI/WiX target is used.
+val packageWindowsInnoSetup = tasks.register<org.gradle.api.tasks.Exec>("packageWindowsInnoSetup") {
+    dependsOn("createDistributable", generateDesktopLogoAssets, generateDesktopBuildConfig)
+    val appImage = layout.buildDirectory.dir("compose/binaries/main/app/GuessTheNumber")
+    val outputDirectory = layout.buildDirectory.dir("compose/binaries/main/exe")
+    val installerScript = layout.projectDirectory.file("packageResources/windows/GuessTheNumber.iss")
+    inputs.dir(appImage)
+    inputs.file(installerScript)
+    outputs.dir(outputDirectory)
+    doFirst {
+        val compiler = providers.environmentVariable("INNO_SETUP_COMPILER")
+            .orElse("C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe").get()
+        val compilerFile = file(compiler)
+        check(compilerFile.isFile) {
+            "Inno Setup compiler was not found at $compiler. Install Inno Setup 6 or set INNO_SETUP_COMPILER."
+        }
+        val appImageDirectory = appImage.get().asFile
+        check(appImageDirectory.isDirectory) {
+            "The jpackage app-image was not produced at ${appImageDirectory.absolutePath}."
+        }
+        outputDirectory.get().asFile.mkdirs()
+        commandLine(
+            compilerFile.absolutePath,
+            "/DAppVersion=${windowsPackageVersion.get()}",
+            "/DAppImageDir=${appImageDirectory.absolutePath}",
+            "/DAppIcon=${generatedWindowsIcon.get().asFile.absolutePath}",
+            "/DOutputDir=${outputDirectory.get().asFile.absolutePath}",
+            installerScript.asFile.absolutePath
+        )
     }
 }
 

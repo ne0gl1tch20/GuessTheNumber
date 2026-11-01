@@ -1,10 +1,15 @@
 package com.jarrlyyy.guessthenumber.desktop.persistence
 
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeEffect
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeEffectType
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.runBlocking
+import java.util.Base64
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.test.Test
@@ -97,6 +102,40 @@ class DesktopSaveStoreTest {
     }
 
     @Test
+    fun creativeModeSavesRoundTripDuplicateExportImportAndReset() = runBlocking {
+        val sourceDirectory = Files.createTempDirectory("gtn-creative-save-source")
+        val source = DesktopSaveStore(sourceDirectory)
+        val base = GameState(targetNumber = 64, lastSaveTimestamp = 1_700_000_000_000L)
+        val creative = CreativeModeSave(
+            name = "Desktop Lab",
+            enabled = true,
+            rangeMin = 10L,
+            rangeMax = 500L,
+            effects = listOf(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, 2))
+        )
+        assertTrue(source.save(1, base))
+        assertTrue(source.save(1, base.copy(targetNumber = 70, lastSaveTimestamp = 1_700_000_000_050L)))
+        assertTrue(source.saveCreativeModeSave(1, creative))
+        assertEquals(creative, source.loadCreativeModeSave(1))
+        assertTrue(source.duplicateSlot(1, 2))
+        assertEquals(creative, source.loadCreativeModeSave(2))
+
+        val bundle = source.exportAllSlotsBundle() ?: error("Creative save bundle should export.")
+        val targetDirectory = Files.createTempDirectory("gtn-creative-save-target")
+        val target = DesktopSaveStore(targetDirectory)
+        assertTrue(target.importAllSlotsBundle(bundle))
+        assertEquals(70L, target.load(1)?.targetNumber)
+        assertTrue(target.restoreBackup(1))
+        assertEquals(64L, target.load(1)?.targetNumber)
+        assertEquals(creative, target.loadCreativeModeSave(1))
+        assertEquals(creative, target.loadCreativeModeSave(2))
+
+        assertTrue(target.reset(1, GameState(targetNumber = 20, lastSaveTimestamp = 1_700_000_000_100L)))
+        assertEquals(null, target.loadCreativeModeSave(1))
+        assertEquals(creative, target.loadCreativeModeSave(2))
+    }
+
+    @Test
     fun singleSlotJsonBackupExportsAndImportsWithRecoveryBackup() = runBlocking {
         val directory = Files.createTempDirectory("gtn-portable-backup")
         val store = DesktopSaveStore(directory)
@@ -125,6 +164,58 @@ class DesktopSaveStoreTest {
         val invalid = original.copy(money = BigNumber(-1))
         assertFalse(store.importSlotJson(1, Json.encodeToString(invalid)))
         assertEquals(0, store.load(1)!!.money.compareTo(BigNumber(500)))
+    }
+
+    @Test
+    fun androidCompatibleBackupRoundTripsSettingsRecoveryAndCreativeMode() = runBlocking {
+        val source = DesktopSaveStore(Files.createTempDirectory("gtn-android-backup-source"))
+        val creativeState = GameState(
+            targetNumber = 17,
+            currentRangeMin = 10,
+            currentRangeMax = 100,
+            creativeModeEnabled = true,
+            lastSaveTimestamp = 1_700_000_000_000L
+        )
+        val latestCreativeState = creativeState.copy(targetNumber = 19, lastSaveTimestamp = 1_700_000_000_100L)
+        val settings = GameSettings(themeMode = "Light", locale = "fil-PH", soundEnabled = false)
+        val creativeSave = CreativeModeSave(
+            name = "Creative Lab",
+            enabled = true,
+            rangeMin = 10L,
+            rangeMax = 100L,
+            effects = listOf(CreativeModeEffect("bonus-hints", CreativeEffectType.EXTRA_HINTS, 2))
+        )
+
+        assertTrue(source.save(1, creativeState))
+        assertTrue(source.save(1, latestCreativeState))
+        assertTrue(source.saveCreativeModeSave(1, creativeSave))
+        assertTrue(source.save(2, GameState(targetNumber = 83, settings = settings, lastSaveTimestamp = 1_700_000_000_200L)))
+        assertTrue(source.setActiveSlot(2))
+
+        val encoded = source.exportAndroidCompatibleBackup() ?: error("Android backup should export.")
+        val decoded = Base64.getDecoder().decode(encoded)
+        val salt = "GTN_ENC_2025_".toByteArray(Charsets.UTF_8)
+        assertTrue(decoded.copyOfRange(0, salt.size).contentEquals(salt))
+        val jsonBytes = ByteArray(decoded.size - salt.size) { index ->
+            (decoded[salt.size + index].toInt() xor 0x42).toByte()
+        }
+        val payload = jsonBytes.toString(Charsets.UTF_8)
+        assertTrue(payload.contains("\"formatVersion\":3"))
+        assertTrue(payload.contains("\"appPreferencesJson\""))
+        assertTrue(payload.contains("\"creativeSlots\""))
+
+        val target = DesktopSaveStore(Files.createTempDirectory("gtn-android-backup-target"))
+        assertTrue(target.importAndroidCompatibleBackup(encoded))
+        assertEquals(2, target.activeSlot())
+        assertEquals(19L, target.load(1)?.targetNumber)
+        assertEquals("Light", target.load(1)?.settings?.themeMode)
+        assertEquals("fil-PH", target.load(1)?.settings?.locale)
+        assertEquals(false, target.load(1)?.settings?.soundEnabled)
+        assertEquals(creativeSave, target.loadCreativeModeSave(1))
+
+        assertTrue(target.restoreBackup(1))
+        assertEquals(17L, target.load(1)?.targetNumber)
+        assertEquals("Light", target.load(1)?.settings?.themeMode)
     }
 
     @Test

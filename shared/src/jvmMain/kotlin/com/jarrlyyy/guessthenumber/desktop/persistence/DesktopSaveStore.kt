@@ -1,9 +1,13 @@
 package com.jarrlyyy.guessthenumber.desktop.persistence
 
-import com.jarrlyyy.guessthenumber.domain.model.BigNumber
-import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.shared.domain.SaveProfileRules
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSaveCodec
+import com.jarrlyyy.guessthenumber.shared.domain.SaveStateRules
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
@@ -16,6 +20,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
+import java.util.Base64
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -24,6 +29,18 @@ private const val MAX_SAVE_SLOTS = 10
 private const val MAX_BUNDLE_BYTES = 20 * 1024 * 1024
 private const val MAX_SLOT_JSON_BYTES = 2 * 1024 * 1024
 private const val MAX_MANIFEST_BYTES = 16 * 1024
+private const val MAX_ANDROID_BACKUP_CHARS = 32 * 1024 * 1024
+private const val ANDROID_BACKUP_XOR_KEY = 0x42
+
+@Serializable
+private data class AndroidCompatibleBackupBundle(
+    val formatVersion: Int = 3,
+    val appPreferencesJson: String,
+    val activeSlot: Int,
+    val slots: Map<Int, String> = emptyMap(),
+    val backups: Map<Int, String> = emptyMap(),
+    val creativeSlots: Map<Int, String> = emptyMap()
+)
 
 data class DesktopSaveSlotSummary(val slot: Int, val state: GameState?, val isEmpty: Boolean, val hasBackup: Boolean, val isCorrupt: Boolean)
 
@@ -127,6 +144,7 @@ class DesktopSaveStore internal constructor(
             fileOps.createDirectories(rootDirectory)
             writeAtomically(primaryPath(normalizedSlot), json.encodeToString(state))
             fileOps.deleteIfExists(backupPath(normalizedSlot))
+            fileOps.deleteIfExists(creativePath(normalizedSlot))
         }.isSuccess
     }
 
@@ -155,7 +173,10 @@ class DesktopSaveStore internal constructor(
     suspend fun createFreshSlot(slot: Int, state: GameState): Boolean {
         val normalized = normalizeSlot(slot)
         if (!validate(state)) return false
-        val occupied = runCatching { fileOps.exists(primaryPath(normalized)) || fileOps.exists(backupPath(normalized)) }.getOrDefault(true)
+        val occupied = runCatching {
+            fileOps.exists(primaryPath(normalized)) || fileOps.exists(backupPath(normalized)) ||
+                fileOps.exists(creativePath(normalized))
+        }.getOrDefault(true)
         return !occupied && save(normalized, state)
     }
 
@@ -164,13 +185,31 @@ class DesktopSaveStore internal constructor(
         val target = normalizeSlot(targetSlot)
         if (source == target) return false
         val sourceState = load(source) ?: return false
-        val occupied = runCatching { fileOps.exists(primaryPath(target)) || fileOps.exists(backupPath(target)) }.getOrDefault(true)
+        val occupied = runCatching {
+            fileOps.exists(primaryPath(target)) || fileOps.exists(backupPath(target)) ||
+                fileOps.exists(creativePath(target))
+        }.getOrDefault(true)
         if (occupied) return false
+        val sourceCreativeRaw = runCatching {
+            if (fileOps.exists(creativePath(source))) fileOps.read(creativePath(source)) else null
+        }.getOrNull()
+        val sourceCreative = sourceCreativeRaw?.let(CreativeModeSaveCodec::decodeAndMigrate)
+            ?: if (sourceCreativeRaw == null) null else return false
+        val sourceBackup = readValidJson(backupPath(source))
         val saved = save(target, sourceState.copy(lastSaveTimestamp = System.currentTimeMillis()))
         if (!saved) return false
-        val sourceBackup = readValidJson(backupPath(source))
-        if (sourceBackup != null) runCatching { writeAtomically(backupPath(target), sourceBackup) }
-        return true
+        return runCatching {
+            if (sourceBackup != null) writeAtomically(backupPath(target), sourceBackup)
+            if (sourceCreative != null) {
+                check(saveCreativeModeSave(target, sourceCreative)) { "Could not duplicate creative mode data." }
+            }
+            true
+        }.getOrElse {
+            runCatching { fileOps.deleteIfExists(primaryPath(target)) }
+            runCatching { fileOps.deleteIfExists(backupPath(target)) }
+            runCatching { fileOps.deleteIfExists(creativePath(target)) }
+            false
+        }
     }
 
     /**
@@ -193,14 +232,196 @@ class DesktopSaveStore internal constructor(
         return save(slot, imported)
     }
 
-    /** Exports every populated slot plus the active-slot selection as one plain JSON ZIP bundle. */
+    suspend fun loadCreativeModeSave(slot: Int): CreativeModeSave? {
+        if (slot !in 1..MAX_SAVE_SLOTS) return null
+        val path = creativePath(slot)
+        val raw = runCatching { if (fileOps.exists(path)) fileOps.read(path) else null }.getOrNull() ?: return null
+        val decoded = CreativeModeSaveCodec.decodeAndMigrate(raw) ?: return null
+        val canonical = runCatching { CreativeModeSaveCodec.encode(decoded) }.getOrNull() ?: return null
+        if (canonical != raw) runCatching { writeAtomically(path, canonical) }
+        return decoded
+    }
+
+    suspend fun saveCreativeModeSave(slot: Int, save: CreativeModeSave): Boolean {
+        if (slot !in 1..MAX_SAVE_SLOTS || !CreativeModeSaveCodec.validate(save)) return false
+        val encoded = runCatching { CreativeModeSaveCodec.encode(save) }.getOrNull() ?: return false
+        return runCatching {
+            fileOps.createDirectories(rootDirectory)
+            writeAtomically(creativePath(slot), encoded)
+        }.isSuccess
+    }
+
+    suspend fun exportCreativeModeSave(slot: Int): String? =
+        loadCreativeModeSave(slot)?.let(CreativeModeSaveCodec::encode)
+
+    suspend fun importCreativeModeSave(slot: Int, raw: String): Boolean {
+        if (slot !in 1..MAX_SAVE_SLOTS || raw.isBlank() || raw.length > MAX_SLOT_JSON_BYTES) return false
+        val imported = CreativeModeSaveCodec.decodeAndMigrate(raw) ?: return false
+        return saveCreativeModeSave(slot, imported)
+    }
+
+    /**
+     * Exports the Android formatVersion=3 backup envelope. The XOR/Base64 layer
+     * intentionally matches Android's existing import format for compatibility;
+     * it is obfuscation, not cryptographic protection.
+     */
+    suspend fun exportAndroidCompatibleBackup(): String? {
+        return runCatching {
+            val slots = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+                readValidJson(primaryPath(slot))?.let { slot to it }
+            }.toMap()
+            val backups = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+                readValidJson(backupPath(slot))?.let { slot to it }
+            }.toMap()
+            val creativeSlots = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+                exportCreativeModeSave(slot)?.let { slot to it }
+            }.toMap()
+            if (slots.isEmpty() && backups.isEmpty() && creativeSlots.isEmpty()) return null
+            val active = activeSlot()
+            val settings = load(active)?.settings ?: GameSettings()
+            val bundle = AndroidCompatibleBackupBundle(
+                formatVersion = 3,
+                appPreferencesJson = json.encodeToString(settings),
+                activeSlot = active,
+                slots = slots,
+                backups = backups,
+                creativeSlots = creativeSlots
+            )
+            encodeAndroidBackup(json.encodeToString(bundle))
+        }.getOrNull()
+    }
+
+    /**
+     * Imports Android's existing encrypted backup envelope, including global
+     * GameSettings, primary saves, recovery backups and Creative Mode records.
+     * Every entry is validated before any existing file is replaced.
+     */
+    suspend fun importAndroidCompatibleBackup(encoded: String): Boolean {
+        if (encoded.isBlank() || encoded.length > MAX_ANDROID_BACKUP_CHARS) return false
+        val raw = decodeAndroidBackup(encoded) ?: return false
+        if (raw.length > MAX_BUNDLE_BYTES) return false
+        val bundle = runCatching {
+            json.decodeFromString<AndroidCompatibleBackupBundle>(raw)
+        }.getOrNull() ?: return false
+        if (bundle.formatVersion !in 2..3 || bundle.activeSlot !in 1..MAX_SAVE_SLOTS) return false
+        if (bundle.appPreferencesJson.isBlank() || bundle.appPreferencesJson.length > MAX_SLOT_JSON_BYTES) return false
+        val importedSettings = runCatching {
+            json.decodeFromString<GameSettings>(bundle.appPreferencesJson)
+        }.getOrNull() ?: return false
+        if (bundle.slots.keys.any { it !in 1..MAX_SAVE_SLOTS } ||
+            bundle.backups.keys.any { it !in 1..MAX_SAVE_SLOTS } ||
+            bundle.creativeSlots.keys.any { it !in 1..MAX_SAVE_SLOTS }
+        ) return false
+        if (bundle.slots.isEmpty() && bundle.backups.isEmpty() && bundle.creativeSlots.isEmpty()) return false
+
+        val existingStates = (1..MAX_SAVE_SLOTS).associateWith { load(it) }
+        val importedSlots = linkedMapOf<Int, GameState>()
+        for ((slot, rawState) in bundle.slots) {
+            if (rawState.isBlank() || rawState.length > MAX_SLOT_JSON_BYTES) return false
+            val state = runCatching { json.decodeFromString<GameState>(rawState) }.getOrNull() ?: return false
+            if (!validate(state)) return false
+            importedSlots[slot] = preserveCreativeMode(existingStates[slot], state).copy(settings = importedSettings)
+        }
+        val importedBackups = linkedMapOf<Int, GameState>()
+        for ((slot, rawState) in bundle.backups) {
+            if (rawState.isBlank() || rawState.length > MAX_SLOT_JSON_BYTES) return false
+            val state = runCatching { json.decodeFromString<GameState>(rawState) }.getOrNull() ?: return false
+            if (!validate(state)) return false
+            importedBackups[slot] = preserveCreativeMode(existingStates[slot], state).copy(settings = importedSettings)
+        }
+        val importedCreative = linkedMapOf<Int, CreativeModeSave>()
+        for ((slot, rawSave) in bundle.creativeSlots) {
+            if (rawSave.isBlank() || rawSave.length > MAX_SLOT_JSON_BYTES) return false
+            importedCreative[slot] = CreativeModeSaveCodec.decodeAndMigrate(rawSave) ?: return false
+        }
+
+        val previousActive = activeSlot()
+        val previousFiles = runCatching {
+            (1..MAX_SAVE_SLOTS).flatMap { slot ->
+                listOf(primaryPath(slot), backupPath(slot), creativePath(slot))
+            }.associateWith { path ->
+                if (fileOps.exists(path)) fileOps.read(path) else null
+            }
+        }.getOrNull() ?: return false
+        return try {
+            fileOps.createDirectories(rootDirectory)
+            for (slot in 1..MAX_SAVE_SLOTS) {
+                fileOps.deleteIfExists(primaryPath(slot))
+                fileOps.deleteIfExists(backupPath(slot))
+                fileOps.deleteIfExists(creativePath(slot))
+                importedSlots[slot]?.let { writeAtomically(primaryPath(slot), json.encodeToString(it)) }
+                importedBackups[slot]?.let { writeAtomically(backupPath(slot), json.encodeToString(it)) }
+                importedCreative[slot]?.let {
+                    check(saveCreativeModeSave(slot, it)) { "Could not import Creative Mode data for slot $slot." }
+                }
+            }
+            check(setActiveSlot(bundle.activeSlot)) { "Could not set the imported active slot." }
+            true
+        } catch (_: Exception) {
+            previousFiles.forEach { (path, content) ->
+                runCatching {
+                    if (content == null) fileOps.deleteIfExists(path) else writeAtomically(path, content)
+                }
+            }
+            runCatching { setActiveSlot(previousActive) }
+            false
+        }
+    }
+
+    private fun preserveCreativeMode(existing: GameState?, incoming: GameState): GameState {
+        if (existing?.creativeModeEnabled != true || incoming.creativeModeEnabled) return incoming
+        val min = existing.currentRangeMin.coerceAtLeast(1L)
+        val max = existing.currentRangeMax.coerceAtLeast(min)
+        return incoming.copy(
+            creativeModeEnabled = true,
+            currentRangeMin = min,
+            currentRangeMax = max,
+            targetNumber = incoming.targetNumber.coerceIn(min, max)
+        )
+    }
+
+    private fun encodeAndroidBackup(raw: String): String {
+        val salt = "GTN_ENC_2025_".toByteArray(Charsets.UTF_8)
+        val payload = raw.toByteArray(Charsets.UTF_8)
+        val combined = ByteArray(salt.size + payload.size)
+        System.arraycopy(salt, 0, combined, 0, salt.size)
+        for (index in payload.indices) {
+            combined[salt.size + index] = (payload[index].toInt() xor ANDROID_BACKUP_XOR_KEY).toByte()
+        }
+        return Base64.getEncoder().encodeToString(combined)
+    }
+
+    private fun decodeAndroidBackup(encoded: String): String? {
+        return runCatching {
+            val decoded = Base64.getDecoder().decode(encoded.trim())
+            val salt = "GTN_ENC_2025_".toByteArray(Charsets.UTF_8)
+            require(decoded.size > salt.size) { "Backup payload is too short." }
+            val hasSalt = salt.indices.all { decoded[it] == salt[it] }
+            val payload = if (hasSalt) {
+                ByteArray(decoded.size - salt.size) { index ->
+                    (decoded[salt.size + index].toInt() xor ANDROID_BACKUP_XOR_KEY).toByte()
+                }
+            } else {
+                decoded
+            }
+            payload.toString(Charsets.UTF_8)
+        }.getOrNull()
+    }
+
+    /** Exports every populated game slot and its separate creative configuration. */
     suspend fun exportAllSlotsBundle(): ByteArray? {
         val populated = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
             exportSlotJson(slot)?.let { slot to it }
         }
+        val backups = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+            readValidJson(backupPath(slot))?.let { slot to it }
+        }
+        val creative = (1..MAX_SAVE_SLOTS).mapNotNull { slot ->
+            exportCreativeModeSave(slot)?.let { slot to it }
+        }
         if (populated.isEmpty()) return null
         val active = activeSlot()
-        val manifest = """{"schemaVersion":1,"activeSlot":$active,"slots":[${populated.joinToString(",") { it.first.toString() }}]}"""
+        val manifest = """{"schemaVersion":1,"activeSlot":$active,"slots":[${populated.joinToString(",") { it.first.toString() }}],"backups":[${backups.joinToString(",") { it.first.toString() }}],"creativeSlots":[${creative.joinToString(",") { it.first.toString() }}]}"""
         val output = ByteArrayOutputStream()
         ZipOutputStream(output).use { zip ->
             zip.putNextEntry(ZipEntry("manifest.json"))
@@ -208,6 +429,16 @@ class DesktopSaveStore internal constructor(
             zip.closeEntry()
             populated.forEach { (slot, rawJson) ->
                 zip.putNextEntry(ZipEntry("slot-$slot.json"))
+                zip.write(rawJson.toByteArray(Charsets.UTF_8))
+                zip.closeEntry()
+            }
+            backups.forEach { (slot, rawJson) ->
+                zip.putNextEntry(ZipEntry("backup-slot-$slot.json"))
+                zip.write(rawJson.toByteArray(Charsets.UTF_8))
+                zip.closeEntry()
+            }
+            creative.forEach { (slot, rawJson) ->
+                zip.putNextEntry(ZipEntry("creative-slot-$slot.json"))
                 zip.write(rawJson.toByteArray(Charsets.UTF_8))
                 zip.closeEntry()
             }
@@ -229,7 +460,7 @@ class DesktopSaveStore internal constructor(
                     val name = entry.name.replace(92.toChar(), '/')
                     if (entry.isDirectory || name.startsWith("/") ||
                         name.split('/').any { it == ".." } ||
-                        !(name == "manifest.json" || name.matches(Regex("slot-(?:[1-9]|10)\\.json")))
+                        !(name == "manifest.json" || name.matches(Regex("(?:slot|backup-slot|creative-slot)-(?:[1-9]|10)\\.json")))
                     ) return false
                     if (files.containsKey(name)) return false
                     val maximum = if (name == "manifest.json") MAX_MANIFEST_BYTES else MAX_SLOT_JSON_BYTES
@@ -255,8 +486,19 @@ class DesktopSaveStore internal constructor(
             val slots = manifest["slots"]?.jsonArray?.map {
                 it.jsonPrimitive.content.toIntOrNull() ?: return false
             } ?: return false
+            val backups = manifest["backups"]?.jsonArray?.map {
+                it.jsonPrimitive.content.toIntOrNull() ?: return false
+            } ?: emptyList()
+            val creativeSlots = manifest["creativeSlots"]?.jsonArray?.map {
+                it.jsonPrimitive.content.toIntOrNull() ?: return false
+            } ?: emptyList()
             if (slots.isEmpty() || slots.size != slots.distinct().size || slots.any { it !in 1..MAX_SAVE_SLOTS }) return false
-            val expectedFiles = slots.map { "slot-$it.json" }.toSet() + "manifest.json"
+            if (backups.size != backups.distinct().size || backups.any { it !in 1..MAX_SAVE_SLOTS }) return false
+            if (creativeSlots.size != creativeSlots.distinct().size || creativeSlots.any { it !in 1..MAX_SAVE_SLOTS }) return false
+            if (backups.any { it !in slots }) return false
+            val expectedFiles = slots.map { "slot-$it.json" }.toSet() +
+                backups.map { "backup-slot-$it.json" }.toSet() +
+                creativeSlots.map { "creative-slot-$it.json" }.toSet() + "manifest.json"
             if (files.keys != expectedFiles) return false
             val imported = slots.associateWith { slot ->
                 val raw = files.getValue("slot-$slot.json").toString(Charsets.UTF_8)
@@ -265,9 +507,21 @@ class DesktopSaveStore internal constructor(
                 if (!validate(state)) return false
                 state
             }
+            val importedBackups = backups.associateWith { slot ->
+                val raw = files.getValue("backup-slot-$slot.json").toString(Charsets.UTF_8)
+                if (raw.isBlank()) return false
+                val state = json.decodeFromString<GameState>(raw)
+                if (!validate(state)) return false
+                state
+            }
+            val importedCreative = creativeSlots.associateWith { slot ->
+                val raw = files.getValue("creative-slot-$slot.json").toString(Charsets.UTF_8)
+                if (raw.isBlank()) return false
+                CreativeModeSaveCodec.decodeAndMigrate(raw) ?: return false
+            }
             val previousActive = activeSlot()
             val previousFiles = (1..MAX_SAVE_SLOTS).flatMap { slot ->
-                listOf(primaryPath(slot), backupPath(slot))
+                listOf(primaryPath(slot), backupPath(slot), creativePath(slot))
             }.associateWith { path ->
                 if (fileOps.exists(path)) fileOps.read(path) else null
             }
@@ -276,9 +530,22 @@ class DesktopSaveStore internal constructor(
                     val state = imported[slot]
                     if (state != null) {
                         check(save(slot, state)) { "Could not write imported save slot $slot." }
+                        val backupState = importedBackups[slot]
+                        if (backupState != null) {
+                            writeAtomically(backupPath(slot), json.encodeToString(backupState))
+                        }
+                        // When the bundle has no backup for this slot, keep the
+                        // destination's pre-import primary as the new recovery copy.
+                        // save() has already written it before replacing the primary.
                     } else {
                         fileOps.deleteIfExists(primaryPath(slot))
                         fileOps.deleteIfExists(backupPath(slot))
+                    }
+                    val creativeSave = importedCreative[slot]
+                    if (creativeSave != null) {
+                        check(saveCreativeModeSave(slot, creativeSave)) { "Could not write creative save slot $slot." }
+                    } else {
+                        fileOps.deleteIfExists(creativePath(slot))
                     }
                 }
                 val selectedActive = active.takeIf { it in imported } ?: imported.keys.minOrNull()!!
@@ -310,47 +577,7 @@ class DesktopSaveStore internal constructor(
     }
 
     fun validate(state: GameState): Boolean =
-        Difficulty.isValid(state.difficultyId) &&
-            state.money.value >= BigNumber.ZERO.value &&
-            state.prestige.value >= BigNumber.ZERO.value &&
-            state.ultra.value >= BigNumber.ZERO.value &&
-            state.nebula.value >= BigNumber.ZERO.value &&
-            state.currentRangeMin >= 1L &&
-            state.currentRangeMin <= state.currentRangeMax &&
-            state.targetNumber in state.currentRangeMin..state.currentRangeMax &&
-            state.attempts >= 0L &&
-            state.correctGuesses >= 0L &&
-            state.streak >= 0 &&
-            state.bestStreak >= 0 &&
-            state.statistics.totalGuesses >= 0L &&
-            state.statistics.correctGuesses >= 0L &&
-            state.statistics.failedGuesses >= 0L &&
-            state.statistics.moneyEarned.value >= BigNumber.ZERO.value &&
-            state.statistics.moneySpent.value >= BigNumber.ZERO.value &&
-            state.statistics.prestigesCount >= 0L &&
-            state.statistics.ultrasCount >= 0L &&
-            state.statistics.nebulaEarned >= 0L &&
-            state.statistics.playtimeSeconds >= 0L &&
-            state.statistics.arcadePlayed >= 0L &&
-            state.statistics.randomEventsTriggered >= 0L &&
-            state.statistics.arcadeBestScores.values.all { it >= 0 } &&
-            state.upgradeLevels.values.all { it >= 0 } &&
-            state.prestigeUpgradeLevels.values.all { it >= 0 } &&
-            state.ultraUpgradeLevels.values.all { it >= 0 } &&
-            state.liveOpsClaims.values.all { it >= 0 } &&
-            state.permanentEventBoosts >= 0 &&
-            state.dailyQuestGuesses >= 0 &&
-            state.dailyQuestCorrectGuesses >= 0 &&
-            state.dailyQuestBestStreak >= 0 &&
-            state.dailyQuestUpgradePurchases >= 0 &&
-            state.lootCommonChests >= 0 &&
-            state.lootRareChests >= 0 &&
-            state.lootEpicChests >= 0 &&
-            state.lootDropsFound >= 0L &&
-            state.lootChestsOpened >= 0L &&
-            state.endlessRiftTier >= 0 &&
-            state.endlessRiftBestTier >= 0 &&
-            state.lastSaveTimestamp > 0L &&
+        SaveStateRules.validate(state) &&
             state.profileName.length <= 24 &&
             SaveProfileRules.isValidIcon(state.profileIconId)
 
@@ -378,6 +605,8 @@ class DesktopSaveStore internal constructor(
     private fun primaryPath(slot: Int): Path = rootDirectory.resolve("slot-${slot}.json")
 
     private fun backupPath(slot: Int): Path = rootDirectory.resolve("slot-${slot}.backup.json")
+
+    private fun creativePath(slot: Int): Path = rootDirectory.resolve("creative-slot-${slot}.json")
 
     private fun normalizeSlot(slot: Int): Int = slot.coerceIn(1, MAX_SAVE_SLOTS)
 }

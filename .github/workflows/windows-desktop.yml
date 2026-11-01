@@ -115,6 +115,16 @@ jobs:
         shell: pwsh
         run: python tools/build_preflight.py
 
+      - name: Install Inno Setup 6
+        shell: pwsh
+        run: |
+          $compiler = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $compiler)) {
+            choco install innosetup --yes --no-progress
+          }
+          if (-not (Test-Path $compiler)) { throw "Inno Setup 6 compiler was not installed." }
+          "INNO_SETUP_COMPILER=$compiler" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
@@ -134,126 +144,53 @@ jobs:
 
       - name: Build versioned Windows installer
         shell: pwsh
-        run: .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache -P "gtn.desktop.debugToolsBuild=true"
+        run: .\gradlew.bat :desktopApp:packageWindowsInnoSetup --no-configuration-cache -P "gtn.desktop.debugToolsBuild=true"
 
       - name: Show packaged files
         shell: pwsh
         run: |
           Get-ChildItem -Path "desktopApp/build/compose/binaries" -Recurse -File | Select-Object FullName, Length
-          if (-not (Test-Path "desktopApp/build/compose/binaries/main/msi")) {
-            throw "Windows MSI output directory was not created."
+          if (-not (Test-Path "desktopApp/build/compose/binaries/main/exe")) {
+            throw "Inno Setup output directory was not created."
           }
 
-      - name: Verify in-place MSI upgrade from legacy package
+      - name: Verify Inno Setup install, upgrade, and data preservation
         if: github.event_name == 'pull_request'
         shell: pwsh
         run: |
-          $gradlePath = "desktopApp/build.gradle.kts"
-          $resourcePath = "desktopApp/src/jvmMain/resources/windows-build.properties"
-          $msiDir = "desktopApp/build/compose/binaries/main/msi"
-          $originalGradle = Get-Content -Path $gradlePath -Raw
-          $baselineGradle = [regex]::Replace(
-            $originalGradle,
-            '(?m)^[ \t]*// Preserve the UpgradeCode embedded in the existing Windows MSI\.\r?\n[ \t]*upgradeUuid = "6178B622-7859-39F2-8ED0-E0466C715DD1"\r?\n',
-            ''
-          )
-          if ($baselineGradle -eq $originalGradle) {
-            throw "Could not prepare the legacy MSI baseline configuration."
-          }
-
-          $baselineMsi = Join-Path $env:RUNNER_TEMP "GuessTheNumber-legacy-1.0.0.msi"
-          try {
-            Set-Content -Path $gradlePath -Value $baselineGradle -NoNewline
-            Set-Content -Path $resourcePath -Value "version=1.0.0" -Encoding ascii
-            $env:GTN_WINDOWS_PACKAGE_VERSION = "1.0.0"
-            Remove-Item -Path (Join-Path $msiDir "*.msi") -Force -ErrorAction SilentlyContinue
-            .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache --rerun-tasks --no-daemon
-            $legacyPackage = Get-ChildItem -Path $msiDir -Filter "GuessTheNumber-1.0.0.msi" -File | Select-Object -First 1
-            if (-not $legacyPackage) { throw "Legacy baseline MSI was not produced." }
-            Copy-Item $legacyPackage.FullName $baselineMsi
-            $legacyInstall = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$baselineMsi`" /qn /norestart" -Wait -PassThru
-            if ($legacyInstall.ExitCode -notin @(0, 3010)) {
-              throw "Legacy MSI installation failed with exit code $($legacyInstall.ExitCode)."
-            }
-          } finally {
-            Set-Content -Path $gradlePath -Value $originalGradle -NoNewline
-            $env:GTN_WINDOWS_PACKAGE_VERSION = "1.0.${{ github.run_number }}"
-            Set-Content -Path $resourcePath -Value "version=$env:GTN_WINDOWS_PACKAGE_VERSION" -Encoding ascii
-          }
+          $installerDir = "desktopApp/build/compose/binaries/main/exe"
+          $installer = Get-ChildItem -Path $installerDir -Filter "*-Setup.exe" -File | Select-Object -First 1
+          if (-not $installer) { throw "The Inno Setup installer was not produced." }
 
           $userDataRoot = Join-Path (Join-Path $env:APPDATA "GuessTheNumber") "saves"
           New-Item -ItemType Directory -Path $userDataRoot -Force | Out-Null
           $userDataMarker = Join-Path $userDataRoot "ci-user-data-preservation.txt"
           Set-Content -Path $userDataMarker -Value "preserve-this-data" -Encoding ascii
-          if (-not (Test-Path $userDataMarker)) { throw "Could not prepare the user-data preservation marker." }
 
-          Remove-Item -Path (Join-Path $msiDir "*.msi") -Force -ErrorAction SilentlyContinue
-          .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache --rerun-tasks --no-daemon -P "gtn.desktop.debugToolsBuild=true"
-          $updatedPackage = Get-ChildItem -Path $msiDir -Filter "GuessTheNumber-$($env:GTN_WINDOWS_PACKAGE_VERSION).msi" -File | Select-Object -First 1
-          if (-not $updatedPackage) { throw "Updated MSI was not produced." }
-          $updatedInstall = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$($updatedPackage.FullName)`" /qn /norestart" -Wait -PassThru
-          if ($updatedInstall.ExitCode -notin @(0, 3010)) {
-            throw "Updated MSI installation failed with exit code $($updatedInstall.ExitCode)."
-          }
+          $arguments = @("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-")
+          $firstInstall = Start-Process -FilePath $installer.FullName -ArgumentList $arguments -Wait -PassThru
+          if ($firstInstall.ExitCode -ne 0) { throw "Inno Setup fresh install failed with exit code $($firstInstall.ExitCode)." }
+          if (-not (Test-Path $userDataMarker)) { throw "Fresh installation removed existing player data." }
 
-          $repeatInstall = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$($updatedPackage.FullName)`" /qn /norestart" -Wait -PassThru
-          if ($repeatInstall.ExitCode -notin @(0, 3010)) {
-            throw "Repeated MSI upgrade failed with exit code $($repeatInstall.ExitCode)."
-          }
-          if (-not (Test-Path $userDataMarker)) {
-            throw "Repeated MSI upgrade removed existing user data."
-          }
+          $secondInstall = Start-Process -FilePath $installer.FullName -ArgumentList $arguments -Wait -PassThru
+          if ($secondInstall.ExitCode -ne 0) { throw "Inno Setup in-place upgrade failed with exit code $($secondInstall.ExitCode)." }
+          if (-not (Test-Path $userDataMarker)) { throw "In-place upgrade removed existing player data." }
 
-          $uninstallRoots = @(
-            "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
-            "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*",
-            "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"
-          )
-          $installedEntries = @(
-            $uninstallRoots |
-              ForEach-Object { Get-ItemProperty -Path $_ -ErrorAction SilentlyContinue } |
-              Where-Object { $_.DisplayName -like "*GuessTheNumber*" }
-          )
-          if ($installedEntries.Count -ne 1) {
-            throw "Expected exactly one GuessTheNumber installation after update, found $($installedEntries.Count)."
-          }
-          if ($installedEntries[0].DisplayVersion -ne $env:GTN_WINDOWS_PACKAGE_VERSION) {
-            throw "Installed MSI version does not match the updated package version."
-          }
-
-          $invalidMsi = Join-Path $env:RUNNER_TEMP "GuessTheNumber-invalid-upgrade.msi"
-          Set-Content -Path $invalidMsi -Value "not an MSI package" -Encoding ascii
-          $failedUpgrade = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$invalidMsi`" /qn /norestart" -Wait -PassThru
-          if ($failedUpgrade.ExitCode -eq 0) {
-            throw "An invalid MSI unexpectedly reported a successful upgrade."
-          }
-          $afterFailedUpgrade = @(
-            $uninstallRoots |
-              ForEach-Object { Get-ItemProperty -Path $_ -ErrorAction SilentlyContinue } |
-              Where-Object { $_.DisplayName -like "*GuessTheNumber*" }
-          )
-          if ($afterFailedUpgrade.Count -ne 1 -or $afterFailedUpgrade[0].DisplayVersion -ne $env:GTN_WINDOWS_PACKAGE_VERSION) {
-            throw "The existing installation was not preserved after a failed upgrade attempt."
-          }
-
-          $installedProductCode = $afterFailedUpgrade[0].PSChildName
-          $remove = Start-Process -FilePath "msiexec.exe" -ArgumentList "/x `"$installedProductCode`" /qn /norestart" -Wait -PassThru
-          if ($remove.ExitCode -notin @(0, 1605, 3010)) {
-            throw "CI cleanup of the test installation failed with exit code $($remove.ExitCode)."
-          }
-          if (-not (Test-Path $userDataMarker)) {
-            throw "MSI uninstall removed player data from APPDATA."
-          }
+          $uninstaller = Join-Path $env:ProgramFiles "GuessTheNumber\unins000.exe"
+          if (-not (Test-Path $uninstaller)) { throw "Inno Setup uninstaller was not registered in Program Files." }
+          $remove = Start-Process -FilePath $uninstaller -ArgumentList @("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART") -Wait -PassThru
+          if ($remove.ExitCode -ne 0) { throw "Inno Setup uninstall failed with exit code $($remove.ExitCode)." }
+          if (-not (Test-Path $userDataMarker)) { throw "Inno Setup uninstall removed player data from APPDATA." }
 
       - name: Prepare debug channel package
         if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
         shell: pwsh
         run: |
-          $msi = Get-ChildItem -Path "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File | Select-Object -First 1
-          if (-not $msi) { throw "Expected Windows MSI was not found." }
+          $installer = Get-ChildItem -Path "desktopApp/build/compose/binaries/main/exe" -Filter "*-Setup.exe" -File | Select-Object -First 1
+          if (-not $installer) { throw "Expected Inno Setup installer was not found." }
           $packageDir = Join-Path $env:RUNNER_TEMP "gtn-windows-debug"
           New-Item -ItemType Directory -Path $packageDir -Force | Out-Null
-          Copy-Item $msi.FullName (Join-Path $packageDir "GuessTheNumber-Windows-Desktop.msi")
+          Copy-Item $installer.FullName (Join-Path $packageDir "GuessTheNumber-Windows-Desktop-Setup.exe")
           $zip = Join-Path $env:RUNNER_TEMP "GuessTheNumber-Windows-Desktop.zip"
           Compress-Archive -Path (Join-Path $packageDir "*") -DestinationPath $zip -Force
           $hash = (Get-FileHash -Path $zip -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -283,7 +220,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: GuessTheNumber-Windows-Desktop
-          path: desktopApp/build/compose/binaries/main/msi/*.msi
+          path: desktopApp/build/compose/binaries/main/exe/*-Setup.exe
           if-no-files-found: error
           retention-days: 7
 

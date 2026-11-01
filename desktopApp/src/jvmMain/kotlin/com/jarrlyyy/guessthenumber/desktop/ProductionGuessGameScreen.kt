@@ -81,6 +81,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 import kotlin.random.Random
 import com.jarrlyyy.guessthenumber.shared.domain.GuessGameStatus
 import com.jarrlyyy.guessthenumber.shared.rules.GuessRateLimitRules
+import com.jarrlyyy.guessthenumber.shared.domain.SaveProfileRules
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackCard
 import com.jarrlyyy.guessthenumber.shared.ui.SharedGuessFeedbackIcon
 import com.jarrlyyy.guessthenumber.shared.ui.toSharedFeedbackIcon
@@ -1011,9 +1012,47 @@ fun ProductionGuessGameScreen(
                             val restored = withContext(Dispatchers.IO) { saveStore.restoreBackup(target) }
                             if (restored && target == activeSaveSlot) {
                                 val recovered = withContext(Dispatchers.IO) { saveStore.load(target) }
-                                if (recovered != null) state = recovered
+                                if (recovered != null) {
+                                    state = recovered
+                                    autoClicker.reset(recovered.currentRangeMin, recovered.currentRangeMax)
+                                }
                             }
                             feedback = if (restored) "Restored the previous backup for slot $target." else "Could not restore a valid backup for that slot."
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    },
+                    onEditProfile = { target, name, iconId ->
+                        scope.launch {
+                            val validIcon = SaveProfileRules.isValidIcon(iconId)
+                            val current = withContext(Dispatchers.IO) { saveStore.load(target) }
+                            val updated = current?.copy(
+                                profileName = name.trim().take(24),
+                                profileIconId = iconId
+                            )
+                            val profileToSave = updated
+                            val saved = validIcon && profileToSave != null &&
+                                withContext(Dispatchers.IO) { saveStore.save(target, profileToSave) }
+                            if (saved && target == activeSaveSlot) state = profileToSave
+                            feedback = if (saved) "Updated the profile for slot $target." else "Could not update that save profile."
+                            saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                        }
+                    },
+                    onResetSlot = { target ->
+                        scope.launch {
+                            val previous = withContext(Dispatchers.IO) { saveStore.load(target) }
+                            val settings = if (target == activeSaveSlot) state?.settings else previous?.settings
+                            val preservedSettings = settings ?: GameState().settings
+                            val fresh = GameState(
+                                settings = preservedSettings,
+                                tutorialCompleted = preservedSettings.tutorialCompleted,
+                                lastSaveTimestamp = System.currentTimeMillis()
+                            )
+                            val reset = withContext(Dispatchers.IO) { saveStore.reset(target, fresh) }
+                            if (reset && target == activeSaveSlot) {
+                                state = fresh
+                                autoClicker.reset(fresh.currentRangeMin, fresh.currentRangeMax)
+                            }
+                            feedback = if (reset) "Reset save slot $target." else "Could not safely reset save slot $target."
                             saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
                         }
                     },
@@ -1093,6 +1132,55 @@ fun ProductionGuessGameScreen(
                                     feedback = "Imported and validated the all-slot backup bundle."
                                 } else {
                                     feedback = "Bundle import rejected. Existing saves were kept intact."
+                                }
+                                saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
+                                isSaving = false
+                            }
+                        }
+                    },
+                    onExportAndroidBackup = {
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Export Android-compatible GuessTheNumber backup"
+                            selectedFile = File("guessthenumber-android-backup.gtnbackup")
+                            fileFilter = FileNameExtensionFilter("Android-compatible backup (*.gtnbackup)", "gtnbackup")
+                        }
+                        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val destination = chooser.selectedFile.toPath()
+                            scope.launch {
+                                isSaving = true
+                                val encoded = withContext(Dispatchers.IO) { saveStore.exportAndroidCompatibleBackup() }
+                                val exported = encoded != null && runCatching {
+                                    Files.writeString(destination, encoded)
+                                }.isSuccess
+                                feedback = if (exported) {
+                                    "Exported an Android-compatible backup. Its Base64/XOR wrapper matches Android's existing format."
+                                } else {
+                                    "Could not export the Android-compatible backup."
+                                }
+                                isSaving = false
+                            }
+                        }
+                    },
+                    onImportAndroidBackup = {
+                        val chooser = JFileChooser().apply {
+                            dialogTitle = "Import Android-compatible GuessTheNumber backup"
+                            fileFilter = FileNameExtensionFilter("Android-compatible backup (*.gtnbackup, *.txt)", "gtnbackup", "txt")
+                        }
+                        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            val source = chooser.selectedFile.toPath()
+                            scope.launch {
+                                isSaving = true
+                                val imported = withContext(Dispatchers.IO) {
+                                    runCatching { Files.readString(source) }.getOrNull()
+                                        ?.let { saveStore.importAndroidCompatibleBackup(it) } ?: false
+                                }
+                                if (imported) {
+                                    activeSaveSlot = withContext(Dispatchers.IO) { saveStore.activeSlot() }
+                                    state = withContext(Dispatchers.IO) { saveStore.load(activeSaveSlot) }
+                                    state?.let { autoClicker.reset(it.currentRangeMin, it.currentRangeMax) }
+                                    feedback = "Imported the Android-compatible backup, including settings, recovery copies and Creative Mode data."
+                                } else {
+                                    feedback = "Android backup rejected. Existing saves were kept intact."
                                 }
                                 saveSlotSummaries = withContext(Dispatchers.IO) { saveStore.slotSummaries() }
                                 isSaving = false

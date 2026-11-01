@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.data.store
 
+import com.jarrlyyy.guessthenumber.shared.domain.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

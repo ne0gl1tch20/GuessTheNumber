@@ -1,30 +1,48 @@
 # Windows desktop application
 
-This module is the Compose Multiplatform desktop host for GuessTheNumber. The long-term product direction is to render the same packaged HTML/CSS/JavaScript player UI on Android and Windows, with Kotlin/KMP remaining authoritative for game state, economy, progression and persistence.
+This module is the Compose Multiplatform desktop host for GuessTheNumber. Android remains the behavioral reference. The player-facing game interface and Settings UI are shared HTML/CSS/JavaScript, with JarrlyyUI as the shared component system. Kotlin/KMP remains authoritative for game state, economy, progression, save validation and platform-neutral rules.
 
 ## Run locally
 
-From the repository root, with JDK 17 installed:
+Use JDK 21.
 
 ```bash
 ./gradlew :desktopApp:run
 ```
 
-On Windows PowerShell, use `.gradlew.bat :desktopApp:run`.
+On Windows PowerShell:
 
-## Current scope
+```powershell
+.\gradlew.bat :desktopApp:run
+```
 
-- Play, Upgrades and Shop now render the canonical shared HTML/CSS/JavaScript bundle inside an embedded JavaFX WebView hosted by Compose Desktop.
-- The desktop host unpacks only the bundled local web assets, blocks navigation away from the local entry page and exposes a small Kotlin bridge. Game guesses, upgrade purchases, shop purchases/equips, multiplier changes, daily quest claims and loot chest rewards are processed by the existing desktop engine/transaction layer and saved through the existing save store.
-- This is the first working host integration, not full parity: other player-facing screens still use Compose Desktop, and Windows runtime/installer behavior plus actual interaction parity still need CI and runtime verification.
-- The desktop app runs offline and does not connect to services during ordinary gameplay.
+## Windows installer
 
-The Android HTML migration has started in `app/src/main/assets/web-play/`; it is not complete across all player-facing screens. See [the shared UI migration matrix](../docs/SHARED_WEB_UI_MIGRATION_MATRIX.md), [the execution plan](../docs/SHARED_WEB_UI_CROSS_PLATFORM_EXECUTION_PLAN.md) and [the Windows host evaluation](../docs/WINDOWS_WEBVIEW_HOST_EVALUATION.md). Native Compose remains appropriate for the desktop shell and OS/system surfaces, not as a permanent duplicate of player-facing game screens.
+Install Inno Setup 6, then build the Windows setup executable:
 
-## Windows Debug update channel
+```powershell
+.\gradlew.bat :desktopApp:packageWindowsInnoSetup
+```
+
+The task builds the jpackage app-image and wraps it with `desktopApp/packageResources/windows/GuessTheNumber.iss`. Set `INNO_SETUP_COMPILER` if `ISCC.exe` is installed outside the default Inno Setup 6 directory.
+
+The installer uses a stable Inno Setup AppId so subsequent versions upgrade the existing installation. It removes a detected legacy MSI installation during the one-time migration, then lets the stable Inno Setup AppId handle future upgrades. Player saves remain under `%APPDATA%\GuessTheNumber\saves` and are not removed by installer uninstall.
+
+## Shared web assets
+
+The desktop host copies the bundled HTML, CSS, JavaScript, JarrlyyUI SDK, fonts and locale assets into a per-session directory before starting the WebView. It applies only a previously validated cached asset version. A background updater checks the repository manifest, verifies safe relative paths and SHA-256 hashes, stages all changed files and atomically activates a complete version for the next launch. The running WebView's files are never replaced in place. If the network is unavailable or an update is invalid, the current bundled or cached version remains available. Startup validation can retry once with the previous validated cache.
+
+## Debug update channel
 
 - Successful Windows Desktop CI builds on `master` publish a separate `windows-debug-<run>-<attempt>` prerelease with `GuessTheNumber-Windows-Desktop.zip` and `windows-debug-manifest.json`.
-- The desktop app checks this public prerelease channel without embedding a GitHub token. Production releases are not used for Windows Debug discovery.
-- The updater downloads to a unique temporary folder, verifies SHA-256, rejects unsafe ZIP paths and unexpected files, extracts only `GuessTheNumber-Windows-Desktop.msi`, and launches Windows Installer through a cleanup helper.
-- CI sets the MSI and app-reported version to `1.0.<run number>`; local builds fall back to `1.0.0`.
-- The updater does not modify save data. The Windows CI upgrade smoke test verifies the old-to-new MSI path before in-place upgrade behavior is considered proven.
+- The desktop app checks the public `debug-latest` channel without embedding a GitHub token.
+- The updater verifies the manifest and archive SHA-256, rejects unsafe ZIP paths and unexpected files, extracts only `GuessTheNumber-Windows-Desktop-Setup.exe` and launches it with Inno Setup's silent update switches.
+- CI versions the installer as `1.0.<run number>`; local builds fall back to `1.0.0`.
+- CI verifies fresh installation, in-place Inno Setup upgrade and uninstall while checking that player data under AppData remains intact.
+
+## Architecture boundaries
+
+- HTML + JarrlyyUI owns the shared player-facing Settings interface.
+- Shared Kotlin/KMP owns platform-neutral state, validation, save models and game rules.
+- Android and Windows adapters own storage, lifecycle, notifications, audio, windowing, startup registration and update installation.
+- Native Compose remains appropriate for the desktop shell and OS-specific surfaces, not as a separate replacement for the shared HTML Settings experience.

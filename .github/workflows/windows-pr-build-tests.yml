@@ -30,11 +30,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
 
       - name: Prepare desktop build version resource
         shell: pwsh
@@ -73,6 +73,16 @@ jobs:
       - name: Build preflight
         run: python tools/build_preflight.py
 
+      - name: Install Inno Setup 6
+        shell: pwsh
+        run: |
+          $compiler = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $compiler)) {
+            choco install innosetup --yes --no-progress
+          }
+          if (-not (Test-Path $compiler)) { throw "Inno Setup 6 compiler was not installed." }
+          "INNO_SETUP_COMPILER=$compiler" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
@@ -88,12 +98,12 @@ jobs:
 
       - name: Build Windows installer without uploading it
         shell: pwsh
-        run: .\gradlew.bat :desktopApp:packageDistributionForCurrentOS --no-configuration-cache
+        run: .\gradlew.bat :desktopApp:packageWindowsInnoSetup --no-configuration-cache
 
-      - name: Verify Windows installer was produced
+      - name: Verify Inno Setup installer was produced
         shell: pwsh
         run: |
-          $msiDir = "desktopApp/build/compose/binaries/main/msi"
-          $msi = Get-ChildItem -Path $msiDir -Filter "*.msi" -File -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $msi) { throw "Windows MSI package was not produced." }
-          Write-Host "Windows build test produced: $($msi.Name) ($($msi.Length) bytes)"
+          $installerDir = "desktopApp/build/compose/binaries/main/exe"
+          $installer = Get-ChildItem -Path $installerDir -Filter "*-Setup.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $installer) { throw "Inno Setup Windows installer was not produced." }
+          Write-Host "Windows build test produced: $($installer.Name) ($($installer.Length) bytes)"

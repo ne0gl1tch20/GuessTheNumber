@@ -1,4 +1,4 @@
-package com.jarrlyyy.guessthenumber.data.store
+package com.jarrlyyy.guessthenumber.shared.domain
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
