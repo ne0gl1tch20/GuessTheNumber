@@ -47,6 +47,10 @@ data class GameState(
     val lastBotFeedback: String? = null,
     val lastBotId: String? = null,
     val botActionSequence: Long = 0L,
+    /** Lifetime bot guesses, kept separate from player attempts/correct/streak counters. */
+    val botTotalGuesses: Long = 0L,
+    val botCorrectGuesses: Long = 0L,
+    val botIncorrectGuesses: Long = 0L,
     val tutorialCompleted: Boolean = false,
     val buyMultiplier: String = "1",
     val prestigeCount: Long = 0,
