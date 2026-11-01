@@ -116,7 +116,7 @@ internal fun DesktopSaveSlotsContent(
     var resetEverythingAcknowledged by remember { mutableStateOf(false) }
     var resetChallengeAnswer by remember { mutableStateOf("") }
     var resetSecondsRemaining by remember { mutableIntStateOf(45) }
-    val resetChallenge = remember { (12..48).random() to (2..19).random() }
+    var resetChallenge by remember { mutableStateOf((12..48).random() to (2..19).random()) }
 
     LaunchedEffect(showResetEverything) {
         while (showResetEverything && resetSecondsRemaining > 0) {
@@ -468,6 +468,7 @@ internal fun DesktopSaveSlotsContent(
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Button(onClick = {
                     resetChallengeAnswer = ""; resetEverythingAcknowledged = false
+                    resetChallenge = (12..48).random() to (2..19).random()
                     resetSecondsRemaining = 45; showResetEverything = true
                 }, modifier = Modifier.fillMaxWidth()) { Text("Reset Everything") }
             }
