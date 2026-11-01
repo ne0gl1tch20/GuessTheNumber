@@ -124,6 +124,24 @@ class WebUiBridgeProtocolTest {
     }
 
     @Test
+    fun validatesSharedDspSoundEvents() {
+        for (preset in 0..7) {
+            assertEquals(
+                WebUiBridgeProtocol.ParseResult.Valid("sfx-$preset", "play_sfx", sfxPreset = preset),
+                WebUiBridgeProtocol.parse("""{"version":1,"id":"sfx-$preset","type":"play_sfx","preset":$preset}""")
+            )
+        }
+        assertEquals(
+            "invalid_sfx_preset",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"sfx-bad","type":"play_sfx","preset":8}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+        assertEquals(
+            "invalid_request",
+            (WebUiBridgeProtocol.parse("""{"version":1,"id":"sfx-extra","type":"play_sfx","preset":1,"volume":1}""") as WebUiBridgeProtocol.ParseResult.Invalid).error
+        )
+    }
+
+    @Test
     fun acceptsReadStateRequest() {
         assertEquals(
             WebUiBridgeProtocol.ParseResult.Valid("req_1", "read_state"),
