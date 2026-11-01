@@ -33,6 +33,7 @@ import com.jarrlyyy.guessthenumber.desktop.economy.DesktopMinigameDef
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.engine.ArcadeRewardRules
+import com.jarrlyyy.guessthenumber.shared.ui.ArcadeCanvasGame
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -126,6 +127,7 @@ internal fun DesktopArcadeScreen(
             isRewarding = isRewarding,
             onReward = { nebula, money -> onEarnReward(nebula, money); activeGame = null }
         )
+        "math_blitz", "memory_grid" -> ArcadeCanvasGame(gameId = activeGame!!, onDismiss = { activeGame = null }, isRewarding = isRewarding, onReward = { nebula, money -> onEarnReward(nebula, money); activeGame = null })
         "number_rush" -> NumberRushArcadeDialog(
             onDismiss = { activeGame = null },
             isRewarding = isRewarding,
