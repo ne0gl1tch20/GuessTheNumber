@@ -49,6 +49,8 @@ jobs:
           grep -q 'rename { "gtn_app_logo.png" }' app/build.gradle.kts
           grep -q '@drawable/gtn_app_logo' app/src/main/res/mipmap-anydpi/ic_launcher.xml
           grep -q '@drawable/gtn_app_logo' app/src/main/res/mipmap-anydpi/ic_launcher_round.xml
+      - name: Install game-data archive builder dependency
+        run: python3 -m pip install -r tools/requirements-game-data.txt
       - name: Validate Localizations
         run: python3 tools/validate_locales.py
       - name: Validate Version Metadata
