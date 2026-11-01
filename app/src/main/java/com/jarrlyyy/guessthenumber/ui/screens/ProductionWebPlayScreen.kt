@@ -410,9 +410,9 @@ fun ProductionWebPlayScreen(
                                         if (parsed.type == "play_sfx") {
                                             val soundState = runCatching { readState() }.getOrNull()
                                             val preset = parsed.sfxPreset
-                                            if (preset != null && soundState?.settings?.soundEnabled == true) {
-                                                val volume = soundState.settings.volume * soundState.settings.sfxVolume * 0.18f
-                                                JarrlyyDspEngine.playPreset(preset, volume.coerceIn(0f, 0.45f))
+                                            soundState?.settings?.takeIf { preset != null && it.soundEnabled }?.let { settings ->
+                                                val volume = settings.volume * settings.sfxVolume * 0.18f
+                                                JarrlyyDspEngine.playPreset(preset!!, volume.coerceIn(0f, 0.45f))
                                             }
                                             return@post
                                         }
