@@ -51,7 +51,7 @@ class BinarifyGameDataTest(unittest.TestCase):
                 self.assertEqual(hashlib.sha256(blob).hexdigest(), chunk["sha256"])
                 version = blob[8]
                 nonce = blob[9:21]
-                associated_data = f"{version}:{chunk['group']}:{int(chunk['id'])}".encode()
+                associated_data = f"{version}:{chunk['group']}:{chunk['id']}".encode()
                 plaintext = AESGCM(builder.KEY).decrypt(nonce, blob[21:], associated_data)
                 with zipfile.ZipFile(BytesIO(plaintext)) as archive:
                     self.assertTrue(archive.namelist())
