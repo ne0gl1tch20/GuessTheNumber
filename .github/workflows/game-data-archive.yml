@@ -7,6 +7,7 @@ on:
       - "app/src/main/assets/**"
       - "tools/binarify_game_data.py"
       - "tools/test_binarify_game_data.py"
+      - "tools/validate_game_data_apk.py"
       - "tools/requirements-game-data.txt"
       - ".github/workflows/game-data-archive.yml"
   pull_request:
