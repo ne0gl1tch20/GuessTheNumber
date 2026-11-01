@@ -92,7 +92,7 @@ def split_group(name: str, files: list[Path], max_bytes: int) -> list[list[Path]
     return chunks
 
 
-def build(output: Path, version: str, max_chunk_bytes: int = MAX_CHUNK_BYTES) -> dict:
+def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BYTES) -> dict:
     if max_chunk_bytes < 64 * 1024:
         raise ValueError("Chunk size must be at least 64 KiB")
     output.mkdir(parents=True, exist_ok=True)
@@ -109,8 +109,9 @@ def build(output: Path, version: str, max_chunk_bytes: int = MAX_CHUNK_BYTES) ->
     for group, files in grouped_files().items():
         for group_chunk in split_group(group, files, max_chunk_bytes):
             archive_bytes = make_zip(group_chunk)
-            nonce = os.urandom(12)
             associated_data = f"{FORMAT_VERSION}:{group}:{chunk_number}".encode()
+            # Deterministic per plaintext chunk: unchanged assets publish byte-identical bundles.
+            nonce = hashlib.sha256(b"gtn-game-data-nonce-v1:" + associated_data + archive_bytes).digest()[:12]
             encrypted = aes.encrypt(nonce, archive_bytes, associated_data)
             name = f"{chunk_number:02d}.bin"
             blob = MAGIC + bytes([FORMAT_VERSION]) + nonce + encrypted
@@ -136,6 +137,9 @@ def build(output: Path, version: str, max_chunk_bytes: int = MAX_CHUNK_BYTES) ->
                 })
             chunk_number += 1
 
+    if version is None:
+        version_payload = json.dumps(file_entries, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        version = hashlib.sha256(version_payload).hexdigest()[:20]
     manifest = {
         "schemaVersion": 1,
         "archiveFormatVersion": FORMAT_VERSION,
@@ -154,7 +158,7 @@ def build(output: Path, version: str, max_chunk_bytes: int = MAX_CHUNK_BYTES) ->
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=OUTPUT)
-    parser.add_argument("--version", default=os.environ.get("GITHUB_SHA", "local"))
+    parser.add_argument("--version", default=None)
     parser.add_argument("--max-chunk-bytes", type=int, default=MAX_CHUNK_BYTES)
     args = parser.parse_args()
     manifest = build(args.output, args.version, args.max_chunk_bytes)
