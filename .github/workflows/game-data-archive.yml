@@ -44,6 +44,11 @@ jobs:
           assert manifest["minAppVersionCode"] == 24
           assert manifest["sourceCommitTimestamp"] >= 0
           assert manifest["chunks"] and manifest["files"]
+          assets = pathlib.Path("app/src/main/assets")
+          expected = {p.relative_to(assets).as_posix() for p in assets.rglob("*") if p.is_file()}
+          actual_list = [entry["path"] for entry in manifest["files"]]
+          assert len(actual_list) == len(set(actual_list)), "Duplicate manifest file paths"
+          assert set(actual_list) == expected, f"Asset coverage mismatch: missing={expected-set(actual_list)}, extra={set(actual_list)-expected}"
           for chunk in manifest["chunks"]:
               data = (root / chunk["file"]).read_bytes()
               assert hashlib.sha256(data).hexdigest() == chunk["sha256"]
