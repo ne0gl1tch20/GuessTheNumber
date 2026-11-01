@@ -93,14 +93,14 @@ def split_group(name: str, files: list[tuple[Path, str]], max_bytes: int) -> lis
     chunks: list[list[tuple[Path, str]]] = []
     current: list[tuple[Path, str]] = []
     current_size = 0
-    for path, _ in files:
+    for path, relative in files:
         size = path.stat().st_size
         if size > max_bytes:
             raise ValueError(f"Asset exceeds configured chunk size ({size} > {max_bytes}): {path}")
         if current and current_size + size > max_bytes:
             chunks.append(current)
             current, current_size = [], 0
-        current.append(path)
+        current.append((path, relative))
         current_size += size
     if current:
         chunks.append(current)
