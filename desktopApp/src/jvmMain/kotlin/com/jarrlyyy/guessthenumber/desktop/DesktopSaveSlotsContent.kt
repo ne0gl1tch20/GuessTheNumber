@@ -37,7 +37,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -65,6 +67,7 @@ import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeEffect
 import com.jarrlyyy.guessthenumber.shared.domain.CreativeEffectType
 import java.text.DateFormat
 import java.util.Date
+import kotlinx.coroutines.delay
 
 /**
  * Save creation options shared with the Windows persistence adapter.
@@ -104,6 +107,7 @@ internal fun DesktopSaveSlotsContent(
     onImportAllSlots: () -> Unit,
     onExportAndroidBackup: () -> Unit,
     onImportAndroidBackup: () -> Unit,
+    onResetEverything: () -> Unit = {},
     onContinueWithActiveSlot: (() -> Unit)? = null,
     showCloseButton: Boolean = true
 ) {
@@ -121,6 +125,19 @@ internal fun DesktopSaveSlotsContent(
     var creativeRangeMaxDraft by remember { mutableStateOf("100") }
     var creativeHintsDraft by remember { mutableStateOf("0") }
     var creativeAttemptLimitDraft by remember { mutableStateOf("0") }
+    var showResetEverything by remember { mutableStateOf(false) }
+    var resetEverythingAcknowledged by remember { mutableStateOf(false) }
+    var resetChallengeAnswer by remember { mutableStateOf("") }
+    var resetSecondsRemaining by remember { mutableIntStateOf(45) }
+    var resetChallenge by remember { mutableStateOf((12..48).random() to (2..19).random()) }
+
+    LaunchedEffect(showResetEverything) {
+        while (showResetEverything && resetSecondsRemaining > 0) {
+            delay(1_000)
+            resetSecondsRemaining--
+        }
+    }
+
 
     fun openCreateDialog(slot: Int) {
         creatingSlot = slot
@@ -132,6 +149,13 @@ internal fun DesktopSaveSlotsContent(
         creativeRangeMaxDraft = "100"
         creativeHintsDraft = "0"
         creativeAttemptLimitDraft = "0"
+    }
+
+    LaunchedEffect(showResetEverything) {
+        while (showResetEverything && resetSecondsRemaining > 0) {
+            delay(1_000)
+            resetSecondsRemaining--
+        }
     }
 
     if (creatingSlot != null) {
@@ -298,6 +322,39 @@ internal fun DesktopSaveSlotsContent(
             dismissButton = {
                 TextButton(onClick = { editingSlot = null }) { Text("Cancel") }
             }
+        )
+    }
+
+    if (showResetEverything) {
+        AlertDialog(
+            onDismissRequest = { showResetEverything = false },
+            title = { Text("Reset Everything?") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("This permanently clears every save slot and its recovery backup. This cannot be undone.")
+                    Text("${resetChallenge.first} + ${resetChallenge.second} = ?", style = MaterialTheme.typography.headlineSmall)
+                    OutlinedTextField(value = resetChallengeAnswer,
+                        onValueChange = { resetChallengeAnswer = it.filter(Char::isDigit).take(3) },
+                        label = { Text("Solve the confirmation") }, singleLine = true)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Switch(checked = resetEverythingAcknowledged, onCheckedChange = { resetEverythingAcknowledged = it })
+                        Text("I understand all save data will be erased.", style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onResetEverything()
+                    showResetEverything = false
+                    resetEverythingAcknowledged = false
+                    resetChallengeAnswer = ""
+                }, enabled = resetEverythingAcknowledged && resetSecondsRemaining == 0 &&
+                    resetChallengeAnswer.toIntOrNull() == resetChallenge.first + resetChallenge.second) {
+                    Text(if (resetSecondsRemaining > 0) "Wait ${resetSecondsRemaining}s" else "Reset everything",
+                        color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = { TextButton(onClick = { showResetEverything = false }) { Text("Cancel") } }
         )
     }
 
@@ -494,6 +551,18 @@ internal fun DesktopSaveSlotsContent(
                 } else null,
                 onImport = { onImportSlot(slot.slot) }
             )
+        }
+        ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Reset Everything", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error)
+                Text("Erase all save slots and their recovery backups. An extra confirmation is required.",
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Button(onClick = {
+                    resetChallengeAnswer = ""; resetEverythingAcknowledged = false
+                    resetChallenge = (12..48).random() to (2..19).random()
+                    resetSecondsRemaining = 45; showResetEverything = true
+                }, modifier = Modifier.fillMaxWidth()) { Text("Reset Everything") }
+            }
         }
     }
 }
