@@ -2,6 +2,7 @@ package com.jarrlyyy.guessthenumber.domain
 
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
+import com.jarrlyyy.guessthenumber.domain.engine.GuessingBot
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import com.jarrlyyy.guessthenumber.domain.model.GameState
@@ -283,5 +284,41 @@ class GameEngineTest {
         assertEquals(1.0, base, 0.0)
         assertEquals(1.5, prestige, 0.0)
         assertEquals(4.5, combined, 0.0)
+    }
+
+    @Test
+    fun botCorrectGuessDoesNotCountAsPlayerGuess() {
+        val bot = GuessingBot().apply { reset(1L, 100L) }
+        val state = GameState(targetNumber = 50L)
+        val guess = bot.nextGuess(1L, 100L)
+        val result = engine.processGuess(state, guess)
+        bot.observeGuess(guess, result.feedback)
+
+        assertEquals(GuessFeedback.CORRECT, result.feedback)
+        assertEquals(0L, result.newState.attempts)
+        assertEquals(0L, result.newState.correctGuesses)
+        assertEquals(0L, result.newState.statistics.totalGuesses)
+        assertEquals(0L, result.newState.statistics.correctGuesses)
+        assertEquals(1L, result.newState.botTotalGuesses)
+        assertEquals(1L, result.newState.botCorrectGuesses)
+        assertEquals(0L, result.newState.botIncorrectGuesses)
+    }
+
+    @Test
+    fun botIncorrectGuessDoesNotCountAsPlayerGuess() {
+        val bot = GuessingBot().apply { reset(1L, 100L) }
+        val state = GameState(targetNumber = 75L)
+        val guess = bot.nextGuess(1L, 100L)
+        val result = engine.processGuess(state, guess)
+        bot.observeGuess(guess, result.feedback)
+
+        assertEquals(GuessFeedback.TOO_LOW, result.feedback)
+        assertEquals(0L, result.newState.attempts)
+        assertEquals(0L, result.newState.correctGuesses)
+        assertEquals(0L, result.newState.statistics.totalGuesses)
+        assertEquals(0L, result.newState.statistics.failedGuesses)
+        assertEquals(1L, result.newState.botTotalGuesses)
+        assertEquals(0L, result.newState.botCorrectGuesses)
+        assertEquals(1L, result.newState.botIncorrectGuesses)
     }
 }
