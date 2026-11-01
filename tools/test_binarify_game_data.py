@@ -93,6 +93,27 @@ class BinarifyGameDataTest(unittest.TestCase):
             self.assertEqual(chunks, 1)
             self.assertEqual(files, 1)
 
+    def test_generated_asset_can_be_included_under_virtual_path(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            assets = root / "assets"
+            assets.mkdir()
+            logo = root / "GTN_APP_LOGO.png"
+            logo.write_bytes(b"test-logo-bytes")
+            previous = builder.ASSETS
+            builder.ASSETS = assets
+            try:
+                manifest = builder.build(
+                    root / "out",
+                    None,
+                    65536,
+                    [(logo, "web-play/gtn-app-logo.png")],
+                )
+            finally:
+                builder.ASSETS = previous
+            entry = next(item for item in manifest["files"] if item["path"] == "web-play/gtn-app-logo.png")
+            self.assertEqual(entry["size"], len(b"test-logo-bytes"))
+
     def test_rejects_too_small_chunk_limit(self):
         with tempfile.TemporaryDirectory() as temporary:
             with self.assertRaises(ValueError):
