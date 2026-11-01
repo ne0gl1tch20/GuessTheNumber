@@ -13,4 +13,8 @@ object GuessSourceContext {
         botGuessPending = false
         return pending
     }
+
+    fun clearBotGuess() {
+        botGuessPending = false
+    }
 }
