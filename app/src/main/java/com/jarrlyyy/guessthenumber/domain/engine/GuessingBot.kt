@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.domain.engine
 
+import com.jarrlyyy.guessthenumber.shared.rules.GuessSourceContext
 import kotlin.math.max
 import kotlin.math.min
 
@@ -24,6 +25,7 @@ class GuessingBot {
             upperBound = min(rangeMax, upperBound).coerceAtLeast(lowerBound)
             if (lowerBound > upperBound) reset(rangeMin, rangeMax)
         }
+        GuessSourceContext.markBotGuess()
         return lowerBound + ((upperBound - lowerBound) / 2L)
     }
 
