@@ -218,7 +218,7 @@ internal fun DesktopSaveSlotsContent(
                     onCreateSlot(slot, DesktopSaveCreationOptions(
                         name = createName.trim().ifBlank { "Slot $slot" }, iconId = createIcon,
                         difficultyId = createDifficulty, creativeMode = creativeEnabled, rangeMin = 1L,
-                        rangeMax = max ?: 100L, extraHints = hints ?: 0, attemptLimit = attempts ?: 0
+                        rangeMax = if (creativeEnabled) max ?: 100L else Difficulty.rangeMax(createDifficulty, 0), extraHints = hints ?: 0, attemptLimit = attempts ?: 0
                     ))
                     creatingSlot = null
                 }, enabled = SaveProfileRules.isValidIcon(createIcon) && Difficulty.isValid(createDifficulty) && validCreative) {
