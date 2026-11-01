@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "ec82c7e01b57056f732ffbc1b7bdf892bc246391",
+  "version": "5f3330ebb3978fe9b6756c71a7462041ac68e547",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -149,11 +149,11 @@
     },
     {
       "path": "locales/uk.json",
-      "sha256": "6017e7bad82aabcbedc7848c2e168dc2b971fcaabd024fc4f4bb30fc9e09ae4d"
+      "sha256": "3bf2f48d3536f2f505c37777540cf2bb6c9f4e3dc93d6fa78ac614d2797e00ee"
     },
     {
       "path": "locales/vi.json",
-      "sha256": "6b20ffb572c9f7e12ce786bdb8c1eacd892fe334b2985fc5ac7dc6d279dd8a05"
+      "sha256": "7832460cbeef5ac9ee5efca7029ec79d915632ad46dbda3ad800ada326a0a1d2"
     },
     {
       "path": "locales/zh_cn.json",
