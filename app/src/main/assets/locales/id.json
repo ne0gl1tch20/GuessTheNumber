@@ -1284,5 +1284,9 @@
   "trait_arm_balanced_title": "Balanced",
   "trait_arm_balanced_description": "25% bonus on hits and 10% extra penalty on misses.",
   "trait_arm_high_risk_title": "High risk",
-  "trait_arm_high_risk_description": "40% bonus on hits and 20% extra penalty on misses."
+  "trait_arm_high_risk_description": "40% bonus on hits and 20% extra penalty on misses.",
+  "minigame_math_blitz_name": "Math Blitz",
+  "minigame_math_blitz_desc": "Solve quick arithmetic challenges in a 60-second round. Score combos for extra Nebula.",
+  "minigame_memory_grid_name": "Memory Grid",
+  "minigame_memory_grid_desc": "Flip a 4×4 grid, find all eight matching pairs and build your score before time runs out."
 }
