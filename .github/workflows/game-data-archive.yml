@@ -15,6 +15,7 @@ on:
       - "app/src/main/assets/**"
       - "tools/binarify_game_data.py"
       - "tools/test_binarify_game_data.py"
+      - "tools/validate_game_data_apk.py"
       - "tools/requirements-game-data.txt"
       - ".github/workflows/game-data-archive.yml"
 
@@ -85,7 +86,7 @@ jobs:
           for attempt in 1 2 3 4 5; do
             git fetch origin master
             git checkout -B master origin/master
-            python tools/binarify_game_data.py --output game_data
+            python tools/binarify_game_data.py --output game_data --extra-file "$GITHUB_WORKSPACE/GTN_APP_LOGO.png=web-play/gtn-app-logo.png"
             git add game_data
             if [ -z "$(git status --porcelain -- game_data)" ]; then
               echo "Published game-data archive is already current"
