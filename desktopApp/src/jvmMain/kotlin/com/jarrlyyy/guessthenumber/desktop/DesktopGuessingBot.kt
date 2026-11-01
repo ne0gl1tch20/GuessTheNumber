@@ -1,6 +1,7 @@
 package com.jarrlyyy.guessthenumber.desktop
 
 import com.jarrlyyy.guessthenumber.domain.engine.GuessFeedback
+import com.jarrlyyy.guessthenumber.shared.rules.GuessSourceContext
 
 /** Feedback-only binary-search bot; it never reads the hidden target. */
 class DesktopGuessingBot {
@@ -18,6 +19,7 @@ class DesktopGuessingBot {
             upperBound = minOf(rangeMax, upperBound).coerceAtLeast(lowerBound)
         }
         if (lowerBound > upperBound) reset(rangeMin, rangeMax)
+        GuessSourceContext.markBotGuess()
         return lowerBound + ((upperBound - lowerBound) / 2L)
     }
 
