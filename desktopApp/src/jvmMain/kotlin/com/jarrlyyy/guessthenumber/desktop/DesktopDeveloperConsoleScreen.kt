@@ -35,7 +35,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit) {
+internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit, onOpenProcessInspector: () -> Unit = {}) {
     val store = remember { DesktopSaveStore(defaultDesktopSaveDirectory()) }
     val executor = remember { DesktopDeveloperCommandExecutor() }
     val scope = rememberCoroutineScope()
@@ -73,6 +73,7 @@ internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit) {
             Text("Developer Console", style = MaterialTheme.typography.headlineSmall)
         }
         Text("Debug-only command allowlist · active save slot $activeSlot", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        OutlinedButton(onClick = onOpenProcessInspector) { Text("Open Developer Playground & Process Inspector") }
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Active Save Overview", style = MaterialTheme.typography.titleLarge)
