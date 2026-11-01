@@ -278,6 +278,8 @@ internal fun desktopWebPlayState(
         .put("ultraShopItems", ultraShopJson)
         .put("rangeMin", game.currentRangeMin.toString())
         .put("rangeMax", game.currentRangeMax.toString())
+        .put("automationRangeMin", "1")
+        .put("automationRangeMax", GameEngine().getRangeMax(game).toString())
         .put("attempts", game.attempts)
         .put("correctGuesses", game.correctGuesses)
         .put("streak", game.streak)
