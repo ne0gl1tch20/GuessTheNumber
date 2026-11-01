@@ -30,6 +30,7 @@ class GuessingBot {
     }
 
     fun observeGuess(guess: Long, feedback: GuessFeedback) {
+        GuessSourceContext.clearBotGuess()
         when (feedback) {
             GuessFeedback.TOO_LOW -> lowerBound = max(lowerBound, guess + 1L)
             GuessFeedback.TOO_HIGH -> upperBound = min(upperBound, guess - 1L)
