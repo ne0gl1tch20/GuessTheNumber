@@ -16,11 +16,13 @@ val pythonExecutable = System.getenv("PYTHON") ?: if (System.getProperty("os.nam
 val generateGameDataAssets by tasks.registering(Exec::class) {
     inputs.dir(rootProject.file("app/src/main/assets"))
     inputs.file(rootProject.file("tools/binarify_game_data.py"))
+    inputs.file(rootProject.file("GTN_APP_LOGO.png"))
     outputs.dir(generatedGameDataAssets)
     commandLine(
         pythonExecutable,
         rootProject.file("tools/binarify_game_data.py").absolutePath,
-        "--output", generatedGameDataAssets.get().dir("game_data").asFile.absolutePath
+        "--output", generatedGameDataAssets.get().dir("game_data").asFile.absolutePath,
+        "--extra-file", rootProject.file("GTN_APP_LOGO.png").absolutePath + "=web-play/gtn-app-logo.png"
     )
 }
 val generatedDebugBuildInfo = layout.buildDirectory.dir("generated/buildInfo/debug")
