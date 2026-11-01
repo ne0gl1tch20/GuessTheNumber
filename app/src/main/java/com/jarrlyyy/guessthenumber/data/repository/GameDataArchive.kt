@@ -84,12 +84,12 @@ object GameDataArchive {
             if (activeDir?.isDirectory == true && activeManifest != null &&
                 filesValid(activeDir, activeManifest) &&
                 activeManifest.optLong("sourceCommitTimestamp", 0L) > incomingTimestamp) {
-                return PrepareResult(true, activeName, "Kept a newer verified game-data cache")
+                return@synchronized PrepareResult(true, activeName, "Kept a newer verified game-data cache")
             }
             val finalDir = File(versions, version)
             if (finalDir.isDirectory && filesValid(finalDir, manifest)) {
                 activate(pointer, version)
-                return PrepareResult(true, version, "Game data cache is current")
+                return@synchronized PrepareResult(true, version, "Game data cache is current")
             }
             val staging = File(root, "staging-$version")
             staging.deleteRecursively()
@@ -175,25 +175,36 @@ object GameDataArchive {
             WebResourceResponse(mimeType(relative), null, input)
         }
 
-    private fun filesValid(root: File, manifest: JSONObject): Boolean = runCatching {
-        val metadataFile = File(root, CACHE_MANIFEST)
-        if (!metadataFile.isFile) return false
-        val metadata = JSONObject(metadataFile.readText())
-        if (metadata.optString("version") != manifest.optString("version")) return false
-        val files = manifest.getJSONArray("files")
-        if (files.length() !in 1..10000) return false
-        val expectedPaths = mutableSetOf<String>()
-        for (index in 0 until files.length()) {
-            val entry = files.getJSONObject(index)
-            val path = entry.getString("path")
-            if (!safePath(path) || !expectedPaths.add(path)) return false
-            val file = File(root, path)
-            if (!file.isFile || file.length() != entry.getLong("size") || sha256(file) != entry.getString("sha256")) return false
-        }
-        val actualPaths = root.walkTopDown().filter { it.isFile }
-            .map { it.relativeTo(root).invariantSeparatorsPath }.filter { it != CACHE_MANIFEST }.toSet()
-        actualPaths == expectedPaths
-    }.getOrDefault(false)
+    private fun filesValid(root: File, manifest: JSONObject): Boolean {
+        return runCatching {
+            val metadataFile = File(root, CACHE_MANIFEST)
+            if (!metadataFile.isFile) return@runCatching false
+            val metadata = JSONObject(metadataFile.readText())
+            if (metadata.optString("version") != manifest.optString("version")) return@runCatching false
+            val files = manifest.getJSONArray("files")
+            if (files.length() !in 1..10000) return@runCatching false
+            val expectedPaths = mutableSetOf<String>()
+            var valid = true
+            for (index in 0 until files.length()) {
+                val entry = files.getJSONObject(index)
+                val path = entry.getString("path")
+                if (!safePath(path) || !expectedPaths.add(path)) {
+                    valid = false
+                    break
+                }
+                val file = File(root, path)
+                if (!file.isFile || file.length() != entry.getLong("size") || sha256(file) != entry.getString("sha256")) {
+                    valid = false
+                    break
+                }
+            }
+            if (!valid) false else {
+                val actualPaths = root.walkTopDown().filter { it.isFile }
+                    .map { it.relativeTo(root).invariantSeparatorsPath }.filter { it != CACHE_MANIFEST }.toSet()
+                actualPaths == expectedPaths
+            }
+        }.getOrDefault(false)
+    }
 
     private fun activate(pointer: File, version: String) {
         val temporary = File(pointer.parentFile, "active-version.tmp")
