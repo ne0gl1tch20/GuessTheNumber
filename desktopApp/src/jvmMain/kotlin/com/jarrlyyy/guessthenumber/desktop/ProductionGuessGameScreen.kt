@@ -445,6 +445,16 @@ fun ProductionGuessGameScreen(
                             }
                             return@launch
                         }
+                        if (type == "play_sfx") {
+                            val settings = state?.settings
+                            val preset = request.opt("preset") as? Int
+                            val valid = request.length() == 4 && preset != null && preset in 0..7 &&
+                                request.keys().asSequence().all { it in setOf("version", "id", "type", "preset") }
+                            if (valid && settings != null && settings.soundEnabled) {
+                                DesktopJarrlyyDsp.play(preset!!, settings.volume * settings.sfxVolume)
+                            }
+                            return@launch
+                        }
                         if (type == "music_state") {
                             val musicSettings = state?.settings
                             if (musicSettings == null) {
