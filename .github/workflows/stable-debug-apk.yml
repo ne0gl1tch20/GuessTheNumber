@@ -37,6 +37,10 @@ jobs:
           ref: ${{ inputs.source_ref || github.event.pull_request.merge_commit_sha || github.sha }}
       - name: Record checked-out source commit
         run: echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -51,6 +55,8 @@ jobs:
           grep -q '@drawable/gtn_app_logo' app/src/main/res/mipmap-anydpi/ic_launcher_round.xml
       - name: Install game-data archive builder dependency
         run: python3 -m pip install -r tools/requirements-game-data.txt
+      - name: Test split game-data archive builder
+        run: python3 -m unittest discover -s tools -p 'test_binarify_game_data.py' -v
       - name: Validate Localizations
         run: python3 tools/validate_locales.py
       - name: Validate Version Metadata
