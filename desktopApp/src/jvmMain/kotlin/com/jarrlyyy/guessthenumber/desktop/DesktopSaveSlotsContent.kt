@@ -32,6 +32,8 @@ import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Switch
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
@@ -40,6 +42,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.jarrlyyy.guessthenumber.shared.domain.SaveProfileRules
+import com.jarrlyyy.guessthenumber.domain.model.Difficulty
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -57,12 +60,31 @@ import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotCard
 import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotUiModel
 import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetric
 import com.jarrlyyy.guessthenumber.shared.ui.SharedSaveSlotMetricIcon
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeEffect
+import com.jarrlyyy.guessthenumber.shared.domain.CreativeEffectType
 import java.text.DateFormat
 import java.util.Date
 
 /**
- * Compose-first desktop save manager. The layout intentionally mirrors the
- * Android save-slot card hierarchy while using the desktop persistence callbacks.
+ * Save creation options shared with the Windows persistence adapter.
+ * The same bounded values and permanent Creative Mode rules as Android are used.
+ */
+internal data class DesktopSaveSlotCreationOptions(
+    val slot: Int,
+    val profileName: String,
+    val profileIconId: String,
+    val difficultyId: String,
+    val creativeModeEnabled: Boolean,
+    val rangeMin: Long,
+    val rangeMax: Long,
+    val extraHints: Int,
+    val attemptLimit: Int
+)
+
+/**
+ * Compose-first desktop save manager. Its hierarchy and creation flow mirror Android;
+ * native file pickers and the desktop save adapter remain platform-specific.
  */
 @Composable
 internal fun DesktopSaveSlotsContent(
@@ -71,7 +93,7 @@ internal fun DesktopSaveSlotsContent(
     onBack: () -> Unit,
     onRefresh: () -> Unit,
     onSwitchSlot: (Int) -> Unit,
-    onCreateSlot: (Int) -> Unit,
+    onCreateSlot: (DesktopSaveSlotCreationOptions) -> Unit,
     onDuplicateSlot: (Int, Int) -> Unit,
     onRestoreBackup: (Int) -> Unit,
     onEditProfile: (Int, String, String) -> Unit,
@@ -90,6 +112,153 @@ internal fun DesktopSaveSlotsContent(
     var profileNameDraft by remember { mutableStateOf("") }
     var profileIconDraft by remember { mutableStateOf(SaveProfileRules.DEFAULT_ICON) }
     var resettingSlot by remember { mutableStateOf<Int?>(null) }
+    var creatingSlot by remember { mutableStateOf<Int?>(null) }
+    var createNameDraft by remember { mutableStateOf("") }
+    var createIconDraft by remember { mutableStateOf(SaveProfileRules.DEFAULT_ICON) }
+    var createDifficultyDraft by remember { mutableStateOf(Difficulty.CLASSIC) }
+    var createCreativeMode by remember { mutableStateOf(false) }
+    var creativeRangeMinDraft by remember { mutableStateOf("1") }
+    var creativeRangeMaxDraft by remember { mutableStateOf("100") }
+    var creativeHintsDraft by remember { mutableStateOf("0") }
+    var creativeAttemptLimitDraft by remember { mutableStateOf("0") }
+
+    fun openCreateDialog(slot: Int) {
+        creatingSlot = slot
+        createNameDraft = ""
+        createIconDraft = SaveProfileRules.DEFAULT_ICON
+        createDifficultyDraft = Difficulty.CLASSIC
+        createCreativeMode = false
+        creativeRangeMinDraft = "1"
+        creativeRangeMaxDraft = "100"
+        creativeHintsDraft = "0"
+        creativeAttemptLimitDraft = "0"
+    }
+
+    if (creatingSlot != null) {
+        val slot = creatingSlot!!
+        val rangeMin = creativeRangeMinDraft.toLongOrNull()
+        val rangeMax = creativeRangeMaxDraft.toLongOrNull()
+        val extraHints = creativeHintsDraft.toIntOrNull()
+        val attemptLimit = creativeAttemptLimitDraft.toIntOrNull()
+        val creativeValid = !createCreativeMode || (
+            rangeMin != null && rangeMax != null &&
+                rangeMin >= 1L && rangeMax >= rangeMin && rangeMax <= 1_000_000L &&
+                extraHints != null && extraHints in 0..5 &&
+                attemptLimit != null && attemptLimit in 0..100
+            )
+        AlertDialog(
+            onDismissRequest = { creatingSlot = null },
+            title = { Text("Create Save Slot $slot") },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    OutlinedTextField(
+                        value = createNameDraft,
+                        onValueChange = { createNameDraft = it.take(24) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Save name") },
+                        singleLine = true
+                    )
+                    Text("Profile icon", style = MaterialTheme.typography.labelLarge)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        SaveProfileRules.iconIds.forEach { iconId ->
+                            FilterChip(
+                                selected = createIconDraft == iconId,
+                                onClick = { createIconDraft = iconId },
+                                label = { Text(SaveProfileRules.iconSymbol(iconId)) }
+                            )
+                        }
+                    }
+                    Text("Difficulty", style = MaterialTheme.typography.labelLarge)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Difficulty.ids.forEach { id ->
+                            FilterChip(
+                                selected = createDifficultyDraft == id,
+                                onClick = { createDifficultyDraft = id },
+                                label = { Text(id.replaceFirstChar(Char::uppercase)) }
+                            )
+                        }
+                    }
+                    androidx.compose.material3.HorizontalDivider()
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Creative Mode", style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                "Permanent for this save. It cannot be turned off later.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(checked = createCreativeMode, onCheckedChange = { createCreativeMode = it })
+                    }
+                    if (createCreativeMode) {
+                        OutlinedTextField(
+                            value = creativeRangeMinDraft,
+                            onValueChange = { creativeRangeMinDraft = it.filter(Char::isDigit).take(7) },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Number range minimum (1–1,000,000)") },
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = creativeRangeMaxDraft,
+                            onValueChange = { creativeRangeMaxDraft = it.filter(Char::isDigit).take(7) },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Number range maximum (1–1,000,000)") },
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = creativeHintsDraft,
+                            onValueChange = { creativeHintsDraft = it.filter(Char::isDigit).take(1) },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Extra hints (0–5)") },
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = creativeAttemptLimitDraft,
+                            onValueChange = { creativeAttemptLimitDraft = it.filter(Char::isDigit).take(3) },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Attempt limit (0 = unlimited, 1–100)") },
+                            singleLine = true
+                        )
+                        if (!creativeValid) {
+                            Text(
+                                "Check the Creative Mode values. Range must be valid, hints 0–5 and attempts 0–100.",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (!Difficulty.isValid(createDifficultyDraft) || !creativeValid) return@Button
+                        onCreateSlot(
+                            DesktopSaveSlotCreationOptions(
+                                slot = slot,
+                                profileName = createNameDraft.trim().ifBlank { "Slot $slot" }.take(24),
+                                profileIconId = createIconDraft,
+                                difficultyId = createDifficultyDraft,
+                                creativeModeEnabled = createCreativeMode,
+                                rangeMin = rangeMin ?: 1L,
+                                rangeMax = rangeMax ?: 100L,
+                                extraHints = extraHints ?: 0,
+                                attemptLimit = attemptLimit ?: 0
+                            )
+                        )
+                        creatingSlot = null
+                    },
+                    enabled = Difficulty.isValid(createDifficultyDraft) && creativeValid
+                ) { Text("Create save") }
+            },
+            dismissButton = {
+                TextButton(onClick = { creatingSlot = null }) { Text("Cancel") }
+            }
+        )
+    }
 
     if (editingSlot != null) {
         AlertDialog(
@@ -153,8 +322,8 @@ internal fun DesktopSaveSlotsContent(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Keep the action bar usable when the user narrows the desktop popup.
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
@@ -294,9 +463,9 @@ internal fun DesktopSaveSlotsContent(
             SharedSaveSlotCard(
                 model = model,
                 onSelect = {
-                    if (slot.isEmpty) onCreateSlot(slot.slot) else onSwitchSlot(slot.slot)
+                    if (slot.isEmpty) openCreateDialog(slot.slot) else onSwitchSlot(slot.slot)
                 },
-                onCreate = { onCreateSlot(slot.slot) },
+                onCreate = { openCreateDialog(slot.slot) },
                 onEditProfile = if (!slot.isEmpty && !slot.isCorrupt) {
                     {
                         profileNameDraft = data?.profileName.orEmpty()
