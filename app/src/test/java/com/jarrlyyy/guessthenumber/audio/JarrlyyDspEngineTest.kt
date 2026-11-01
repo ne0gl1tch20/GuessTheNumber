@@ -11,6 +11,13 @@ class JarrlyyDspEngineTest {
         assertTrue(JarrlyyDspEngine.presets.all { it.title.isNotBlank() && it.description.isNotBlank() })
     }
 
+    @Test fun gameplayPresetIdsCoverTheSharedSoundContract() {
+        assertEquals(
+            listOf("Tap", "Confirm", "Back", "Error", "Reward", "Arcade", "Guess too low", "Guess too high"),
+            JarrlyyDspEngine.presets.map { it.title }
+        )
+    }
+
     @Test fun effectFlagsAreIndependentBits() {
         val flags = listOf(JarrlyyDspEngine.EFFECT_LOWPASS, JarrlyyDspEngine.EFFECT_REVERB,
             JarrlyyDspEngine.EFFECT_CHORUS, JarrlyyDspEngine.EFFECT_DISTORTION)
