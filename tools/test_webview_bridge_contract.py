@@ -2,6 +2,7 @@
 """Cross-platform contract checks for the Android and Windows WebView bridge."""
 
 from pathlib import Path
+from html.parser import HTMLParser
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,8 +20,38 @@ def require(source: str, fragment: str, description: str) -> None:
         raise AssertionError(f"Bridge contract check failed: {description}")
 
 
+class ScreenStructureParser(HTMLParser):
+    VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.stack: list[str] = []
+        self.ancestors: dict[str, tuple[str, ...]] = {}
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        attributes = dict(attrs)
+        screen = attributes.get("data-screen")
+        if screen:
+            self.ancestors[screen] = tuple(self.stack)
+        if tag not in self.VOID_TAGS:
+            self.stack.append(tag + ("#" + attributes["id"] if attributes.get("id") else ""))
+
+    def handle_endtag(self, tag: str) -> None:
+        for index in range(len(self.stack) - 1, -1, -1):
+            if self.stack[index].split("#", 1)[0] == tag:
+                del self.stack[index:]
+                break
+
+
 def main() -> int:
     web = read("app/src/main/assets/web-play/app.js")
+    html = read("app/src/main/assets/web-play/index.html")
+    structure = ScreenStructureParser()
+    structure.feed(html)
+    worlds_ancestors = structure.ancestors.get("worlds", ())
+    if "div#screen-play" in worlds_ancestors or not worlds_ancestors or worlds_ancestors[-1] != "main":
+        raise AssertionError("Beyond the Numbers must be a sibling of Play inside the main app, not nested in the hidden Play screen.")
+
     android_host = read("app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/ProductionWebPlayScreen.kt")
     android_protocol = read("app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/WebUiBridgeProtocol.kt")
     android_tests = read("app/src/test/java/com/jarrlyyy/guessthenumber/ui/screens/WebUiBridgeProtocolTest.kt")
