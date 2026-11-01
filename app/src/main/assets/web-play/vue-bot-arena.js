@@ -58,7 +58,7 @@ const component={
     c.strokeStyle=color;c.lineWidth=4;c.beginPath();c.moveTo(-15,11);c.lineTo(-20,22);c.moveTo(15,11);c.lineTo(20,22);c.stroke();
     c.fillStyle=color;c.beginPath();this.roundedRect(c,-16,13,10,18,4);this.roundedRect(c,6,13,10,18,4);c.fill();
     c.strokeStyle=color;c.lineWidth=3;c.beginPath();c.moveTo(0,-31);c.lineTo(0,-40);c.stroke();c.beginPath();c.arc(0,-43,3,0,Math.PI*2);c.fill();
-    c.fillStyle='#e8edff';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText(bot.name||bot.id,0,48);
+    c.fillStyle='#e8edff';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText(bot.name||bot.id,0,48);c.fillStyle='#aebbdc';c.font='9px sans-serif';c.fillText('Range '+String(bot.rangeMin??1)+'–'+String(bot.rangeMax??100),0,61);
     if(isActive){
      const text=this.displayGuess||'…',bubbleW=Math.max(52,Math.min(120,text.length*9+20)),bubbleY=-66;
      c.fillStyle='#f3f5ff';c.beginPath();this.roundedRect(c,-bubbleW/2,bubbleY,bubbleW,22,8);c.fill();
