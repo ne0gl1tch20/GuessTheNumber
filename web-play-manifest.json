@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "version": "8994ea2d5ab53bdfb267bb1fc11b00e49b0c912d",
+  "version": "d27e25bc27e200b7801d297d2f3a5482a8505dd6",
   "minAppVersionCode": 21,
   "files": [
     {
       "path": "web-play/app.js",
-      "sha256": "f34950ae6bc36afa436f23f60aac0bfdb459238e1579da2b6dfc85a9aabadd20"
+      "sha256": "41e3263d8f81a9dc45474bdfc1a87250e27ca543e738f7025c4b3c492b451323"
     },
     {
       "path": "web-play/icons/guess-the-number.svg",
@@ -37,7 +37,7 @@
     },
     {
       "path": "web-play/vue-bot-arena.js",
-      "sha256": "1e0dee97d689d9f770ee46005eaad52bae218fcd74d1017c9e7eccd371f87b7b"
+      "sha256": "f19a5b79b5891b8bde8cb2880694b7a2cda178ebc37f02e57972469a79acb799"
     },
     {
       "path": "web-play/vue-jarrlyy-adapter.js",
