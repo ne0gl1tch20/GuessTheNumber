@@ -408,6 +408,13 @@ fun ProductionWebPlayScreen(
                                         }
                                         if (parsed.type in setOf("check_updates", "install_update", "open_update_page")) {
                                             when (parsed.type) {
+                                                "play_sfx" -> {
+                                                    val preset = parsed.sfxPreset ?: throw IllegalArgumentException("Missing sound preset")
+                                                    if (beforeAction.settings.soundEnabled) {
+                                                        val volume = beforeAction.settings.volume * beforeAction.settings.sfxVolume * 0.18f
+                                                        JarrlyyDspEngine.playPreset(preset, volume.coerceIn(0f, 0.45f))
+                                                    }
+                                                }
                                                 "check_updates" -> updateScope.launch {
                                                     val response = JSONObject().put("version", 1).put("id", parsed.id).put("type", "update_result").put("installedVersion", BuildConfig.VERSION_NAME).put("installedVersionCode", BuildConfig.VERSION_CODE).put("channel", BuildConfig.UPDATE_CHANNEL)
                                                     when (val updateResult = runCatching { UpdateChannelChecker.check() }.getOrElse { UpdateChannelChecker.Result.Unavailable }) {
