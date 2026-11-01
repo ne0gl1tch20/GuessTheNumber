@@ -9,10 +9,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import shutil
 import zipfile
-from collections import defaultdict
 from pathlib import Path
 from typing import Iterable
 
@@ -68,7 +66,11 @@ def make_zip(files: Iterable[Path]) -> bytes:
     output = BytesIO()
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for path in files:
-            archive.write(path, path.relative_to(ASSETS).as_posix())
+            info = zipfile.ZipInfo(path.relative_to(ASSETS).as_posix(), date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.create_system = 3
+            info.external_attr = 0o100600 << 16
+            archive.writestr(info, path.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
     return output.getvalue()
 
 
