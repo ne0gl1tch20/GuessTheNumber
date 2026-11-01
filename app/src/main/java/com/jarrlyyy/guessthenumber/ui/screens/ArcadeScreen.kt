@@ -22,6 +22,7 @@ import com.jarrlyyy.guessthenumber.data.repository.JsonConfigRepository
 import com.jarrlyyy.guessthenumber.data.repository.MinigameDef
 import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.engine.ArcadeRewardRules
+import com.jarrlyyy.guessthenumber.shared.ui.ArcadeCanvasGame
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -112,6 +113,7 @@ fun ArcadeScreen(
             "lucky_number" -> LuckyNumberDialog(onDismiss = { activeMinigame = null }, onReward = onEarnReward)
             "memory_match" -> MemoryMatchDialog(onDismiss = { activeMinigame = null }, onReward = onEarnReward)
             "number_rush" -> NumberRushDialog(onDismiss = { activeMinigame = null }, onReward = onEarnReward)
+            "math_blitz", "memory_grid" -> ArcadeCanvasGame(gameId = game.id, onDismiss = { activeMinigame = null }, onReward = onEarnReward)
             else -> QuickGuessDialog(onDismiss = { activeMinigame = null }, onReward = onEarnReward)
         }
     }
