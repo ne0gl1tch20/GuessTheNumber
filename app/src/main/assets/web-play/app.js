@@ -290,8 +290,8 @@ function render(s){if(!s||typeof s!=='object')return;const previousGuessAttempts
 function renderBotArena(s){
  const root=$('botArena');if(!root)return;
  const botIds=new Set(['auto_clicker_basic','bot_byte','bot_pixel']);
- const bots=(Array.isArray(s.shopItems)?s.shopItems:[]).filter(item=>botIds.has(String(item.id))&&item.owned).map(item=>({id:String(item.id),name:({auto_clicker_basic:'Nimmy',bot_byte:'Byte',bot_pixel:'Pixel'})[String(item.id)]||String(item.name||item.id),rangeMin:String(s.rangeMin??1),rangeMax:String(s.rangeMax??100)}));
- if(!bots.length&&s.autoClickerActive)bots.push({id:'auto_clicker_basic',name:'Nimmy',rangeMin:String(s.rangeMin??1),rangeMax:String(s.rangeMax??100)});
+ const bots=(Array.isArray(s.shopItems)?s.shopItems:[]).filter(item=>botIds.has(String(item.id))&&item.owned).map(item=>({id:String(item.id),name:({auto_clicker_basic:'Nimmy',bot_byte:'Byte',bot_pixel:'Pixel'})[String(item.id)]||String(item.name||item.id),rangeMin:String(s.automationRangeMin??1),rangeMax:String(s.automationRangeMax??100)}));
+ if(!bots.length&&s.autoClickerActive)bots.push({id:'auto_clicker_basic',name:'Nimmy',rangeMin:String(s.automationRangeMin??1),rangeMax:String(s.automationRangeMax??100)});
  const sequence=Number(s.botActionSequence||0),active=!!s.autoClickerActive;
  const lastId=String(s.lastBotId||''),lastGuess=String(s.lastBotGuess??''),feedback=String(s.lastBotFeedback||'');
  const activeBot=bots.find(bot=>bot.id===lastId)||bots[0];
