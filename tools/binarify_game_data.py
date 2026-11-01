@@ -55,6 +55,9 @@ def grouped_files() -> dict[str, list[Path]]:
         files = safe_files(ASSETS / name)
         if files:
             groups[name] = files
+    root_files = [path for path in sorted(ASSETS.iterdir()) if path.is_file()]
+    if root_files:
+        groups["core"] = root_files
     if not groups:
         raise ValueError(f"No game data found under {ASSETS}")
     return groups
@@ -77,6 +80,8 @@ def split_group(name: str, files: list[Path], max_bytes: int) -> list[list[Path]
     current_size = 0
     for path in files:
         size = path.stat().st_size
+        if size > max_bytes:
+            raise ValueError(f"Asset exceeds configured chunk size ({size} > {max_bytes}): {path}")
         if current and current_size + size > max_bytes:
             chunks.append(current)
             current, current_size = [], 0
