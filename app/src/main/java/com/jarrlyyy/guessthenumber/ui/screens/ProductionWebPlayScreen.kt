@@ -999,6 +999,8 @@ fun ProductionWebPlayScreen(
                                             .put("creativeModeEnabled", game.creativeModeEnabled)
                                             .put("rangeMin", (result?.rangeMin ?: game.currentRangeMin).toString())
                                             .put("rangeMax", (result?.rangeMax ?: game.currentRangeMax).toString())
+                                            .put("automationRangeMin", "1")
+                                            .put("automationRangeMax", progressionEngine.getRangeMax(game).toString())
                                             .put("attempts", result?.attempts ?: game.attempts)
                                             .put("correctGuesses", result?.correctGuesses ?: game.correctGuesses)
                                              .put("gameplayTraits", gameplayTraitsJson)
