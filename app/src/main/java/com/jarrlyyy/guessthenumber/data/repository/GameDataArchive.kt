@@ -140,8 +140,7 @@ object GameDataArchive {
     private fun activate(pointer: File, version: String, root: File) {
         val temporary = File(root, "active-version.tmp")
         temporary.writeText(version)
-        if (pointer.exists()) check(pointer.delete())
-        check(temporary.renameTo(pointer))
+        check(temporary.renameTo(pointer)) { "Could not atomically activate game-data version" }
     }
 
     private fun activeVersion(pointer: File): String? = runCatching {
