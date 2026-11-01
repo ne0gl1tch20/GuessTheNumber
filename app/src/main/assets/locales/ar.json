@@ -1289,6 +1289,6 @@
   "minigame_math_blitz_name": "Math Blitz",
   "minigame_math_blitz_desc": "Solve quick arithmetic challenges in a 60-second round. Score combos for extra Nebula.",
   "minigame_memory_grid_name": "Memory Grid",
-  "minigame_memory_grid_desc": "Flip a 4×4 grid, find all eight matching pairs and build your score before time runs out."
+  "minigame_memory_grid_desc": "Flip a 4×4 grid, find all eight matching pairs and build your score before time runs out.",
   "update_install_failed": "Update failed: %s"
 }
