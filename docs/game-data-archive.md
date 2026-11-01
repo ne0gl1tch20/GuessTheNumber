@@ -22,7 +22,7 @@ python tools/binarify_game_data.py --output /tmp/gtn-game-data
 python -m unittest discover -s tools -p 'test_binarify_game_data.py' -v
 ```
 
-Android Gradle builds invoke the same builder automatically before asset merging.
+Android Gradle builds invoke the same builder automatically before asset merging. On asset changes pushed to `master`, the archive workflow tests the output and publishes `game_data/` with the manifest and numbered chunks.
 
 ## Runtime behavior
 
@@ -32,7 +32,7 @@ At startup, while the existing save-loading screen is visible, Android:
 3. Decompresses into an app-private staging directory while enforcing path and size limits.
 4. Verifies every extracted file hash.
 5. Atomically activates the new cache version.
-6. Checks the published `master/game_data/manifest.json` and downloads changed chunks when available.
+6. Checks the published `master/game_data/manifest.json` and downloads changed chunks when available. Source commit timestamps prevent an older published bundle from replacing newer APK assets or a newer verified cache.
 
 If a download or archive validation fails, the last verified cache remains active and the app falls back to its bundled assets. Save data is stored separately and is not touched.
 
