@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "5f3330ebb3978fe9b6756c71a7462041ac68e547",
+  "version": "427fe3840a8e4518ec6a53cbccaceca2052d39ed",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -157,11 +157,11 @@
     },
     {
       "path": "locales/zh_cn.json",
-      "sha256": "da8357cc7ca28f8f6624ece8d7fbf6d757caccf0d1e85d4cf8b6e81614a99ef8"
+      "sha256": "a53bf558eccfcf82bf2f4ee641f8e56d1e2a9851196b70a2498cf8e0d61ae80a"
     },
     {
       "path": "locales/zh_tw.json",
-      "sha256": "222d2059f05bfcdeba01fdc79c881c6511f1020040464d4d69ba1f4c754e8499"
+      "sha256": "e06bb391d861cb54e71d52d9ab21988ab1d5b729dbb4e6d0fa67fe9845bf95d8"
     },
     {
       "path": "libraries/jarrlyyuisdk/README.md",
