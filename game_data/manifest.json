@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "archiveFormatVersion": 1,
   "minAppVersionCode": 24,
-  "version": "ce9503b9582639d6386c",
-  "sourceCommit": "37edadaf91f60724545f2a6dd2ab5add6a8ad354",
-  "sourceCommitTimestamp": 1793614764,
+  "version": "f327a0cb02d74434847c",
+  "sourceCommit": "a4c7c6a1a98ec73de7441bef77807ab2ea0fe92e",
+  "sourceCommitTimestamp": 1793614897,
   "keyId": "gtn-assets-v1",
   "cipher": "AES-256-GCM",
   "compression": "ZIP-DEFLATE",
@@ -23,8 +23,8 @@
       "id": "02",
       "file": "02.bin",
       "group": "locales",
-      "size": 548732,
-      "sha256": "8f8ddd5548c9f25f03017d0366641dff7b7e4720525424ab9c2d4d651b226f5a",
+      "size": 548734,
+      "sha256": "41a6c07d9ca71ddf6ab598d010d705933deaa9ee77337118f7a9a909ff823d72",
       "nonceBytes": 12,
       "fileCount": 23
     },
@@ -32,8 +32,8 @@
       "id": "03",
       "file": "03.bin",
       "group": "web-play",
-      "size": 1150908,
-      "sha256": "c8bb91319254b8d7c80fba38e97b5001ad66a656447e797f6b443f0114794245",
+      "size": 1150998,
+      "sha256": "7e5274bbb72c6f43dc8b3d678070743d6c2164cc5ead28f498094b12f90d4b76",
       "nonceBytes": 12,
       "fileCount": 11
     },
@@ -243,8 +243,8 @@
     {
       "path": "locales/en_us.json",
       "chunk": "02",
-      "size": 114375,
-      "sha256": "6627ea1b12122e44635ad61327158aed05303e784ed0444f74aa74619c978b0a"
+      "size": 114379,
+      "sha256": "9ffa92e6d784880342eef8585bfee2d26e328ab5623746107b2cbfce9e588f89"
     },
     {
       "path": "locales/es.json",
@@ -363,8 +363,8 @@
     {
       "path": "web-play/app.js",
       "chunk": "03",
-      "size": 136346,
-      "sha256": "d911f3b28a23c3c8daca5637b68894dfd5763cc77eca614a6366fa68e5d486b6"
+      "size": 136631,
+      "sha256": "9190c06992be55347b7e3c9ef5cb073320f0a953a706ef83a48f87a382807a69"
     },
     {
       "path": "web-play/icons/guess-the-number.svg",
@@ -387,8 +387,8 @@
     {
       "path": "web-play/index.html",
       "chunk": "03",
-      "size": 104115,
-      "sha256": "411e77801c2ce902a9a721c7fd2787ca28b37a076fc2b2992ce523813f977c3b"
+      "size": 104023,
+      "sha256": "1f29bd6a7a5b2c987391d9c66e890153917f4fe5c76266599defd63b9163fd50"
     },
     {
       "path": "web-play/menu-studio.js",
