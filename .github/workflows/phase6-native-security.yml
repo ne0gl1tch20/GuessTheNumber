@@ -65,18 +65,4 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           emulator-boot-timeout: 900
           disable-animations: true
-          script: |
-            adb wait-for-device
-            for attempt in $(seq 1 36); do
-              if [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; then
-                break
-              fi
-              sleep 5
-            done
-            if [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" != "1" ]; then
-              echo "Android emulator did not finish booting within 180 seconds."
-              adb devices -l
-              exit 1
-            fi
-            adb shell cmd package list packages >/dev/null
-            ./gradlew :app:connectedDebugAndroidTest --no-build-cache --console=plain -Pandroid.testInstrumentationRunnerArguments.class=com.jarrlyyy.guessthenumber.data.repository.NativeGameDataCryptoInstrumentedTest
+          script: adb wait-for-device && adb shell cmd package list packages >/dev/null && ./gradlew :app:connectedDebugAndroidTest --no-build-cache --console=plain -Pandroid.testInstrumentationRunnerArguments.class=com.jarrlyyy.guessthenumber.data.repository.NativeGameDataCryptoInstrumentedTest
