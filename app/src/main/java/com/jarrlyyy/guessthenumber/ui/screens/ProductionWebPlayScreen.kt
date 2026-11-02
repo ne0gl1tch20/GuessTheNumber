@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import com.jarrlyyy.guessthenumber.BuildConfig
 import android.net.Uri
 import android.content.Intent
@@ -247,7 +248,7 @@ fun ProductionWebPlayScreen(
                 .addPathHandler("/assets/fonts/", webPlayAssetSyncer.pathHandler("fonts"))
                 .addPathHandler("/assets/locales/", webPlayAssetSyncer.pathHandler("locales"))
                 .addPathHandler("/assets/libraries/", webPlayAssetSyncer.pathHandler("libraries"))
-                .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
+                .addPathHandler("/assets/", GameDataArchive.pathHandler(context, ""))
                 .build()
             WebView(context).apply {
                 webViewRef = this
@@ -384,7 +385,7 @@ fun ProductionWebPlayScreen(
                                         }
                                         if (parsed.type == "read_changelog") {
                                             val markdown = try {
-                                                context.assets.open("changelogs.md").bufferedReader(Charsets.UTF_8).use { it.readText() }
+                                                GameDataArchive.open(context, "changelogs.md").bufferedReader(Charsets.UTF_8).use { it.readText() }
                                             } catch (_: Exception) {
                                                 replyProxy.postMessage(errorResponse(parsed.id, "changelog_unavailable"))
                                                 return@post

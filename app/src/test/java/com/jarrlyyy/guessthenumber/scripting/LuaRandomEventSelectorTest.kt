@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.scripting
 
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import com.jarrlyyy.guessthenumber.domain.model.RandomEventType
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -26,7 +27,7 @@ class LuaRandomEventSelectorTest {
     @Test
     fun selectorUsesBundledLuaAsset() {
         val context = RuntimeEnvironment.getApplication()
-        val source = context.assets.open("scripts/events/random_event.lua")
+        val source = GameDataArchive.open(context, "scripts/events/random_event.lua")
             .bufferedReader().use { it.readText() }
 
         assertNotNull(source)

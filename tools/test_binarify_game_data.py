@@ -95,6 +95,27 @@ class BinarifyGameDataTest(unittest.TestCase):
             self.assertEqual(chunks, 1)
             self.assertEqual(files, 1)
 
+    def test_apk_validator_rejects_plaintext_asset_duplicates(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            assets = root / "assets"
+            (assets / "game").mkdir(parents=True)
+            (assets / "game" / "config.json").write_text('{"value":3}')
+            previous = builder.ASSETS
+            builder.ASSETS = assets
+            try:
+                output = root / "game_data"
+                builder.build(output, None, 65536)
+            finally:
+                builder.ASSETS = previous
+            apk = root / "test-plaintext.apk"
+            with zipfile.ZipFile(apk, "w") as archive:
+                for path in output.iterdir():
+                    archive.write(path, f"assets/game_data/{path.name}")
+                archive.writestr("assets/game/config.json", '{"value":3}')
+            with self.assertRaises(AssertionError):
+                apk_validator.validate(apk)
+
     def test_generated_asset_can_be_included_under_virtual_path(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

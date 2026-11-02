@@ -27,7 +27,7 @@ class FeatureFlagRepository(private val context: Context) {
     private val json = Json { ignoreUnknownKeys = true }
 
     fun load(): Map<String, Boolean> = runCatching {
-        val config = context.assets.open("game/feature_flags.json").bufferedReader().use {
+        val config = GameDataArchive.open(context, "game/feature_flags.json").bufferedReader().use {
             json.decodeFromString<FeatureFlagConfig>(it.readText())
         }
         ContentValidation.requireSupportedSchema(config.schemaVersion)

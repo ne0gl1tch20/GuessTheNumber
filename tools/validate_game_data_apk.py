@@ -14,6 +14,18 @@ from binarify_game_data import FORMAT_VERSION, KEY, MAGIC
 
 def validate(apk_path: Path) -> tuple[int, int]:
     with zipfile.ZipFile(apk_path) as apk:
+        asset_files = {name for name in apk.namelist() if name.startswith("assets/") and not name.endswith("/")}
+        approved = {
+            "assets/info.txt",
+        }
+        unexpected = {
+            name for name in asset_files
+            if not name.startswith("assets/game_data/") and name not in approved
+        }
+        assert not unexpected, (
+            "Unexpected APK assets (plaintext or unapproved bootstrap files): "
+            + ", ".join(sorted(unexpected))
+        )
         manifest_path = "assets/game_data/manifest.json"
         manifest = json.loads(apk.read(manifest_path))
         assert manifest["schemaVersion"] == 1

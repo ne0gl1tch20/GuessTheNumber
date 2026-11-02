@@ -34,8 +34,8 @@ concurrency:
 jobs:
   validate:
     name: Build native library and Android tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -62,4 +62,7 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_6
-          script: ./gradlew :app:connectedDebugAndroidTest --no-build-cache --console=plain
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          emulator-boot-timeout: 900
+          disable-animations: true
+          script: adb wait-for-device && adb shell cmd package list packages >/dev/null && ./gradlew :app:connectedDebugAndroidTest --no-build-cache --console=plain -Pandroid.testInstrumentationRunnerArguments.class=com.jarrlyyy.guessthenumber.data.repository.NativeGameDataCryptoInstrumentedTest

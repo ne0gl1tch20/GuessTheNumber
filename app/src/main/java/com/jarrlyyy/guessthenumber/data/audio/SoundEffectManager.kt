@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.data.audio
 
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
@@ -107,7 +108,7 @@ class SoundEffectManager private constructor(context: Context) : AutoCloseable {
     }
 
     private fun discoverAssets(): Map<String, String> {
-        val files = runCatching { appContext.assets.list("sfx").orEmpty() }.getOrElse {
+        val files = runCatching { GameDataArchive.list(appContext, "sfx") }.getOrElse {
             debugLog("Sound-effects folder unavailable; effects remain silent.")
             emptyArray()
         }
@@ -128,7 +129,7 @@ class SoundEffectManager private constructor(context: Context) : AutoCloseable {
 
         val temporary = File(cacheDir, outputFile.name + ".tmp")
         var total = 0L
-        appContext.assets.open(assetPath).use { input ->
+        GameDataArchive.open(appContext, assetPath).use { input ->
             FileOutputStream(temporary).use { output ->
                 val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                 while (true) {

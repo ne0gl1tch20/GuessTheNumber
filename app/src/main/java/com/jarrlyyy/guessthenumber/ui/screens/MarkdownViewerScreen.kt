@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -113,7 +114,7 @@ fun MarkdownViewerScreen(
     LaunchedEffect(assetFileName) {
         loadError = false
         markdownText = try {
-            context.assets.open(assetFileName).bufferedReader().use { it.readText() }
+            GameDataArchive.open(context, assetFileName).bufferedReader().use { it.readText() }
         } catch (_: Exception) {
             loadError = true
             ""

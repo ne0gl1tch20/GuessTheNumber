@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.data.repository
 
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import com.jarrlyyy.guessthenumber.scripting.LuaSeasonalEventCatalog
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -27,7 +28,7 @@ class LiveOpsRepositoryTest {
     @Test
     fun bundledLuaCatalogMatchesUnchangedJsonFallback() {
         val context = RuntimeEnvironment.getApplication()
-        val jsonManifest = context.assets.open("game/liveops_manifest.json").bufferedReader().use {
+        val jsonManifest = GameDataArchive.open(context, "game/liveops_manifest.json").bufferedReader().use {
             Json { ignoreUnknownKeys = true }.decodeFromString<LiveOpsManifest>(it.readText())
         }
         val luaManifest = LuaSeasonalEventCatalog(context).loadBundled()

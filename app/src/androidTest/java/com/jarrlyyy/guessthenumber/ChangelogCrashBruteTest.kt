@@ -1,122 +1,109 @@
 package com.jarrlyyy.guessthenumber
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Rule
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ChangelogCrashBruteTest {
-    @get:Rule
-    val composeRule = createAndroidComposeRule<MainActivity>()
+    private lateinit var device: UiDevice
+
+    @Before
+    fun setUp() {
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    }
 
     @Test
     fun repeatedlyOpenChangelogFromMoreWithoutCrashing() {
         enterPlayableState()
 
         repeat(10) {
-            composeRule.onNodeWithText("More", useUnmergedTree = true).performClick()
-            composeRule.waitUntil(timeoutMillis = 5_000) {
-                composeRule.onAllNodesWithText("Changelog", useUnmergedTree = true)
-                    .fetchSemanticsNodes().isNotEmpty()
+            clickText("More")
+            waitForText("Changelog")
+            clickText("Changelog")
+            waitForText("Changelog")
+            check(device.findObject(By.text("Changelog")) != null) {
+                "Changelog screen did not appear"
             }
-            composeRule.onNodeWithText("Changelog", useUnmergedTree = true).performClick()
-            composeRule.waitUntil(timeoutMillis = 5_000) {
-                composeRule.onAllNodesWithText("Changelog", useUnmergedTree = true)
-                    .fetchSemanticsNodes().isNotEmpty()
-            }
-            composeRule.onNodeWithText("Changelog", useUnmergedTree = true).assertIsDisplayed()
-            composeRule.activityRule.scenario.onActivity {
-                it.onBackPressedDispatcher.onBackPressed()
-            }
-            composeRule.waitUntil(timeoutMillis = 5_000) {
-                composeRule.onAllNodesWithText("More Hub", useUnmergedTree = true)
-                    .fetchSemanticsNodes().isNotEmpty()
-            }
+            device.pressBack()
+            waitForText("More Hub")
         }
     }
 
-    /**
-     * The debug APK can start in Save Slots instead of the game. The brute test must
-     * bootstrap a fresh slot and complete the guided tutorial before looking for More.
-     */
     private fun enterPlayableState() {
-        val saveSlotsVisible = composeRule.onAllNodesWithText(
-            "Save Slots",
-            useUnmergedTree = true
-        ).fetchSemanticsNodes().isNotEmpty()
+        waitForAnyText("Create your profile", "Save Slots", "More", "Guess The Number")
 
-        if (saveSlotsVisible) {
-            composeRule.onNodeWithText("Start New Game", useUnmergedTree = true).performClick()
-            composeRule.waitUntil(timeoutMillis = 5_000) {
-                composeRule.onAllNodesWithText("Create", useUnmergedTree = true)
-                    .fetchSemanticsNodes().isNotEmpty()
-            }
-            composeRule.onNodeWithText("Create", useUnmergedTree = true).performClick()
+        if (hasText("Create your profile")) {
+            setText("Username", "Archive Test")
+            clickText("Create profile & continue")
+            waitForText("Save Slots")
+        }
 
-            composeRule.waitUntil(timeoutMillis = 10_000) {
-                composeRule.onAllNodesWithText("Guess The Number", useUnmergedTree = true)
-                    .fetchSemanticsNodes().isNotEmpty()
-            }
+        if (hasText("Save Slots")) {
+            clickText("Start New Game")
+            waitForText("Create")
+            clickText("Create")
+            waitForText("Guess The Number")
         } else {
-            composeRule.waitUntil(timeoutMillis = 15_000) {
-                composeRule.onAllNodesWithText("More", useUnmergedTree = true)
-                    .fetchSemanticsNodes().isNotEmpty() ||
-                    composeRule.onAllNodesWithText("Guess The Number", useUnmergedTree = true)
-                        .fetchSemanticsNodes().isNotEmpty()
-            }
+            waitForAnyText("More", "Guess The Number")
         }
 
         completeGuidedTutorialIfPresent()
-
-        composeRule.waitUntil(timeoutMillis = 15_000) {
-            composeRule.onAllNodesWithText("More", useUnmergedTree = true)
-                .fetchSemanticsNodes().isNotEmpty()
-        }
+        waitForText("More")
     }
 
     private fun completeGuidedTutorialIfPresent() {
-        val tutorialVisible = composeRule.onAllNodesWithText(
-            "Step 1 of 4 • Action required",
-            useUnmergedTree = true
-        ).fetchSemanticsNodes().isNotEmpty()
+        if (!hasText("Step 1 of 4 • Action required")) return
 
-        if (!tutorialVisible) return
+        setText("Enter your guess", "1")
+        clickText("GUESS NUMBER")
 
-        // Step 1: make the first real guess.
-        composeRule.onNodeWithText("Enter your guess", useUnmergedTree = true).performTextInput("1")
-        composeRule.onNodeWithText("GUESS NUMBER", useUnmergedTree = true).performClick()
+        waitForText("Upgrades")
+        clickText("Upgrades")
 
-        // Step 2: open Upgrades.
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText("Upgrades", useUnmergedTree = true)
-                .fetchSemanticsNodes().isNotEmpty()
+        waitForText("More")
+        clickText("More")
+
+        waitForText("Settings")
+        clickText("Settings")
+        device.pressBack()
+        waitForText("More")
+    }
+
+    private fun waitForText(text: String, timeout: Long = 10_000) {
+        check(device.wait(Until.hasObject(By.text(text)), timeout)) {
+            "Timed out waiting for '$text'"
         }
-        composeRule.onNodeWithText("Upgrades", useUnmergedTree = true).performClick()
+    }
 
-        // Step 3: open More.
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText("More", useUnmergedTree = true)
-                .fetchSemanticsNodes().isNotEmpty()
+    private fun waitForAnyText(vararg texts: String, timeout: Long = 20_000) {
+        val deadline = System.currentTimeMillis() + timeout
+        while (System.currentTimeMillis() < deadline) {
+            if (texts.any(::hasText)) return
+            Thread.sleep(100)
         }
-        composeRule.onNodeWithText("More", useUnmergedTree = true).performClick()
+        error("Timed out waiting for any of: ${texts.joinToString()}")
+    }
 
-        // Step 4: open Settings. This completes the tutorial.
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText("Settings", useUnmergedTree = true)
-                .fetchSemanticsNodes().isNotEmpty()
-        }
-        composeRule.onNodeWithText("Settings", useUnmergedTree = true).performClick()
+    private fun hasText(text: String): Boolean = device.findObject(By.text(text)) != null
 
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText("Settings", useUnmergedTree = true)
-                .fetchSemanticsNodes().isNotEmpty()
-        }
+    private fun clickText(text: String) {
+        waitForText(text)
+        val target = device.findObject(By.text(text))
+        check(target != null) { "Could not find '$text'" }
+        target.click()
+    }
+
+    private fun setText(label: String, value: String) {
+        waitForText(label)
+        val target = device.findObject(By.text(label))
+        check(target != null) { "Could not find '$label'" }
+        target.click()
+        target.setText(value)
     }
 }

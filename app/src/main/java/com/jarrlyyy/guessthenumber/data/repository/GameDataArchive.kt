@@ -161,21 +161,58 @@ object GameDataArchive {
         }
     }
 
-    fun open(context: Context, relativePath: String): InputStream {
+    fun open(context: Context, relativePath: String): InputStream =
+        file(context, relativePath).inputStream()
+
+    /** Returns a verified extracted archive file. No plaintext APK fallback is permitted. */
+    fun file(context: Context, relativePath: String): File {
         require(safePath(relativePath))
         val app = context.applicationContext
         val root = File(app.filesDir, "game-data-cache")
-        val active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
-        val cached = active?.let { File(it, relativePath) }
-        if (cached != null && cached.isFile && cached.canonicalPath.startsWith(active.canonicalPath + File.separator)) {
-            return cached.inputStream()
+        var active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
+        if (active == null) {
+            val prepared = prepare(app)
+            check(prepared.ready) { "Could not prepare bundled game data: ${prepared.message}" }
+            active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
         }
-        return app.assets.open(relativePath)
+        val activeDir = active ?: throw IllegalStateException("Game data archive has not been prepared")
+        val cached = File(activeDir, relativePath)
+        require(cached.canonicalPath.startsWith(activeDir.canonicalPath + File.separator) && cached.isFile) {
+            "Game-data asset is missing from the verified archive: $relativePath"
+        }
+        return cached
+    }
+
+    /** Lists immediate children from the verified manifest, not from APK plaintext assets. */
+    fun list(context: Context, relativeDirectory: String): Array<String> {
+        require(relativeDirectory.isEmpty() || safePath(relativeDirectory))
+        val app = context.applicationContext
+        val root = File(app.filesDir, "game-data-cache")
+        var active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
+        if (active == null) {
+            val prepared = prepare(app)
+            check(prepared.ready) { "Could not prepare bundled game data: ${prepared.message}" }
+            active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
+        }
+        val activeDir = active ?: throw IllegalStateException("Game data archive has not been prepared")
+        val manifest = JSONObject(File(activeDir, CACHE_MANIFEST).readText())
+        val prefix = if (relativeDirectory.isEmpty()) "" else "$relativeDirectory/"
+        return buildSet {
+            val files = manifest.getJSONArray("files")
+            for (index in 0 until files.length()) {
+                val path = files.getJSONObject(index).getString("path")
+                if (path.startsWith(prefix)) {
+                    val child = path.removePrefix(prefix).substringBefore('/')
+                    if (child.isNotBlank()) add(child)
+                }
+            }
+        }.sorted().toTypedArray()
     }
 
     fun pathHandler(context: Context, assetRoot: String): androidx.webkit.WebViewAssetLoader.PathHandler =
         androidx.webkit.WebViewAssetLoader.PathHandler { path ->
-            val relative = "$assetRoot/" + path.trimStart('/')
+            val cleanPath = path.trimStart('/')
+            val relative = if (assetRoot.isBlank()) cleanPath else "$assetRoot/$cleanPath"
             if (!safePath(relative)) return@PathHandler null
             val input = runCatching { open(context, relative) }.getOrNull() ?: return@PathHandler null
             WebResourceResponse(mimeType(relative), null, input)
