@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.scripting
 
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import android.content.Context
 import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
@@ -19,7 +20,7 @@ class LuaInvisibleTraitSelector(context: Context) {
         evaluateWithSource(
             state = state,
             loadSource = {
-                appContext.assets.open(SCRIPT_PATH).bufferedReader().use { it.readText() }
+                GameDataArchive.open(appContext, SCRIPT_PATH).bufferedReader().use { it.readText() }
             },
             onFailure = { message ->
                 GameLogger.log(
