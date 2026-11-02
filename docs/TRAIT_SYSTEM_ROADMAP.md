@@ -67,7 +67,7 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 - Export asks users to confirm a 12+ character passphrase; import accepts the passphrase without persisting it. The backup format remains compatible across devices using the same format and passphrase.
 - Wrong passphrases, altered ciphertext, malformed envelopes and unknown `GTNPORT` versions are rejected. Portable-format failures never downgrade to the legacy parser.
 - Existing device-bound `GTNSEC2:` envelopes and supported legacy encrypted/plain imports remain importable through explicit compatibility paths.
-- C++ does not implement cryptographic primitives from scratch. The native game-data archive path uses Mbed TLS 3.6.7 (Apache-2.0 OR GPL-2.0-or-later) for AES-256-GCM authenticated decryption; the dependency is pinned in CMake and statically linked into `libgtn.so`. Save-transfer cryptography remains on the standard platform/JVM provider.
+- Save-transfer cryptography remains on the standard platform/JVM provider; the native archive decryptor is a separate, narrowly scoped component.
 
 ### Phase 6 acceptance
 
