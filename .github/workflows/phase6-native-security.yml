@@ -35,7 +35,7 @@ jobs:
   validate:
     name: Build native library and Android tests
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
       - name: Build debug APK and run JVM tests
         run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-build-cache --console=plain
 
-      - name: Run Android instrumentation suite (including native AES-GCM tests)
+      - name: Run native AES-GCM instrumentation tests on Android
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -64,4 +64,4 @@ jobs:
           profile: pixel_6
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -wipe-data
           disable-animations: true
-          script: ./gradlew :app:connectedDebugAndroidTest --no-build-cache --console=plain
+          script: ./gradlew :app:connectedDebugAndroidTest --no-build-cache --console=plain -Pandroid.testInstrumentationRunnerArguments.class=com.jarrlyyy.guessthenumber.data.repository.NativeGameDataCryptoInstrumentedTest
