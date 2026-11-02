@@ -82,10 +82,6 @@ class ChangelogCrashBruteTest {
     }
 
     private fun waitForAnyText(vararg texts: String, timeout: Long = 20_000) {
-        val selectors = texts.map { By.text(it) }
-        check(device.wait(Until.hasObject(By.pkg(device.currentPackage).text(selectors.first().toString())), 1)) {
-            // Keep the actual polling below; this branch only prevents a long Compose-idle wait.
-        }
         val deadline = System.currentTimeMillis() + timeout
         while (System.currentTimeMillis() < deadline) {
             if (texts.any(::hasText)) return
@@ -98,7 +94,9 @@ class ChangelogCrashBruteTest {
 
     private fun clickText(text: String) {
         waitForText(text)
-        device.findObject(By.text(text)).click()
+        val target = device.findObject(By.text(text))
+        check(target != null) { "Could not find '$text'" }
+        target.click()
     }
 
     private fun setText(label: String, value: String) {
@@ -106,6 +104,6 @@ class ChangelogCrashBruteTest {
         val target = device.findObject(By.text(label))
         check(target != null) { "Could not find '$label'" }
         target.click()
-        target.text = value
+        target.setText(value)
     }
 }
