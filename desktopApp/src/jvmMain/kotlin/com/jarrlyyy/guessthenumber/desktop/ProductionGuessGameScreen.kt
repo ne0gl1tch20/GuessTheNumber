@@ -67,6 +67,7 @@ import com.jarrlyyy.guessthenumber.domain.model.BigNumber
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.model.GameSettings
 import com.jarrlyyy.guessthenumber.domain.model.Difficulty
+import com.jarrlyyy.guessthenumber.shared.domain.AntiTimeTravelRules
 import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeSave
 import com.jarrlyyy.guessthenumber.shared.domain.CreativeModeEffect
 import com.jarrlyyy.guessthenumber.shared.domain.CreativeEffectType
@@ -155,30 +156,38 @@ fun ProductionGuessGameScreen(
         activeSaveSlot = selectedSlot
         val loaded = withContext(Dispatchers.IO) { saveStore.load(selectedSlot) }
         if (loaded != null) {
-            autoClicker.reset(loaded.currentRangeMin, loaded.currentRangeMax)
-            val elapsedSeconds = ((System.currentTimeMillis() - loaded.lastSaveTimestamp) / 1000L)
-                .takeIf { it > 0L } ?: 0L
-            val earnedOffline = OfflineEarningsPolicy.calculate(loaded, elapsedSeconds)
+            val clockCheck = AntiTimeTravelRules.check(loaded)
+            val clockSafeState = clockCheck.updatedState
+            autoClicker.reset(clockSafeState.currentRangeMin, clockSafeState.currentRangeMax)
+            val elapsedSeconds = if (clockCheck.detected) 0L else
+                ((System.currentTimeMillis() - loaded.lastSaveTimestamp) / 1000L).coerceAtLeast(0L)
+            val earnedOffline = OfflineEarningsPolicy.calculate(clockSafeState, elapsedSeconds)
             val resumedState = if (earnedOffline > BigNumber.ZERO) {
-                loaded.copy(
-                    money = loaded.money + earnedOffline,
-                    statistics = loaded.statistics.copy(
-                        moneyEarned = loaded.statistics.moneyEarned + earnedOffline
+                clockSafeState.copy(
+                    money = clockSafeState.money + earnedOffline,
+                    statistics = clockSafeState.statistics.copy(
+                        moneyEarned = clockSafeState.statistics.moneyEarned + earnedOffline
                     )
                 )
-            } else loaded
+            } else clockSafeState
             val stampedState = resumedState.copy(lastSaveTimestamp = System.currentTimeMillis())
             val persisted = withContext(Dispatchers.IO) { saveStore.save(selectedSlot, stampedState) }
             if (persisted) {
                 state = stampedState
                 offlineGains = earnedOffline.takeIf { it > BigNumber.ZERO }
                 offlineRewardDismissed = false
-                feedback = if (earnedOffline > BigNumber.ZERO) {
-                    "Welcome back! Your Auto Clicker earned $earnedOffline Money while you were away."
-                } else "Saved game loaded."
+                feedback = when {
+                    clockCheck.detected ->
+                        "Clock rollback detected. Auto Clicker paused for 24 hours; offline earnings were skipped."
+                    earnedOffline > BigNumber.ZERO ->
+                        "Welcome back! Your Auto Clicker earned $earnedOffline Money while you were away."
+                    else -> "Saved game loaded."
+                }
             } else {
-                state = loaded
-                feedback = "Saved game loaded, but offline earnings could not be saved."
+                state = clockSafeState
+                feedback = if (clockCheck.detected) {
+                    "Clock rollback detected. Auto Clicker paused for 24 hours, but the updated save could not be written."
+                } else "Saved game loaded, but offline earnings could not be saved."
             }
         } else {
             val fresh = GameState(
