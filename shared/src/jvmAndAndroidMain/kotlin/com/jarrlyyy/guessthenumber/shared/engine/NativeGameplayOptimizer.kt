@@ -24,7 +24,7 @@ object NativeGameplayOptimizer {
     private fun ensureNativeLoaded(): Boolean {
         nativeAvailable?.let { return it }
         return try {
-            System.loadLibrary("gtn_native")
+            System.loadLibrary("gtn")
             nativeAvailable = true
             true
         } catch (_: UnsatisfiedLinkError) {

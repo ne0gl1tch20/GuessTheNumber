@@ -9,11 +9,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
-    types:
-      - closed
   workflow_dispatch:
     inputs:
       source_ref:
@@ -37,6 +32,10 @@ jobs:
           ref: ${{ inputs.source_ref || github.event.pull_request.merge_commit_sha || github.sha }}
       - name: Record checked-out source commit
         run: echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -49,6 +48,10 @@ jobs:
           grep -q 'rename { "gtn_app_logo.png" }' app/build.gradle.kts
           grep -q '@drawable/gtn_app_logo' app/src/main/res/mipmap-anydpi/ic_launcher.xml
           grep -q '@drawable/gtn_app_logo' app/src/main/res/mipmap-anydpi/ic_launcher_round.xml
+      - name: Install game-data archive builder dependency
+        run: python3 -m pip install -r tools/requirements-game-data.txt
+      - name: Test split game-data archive builder
+        run: python3 -m unittest discover -s tools -p 'test_binarify_game_data.py' -v
       - name: Validate Localizations
         run: python3 tools/validate_locales.py
       - name: Validate Version Metadata
@@ -93,6 +96,11 @@ jobs:
         # Clean Android's incremental APK packaging state before the publishable build.
         # Keep stack traces in CI so packaging failures expose their real cause.
         run: ./gradlew clean assembleDebug --no-daemon --stacktrace
+      - name: Validate encrypted game-data payload
+        run: |
+          apk="$(find app/build/outputs/apk/debug -maxdepth 1 -name '*.apk' -print -quit)"
+          test -n "$apk"
+          python3 tools/validate_game_data_apk.py "$apk"
       - name: Validate embedded APK build metadata
         run: |
           version_name="$(grep -E '^[[:space:]]*val appVersionName = ' "$GITHUB_WORKSPACE/app/build.gradle.kts" | head -1 | sed 's/.*= *"//; s/"$//')"

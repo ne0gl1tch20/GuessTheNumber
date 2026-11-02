@@ -70,7 +70,7 @@ class WebPlayAssetSyncer(context: Context) {
                         cached?.isFile == true && sha256(cached) == expectedHash ->
                             cached.copyTo(target, overwrite = true)
                         bundledAssetMatches(path, expectedHash) ->
-                            appContext.assets.open(path).use { input -> target.outputStream().use { input.copyTo(it) } }
+                            GameDataArchive.open(appContext, path).use { input -> target.outputStream().use { input.copyTo(it) } }
                         else -> {
                             val bytes = request("$RAW_BASE/$version/app/src/main/assets/$path")
                             require(sha256(bytes) == expectedHash) { "Hash mismatch for $path" }
@@ -139,13 +139,13 @@ class WebPlayAssetSyncer(context: Context) {
             cached.canonicalPath.startsWith(activeRoot.canonicalPath + File.separator)) {
             cached.inputStream()
         } else {
-            runCatching { appContext.assets.open(relative) }.getOrNull()
+            runCatching { GameDataArchive.open(appContext, relative) }.getOrNull()
         } ?: return@PathHandler null
         WebResourceResponse(mimeType(relative), null, input)
     }
 
     private fun bundledAssetMatches(path: String, expectedHash: String): Boolean =
-        runCatching { appContext.assets.open(path).use { sha256(it) == expectedHash } }.getOrDefault(false)
+        runCatching { GameDataArchive.open(appContext, path).use { sha256(it) == expectedHash } }.getOrDefault(false)
 
     private fun request(url: String): ByteArray {
         require(url == MANIFEST_URL || url.startsWith("$RAW_BASE/")) { "Untrusted update URL" }
@@ -184,7 +184,7 @@ class WebPlayAssetSyncer(context: Context) {
     }
 
     companion object {
-        const val APP_VERSION_CODE = 23
+        const val APP_VERSION_CODE = 24
         private val PROCESS_MUTEX = Mutex()
         private const val MAX_DOWNLOAD_BYTES = 8 * 1024 * 1024
         private const val MANIFEST_URL = "https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/web-play-manifest.json"

@@ -22,6 +22,10 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install game-data archive builder dependency
+        run: python3 -m pip install -r tools/requirements-game-data.txt
+      - name: Test split game-data archive builder
+        run: python3 -m unittest discover -s tools -p 'test_binarify_game_data.py' -v
       - name: Audit all tracked HTML, CSS and JavaScript files
         run: python tools/audit_web_frontend.py --report-file build/reports/web-frontend-audit.txt
 
