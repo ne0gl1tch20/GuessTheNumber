@@ -901,6 +901,22 @@ fun ProductionWebPlayScreen(
                                                     put("feedback_toolow_$index", activeLocaleManager.getString("feedback_toolow_$index"))
                                                     put("feedback_toohigh_$index", activeLocaleManager.getString("feedback_toohigh_$index"))
                                                 }
+                                                listOf(
+                                                    "traits_title", "traits_intro", "traits_intro_short", "traits_loading",
+                                                    "traits_summary_format", "traits_empty", "traits_active", "traits_locked_format",
+                                                    "traits_choose_variant", "traits_automatic", "traits_unlock_hint", "traits_footer",
+                                                    "traits_saving", "trait_combo_momentum_title", "trait_combo_momentum_description",
+                                                    "trait_range_scout_title", "trait_range_scout_description",
+                                                    "trait_mistake_insurance_title", "trait_mistake_insurance_description",
+                                                    "trait_risk_reward_title", "trait_risk_reward_description",
+                                                    "trait_streak_guard_title", "trait_streak_guard_description",
+                                                    "trait_arm_steady_title", "trait_arm_steady_description",
+                                                    "trait_arm_burst_title", "trait_arm_burst_description",
+                                                    "trait_arm_half_refund_title", "trait_arm_half_refund_description",
+                                                    "trait_arm_careful_title", "trait_arm_careful_description",
+                                                    "trait_arm_balanced_title", "trait_arm_balanced_description",
+                                                    "trait_arm_high_risk_title", "trait_arm_high_risk_description"
+                                                ).forEach { key -> put(key, activeLocaleManager.getString(key)) }
                                             })
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
