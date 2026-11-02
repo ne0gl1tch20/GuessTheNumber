@@ -1942,5 +1942,8 @@
   "web_ui_this_minigame_is_unavailable": "This minigame is unavailable.",
   "web_ui_take_a_short_breather_before_trying_again": "⏳ Take a short breather before trying again.",
   "web_ui_installation_failed": "Installation failed",
-  "web_ui_update_page_opened": "Update page opened"
+  "web_ui_update_page_opened": "Update page opened",
+  "daily_reward_test_amount": "+ 5 Nebula",
+  "daily_reward_test_streak": "Day 1 streak",
+  "update_checks_unavailable_preview": "Update checks are available in the installed app."
 }
