@@ -25,6 +25,12 @@ private val webUiLocaleFiles = mapOf(
 
 internal fun isDesktopWebLocaleSupported(localeTag: String): Boolean = localeTag in webUiLocaleFiles
 
+private fun desktopEnglishWebUiStrings(): JSONObject = runCatching {
+    Thread.currentThread().contextClassLoader.getResourceAsStream("locales/en_us.json")?.bufferedReader(Charsets.UTF_8)?.use {
+        JSONObject(it.readText())
+    }
+}.getOrNull() ?: JSONObject()
+
 private fun desktopWebUiStrings(localeTag: String): JSONObject {
     val file = webUiLocaleFiles[localeTag] ?: "en_us.json"
     fun read(name: String): JSONObject? = runCatching {
@@ -226,6 +232,7 @@ internal fun desktopWebPlayState(
         .put("updateChannel", "debug")
         .put("debugBuild", true)
         .put("initialScreen", initialScreen)
+        .put("englishUiStrings", desktopEnglishWebUiStrings())
         .put("uiStrings", uiStrings)
         .put("buyMultiplier", game.buyMultiplier)
         .put("prestigeRequirement", engine.calculatePrestigeRequirement(game.prestigeCount).format(game.settings.numberNotation))
