@@ -42,7 +42,7 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug
+        run: bash ./gradlew :app:assembleDebug
       - name: Verify actual APK contains only encrypted game data and approved build metadata
         run: python tools/validate_game_data_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Build and verify repository game-data chunks
