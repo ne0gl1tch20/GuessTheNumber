@@ -23,13 +23,17 @@ for tag in re.findall(r"<[a-z][^>]*>", html, flags=re.IGNORECASE):
     duplicates = sorted(name for name in set(attributes) if attributes.count(name) > 1)
     assert not duplicates, f"Duplicate HTML attributes {duplicates}: {tag[:240]}"
 
-for match in re.finditer(r'<input\b([^>]*)\bplaceholder="([^"]*)"([^>]*)>', html, flags=re.IGNORECASE):
-    placeholder = match.group(2)
-    attributes = match.group(1) + match.group(3)
-    if placeholder.strip():
-        assert re.search(r'\bdata-i18n-placeholder="[^"]+"', attributes), (
-            f"Input placeholder is missing a Kotlin locale key: {match.group(0)}"
-        )
+for match in re.finditer(r'<input\b([^>]*)>', html, flags=re.IGNORECASE):
+    attributes = match.group(1)
+    placeholder_match = re.search(
+        r'(?<![\w:-])placeholder="([^"]*)"', attributes, flags=re.IGNORECASE
+    )
+    if placeholder_match and placeholder_match.group(1).strip():
+        assert re.search(
+            r'(?<![\w:-])data-i18n-placeholder="[^"]+"',
+            attributes,
+            flags=re.IGNORECASE,
+        ), f"Input placeholder is missing a Kotlin locale key: {match.group(0)}"
 android_locale = ANDROID_LOCALE.read_text(encoding="utf-8")
 android_bridge = ANDROID_BRIDGE.read_text(encoding="utf-8")
 desktop_bridge = DESKTOP_BRIDGE.read_text(encoding="utf-8")
