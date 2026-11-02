@@ -43,9 +43,7 @@ private fun desktopWebUiStrings(localeTag: String): JSONObject {
             merged.put(key, overlay.get(key))
         }
     }
-    return JSONObject().apply {
-        webUiStringKeys.forEach { key -> put(key, merged.optString(key, key)) }
-    }
+    return merged
 }
 
 
