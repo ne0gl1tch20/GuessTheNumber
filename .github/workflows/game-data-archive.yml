@@ -86,7 +86,18 @@ jobs:
           for attempt in 1 2 3 4 5; do
             git fetch origin master
             git checkout -B master origin/master
-            python tools/binarify_game_data.py --output game_data --extra-file "$GITHUB_WORKSPACE/GTN_APP_LOGO.png=web-play/gtn-app-logo.png"
+            generated="$RUNNER_TEMP/game_data"
+            python tools/binarify_game_data.py --output "$generated" --extra-file "$GITHUB_WORKSPACE/GTN_APP_LOGO.png=web-play/gtn-app-logo.png"
+            version="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$generated/manifest.json")"
+            mkdir -p "game_data/versions/$version"
+            python - "$generated/manifest.json" "$generated" "game_data/versions/$version" <<'PY'
+          import json, pathlib, shutil, sys
+          manifest_path, generated, destination = map(pathlib.Path, sys.argv[1:])
+          manifest = json.loads(manifest_path.read_text())
+          for chunk in manifest["chunks"]:
+              shutil.copy2(generated / chunk["file"], destination / chunk["file"])
+          shutil.copy2(manifest_path, pathlib.Path("game_data/manifest.json"))
+          PY
             git add game_data
             if [ -z "$(git status --porcelain -- game_data)" ]; then
               echo "Published game-data archive is already current"
