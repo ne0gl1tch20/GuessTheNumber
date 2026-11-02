@@ -266,7 +266,7 @@
         <article class="currency-tile ultra-tile"><span data-i18n="web_ui_ultra">⬡ ULTRA</span><strong id="ultra">0</strong><small id="ultraCount">0 ultra resets</small></article>
         <article class="currency-tile nebula-tile"><span data-i18n="web_ui_nebula">☄ NEBULA</span><strong id="nebula">0</strong><small data-i18n="web_ui_cosmic_currency">Cosmic currency</small></article>
       </div>
-      <div class="realm-row"><div class="realm-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 2 2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6L12 2Z"/></svg></div><div class="realm-copy"><span class="stat-label" data-i18n="web_ui_current_realm">CURRENT REALM</span><strong id="activeWorld">Verdant Grove</strong><small id="realmSubtext">Your adventure is taking shape.</small></div><div class="realm-score"><strong id="bossVictories">0</strong><small data-i18n="web_ui_bosses">BOSSES</small></div></div>
+      <div class="realm-row"><div class="realm-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 2 2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6L12 2Z"/></svg></div><div class="realm-copy"><span class="stat-label" data-i18n="web_ui_current_realm">CURRENT REALM</span><strong id="activeWorld" data-i18n="world_verdant_name">Verdant Grove</strong><small id="realmSubtext">Your adventure is taking shape.</small></div><div class="realm-score"><strong id="bossVictories">0</strong><small data-i18n="web_ui_bosses">BOSSES</small></div></div>
       <div class="progression-mini-grid">
         <div><span>⌂</span><strong id="homeBase">Lv. 0</strong><small data-i18n="web_ui_home_base">Home base</small></div>
         <div><span>∞</span><strong id="riftTier">Tier 0</strong><small data-i18n="web_ui_endless_rift_best">Endless Rift best</small></div>
@@ -285,13 +285,13 @@
       <div class="boss-art" aria-hidden="true">♜</div><div class="boss-content"><span class="eyebrow" data-i18n="web_ui_encounter_in_progress">ENCOUNTER IN PROGRESS</span><h2 id="bossName">Boss encounter</h2><p data-i18n="web_ui_correct_guesses_deal_damage_keep_your_run_going">Correct guesses deal damage. Keep your run going.</p><div class="boss-health-row"><span data-i18n="web_ui_health">HEALTH</span><strong id="bossHealthText">0 / 0 HP</strong></div><div class="boss-health-track"><div id="bossHealthFill" class="boss-health-fill"></div></div></div><span class="boss-live" data-i18n="traits_active">ACTIVE</span>
     </section>
 <section class="world-card card" id="worldPanel" aria-label="Worlds and boss encounters" data-i18n-aria-label="web_worlds_and_boss_encounters">
-      <div class="panel-title"><span class="panel-glyph world-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_world_expedition">WORLD EXPEDITION</span><h2 data-i18n="web_ui_worlds_bosses">Worlds & bosses</h2></div><span class="panel-chip" id="worldBossStatus">READY</span></div>
+      <div class="panel-title"><span class="panel-glyph world-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_world_expedition">WORLD EXPEDITION</span><h2 data-i18n="web_ui_worlds_bosses">Worlds & bosses</h2></div><span class="panel-chip" id="worldBossStatus" data-i18n="web_ui_ready">READY</span></div>
       <p class="world-intro" data-i18n="web_ui_unlock_new_realms_and_challenge_their_guardians_boss_rul">Unlock new realms and challenge their guardians. Boss rules and rewards are handled by the game engine.</p>
       <div class="world-list" id="worldList"><div class="world-empty" data-i18n="web_ui_syncing_your_world_map">Syncing your world map…</div></div>
     </section>
     </div>
     <div class="screen" id="screen-rewards" role="tabpanel" aria-labelledby="tab-rewards" data-screen="rewards" hidden>
-    <section class="daily-rewards-page card" aria-label="Daily Nebula rewards" data-i18n-aria-label="web_daily_nebula_rewards"><div class="panel-title"><span class="eyebrow" data-i18n="web_ui_daily_login">DAILY LOGIN</span><h2 data-i18n="daily_reward_title">Daily Nebula Reward</h2><span class="panel-chip" id="dailyRewardPageStatus">READY</span></div><p id="dailyRewardPageSubtitle" data-i18n="daily_reward_subtitle">Claim today's reward and keep your streak alive.</p><div class="daily-reward-page-main"><strong class="reward-amount" id="dailyRewardPageAmount">+5 Nebula</strong><p class="reward-streak" id="dailyRewardPageStreak">Day 1 streak</p></div><div id="dailyRewardPageSchedule" class="daily-reward-schedule"></div><p id="dailyRewardPageMessage" class="catalog-intro" role="status" aria-live="polite"></p><button type="button" class="primary-action reward-claim" id="dailyRewardPageClaim">Claim reward</button></section>
+    <section class="daily-rewards-page card" aria-label="Daily Nebula rewards" data-i18n-aria-label="web_daily_nebula_rewards"><div class="panel-title"><span class="eyebrow" data-i18n="web_ui_daily_login">DAILY LOGIN</span><h2 data-i18n="daily_reward_title">Daily Nebula Reward</h2><span class="panel-chip" id="dailyRewardPageStatus" data-i18n="web_ui_ready">READY</span></div><p id="dailyRewardPageSubtitle" data-i18n="daily_reward_subtitle">Claim today's reward and keep your streak alive.</p><div class="daily-reward-page-main"><strong class="reward-amount" id="dailyRewardPageAmount">+5 Nebula</strong><p class="reward-streak" id="dailyRewardPageStreak">Day 1 streak</p></div><div id="dailyRewardPageSchedule" class="daily-reward-schedule"></div><p id="dailyRewardPageMessage" class="catalog-intro" role="status" aria-live="polite"></p><button type="button" class="primary-action reward-claim" id="dailyRewardPageClaim" data-i18n="endgame_claim_reward">Claim reward</button></section>
 
 <section class="milestones-card card" aria-label="Achievement progress" data-i18n-aria-label="achievement_progress_title">
       <div class="panel-title"><span class="panel-glyph milestone-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-trophy"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_personal_milestones">PERSONAL MILESTONES</span><h2 data-i18n="web_ui_achievement_progress">Achievement progress</h2></div><span class="panel-chip" data-i18n="web_ui_3_goals">3 GOALS</span></div>
@@ -313,10 +313,10 @@
       <div class="panel-title"><span class="panel-glyph quest-glyph"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><div><span class="eyebrow" data-i18n="web_ui_daily_momentum_2">DAILY MOMENTUM</span><h2 data-i18n="web_ui_today_s_run">Today's run</h2></div><span class="panel-chip" id="claimedQuests">0 CLAIMED</span></div>
       <div class="quest-metrics"><div><strong id="dailyGuesses">0</strong><span data-i18n="web_ui_guesses_made">Guesses made</span></div><div><strong id="dailyCorrect">0</strong><span data-i18n="stats_correct_guesses">Correct guesses</span></div><div><strong id="dailyBestStreak">0</strong><span data-i18n="web_ui_best_daily_streak">Best daily streak</span></div></div>
       <div class="quest-board" aria-label="Daily quests" data-i18n-aria-label="web_daily_quests">
-        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="web_ui_warm_up">Warm-up</strong><small data-i18n="daily_quest_guesses_desc">Make 10 guesses</small><span class="quest-progress" id="questProgressGuesses">0 / 10</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_guesses_10" type="button">Claim</button></article>
-        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="web_ui_sharp_aim">Sharp aim</strong><small data-i18n="daily_quest_correct_desc">Get 5 correct guesses</small><span class="quest-progress" id="questProgressCorrect">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_correct_5" type="button">Claim</button></article>
-        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="web_ui_on_a_roll">On a roll</strong><small data-i18n="web_ui_reach_a_best_streak_of_5">Reach a best streak of 5</small><span class="quest-progress" id="questProgressStreak">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_streak_5" type="button">Claim</button></article>
-        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="daily_quest_upgrades_name">Builder</strong><small data-i18n="web_ui_buy_3_upgrades">Buy 3 upgrades</small><span class="quest-progress" id="questProgressUpgrades">0 / 3</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_upgrades_3" type="button">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="web_ui_warm_up">Warm-up</strong><small data-i18n="daily_quest_guesses_desc">Make 10 guesses</small><span class="quest-progress" id="questProgressGuesses">0 / 10</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_guesses_10" type="button" data-i18n="claim">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="web_ui_sharp_aim">Sharp aim</strong><small data-i18n="daily_quest_correct_desc">Get 5 correct guesses</small><span class="quest-progress" id="questProgressCorrect">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_correct_5" type="button" data-i18n="claim">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="web_ui_on_a_roll">On a roll</strong><small data-i18n="web_ui_reach_a_best_streak_of_5">Reach a best streak of 5</small><span class="quest-progress" id="questProgressStreak">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_streak_5" type="button" data-i18n="claim">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="daily_quest_upgrades_name">Builder</strong><small data-i18n="web_ui_buy_3_upgrades">Buy 3 upgrades</small><span class="quest-progress" id="questProgressUpgrades">0 / 3</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_upgrades_3" type="button" data-i18n="claim">Claim</button></article>
       </div>
       <div class="quest-foot"><span class="quest-pulse"></span><span id="questMessage">Every guess builds your run.</span></div>
     </section>
@@ -417,7 +417,7 @@
         <button type="button" class="primary-action" id="aboutCheckUpdates" data-bridge-action="check_updates" data-i18n="update_check">Check for updates</button>
         <div id="aboutUpdateStatus" class="about-update-status" role="status" aria-live="polite"></div>
         <div id="aboutUpdateProgress" class="about-update-progress" hidden>
-          <div class="about-update-progress-head"><span id="aboutUpdateProgressLabel">Preparing update…</span></div>
+          <div class="about-update-progress-head"><span id="aboutUpdateProgressLabel" data-i18n="update_downloading">Preparing update…</span></div>
           <div class="about-update-progress-track" role="progressbar" aria-label="Update download progress" data-i18n-aria-label="web_update_download_progress" aria-valuemin="0" aria-valuemax="100"><span id="aboutUpdateProgressFill"></span></div>
         </div>
         <div id="aboutAvailableUpdate" class="about-available-update" hidden>
@@ -593,7 +593,7 @@
         
         <div class="catalog-list" id="arcadeList"><p class="catalog-empty" data-i18n="loading_save_data">Loading minigames…</p></div>
         <div class="arcade-game card" id="arcadeGame" hidden>
-          <div class="panel-title"><div><span class="eyebrow" id="arcadeEyebrow" data-i18n="arcade">MINIGAME</span><h2 id="arcadeTitle">Quick Guess</h2></div><button type="button" class="world-action-button" id="arcadeClose" data-i18n="close_button">Close</button></div>
+          <div class="panel-title"><div><span class="eyebrow" id="arcadeEyebrow" data-i18n="arcade">MINIGAME</span><h2 id="arcadeTitle" data-i18n="minigame_quick_guess_name">Quick Guess</h2></div><button type="button" class="world-action-button" id="arcadeClose" data-i18n="close_button">Close</button></div>
           <p id="arcadeInstructions" class="catalog-intro"></p>
           <div id="arcadePlayArea" class="arcade-play-area"></div>
           <p id="arcadeStatus" role="status" aria-live="polite" class="catalog-intro"></p>
@@ -625,19 +625,19 @@
       <h2 id="offlineRewardTitle">Welcome back!</h2>
       <p id="offlineRewardText">Your auto-clicker earned money while you were away.</p>
       <strong class="reward-amount" id="offlineRewardAmount">+0 Money</strong>
-      <button type="button" class="primary-action reward-claim" id="offlineRewardCollect">Collect</button>
+      <button type="button" class="primary-action reward-claim" id="offlineRewardCollect" data-i18n="collect">Collect</button>
     </div>
   </section>
   <section id="dailyRewardOverlay" class="reward-overlay" role="presentation" hidden>
     <div class="reward-dialog daily-reward-dialog" role="dialog" aria-modal="true" aria-labelledby="dailyRewardTitle" aria-describedby="dailyRewardSubtitle">
       <span class="reward-emoji daily-reward-art" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" focusable="false"><use href="#icon-gift"></use></svg></span>
       <span class="reward-eyebrow" data-i18n="web_ui_daily_login">DAILY LOGIN</span>
-      <h2 id="dailyRewardTitle">Daily Nebula Reward</h2>
-      <p id="dailyRewardSubtitle">Claim today's reward and keep your streak alive.</p>
+      <h2 id="dailyRewardTitle" data-i18n="daily_reward_title">Daily Nebula Reward</h2>
+      <p id="dailyRewardSubtitle" data-i18n="daily_reward_subtitle">Claim today's reward and keep your streak alive.</p>
       <strong class="reward-amount" id="dailyRewardAmount">+5 Nebula</strong>
       <p class="reward-streak" id="dailyRewardStreak">Day 1 streak</p>
       <div id="dailyRewardSchedule" class="daily-reward-schedule" aria-label="Upcoming daily rewards" data-i18n-aria-label="web_upcoming_daily_rewards"></div>
-      <button type="button" class="primary-action reward-claim" id="dailyRewardClaim"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"></use></svg> Claim reward</button><button type="button" class="secondary-action reward-close" id="dailyRewardClose">Close</button>
+      <button type="button" class="primary-action reward-claim" id="dailyRewardClaim"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"></use></svg> Claim reward</button><button type="button" class="secondary-action reward-close" id="dailyRewardClose" data-i18n="close">Close</button>
     </div>
   </section>
   <section id="resetMovedDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetMovedTitle" aria-describedby="resetMovedMessage">
@@ -647,25 +647,25 @@
       <h2 id="resetMovedTitle">Reset Everything has moved</h2>
       <p id="resetMovedMessage">Please use the Save Slots screen to reset everything. This keeps save-management actions in one place and helps prevent accidental data loss.</p>
       <div class="nimmy-actions">
-        <button type="button" class="secondary-action" id="resetMovedCancel">Cancel</button>
+        <button type="button" class="secondary-action" id="resetMovedCancel" data-i18n="cancel">Cancel</button>
         <button type="button" class="primary-action" id="resetMovedOpenSlots">Open Save Slots</button>
       </div>
     </div>
   </section>
-  <section id="resetEverythingDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetEverythingDialogTitle"><div class="nimmy-tutorial-backdrop" aria-hidden="true"></div><div class="nimmy-dialog card reset-dialog"><span class="eyebrow" data-i18n="web_ui_data_reset">DATA RESET</span><h2 id="resetEverythingDialogTitle" data-i18n="confirm_data_reset_title">Confirm Data Reset</h2><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><p id="resetMathPrompt" class="reset-math-prompt"></p><p id="resetTimerText" class="catalog-intro">Wait 45s before confirming.</p><label class="reset-check-row"><input type="checkbox" id="resetAcknowledgement"><span data-i18n="reset_data_acknowledgement">I understand this will erase all my progress</span></label><input id="resetMathAnswer" class="stake-input" inputmode="numeric" autocomplete="off"><div class="nimmy-actions"><button type="button" class="secondary-action" id="resetCancelButton">Cancel</button><button type="button" class="primary-action" id="resetConfirmButton" disabled>Confirm reset</button></div></div></section>
+  <section id="resetEverythingDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetEverythingDialogTitle"><div class="nimmy-tutorial-backdrop" aria-hidden="true"></div><div class="nimmy-dialog card reset-dialog"><span class="eyebrow" data-i18n="web_ui_data_reset">DATA RESET</span><h2 id="resetEverythingDialogTitle" data-i18n="confirm_data_reset_title">Confirm Data Reset</h2><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><p id="resetMathPrompt" class="reset-math-prompt"></p><p id="resetTimerText" class="catalog-intro">Wait 45s before confirming.</p><label class="reset-check-row"><input type="checkbox" id="resetAcknowledgement"><span data-i18n="reset_data_acknowledgement">I understand this will erase all my progress</span></label><input id="resetMathAnswer" class="stake-input" inputmode="numeric" autocomplete="off"><div class="nimmy-actions"><button type="button" class="secondary-action" id="resetCancelButton" data-i18n="cancel">Cancel</button><button type="button" class="primary-action" id="resetConfirmButton" disabled data-i18n="reset_confirm_button">Confirm reset</button></div></div></section>
 <section id="nimmyTutorial" class="nimmy-tutorial" hidden role="dialog" aria-modal="false" aria-labelledby="nimmyTitle" aria-describedby="nimmyBody">
     <div class="nimmy-tutorial-backdrop" aria-hidden="true"></div>
     <div id="nimmySpotlight" class="nimmy-spotlight" aria-hidden="true"></div>
     <div id="nimmyDialog" class="nimmy-dialog">
       <div class="nimmy-guide-row">
         <span class="nimmy-mascot" aria-hidden="true"><span class="nimmy-eyes">••</span><span class="nimmy-smile">⌣</span></span>
-        <span class="nimmy-guide-copy"><strong id="nimmyName">Nimmy</strong><small id="nimmyStep">Step 1 of 4</small></span>
+        <span class="nimmy-guide-copy"><strong id="nimmyName" data-i18n="nimmy_name">Nimmy</strong><small id="nimmyStep">Step 1 of 4</small></span>
       </div>
       <h2 id="nimmyTitle">Hi, I'm Nimmy!</h2>
       <p id="nimmyBody">I'll help you get started. Let's make your first guess.</p>
       <div class="nimmy-actions">
-        <button type="button" id="nimmySkip" class="nimmy-skip">Skip tour</button>
-        <button type="button" id="nimmyNext" class="primary-action">Next</button>
+        <button type="button" id="nimmySkip" class="nimmy-skip" data-i18n="nimmy_skip">Skip tour</button>
+        <button type="button" id="nimmyNext" class="primary-action" data-i18n="music_control_next">Next</button>
       </div>
     </div>
   </section>
