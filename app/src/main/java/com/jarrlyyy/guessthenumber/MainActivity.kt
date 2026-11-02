@@ -9,6 +9,7 @@ import com.jarrlyyy.guessthenumber.traits.ActiveTraitCatalog
 import com.jarrlyyy.guessthenumber.traits.TraitLiveOpsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runBlocking
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -52,6 +53,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Ensure the verified archive is ready before ViewModel constructors load bundled content.
+        runBlocking(Dispatchers.IO) { GameDataArchive.prepare(applicationContext) }
         notificationDestination = savedInstanceState?.getString(STATE_NOTIFICATION_DESTINATION)
             ?: intent.getStringExtra(EXTRA_NOTIFICATION_DESTINATION)
         pendingWidgetSaveSlot = intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
