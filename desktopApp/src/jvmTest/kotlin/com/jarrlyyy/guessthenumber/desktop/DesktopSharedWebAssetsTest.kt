@@ -164,6 +164,27 @@ class DesktopSharedWebAssetsTest {
     }
 
     @Test
+    fun desktopWebSettingsExposeEveryPackagedLocaleFromKotlin() {
+        val state = desktopWebPlayState(GameState(), DesktopEconomyCatalog.load())
+        val options = state.getJSONObject("settings").getJSONArray("locales")
+        val expectedTags = listOf(
+            "ar-SA", "de-DE", "en-GB", "en-US", "es-ES", "fil-PH", "fr-FR",
+            "hi-IN", "id-ID", "it-IT", "ja-JP", "ko-KR", "nl-NL", "pl-PL",
+            "pt-BR", "pt-PT", "ru-RU", "th-TH", "tr-TR", "uk-UA", "vi-VN",
+            "zh-CN", "zh-TW"
+        )
+
+        assertTrue("All 23 locale options must be exposed to shared Web Play", options.length() == expectedTags.size)
+        val actualTags = (0 until options.length()).map { index ->
+            val option = options.getJSONObject(index)
+            assertTrue("Locale option must have a display name", option.getString("name").isNotBlank())
+            option.getString("tag")
+        }
+        assertTrue("Desktop locale options must match the packaged locale catalog", actualTags.toSet() == expectedTags.toSet())
+        assertTrue("Default English catalog must be selected", state.getJSONObject("uiStrings").getString("locale_tag") == "en-US")
+    }
+
+    @Test
     fun everySupportedLocaleContainsSharedSettingsTranslations() {
         val locales = listOf(
             "ar.json", "de.json", "en_gb.json", "en_us.json", "es.json", "fil_ph.json",
