@@ -54,7 +54,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Ensure the verified archive is ready before ViewModel constructors load bundled content.
-        runBlocking(Dispatchers.IO) { GameDataArchive.prepare(applicationContext) }
+        runBlocking(Dispatchers.IO) {
+            val result = GameDataArchive.prepare(applicationContext)
+            check(result.ready || result.version != null) {
+                "Unable to initialize verified game data: ${result.message}"
+            }
+        }
         notificationDestination = savedInstanceState?.getString(STATE_NOTIFICATION_DESTINATION)
             ?: intent.getStringExtra(EXTRA_NOTIFICATION_DESTINATION)
         pendingWidgetSaveSlot = intent.getIntExtra(EXTRA_WIDGET_SAVE_SLOT, 0)
