@@ -51,6 +51,8 @@ class LocaleManager(private val context: Context) {
             ?: ENGLISH_FILE
     }
     fun getCurrentLocaleTag(): String = currentLocale.toLanguageTag()
+    /** Returns the complete active catalog, including English fallbacks, for native-hosted web UI. */
+    fun getAllStrings(): JSONObject = JSONObject(translations.toString())
     fun isRtl(): Boolean = currentLocale.language in setOf("ar", "fa", "he", "ur")
 
     fun getString(key: String, default: String = key): String {
