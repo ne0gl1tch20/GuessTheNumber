@@ -16,8 +16,7 @@ def validate(apk_path: Path) -> tuple[int, int]:
     with zipfile.ZipFile(apk_path) as apk:
         asset_files = {name for name in apk.namelist() if name.startswith("assets/") and not name.endswith("/")}
         approved = {
-            "assets/debug/info.txt",
-            "assets/release/info.txt",
+            "assets/info.txt",
         }
         unexpected = {
             name for name in asset_files
