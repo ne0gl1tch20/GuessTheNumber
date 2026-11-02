@@ -699,7 +699,7 @@ object DesktopEconomyTransactions {
         )
     }
 
-    private fun refreshDailyQuestDay(state: GameState, today: String): GameState {
+    fun refreshDailyQuestDay(state: GameState, today: String): GameState {
         if (state.dailyQuestDate == today) return state
         return state.copy(
             dailyQuestDate = today,
