@@ -48,7 +48,7 @@ class WorldConfigRepository(private val context: Context) {
 
     fun loadWorlds(): List<WorldDefinition> {
         val loaded = runCatching {
-            context.assets.open("game/worlds.json").bufferedReader().use { reader ->
+            GameDataArchive.open(context, "game/worlds.json").bufferedReader().use { reader ->
                 json.decodeFromString<WorldConfigRoot>(reader.readText())
             }
         }.getOrNull()
