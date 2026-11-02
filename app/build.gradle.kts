@@ -136,12 +136,8 @@ android {
             }
         }
     }
-    sourceSets.getByName("main").assets.srcDir(generatedGameDataAssets.get().asFile)
-    // All repository-owned runtime content is packed into game_data; only generated bootstrap metadata remains outside.
-    sourceSets.getByName("main").assets.exclude(
-        "game/**", "locales/**", "libraries/**", "fonts/**", "scripts/**", "traits/**",
-        "web-play/**", "web-app/**", "web-prototype/**", "web-ui/**", "licenses/**", "changelogs.md"
-    )
+    // Replace the default source asset directory entirely: only the generated archive is packaged.
+    sourceSets.getByName("main").assets.setSrcDirs(listOf(generatedGameDataAssets.get().asFile))
     sourceSets.getByName("debug").assets.srcDir(generatedDebugBuildInfo.get().asFile)
     sourceSets.getByName("release").assets.srcDir(generatedReleaseBuildInfo.get().asFile)
     sourceSets.getByName("main").res.srcDir(generatedLauncherIconRes.get().asFile)
