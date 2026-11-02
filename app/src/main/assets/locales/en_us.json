@@ -1945,5 +1945,15 @@
   "web_ui_update_page_opened": "Update page opened",
   "daily_reward_test_amount": "+ 5 Nebula",
   "daily_reward_test_streak": "Day 1 streak",
-  "update_checks_unavailable_preview": "Update checks are available in the installed app."
+  "update_checks_unavailable_preview": "Update checks are available in the installed app.",
+  "web_guess_lower_end": "LOW END",
+  "web_guess_upper_end": "HIGH END",
+  "web_creative_set_money": "Set money",
+  "web_creative_set_prestige": "Set prestige",
+  "web_creative_set_ultra": "Set ultra",
+  "web_creative_set_nebula": "Set nebula",
+  "web_creative_set_attempts": "Set attempts",
+  "web_creative_set_correct_guesses": "Set correct guesses",
+  "web_creative_set_streak": "Set streak",
+  "web_creative_set_best_streak": "Set best streak"
 }
