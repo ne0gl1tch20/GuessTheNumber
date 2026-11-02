@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+"""Guard the Kotlin-owned localization contract for shared Web Play UI."""
+import json
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+HTML = ROOT / "app/src/main/assets/web-play/index.html"
+JS = ROOT / "app/src/main/assets/web-play/app.js"
+ENGLISH = ROOT / "app/src/main/assets/locales/en_us.json"
+ANDROID_LOCALE = ROOT / "app/src/main/java/com/jarrlyyy/guessthenumber/data/repository/LocaleManager.kt"
+ANDROID_BRIDGE = ROOT / "app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/ProductionWebPlayScreen.kt"
+DESKTOP_BRIDGE = ROOT / "desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopWebPlayState.kt"
+
+html = HTML.read_text(encoding="utf-8")
+js = JS.read_text(encoding="utf-8")
+catalog = json.loads(ENGLISH.read_text(encoding="utf-8"))
+android_locale = ANDROID_LOCALE.read_text(encoding="utf-8")
+android_bridge = ANDROID_BRIDGE.read_text(encoding="utf-8")
+desktop_bridge = DESKTOP_BRIDGE.read_text(encoding="utf-8")
+
+# Static labels, placeholders and accessible names must resolve through Kotlin's
+# complete English-backed catalog. Locale overlays replace these defaults.
+for attribute in ("data-i18n", "data-i18n-placeholder", "data-i18n-aria-label"):
+    keys = re.findall(rf'{attribute}="([^"]+)"', html)
+    missing = sorted(set(key for key in keys if not catalog.get(key)))
+    assert not missing, f"{attribute} keys missing from English fallback: {missing}"
+
+# Literal uiText keys used by JS-generated screens must also exist in Kotlin's
+# active locale payload rather than silently using local-only English strings.
+ui_keys = re.findall(r"""uiText\(['"]([^'"]+)['"]\s*,\s*['"`]""", js)
+missing_ui = sorted(set(key for key in ui_keys if not catalog.get(key)))
+assert not missing_ui, f"JS uiText keys missing from Kotlin catalog: {missing_ui}"
+
+assert "fun getAllStrings(): JSONObject = JSONObject(translations.toString())" in android_locale
+assert '.put("uiStrings", activeLocaleManager.getAllStrings()' in android_bridge
+assert "return merged" in desktop_bridge
+assert "const locale=String(lastState?.settings?.locale||'en-US')" in js
+assert "document.documentElement.dir=" in js
+assert "[data-i18n-aria-label]" in js
+assert "renderTraitLoadout(s);applyAuxiliaryTranslations();" in js
+
+print(
+    f"Kotlin-owned Web Play localization passed "
+    f"({len(set(keys)) if 'keys' in locals() else 0} static keys, "
+    f"{len(set(ui_keys))} JS keys, {len(catalog)} English fallback entries)."
+)
