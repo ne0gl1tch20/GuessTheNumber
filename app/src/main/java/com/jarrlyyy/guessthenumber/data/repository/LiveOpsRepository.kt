@@ -111,7 +111,7 @@ class LiveOpsRepository(
         }
 
         // Keep the existing JSON manifest unchanged as a compatibility fallback.
-        val jsonString = appContext.assets.open("game/liveops_manifest.json").bufferedReader().use { it.readText() }
+        val jsonString = GameDataArchive.open(appContext, "game/liveops_manifest.json").bufferedReader().use { it.readText() }
         return json.decodeFromString<LiveOpsManifest>(jsonString).also(LiveOpsContentValidator::validate)
     }
 
