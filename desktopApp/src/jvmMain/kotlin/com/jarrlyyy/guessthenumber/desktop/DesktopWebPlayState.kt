@@ -25,6 +25,18 @@ private val webUiLocaleFiles = mapOf(
 
 internal fun isDesktopWebLocaleSupported(localeTag: String): Boolean = localeTag in webUiLocaleFiles
 
+private val desktopWebUiLocaleOptions: List<Pair<String, String>> by lazy {
+    webUiLocaleFiles.map { (tag, file) ->
+        val displayName = runCatching {
+            Thread.currentThread().contextClassLoader
+                .getResourceAsStream("locales/$file")
+                ?.bufferedReader(Charsets.UTF_8)
+                ?.use { JSONObject(it.readText()).optString("locale_language", tag) }
+        }.getOrNull().orEmpty().ifBlank { tag }
+        tag to displayName
+    }
+}
+
 private fun desktopEnglishWebUiStrings(): JSONObject = runCatching {
     Thread.currentThread().contextClassLoader.getResourceAsStream("locales/en_us.json")?.bufferedReader(Charsets.UTF_8)?.use {
         JSONObject(it.readText())
@@ -259,6 +271,11 @@ internal fun desktopWebPlayState(
             .put("themeMode", game.settings.themeMode)
             .put("numberNotation", game.settings.numberNotation)
             .put("locale", game.settings.locale)
+            .put("locales", JSONArray().apply {
+                desktopWebUiLocaleOptions.forEach { (tag, name) ->
+                    put(JSONObject().put("tag", tag).put("name", name))
+                }
+            })
             .put("reducedMotion", game.settings.reducedMotion)
             .put("reduceFlashes", game.settings.reduceFlashes)
             .put("volume", game.settings.volume)
