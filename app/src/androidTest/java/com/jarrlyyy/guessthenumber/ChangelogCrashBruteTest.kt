@@ -47,6 +47,23 @@ class ChangelogCrashBruteTest {
      * bootstrap a fresh slot and complete the guided tutorial before looking for More.
      */
     private fun enterPlayableState() {
+        // A clean install now asks for a local player profile before showing Save Slots.
+        val profileSetupVisible = composeRule.onAllNodesWithText(
+            "Create your profile",
+            useUnmergedTree = true
+        ).fetchSemanticsNodes().isNotEmpty()
+
+        if (profileSetupVisible) {
+            composeRule.onNodeWithText("Username", useUnmergedTree = true)
+                .performTextInput("Archive Test")
+            composeRule.onNodeWithText("Create profile & continue", useUnmergedTree = true)
+                .performClick()
+            composeRule.waitUntil(timeoutMillis = 10_000) {
+                composeRule.onAllNodesWithText("Save Slots", useUnmergedTree = true)
+                    .fetchSemanticsNodes().isNotEmpty()
+            }
+        }
+
         val saveSlotsVisible = composeRule.onAllNodesWithText(
             "Save Slots",
             useUnmergedTree = true
@@ -114,8 +131,13 @@ class ChangelogCrashBruteTest {
         }
         composeRule.onNodeWithText("Settings", useUnmergedTree = true).performClick()
 
+        // Opening Settings completes the final tutorial action, but leaves the game
+        // on the Settings screen. Return to the game before the test waits for More.
+        composeRule.activityRule.scenario.onActivity {
+            it.onBackPressedDispatcher.onBackPressed()
+        }
         composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText("Settings", useUnmergedTree = true)
+            composeRule.onAllNodesWithText("More", useUnmergedTree = true)
                 .fetchSemanticsNodes().isNotEmpty()
         }
     }
