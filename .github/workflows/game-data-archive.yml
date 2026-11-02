@@ -34,6 +34,17 @@ jobs:
         run: python -m pip install -r tools/requirements-game-data.txt
       - name: Test archive builder
         run: python -m unittest discover -s tools -p 'test_binarify_game_data.py' -v
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build debug APK
+        run: ./gradlew :app:assembleDebug
+      - name: Verify actual APK contains only encrypted game data and approved build metadata
+        run: python tools/validate_game_data_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Build and verify repository game-data chunks
         run: |
           python tools/binarify_game_data.py --output "$RUNNER_TEMP/game_data" --extra-file "$GITHUB_WORKSPACE/GTN_APP_LOGO.png=web-play/gtn-app-logo.png"
