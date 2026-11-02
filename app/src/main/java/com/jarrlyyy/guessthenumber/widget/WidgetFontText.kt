@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.widget
 
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -30,7 +31,7 @@ internal fun renderWidgetFontText(
     val heightPx = (heightDp * density).roundToInt().coerceAtLeast(1)
     val paddingPx = (4f * density).roundToInt()
     val typeface = runCatching {
-        Typeface.createFromAsset(context.assets, fontAssetPath)
+        Typeface.createFromFile(GameDataArchive.file(context, fontAssetPath))
     }.getOrElse {
         Typeface.create("sans-serif", if (bold) Typeface.BOLD else Typeface.NORMAL)
     }
