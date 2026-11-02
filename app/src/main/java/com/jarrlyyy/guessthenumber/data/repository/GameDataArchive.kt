@@ -112,10 +112,14 @@ object GameDataArchive {
                     require(sha256(blob) == entry.getString("sha256"))
                     require(blob.size >= 37 && String(blob, 0, 8, Charsets.US_ASCII) == MAGIC)
                     require(blob[8].toInt() == FORMAT_VERSION)
-                    val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-                    cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(128, blob.copyOfRange(9, 21)))
-                    cipher.updateAAD("$FORMAT_VERSION:$group:$id".toByteArray(Charsets.UTF_8))
-                    ZipInputStream(cipher.doFinal(blob.copyOfRange(21, blob.size)).inputStream()).use { zip ->
+                    val decryptedChunk = NativeGameDataCrypto.decryptChunk(blob, group, id) ?: run {
+                        // Keep the provider-backed path for devices where libgtn cannot be loaded.
+                        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+                        cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(128, blob.copyOfRange(9, 21)))
+                        cipher.updateAAD("$FORMAT_VERSION:$group:$id".toByteArray(Charsets.UTF_8))
+                        cipher.doFinal(blob.copyOfRange(21, blob.size))
+                    }
+                    ZipInputStream(decryptedChunk.inputStream()).use { zip ->
                         while (true) {
                             val item = zip.nextEntry ?: break
                             require(safePath(item.name))

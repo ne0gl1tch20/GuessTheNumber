@@ -53,13 +53,21 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 - The native algorithm receives the **difficulty stored in the active save state** plus that save's streak and attempts. It never reads or mutates save files, rewards or game state; Kotlin validates the transition and remains authoritative.
 - A repeatable native-vs-Kotlin core benchmark runs in GitHub Actions and uploads its report. For 128 deterministic cases, 2,000 warmups and 21 × 5,000 iterations, Kotlin median/p95 were 20.671/35.392 ns with 48.38M evaluations/s; native median/p95 were 5.999/6.306 ns with 166.68M evaluations/s. Checksum parity passed and both outputs stayed bounded. The microbenchmark excludes Android JNI-call overhead, so it does not claim whole-game speedup.
 
+### Native game-data archive cryptography
+
+- `NativeGameDataCrypto` calls a JNI entry point in `libgtn.so`; C++ validates the `GTNGBIN1` header, derives the same SHA-256 key as the Kotlin archive reader, binds `formatVersion:group:id` as GCM additional authenticated data, and verifies the 128-bit tag before returning compressed bytes.
+- Mbed TLS performs AES-256-GCM and SHA-256; no hand-written cryptographic primitive or Android private system library is used.
+- Kotlin prefers the native path and falls back to Android JCA only when the native library/JNI entry point is unavailable. A native authentication failure is propagated and never bypassed by fallback.
+- On-device instrumentation tests cover valid decryption, altered tags, wrong subsystem/chunk context and malformed headers. The Phase 6 workflow runs these tests on an Android emulator.
+- Mbed TLS 3.6 is an LTS branch supported until March 2027; update the pinned dependency before that support window ends.
+
 ### Save transfer security
 
 - New Save Slots exports use the portable `GTNPORT1:` envelope: PBKDF2-HMAC-SHA256 (310,000 iterations), random 128-bit salt, AES-256-GCM, random 96-bit IV and authenticated format metadata. The key is derived from a user passphrase, not Android Keystore, so a backup can be restored on another device with the same passphrase.
 - Export asks users to confirm a 12+ character passphrase; import accepts the passphrase without persisting it. The backup format remains compatible across devices using the same format and passphrase.
 - Wrong passphrases, altered ciphertext, malformed envelopes and unknown `GTNPORT` versions are rejected. Portable-format failures never downgrade to the legacy parser.
 - Existing device-bound `GTNSEC2:` envelopes and supported legacy encrypted/plain imports remain importable through explicit compatibility paths.
-- C++ is not used to implement cryptography from scratch. Native code is used for gameplay compute; standard platform/JVM cryptography provides the save-transfer security boundary.
+- C++ does not implement cryptographic primitives from scratch. The native game-data archive path uses Mbed TLS 3.6.7 (Apache-2.0 OR GPL-2.0-or-later) for AES-256-GCM authenticated decryption; the dependency is pinned in CMake and statically linked into `libgtn.so`. Save-transfer cryptography remains on the standard platform/JVM provider.
 
 ### Phase 6 acceptance
 
