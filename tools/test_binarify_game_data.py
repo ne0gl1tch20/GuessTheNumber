@@ -190,6 +190,27 @@ class BinarifyGameDataTest(unittest.TestCase):
             chunks, files = apk_validator.validate(apk)
             self.assertEqual((chunks, files), (1, 1))
 
+    def test_apk_validator_rejects_plaintext_json_inside_game_data_directory(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            assets = root / "assets"
+            (assets / "game").mkdir(parents=True)
+            (assets / "game" / "config.json").write_text('{"value":"hidden"}')
+            previous = builder.ASSETS
+            builder.ASSETS = assets
+            try:
+                output = root / "game_data"
+                builder.build(output, None, 65536, encrypt_manifest=True)
+            finally:
+                builder.ASSETS = previous
+            apk = root / "test-plaintext-game-data.apk"
+            with zipfile.ZipFile(apk, "w") as archive:
+                for path in output.iterdir():
+                    archive.write(path, f"assets/game_data/{path.name}")
+                archive.writestr("assets/game_data/game/config.json", '{"value":"hidden"}')
+            with self.assertRaises(AssertionError):
+                apk_validator.validate(apk)
+
     def test_encrypted_manifest_rejects_tampering(self):
         blob = bytearray(builder.encrypt_manifest_blob({"version": "test"}))
         blob[-1] ^= 1

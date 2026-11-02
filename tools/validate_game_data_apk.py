@@ -40,6 +40,14 @@ def validate(apk_path: Path) -> tuple[int, int]:
         extracted = {}
         chunks = manifest["chunks"]
         assert 1 <= len(chunks) <= 512
+        expected_payload = {encrypted_manifest_path} | {
+            f"assets/game_data/{entry['file']}" for entry in chunks
+        }
+        actual_payload = {name for name in asset_files if name.startswith("assets/game_data/")}
+        assert actual_payload == expected_payload, (
+            "APK game-data directory contains missing or unexpected files: "
+            + ", ".join(sorted(actual_payload ^ expected_payload))
+        )
         for chunk in chunks:
             name = chunk["file"]
             assert name == f'{chunk["id"]}.bin'
