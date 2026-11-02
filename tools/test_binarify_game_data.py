@@ -18,6 +18,8 @@ class BinarifyGameDataTest(unittest.TestCase):
             assets = root / "assets"
             (assets / "game").mkdir(parents=True)
             (assets / "traits" / "seasonal").mkdir(parents=True)
+            (assets / "licenses").mkdir(parents=True)
+            (assets / "licenses" / "MBEDTLS-LICENSE.txt").write_text("Mbed TLS license")
             (assets / "changelogs.md").write_text("release notes")
             (assets / "game" / "config.json").write_text('{"schemaVersion":1}')
             (assets / "traits" / "seasonal" / "rule.lua").write_text("return {}")
@@ -41,7 +43,7 @@ class BinarifyGameDataTest(unittest.TestCase):
 
             self.assertEqual(manifest["schemaVersion"], 1)
             self.assertEqual({entry["path"] for entry in manifest["files"]},
-                             {"game/config.json", "traits/seasonal/rule.lua", "changelogs.md"})
+                             {"game/config.json", "traits/seasonal/rule.lua", "licenses/MBEDTLS-LICENSE.txt", "changelogs.md"})
             self.assertTrue((output / "01.bin").is_file())
             self.assertTrue((output / "manifest.json").is_file())
 

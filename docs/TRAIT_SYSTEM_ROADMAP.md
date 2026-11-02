@@ -71,7 +71,7 @@ Phase 6 is deliberately narrow: use native code for personalized compute work, w
 
 ### Phase 6 acceptance
 
-- Android native build, production-engine integration tests and secure-transfer tests pass in GitHub Actions.
+- Android native build, production-engine integration tests, secure-transfer tests and native game-data AES-GCM emulator tests pass in GitHub Actions.
 - No save state or reward authority moves into C++.
 - Native output stays within supplied bounds and deterministic benchmark inputs produce matching checksums.
 - Secure envelope ciphertext/tag tampering and malformed envelopes are rejected without a legacy downgrade; legacy import compatibility is covered by tests.
