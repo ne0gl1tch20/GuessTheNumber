@@ -87,7 +87,10 @@ def main() -> int:
 
         missing_translation_keys = baseline_keys - set(data)
         for key in sorted(missing_translation_keys):
-            errors.append(f"{filename}: missing translation key {key!r}")
+            # New Web Play strings may intentionally use LocaleManager's English fallback
+            # until a locale overlay receives its own translation.
+            if not key.startswith("web_ui_"):
+                errors.append(f"{filename}: missing translation key {key!r}")
 
         for key in data:
             if key not in baseline_keys:

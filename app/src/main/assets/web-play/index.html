@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>Guess The Number</title>
+  <title data-i18n="app_name">Guess The Number</title>
   <meta name="gtn-html-version" content="2026.10.25.1">
   <link rel="stylesheet" href="../libraries/jarrlyyuisdk/styles/jarrlyy-ui.css">
   <link rel="stylesheet" href="../libraries/jarrlyyuisdk/styles/jarrlyy-ui-advanced.css">
@@ -50,18 +50,18 @@
       <div class="brand-lockup">
         <img class="brand-logo" src="icons/guess-the-number.svg" alt="Guess The Number logo">
         <div>
-          <h1>Guess The Number</h1>
+          <h1 data-i18n="app_name">Guess The Number</h1>
         </div>
       </div>
       <div class="live-pill"><span class="live-dot"></span><span id="statusLabel">ONLINE</span></div>
     </header>
 
     <nav class="screen-nav" aria-label="Game sections" role="tablist">
-      <button type="button" role="tab" id="tab-worlds" aria-controls="screen-worlds" aria-selected="false" data-screen-target="worlds" tabindex="-1"><svg class="ui-icon nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg><b>Beyond the Numbers</b></button>
+      <button type="button" role="tab" id="tab-worlds" aria-controls="screen-worlds" aria-selected="false" data-screen-target="worlds" tabindex="-1"><svg class="ui-icon nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg><b data-i18n="beyond_numbers_title">Beyond the Numbers</b></button>
       <button type="button" role="tab" id="tab-arcade" aria-controls="screen-arcade" aria-selected="false" data-screen-target="arcade" tabindex="-1"><svg class="ui-icon nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-gamepad"></use></svg><b data-i18n="arcade">Arcade</b></button>
-      <button type="button" role="tab" id="tab-play" aria-controls="screen-play" aria-selected="true" data-screen-target="play"><svg class="ui-icon nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-play"></use></svg><b>Play</b></button>
-      <button type="button" role="tab" id="tab-upgrades" aria-controls="screen-upgrades" aria-selected="false" data-screen-target="upgrades" tabindex="-1"><svg class="ui-icon nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-arrow-up"></use></svg><b>Upgrades</b></button>
-      <button type="button" role="tab" id="tab-more" aria-controls="screen-more" aria-selected="false" data-screen-target="more" tabindex="-1"><svg class="ui-icon nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-menu"></use></svg><b>More</b></button>
+      <button type="button" role="tab" id="tab-play" aria-controls="screen-play" aria-selected="true" data-screen-target="play"><svg class="ui-icon nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-play"></use></svg><b data-i18n="play">Play</b></button>
+      <button type="button" role="tab" id="tab-upgrades" aria-controls="screen-upgrades" aria-selected="false" data-screen-target="upgrades" tabindex="-1"><svg class="ui-icon nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-arrow-up"></use></svg><b data-i18n="nav_upgrade">Upgrades</b></button>
+      <button type="button" role="tab" id="tab-more" aria-controls="screen-more" aria-selected="false" data-screen-target="more" tabindex="-1"><svg class="ui-icon nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-menu"></use></svg><b data-i18n="more">More</b></button>
     </nav>
     <section class="screen more-screen" id="screen-more" role="tabpanel" aria-labelledby="tab-more" data-screen="more" hidden>
       <button type="button" class="more-heading card more-link-card player-profile-entry" data-route="player_profile" aria-label="Open player profile"><span class="player-profile-entry-avatar" id="playerProfileCardAvatar" aria-hidden="true">⭐</span><span><b id="playerProfileCardName">Player profile</b><small id="playerProfileCardDescription">View your username and bio, then edit your profile.</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
@@ -82,17 +82,17 @@
         <button type="button" class="more-link-card" data-screen-target="talent"><svg class="ui-icon more-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg><span><b data-i18n="talents">Talents</b><small data-i18n="talents_subtitle">Build your talent path</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
         <button type="button" class="more-link-card" data-screen-target="traits"><svg class="ui-icon more-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg><span><b data-i18n="traits_title">Traits</b><small data-i18n="traits_intro_short">Gameplay modules and selectable variants</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
         <button type="button" class="more-link-card" data-screen-target="mutators"><svg class="ui-icon more-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg><span><b data-i18n="mutators">Mutators</b><small data-i18n="mutators_subtitle">Customize challenge rules</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
-        <button type="button" class="more-link-card" data-screen-target="stats"><svg class="ui-icon more-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-book"></use></svg><span><b data-i18n="stats">Stats</b><small>Review your game statistics</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
+        <button type="button" class="more-link-card" data-screen-target="stats"><svg class="ui-icon more-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-book"></use></svg><span><b data-i18n="stats">Stats</b><small data-i18n="web_ui_review_your_game_statistics">Review your game statistics</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
         <button type="button" class="more-link-card" id="more-dev-settings" data-screen-target="dev_settings" hidden><svg class="ui-icon more-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-wrench"></use></svg><span><b data-i18n="dev_settings">Dev Settings</b><small data-i18n="dev_settings_subtitle">Developer console and diagnostics</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
         <button type="button" class="more-link-card" data-screen-target="stake"><svg class="ui-icon more-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-star"></use></svg><span><b data-i18n="staking_flip_button">Lucky Stake</b><small data-i18n="lucky_stake_subtitle">Try your luck with a stake</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg></strong></button>
       </section>
     </section>
     <section class="screen traits-screen" id="screen-traits" role="tabpanel" aria-labelledby="tab-more" data-screen="traits" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg></span><div><span class="eyebrow">GAMEPLAY SYSTEM</span><h2>Traits & Loadout</h2></div></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_gameplay_system">GAMEPLAY SYSTEM</span><h2 data-i18n="traits_title">Traits & Loadout</h2></div></div>
         <p class="traits-intro" data-i18n="traits_intro">Traits are real gameplay rules, not badges. Unlock them by playing, then choose an arm to tune how selected traits behave. The game engine validates every selection and owns the save.</p>
         <div class="traits-summary" id="traitsSummary" aria-live="polite" data-i18n="traits_loading">Syncing gameplay traits…</div>
-        <div class="traits-list" id="traitsList" aria-live="polite"><p class="catalog-empty">Loading gameplay traits…</p></div>
+        <div class="traits-list" id="traitsList" aria-live="polite"><p class="catalog-empty" data-i18n="web_ui_loading_gameplay_traits">Loading gameplay traits…</p></div>
         <p class="traits-footer" data-i18n="traits_footer">Gameplay effects are validated by the game before they change your run.</p>
       </section>
     </section>
@@ -117,8 +117,8 @@
         <label class="setting-field"><span data-i18n="master_volume">Master volume</span><input type="range" min="0" max="1" step="0.01" data-setting-value="volume" id="musicVolume"></label>
         <p class="catalog-intro" id="musicPlayerStatus" role="status" aria-live="polite" data-i18n="music_player_status">Your music preference is saved with your game.</p>
       </section>
-      <section class="card catalog-panel music-library-panel"><h3 data-i18n="music_library">Library</h3><div id="musicLibrary" class="music-list"><p class="catalog-empty">Loading music library…</p></div></section>
-      <section class="card catalog-panel music-library-panel"><div class="music-section-heading"><h3 data-i18n="music_queue">Queue</h3><button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="clear_queue" data-i18n="clear">Clear</button></div><div id="musicQueue" class="music-list"><p class="catalog-empty">Loading queue…</p></div></section>
+      <section class="card catalog-panel music-library-panel"><h3 data-i18n="music_library">Library</h3><div id="musicLibrary" class="music-list"><p class="catalog-empty" data-i18n="web_ui_loading_music_library">Loading music library…</p></div></section>
+      <section class="card catalog-panel music-library-panel"><div class="music-section-heading"><h3 data-i18n="music_queue">Queue</h3><button type="button" class="catalog-button music-control" data-bridge-action="music" data-music-action="clear_queue" data-i18n="clear">Clear</button></div><div id="musicQueue" class="music-list"><p class="catalog-empty" data-i18n="web_ui_loading_queue">Loading queue…</p></div></section>
       <section class="card catalog-panel music-library-panel"><h3 data-i18n="music_playlists">Playlists</h3><form id="musicPlaylistForm" class="music-playlist-form"><input id="musicPlaylistName" maxlength="60" required data-i18n-placeholder="music_playlist_name" placeholder="Playlist name"><button class="primary-action" type="submit" data-i18n="music_create_playlist">Create</button></form><div id="musicPlaylists" class="music-list"></div></section>
     </div><section class="screen changelog-screen" id="screen-changelog" role="tabpanel" aria-labelledby="tab-more" data-screen="changelog" hidden>
       <section class="card changelog-heading">
@@ -132,14 +132,14 @@
     </section>
     <div class="screen" id="screen-play" role="tabpanel" aria-labelledby="tab-play" data-screen="play">
 <section class="update-notice card" id="updateNoticeCard" aria-live="polite" aria-labelledby="updateNoticeTitle" hidden>
-  <div class="update-notice-copy"><span class="eyebrow">UPDATE AVAILABLE</span><h2 id="updateNoticeTitle">A new version is ready</h2><p id="updateNoticeDetails">Install the latest version to get the newest fixes.</p></div>
+  <div class="update-notice-copy"><span class="eyebrow" data-i18n="web_ui_update_available">UPDATE AVAILABLE</span><h2 id="updateNoticeTitle">A new version is ready</h2><p id="updateNoticeDetails">Install the latest version to get the newest fixes.</p></div>
   <div class="update-notice-actions"><button type="button" class="primary-action" id="updateNoticeInstall">Update</button><button type="button" class="update-notice-dismiss" id="updateNoticeDismiss" aria-label="Dismiss update notice">Later</button></div>
 </section>
 <section class="hero-card card">
       <div class="hero-glow"></div>
       <div class="hero-copy">
-        <span class="eyebrow">CURRENT RUN</span>
-        <div class="range-label">Find your secret number</div>
+        <span class="eyebrow" data-i18n="web_ui_current_run">CURRENT RUN</span>
+        <div class="range-label" data-i18n="web_ui_find_your_secret_number">Find your secret number</div>
         <div class="range" id="rangeText">1 — 100</div>
         <div class="feedback" id="feedback" role="status" aria-live="polite" aria-atomic="true">Make your move.</div>
       </div>
@@ -148,7 +148,7 @@
 
 <section class="bot-arena-card card" id="botArena" aria-labelledby="botArenaTitle">
   <div class="bot-arena-heading">
-    <div><span class="eyebrow">AUTOMATION LAB</span><h2 id="botArenaTitle">Guessing Bots</h2></div>
+    <div><span class="eyebrow" data-i18n="web_ui_automation_lab">AUTOMATION LAB</span><h2 id="botArenaTitle">Guessing Bots</h2></div>
     <span class="panel-chip" id="botArenaCount">NO BOTS YET</span>
   </div>
   <div class="bot-arena-stage">
@@ -164,7 +164,7 @@
 <div class="play-controls-drawer play-dashboard-sections" id="playControlsDrawer">
   <!-- Full Play dashboard: keep guesses, stats, quests and tools in the page flow. -->
 <section class="guess-card card">
-      <div class="section-heading"><span>YOUR GUESS</span><span class="hint">WHOLE NUMBER</span></div>
+      <div class="section-heading"><span data-i18n="web_ui_your_guess">YOUR GUESS</span><span class="hint" data-i18n="web_ui_whole_number">WHOLE NUMBER</span></div>
       <form id="guessForm" autocomplete="off">
         <div class="input-shell">
           <input id="guessInput" type="text" inputmode="numeric" pattern="-?[0-9]+" maxlength="20" placeholder="Enter a number" aria-label="Your guess">
@@ -173,7 +173,7 @@
       </form>
       <p id="actionStatus" class="action-status" role="status" aria-live="polite" aria-atomic="true">Ready when you are.</p>
       <div class="guess-tools" aria-label="Quick guess helpers">
-        <span class="guess-tools-label">QUICK PICK</span>
+        <span class="guess-tools-label" data-i18n="web_ui_quick_pick">QUICK PICK</span>
         <div class="guess-tool-buttons">
           <button type="button" data-guess-pick="min" aria-label="Use lower end of range"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-arrow-down"></use></svg> LOW END</button>
           <button type="button" data-guess-pick="mid" aria-label="Use midpoint of range"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-target"></use></svg> MIDPOINT</button>
@@ -186,51 +186,51 @@
       <article class="stat-card card">
         <span class="stat-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-target"></use></svg></span>
         <span class="stat-value" id="attempts">0</span>
-        <span class="stat-label">ATTEMPTS</span>
+        <span class="stat-label" data-i18n="web_ui_attempts">ATTEMPTS</span>
       </article>
       <article class="stat-card card">
         <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span>
         <span class="stat-value" id="correct">0</span>
-        <span class="stat-label">CORRECT</span>
+        <span class="stat-label" data-i18n="web_ui_correct">CORRECT</span>
       </article>
       <article class="stat-card card">
         <span class="stat-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-flame"></use></svg></span>
         <span class="stat-value" id="streak">0</span>
-        <span class="stat-label">STREAK</span>
+        <span class="stat-label" data-i18n="web_ui_streak">STREAK</span>
       </article>
     </section>
 <section class="economy-card card">
       <div class="economy-row">
         <div><span class="stat-label"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-coins"></use></svg> MONEY</span><strong id="money">0</strong></div>
-        <div class="income"><span>＋</span><strong id="income">0</strong><small>/s</small></div>
+        <div class="income"><span>＋</span><strong id="income">0</strong><small data-i18n="web_ui_s">/s</small></div>
       </div>
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-caption"><span>RUN MOMENTUM</span><span id="bestStreak">BEST 0</span></div>
+      <div class="progress-caption"><span data-i18n="web_ui_run_momentum">RUN MOMENTUM</span><span id="bestStreak">BEST 0</span></div>
     </section>
 
 <section class="quick-actions">
-      <button class="action-card" id="beyondButton" type="button"><span class="action-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><span><b>Beyond the Numbers</b><small>Explore your progression</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-chevron-right"></use></svg></strong></button>
-      <button class="action-card" id="questButton" type="button"><span class="action-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><span><b>Daily Momentum</b><small>Keep the streak alive</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-chevron-right"></use></svg></strong></button>
+      <button class="action-card" id="beyondButton" type="button"><span class="action-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><span><b data-i18n="beyond_numbers_title">Beyond the Numbers</b><small data-i18n="web_ui_explore_your_progression">Explore your progression</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-chevron-right"></use></svg></strong></button>
+      <button class="action-card" id="questButton" type="button"><span class="action-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><span><b data-i18n="web_ui_daily_momentum">Daily Momentum</b><small data-i18n="web_ui_keep_the_streak_alive">Keep the streak alive</small></span><strong aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-chevron-right"></use></svg></strong></button>
     </section>
 <section class="creative-tools card" id="creativeToolsPanel" aria-labelledby="creativeToolsHeading" hidden>
-  <div class="panel-title"><span class="panel-glyph" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-wand"></use></svg></span><div><span class="eyebrow">CREATIVE SAVE</span><h2 id="creativeToolsHeading">Creative Tools</h2></div></div>
-  <p class="catalog-intro">Changes are validated and saved by the Android game. Updating the range starts a fresh guessing round.</p>
+  <div class="panel-title"><span class="panel-glyph" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="#icon-wand"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_creative_save">CREATIVE SAVE</span><h2 id="creativeToolsHeading">Creative Tools</h2></div></div>
+  <p class="catalog-intro" data-i18n="web_ui_changes_are_validated_and_saved_by_the_android_game_upda">Changes are validated and saved by the Android game. Updating the range starts a fresh guessing round.</p>
   <div class="creative-range-fields">
-    <label class="setting-field"><span>Range minimum</span><input id="creativeRangeMin" type="number" min="1" max="1000000" inputmode="numeric" value="1"></label>
-    <label class="setting-field"><span>Range maximum</span><input id="creativeRangeMax" type="number" min="1" max="1000000" inputmode="numeric" value="100"></label>
+    <label class="setting-field"><span data-i18n="web_ui_range_minimum">Range minimum</span><input id="creativeRangeMin" type="number" min="1" max="1000000" inputmode="numeric" value="1"></label>
+    <label class="setting-field"><span data-i18n="web_ui_range_maximum">Range maximum</span><input id="creativeRangeMax" type="number" min="1" max="1000000" inputmode="numeric" value="100"></label>
   </div>
   <button type="button" class="jui-button jui-button-primary jui-button-block" id="creativeSaveRange">Apply range</button>
-  <h3 class="creative-subheading">Game values</h3>
-  <p class="catalog-intro">Set currencies and run counters directly. Values are checked before saving.</p>
+  <h3 class="creative-subheading" data-i18n="web_ui_game_values">Game values</h3>
+  <p class="catalog-intro" data-i18n="web_ui_set_currencies_and_run_counters_directly_values_are_chec">Set currencies and run counters directly. Values are checked before saving.</p>
   <div class="creative-state-grid">
-    <label class="setting-field"><span>Money</span><input id="creativeValue_money" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
-    <label class="setting-field"><span>Prestige</span><input id="creativeValue_prestige" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
-    <label class="setting-field"><span>Ultra</span><input id="creativeValue_ultra" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
-    <label class="setting-field"><span>Nebula</span><input id="creativeValue_nebula" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
-    <label class="setting-field"><span>Attempts</span><input id="creativeValue_attempts" type="number" min="0" max="1000000000000" value="0"></label>
-    <label class="setting-field"><span>Correct guesses</span><input id="creativeValue_correctGuesses" type="number" min="0" max="1000000000000" value="0"></label>
-    <label class="setting-field"><span>Current streak</span><input id="creativeValue_streak" type="number" min="0" max="1000000" value="0"></label>
-    <label class="setting-field"><span>Best streak</span><input id="creativeValue_bestStreak" type="number" min="0" max="1000000" value="0"></label>
+    <label class="setting-field"><span data-i18n="builder_kind_money">Money</span><input id="creativeValue_money" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
+    <label class="setting-field"><span data-i18n="prestige">Prestige</span><input id="creativeValue_prestige" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
+    <label class="setting-field"><span data-i18n="currency_ultra_label">Ultra</span><input id="creativeValue_ultra" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
+    <label class="setting-field"><span data-i18n="currency_nebula_label">Nebula</span><input id="creativeValue_nebula" type="text" inputmode="decimal" maxlength="100" value="0" autocomplete="off"></label>
+    <label class="setting-field"><span data-i18n="web_ui_attempts_2">Attempts</span><input id="creativeValue_attempts" type="number" min="0" max="1000000000000" value="0"></label>
+    <label class="setting-field"><span data-i18n="web_ui_correct_guesses">Correct guesses</span><input id="creativeValue_correctGuesses" type="number" min="0" max="1000000000000" value="0"></label>
+    <label class="setting-field"><span data-i18n="web_ui_current_streak">Current streak</span><input id="creativeValue_streak" type="number" min="0" max="1000000" value="0"></label>
+    <label class="setting-field"><span data-i18n="web_ui_best_streak">Best streak</span><input id="creativeValue_bestStreak" type="number" min="0" max="1000000" value="0"></label>
   </div>
   <div class="creative-value-actions">
     <button type="button" class="jui-button jui-button-secondary" data-creative-apply="money"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-coins"></use></svg> Set money</button>
@@ -242,35 +242,35 @@
     <button type="button" class="jui-button jui-button-secondary" data-creative-apply="streak"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-flame"></use></svg> Set streak</button>
     <button type="button" class="jui-button jui-button-secondary" data-creative-apply="bestStreak"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-star"></use></svg> Set best streak</button>
   </div>
-  <h3 class="creative-subheading">Upgrade levels</h3>
-  <p class="catalog-intro">Set owned upgrade levels directly, within each upgrade’s configured maximum.</p>
-  <div id="creativeUpgradeList" class="creative-upgrade-list"><p class="catalog-empty">Loading upgrade catalog…</p></div>
-  <h3 class="creative-subheading">Prestige upgrades</h3>
-  <div id="creativePrestigeUpgradeList" class="creative-upgrade-list"><p class="catalog-empty">Loading prestige upgrades…</p></div>
-  <h3 class="creative-subheading">Ultra upgrades</h3>
-  <div id="creativeUltraUpgradeList" class="creative-upgrade-list"><p class="catalog-empty">Loading ultra upgrades…</p></div>
+  <h3 class="creative-subheading" data-i18n="web_ui_upgrade_levels">Upgrade levels</h3>
+  <p class="catalog-intro" data-i18n="web_ui_set_owned_upgrade_levels_directly_within_each_upgrade_s">Set owned upgrade levels directly, within each upgrade’s configured maximum.</p>
+  <div id="creativeUpgradeList" class="creative-upgrade-list"><p class="catalog-empty" data-i18n="web_ui_loading_upgrade_catalog">Loading upgrade catalog…</p></div>
+  <h3 class="creative-subheading" data-i18n="web_ui_prestige_upgrades">Prestige upgrades</h3>
+  <div id="creativePrestigeUpgradeList" class="creative-upgrade-list"><p class="catalog-empty" data-i18n="web_ui_loading_prestige_upgrades">Loading prestige upgrades…</p></div>
+  <h3 class="creative-subheading" data-i18n="web_ui_ultra_upgrades">Ultra upgrades</h3>
+  <div id="creativeUltraUpgradeList" class="creative-upgrade-list"><p class="catalog-empty" data-i18n="web_ui_loading_ultra_upgrades">Loading ultra upgrades…</p></div>
   <p id="creativeToolsStatus" class="catalog-intro" role="status" aria-live="polite"></p>
 </section>
 
 <section class="debug-build-card card" id="debugBuildCard" aria-labelledby="debugBuildHeading" hidden>
-  <div class="debug-build-heading"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-code"></use></svg><div><span class="eyebrow">DEVELOPER INFO</span><h2 id="debugBuildHeading">Debug build</h2></div><span class="debug-build-badge">DEBUG</span></div>
-  <p>This copy of Guess The Number is a debug build. Developer tools and diagnostics may be available, and behavior can differ from a release build. Your progress is saved to the active local save slot.</p>
+  <div class="debug-build-heading"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-code"></use></svg><div><span class="eyebrow" data-i18n="web_ui_developer_info">DEVELOPER INFO</span><h2 id="debugBuildHeading">Debug build</h2></div><span class="debug-build-badge" data-i18n="web_ui_debug">DEBUG</span></div>
+  <p data-i18n="web_ui_this_copy_of_guess_the_number_is_a_debug_build_developer">This copy of Guess The Number is a debug build. Developer tools and diagnostics may be available, and behavior can differ from a release build. Your progress is saved to the active local save slot.</p>
 </section>
     </div>
     </div>
     <div class="screen" id="screen-worlds" role="tabpanel" aria-labelledby="tab-worlds" data-screen="worlds" hidden>
 <section class="progression-card card" id="progressionPanel" aria-label="Beyond the Numbers progression">
-      <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><div><span class="eyebrow">BEYOND THE NUMBERS</span><h2>Your universe</h2></div><span class="panel-chip" id="worldCount">1 WORLD</span></div>
+      <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_beyond_the_numbers">BEYOND THE NUMBERS</span><h2 data-i18n="web_ui_your_universe">Your universe</h2></div><span class="panel-chip" id="worldCount">1 WORLD</span></div>
       <div class="currency-grid">
         <article class="currency-tile prestige-tile"><span><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg> PRESTIGE</span><strong id="prestige">0</strong><small id="prestigeCount">0 ascensions</small></article>
-        <article class="currency-tile ultra-tile"><span>⬡ ULTRA</span><strong id="ultra">0</strong><small id="ultraCount">0 ultra resets</small></article>
-        <article class="currency-tile nebula-tile"><span>☄ NEBULA</span><strong id="nebula">0</strong><small>Cosmic currency</small></article>
+        <article class="currency-tile ultra-tile"><span data-i18n="web_ui_ultra">⬡ ULTRA</span><strong id="ultra">0</strong><small id="ultraCount">0 ultra resets</small></article>
+        <article class="currency-tile nebula-tile"><span data-i18n="web_ui_nebula">☄ NEBULA</span><strong id="nebula">0</strong><small data-i18n="web_ui_cosmic_currency">Cosmic currency</small></article>
       </div>
-      <div class="realm-row"><div class="realm-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 2 2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6L12 2Z"/></svg></div><div class="realm-copy"><span class="stat-label">CURRENT REALM</span><strong id="activeWorld">Verdant Grove</strong><small id="realmSubtext">Your adventure is taking shape.</small></div><div class="realm-score"><strong id="bossVictories">0</strong><small>BOSSES</small></div></div>
+      <div class="realm-row"><div class="realm-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 2 2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6L12 2Z"/></svg></div><div class="realm-copy"><span class="stat-label" data-i18n="web_ui_current_realm">CURRENT REALM</span><strong id="activeWorld">Verdant Grove</strong><small id="realmSubtext">Your adventure is taking shape.</small></div><div class="realm-score"><strong id="bossVictories">0</strong><small data-i18n="web_ui_bosses">BOSSES</small></div></div>
       <div class="progression-mini-grid">
-        <div><span>⌂</span><strong id="homeBase">Lv. 0</strong><small>Home base</small></div>
-        <div><span>∞</span><strong id="riftTier">Tier 0</strong><small>Endless Rift best</small></div>
-        <div><span>♜</span><strong id="defeatedBosses">0</strong><small>Bosses defeated</small></div>
+        <div><span>⌂</span><strong id="homeBase">Lv. 0</strong><small data-i18n="web_ui_home_base">Home base</small></div>
+        <div><span>∞</span><strong id="riftTier">Tier 0</strong><small data-i18n="web_ui_endless_rift_best">Endless Rift best</small></div>
+        <div><span>♜</span><strong id="defeatedBosses">0</strong><small data-i18n="web_ui_bosses_defeated">Bosses defeated</small></div>
       </div>
       <div class="realm-actions" aria-label="Open progression screens">
         <button type="button" data-bridge-action="navigate" data-route="world_map">World Map <span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-arrow-up-right"></use></svg></span></button>
@@ -282,73 +282,73 @@
       </div>
     </section>
 <section class="boss-card card" id="bossPanel" hidden aria-label="Active boss encounter">
-      <div class="boss-art" aria-hidden="true">♜</div><div class="boss-content"><span class="eyebrow">ENCOUNTER IN PROGRESS</span><h2 id="bossName">Boss encounter</h2><p>Correct guesses deal damage. Keep your run going.</p><div class="boss-health-row"><span>HEALTH</span><strong id="bossHealthText">0 / 0 HP</strong></div><div class="boss-health-track"><div id="bossHealthFill" class="boss-health-fill"></div></div></div><span class="boss-live">ACTIVE</span>
+      <div class="boss-art" aria-hidden="true">♜</div><div class="boss-content"><span class="eyebrow" data-i18n="web_ui_encounter_in_progress">ENCOUNTER IN PROGRESS</span><h2 id="bossName">Boss encounter</h2><p data-i18n="web_ui_correct_guesses_deal_damage_keep_your_run_going">Correct guesses deal damage. Keep your run going.</p><div class="boss-health-row"><span data-i18n="web_ui_health">HEALTH</span><strong id="bossHealthText">0 / 0 HP</strong></div><div class="boss-health-track"><div id="bossHealthFill" class="boss-health-fill"></div></div></div><span class="boss-live" data-i18n="traits_active">ACTIVE</span>
     </section>
 <section class="world-card card" id="worldPanel" aria-label="Worlds and boss encounters">
-      <div class="panel-title"><span class="panel-glyph world-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg></span><div><span class="eyebrow">WORLD EXPEDITION</span><h2>Worlds & bosses</h2></div><span class="panel-chip" id="worldBossStatus">READY</span></div>
-      <p class="world-intro">Unlock new realms and challenge their guardians. Boss rules and rewards are handled by the game engine.</p>
-      <div class="world-list" id="worldList"><div class="world-empty">Syncing your world map…</div></div>
+      <div class="panel-title"><span class="panel-glyph world-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_world_expedition">WORLD EXPEDITION</span><h2 data-i18n="web_ui_worlds_bosses">Worlds & bosses</h2></div><span class="panel-chip" id="worldBossStatus">READY</span></div>
+      <p class="world-intro" data-i18n="web_ui_unlock_new_realms_and_challenge_their_guardians_boss_rul">Unlock new realms and challenge their guardians. Boss rules and rewards are handled by the game engine.</p>
+      <div class="world-list" id="worldList"><div class="world-empty" data-i18n="web_ui_syncing_your_world_map">Syncing your world map…</div></div>
     </section>
     </div>
     <div class="screen" id="screen-rewards" role="tabpanel" aria-labelledby="tab-rewards" data-screen="rewards" hidden>
-    <section class="daily-rewards-page card" aria-label="Daily Nebula rewards"><div class="panel-title"><span class="eyebrow">DAILY LOGIN</span><h2 data-i18n="daily_reward_title">Daily Nebula Reward</h2><span class="panel-chip" id="dailyRewardPageStatus">READY</span></div><p id="dailyRewardPageSubtitle" data-i18n="daily_reward_subtitle">Claim today's reward and keep your streak alive.</p><div class="daily-reward-page-main"><strong class="reward-amount" id="dailyRewardPageAmount">+5 Nebula</strong><p class="reward-streak" id="dailyRewardPageStreak">Day 1 streak</p></div><div id="dailyRewardPageSchedule" class="daily-reward-schedule"></div><p id="dailyRewardPageMessage" class="catalog-intro" role="status" aria-live="polite"></p><button type="button" class="primary-action reward-claim" id="dailyRewardPageClaim">Claim reward</button></section>
+    <section class="daily-rewards-page card" aria-label="Daily Nebula rewards"><div class="panel-title"><span class="eyebrow" data-i18n="web_ui_daily_login">DAILY LOGIN</span><h2 data-i18n="daily_reward_title">Daily Nebula Reward</h2><span class="panel-chip" id="dailyRewardPageStatus">READY</span></div><p id="dailyRewardPageSubtitle" data-i18n="daily_reward_subtitle">Claim today's reward and keep your streak alive.</p><div class="daily-reward-page-main"><strong class="reward-amount" id="dailyRewardPageAmount">+5 Nebula</strong><p class="reward-streak" id="dailyRewardPageStreak">Day 1 streak</p></div><div id="dailyRewardPageSchedule" class="daily-reward-schedule"></div><p id="dailyRewardPageMessage" class="catalog-intro" role="status" aria-live="polite"></p><button type="button" class="primary-action reward-claim" id="dailyRewardPageClaim">Claim reward</button></section>
 
 <section class="milestones-card card" aria-label="Achievement progress">
-      <div class="panel-title"><span class="panel-glyph milestone-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-trophy"></use></svg></span><div><span class="eyebrow">PERSONAL MILESTONES</span><h2>Achievement progress</h2></div><span class="panel-chip">3 GOALS</span></div>
+      <div class="panel-title"><span class="panel-glyph milestone-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-trophy"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_personal_milestones">PERSONAL MILESTONES</span><h2 data-i18n="web_ui_achievement_progress">Achievement progress</h2></div><span class="panel-chip" data-i18n="web_ui_3_goals">3 GOALS</span></div>
       <article class="milestone-row">
-        <div class="milestone-copy"><div><strong>Getting the hang of it</strong><span id="achievementCorrectStatus" class="milestone-status">IN PROGRESS</span></div><small>Land 10 correct guesses</small></div>
+        <div class="milestone-copy"><div><strong data-i18n="web_ui_getting_the_hang_of_it">Getting the hang of it</strong><span id="achievementCorrectStatus" class="milestone-status">IN PROGRESS</span></div><small data-i18n="web_ui_land_10_correct_guesses">Land 10 correct guesses</small></div>
         <div class="milestone-progress"><div class="milestone-track"><span id="achievementCorrectFill"></span></div><small id="achievementCorrectText">0 / 10</small></div>
       </article>
       <article class="milestone-row">
-        <div class="milestone-copy"><div><strong>On a roll</strong><span id="achievementStreakStatus" class="milestone-status">IN PROGRESS</span></div><small>Reach a best streak of 5</small></div>
+        <div class="milestone-copy"><div><strong data-i18n="web_ui_on_a_roll">On a roll</strong><span id="achievementStreakStatus" class="milestone-status">IN PROGRESS</span></div><small data-i18n="web_ui_reach_a_best_streak_of_5">Reach a best streak of 5</small></div>
         <div class="milestone-progress"><div class="milestone-track"><span id="achievementStreakFill"></span></div><small id="achievementStreakText">0 / 5</small></div>
       </article>
       <article class="milestone-row">
-        <div class="milestone-copy"><div><strong>Millionaire</strong><span id="achievementMoneyStatus" class="milestone-status">IN PROGRESS</span></div><small>Reach 1,000,000 money</small></div>
+        <div class="milestone-copy"><div><strong data-i18n="web_ui_millionaire">Millionaire</strong><span id="achievementMoneyStatus" class="milestone-status">IN PROGRESS</span></div><small data-i18n="web_ui_reach_1_000_000_money">Reach 1,000,000 money</small></div>
         <div class="milestone-progress"><div class="milestone-track"><span id="achievementMoneyFill"></span></div><small id="achievementMoneyText">0%</small></div>
       </article>
-      <p class="milestone-note">Progress is read from your saved game state. This panel does not grant rewards.</p>
+      <p class="milestone-note" data-i18n="web_ui_progress_is_read_from_your_saved_game_state_this_panel_d">Progress is read from your saved game state. This panel does not grant rewards.</p>
     </section>
 <section class="quest-card card" id="questPanel" aria-label="Daily momentum">
-      <div class="panel-title"><span class="panel-glyph quest-glyph"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><div><span class="eyebrow">DAILY MOMENTUM</span><h2>Today's run</h2></div><span class="panel-chip" id="claimedQuests">0 CLAIMED</span></div>
-      <div class="quest-metrics"><div><strong id="dailyGuesses">0</strong><span>Guesses made</span></div><div><strong id="dailyCorrect">0</strong><span data-i18n="stats_correct_guesses">Correct guesses</span></div><div><strong id="dailyBestStreak">0</strong><span>Best daily streak</span></div></div>
+      <div class="panel-title"><span class="panel-glyph quest-glyph"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg></span><div><span class="eyebrow" data-i18n="web_ui_daily_momentum_2">DAILY MOMENTUM</span><h2 data-i18n="web_ui_today_s_run">Today's run</h2></div><span class="panel-chip" id="claimedQuests">0 CLAIMED</span></div>
+      <div class="quest-metrics"><div><strong id="dailyGuesses">0</strong><span data-i18n="web_ui_guesses_made">Guesses made</span></div><div><strong id="dailyCorrect">0</strong><span data-i18n="stats_correct_guesses">Correct guesses</span></div><div><strong id="dailyBestStreak">0</strong><span data-i18n="web_ui_best_daily_streak">Best daily streak</span></div></div>
       <div class="quest-board" aria-label="Daily quests">
-        <article class="quest-row"><div class="quest-row-copy"><strong>Warm-up</strong><small>Make 10 guesses</small><span class="quest-progress" id="questProgressGuesses">0 / 10</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_guesses_10" type="button">Claim</button></article>
-        <article class="quest-row"><div class="quest-row-copy"><strong>Sharp aim</strong><small>Get 5 correct guesses</small><span class="quest-progress" id="questProgressCorrect">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_correct_5" type="button">Claim</button></article>
-        <article class="quest-row"><div class="quest-row-copy"><strong>On a roll</strong><small>Reach a best streak of 5</small><span class="quest-progress" id="questProgressStreak">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_streak_5" type="button">Claim</button></article>
-        <article class="quest-row"><div class="quest-row-copy"><strong>Builder</strong><small>Buy 3 upgrades</small><span class="quest-progress" id="questProgressUpgrades">0 / 3</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_upgrades_3" type="button">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="web_ui_warm_up">Warm-up</strong><small data-i18n="daily_quest_guesses_desc">Make 10 guesses</small><span class="quest-progress" id="questProgressGuesses">0 / 10</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_guesses_10" type="button">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="web_ui_sharp_aim">Sharp aim</strong><small data-i18n="daily_quest_correct_desc">Get 5 correct guesses</small><span class="quest-progress" id="questProgressCorrect">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_correct_5" type="button">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="web_ui_on_a_roll">On a roll</strong><small data-i18n="web_ui_reach_a_best_streak_of_5">Reach a best streak of 5</small><span class="quest-progress" id="questProgressStreak">0 / 5</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_streak_5" type="button">Claim</button></article>
+        <article class="quest-row"><div class="quest-row-copy"><strong data-i18n="daily_quest_upgrades_name">Builder</strong><small data-i18n="web_ui_buy_3_upgrades">Buy 3 upgrades</small><span class="quest-progress" id="questProgressUpgrades">0 / 3</span></div><button class="claim-button" data-bridge-action="claim" data-quest-id="daily_upgrades_3" type="button">Claim</button></article>
       </div>
       <div class="quest-foot"><span class="quest-pulse"></span><span id="questMessage">Every guess builds your run.</span></div>
     </section>
 <section class="loot-card card" aria-label="Loot inventory">
-      <div class="loot-heading"><span class="panel-glyph loot-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><div><span class="eyebrow">LOOT INVENTORY</span><h2>Ready to open</h2></div></div>
-      <div class="loot-items"><div><span class="loot-icon common"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-box"></use></svg></span><span><strong id="commonChests">0</strong><small>Common</small></span><button class="chest-open" data-bridge-action="chest" data-tier="common" type="button">Open</button></div><div><span class="loot-icon rare"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><span><strong id="rareChests">0</strong><small>Rare</small></span><button class="chest-open" data-bridge-action="chest" data-tier="rare" type="button">Open</button></div><div><span class="loot-icon epic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg></span><span><strong id="epicChests">0</strong><small>Epic</small></span><button class="chest-open" data-bridge-action="chest" data-tier="epic" type="button">Open</button></div></div>
-      <p class="loot-note">Your inventory is synced from the game engine.</p>
+      <div class="loot-heading"><span class="panel-glyph loot-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_loot_inventory">LOOT INVENTORY</span><h2 data-i18n="web_ui_ready_to_open">Ready to open</h2></div></div>
+      <div class="loot-items"><div><span class="loot-icon common"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-box"></use></svg></span><span><strong id="commonChests">0</strong><small data-i18n="web_ui_common">Common</small></span><button class="chest-open" data-bridge-action="chest" data-tier="common" type="button">Open</button></div><div><span class="loot-icon rare"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><span><strong id="rareChests">0</strong><small data-i18n="web_ui_rare">Rare</small></span><button class="chest-open" data-bridge-action="chest" data-tier="rare" type="button">Open</button></div><div><span class="loot-icon epic"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg></span><span><strong id="epicChests">0</strong><small data-i18n="web_ui_epic">Epic</small></span><button class="chest-open" data-bridge-action="chest" data-tier="epic" type="button">Open</button></div></div>
+      <p class="loot-note" data-i18n="web_ui_your_inventory_is_synced_from_the_game_engine">Your inventory is synced from the game engine.</p>
     </section>
   </div>
     </div>
     <div class="screen" id="screen-journey" role="tabpanel" aria-labelledby="tab-journey" data-screen="journey" hidden>
 <section class="run-summary-card card" aria-label="Run summary">
-      <div class="panel-title"><span class="panel-glyph summary-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-clock"></use></svg></span><div><span class="eyebrow">YOUR JOURNEY</span><h2>Run summary</h2></div></div>
+      <div class="panel-title"><span class="panel-glyph summary-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-clock"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_your_journey">YOUR JOURNEY</span><h2 data-i18n="web_ui_run_summary">Run summary</h2></div></div>
       <div class="summary-grid">
-        <div><span>RANDOM EVENTS</span><strong id="summaryEvents">0</strong></div>
-        <div><span>CHESTS FOUND</span><strong id="summaryDrops">0</strong></div>
-        <div><span>CHESTS OPENED</span><strong id="summaryOpened">0</strong></div>
-        <div><span>BOSS VICTORIES</span><strong id="summaryVictories">0</strong></div>
+        <div><span data-i18n="web_ui_random_events">RANDOM EVENTS</span><strong id="summaryEvents">0</strong></div>
+        <div><span data-i18n="web_ui_chests_found">CHESTS FOUND</span><strong id="summaryDrops">0</strong></div>
+        <div><span data-i18n="web_ui_chests_opened">CHESTS OPENED</span><strong id="summaryOpened">0</strong></div>
+        <div><span data-i18n="web_ui_boss_victories">BOSS VICTORIES</span><strong id="summaryVictories">0</strong></div>
       </div>
     </section>
 <section class="event-card card" id="randomEventPanel" aria-label="Latest random event" hidden>
-      <div class="panel-title"><span class="panel-glyph event-glyph"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg></span><div><span class="eyebrow">UNEXPECTED BONUS</span><h2 id="eventTitle">Random event</h2></div><span class="panel-chip">EVENT</span></div>
+      <div class="panel-title"><span class="panel-glyph event-glyph"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg></span><div><span class="eyebrow" data-i18n="web_ui_unexpected_bonus">UNEXPECTED BONUS</span><h2 id="eventTitle">Random event</h2></div><span class="panel-chip" data-i18n="web_ui_event">EVENT</span></div>
       <p id="eventDescription" class="event-description">A surprise from the game engine.</p>
-      <div class="event-footnote"><span>EVENTS TRIGGERED</span><strong id="eventCount">0</strong></div>
+      <div class="event-footnote"><span data-i18n="web_ui_events_triggered">EVENTS TRIGGERED</span><strong id="eventCount">0</strong></div>
     </section>
 <section class="strategy-card card" id="strategyPanel" aria-label="Math Strategy Lab">
-      <div class="panel-title"><span class="panel-glyph strategy-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><div><span class="eyebrow">THINK LIKE A PLAYER</span><h2>Math Strategy Lab</h2></div><span class="panel-chip">OPTIONAL</span></div>
-      <p class="strategy-intro">Use the current range to plan your next guess. These are hints only; the game engine still decides the result.</p>
+      <div class="panel-title"><span class="panel-glyph strategy-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_think_like_a_player">THINK LIKE A PLAYER</span><h2 data-i18n="web_ui_math_strategy_lab">Math Strategy Lab</h2></div><span class="panel-chip" data-i18n="web_ui_optional">OPTIONAL</span></div>
+      <p class="strategy-intro" data-i18n="web_ui_use_the_current_range_to_plan_your_next_guess_these_are">Use the current range to plan your next guess. These are hints only; the game engine still decides the result.</p>
       <div class="strategy-grid">
-        <div><span>RANGE WIDTH</span><strong id="strategyWidth">—</strong></div>
-        <div><span>MIDPOINT</span><strong id="strategyMidpoint">—</strong></div>
-        <div><span>EVEN VALUES</span><strong id="strategyEvenCount">—</strong></div>
+        <div><span data-i18n="web_ui_range_width">RANGE WIDTH</span><strong id="strategyWidth">—</strong></div>
+        <div><span data-i18n="web_ui_midpoint">MIDPOINT</span><strong id="strategyMidpoint">—</strong></div>
+        <div><span data-i18n="web_ui_even_values">EVEN VALUES</span><strong id="strategyEvenCount">—</strong></div>
       </div>
       <div class="strategy-advice" id="strategyAdvice" role="status">A midpoint guess can split a range into smaller sections.</div>
       <button type="button" class="strategy-use" id="useMidpoint">Use midpoint in guess box <span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-arrow-up-right"></use></svg></span></button>
@@ -356,29 +356,29 @@
     </div>
     <div class="screen" id="screen-upgrades" role="tabpanel" aria-labelledby="tab-upgrades" data-screen="upgrades" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-arrow-up"></use></svg></span><div><span class="eyebrow">POWER UP</span><h2>Upgrades</h2></div><span class="panel-chip" id="upgradeCount">0 UPGRADES</span></div>
-        <p class="catalog-intro">Upgrade costs and purchase checks come from the game engine.</p>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-arrow-up"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_power_up">POWER UP</span><h2 data-i18n="nav_upgrade">Upgrades</h2></div><span class="panel-chip" id="upgradeCount">0 UPGRADES</span></div>
+        <p class="catalog-intro" data-i18n="web_ui_upgrade_costs_and_purchase_checks_come_from_the_game_eng">Upgrade costs and purchase checks come from the game engine.</p>
         <div class="multiplier-row" aria-label="Purchase quantity">
-          <span>BUY AMOUNT</span>
+          <span data-i18n="web_ui_buy_amount">BUY AMOUNT</span>
           <button type="button" data-multiplier="1">×1</button><button type="button" data-multiplier="10">×10</button><button type="button" data-multiplier="100">×100</button><button type="button" data-multiplier="MAX">MAX</button>
         </div>
         <div class="catalog-currency-balance" id="upgradeCurrencyBalance" aria-live="polite">Money: <strong>0</strong></div>
-        <div class="catalog-list" id="upgradeList"><p class="catalog-empty">Syncing upgrades…</p></div>
+        <div class="catalog-list" id="upgradeList"><p class="catalog-empty" data-i18n="web_ui_syncing_upgrades">Syncing upgrades…</p></div>
       </section>
     </div>
     <div class="screen" id="screen-shop" role="tabpanel" aria-labelledby="tab-shop" data-screen="shop" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><div><span class="eyebrow">COSMIC MARKET</span><h2>Shop</h2></div><span class="panel-chip" id="shopCurrency">NEBULA</span></div>
-        <p class="catalog-intro">Spend Nebula on useful items and cosmetics. Owned cosmetics can be equipped here.</p>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_cosmic_market">COSMIC MARKET</span><h2 data-i18n="shop">Shop</h2></div><span class="panel-chip" id="shopCurrency">NEBULA</span></div>
+        <p class="catalog-intro" data-i18n="web_ui_spend_nebula_on_useful_items_and_cosmetics_owned_cosmeti">Spend Nebula on useful items and cosmetics. Owned cosmetics can be equipped here.</p>
         <div class="catalog-currency-balance" id="shopCurrencyBalance" aria-live="polite">Nebula: <strong>0</strong></div>
-        <div class="catalog-list" id="shopList"><p class="catalog-empty">Syncing shop…</p></div>
+        <div class="catalog-list" id="shopList"><p class="catalog-empty" data-i18n="web_ui_syncing_shop">Syncing shop…</p></div>
       </section>
     </div>
 
     <div class="screen" id="screen-homebase" role="tabpanel" aria-labelledby="tab-homebase" data-screen="homebase" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-home"></use></svg></span><div><span class="eyebrow">YOUR SANCTUARY</span><h2>Home Base</h2></div><span class="panel-chip" id="homeBaseLevelPanel">LEVEL 0</span></div>
-        <p class="catalog-intro">Restore your sanctuary to boost the rewards earned from correct guesses.</p>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-home"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_your_sanctuary">YOUR SANCTUARY</span><h2 data-i18n="home_base_title">Home Base</h2></div><span class="panel-chip" id="homeBaseLevelPanel">LEVEL 0</span></div>
+        <p class="catalog-intro" data-i18n="web_ui_restore_your_sanctuary_to_boost_the_rewards_earned_from">Restore your sanctuary to boost the rewards earned from correct guesses.</p>
         <div class="homebase-summary"><strong id="homeBaseBonus">0% reward bonus</strong><span id="homeBaseCost">Next level: 50,000 Money</span></div>
         <button type="button" class="world-action-button" id="upgradeHomeBase" data-bridge-action="homebase_upgrade">Restore next level</button>
         <p class="catalog-intro" id="homeBaseStatus">Sanctuary progression syncs with your saved game.</p>
@@ -386,17 +386,17 @@
     </div>
     <div class="screen" id="screen-relics" role="tabpanel" aria-labelledby="tab-relics" data-screen="relics" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-crown"></use></svg></span><div><span class="eyebrow">BOSS TROPHIES</span><h2>Relics</h2></div><span class="panel-chip" id="relicCount">0 / 4 EQUIPPED</span></div>
-        <p class="catalog-intro">Relics are earned by defeating bosses. Equip up to four for lasting bonuses.</p>
-        <div class="catalog-list" id="relicList"><p class="catalog-empty">Syncing relic collection…</p></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-crown"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_boss_trophies">BOSS TROPHIES</span><h2 data-i18n="web_ui_relics">Relics</h2></div><span class="panel-chip" id="relicCount">0 / 4 EQUIPPED</span></div>
+        <p class="catalog-intro" data-i18n="web_ui_relics_are_earned_by_defeating_bosses_equip_up_to_four_f">Relics are earned by defeating bosses. Equip up to four for lasting bonuses.</p>
+        <div class="catalog-list" id="relicList"><p class="catalog-empty" data-i18n="web_ui_syncing_relic_collection">Syncing relic collection…</p></div>
       </section>
     </div>
     <div class="screen" id="screen-codex" role="tabpanel" aria-labelledby="tab-codex" data-screen="codex" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-book"></use></svg></span><div><span class="eyebrow">DISCOVERY LOG</span><h2>Explorer's Codex</h2></div><span class="panel-chip" id="codexCount">0 / 12</span></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-book"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_discovery_log">DISCOVERY LOG</span><h2 data-i18n="codex_title">Explorer's Codex</h2></div><span class="panel-chip" id="codexCount">0 / 12</span></div>
         <div class="progress-track"><div class="progress-fill" id="codexProgressFill"></div></div>
-        <p class="catalog-intro">Explore worlds, defeat their bosses and uncover hidden places.</p>
-        <div class="catalog-list" id="codexList"><p class="catalog-empty">Syncing discoveries…</p></div>
+        <p class="catalog-intro" data-i18n="web_ui_explore_worlds_defeat_their_bosses_and_uncover_hidden_pl">Explore worlds, defeat their bosses and uncover hidden places.</p>
+        <div class="catalog-list" id="codexList"><p class="catalog-empty" data-i18n="web_ui_syncing_discoveries">Syncing discoveries…</p></div>
         <button type="button" class="world-action-button" id="claimCodexReward" data-bridge-action="codex_reward">Claim 100 Nebula</button>
         <p class="catalog-intro" id="codexRewardStatus"></p>
       </section>
@@ -429,65 +429,65 @@
         </div>
       </section>
       <section class="about-social card" aria-labelledby="aboutSocialHeading">
-        <span class="eyebrow">CONNECT</span>
+        <span class="eyebrow" data-i18n="web_ui_connect">CONNECT</span>
         <h2 id="aboutSocialHeading">Socials &amp; source code</h2>
-        <p class="catalog-intro">These links always open in your external browser.</p>
+        <p class="catalog-intro" data-i18n="web_ui_these_links_always_open_in_your_external_browser">These links always open in your external browser.</p>
         <div class="about-social-links">
-          <a class="jui-button jui-button-secondary jui-button-block" href="https://www.youtube.com/@theg0ldne0_01" rel="noopener noreferrer">YouTube · @theg0ldne0_01</a>
-          <a class="jui-button jui-button-secondary jui-button-block" href="https://www.instagram.com/theg0ldne0_01/" rel="noopener noreferrer">Instagram · theg0ldne0_01</a>
-          <a class="jui-button jui-button-secondary jui-button-block" href="https://namemc.com/profile/PearlSteve15" rel="noopener noreferrer">NameMC · PearlSteve15</a>
-          <a class="jui-button jui-button-secondary jui-button-block" href="https://github.com/ne0gl1tch20" rel="noopener noreferrer">GitHub · Source code</a>
-          <a class="jui-button jui-button-secondary jui-button-block" href="https://ne0gl1tch20.github.io/GuessTheNumber" rel="noopener noreferrer">Official website</a>
+          <a class="jui-button jui-button-secondary jui-button-block" href="https://www.youtube.com/@theg0ldne0_01" rel="noopener noreferrer" data-i18n="web_ui_youtube_theg0ldne0_01">YouTube · @theg0ldne0_01</a>
+          <a class="jui-button jui-button-secondary jui-button-block" href="https://www.instagram.com/theg0ldne0_01/" rel="noopener noreferrer" data-i18n="web_ui_instagram_theg0ldne0_01">Instagram · theg0ldne0_01</a>
+          <a class="jui-button jui-button-secondary jui-button-block" href="https://namemc.com/profile/PearlSteve15" rel="noopener noreferrer" data-i18n="web_ui_namemc_pearlsteve15">NameMC · PearlSteve15</a>
+          <a class="jui-button jui-button-secondary jui-button-block" href="https://github.com/ne0gl1tch20" rel="noopener noreferrer" data-i18n="web_ui_github_source_code">GitHub · Source code</a>
+          <a class="jui-button jui-button-secondary jui-button-block" href="https://ne0gl1tch20.github.io/GuessTheNumber" rel="noopener noreferrer" data-i18n="web_ui_official_website">Official website</a>
         </div>
       </section>
       <section class="about-licenses card">
         <span class="eyebrow" data-i18n="about_licenses">CREDITS</span>
         <h2 data-i18n="about_licenses_title">Open-source libraries</h2>
         <div class="about-license-list">
-          <div><strong>Jetpack Compose</strong><span>Apache 2.0</span><small>Google / Android Open Source Project</small></div>
-          <div><strong>Material 3</strong><span>Apache 2.0</span><small>Google</small></div>
-          <div><strong>Kotlinx Serialization</strong><span>Apache 2.0</span><small>JetBrains</small></div>
-          <div><strong>Kotlinx Coroutines</strong><span>Apache 2.0</span><small>JetBrains</small></div>
-          <div><strong>DataStore Preferences</strong><span>Apache 2.0</span><small>Google</small></div>
-          <div><strong>Navigation Compose</strong><span>Apache 2.0</span><small>Google</small></div>
-          <div><strong>LuaJ</strong><span>MIT</span><small>LuaJ project; James Roseborough and Ian Farmer</small></div>
-          <div><strong>Jarrlyy UI SDK</strong><span>Project component</span><small>Jarrlyy · local, framework-free HTML/CSS/JavaScript UI kit</small></div>
+          <div><strong data-i18n="web_ui_jetpack_compose">Jetpack Compose</strong><span data-i18n="web_ui_apache_2_0">Apache 2.0</span><small data-i18n="web_ui_google_android_open_source_project">Google / Android Open Source Project</small></div>
+          <div><strong data-i18n="web_ui_material_3">Material 3</strong><span data-i18n="web_ui_apache_2_0">Apache 2.0</span><small data-i18n="web_ui_google">Google</small></div>
+          <div><strong data-i18n="web_ui_kotlinx_serialization">Kotlinx Serialization</strong><span data-i18n="web_ui_apache_2_0">Apache 2.0</span><small data-i18n="web_ui_jetbrains">JetBrains</small></div>
+          <div><strong data-i18n="web_ui_kotlinx_coroutines">Kotlinx Coroutines</strong><span data-i18n="web_ui_apache_2_0">Apache 2.0</span><small data-i18n="web_ui_jetbrains">JetBrains</small></div>
+          <div><strong data-i18n="web_ui_datastore_preferences">DataStore Preferences</strong><span data-i18n="web_ui_apache_2_0">Apache 2.0</span><small data-i18n="web_ui_google">Google</small></div>
+          <div><strong data-i18n="web_ui_navigation_compose">Navigation Compose</strong><span data-i18n="web_ui_apache_2_0">Apache 2.0</span><small data-i18n="web_ui_google">Google</small></div>
+          <div><strong data-i18n="web_ui_luaj">LuaJ</strong><span data-i18n="web_ui_mit">MIT</span><small data-i18n="web_ui_luaj_project_james_roseborough_and_ian_farmer">LuaJ project; James Roseborough and Ian Farmer</small></div>
+          <div><strong data-i18n="web_ui_jarrlyy_ui_sdk">Jarrlyy UI SDK</strong><span data-i18n="web_ui_project_component">Project component</span><small data-i18n="web_ui_jarrlyy_local_framework_free_html_css_javascript_ui_kit">Jarrlyy · local, framework-free HTML/CSS/JavaScript UI kit</small></div>
         </div>
       </section>
     </div>
     <div class="screen" id="screen-settings" role="tabpanel" aria-labelledby="tab-settings" data-screen="settings" hidden>
       <section class="card catalog-panel">
         <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-settings"></use></svg></span><div><span class="eyebrow" data-i18n="game_preferences">Game Preferences</span><h2 data-i18n="settings">Settings</h2></div></div>
-        <div class="settings-group"><h3>Language &amp; Numbers</h3>
-          <label class="setting-field"><span>Language</span><select data-setting-value="locale" id="settingLocale"><option value="en-US">English</option></select></label>
-          <label class="setting-field"><span>Number notation</span><select data-setting-value="numberNotation"><option>Standard</option><option>Scientific</option><option>Engineering</option></select></label>
+        <div class="settings-group"><h3 data-i18n="web_ui_language_numbers">Language &amp; Numbers</h3>
+          <label class="setting-field"><span data-i18n="language">Language</span><select data-setting-value="locale" id="settingLocale"><option value="en-US" data-i18n="locale_language">English</option></select></label>
+          <label class="setting-field"><span data-i18n="web_ui_number_notation">Number notation</span><select data-setting-value="numberNotation"><option data-i18n="web_ui_standard">Standard</option><option data-i18n="web_ui_scientific">Scientific</option><option data-i18n="web_ui_engineering">Engineering</option></select></label>
         </div>
-        <div class="settings-group"><h3>Appearance</h3>
-          <label class="setting-field"><span>Theme mode</span><select data-setting-value="themeMode"><option>System</option><option>Dark</option><option>Light</option><option>AMOLED</option></select></label>
-          <label class="setting-field"><span>Theme preset</span><select data-setting-value="themePreset"><option>Neon</option><option>Sunset</option><option>Ocean</option><option>Forest</option><option>Custom</option></select></label>
-          <label class="setting-field"><span>Primary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_primary" data-color-key="customPrimaryColor"><i id="customPrimaryColorSwatch" aria-hidden="true"></i><strong id="customPrimaryColorValue">#7C4DFF</strong><span>Choose</span></button></label>
-          <label class="setting-field"><span>Secondary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_secondary" data-color-key="customSecondaryColor"><i id="customSecondaryColorSwatch" aria-hidden="true"></i><strong id="customSecondaryColorValue">#00BCD4</strong><span>Choose</span></button></label>
-          <label class="setting-field"><span>Tertiary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_tertiary" data-color-key="customTertiaryColor"><i id="customTertiaryColorSwatch" aria-hidden="true"></i><strong id="customTertiaryColorValue">#00C853</strong><span>Choose</span></button></label>
+        <div class="settings-group"><h3 data-i18n="web_ui_appearance">Appearance</h3>
+          <label class="setting-field"><span data-i18n="web_ui_theme_mode">Theme mode</span><select data-setting-value="themeMode"><option data-i18n="changelog_category_system">System</option><option data-i18n="web_ui_dark">Dark</option><option data-i18n="web_ui_light">Light</option><option data-i18n="web_ui_amoled">AMOLED</option></select></label>
+          <label class="setting-field"><span data-i18n="web_ui_theme_preset">Theme preset</span><select data-setting-value="themePreset"><option data-i18n="web_ui_neon">Neon</option><option data-i18n="web_ui_sunset">Sunset</option><option data-i18n="web_ui_ocean">Ocean</option><option data-i18n="web_ui_forest">Forest</option><option data-i18n="theme_custom_label">Custom</option></select></label>
+          <label class="setting-field"><span data-i18n="web_ui_primary_color">Primary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_primary" data-color-key="customPrimaryColor"><i id="customPrimaryColorSwatch" aria-hidden="true"></i><strong id="customPrimaryColorValue">#7C4DFF</strong><span data-i18n="web_ui_choose">Choose</span></button></label>
+          <label class="setting-field"><span data-i18n="web_ui_secondary_color">Secondary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_secondary" data-color-key="customSecondaryColor"><i id="customSecondaryColorSwatch" aria-hidden="true"></i><strong id="customSecondaryColorValue">#00BCD4</strong><span data-i18n="web_ui_choose">Choose</span></button></label>
+          <label class="setting-field"><span data-i18n="web_ui_tertiary_color">Tertiary color</span><button type="button" class="color-picker-trigger" data-bridge-action="navigate" data-route="color_picker_tertiary" data-color-key="customTertiaryColor"><i id="customTertiaryColorSwatch" aria-hidden="true"></i><strong id="customTertiaryColorValue">#00C853</strong><span data-i18n="web_ui_choose">Choose</span></button></label>
         </div>
-        <div class="settings-group"><h3>Audio &amp; Haptics</h3>
+        <div class="settings-group"><h3 data-i18n="web_ui_audio_haptics">Audio &amp; Haptics</h3>
           <label class="setting-row jui-switch"><span><strong data-i18n="background_music">Background music</strong></span><input type="checkbox" data-setting-toggle="musicEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
           <label class="setting-row jui-switch"><span><strong data-i18n="sound_effects">Sound effects</strong><small data-i18n="settings_desc_sound_fx">Turn sound effects for in-game interactions on or off.</small></span><input type="checkbox" data-setting-toggle="soundEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
           <label class="setting-row jui-switch"><span><strong data-i18n="vibration_label">Vibration</strong><small data-i18n="settings_desc_vibration">Turn app-triggered vibration during interactions on or off.</small></span><input type="checkbox" data-setting-toggle="vibrationEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
           <label class="setting-field"><span id="masterVolumeLabel">Master volume · 100%</span><input type="range" min="0" max="1" step="0.01" data-setting-value="volume"></label>
           <label class="setting-field"><span id="sfxVolumeLabel">Sound effects volume · 100%</span><input type="range" min="0" max="1" step="0.01" data-setting-value="sfxVolume"></label>
         </div>
-        <div class="settings-group"><h3>Notifications</h3>
-          <label class="setting-row jui-switch"><span><strong>Game reminders</strong><small>Allow scheduled game notifications.</small></span><input type="checkbox" data-setting-toggle="notificationsEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
-          <label class="setting-field"><span>Reminder frequency</span><select data-setting-value="notificationIntervalHours"><option value="12">12 hours</option><option value="24">24 hours</option><option value="48">48 hours</option></select></label>
-          <label class="setting-row jui-switch"><span><strong>Reminder notifications</strong></span><input type="checkbox" data-setting-toggle="notificationRemindersEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
-          <label class="setting-row jui-switch"><span><strong>Progression milestones</strong></span><input type="checkbox" data-setting-toggle="notificationProgressionEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
-          <label class="setting-row jui-switch"><span><strong>Game events</strong></span><input type="checkbox" data-setting-toggle="notificationEventsEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
+        <div class="settings-group"><h3 data-i18n="notifications">Notifications</h3>
+          <label class="setting-row jui-switch"><span><strong data-i18n="web_ui_game_reminders">Game reminders</strong><small data-i18n="web_ui_allow_scheduled_game_notifications">Allow scheduled game notifications.</small></span><input type="checkbox" data-setting-toggle="notificationsEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
+          <label class="setting-field"><span data-i18n="web_ui_reminder_frequency">Reminder frequency</span><select data-setting-value="notificationIntervalHours"><option value="12" data-i18n="web_ui_12_hours">12 hours</option><option value="24" data-i18n="web_ui_24_hours">24 hours</option><option value="48" data-i18n="web_ui_48_hours">48 hours</option></select></label>
+          <label class="setting-row jui-switch"><span><strong data-i18n="web_ui_reminder_notifications">Reminder notifications</strong></span><input type="checkbox" data-setting-toggle="notificationRemindersEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
+          <label class="setting-row jui-switch"><span><strong data-i18n="notification_category_progression">Progression milestones</strong></span><input type="checkbox" data-setting-toggle="notificationProgressionEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
+          <label class="setting-row jui-switch"><span><strong data-i18n="notification_category_events">Game events</strong></span><input type="checkbox" data-setting-toggle="notificationEventsEnabled"><span class="jui-switch-track" aria-hidden="true"></span></label>
         </div>
-        <div class="settings-group"><h3>Updates</h3>
-          <label class="setting-field"><span>Check for updates automatically</span><select id="updateCheckInterval" aria-describedby="updateCheckIntervalHelp"><option value="0">None</option><option value="1">Every hour</option><option value="6">Every 6 hours</option><option value="12">Every 12 hours</option><option value="24">Every 24 hours</option><option value="168">Every 7 days</option></select></label>
+        <div class="settings-group"><h3 data-i18n="web_ui_updates">Updates</h3>
+          <label class="setting-field"><span data-i18n="web_ui_check_for_updates_automatically">Check for updates automatically</span><select id="updateCheckInterval" aria-describedby="updateCheckIntervalHelp"><option value="0" data-i18n="inspector_none">None</option><option value="1" data-i18n="web_ui_every_hour">Every hour</option><option value="6" data-i18n="web_ui_every_6_hours">Every 6 hours</option><option value="12" data-i18n="web_ui_every_12_hours">Every 12 hours</option><option value="24" data-i18n="web_ui_every_24_hours">Every 24 hours</option><option value="168" data-i18n="web_ui_every_7_days">Every 7 days</option></select></label>
           <p class="catalog-intro" id="updateCheckIntervalHelp">Automatic checks use the app updater. None is the default. You can always check manually in About.</p>
         </div>
-        <div class="settings-group"><h3>Accessibility</h3>
+        <div class="settings-group"><h3 data-i18n="web_ui_accessibility">Accessibility</h3>
           <label class="setting-row jui-switch"><span><strong data-i18n="reduced_motion_label">Reduced motion</strong><small data-i18n="reduced_motion_description">Soften or disable expressive screen transitions</small></span><input type="checkbox" data-setting-toggle="reducedMotion"><span class="jui-switch-track" aria-hidden="true"></span></label>
           <label class="setting-row jui-switch"><span><strong data-i18n="reduce_flashes_label">Reduce flashes</strong><small data-i18n="settings_desc_reduce_flashes">Reduce flashes and sudden visual changes for greater visual comfort.</small></span><input type="checkbox" data-setting-toggle="reduceFlashes"><span class="jui-switch-track" aria-hidden="true"></span></label>
         </div>
@@ -495,29 +495,29 @@
           <h3 data-i18n="nimmy_settings_heading">Help &amp; tutorial</h3>
           <p class="catalog-intro" data-i18n="nimmy_settings_description">Want a refresher? Nimmy can show you around again.</p>
           <button type="button" class="primary-action" id="rerunNimmyButton" data-i18n="nimmy_rerun_button">Rerun Nimmy tutorial</button>
-      <section class="settings-danger card" aria-labelledby="resetEverythingTitle"><div class="panel-title"><span class="eyebrow">DATA</span><h3 id="resetEverythingTitle" data-i18n="reset_everything_label">Reset Everything</h3></div><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><button type="button" class="world-action-button" id="resetEverythingButton" data-i18n="reset_everything_label">Reset Everything</button></section>
+      <section class="settings-danger card" aria-labelledby="resetEverythingTitle"><div class="panel-title"><span class="eyebrow" data-i18n="web_ui_data">DATA</span><h3 id="resetEverythingTitle" data-i18n="reset_everything_label">Reset Everything</h3></div><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><button type="button" class="world-action-button" id="resetEverythingButton" data-i18n="reset_everything_label">Reset Everything</button></section>
         </div>
         <p class="catalog-intro" id="settingsStatus" role="status" aria-live="polite">Settings sync with the Android game.</p>
       </section>
     </div>
     <div class="screen" id="screen-prestige" role="tabpanel" aria-labelledby="tab-prestige" data-screen="prestige" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-crown"></use></svg></span><div><span class="eyebrow">RESET FOR PERMANENT POWER</span><h2>Prestige</h2></div><span class="panel-chip" id="prestigeCountPanel">0 ASCENSIONS</span></div>
-        <div class="reset-summary"><div><span>Current Prestige</span><strong id="prestigeCurrent">0</strong></div><div><span>Next reward</span><strong id="prestigeReward">0</strong></div><div><span>Money required</span><strong id="prestigeRequirement">0</strong></div></div>
-        <div class="requirement-panel"><h3>Prestige requirements</h3><div class="requirement-row" id="prestigeMoneyRequirementRow"><span>Current Money</span><strong id="prestigeCurrentMoney">0</strong><span class="requirement-state" id="prestigeMoneyState">Checking…</span></div><div class="requirement-row" id="prestigeRewardRequirementRow"><span>Next reward</span><strong id="prestigeRewardDetail">0</strong><span class="requirement-state" id="prestigeRewardState">Checking…</span></div><p id="prestigeNextReset" class="requirement-note"></p></div>
-        <div class="reset-effects"><h3>What resets?</h3><ul><li>Regular Money and upgrade levels reset.</li><li>The guessing range returns to its starting range.</li><li>Prestige currency and Prestige progression remain.</li></ul></div>
-        <p class="catalog-intro">Prestige resets your regular upgrades and Money, while keeping permanent Prestige progress. Review the reward before resetting.</p>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-crown"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_reset_for_permanent_power">RESET FOR PERMANENT POWER</span><h2 data-i18n="prestige">Prestige</h2></div><span class="panel-chip" id="prestigeCountPanel">0 ASCENSIONS</span></div>
+        <div class="reset-summary"><div><span data-i18n="web_ui_current_prestige">Current Prestige</span><strong id="prestigeCurrent">0</strong></div><div><span data-i18n="web_ui_next_reward">Next reward</span><strong id="prestigeReward">0</strong></div><div><span data-i18n="web_ui_money_required">Money required</span><strong id="prestigeRequirement">0</strong></div></div>
+        <div class="requirement-panel"><h3 data-i18n="web_ui_prestige_requirements">Prestige requirements</h3><div class="requirement-row" id="prestigeMoneyRequirementRow"><span data-i18n="web_ui_current_money">Current Money</span><strong id="prestigeCurrentMoney">0</strong><span class="requirement-state" id="prestigeMoneyState">Checking…</span></div><div class="requirement-row" id="prestigeRewardRequirementRow"><span data-i18n="web_ui_next_reward">Next reward</span><strong id="prestigeRewardDetail">0</strong><span class="requirement-state" id="prestigeRewardState">Checking…</span></div><p id="prestigeNextReset" class="requirement-note"></p></div>
+        <div class="reset-effects"><h3 data-i18n="web_ui_what_resets">What resets?</h3><ul><li data-i18n="web_ui_regular_money_and_upgrade_levels_reset">Regular Money and upgrade levels reset.</li><li data-i18n="web_ui_the_guessing_range_returns_to_its_starting_range">The guessing range returns to its starting range.</li><li data-i18n="web_ui_prestige_currency_and_prestige_progression_remain">Prestige currency and Prestige progression remain.</li></ul></div>
+        <p class="catalog-intro" data-i18n="web_ui_prestige_resets_your_regular_upgrades_and_money_while_ke">Prestige resets your regular upgrades and Money, while keeping permanent Prestige progress. Review the reward before resetting.</p>
         <section class="progression-catalog-section">
           <h3 data-i18n="prestige_upgrade_tree_title">Prestige upgrades</h3>
           <p class="catalog-intro" data-i18n="prestige_html_upgrades_desc">Spend Prestige to buy permanent upgrades.</p>
           <div class="catalog-currency-balance" id="prestigeUpgradeCurrencyBalance" aria-live="polite">Prestige: <strong>0</strong></div>
-          <div class="catalog-list" id="prestigeUpgradeList"><p class="catalog-empty">Loading Prestige upgrades…</p></div>
+          <div class="catalog-list" id="prestigeUpgradeList"><p class="catalog-empty" data-i18n="web_ui_loading_prestige_upgrades_2">Loading Prestige upgrades…</p></div>
         </section>
         <section class="progression-catalog-section">
           <h3 data-i18n="prestige_shop_title">Prestige Shop</h3>
           <p class="catalog-intro" data-i18n="prestige_html_shop_desc">Spend Prestige on one-time shop items.</p>
           <div class="catalog-currency-balance" id="prestigeShopCurrencyBalance" aria-live="polite">Prestige: <strong>0</strong></div>
-          <div class="catalog-list" id="prestigeShopList"><p class="catalog-empty">Loading Prestige shop…</p></div>
+          <div class="catalog-list" id="prestigeShopList"><p class="catalog-empty" data-i18n="web_ui_loading_prestige_shop">Loading Prestige shop…</p></div>
         </section>
         <button type="button" class="world-action-button" id="prestigeResetButton" data-bridge-action="prestige_reset">Prestige reset</button>
         <p class="catalog-intro" id="prestigeStatus" role="status" aria-live="polite"></p>
@@ -525,22 +525,22 @@
     </div>
     <div class="screen" id="screen-ultra" role="tabpanel" aria-labelledby="tab-ultra" data-screen="ultra" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><div><span class="eyebrow">ASCEND BEYOND PRESTIGE</span><h2>Ultra</h2></div><span class="panel-chip" id="ultraCountPanel">0 RESETS</span></div>
-        <div class="reset-summary"><div><span>Current Ultra</span><strong id="ultraCurrent">0</strong></div><div><span>Next reward</span><strong id="ultraReward">0</strong></div><div><span>Money required</span><strong id="ultraRequirement">0</strong></div></div>
-        <div class="requirement-panel"><h3>Ultra requirements</h3><div class="requirement-row" id="ultraMoneyRequirementRow"><span>Current Money</span><strong id="ultraCurrentMoney">0</strong><span class="requirement-state" id="ultraMoneyState">Checking…</span></div><div class="requirement-row" id="ultraPrestigeRequirementRow"><span>Prestige balance needed</span><strong>1,000</strong><span class="requirement-state" id="ultraPrestigeState">Checking…</span></div><div class="requirement-row" id="ultraRewardRequirementRow"><span>Next reward</span><strong id="ultraRewardDetail">0</strong><span class="requirement-state" id="ultraRewardState">Checking…</span></div><p id="ultraNextReset" class="requirement-note"></p></div>
-        <div class="reset-effects"><h3>What resets?</h3><ul><li>Regular Money and Prestige balance reset.</li><li>Regular and Prestige upgrade levels reset.</li><li>Ultra currency and Ultra progression remain.</li><li>At least 1,000 Prestige and enough Money are required.</li></ul></div>
-        <p class="catalog-intro">Ultra requires at least 1,000 Prestige and enough Money. It resets Prestige and regular upgrades for permanent Ultra progress.</p>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-sparkles"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_ascend_beyond_prestige">ASCEND BEYOND PRESTIGE</span><h2 data-i18n="currency_ultra_label">Ultra</h2></div><span class="panel-chip" id="ultraCountPanel">0 RESETS</span></div>
+        <div class="reset-summary"><div><span data-i18n="web_ui_current_ultra">Current Ultra</span><strong id="ultraCurrent">0</strong></div><div><span data-i18n="web_ui_next_reward">Next reward</span><strong id="ultraReward">0</strong></div><div><span data-i18n="web_ui_money_required">Money required</span><strong id="ultraRequirement">0</strong></div></div>
+        <div class="requirement-panel"><h3 data-i18n="web_ui_ultra_requirements">Ultra requirements</h3><div class="requirement-row" id="ultraMoneyRequirementRow"><span data-i18n="web_ui_current_money">Current Money</span><strong id="ultraCurrentMoney">0</strong><span class="requirement-state" id="ultraMoneyState">Checking…</span></div><div class="requirement-row" id="ultraPrestigeRequirementRow"><span data-i18n="web_ui_prestige_balance_needed">Prestige balance needed</span><strong>1,000</strong><span class="requirement-state" id="ultraPrestigeState">Checking…</span></div><div class="requirement-row" id="ultraRewardRequirementRow"><span data-i18n="web_ui_next_reward">Next reward</span><strong id="ultraRewardDetail">0</strong><span class="requirement-state" id="ultraRewardState">Checking…</span></div><p id="ultraNextReset" class="requirement-note"></p></div>
+        <div class="reset-effects"><h3 data-i18n="web_ui_what_resets">What resets?</h3><ul><li data-i18n="web_ui_regular_money_and_prestige_balance_reset">Regular Money and Prestige balance reset.</li><li data-i18n="web_ui_regular_and_prestige_upgrade_levels_reset">Regular and Prestige upgrade levels reset.</li><li data-i18n="web_ui_ultra_currency_and_ultra_progression_remain">Ultra currency and Ultra progression remain.</li><li data-i18n="web_ui_at_least_1_000_prestige_and_enough_money_are_required">At least 1,000 Prestige and enough Money are required.</li></ul></div>
+        <p class="catalog-intro" data-i18n="web_ui_ultra_requires_at_least_1_000_prestige_and_enough_money">Ultra requires at least 1,000 Prestige and enough Money. It resets Prestige and regular upgrades for permanent Ultra progress.</p>
         <section class="progression-catalog-section">
           <h3 data-i18n="ultra_upgrade_tree_title">Ultra upgrades</h3>
           <p class="catalog-intro" data-i18n="ultra_html_upgrades_desc">Spend Ultra to buy permanent upgrades.</p>
           <div class="catalog-currency-balance" id="ultraUpgradeCurrencyBalance" aria-live="polite">Ultra: <strong>0</strong></div>
-          <div class="catalog-list" id="ultraUpgradeList"><p class="catalog-empty">Loading Ultra upgrades…</p></div>
+          <div class="catalog-list" id="ultraUpgradeList"><p class="catalog-empty" data-i18n="web_ui_loading_ultra_upgrades_2">Loading Ultra upgrades…</p></div>
         </section>
         <section class="progression-catalog-section">
           <h3 data-i18n="ultra_shop_title">Ultra Shop</h3>
           <p class="catalog-intro" data-i18n="ultra_html_shop_desc">Spend Ultra on one-time shop items.</p>
           <div class="catalog-currency-balance" id="ultraShopCurrencyBalance" aria-live="polite">Ultra: <strong>0</strong></div>
-          <div class="catalog-list" id="ultraShopList"><p class="catalog-empty">Loading Ultra shop…</p></div>
+          <div class="catalog-list" id="ultraShopList"><p class="catalog-empty" data-i18n="web_ui_loading_ultra_shop">Loading Ultra shop…</p></div>
         </section>
         <button type="button" class="world-action-button" id="ultraResetButton" data-bridge-action="ultra_reset">Ultra reset</button>
         <p class="catalog-intro" id="ultraStatus" role="status" aria-live="polite"></p>
@@ -548,16 +548,16 @@
     </div>
     <div class="screen" id="screen-talent" role="tabpanel" aria-labelledby="tab-talent" data-screen="talent" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg></span><div><span class="eyebrow">PERMANENT PROGRESSION</span><h2>Talent Web</h2></div><span class="panel-chip" id="talentCount">0 / 6 UNLOCKED</span></div>
-        <p class="catalog-intro">Spend Prestige to unlock permanent talents. Each talent has its own requirements and cost.</p>
-        <div class="catalog-list" id="talentList"><p class="catalog-empty">Syncing talents…</p></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-layers"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_permanent_progression">PERMANENT PROGRESSION</span><h2 data-i18n="web_ui_talent_web">Talent Web</h2></div><span class="panel-chip" id="talentCount">0 / 6 UNLOCKED</span></div>
+        <p class="catalog-intro" data-i18n="web_ui_spend_prestige_to_unlock_permanent_talents_each_talent_h">Spend Prestige to unlock permanent talents. Each talent has its own requirements and cost.</p>
+        <div class="catalog-list" id="talentList"><p class="catalog-empty" data-i18n="web_ui_syncing_talents">Syncing talents…</p></div>
       </section>
     </div>
     <div class="screen" id="screen-mutators" role="tabpanel" aria-labelledby="tab-mutators" data-screen="mutators" hidden>
       <section class="card catalog-panel">
-        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><div><span class="eyebrow">CUSTOMIZE YOUR RUN</span><h2>Mutators</h2></div><span class="panel-chip" id="mutatorCount">0 ACTIVE</span></div>
-        <p class="catalog-intro">Toggle challenge rules to change the current run. The engine recalculates the range and target when a mutator changes.</p>
-        <div class="catalog-list" id="mutatorList"><p class="catalog-empty">Syncing mutators…</p></div>
+        <div class="panel-title"><span class="panel-glyph"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg></span><div><span class="eyebrow" data-i18n="web_ui_customize_your_run">CUSTOMIZE YOUR RUN</span><h2 data-i18n="mutators">Mutators</h2></div><span class="panel-chip" id="mutatorCount">0 ACTIVE</span></div>
+        <p class="catalog-intro" data-i18n="web_ui_toggle_challenge_rules_to_change_the_current_run_the_eng">Toggle challenge rules to change the current run. The engine recalculates the range and target when a mutator changes.</p>
+        <div class="catalog-list" id="mutatorList"><p class="catalog-empty" data-i18n="web_ui_syncing_mutators">Syncing mutators…</p></div>
       </section>
     </div>
     <div class="screen" id="screen-stats" role="tabpanel" aria-labelledby="tab-stats" data-screen="stats" hidden>
@@ -584,7 +584,7 @@
           <article class="stat-card"><span data-i18n="rift_best_tier">Best cleared tier: %d</span><strong id="statRiftBestTier">0</strong></article>
           <article class="stat-card"><span data-i18n="inspector_arcade_best_scores">Arcade Best Scores</span><strong id="statArcadeBestScores">—</strong></article>
         </div>
-        <section class="stats-visual card" aria-label="Visual statistics"><div class="stats-visual-head"><div><span class="eyebrow">AT A GLANCE</span><h3>Run performance</h3></div><span class="panel-chip" id="statsSummaryChip">0% ACCURACY</span></div><div class="stats-visual-grid"><div class="accuracy-visual" id="statAccuracyRing" role="img" aria-label="Guess accuracy"><div><strong id="statAccuracyVisual">0%</strong><span>ACCURACY</span></div></div><div class="stats-bars"><div class="stats-bar-row"><div><span>Correct guesses</span><strong id="statsCorrectRatio">0</strong></div><div class="stats-bar-track"><span id="statsCorrectBar"></span></div></div><div class="stats-bar-row"><div><span>Failed guesses</span><strong id="statsFailedRatio">0</strong></div><div class="stats-bar-track"><span id="statsFailedBar"></span></div></div><div class="stats-bar-row"><div><span>Money earned</span><strong id="statsMoneyVisual">0</strong></div><div class="stats-bar-track"><span id="statsMoneyBar"></span></div></div></div></div></section>
+        <section class="stats-visual card" aria-label="Visual statistics"><div class="stats-visual-head"><div><span class="eyebrow" data-i18n="web_ui_at_a_glance">AT A GLANCE</span><h3 data-i18n="web_ui_run_performance">Run performance</h3></div><span class="panel-chip" id="statsSummaryChip">0% ACCURACY</span></div><div class="stats-visual-grid"><div class="accuracy-visual" id="statAccuracyRing" role="img" aria-label="Guess accuracy"><div><strong id="statAccuracyVisual">0%</strong><span data-i18n="web_ui_accuracy">ACCURACY</span></div></div><div class="stats-bars"><div class="stats-bar-row"><div><span data-i18n="web_ui_correct_guesses">Correct guesses</span><strong id="statsCorrectRatio">0</strong></div><div class="stats-bar-track"><span id="statsCorrectBar"></span></div></div><div class="stats-bar-row"><div><span data-i18n="web_ui_failed_guesses">Failed guesses</span><strong id="statsFailedRatio">0</strong></div><div class="stats-bar-track"><span id="statsFailedBar"></span></div></div><div class="stats-bar-row"><div><span data-i18n="web_ui_money_earned">Money earned</span><strong id="statsMoneyVisual">0</strong></div><div class="stats-bar-track"><span id="statsMoneyBar"></span></div></div></div></div></section>
       </section>
     </div>
     <div class="screen" id="screen-arcade" role="tabpanel" aria-labelledby="tab-arcade" data-screen="arcade" hidden>
@@ -631,7 +631,7 @@
   <section id="dailyRewardOverlay" class="reward-overlay" role="presentation" hidden>
     <div class="reward-dialog daily-reward-dialog" role="dialog" aria-modal="true" aria-labelledby="dailyRewardTitle" aria-describedby="dailyRewardSubtitle">
       <span class="reward-emoji daily-reward-art" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" focusable="false"><use href="#icon-gift"></use></svg></span>
-      <span class="reward-eyebrow">DAILY LOGIN</span>
+      <span class="reward-eyebrow" data-i18n="web_ui_daily_login">DAILY LOGIN</span>
       <h2 id="dailyRewardTitle">Daily Nebula Reward</h2>
       <p id="dailyRewardSubtitle">Claim today's reward and keep your streak alive.</p>
       <strong class="reward-amount" id="dailyRewardAmount">+5 Nebula</strong>
@@ -643,7 +643,7 @@
   <section id="resetMovedDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetMovedTitle" aria-describedby="resetMovedMessage">
     <div class="nimmy-tutorial-backdrop" aria-hidden="true"></div>
     <div class="nimmy-dialog card reset-dialog reset-moved-dialog">
-      <span class="eyebrow">SETTINGS</span>
+      <span class="eyebrow" data-i18n="web_ui_settings">SETTINGS</span>
       <h2 id="resetMovedTitle">Reset Everything has moved</h2>
       <p id="resetMovedMessage">Please use the Save Slots screen to reset everything. This keeps save-management actions in one place and helps prevent accidental data loss.</p>
       <div class="nimmy-actions">
@@ -652,7 +652,7 @@
       </div>
     </div>
   </section>
-  <section id="resetEverythingDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetEverythingDialogTitle"><div class="nimmy-tutorial-backdrop" aria-hidden="true"></div><div class="nimmy-dialog card reset-dialog"><span class="eyebrow">DATA RESET</span><h2 id="resetEverythingDialogTitle" data-i18n="confirm_data_reset_title">Confirm Data Reset</h2><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><p id="resetMathPrompt" class="reset-math-prompt"></p><p id="resetTimerText" class="catalog-intro">Wait 45s before confirming.</p><label class="reset-check-row"><input type="checkbox" id="resetAcknowledgement"><span data-i18n="reset_data_acknowledgement">I understand this will erase all my progress</span></label><input id="resetMathAnswer" class="stake-input" inputmode="numeric" autocomplete="off"><div class="nimmy-actions"><button type="button" class="secondary-action" id="resetCancelButton">Cancel</button><button type="button" class="primary-action" id="resetConfirmButton" disabled>Confirm reset</button></div></div></section>
+  <section id="resetEverythingDialog" class="nimmy-tutorial" hidden role="dialog" aria-modal="true" aria-labelledby="resetEverythingDialogTitle"><div class="nimmy-tutorial-backdrop" aria-hidden="true"></div><div class="nimmy-dialog card reset-dialog"><span class="eyebrow" data-i18n="web_ui_data_reset">DATA RESET</span><h2 id="resetEverythingDialogTitle" data-i18n="confirm_data_reset_title">Confirm Data Reset</h2><p data-i18n="reset_data_warning">Are you sure you want to reset all progress? This action is irreversible.</p><p id="resetMathPrompt" class="reset-math-prompt"></p><p id="resetTimerText" class="catalog-intro">Wait 45s before confirming.</p><label class="reset-check-row"><input type="checkbox" id="resetAcknowledgement"><span data-i18n="reset_data_acknowledgement">I understand this will erase all my progress</span></label><input id="resetMathAnswer" class="stake-input" inputmode="numeric" autocomplete="off"><div class="nimmy-actions"><button type="button" class="secondary-action" id="resetCancelButton">Cancel</button><button type="button" class="primary-action" id="resetConfirmButton" disabled>Confirm reset</button></div></div></section>
 <section id="nimmyTutorial" class="nimmy-tutorial" hidden role="dialog" aria-modal="false" aria-labelledby="nimmyTitle" aria-describedby="nimmyBody">
     <div class="nimmy-tutorial-backdrop" aria-hidden="true"></div>
     <div id="nimmySpotlight" class="nimmy-spotlight" aria-hidden="true"></div>
