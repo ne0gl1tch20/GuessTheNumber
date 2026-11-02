@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import zipfile
@@ -22,6 +23,8 @@ ASSETS = ROOT / "app" / "src" / "main" / "assets"
 OUTPUT = ROOT / "app" / "build" / "generated" / "gameDataAssets" / "game_data"
 MAGIC = b"GTNGBIN1"
 FORMAT_VERSION = 1
+MANIFEST_MAGIC = b"GTNMFST1"
+MANIFEST_AAD = b"GTN-GAME-DATA-MANIFEST:1:gtn-assets-v1"
 KEY_ID = "gtn-assets-v1"
 # This key provides at-rest obfuscation only while embedded in an APK.
 # A determined reverse engineer can recover client-side key material.
@@ -107,7 +110,23 @@ def split_group(name: str, files: list[tuple[Path, str]], max_bytes: int) -> lis
     return chunks
 
 
-def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BYTES, extra_files: list[tuple[Path, str]] | None = None) -> dict:
+def encrypt_manifest_blob(manifest: dict) -> bytes:
+    """Encode an APK-only manifest using the archive key and authenticated metadata."""
+    nonce = os.urandom(12)
+    plaintext = json.dumps(manifest, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    encrypted = AESGCM(KEY).encrypt(nonce, plaintext, MANIFEST_AAD)
+    return MANIFEST_MAGIC + bytes([FORMAT_VERSION]) + nonce + encrypted
+
+
+def decrypt_manifest_blob(blob: bytes) -> dict:
+    """Decode and authenticate an APK-bundled manifest."""
+    if len(blob) < 37 or blob[:8] != MANIFEST_MAGIC or blob[8] != FORMAT_VERSION:
+        raise ValueError("Invalid encrypted game-data manifest header")
+    plaintext = AESGCM(KEY).decrypt(blob[9:21], blob[21:], MANIFEST_AAD)
+    return json.loads(plaintext.decode("utf-8"))
+
+
+def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BYTES, extra_files: list[tuple[Path, str]] | None = None, encrypt_manifest: bool = False) -> dict:
     if max_chunk_bytes < 64 * 1024:
         raise ValueError("Chunk size must be at least 64 KiB")
     output.mkdir(parents=True, exist_ok=True)
@@ -189,7 +208,10 @@ def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BY
         "chunks": chunk_entries,
         "files": file_entries,
     }
-    (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    if encrypt_manifest:
+        (output / "manifest.bin").write_bytes(encrypt_manifest_blob(manifest))
+    else:
+        (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest
 
 
@@ -197,6 +219,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=OUTPUT)
     parser.add_argument("--version", default=None)
+    parser.add_argument("--encrypt-manifest", action="store_true", help="Write manifest.bin for APK packaging; leave remote publish output as plaintext JSON by default")
     parser.add_argument("--max-chunk-bytes", type=int, default=MAX_CHUNK_BYTES)
     parser.add_argument("--extra-file", action="append", default=[], metavar="SOURCE=ASSET_PATH")
     args = parser.parse_args()
@@ -206,7 +229,7 @@ def main() -> None:
             parser.error("--extra-file must use SOURCE=ASSET_PATH")
         source, relative = specification.split("=", 1)
         extra_files.append((Path(source), relative))
-    manifest = build(args.output, args.version, args.max_chunk_bytes, extra_files)
+    manifest = build(args.output, args.version, args.max_chunk_bytes, extra_files, args.encrypt_manifest)
     print(f"Built {len(manifest['chunks'])} encrypted chunks containing {len(manifest['files'])} files at {args.output}")
 
 

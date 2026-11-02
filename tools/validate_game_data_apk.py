@@ -9,7 +9,7 @@ from pathlib import Path
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from binarify_game_data import FORMAT_VERSION, KEY, MAGIC
+from binarify_game_data import FORMAT_VERSION, MAGIC, decrypt_manifest_blob
 
 
 def validate(apk_path: Path) -> tuple[int, int]:
@@ -27,7 +27,10 @@ def validate(apk_path: Path) -> tuple[int, int]:
             + ", ".join(sorted(unexpected))
         )
         manifest_path = "assets/game_data/manifest.json"
-        manifest = json.loads(apk.read(manifest_path))
+        encrypted_manifest_path = "assets/game_data/manifest.bin"
+        assert manifest_path not in asset_files, "Plaintext game-data manifest must not be packaged in the APK"
+        assert encrypted_manifest_path in asset_files, "Encrypted game-data manifest is missing"
+        manifest = decrypt_manifest_blob(apk.read(encrypted_manifest_path))
         assert manifest["schemaVersion"] == 1
         assert manifest["archiveFormatVersion"] == FORMAT_VERSION
         assert manifest["minAppVersionCode"] == 24
@@ -46,6 +49,7 @@ def validate(apk_path: Path) -> tuple[int, int]:
             assert blob[:8] == MAGIC and blob[8] == FORMAT_VERSION
             nonce = blob[9:21]
             aad = f'{FORMAT_VERSION}:{chunk["group"]}:{chunk["id"]}'.encode()
+            from binarify_game_data import KEY
             compressed = AESGCM(KEY).decrypt(nonce, blob[21:], aad)
             with zipfile.ZipFile(BytesIO(compressed)) as archive:
                 for path in archive.namelist():

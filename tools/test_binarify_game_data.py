@@ -84,7 +84,7 @@ class BinarifyGameDataTest(unittest.TestCase):
             builder.ASSETS = assets
             try:
                 output = root / "game_data"
-                builder.build(output, None, 65536)
+                builder.build(output, None, 65536, encrypt_manifest=True)
             finally:
                 builder.ASSETS = previous
             apk = root / "test.apk"
@@ -105,7 +105,7 @@ class BinarifyGameDataTest(unittest.TestCase):
             builder.ASSETS = assets
             try:
                 output = root / "game_data"
-                builder.build(output, None, 65536)
+                builder.build(output, None, 65536, encrypt_manifest=True)
             finally:
                 builder.ASSETS = previous
             apk = root / "test-plaintext.apk"
@@ -159,6 +159,42 @@ class BinarifyGameDataTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             with self.assertRaises(ValueError):
                 builder.build(Path(temporary), "test", 1024)
+
+    def test_apk_manifest_is_encrypted_and_round_trips(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            assets = root / "assets"
+            (assets / "game").mkdir(parents=True)
+            source_json = '{"secretConfig":"not-readable-in-apk"}'
+            (assets / "game" / "config.json").write_text(source_json)
+            previous = builder.ASSETS
+            builder.ASSETS = assets
+            try:
+                output = root / "game_data"
+                manifest = builder.build(output, "encrypted-test", 65536, encrypt_manifest=True)
+            finally:
+                builder.ASSETS = previous
+
+            encrypted_manifest = (output / "manifest.bin").read_bytes()
+            self.assertFalse((output / "manifest.json").exists())
+            self.assertNotIn(b'"schemaVersion"', encrypted_manifest)
+            self.assertEqual(builder.decrypt_manifest_blob(encrypted_manifest), manifest)
+
+            apk = root / "encrypted-manifest.apk"
+            with zipfile.ZipFile(apk, "w") as archive:
+                for path in output.iterdir():
+                    archive.write(path, f"assets/game_data/{path.name}")
+            with zipfile.ZipFile(apk) as archive:
+                packaged_bytes = b"".join(archive.read(name) for name in archive.namelist())
+            self.assertNotIn(source_json.encode(), packaged_bytes)
+            chunks, files = apk_validator.validate(apk)
+            self.assertEqual((chunks, files), (1, 1))
+
+    def test_encrypted_manifest_rejects_tampering(self):
+        blob = bytearray(builder.encrypt_manifest_blob({"version": "test"}))
+        blob[-1] ^= 1
+        with self.assertRaises(Exception):
+            builder.decrypt_manifest_blob(bytes(blob))
 
 
 if __name__ == "__main__":
