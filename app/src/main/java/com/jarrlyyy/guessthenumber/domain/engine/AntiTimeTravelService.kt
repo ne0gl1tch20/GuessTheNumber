@@ -4,11 +4,9 @@ import com.jarrlyyy.guessthenumber.data.logger.GameLogger
 import com.jarrlyyy.guessthenumber.data.logger.LoggerCategory
 import com.jarrlyyy.guessthenumber.data.logger.LogLevel
 import com.jarrlyyy.guessthenumber.domain.model.GameState
+import com.jarrlyyy.guessthenumber.shared.domain.AntiTimeTravelRules
 
 object AntiTimeTravelService {
-    // Tomodachi Life inspired anti-time-travel mechanic:
-    // When device time is behind last save or tampered backward, apply 24-hour temporary consequence (pause auto-clicker / production).
-    
     data class TimeTravelCheckResult(
         val updatedState: GameState,
         val timeTravelDetected: Boolean,
@@ -16,24 +14,19 @@ object AntiTimeTravelService {
     )
 
     fun checkTimeTravel(state: GameState): TimeTravelCheckResult {
-        val now = System.currentTimeMillis()
-        val lastSave = state.lastSaveTimestamp
-        
-        // 1. Backward tampering check only (device clock set behind last save).
-        // Removed forward-jump heuristic checks to completely prevent false positives when device reboots or time syncs normally.
-        if (now < lastSave) {
-            val diffSeconds = (lastSave - now) / 1000
-            GameLogger.log(LogLevel.WARN, LoggerCategory.GAME, "TIME_TRAVEL_BACKWARD", "Clock tampering detected! Device time is $diffSeconds seconds behind last save.")
-            
-            val penaltyUntil = now + (24 * 60 * 60 * 1000L)
-            val penalizedState = state.copy(
-                autoClickerActive = false,
-                timeTravelPenaltyUntil = penaltyUntil,
-                lastSaveTimestamp = now
+        val result = AntiTimeTravelRules.check(state)
+        if (result.detected) {
+            GameLogger.log(
+                LogLevel.WARN,
+                LoggerCategory.GAME,
+                "TIME_TRAVEL_BACKWARD",
+                "Clock rollback detected: device time is ${result.differenceSeconds} seconds behind the last save."
             )
-            return TimeTravelCheckResult(penalizedState, true, diffSeconds)
         }
-        
-        return TimeTravelCheckResult(state.copy(lastSaveTimestamp = now), false, 0)
+        return TimeTravelCheckResult(
+            updatedState = result.updatedState,
+            timeTravelDetected = result.detected,
+            timeDifferenceSeconds = result.differenceSeconds
+        )
     }
 }
