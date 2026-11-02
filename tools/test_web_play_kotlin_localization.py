@@ -61,6 +61,8 @@ assert "return merged" in desktop_bridge
 assert "const locale=String(lastState?.settings?.locale||'en-US')" in js
 assert "document.documentElement.dir=" in js
 assert "[data-i18n-aria-label]" in js
+assert "ring.setAttribute('aria-label',uiText('web_guess_accuracy_aria'" in js
+assert "input.setAttribute('aria-label',uiText('web_creative_level_aria'" in js
 assert "textNodes=Array.from(node.childNodes)" in js
 assert "node.textContent=value" not in js, "Localization must preserve nested SVG icons"
 assert "renderTraitLoadout(s);applyAuxiliaryTranslations();" in js
