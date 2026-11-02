@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "version": "ca05a239628f970149689c106311c2e44bc08289",
+  "version": "c103f0ef64d000b52e17f69ac7abf34ae5ca4537",
   "minAppVersionCode": 21,
   "files": [
     {
       "path": "web-play/app.js",
-      "sha256": "6acab19ab64acf2f597efdf3ff15cac828528aafce5a39500124e74589198d33"
+      "sha256": "565cd4021a5710c2859a5904151372072380dc06c6d48f96a942ffa4a56c21a8"
     },
     {
       "path": "web-play/icons/guess-the-number.svg",
