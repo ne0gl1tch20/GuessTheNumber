@@ -7,6 +7,11 @@ on:
     branches: [master]
     paths:
       - "app/src/main/assets/web-play/**"
+      - "app/src/main/assets/locales/**"
+      - "app/src/main/java/com/jarrlyyy/guessthenumber/data/repository/LocaleManager.kt"
+      - "app/src/main/java/com/jarrlyyy/guessthenumber/ui/screens/ProductionWebPlayScreen.kt"
+      - "desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumber/desktop/DesktopWebPlayState.kt"
+      - "tools/test_web_play_kotlin_localization.py"
       - "app/src/main/assets/libraries/vue/**"
       - "app/src/main/assets/libraries/jarrlyyuisdk/**"
       - "tools/test_vue_canvas_effects.cjs"
