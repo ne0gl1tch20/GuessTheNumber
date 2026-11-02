@@ -114,6 +114,24 @@ class BinarifyGameDataTest(unittest.TestCase):
             entry = next(item for item in manifest["files"] if item["path"] == "web-play/gtn-app-logo.png")
             self.assertEqual(entry["size"], len(b"test-logo-bytes"))
 
+    def test_version_changes_when_chunk_layout_changes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            assets = root / "assets"
+            (assets / "game").mkdir(parents=True)
+            (assets / "game" / "first.bin").write_bytes(b"a" * 40000)
+            (assets / "game" / "second.bin").write_bytes(b"b" * 40000)
+            previous = builder.ASSETS
+            builder.ASSETS = assets
+            try:
+                split = builder.build(root / "split", None, 65536)
+                combined = builder.build(root / "combined", None, 131072)
+            finally:
+                builder.ASSETS = previous
+            self.assertEqual(len(split["chunks"]), 2)
+            self.assertEqual(len(combined["chunks"]), 1)
+            self.assertNotEqual(split["version"], combined["version"])
+
     def test_rejects_too_small_chunk_limit(self):
         with tempfile.TemporaryDirectory() as temporary:
             with self.assertRaises(ValueError):
