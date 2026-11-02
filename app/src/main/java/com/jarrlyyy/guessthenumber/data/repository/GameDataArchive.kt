@@ -161,7 +161,7 @@ object GameDataArchive {
         val root = File(app.filesDir, "game-data-cache")
         val active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
         val cached = active?.let { File(it, relativePath) }
-        if (cached != null && cached.isFile && cached.canonicalPath.startsWith(active!!.canonicalPath + File.separator)) {
+        if (cached != null && cached.isFile && cached.canonicalPath.startsWith(active.canonicalPath + File.separator)) {
             return cached.inputStream()
         }
         return app.assets.open(relativePath)
@@ -174,6 +174,28 @@ object GameDataArchive {
             val input = runCatching { open(context, relative) }.getOrNull() ?: return@PathHandler null
             WebResourceResponse(mimeType(relative), null, input)
         }
+
+    /** Switch to the newest other verified cache after a WebView load failure. */
+    fun rollbackToPrevious(context: Context): Boolean = synchronized(lock) {
+        val root = File(context.applicationContext.filesDir, "game-data-cache")
+        val versions = File(root, "versions")
+        val pointer = File(root, "active-version")
+        val current = activeVersion(pointer)
+        val candidate = versions.listFiles()
+            ?.filter { it.isDirectory && it.name != current }
+            ?.mapNotNull { dir ->
+                val manifestFile = File(dir, CACHE_MANIFEST)
+                val manifest = runCatching { if (manifestFile.isFile) JSONObject(manifestFile.readText()) else null }.getOrNull()
+                if (manifest != null && filesValid(dir, manifest)) {
+                    dir to manifest.optLong("sourceCommitTimestamp", 0L)
+                } else null
+            }
+            ?.maxByOrNull { it.second }
+            ?.first
+            ?: return@synchronized false
+        activate(pointer, candidate.name)
+        true
+    }
 
     private fun filesValid(root: File, manifest: JSONObject): Boolean {
         return runCatching {
@@ -210,12 +232,7 @@ object GameDataArchive {
         val temporary = File(pointer.parentFile, "active-version.tmp")
         temporary.writeText(version)
         try {
-            Files.move(
-                temporary.toPath(),
-                pointer.toPath(),
-                StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.ATOMIC_MOVE
-            )
+            Files.move(temporary.toPath(), pointer.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
         } catch (_: AtomicMoveNotSupportedException) {
             Files.move(temporary.toPath(), pointer.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
@@ -224,7 +241,6 @@ object GameDataArchive {
     private fun activeVersion(pointer: File): String? = runCatching {
         pointer.takeIf { it.isFile }?.readText()?.trim()?.takeIf { it.matches(Regex("[a-zA-Z0-9._-]{1,80}")) }
     }.getOrNull()
-
 
     private fun request(url: String): ByteArray {
         val isManifest = url == MANIFEST_URL
