@@ -53,6 +53,8 @@ class LocaleManager(private val context: Context) {
     fun getCurrentLocaleTag(): String = currentLocale.toLanguageTag()
     /** Returns the complete active catalog, including English fallbacks, for native-hosted web UI. */
     fun getAllStrings(): JSONObject = JSONObject(translations.toString())
+    /** Returns the canonical English catalog so Web Play can translate legacy English literals safely. */
+    fun getEnglishStrings(): JSONObject = JSONObject(englishCatalog.toString())
     fun isRtl(): Boolean = currentLocale.language in setOf("ar", "fa", "he", "ur")
 
     fun getString(key: String, default: String = key): String {
