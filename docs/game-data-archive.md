@@ -22,7 +22,7 @@ python tools/binarify_game_data.py --output /tmp/gtn-game-data
 python -m unittest discover -s tools -p 'test_binarify_game_data.py' -v
 ```
 
-Android Gradle builds invoke the same builder automatically before asset merging. On asset changes pushed to `master`, the archive workflow tests the output and publishes `game_data/` with the manifest and numbered chunks.
+Android Gradle builds invoke the same builder automatically before asset merging. On asset changes pushed to `master`, the archive workflow tests the output and publishes `game_data/manifest.json`, flat numbered chunks for older APKs, and immutable copies under `game_data/versions/<version>/`. New clients fetch the versioned copies so a manifest update cannot redirect them to chunks being overwritten by a later publish.
 
 ## Runtime behavior
 
