@@ -15,6 +15,20 @@ DESKTOP_BRIDGE = ROOT / "desktopApp/src/jvmMain/kotlin/com/jarrlyyy/guessthenumb
 html = HTML.read_text(encoding="utf-8")
 js = JS.read_text(encoding="utf-8")
 catalog = json.loads(ENGLISH.read_text(encoding="utf-8"))
+
+# Catch malformed duplicate HTML attributes before browsers silently choose one.
+for tag in re.findall(r"<[a-z][^>]*>", html, flags=re.IGNORECASE):
+    attributes = re.findall(r'\\b([a-z][\\w:-]*)\\s*=', tag, flags=re.IGNORECASE)
+    duplicates = sorted(name for name in set(attributes) if attributes.count(name) > 1)
+    assert not duplicates, f"Duplicate HTML attributes {duplicates}: {tag[:240]}"
+
+for match in re.finditer(r'<input\\b([^>]*)\\bplaceholder="([^"]*)"([^>]*)>', html, flags=re.IGNORECASE):
+    placeholder = match.group(2)
+    attributes = match.group(1) + match.group(3)
+    if placeholder.strip():
+        assert re.search(r'\\bdata-i18n-placeholder="[^"]+"', attributes), (
+            f"Input placeholder is missing a Kotlin locale key: {match.group(0)}"
+        )
 android_locale = ANDROID_LOCALE.read_text(encoding="utf-8")
 android_bridge = ANDROID_BRIDGE.read_text(encoding="utf-8")
 desktop_bridge = DESKTOP_BRIDGE.read_text(encoding="utf-8")
