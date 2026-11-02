@@ -20,11 +20,14 @@ import javax.crypto.spec.SecretKeySpec
 object GameDataArchive {
     private const val ROOT_ASSET = "game_data"
     private const val MAGIC = "GTNGBIN1"
+    private const val MANIFEST_MAGIC = "GTNMFST1"
+    private const val MANIFEST_AAD = "GTN-GAME-DATA-MANIFEST:1:gtn-assets-v1"
     private const val FORMAT_VERSION = 1
     private const val APP_VERSION_CODE = 24
     private const val KEY_ID = "gtn-assets-v1"
     private const val CACHE_MANIFEST = ".game-data-manifest.json"
     private const val MAX_CHUNK_BYTES = 16 * 1024 * 1024
+    private const val MAX_MANIFEST_BYTES = 8 * 1024 * 1024
     private const val MAX_EXTRACTED_BYTES = 256L * 1024 * 1024
     private const val MANIFEST_URL = "https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber/master/game_data/manifest.json"
     private const val RAW_BASE = "https://raw.githubusercontent.com/ne0gl1tch20/GuessTheNumber"
@@ -38,8 +41,9 @@ object GameDataArchive {
 
     fun prepare(context: Context): PrepareResult = prepareWithSource(
         context,
-        manifestSource = { context.applicationContext.assets.open("$ROOT_ASSET/manifest.json") },
-        chunkSource = { name -> context.applicationContext.assets.open("$ROOT_ASSET/$name") }
+        manifestSource = { context.applicationContext.assets.open("$ROOT_ASSET/manifest.bin") },
+        chunkSource = { name -> context.applicationContext.assets.open("$ROOT_ASSET/$name") },
+        encryptedManifest = true
     )
 
     /** Downloads a published bundle only after the bundled archive is ready. */
@@ -50,7 +54,8 @@ object GameDataArchive {
         prepareWithSource(
             context,
             manifestSource = { manifestBytes.inputStream() },
-            chunkSource = { name -> request("$RAW_BASE/game_data/versions/$publishedVersion/$name").inputStream() }
+            chunkSource = { name -> request("$RAW_BASE/game_data/versions/$publishedVersion/$name").inputStream() },
+            encryptedManifest = false
         )
     } catch (error: Exception) {
         val root = File(context.applicationContext.filesDir, "game-data-cache")
@@ -60,7 +65,8 @@ object GameDataArchive {
     private fun prepareWithSource(
         context: Context,
         manifestSource: () -> InputStream,
-        chunkSource: (String) -> InputStream
+        chunkSource: (String) -> InputStream,
+        encryptedManifest: Boolean
     ): PrepareResult = synchronized(lock) {
         val app = context.applicationContext
         val root = File(app.filesDir, "game-data-cache")
@@ -68,7 +74,9 @@ object GameDataArchive {
         val pointer = File(root, "active-version")
         try {
             versions.mkdirs()
-            val manifest = manifestSource().bufferedReader().use { JSONObject(it.readText()) }
+            val manifestBytes = manifestSource().use { readBounded(it, MAX_MANIFEST_BYTES) }
+            val manifestJson = if (encryptedManifest) decryptManifest(manifestBytes) else manifestBytes
+            val manifest = JSONObject(String(manifestJson, Charsets.UTF_8))
             require(manifest.optInt("schemaVersion") == 1 && manifest.optInt("archiveFormatVersion") == FORMAT_VERSION)
             require(manifest.optInt("minAppVersionCode", Int.MAX_VALUE) <= APP_VERSION_CODE)
             require(manifest.optString("keyId") == KEY_ID)
@@ -284,6 +292,17 @@ object GameDataArchive {
     private fun activeVersion(pointer: File): String? = runCatching {
         pointer.takeIf { it.isFile }?.readText()?.trim()?.takeIf { it.matches(Regex("[a-zA-Z0-9._-]{1,80}")) }
     }.getOrNull()
+
+    private fun decryptManifest(blob: ByteArray): ByteArray {
+        require(blob.size >= 37 && String(blob, 0, 8, Charsets.US_ASCII) == MANIFEST_MAGIC) {
+            "Invalid encrypted game-data manifest header"
+        }
+        require(blob[8].toInt() == FORMAT_VERSION) { "Unsupported encrypted game-data manifest version" }
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(128, blob.copyOfRange(9, 21)))
+        cipher.updateAAD(MANIFEST_AAD.toByteArray(Charsets.UTF_8))
+        return cipher.doFinal(blob.copyOfRange(21, blob.size))
+    }
 
     private fun request(url: String): ByteArray {
         val isManifest = url == MANIFEST_URL

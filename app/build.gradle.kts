@@ -21,6 +21,7 @@ val generateGameDataAssets by tasks.registering(Exec::class) {
         pythonExecutable,
         rootProject.file("tools/binarify_game_data.py").absolutePath,
         "--output", generatedGameDataAssets.get().dir("game_data").asFile.absolutePath,
+        "--encrypt-manifest",
         "--extra-file", rootProject.file("GTN_APP_LOGO.png").absolutePath + "=web-play/gtn-app-logo.png"
     )
 }
