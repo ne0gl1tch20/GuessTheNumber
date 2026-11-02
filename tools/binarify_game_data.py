@@ -153,7 +153,18 @@ def build(output: Path, version: str | None, max_chunk_bytes: int = MAX_CHUNK_BY
             chunk_number += 1
 
     if version is None:
-        version_payload = json.dumps(file_entries, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        # Include chunk layout and encrypted chunk digests so builder/chunking changes
+        # always receive a new immutable publish path, even when source files are unchanged.
+        version_payload = json.dumps(
+            {
+                "archiveFormatVersion": FORMAT_VERSION,
+                "keyId": KEY_ID,
+                "chunks": chunk_entries,
+                "files": file_entries,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
         version = hashlib.sha256(version_payload).hexdigest()[:20]
     try:
         source_commit = subprocess.check_output(
