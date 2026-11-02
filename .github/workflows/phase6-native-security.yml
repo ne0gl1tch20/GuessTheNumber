@@ -55,11 +55,13 @@ jobs:
       - name: Build debug APK and run JVM tests
         run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-build-cache --console=plain
 
-      - name: Run native AES-GCM instrumentation tests on Android
+      - name: Run Android instrumentation suite (including native AES-GCM tests)
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
           arch: x86_64
           target: google_apis
           profile: pixel_6
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -wipe-data
+          disable-animations: true
           script: ./gradlew :app:connectedDebugAndroidTest --no-build-cache --console=plain
