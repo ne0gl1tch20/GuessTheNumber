@@ -169,8 +169,13 @@ object GameDataArchive {
         require(safePath(relativePath))
         val app = context.applicationContext
         val root = File(app.filesDir, "game-data-cache")
-        val active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
-            ?: throw IllegalStateException("Game data archive has not been prepared")
+        var active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
+        if (active == null) {
+            val prepared = prepare(app)
+            check(prepared.ready) { "Could not prepare bundled game data: ${prepared.message}" }
+            active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
+        }
+        active ?: throw IllegalStateException("Game data archive has not been prepared")
         val cached = File(active, relativePath)
         require(cached.canonicalPath.startsWith(active.canonicalPath + File.separator) && cached.isFile) {
             "Game-data asset is missing from the verified archive: $relativePath"
@@ -183,8 +188,13 @@ object GameDataArchive {
         require(relativeDirectory.isEmpty() || safePath(relativeDirectory))
         val app = context.applicationContext
         val root = File(app.filesDir, "game-data-cache")
-        val active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
-            ?: throw IllegalStateException("Game data archive has not been prepared")
+        var active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
+        if (active == null) {
+            val prepared = prepare(app)
+            check(prepared.ready) { "Could not prepare bundled game data: ${prepared.message}" }
+            active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
+        }
+        active ?: throw IllegalStateException("Game data archive has not been prepared")
         val manifest = JSONObject(File(active, CACHE_MANIFEST).readText())
         val prefix = if (relativeDirectory.isEmpty()) "" else "$relativeDirectory/"
         return buildSet {
