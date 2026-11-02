@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "archiveFormatVersion": 1,
   "minAppVersionCode": 24,
-  "version": "e44d62068a8143143839",
-  "sourceCommit": "0348576cc81de1978e3519b092993e19895a267d",
-  "sourceCommitTimestamp": 1793608937,
+  "version": "74ea8effbbe75831a359",
+  "sourceCommit": "3d8efad27a09410eeff03f8c2c735947df027bda",
+  "sourceCommitTimestamp": 1793612494,
   "keyId": "gtn-assets-v1",
   "cipher": "AES-256-GCM",
   "compression": "ZIP-DEFLATE",
@@ -32,8 +32,8 @@
       "id": "03",
       "file": "03.bin",
       "group": "web-play",
-      "size": 1146478,
-      "sha256": "88653da52e79ce373c3efa615db238c1f841f96250c9c99f6bf6b39f51b643b9",
+      "size": 1146544,
+      "sha256": "64e1ab8bb979cd1d0abdbc11f811465d1bc5d5b84f18e824cb70b75eb2c0cd54",
       "nonceBytes": 12,
       "fileCount": 11
     },
@@ -363,8 +363,8 @@
     {
       "path": "web-play/app.js",
       "chunk": "03",
-      "size": 127006,
-      "sha256": "0f5bf147462caebadad37358a8b54eb61f6a6ff9812cc5f36a532e5a795727b1"
+      "size": 127310,
+      "sha256": "d16052b8aa6fcfe03bb60bb900b10f80264ab6212f8a845881db7dd824591b15"
     },
     {
       "path": "web-play/icons/guess-the-number.svg",
