@@ -248,7 +248,7 @@ fun ProductionWebPlayScreen(
                 .addPathHandler("/assets/fonts/", webPlayAssetSyncer.pathHandler("fonts"))
                 .addPathHandler("/assets/locales/", webPlayAssetSyncer.pathHandler("locales"))
                 .addPathHandler("/assets/libraries/", webPlayAssetSyncer.pathHandler("libraries"))
-                .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
+                .addPathHandler("/assets/", GameDataArchive.pathHandler(context, ""))
                 .build()
             WebView(context).apply {
                 webViewRef = this
