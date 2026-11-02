@@ -33,6 +33,11 @@ missing_ui = sorted(set(key for key in ui_keys if not catalog.get(key)))
 assert not missing_ui, f"JS uiText keys missing from Kotlin catalog: {missing_ui}"
 
 assert "fun getAllStrings(): JSONObject = JSONObject(translations.toString())" in android_locale
+assert "fun getEnglishStrings(): JSONObject = JSONObject(englishCatalog.toString())" in android_locale
+assert '.put("englishUiStrings", activeLocaleManager.getEnglishStrings())' in android_bridge
+assert '.put("englishUiStrings", desktopEnglishWebUiStrings())' in desktop_bridge
+assert "function localizeCatalogText(value)" in js
+assert "createTreeWalker(document.body,NodeFilter.SHOW_TEXT)" in js
 assert '.put("uiStrings", activeLocaleManager.getAllStrings()' in android_bridge
 assert "return merged" in desktop_bridge
 assert "const locale=String(lastState?.settings?.locale||'en-US')" in js
