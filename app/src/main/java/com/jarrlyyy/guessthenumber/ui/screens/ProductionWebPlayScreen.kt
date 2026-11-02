@@ -896,7 +896,12 @@ fun ProductionWebPlayScreen(
                                                 .put("customSecondaryColor", game.settings.customSecondaryColor)
                                                 .put("customTertiaryColor", game.settings.customTertiaryColor)
                                                 .put("webMenuStudioLayout", game.settings.webMenuStudioLayout ?: ""))
-                                            .put("uiStrings", activeLocaleManager.getAllStrings())
+                                            .put("uiStrings", activeLocaleManager.getAllStrings().apply {
+                                                (0..29).forEach { index ->
+                                                    put("feedback_toolow_$index", activeLocaleManager.getString("feedback_toolow_$index"))
+                                                    put("feedback_toohigh_$index", activeLocaleManager.getString("feedback_toohigh_$index"))
+                                                }
+                                            })
                                             .put("upgrades", upgradesJson)
                                             .put("shopItems", shopJson)
                                             .put("prestigeUpgrades", prestigeUpgradesJson)
