@@ -21,8 +21,10 @@ desktop_bridge = DESKTOP_BRIDGE.read_text(encoding="utf-8")
 
 # Static labels, placeholders and accessible names must resolve through Kotlin's
 # complete English-backed catalog. Locale overlays replace these defaults.
+static_keys = set()
 for attribute in ("data-i18n", "data-i18n-placeholder", "data-i18n-aria-label"):
     keys = re.findall(rf'{attribute}="([^"]+)"', html)
+    static_keys.update(keys)
     missing = sorted(set(key for key in keys if not catalog.get(key)))
     assert not missing, f"{attribute} keys missing from English fallback: {missing}"
 
@@ -37,7 +39,9 @@ assert "fun getEnglishStrings(): JSONObject = JSONObject(englishCatalog.toString
 assert '.put("englishUiStrings", activeLocaleManager.getEnglishStrings())' in android_bridge
 assert '.put("englishUiStrings", desktopEnglishWebUiStrings())' in desktop_bridge
 assert "function localizeCatalogText(value)" in js
+assert "const english=lastState?.englishUiStrings,active=lastState?.uiStrings" in js
 assert "createTreeWalker(document.body,NodeFilter.SHOW_TEXT)" in js
+assert "englishTextEntries.sort((a,b)=>b[0].length-a[0].length)" in js
 assert '.put("uiStrings", activeLocaleManager.getAllStrings()' in android_bridge
 assert "return merged" in desktop_bridge
 assert "const locale=String(lastState?.settings?.locale||'en-US')" in js
@@ -47,6 +51,6 @@ assert "renderTraitLoadout(s);applyAuxiliaryTranslations();" in js
 
 print(
     f"Kotlin-owned Web Play localization passed "
-    f"({len(set(keys)) if 'keys' in locals() else 0} static keys, "
+    f"({len(static_keys)} static keys, "
     f"{len(set(ui_keys))} JS keys, {len(catalog)} English fallback entries)."
 )
