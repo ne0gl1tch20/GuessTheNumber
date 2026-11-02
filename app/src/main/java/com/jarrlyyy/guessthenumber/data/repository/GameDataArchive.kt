@@ -85,7 +85,7 @@ object GameDataArchive {
             }.getOrNull()
             if (activeDir?.isDirectory == true && activeManifest != null &&
                 filesValid(activeDir, activeManifest) &&
-                activeManifest.optLong("sourceCommitTimestamp", 0L) > incomingTimestamp) {
+                activeManifest.optLong("sourceCommitTimestamp", 0L) >= incomingTimestamp) {
                 return@synchronized PrepareResult(true, activeName, "Kept a newer verified game-data cache")
             }
             val finalDir = File(versions, version)
