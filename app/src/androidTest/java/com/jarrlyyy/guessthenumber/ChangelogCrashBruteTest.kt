@@ -47,6 +47,18 @@ class ChangelogCrashBruteTest {
      * bootstrap a fresh slot and complete the guided tutorial before looking for More.
      */
     private fun enterPlayableState() {
+        // Wait for asynchronous profile loading before deciding which first-launch screen is active.
+        composeRule.waitUntil(timeoutMillis = 20_000) {
+            composeRule.onAllNodesWithText("Create your profile", useUnmergedTree = true)
+                .fetchSemanticsNodes().isNotEmpty() ||
+                composeRule.onAllNodesWithText("Save Slots", useUnmergedTree = true)
+                    .fetchSemanticsNodes().isNotEmpty() ||
+                composeRule.onAllNodesWithText("More", useUnmergedTree = true)
+                    .fetchSemanticsNodes().isNotEmpty() ||
+                composeRule.onAllNodesWithText("Guess The Number", useUnmergedTree = true)
+                    .fetchSemanticsNodes().isNotEmpty()
+        }
+
         // A clean install now asks for a local player profile before showing Save Slots.
         val profileSetupVisible = composeRule.onAllNodesWithText(
             "Create your profile",
