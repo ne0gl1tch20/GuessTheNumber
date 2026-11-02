@@ -36,7 +36,7 @@ desktop_bridge = DESKTOP_BRIDGE.read_text(encoding="utf-8")
 # Static labels, placeholders and accessible names must resolve through Kotlin's
 # complete English-backed catalog. Locale overlays replace these defaults.
 static_keys = set()
-for attribute in ("data-i18n", "data-i18n-placeholder", "data-i18n-aria-label"):
+for attribute in ("data-i18n", "data-i18n-placeholder", "data-i18n-aria-label", "data-i18n-alt"):
     keys = re.findall(rf'{attribute}="([^"]+)"', html)
     static_keys.update(keys)
     missing = sorted(set(key for key in keys if not catalog.get(key)))
