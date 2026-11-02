@@ -157,7 +157,10 @@ fun ProductionGuessGameScreen(
         val loaded = withContext(Dispatchers.IO) { saveStore.load(selectedSlot) }
         if (loaded != null) {
             val clockCheck = AntiTimeTravelRules.check(loaded)
-            val clockSafeState = clockCheck.updatedState
+            val clockSafeState = DesktopEconomyTransactions.refreshDailyQuestDay(
+                clockCheck.updatedState,
+                LocalDate.now().toString()
+            )
             autoClicker.reset(clockSafeState.currentRangeMin, clockSafeState.currentRangeMax)
             val elapsedSeconds = if (clockCheck.detected) 0L else
                 ((System.currentTimeMillis() - loaded.lastSaveTimestamp) / 1000L).coerceAtLeast(0L)
