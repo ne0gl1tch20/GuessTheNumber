@@ -94,7 +94,7 @@ class LocaleManager(private val context: Context) {
         return if (hours > 0) getString("duration_hms_format", "%s:%s:%s", formatNumber(hours), formatNumber(minutes), formatNumber(seconds)) else if (minutes > 0) getString("duration_ms_format", "%s:%s", formatNumber(minutes), formatNumber(seconds)) else getString("duration_seconds_format", "%ss", formatNumber(seconds))
     }
     fun formatClock(totalSeconds: Int): String { val safeSeconds = totalSeconds.coerceAtLeast(0); return "%d:%02d".format(Locale.ROOT, safeSeconds / 60, safeSeconds % 60) }
-    private fun readJson(fileName: String): JSONObject = InputStreamReader(context.assets.open("locales/$fileName")).use { JSONObject(it.readText()) }
+    private fun readJson(fileName: String): JSONObject = InputStreamReader(GameDataArchive.open(context, "locales/$fileName")).use { JSONObject(it.readText()) }
     private fun formatString(raw: String, vararg args: Any): String = runCatching { String.format(currentLocale, raw, *args) }.getOrElse { raw }
 
     data class SupportedLocale(val tag: String, val fileName: String, val displayName: String, val rtl: Boolean = false)
