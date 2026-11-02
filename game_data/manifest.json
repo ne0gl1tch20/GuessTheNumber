@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "archiveFormatVersion": 1,
   "minAppVersionCode": 24,
-  "version": "22155717392c3d461ee0",
-  "sourceCommit": "8436fac82d961ba10888a9caeb5f75eee05f044b",
-  "sourceCommitTimestamp": 1793588595,
+  "version": "e44d62068a8143143839",
+  "sourceCommit": "27e1250a3b83e08d3b90d9a467b59707ba025a46",
+  "sourceCommitTimestamp": 1793593896,
   "keyId": "gtn-assets-v1",
   "cipher": "AES-256-GCM",
   "compression": "ZIP-DEFLATE",
@@ -103,9 +103,18 @@
     {
       "id": "11",
       "file": "11.bin",
+      "group": "licenses",
+      "size": 10471,
+      "sha256": "879c003a6dd9baf420c2d5039e4f9315d670d70650a2f1b437400cc74419ac27",
+      "nonceBytes": 12,
+      "fileCount": 1
+    },
+    {
+      "id": "12",
+      "file": "12.bin",
       "group": "core",
       "size": 17157,
-      "sha256": "a40b2b94b8ed703110b6b8fc8edf278fbafcd282d8dfb8c7256ec6e1e1ef1d1d",
+      "sha256": "f789fe3b9e876fdf342d74e043b149dd0cd0ddcd48d159216d7b6a387d607a5f",
       "nonceBytes": 12,
       "fileCount": 1
     }
@@ -8572,8 +8581,14 @@
       "sha256": "e17a4fcfe7843566f59504a45ef27c538feae61651769e82f525c98d4db36af0"
     },
     {
-      "path": "changelogs.md",
+      "path": "licenses/MBEDTLS-LICENSE.txt",
       "chunk": "11",
+      "size": 29852,
+      "sha256": "9b405ef4c89342f5eae1dd828882f931747f71001cfba7d114801039b52ad09b"
+    },
+    {
+      "path": "changelogs.md",
+      "chunk": "12",
       "size": 46163,
       "sha256": "b3b360aee55777707fbb3679d4e5706fbfbbe9d7e6039d93287c14142eaaa05e"
     }
