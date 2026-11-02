@@ -45,10 +45,12 @@ object GameDataArchive {
     /** Downloads a published bundle only after the bundled archive is ready. */
     fun syncRemote(context: Context): PrepareResult = try {
         val manifestBytes = request(MANIFEST_URL)
+        val publishedVersion = JSONObject(String(manifestBytes, Charsets.UTF_8)).getString("version")
+        require(publishedVersion.matches(Regex("[a-zA-Z0-9._-]{1,80}"))) { "Invalid published game-data version" }
         prepareWithSource(
             context,
             manifestSource = { manifestBytes.inputStream() },
-            chunkSource = { name -> request("$RAW_BASE/game_data/$name").inputStream() }
+            chunkSource = { name -> request("$RAW_BASE/game_data/versions/$publishedVersion/$name").inputStream() }
         )
     } catch (error: Exception) {
         val root = File(context.applicationContext.filesDir, "game-data-cache")
