@@ -82,6 +82,7 @@ function renderCatalogs(s){
  renderCurrencyCatalog('ultraShopList',s.ultraShopItems,'ultra_shop','Ultra');
  document.querySelectorAll('[data-multiplier]').forEach(button=>{const selected=String(s.buyMultiplier||'1')===button.dataset.multiplier;button.setAttribute('aria-pressed',String(selected));button.disabled=!!pending;});
 }
+// Production locale strings come from the complete Kotlin LocaleManager catalog via the native bridge.
 function uiText(key,fallback,...args){const raw=lastState&&lastState.uiStrings&&lastState.uiStrings[key];let value=typeof raw==='string'&&raw&&raw!==key?raw:fallback;if(args.length){let i=0;value=value.replace(/%s|%d|%\.1f/g,token=>String(args[i++]??token))}return value}
 const nimmySteps=[
  {target:'#guessInput',title:'nimmy_step_guess_title',titleFallback:'Let’s make a guess!',body:'nimmy_step_guess_body',bodyFallback:'Enter a whole number here. I’ll help you learn from the hints.'},
