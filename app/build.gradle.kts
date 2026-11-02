@@ -10,7 +10,6 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-val generatedWebPlayAssets = layout.buildDirectory.dir("generated/webPlayAssets")
 val generatedGameDataAssets = layout.buildDirectory.dir("generated/gameDataAssets")
 val pythonExecutable = System.getenv("PYTHON") ?: if (System.getProperty("os.name").startsWith("Windows")) "python" else "python3"
 val generateGameDataAssets by tasks.registering(Exec::class) {
@@ -31,11 +30,6 @@ val appVersionName = "3.3.0"
 val appVersionCode = 24
 val generatedLauncherIconRes = layout.buildDirectory.dir("generated/launcherIconRes")
 val launcherLogo = rootProject.file("GTN_APP_LOGO.png")
-val prepareWebPlayBrandAsset by tasks.registering(Copy::class) {
-    from(launcherLogo)
-    into(generatedWebPlayAssets.map { it.dir("web-play") })
-    rename { "gtn-app-logo.png" }
-}
 val prepareLauncherIcon by tasks.registering(Copy::class) {
     from(launcherLogo)
     into(generatedLauncherIconRes.map { it.dir("drawable-nodpi") })
@@ -142,13 +136,17 @@ android {
             }
         }
     }
-    sourceSets.getByName("main").assets.srcDir(generatedWebPlayAssets.get().asFile)
     sourceSets.getByName("main").assets.srcDir(generatedGameDataAssets.get().asFile)
+    // All repository-owned runtime content is packed into game_data; only generated bootstrap metadata remains outside.
+    sourceSets.getByName("main").assets.exclude(
+        "game/**", "locales/**", "libraries/**", "fonts/**", "scripts/**", "traits/**",
+        "web-play/**", "web-app/**", "web-prototype/**", "web-ui/**", "licenses/**", "changelogs.md"
+    )
     sourceSets.getByName("debug").assets.srcDir(generatedDebugBuildInfo.get().asFile)
     sourceSets.getByName("release").assets.srcDir(generatedReleaseBuildInfo.get().asFile)
     sourceSets.getByName("main").res.srcDir(generatedLauncherIconRes.get().asFile)
     tasks.matching { it.name == "preBuild" || it.name.endsWith("PreBuild") }
-        .configureEach { dependsOn(prepareWebPlayBrandAsset, prepareLauncherIcon, generateGameDataAssets) }
+        .configureEach { dependsOn(prepareLauncherIcon, generateGameDataAssets) }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -173,7 +171,7 @@ android {
 }
 
 tasks.named("preBuild").configure {
-    dependsOn(prepareWebPlayBrandAsset, prepareLauncherIcon)
+    dependsOn(prepareLauncherIcon)
 }
 
 tasks.matching { it.name == "preDebugBuild" || it.name == "mergeDebugAssets" }.configureEach {
