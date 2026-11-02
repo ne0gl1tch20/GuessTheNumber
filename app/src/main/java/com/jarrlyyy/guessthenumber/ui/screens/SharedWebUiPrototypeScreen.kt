@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -97,7 +98,7 @@ fun SharedWebUiPrototypeScreen(state: GameState, onSubmitGuess: (Long) -> GuessS
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 factory = { viewContext ->
                     val assetLoader = WebViewAssetLoader.Builder()
-                        .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(viewContext))
+                        .addPathHandler("/assets/", GameDataArchive.pathHandler(viewContext, ""))
                         .build()
                     WebView(viewContext).apply {
                         webViewRef = this
