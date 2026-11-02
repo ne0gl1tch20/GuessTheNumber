@@ -246,8 +246,8 @@ object GameDataArchive {
 
     private fun request(url: String): ByteArray {
         val isManifest = url == MANIFEST_URL
-        val isChunk = url.startsWith("$RAW_BASE/game_data/") &&
-            url.removePrefix("$RAW_BASE/game_data/").matches(Regex("[0-9]{2,4}\\.bin"))
+        val isChunk = url.startsWith("$RAW_BASE/game_data/versions/") &&
+            url.removePrefix("$RAW_BASE/game_data/versions/").matches(Regex("[a-zA-Z0-9._-]{1,80}/[0-9]{2,4}\\.bin"))
         require(isManifest || isChunk) { "Rejected game-data URL" }
         val connection = (URL(url).openConnection() as HttpURLConnection).apply {
             connectTimeout = 1800
