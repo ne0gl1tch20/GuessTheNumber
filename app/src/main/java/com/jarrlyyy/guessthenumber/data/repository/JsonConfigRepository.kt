@@ -70,7 +70,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadGameConfig(): GameConfig {
         return try {
-            val inputStream = context.assets.open("game/game_config.json")
+            val inputStream = GameDataArchive.open(context, "game/game_config.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             json.decodeFromString<GameConfig>(jsonString).also { config ->
                 ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -92,7 +92,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadUpgrades(): List<UpgradeDef> {
         return try {
-            val inputStream = context.assets.open("game/upgrades.json")
+            val inputStream = GameDataArchive.open(context, "game/upgrades.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val config = json.decodeFromString<UpgradeConfigRoot>(jsonString)
             ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -117,7 +117,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadShopItems(): List<ShopItemDef> {
         return try {
-            val inputStream = context.assets.open("game/shop_items.json")
+            val inputStream = GameDataArchive.open(context, "game/shop_items.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val config = json.decodeFromString<ShopConfigRoot>(jsonString)
             ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -142,7 +142,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadAchievements(): List<AchievementDef> {
         return try {
-            val inputStream = context.assets.open("game/achievements.json")
+            val inputStream = GameDataArchive.open(context, "game/achievements.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val config = json.decodeFromString<AchievementConfigRoot>(jsonString)
             ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -167,7 +167,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadMinigames(): List<MinigameDef> {
         return try {
-            val inputStream = context.assets.open("game/minigames.json")
+            val inputStream = GameDataArchive.open(context, "game/minigames.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val config = json.decodeFromString<MinigameConfigRoot>(jsonString)
             ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -192,7 +192,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadChallenges(): List<ChallengeDef> {
         return try {
-            val inputStream = context.assets.open("game/challenges.json")
+            val inputStream = GameDataArchive.open(context, "game/challenges.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val config = json.decodeFromString<ChallengeConfigRoot>(jsonString)
             ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -217,7 +217,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadPrestigeUpgrades(): List<UpgradeDef> {
         return try {
-            val inputStream = context.assets.open("game/prestige_upgrades.json")
+            val inputStream = GameDataArchive.open(context, "game/prestige_upgrades.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val config = json.decodeFromString<UpgradeConfigRoot>(jsonString)
             ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -242,7 +242,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadPrestigeShopItems(): List<PrestigeShopItemDef> {
         return try {
-            val inputStream = context.assets.open("game/prestige_shop.json")
+            val inputStream = GameDataArchive.open(context, "game/prestige_shop.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val config = json.decodeFromString<PrestigeShopConfigRoot>(jsonString)
             ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -268,7 +268,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadUltraUpgrades(): List<UpgradeDef> {
         return try {
-            val inputStream = context.assets.open("game/ultra_upgrades.json")
+            val inputStream = GameDataArchive.open(context, "game/ultra_upgrades.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val config = json.decodeFromString<UpgradeConfigRoot>(jsonString)
             ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -293,7 +293,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadUltraShopItems(): List<UltraShopItemDef> {
         return try {
-            val inputStream = context.assets.open("game/ultra_shop.json")
+            val inputStream = GameDataArchive.open(context, "game/ultra_shop.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val config = json.decodeFromString<UltraShopConfigRoot>(jsonString)
             ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -321,7 +321,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadTalents(): List<TalentDef> {
         return try {
-            val inputStream = context.assets.open("game/talents.json")
+            val inputStream = GameDataArchive.open(context, "game/talents.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val config = json.decodeFromString<TalentConfigRoot>(jsonString)
             ContentValidation.requireSupportedSchema(config.schemaVersion)
@@ -346,7 +346,7 @@ class JsonConfigRepository(private val context: Context, private val localeTag: 
 
     fun loadFeedbackMessages(): FeedbackMessagesRoot {
         val root = try {
-            val inputStream = context.assets.open("game/guess_feedback_messages.json")
+            val inputStream = GameDataArchive.open(context, "game/guess_feedback_messages.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             json.decodeFromString<FeedbackMessagesRoot>(jsonString).also {
                 ContentValidation.requireSupportedSchema(it.schemaVersion)
