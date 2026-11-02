@@ -45,18 +45,18 @@ for attribute in ("data-i18n", "data-i18n-placeholder", "data-i18n-aria-label", 
 
 # Every static visible HTML text node must map to the English catalog so the
 # Kotlin locale bridge can translate it without destroying nested markup.
-visible_html = re.sub(r"<script[\\s\\S]*?</script>|<style[\\s\\S]*?</style>|<svg[\\s\\S]*?</svg>", "", html, flags=re.IGNORECASE)
+visible_html = re.sub(r"<script[\s\S]*?</script>|<style[\s\S]*?</style>|<svg[\s\S]*?</svg>", "", html, flags=re.IGNORECASE)
 english_values = {
-    re.sub(r"\\s+", " ", value).strip().casefold()
+    re.sub(r"\s+", " ", value).strip().casefold()
     for value in catalog.values()
     if isinstance(value, str)
 }
 unmapped_text = sorted({
     value
     for raw in re.findall(r">([^<>]+)<", visible_html)
-    if (value := re.sub(r"\\s+", " ", unescape(raw)).strip())
+    if (value := re.sub(r"\s+", " ", unescape(raw)).strip())
     and len(value) > 1
-    and not re.fullmatch(r"[\\d\\s.,:;!?%×+()\\-–—/|◀▶⭐⬡☄▣■＋⌂∞♜ⓘ🌙•]+", value)
+    and not re.fullmatch(r"[\d\s.,:;!?%×+()\-–—/|◀▶⭐⬡☄▣■＋⌂∞♜ⓘ🌙•]+", value)
     and not re.fullmatch(r"[A-Z0-9_-]+", value)
     and value.casefold() not in english_values
 })
