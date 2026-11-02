@@ -101,6 +101,7 @@ function localizeCatalogText(value){
  const exact=englishTextKeyMap.get(text.trim());
  if(exact&&typeof active[exact]==='string'&&active[exact]!==exact)return active[exact];
  let output=text;
+ // Translate catalog phrases inside formatted labels such as Cost: 5 Prestige.
  for(const [source,key] of englishTextEntries){
   const translated=active[key];
   if(typeof translated!=='string'||!translated||translated===key||translated===source||!output.includes(source))continue;
