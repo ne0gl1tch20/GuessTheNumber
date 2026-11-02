@@ -105,7 +105,7 @@ function localizeCatalogText(value){
  for(const [source,key] of englishTextEntries){
   const translated=active[key];
   if(typeof translated!=='string'||!translated||translated===key||translated===source||!output.includes(source))continue;
-  if(/^[\\s:.,;·/+-]|[\\s:.,;·/+-]$/.test(source)){output=output.split(source).join(translated);continue;}
+  if(source.trim()!==source||/^[^A-Za-z0-9]|[^A-Za-z0-9]$/.test(source)){output=output.split(source).join(translated);continue;}
   let from=0,result='',at;
   while((at=output.indexOf(source,from))>=0){
    const before=at>0?output[at-1]:'';const after=output[at+source.length]||'';
