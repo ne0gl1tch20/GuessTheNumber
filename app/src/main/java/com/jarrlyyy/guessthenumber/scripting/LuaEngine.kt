@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.scripting
 
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import android.content.Context
 import com.jarrlyyy.guessthenumber.BuildConfig
 import com.jarrlyyy.guessthenumber.data.logger.GameLogger
@@ -133,7 +134,7 @@ class LuaEngine private constructor(context: Context) {
         if (entry.hostApiVersion != HOST_API_VERSION) return reject("This script requires an unsupported host API version.")
         return try {
             val source = if (entry.source == "bundled") {
-                appContext.assets.open("scripts/${entry.file}").bufferedReader().use { it.readText() }
+                GameDataArchive.open(appContext, "scripts/${entry.file}").bufferedReader().use { it.readText() }
             } else {
                 remote.readVerifiedCachedScript(entry)
                     ?: return reject("The signed LiveOps script is not available in the verified cache.")
@@ -225,7 +226,7 @@ class LuaEngine private constructor(context: Context) {
     fun recentDiagnostics(): List<String> = diagnostics.toList()
 
     private fun catalog(): List<LuaScriptEntry> {
-        val raw = appContext.assets.open(CATALOG_PATH).bufferedReader().use { it.readText() }
+        val raw = GameDataArchive.open(appContext, CATALOG_PATH).bufferedReader().use { it.readText() }
         val decoded = json.decodeFromString<LuaScriptCatalog>(raw)
         require(decoded.schemaVersion == 1 && decoded.hostApiVersion == HOST_API_VERSION) {
             "Unsupported bundled Lua catalog schema or host API version."
