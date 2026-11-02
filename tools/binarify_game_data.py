@@ -28,7 +28,7 @@ KEY_ID = "gtn-assets-v1"
 KEY = hashlib.sha256(b"GuessTheNumber|game-data|archive-v1|2026").digest()
 GROUPS = (
     "game", "locales", "web-play", "web-app", "web-prototype",
-    "web-ui", "libraries", "fonts", "scripts", "traits", "changelogs",
+    "web-ui", "libraries", "fonts", "scripts", "traits", "changelogs", "licenses",
 )
 MAX_CHUNK_BYTES = 4 * 1024 * 1024
 

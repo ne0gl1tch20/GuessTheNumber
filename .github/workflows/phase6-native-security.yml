@@ -5,6 +5,9 @@ on:
     branches: [master]
     paths:
       - "app/src/main/cpp/**"
+      - "app/src/main/java/com/jarrlyyy/guessthenumber/data/repository/GameDataArchive.kt"
+      - "app/src/main/java/com/jarrlyyy/guessthenumber/data/repository/NativeGameDataCrypto.kt"
+      - "app/src/androidTest/**"
       - "app/src/main/java/com/jarrlyyy/guessthenumber/data/store/SecureSaveTransfer.kt"
       - "app/src/main/java/com/jarrlyyy/guessthenumber/data/store/PortableSaveBackup.kt"
       - "app/src/main/java/com/jarrlyyy/guessthenumber/data/store/CreativeModeSave.kt"
@@ -32,7 +35,7 @@ jobs:
   validate:
     name: Build native library and Android tests
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -51,3 +54,12 @@ jobs:
 
       - name: Build debug APK and run JVM tests
         run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-build-cache --console=plain
+
+      - name: Run native AES-GCM instrumentation tests on Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          script: ./gradlew :app:connectedDebugAndroidTest --no-build-cache --console=plain
