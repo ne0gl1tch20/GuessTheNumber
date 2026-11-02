@@ -94,6 +94,8 @@ jobs:
 
       - name: Test localized randomized guess feedback
         run: python tools/test_guess_feedback_localization.py
+      - name: Test Kotlin-owned Web Play localization
+        run: python tools/test_web_play_kotlin_localization.py
 
       - name: Test sandboxed trait extension host
         run: node tools/test_trait_extension_host.cjs
