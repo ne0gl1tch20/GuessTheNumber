@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "archiveFormatVersion": 1,
   "minAppVersionCode": 24,
-  "version": "d1c2638efb120bd051f4",
-  "sourceCommit": "88364a7eeebd23371ed4c17aaeb3fac6fe8ac452",
-  "sourceCommitTimestamp": 1793614921,
+  "version": "1a9e077d66dd3f5770ad",
+  "sourceCommit": "8d7d378168ea7ad180f66d5d17227e810ce33720",
+  "sourceCommitTimestamp": 1793614986,
   "keyId": "gtn-assets-v1",
   "cipher": "AES-256-GCM",
   "compression": "ZIP-DEFLATE",
@@ -23,8 +23,8 @@
       "id": "02",
       "file": "02.bin",
       "group": "locales",
-      "size": 548734,
-      "sha256": "41a6c07d9ca71ddf6ab598d010d705933deaa9ee77337118f7a9a909ff823d72",
+      "size": 548768,
+      "sha256": "bf983dab9ea0efaff4f0e1a38dff86cee095c767c24d0d5c38c34d69c2c7789d",
       "nonceBytes": 12,
       "fileCount": 23
     },
@@ -32,8 +32,8 @@
       "id": "03",
       "file": "03.bin",
       "group": "web-play",
-      "size": 1151029,
-      "sha256": "9293c1676164859724ed31a0f26598b193a430c65d0eec40a844caa4e7c2ae41",
+      "size": 1151061,
+      "sha256": "9a2d8b3b25b26007ed767a92836eac02a2ddf448398e3800aed02d4af45fcfd2",
       "nonceBytes": 12,
       "fileCount": 11
     },
@@ -243,8 +243,8 @@
     {
       "path": "locales/en_us.json",
       "chunk": "02",
-      "size": 114379,
-      "sha256": "9ffa92e6d784880342eef8585bfee2d26e328ab5623746107b2cbfce9e588f89"
+      "size": 114491,
+      "sha256": "092be61aaff4616d761b3cec75593955b2357f3e26485ea8accbe4869c9026bb"
     },
     {
       "path": "locales/es.json",
@@ -363,8 +363,8 @@
     {
       "path": "web-play/app.js",
       "chunk": "03",
-      "size": 136776,
-      "sha256": "463e0c2e5fb7af44393c26c663141d51c8f5a7c5ed1469eb2f8497d02b761983"
+      "size": 136866,
+      "sha256": "032f18cf7ec96cf26f5a8614e3c3de930f76517a16e4e4b8e8c09be87bcede21"
     },
     {
       "path": "web-play/icons/guess-the-number.svg",
