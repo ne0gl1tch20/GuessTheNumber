@@ -334,7 +334,7 @@ class JarrlyyUiAdvancedTests(unittest.TestCase):
         for icon in ("icon-target", "icon-flame", "icon-coins", "icon-check-circle", "icon-wand", "icon-code", "icon-arrow-down"):
             with self.subTest(icon=icon):
                 self.assertIn(f'id="{icon}"', html)
-        self.assertIn('data-guess-pick="mid" aria-label="Use midpoint of range"><svg', html)
+        self.assertIn('data-guess-pick="mid" aria-label="Use midpoint of range" data-i18n-aria-label="web_use_midpoint_of_range"><svg', html)
 
         # HTML rendering honors the saved notation and locale preference.
         self.assertIn("function formatGameNumber(value,settings=lastState?.settings||{})", app)
