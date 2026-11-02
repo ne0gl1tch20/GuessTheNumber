@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "archiveFormatVersion": 1,
   "minAppVersionCode": 24,
-  "version": "1a9e077d66dd3f5770ad",
-  "sourceCommit": "5110434687176096d4b8db132dda65ae3b482802",
-  "sourceCommitTimestamp": 1793615025,
+  "version": "76ae037204829dd21413",
+  "sourceCommit": "690d7dc97fad768be7d853608782ce71db6c4d3f",
+  "sourceCommitTimestamp": 1793615033,
   "keyId": "gtn-assets-v1",
   "cipher": "AES-256-GCM",
   "compression": "ZIP-DEFLATE",
@@ -23,8 +23,8 @@
       "id": "02",
       "file": "02.bin",
       "group": "locales",
-      "size": 548768,
-      "sha256": "bf983dab9ea0efaff4f0e1a38dff86cee095c767c24d0d5c38c34d69c2c7789d",
+      "size": 548842,
+      "sha256": "2746863296cee1e44fe6623e5b43acae15aadee3bbfa679b0fd4e15aa69c2463",
       "nonceBytes": 12,
       "fileCount": 23
     },
@@ -243,8 +243,8 @@
     {
       "path": "locales/en_us.json",
       "chunk": "02",
-      "size": 114491,
-      "sha256": "092be61aaff4616d761b3cec75593955b2357f3e26485ea8accbe4869c9026bb"
+      "size": 114715,
+      "sha256": "95975143b491c639058281a6dc3cd6b981717f3fb461d44b6c3b384d5500f9ba"
     },
     {
       "path": "locales/es.json",
