@@ -175,9 +175,9 @@ object GameDataArchive {
             check(prepared.ready) { "Could not prepare bundled game data: ${prepared.message}" }
             active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
         }
-        active ?: throw IllegalStateException("Game data archive has not been prepared")
-        val cached = File(active, relativePath)
-        require(cached.canonicalPath.startsWith(active.canonicalPath + File.separator) && cached.isFile) {
+        val activeDir = active ?: throw IllegalStateException("Game data archive has not been prepared")
+        val cached = File(activeDir, relativePath)
+        require(cached.canonicalPath.startsWith(activeDir.canonicalPath + File.separator) && cached.isFile) {
             "Game-data asset is missing from the verified archive: $relativePath"
         }
         return cached
@@ -194,8 +194,8 @@ object GameDataArchive {
             check(prepared.ready) { "Could not prepare bundled game data: ${prepared.message}" }
             active = activeVersion(File(root, "active-version"))?.let { File(root, "versions/$it") }
         }
-        active ?: throw IllegalStateException("Game data archive has not been prepared")
-        val manifest = JSONObject(File(active, CACHE_MANIFEST).readText())
+        val activeDir = active ?: throw IllegalStateException("Game data archive has not been prepared")
+        val manifest = JSONObject(File(activeDir, CACHE_MANIFEST).readText())
         val prefix = if (relativeDirectory.isEmpty()) "" else "$relativeDirectory/"
         return buildSet {
             val files = manifest.getJSONArray("files")
