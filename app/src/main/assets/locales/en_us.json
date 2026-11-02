@@ -1957,5 +1957,11 @@
   "web_creative_set_best_streak": "Set best streak",
   "web_guess_the_number_logo": "Guess The Number logo",
   "web_guess_accuracy_aria": "Guess accuracy %s percent",
-  "web_creative_level_aria": "Creative level for %s"
+  "web_creative_level_aria": "Creative level for %s",
+  "web_use_midpoint_in_guess_box": "Use midpoint in guess box",
+  "web_money_label": "Money:",
+  "web_nebula_label": "Nebula:",
+  "web_prestige_label": "Prestige:",
+  "web_ultra_label": "Ultra:",
+  "web_zero_minutes": "0m"
 }
