@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "archiveFormatVersion": 1,
   "minAppVersionCode": 24,
-  "version": "f56d3f5b2b2432c7b839",
-  "sourceCommit": "6eea862101beed1b4d8fb8032bcb4d494c3dd882",
-  "sourceCommitTimestamp": 1793614708,
+  "version": "ce9503b9582639d6386c",
+  "sourceCommit": "ae63f35103098782985e6c7fb45d5fe9181fd4c4",
+  "sourceCommitTimestamp": 1793614728,
   "keyId": "gtn-assets-v1",
   "cipher": "AES-256-GCM",
   "compression": "ZIP-DEFLATE",
@@ -32,8 +32,8 @@
       "id": "03",
       "file": "03.bin",
       "group": "web-play",
-      "size": 1150915,
-      "sha256": "f5d1c20b357ee9cae3fe0aaa234d5c998ecf40e7a116ca03d7bc86bb678fcf37",
+      "size": 1150908,
+      "sha256": "c8bb91319254b8d7c80fba38e97b5001ad66a656447e797f6b443f0114794245",
       "nonceBytes": 12,
       "fileCount": 11
     },
@@ -388,7 +388,7 @@
       "path": "web-play/index.html",
       "chunk": "03",
       "size": 104115,
-      "sha256": "d24a36499e9f0af59a6fa5134be324c9fe2347fe5903de19f88c1cdf7343834c"
+      "sha256": "411e77801c2ce902a9a721c7fd2787ca28b37a076fc2b2992ce523813f977c3b"
     },
     {
       "path": "web-play/menu-studio.js",
