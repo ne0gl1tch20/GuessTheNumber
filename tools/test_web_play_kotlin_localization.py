@@ -2,6 +2,7 @@
 """Guard the Kotlin-owned localization contract for shared Web Play UI."""
 import json
 import re
+from html import unescape
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,6 +42,25 @@ for attribute in ("data-i18n", "data-i18n-placeholder", "data-i18n-aria-label", 
     static_keys.update(keys)
     missing = sorted(set(key for key in keys if not catalog.get(key)))
     assert not missing, f"{attribute} keys missing from English fallback: {missing}"
+
+# Every static visible HTML text node must map to the English catalog so the
+# Kotlin locale bridge can translate it without destroying nested markup.
+visible_html = re.sub(r"<script[\\s\\S]*?</script>|<style[\\s\\S]*?</style>|<svg[\\s\\S]*?</svg>", "", html, flags=re.IGNORECASE)
+english_values = {
+    re.sub(r"\\s+", " ", value).strip().casefold()
+    for value in catalog.values()
+    if isinstance(value, str)
+}
+unmapped_text = sorted({
+    value
+    for raw in re.findall(r">([^<>]+)<", visible_html)
+    if (value := re.sub(r"\\s+", " ", unescape(raw)).strip())
+    and len(value) > 1
+    and not re.fullmatch(r"[\\d\\s.,:;!?%×+()\\-–—/|◀▶⭐⬡☄▣■＋⌂∞♜ⓘ🌙•]+", value)
+    and not re.fullmatch(r"[A-Z0-9_-]+", value)
+    and value.casefold() not in english_values
+})
+assert not unmapped_text, f"Visible HTML text missing from English catalog: {unmapped_text}"
 
 # Literal uiText keys used by JS-generated screens must also exist in Kotlin's
 # active locale payload rather than silently using local-only English strings.
