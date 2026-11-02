@@ -896,6 +896,7 @@ fun ProductionWebPlayScreen(
                                                 .put("customSecondaryColor", game.settings.customSecondaryColor)
                                                 .put("customTertiaryColor", game.settings.customTertiaryColor)
                                                 .put("webMenuStudioLayout", game.settings.webMenuStudioLayout ?: ""))
+                                            .put("englishUiStrings", activeLocaleManager.getEnglishStrings())
                                             .put("uiStrings", activeLocaleManager.getAllStrings().apply {
                                                 (0..29).forEach { index ->
                                                     put("feedback_toolow_$index", activeLocaleManager.getString("feedback_toolow_$index"))
