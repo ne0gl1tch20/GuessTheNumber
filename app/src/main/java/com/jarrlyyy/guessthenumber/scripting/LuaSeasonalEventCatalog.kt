@@ -1,5 +1,6 @@
 package com.jarrlyyy.guessthenumber.scripting
 
+import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
 import android.content.Context
 import com.jarrlyyy.guessthenumber.data.repository.LiveOpsContentValidator
 import com.jarrlyyy.guessthenumber.data.repository.LiveOpsEvent
@@ -14,7 +15,7 @@ class LuaSeasonalEventCatalog(context: Context) {
     private val appContext = context.applicationContext
 
     fun loadBundled(): LiveOpsManifest {
-        val source = appContext.assets.open(SCRIPT_PATH).bufferedReader().use { it.readText() }
+        val source = GameDataArchive.open(appContext, SCRIPT_PATH).bufferedReader().use { it.readText() }
         val result = LuaSandbox {}.execute(SCRIPT_ID, source)
         require(result.istable()) { "Seasonal catalog must return a table." }
 
