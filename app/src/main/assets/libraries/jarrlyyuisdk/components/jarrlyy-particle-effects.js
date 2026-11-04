@@ -33,7 +33,7 @@ const component={
   document.removeEventListener('visibilitychange',this.onVisibility);
   if(this.frame)cancelAnimationFrame(this.frame);
   this.frame=0;
-  this.particles.forEach(p=>{if(p.view)p.view.destroy();});
+  this.particles.forEach(p=>{if(p.view){if(this.app)this.app.stage.removeChild(p.view);p.view.destroy();}});
   this.particles.length=0;
   if(this.app){
    this.app.ticker.stop();
