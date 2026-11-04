@@ -17,7 +17,7 @@ data class SeasonalThemeCalendarConfig(
     val winterStart: MonthDay = MonthDay.of(12, 1),
     val winterEndExclusive: MonthDay = MonthDay.of(3, 1),
     /** Explicit, validated date windows supplied by the regional calendar data source. */
-    val lunarNewYearWindows: Map<Int, SeasonalDateWindow> = emptyMap()
+    val lunarNewYearWindows: Map<Int, SeasonalDateWindow> = LunarNewYearCalendar.windows
 ) {
     init {
         require(regionCode.matches(Regex("[A-Za-z0-9_-]{2,16}"))) { "Region code is invalid." }
@@ -35,6 +35,31 @@ data class SeasonalDateWindow(
     }
 
     fun contains(date: LocalDate): Boolean = !date.isBefore(start) && date.isBefore(endExclusive)
+}
+
+/**
+ * Official Gregorian dates for Lunar New Year, based on the Hong Kong Observatory's
+ * Gregorian-Lunar conversion tables. Each event window covers Lunar New Year's Day
+ * through the 15th day (end-exclusive). Extend this table when new official years are published.
+ * Source: https://www.hko.gov.hk/en/gts/time/conversion.htm
+ */
+object LunarNewYearCalendar {
+    private val newYearDates = mapOf(
+        2026 to LocalDate.of(2026, 2, 17),
+        2027 to LocalDate.of(2027, 2, 6),
+        2028 to LocalDate.of(2028, 1, 26),
+        2029 to LocalDate.of(2029, 2, 13),
+        2030 to LocalDate.of(2030, 2, 3),
+        2031 to LocalDate.of(2031, 1, 23),
+        2032 to LocalDate.of(2032, 2, 11),
+        2033 to LocalDate.of(2033, 1, 31),
+        2034 to LocalDate.of(2034, 2, 19),
+        2035 to LocalDate.of(2035, 2, 8)
+    )
+
+    val windows: Map<Int, SeasonalDateWindow> = newYearDates.mapValues { (_, start) ->
+        SeasonalDateWindow(start, start.plusDays(15))
+    }
 }
 
 data class ActiveSeasonalTheme(
