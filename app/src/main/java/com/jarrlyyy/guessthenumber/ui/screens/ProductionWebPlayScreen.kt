@@ -1,6 +1,8 @@
 package com.jarrlyyy.guessthenumber.ui.screens
 
 import com.jarrlyyy.guessthenumber.data.repository.GameDataArchive
+import com.jarrlyyy.guessthenumber.shared.seasonal.SeasonalThemeCalendar
+import java.time.LocalDate
 import com.jarrlyyy.guessthenumber.BuildConfig
 import android.net.Uri
 import android.content.Intent
@@ -862,6 +864,7 @@ fun ProductionWebPlayScreen(
                                             .put("appVersionCode", BuildConfig.VERSION_CODE)
                                             .put("updateChannel", BuildConfig.UPDATE_CHANNEL)
                                             .put("debugBuild", BuildConfig.DEBUG)
+                                            .put("seasonalThemes", org.json.JSONArray().apply { SeasonalThemeCalendar.activeThemes(LocalDate.now()).forEach { put(it.id) } })
                                             .put("buyMultiplier", game.buyMultiplier)
                                             .put("prestigeRequirement", progressionEngine.calculatePrestigeRequirement(game.prestigeCount).format(game.settings.numberNotation))
                                             .put("prestigeReward", progressionEngine.calculatePrestigeReward(game.money, game.prestigeCount).format(game.settings.numberNotation))
