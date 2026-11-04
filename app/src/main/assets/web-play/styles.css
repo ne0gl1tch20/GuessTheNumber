@@ -1553,16 +1553,16 @@ body.jui-game-compat .jui-dialog-actions { display:flex; flex-wrap:wrap; gap:.55
 
 
 /* Seasonal presentation layer. Decorative only; no gameplay state is changed. */
-html.seasonal-theme-christmas{--accent:#69b9ff;--accent2:#d9f3ff;--gold:#ffe7a0}
-html.seasonal-theme-new_year{--accent:#f2c45d;--accent2:#8be8ff;--gold:#ffe18a}
-html.seasonal-theme-valentines{--accent:#ff78a8;--accent2:#ffc0d9;--gold:#ffe0a4}
-html.seasonal-theme-lunar_new_year{--accent:#ff5b55;--accent2:#ffd16b;--gold:#ffe28c}
-html.seasonal-theme-easter{--accent:#bd91ff;--accent2:#a8edc0;--gold:#ffe28c}
-html.seasonal-theme-philippine_summer{--accent:#ffb347;--accent2:#ffe27a;--gold:#ffe6a3}
-html.seasonal-theme-philippine_independence_day{--accent:#4c9dff;--accent2:#ff5e72;--gold:#ffe28c}
-html.seasonal-theme-back_to_school{--accent:#6bb8ff;--accent2:#9de8d0;--gold:#ffe28c}
-html.seasonal-theme-halloween{--accent:#ff8a3d;--accent2:#c58aff;--gold:#ffd16b}
-html.seasonal-theme-winter{--accent:#8dcaff;--accent2:#e4f6ff;--gold:#d9eaff}
+html.seasonal-theme-christmas body{--accent:#69b9ff;--accent2:#d9f3ff;--gold:#ffe7a0}
+html.seasonal-theme-new_year body{--accent:#f2c45d;--accent2:#8be8ff;--gold:#ffe18a}
+html.seasonal-theme-valentines body{--accent:#ff78a8;--accent2:#ffc0d9;--gold:#ffe0a4}
+html.seasonal-theme-lunar_new_year body{--accent:#ff5b55;--accent2:#ffd16b;--gold:#ffe28c}
+html.seasonal-theme-easter body{--accent:#bd91ff;--accent2:#a8edc0;--gold:#ffe28c}
+html.seasonal-theme-philippine_summer body{--accent:#ffb347;--accent2:#ffe27a;--gold:#ffe6a3}
+html.seasonal-theme-philippine_independence_day body{--accent:#4c9dff;--accent2:#ff5e72;--gold:#ffe28c}
+html.seasonal-theme-back_to_school body{--accent:#6bb8ff;--accent2:#9de8d0;--gold:#ffe28c}
+html.seasonal-theme-halloween body{--accent:#ff8a3d;--accent2:#c58aff;--gold:#ffd16b}
+html.seasonal-theme-winter body{--accent:#8dcaff;--accent2:#e4f6ff;--gold:#d9eaff}
 html[class*="seasonal-theme-"] body{background-image:radial-gradient(circle at 50% -10%,color-mix(in srgb,var(--accent) 30%,transparent) 0,transparent 44%),linear-gradient(180deg,#0a0e1d 0%,#070914 100%)}
 html[class*="seasonal-theme-"] .hero-card::after{position:absolute;right:18px;bottom:5px;font-size:clamp(54px,12vw,88px);line-height:1;opacity:.2;filter:drop-shadow(0 8px 18px color-mix(in srgb,var(--accent) 35%,transparent));pointer-events:none}
 html.seasonal-theme-christmas .hero-card::after{content:"🎄"}
