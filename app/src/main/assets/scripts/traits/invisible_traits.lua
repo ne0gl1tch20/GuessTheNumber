@@ -25,8 +25,14 @@ local function traits_evaluate()
     local correct = number("correct_guesses")
     local long_streaks = number("long_streaks_observed")
     local current_streak = number("current_streak")
+    local total_guesses = number("total_guesses")
+    local accuracy = number("accuracy_score")
     local prestige = number("prestige_count")
     local ultra = number("ultra_count")
+
+    if total_guesses >= 5 and failed >= 3 and accuracy <= 0.45 then
+        add_helper(helpers, "gentle_target_bias")
+    end
 
     if failed >= 3 then add_helper(helpers, "mistake_insurance") end
     if failed >= 5 and correct >= 10 then add_helper(helpers, "range_scout") end
