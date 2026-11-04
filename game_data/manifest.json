@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "archiveFormatVersion": 1,
   "minAppVersionCode": 24,
-  "version": "76ae037204829dd21413",
-  "sourceCommit": "db07e51dcee2c72194113d717ab096591aef42cc",
-  "sourceCommitTimestamp": 1793615179,
+  "version": "d318b5ba884644a02203",
+  "sourceCommit": "b33b049ba541f64eb637d41c4c5d8bae304551ec",
+  "sourceCommitTimestamp": 1793766605,
   "keyId": "gtn-assets-v1",
   "cipher": "AES-256-GCM",
   "compression": "ZIP-DEFLATE",
@@ -32,8 +32,8 @@
       "id": "03",
       "file": "03.bin",
       "group": "web-play",
-      "size": 1151061,
-      "sha256": "9a2d8b3b25b26007ed767a92836eac02a2ddf448398e3800aed02d4af45fcfd2",
+      "size": 1151082,
+      "sha256": "09c46949a1847e16aaf483b55a93bb33eaca2f62532eb00d1cbbaf2414eb12ee",
       "nonceBytes": 12,
       "fileCount": 11
     },
@@ -68,8 +68,8 @@
       "id": "07",
       "file": "07.bin",
       "group": "libraries",
-      "size": 115496,
-      "sha256": "73a42f62bbc7e31fd8d22e290854530ad039f8bc808c9db80393f74b21b6344c",
+      "size": 116172,
+      "sha256": "856f3d29179a8cb756310f116cec57fc9d3110f70db98928f5b0151a28a1c233",
       "nonceBytes": 12,
       "fileCount": 27
     },
@@ -387,8 +387,8 @@
     {
       "path": "web-play/index.html",
       "chunk": "03",
-      "size": 104065,
-      "sha256": "b83ab1b34a7c82fb2b362d2545ecd47d72613d7825a1e3c55f0576f8c1ce8a06"
+      "size": 104121,
+      "sha256": "89113d56ecf436041586666636d18d7c3a657982e92e31feb394e97f44dd01cb"
     },
     {
       "path": "web-play/menu-studio.js",
@@ -399,8 +399,8 @@
     {
       "path": "web-play/styles.css",
       "chunk": "03",
-      "size": 115211,
-      "sha256": "ccfb50435c6697c952e96f3bb77fc8e923df66005ac95d3ca4753e2e0e675bbf"
+      "size": 115292,
+      "sha256": "6d569c6f1d12fabe129b49babd4a25f2b69b8fe251562482ff3eac2e7d3f8b3a"
     },
     {
       "path": "web-play/trait-extension-host.js",
@@ -471,8 +471,8 @@
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-particle-effects.js",
       "chunk": "07",
-      "size": 4757,
-      "sha256": "e5746abd35a475425c1e0e361bd506915d80d71b21c910e1ed9f99efd217a338"
+      "size": 7498,
+      "sha256": "8e013d0d7ee249dae087cd7e5d1e1c142e2f7568d877b39a343d0de4a0444660"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-advanced.js",
