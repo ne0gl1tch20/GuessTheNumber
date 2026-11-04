@@ -332,7 +332,8 @@ function renderSeasonalPresentation(s){
  const root=document.documentElement;
  Array.from(root.classList).filter(name=>name.startsWith('seasonal-theme-')).forEach(name=>root.classList.remove(name));
  ids.forEach(id=>root.classList.add('seasonal-theme-'+id));
- const christmas=ids.includes('christmas'),button=$('seasonalSnowToggle');
+ const christmas=ids.includes('christmas'),button=$('seasonalSnowToggle'),footer=$('seasonalControlsFooter');
+ if(footer)footer.hidden=!christmas;
  if(button)button.hidden=!christmas;
  const enabled=christmas&&readSeasonalSnowPreference();
  if(button)button.setAttribute('aria-pressed',String(enabled));
