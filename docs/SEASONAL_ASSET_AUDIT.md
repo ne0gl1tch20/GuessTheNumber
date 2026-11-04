@@ -46,3 +46,10 @@ Therefore, the first visual release needs purpose-made, lightweight seasonal art
 5. Regional Philippine events: tasteful summer and Independence Day accents, with Back to School as a short configurable theme.
 
 Do not mark any season visually complete until the real Play screen uses the assets and the reduced-motion fallback is verified.
+
+
+## Lunar New Year date source
+
+The shared calendar now bundles Lunar New Year start dates for 2026–2035 from the Hong Kong Observatory's Gregorian-Lunar conversion tables. Each presentation window covers Lunar New Year's Day through day 15. The table is data, not a fixed Gregorian recurrence; refresh it when the Observatory publishes later years.
+
+Source: https://www.hko.gov.hk/en/gts/time/conversion.htm
