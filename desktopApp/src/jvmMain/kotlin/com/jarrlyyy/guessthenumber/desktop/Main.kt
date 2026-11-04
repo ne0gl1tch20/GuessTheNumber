@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -268,6 +269,10 @@ fun main() = application {
 
             LaunchedEffect(Unit) {
                 refreshUpdates()
+            }
+            DisposableEffect(Unit) {
+                DesktopJarrlyyDsp.start()
+                onDispose { DesktopJarrlyyDsp.shutdown() }
             }
             LaunchedEffect(shellFocusRequester) {
                 shellFocusRequester.requestFocus()
