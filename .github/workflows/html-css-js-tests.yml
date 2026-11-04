@@ -14,6 +14,9 @@ on:
       - "tools/test_web_play_kotlin_localization.py"
       - "app/src/main/assets/libraries/vue/**"
       - "app/src/main/assets/libraries/jarrlyyuisdk/**"
+      - "app/src/main/assets/libraries/pixi/**"
+      - "tools/pixi-vendor/**"
+      - "tools/vendor_pixi.js"
       - "tools/test_vue_canvas_effects.cjs"
       - "tools/test_jarrlyy_ui_dom_utils.cjs"
       - "tools/test_jarrlyy_ui_typescript.mjs"
@@ -44,6 +47,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+
+      - name: Vendor pinned PixiJS browser bundle
+        run: |
+          npm install --prefix tools/pixi-vendor --no-audit --no-fund
+          node tools/vendor_pixi.js
 
       - name: Set up Python
         uses: actions/setup-python@v5
