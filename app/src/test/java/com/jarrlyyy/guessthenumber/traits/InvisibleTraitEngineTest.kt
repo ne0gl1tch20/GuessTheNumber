@@ -39,6 +39,26 @@ class InvisibleTraitEngineTest {
     }
 
     @Test
+    fun gentleTargetTraitActivatesOnlyAfterAConsistentRoughPatch() {
+        val profile = GameState().traitProfile.copy(totalGuessesObserved = 8L, failedGuessesObserved = 5L, correctGuessesObserved = 3L, accuracyScore = 0.30)
+        val struggling = GameState(traitProfile = profile)
+        val confident = struggling.copy(traitProfile = profile.copy(accuracyScore = 0.80))
+        assertTrue(InvisibleTraitEngine.HELPER_GENTLE_TARGET in InvisibleTraitEngine.evaluate(struggling).helperIds)
+        assertTrue(InvisibleTraitEngine.HELPER_GENTLE_TARGET !in InvisibleTraitEngine.evaluate(confident).helperIds)
+    }
+
+    @Test
+    fun gentleTargetBiasMovesNextSecretTowardTheMiddleWithoutLeavingTheRange() {
+        val profile = GameState().traitProfile.copy(totalGuessesObserved = 8L, failedGuessesObserved = 5L, accuracyScore = 0.30)
+        val struggling = GameState(traitProfile = profile)
+        val adjusted = InvisibleTraitEngine.adjustNextTarget(struggling, 90L, 1L, 100L)
+        assertTrue(adjusted in 1L..100L)
+        assertTrue(adjusted < 90L)
+        assertTrue(adjusted > 50L)
+        assertEquals(90L, InvisibleTraitEngine.adjustNextTarget(GameState(), 90L, 1L, 100L))
+    }
+
+    @Test
     fun progressionBonusIsOneTimeAndSurvivesReload() {
         val state = GameState(prestigeCount = 1)
         val decision = InvisibleTraitEngine.evaluate(state)
