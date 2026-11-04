@@ -22,6 +22,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Vendor pinned PixiJS browser bundle
+        run: |
+          npm install --prefix tools/pixi-vendor --no-package-lock --no-audit --no-fund
+          node tools/vendor_pixi.js
+
       - name: Show Build Revision
         run: |
           echo "GitHub SHA: $GITHUB_SHA"
