@@ -1313,7 +1313,7 @@ body.jui-game-compat .jui-dialog-actions { display:flex; flex-wrap:wrap; gap:.55
 
 /* Vue-managed Canvas is reserved for non-interactive celebration visuals. */
 .jarrlyy-particle-effects{position:fixed;inset:0;z-index:10000;pointer-events:none;overflow:hidden;contain:strict}
-.jarrlyy-particle-effects__canvas{display:block;width:100%;height:100%;pointer-events:none}
+.jarrlyy-particle-effects__surface{position:absolute;inset:0;pointer-events:none}.jarrlyy-particle-effects__canvas{display:block;width:100%;height:100%;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.jarrlyy-particle-effects{display:none}}
 /* Play controls now live in the regular dashboard flow instead of a cramped fixed drawer. */
 .play-controls-drawer{position:static;margin:12px 0 16px}
