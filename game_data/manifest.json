@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "archiveFormatVersion": 1,
   "minAppVersionCode": 24,
-  "version": "d318b5ba884644a02203",
-  "sourceCommit": "b33b049ba541f64eb637d41c4c5d8bae304551ec",
-  "sourceCommitTimestamp": 1793766605,
+  "version": "f3f82f7678f2b4a3b362",
+  "sourceCommit": "bf02fd62a5872e2546d16a452779762650e4d32c",
+  "sourceCommitTimestamp": 1793782996,
   "keyId": "gtn-assets-v1",
   "cipher": "AES-256-GCM",
   "compression": "ZIP-DEFLATE",
@@ -23,8 +23,8 @@
       "id": "02",
       "file": "02.bin",
       "group": "locales",
-      "size": 548842,
-      "sha256": "2746863296cee1e44fe6623e5b43acae15aadee3bbfa679b0fd4e15aa69c2463",
+      "size": 548876,
+      "sha256": "a03b0b0a962b4492afc68ffb135e6dd93cef46cae3b56389fb85ac069532840a",
       "nonceBytes": 12,
       "fileCount": 23
     },
@@ -32,10 +32,10 @@
       "id": "03",
       "file": "03.bin",
       "group": "web-play",
-      "size": 1151082,
-      "sha256": "09c46949a1847e16aaf483b55a93bb33eaca2f62532eb00d1cbbaf2414eb12ee",
+      "size": 1157967,
+      "sha256": "da8cf9734dc6051640069779d317a2feae90a6552fb7a55fa81918bcaa4ff129",
       "nonceBytes": 12,
-      "fileCount": 11
+      "fileCount": 21
     },
     {
       "id": "04",
@@ -68,10 +68,10 @@
       "id": "07",
       "file": "07.bin",
       "group": "libraries",
-      "size": 116172,
-      "sha256": "856f3d29179a8cb756310f116cec57fc9d3110f70db98928f5b0151a28a1c233",
+      "size": 353967,
+      "sha256": "4f5bf3eaa2d8e694ddb0c1e44b927f6443e50f2cd816634799f0ba459adee7ec",
       "nonceBytes": 12,
-      "fileCount": 27
+      "fileCount": 30
     },
     {
       "id": "08",
@@ -243,8 +243,8 @@
     {
       "path": "locales/en_us.json",
       "chunk": "02",
-      "size": 114715,
-      "sha256": "95975143b491c639058281a6dc3cd6b981717f3fb461d44b6c3b384d5500f9ba"
+      "size": 114763,
+      "sha256": "ed0a20f827e7c8f4e6dab954e94be311df22aa2834b55dd74949428265844e32"
     },
     {
       "path": "locales/es.json",
@@ -363,8 +363,8 @@
     {
       "path": "web-play/app.js",
       "chunk": "03",
-      "size": 136866,
-      "sha256": "032f18cf7ec96cf26f5a8614e3c3de930f76517a16e4e4b8e8c09be87bcede21"
+      "size": 139266,
+      "sha256": "ff6353be3b0aff2475a9059ba3609b80a837a63a32e2ff3181a88538f51bd448"
     },
     {
       "path": "web-play/icons/guess-the-number.svg",
@@ -387,8 +387,8 @@
     {
       "path": "web-play/index.html",
       "chunk": "03",
-      "size": 104121,
-      "sha256": "89113d56ecf436041586666636d18d7c3a657982e92e31feb394e97f44dd01cb"
+      "size": 104379,
+      "sha256": "0575347f490bad7a5272fb506bd2fa5eebd1c66c5a12817f2cfa393bd526f84a"
     },
     {
       "path": "web-play/menu-studio.js",
@@ -397,10 +397,70 @@
       "sha256": "568692c3cb510c4048f69ec9a02781e264d6569efb35594be1e24b88128b2fc2"
     },
     {
+      "path": "web-play/seasonal/back-to-school.svg",
+      "chunk": "03",
+      "size": 622,
+      "sha256": "5d03e8cfacd467e0670b4edf51e1b5d31e8c68c054294d30656e996f04afb9d6"
+    },
+    {
+      "path": "web-play/seasonal/christmas.svg",
+      "chunk": "03",
+      "size": 615,
+      "sha256": "369f714278f74ea1589d2e741e0a1c0764ddef271069191d5048716bf5558949"
+    },
+    {
+      "path": "web-play/seasonal/easter.svg",
+      "chunk": "03",
+      "size": 610,
+      "sha256": "7184a71eaa4c700debd4ebb2207678c02a2ea8eecb9ce60bb46fbd321524ac36"
+    },
+    {
+      "path": "web-play/seasonal/halloween.svg",
+      "chunk": "03",
+      "size": 616,
+      "sha256": "0da636149f324378aff0bd2789697de54a2e9e00dc695dfce1f10291b975fc50"
+    },
+    {
+      "path": "web-play/seasonal/lunar-new-year.svg",
+      "chunk": "03",
+      "size": 593,
+      "sha256": "8f9eed14ea927ca64ff9515e3eb5d348b71cc898239879d8e7c3d9457c348461"
+    },
+    {
+      "path": "web-play/seasonal/new-year.svg",
+      "chunk": "03",
+      "size": 635,
+      "sha256": "7f66a06a303d849fe0d2046699a7d0f4d5d61460baed25f07121ebd262359511"
+    },
+    {
+      "path": "web-play/seasonal/philippine-independence-day.svg",
+      "chunk": "03",
+      "size": 590,
+      "sha256": "99674b9c4c58724c82a6e1a60436c33092e4ce57ddeafee1e0e729659beb1405"
+    },
+    {
+      "path": "web-play/seasonal/philippine-summer.svg",
+      "chunk": "03",
+      "size": 653,
+      "sha256": "a60693849e113ba5758b0897c499d29aa08ca0b086de6f68248803503492933f"
+    },
+    {
+      "path": "web-play/seasonal/valentines.svg",
+      "chunk": "03",
+      "size": 532,
+      "sha256": "abc3076248bba40f209f98777bd78d51291062092aa466f95a4def5444682e23"
+    },
+    {
+      "path": "web-play/seasonal/winter.svg",
+      "chunk": "03",
+      "size": 628,
+      "sha256": "2a849e9137daaadff019a29cc95b71bef3f90a010bea0dc91f08dda1fee77a63"
+    },
+    {
       "path": "web-play/styles.css",
       "chunk": "03",
-      "size": 115292,
-      "sha256": "6d569c6f1d12fabe129b49babd4a25f2b69b8fe251562482ff3eac2e7d3f8b3a"
+      "size": 122456,
+      "sha256": "79be84f059074abbd03d3f80f9291eab27ac8e26a77c0b10ec2361d69c15f6af"
     },
     {
       "path": "web-play/trait-extension-host.js",
@@ -599,6 +659,24 @@
       "chunk": "07",
       "size": 281,
       "sha256": "edf4ee33851e088cbf367dc6b6c5cd1f082375cb90e8957f37a658ae0132c42a"
+    },
+    {
+      "path": "libraries/pixi/LICENSE.txt",
+      "chunk": "07",
+      "size": 1092,
+      "sha256": "5ce7447bc57f7349ffc48338782fbcabe613696e00712b20d66bc58e780f9473"
+    },
+    {
+      "path": "libraries/pixi/VERSION.txt",
+      "chunk": "07",
+      "size": 14,
+      "sha256": "ea816b69bff8a32314e1be5eef034d58823f0ce3940d178f3aefe1e1af4a3b1e"
+    },
+    {
+      "path": "libraries/pixi/pixi.min.js",
+      "chunk": "07",
+      "size": 840663,
+      "sha256": "06d9ef9823e743518793083c296d801e752db128cb1f519fbabe37e1259567ea"
     },
     {
       "path": "libraries/vue/LICENSE",
