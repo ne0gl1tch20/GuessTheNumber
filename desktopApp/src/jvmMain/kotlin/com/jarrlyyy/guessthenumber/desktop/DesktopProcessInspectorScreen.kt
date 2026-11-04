@@ -28,8 +28,8 @@ import com.jarrlyyy.guessthenumber.desktop.persistence.defaultDesktopSaveDirecto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.management.ManagementFactory
 import java.text.DecimalFormat
+import java.time.Instant
 
 internal data class DesktopProcessSnapshot(
     val osName: String,
@@ -44,23 +44,27 @@ internal data class DesktopProcessSnapshot(
     val nonHeapUsedBytes: Long
 )
 
+/** Uses java.base APIs only; the packaged Windows runtime need not include java.management. */
 internal object DesktopProcessDiagnostics {
     fun capture(): DesktopProcessSnapshot {
-        val runtime = ManagementFactory.getRuntimeMXBean()
-        val memory = ManagementFactory.getMemoryMXBean()
-        val heap = memory.heapMemoryUsage
-        val nonHeap = memory.nonHeapMemoryUsage
+        val runtime = Runtime.getRuntime()
+        val processStartMillis = ProcessHandle.current().info().startInstant()
+            .orElse(Instant.now())
+            .toEpochMilli()
+        val totalMemory = runtime.totalMemory().coerceAtLeast(0L)
+        val freeMemory = runtime.freeMemory().coerceIn(0L, totalMemory)
         return DesktopProcessSnapshot(
-            osName = System.getProperty("os.name").take(120),
-            osVersion = System.getProperty("os.version").take(80),
-            architecture = System.getProperty("os.arch").take(40),
-            javaVersion = System.getProperty("java.version").take(40),
-            availableProcessors = Runtime.getRuntime().availableProcessors().coerceAtLeast(1),
-            uptimeMillis = runtime.uptime.coerceAtLeast(0L),
-            heapUsedBytes = heap.used.coerceAtLeast(0L),
-            heapCommittedBytes = heap.committed.coerceAtLeast(0L),
-            heapMaxBytes = heap.max.coerceAtLeast(0L),
-            nonHeapUsedBytes = nonHeap.used.coerceAtLeast(0L)
+            osName = System.getProperty("os.name", "Unknown").take(120),
+            osVersion = System.getProperty("os.version", "Unknown").take(80),
+            architecture = System.getProperty("os.arch", "Unknown").take(40),
+            javaVersion = System.getProperty("java.version", "Unknown").take(40),
+            availableProcessors = runtime.availableProcessors().coerceAtLeast(1),
+            uptimeMillis = (System.currentTimeMillis() - processStartMillis).coerceAtLeast(0L),
+            heapUsedBytes = (totalMemory - freeMemory).coerceAtLeast(0L),
+            heapCommittedBytes = totalMemory,
+            heapMaxBytes = runtime.maxMemory().coerceAtLeast(0L),
+            // java.base exposes heap metrics but not JVM non-heap pool totals.
+            nonHeapUsedBytes = 0L
         )
     }
 }
@@ -175,7 +179,7 @@ internal fun DesktopProcessInspectorScreen(onBack: () -> Unit) {
                 Text("Heap used: ${megabytes(snapshot.heapUsedBytes)}")
                 Text("Heap committed: ${megabytes(snapshot.heapCommittedBytes)}")
                 Text("Heap maximum: ${if (snapshot.heapMaxBytes > 0) megabytes(snapshot.heapMaxBytes) else "Not reported"}")
-                Text("Non-heap used: ${megabytes(snapshot.nonHeapUsedBytes)}")
+                Text("Non-heap memory: Not exposed by the packaged runtime")
             }
         }
     }
