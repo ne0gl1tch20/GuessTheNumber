@@ -1,0 +1,9 @@
+{
+  "name": "gtn-pixi-vendor",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pinned build-time vendor dependency for the offline GuessTheNumber WebView bundle.",
+  "dependencies": {
+    "pixi.js": "8.22.0"
+  }
+}
