@@ -464,7 +464,7 @@ fun main() = application {
                                     onOpenParityDestination = { target ->
                                         when (target) {
                                             DesktopDestination.ARCADE,
-                                            DesktopDestination.SAVE_SLOTS,
+                                            DesktopDestination.SAVE_SLOTS -> popupDestination = target
                                             else -> shell.navigate(target)
                                         }
                                     },
