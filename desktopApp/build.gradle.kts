@@ -101,6 +101,12 @@ tasks.configureEach {
 compose.desktop {
     application {
         mainClass = "com.jarrlyyy.guessthenumber.desktop.MainKt"
+        // The debug-tools build opt-in must reach the packaged JVM too. Without this
+        // launcher argument, DesktopDebugToolsPolicy rejects Developer Settings even
+        // though CI generated desktop-build.properties with debugToolsBuildAllowed=true.
+        if (desktopDebugToolsBuildAllowed.get()) {
+            jvmArgs += "-Dgtn.desktop.debugTools=true"
+        }
 
         nativeDistributions {
             packageName = "GuessTheNumber"
