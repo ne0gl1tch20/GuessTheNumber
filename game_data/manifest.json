@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "archiveFormatVersion": 1,
   "minAppVersionCode": 24,
-  "version": "f3f82f7678f2b4a3b362",
-  "sourceCommit": "bf02fd62a5872e2546d16a452779762650e4d32c",
-  "sourceCommitTimestamp": 1793782996,
+  "version": "2054cf85d607b953798b",
+  "sourceCommit": "64929f628a2d640c849fa2a9d8252fea1138dc45",
+  "sourceCommitTimestamp": 1793783573,
   "keyId": "gtn-assets-v1",
   "cipher": "AES-256-GCM",
   "compression": "ZIP-DEFLATE",
@@ -86,8 +86,8 @@
       "id": "09",
       "file": "09.bin",
       "group": "scripts",
-      "size": 4149,
-      "sha256": "f102549e82fdbd5e466453bbf84b7b68cf8517bf46c1df701d9cb2d33a6b346d",
+      "size": 4214,
+      "sha256": "051546fe2db79bbfae8719fb67eb265ff7343baa663eaa9b241a9e213b17ec55",
       "nonceBytes": 12,
       "fileCount": 6
     },
@@ -95,8 +95,8 @@
       "id": "10",
       "file": "10.bin",
       "group": "traits",
-      "size": 501197,
-      "sha256": "a16b849452ff7f575c34a44c9d1637c77a5b585ee20e8da737d64e74028dd13a",
+      "size": 501269,
+      "sha256": "a85f22c584e646fffc3e5b8d8ca674cdf0729297d1064824d4a7abb1475507e6",
       "nonceBytes": 12,
       "fileCount": 1314
     },
@@ -771,8 +771,8 @@
     {
       "path": "scripts/traits/invisible_traits.lua",
       "chunk": "09",
-      "size": 1652,
-      "sha256": "53b3dfbfa0c3809074c9dddf1208d65ecc13a0c524cc32d7201584abe6a0996c"
+      "size": 1875,
+      "sha256": "ee39d8fee83a0d8836ef53aa7dea6f303e11a3b3c66fe1cc374a7c7ebfc3e607"
     },
     {
       "path": "traits/catalogs/adventure/AncientTrailTrait/icon.svg",
@@ -8655,8 +8655,8 @@
     {
       "path": "traits/invisible/trait_profile.json",
       "chunk": "10",
-      "size": 1003,
-      "sha256": "e17a4fcfe7843566f59504a45ef27c538feae61651769e82f525c98d4db36af0"
+      "size": 1139,
+      "sha256": "90577e61bf96e143deafa801e755f87c244101193a0ea709d516c5ac154a15a6"
     },
     {
       "path": "licenses/MBEDTLS-LICENSE.txt",
