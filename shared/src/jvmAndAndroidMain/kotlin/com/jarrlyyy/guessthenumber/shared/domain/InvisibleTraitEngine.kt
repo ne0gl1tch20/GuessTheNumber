@@ -16,6 +16,7 @@ object InvisibleTraitEngine {
     const val HELPER_STREAK_GUARD = "streak_guard"
     const val HELPER_COMEBACK = "comeback_reward"
     const val HELPER_MOMENTUM = "momentum_reward"
+    const val HELPER_GENTLE_TARGET = "gentle_target_bias"
 
     const val BONUS_FIRST_PRESTIGE = "first_prestige_bonus"
     const val BONUS_FIRST_ULTRA = "first_ultra_bonus"
@@ -78,7 +79,10 @@ object InvisibleTraitEngine {
             if (!cooldownActive(p, id, tick) && helpers.size < MAX_HELPERS_PER_GUESS) helpers += id
         }
 
-        // Adaptive helpers: deliberately small, deterministic and cooldown-limited.
+        // Quietly soften the next round after a sustained rough patch.
+        if (p.totalGuessesObserved >= GENTLE_TARGET_MIN_GUESSES && p.failedGuessesObserved >= GENTLE_TARGET_MIN_FAILURES && p.accuracyScore <= GENTLE_TARGET_ACCURACY_CEILING) helpers += HELPER_GENTLE_TARGET
+
+        // Other helpers remain deterministic and cooldown-limited.
         if (p.failedGuessesObserved >= FAILURE_HELPER_THRESHOLD) offer(HELPER_MISTAKE_INSURANCE)
         if (p.failedGuessesObserved >= RANGE_HELPER_THRESHOLD && p.correctGuessesObserved >= 10L) offer(HELPER_RANGE_SCOUT)
         if (p.longStreaksObserved > 0L) offer(HELPER_STREAK_GUARD)
@@ -104,6 +108,15 @@ object InvisibleTraitEngine {
                 .toSet(),
             bonusIds = requested.bonusIds.intersect(eligible.bonusIds)
         )
+    }
+
+    /** Bias a newly generated secret slightly toward the range midpoint after repeated misses. */
+    fun adjustNextTarget(state: GameState, candidate: Long, rangeMin: Long, rangeMax: Long): Long {
+        val safeCandidate = candidate.coerceIn(rangeMin, rangeMax)
+        if (rangeMax <= rangeMin || HELPER_GENTLE_TARGET !in evaluate(state).helperIds) return safeCandidate
+        val midpoint = rangeMin / 2.0 + rangeMax / 2.0
+        val strength = (GENTLE_TARGET_BASE_STRENGTH + (GENTLE_TARGET_ACCURACY_CEILING - state.traitProfile.accuracyScore) * 0.20).coerceIn(GENTLE_TARGET_BASE_STRENGTH, GENTLE_TARGET_MAX_STRENGTH)
+        return (safeCandidate.toDouble() + (midpoint - safeCandidate.toDouble()) * strength).toLong().coerceIn(rangeMin, rangeMax)
     }
 
     fun markHelperUses(state: GameState, helperIds: Set<String>): GameState {
@@ -153,6 +166,11 @@ object InvisibleTraitEngine {
     const val RANGE_HELPER_THRESHOLD = 5L
     const val COMEBACK_FAILURE_THRESHOLD = 6L
     const val MOMENTUM_STREAK_THRESHOLD = 5
+    const val GENTLE_TARGET_MIN_GUESSES = 5L
+    const val GENTLE_TARGET_MIN_FAILURES = 3L
+    const val GENTLE_TARGET_ACCURACY_CEILING = 0.45
+    const val GENTLE_TARGET_BASE_STRENGTH = 0.18
+    const val GENTLE_TARGET_MAX_STRENGTH = 0.25
     const val VETERAN_PRESTIGE_THRESHOLD = 10L
     const val SCORE_DECAY = 0.92
 }

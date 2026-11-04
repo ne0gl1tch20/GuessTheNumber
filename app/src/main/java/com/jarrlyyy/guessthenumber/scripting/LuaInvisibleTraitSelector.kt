@@ -41,7 +41,8 @@ class LuaInvisibleTraitSelector(context: Context) {
             InvisibleTraitEngine.HELPER_MISTAKE_INSURANCE,
             InvisibleTraitEngine.HELPER_STREAK_GUARD,
             InvisibleTraitEngine.HELPER_COMEBACK,
-            InvisibleTraitEngine.HELPER_MOMENTUM
+            InvisibleTraitEngine.HELPER_MOMENTUM,
+            InvisibleTraitEngine.HELPER_GENTLE_TARGET
         )
         private val VALID_BONUSES = setOf(
             InvisibleTraitEngine.BONUS_FIRST_PRESTIGE,
@@ -61,6 +62,8 @@ class LuaInvisibleTraitSelector(context: Context) {
                     "correct_guesses" to state.traitProfile.correctGuessesObserved.toString(),
                     "long_streaks_observed" to state.traitProfile.longStreaksObserved.toString(),
                     "current_streak" to state.streak.toString(),
+                    "total_guesses" to state.traitProfile.totalGuessesObserved.toString(),
+                    "accuracy_score" to state.traitProfile.accuracyScore.toString(),
                     "prestige_count" to state.prestigeCount.toString(),
                     "ultra_count" to state.ultraCount.toString(),
                     "first_prestige_awarded" to bool(state.traitProfile.awardedBonuses.contains(InvisibleTraitEngine.BONUS_FIRST_PRESTIGE)),

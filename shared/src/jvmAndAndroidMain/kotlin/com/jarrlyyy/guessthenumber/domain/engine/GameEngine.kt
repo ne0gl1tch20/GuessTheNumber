@@ -8,6 +8,7 @@ import com.jarrlyyy.guessthenumber.shared.domain.ChallengeProgress
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeRewardRules
 import com.jarrlyyy.guessthenumber.shared.domain.ChallengeClaimRules
 import com.jarrlyyy.guessthenumber.shared.domain.ProgressionRequirementRules
+import com.jarrlyyy.guessthenumber.shared.domain.InvisibleTraitEngine
 import com.jarrlyyy.guessthenumber.shared.rules.GuessCoreState
 import com.jarrlyyy.guessthenumber.shared.rules.GuessSourceContext
 import com.jarrlyyy.guessthenumber.shared.rules.GuessStateRules
@@ -137,12 +138,13 @@ class GameEngine(private val rng: Random = Random.Default) {
                 attempts = state.attempts,
                 rng = rng
             )
+            val playerFriendlyTarget = InvisibleTraitEngine.adjustNextTarget(state, generatedNextTarget, newMin, newMax)
             val decision = GuessTransitionRules.resolve(
                 stateTransition = transition.stateTransition,
                 currentState = transition.nextState,
                 criticalChance = critChance,
                 criticalRoll = criticalRoll,
-                nextTarget = generatedNextTarget,
+                nextTarget = playerFriendlyTarget,
                 nextRangeMin = newMin,
                 nextRangeMax = newMax
             )
