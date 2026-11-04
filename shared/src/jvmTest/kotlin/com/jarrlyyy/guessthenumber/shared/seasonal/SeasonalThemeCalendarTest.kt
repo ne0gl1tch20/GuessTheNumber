@@ -21,8 +21,9 @@ class SeasonalThemeCalendarTest {
 
     @Test
     fun fixedEventsUseInclusiveStartAndExclusiveEnd() {
-        assertEquals("valentines", SeasonalThemeCalendar.primaryTheme(LocalDate.of(2027, 2, 7))?.id)
-        assertEquals("valentines", SeasonalThemeCalendar.primaryTheme(LocalDate.of(2027, 2, 15))?.id)
+        // Lunar New Year overlaps Valentine's Day in 2027 and has higher primary-theme priority.
+        assertTrue(SeasonalThemeCalendar.activeThemes(LocalDate.of(2027, 2, 7)).any { it.id == "valentines" })
+        assertTrue(SeasonalThemeCalendar.activeThemes(LocalDate.of(2027, 2, 15)).any { it.id == "valentines" })
         assertFalse(SeasonalThemeCalendar.activeThemes(LocalDate.of(2027, 2, 16)).any { it.id == "valentines" })
 
         assertEquals("halloween", SeasonalThemeCalendar.primaryTheme(LocalDate.of(2027, 10, 15))?.id)
