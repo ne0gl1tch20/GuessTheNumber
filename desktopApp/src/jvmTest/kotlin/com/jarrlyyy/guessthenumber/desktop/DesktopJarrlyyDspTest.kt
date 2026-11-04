@@ -27,6 +27,14 @@ class DesktopJarrlyyDspTest {
     }
 
     @Test
+    fun rejectsInvalidPlaybackRequestsWithoutTouchingTheAudioDevice() {
+        assertFalse(DesktopJarrlyyDsp.play(-1, 1f))
+        assertFalse(DesktopJarrlyyDsp.play(8, 1f))
+        assertFalse(DesktopJarrlyyDsp.play(0, 0f))
+        assertFalse(DesktopJarrlyyDsp.play(0, Float.NaN))
+    }
+
+    @Test
     fun generatedPcmIsBoundedAndVolumeScalesOutput() {
         val quiet = DesktopJarrlyyDsp.renderPcm(0, 0.25f)!!
         val loud = DesktopJarrlyyDsp.renderPcm(0, 1f)!!
