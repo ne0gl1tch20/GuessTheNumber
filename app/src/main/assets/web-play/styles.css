@@ -1550,3 +1550,37 @@ body.jui-game-compat .jui-dialog-actions { display:flex; flex-wrap:wrap; gap:.55
     padding-bottom: 78px;
   }
 }
+
+
+/* Seasonal presentation layer. Decorative only; no gameplay state is changed. */
+html.seasonal-theme-christmas{--accent:#69b9ff;--accent2:#d9f3ff;--gold:#ffe7a0}
+html.seasonal-theme-new_year{--accent:#f2c45d;--accent2:#8be8ff;--gold:#ffe18a}
+html.seasonal-theme-valentines{--accent:#ff78a8;--accent2:#ffc0d9;--gold:#ffe0a4}
+html.seasonal-theme-lunar_new_year{--accent:#ff5b55;--accent2:#ffd16b;--gold:#ffe28c}
+html.seasonal-theme-easter{--accent:#bd91ff;--accent2:#a8edc0;--gold:#ffe28c}
+html.seasonal-theme-philippine_summer{--accent:#ffb347;--accent2:#ffe27a;--gold:#ffe6a3}
+html.seasonal-theme-philippine_independence_day{--accent:#4c9dff;--accent2:#ff5e72;--gold:#ffe28c}
+html.seasonal-theme-back_to_school{--accent:#6bb8ff;--accent2:#9de8d0;--gold:#ffe28c}
+html.seasonal-theme-halloween{--accent:#ff8a3d;--accent2:#c58aff;--gold:#ffd16b}
+html.seasonal-theme-winter{--accent:#8dcaff;--accent2:#e4f6ff;--gold:#d9eaff}
+html[class*="seasonal-theme-"] body{background-image:radial-gradient(circle at 50% -10%,color-mix(in srgb,var(--accent) 30%,transparent) 0,transparent 44%),linear-gradient(180deg,#0a0e1d 0%,#070914 100%)}
+html[class*="seasonal-theme-"] .hero-card::after{position:absolute;right:18px;bottom:5px;font-size:clamp(54px,12vw,88px);line-height:1;opacity:.2;filter:drop-shadow(0 8px 18px color-mix(in srgb,var(--accent) 35%,transparent));pointer-events:none}
+html.seasonal-theme-christmas .hero-card::after{content:"🎄"}
+html.seasonal-theme-new_year .hero-card::after{content:"🎆"}
+html.seasonal-theme-valentines .hero-card::after{content:"💗"}
+html.seasonal-theme-lunar_new_year .hero-card::after{content:"🧧"}
+html.seasonal-theme-easter .hero-card::after{content:"🐣"}
+html.seasonal-theme-philippine_summer .hero-card::after{content:"☀️"}
+html.seasonal-theme-philippine_independence_day .hero-card::after{content:"🇵🇭"}
+html.seasonal-theme-back_to_school .hero-card::after{content:"🎒"}
+html.seasonal-theme-halloween .hero-card::after{content:"🎃"}
+html.seasonal-theme-winter .hero-card::after{content:"❄️"}
+.seasonal-controls-footer{display:flex;justify-content:center;padding:4px 0 12px}
+.seasonal-controls-footer[hidden]{display:none}
+.seasonal-snow-toggle{border:1px solid color-mix(in srgb,var(--accent2) 45%,var(--line));border-radius:999px;padding:10px 16px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 22%,var(--panel)),color-mix(in srgb,var(--accent2) 12%,var(--panel)));color:var(--text);font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.seasonal-snow-toggle[aria-pressed="true"]{border-color:var(--accent2);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent2) 16%,transparent),0 8px 24px rgba(0,0,0,.18)}
+#seasonalSnowLayer{position:fixed;inset:0;z-index:50;overflow:hidden;pointer-events:none}
+#seasonalSnowLayer i{position:absolute;top:-8%;left:var(--snow-x);font-style:normal;font-size:var(--snow-size);line-height:1;color:#f3fbff;text-shadow:0 0 8px rgba(180,225,255,.8);opacity:.8;animation:seasonalSnowFall var(--snow-duration) linear var(--snow-delay) infinite}
+#seasonalSnowLayer.is-static i{top:var(--snow-static-y);animation:none;opacity:.35}
+@keyframes seasonalSnowFall{from{transform:translate3d(0,-8vh,0) rotate(0);opacity:0}12%{opacity:.8}to{transform:translate3d(var(--snow-drift),112vh,0) rotate(240deg);opacity:.18}}
+@media(prefers-reduced-motion:reduce){#seasonalSnowLayer i{animation:none;top:var(--snow-static-y);opacity:.35}}
