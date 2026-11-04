@@ -22,6 +22,7 @@ import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugInstaller
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdate
 import com.jarrlyyy.guessthenumber.desktop.update.WindowsDebugUpdateClient
 import com.jarrlyyy.guessthenumber.shared.ui.SharedDeveloperSettingsScreen
+import com.jarrlyyy.guessthenumber.shared.ui.SeasonalThemeSimulatorCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,7 +36,8 @@ internal fun DesktopDeveloperSettingsScreen(
         onBack = onBack,
         onNavigate = onNavigate,
         updateToolsContent = { WindowsUpdateToolsCard() },
-        audioToolsContent = { WindowsAudioAdapterCard() }
+        audioToolsContent = { WindowsAudioAdapterCard() },
+        seasonSimulatorContent = { SeasonalThemeSimulatorCard() }
     )
 }
 
