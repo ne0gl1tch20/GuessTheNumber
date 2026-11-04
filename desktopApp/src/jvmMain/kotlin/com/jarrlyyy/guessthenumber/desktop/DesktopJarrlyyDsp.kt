@@ -1,3 +1,5 @@
+package com.jarrlyyy.guessthenumber.desktop
+
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.Executors
