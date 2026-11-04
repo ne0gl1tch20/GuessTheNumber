@@ -9,6 +9,7 @@ const vueRuntime = fs.readFileSync("app/src/main/assets/libraries/vue/vue.global
 const vueVersion = fs.readFileSync("app/src/main/assets/libraries/vue/VERSION.txt", "utf8");
 const pixiRuntime = fs.readFileSync("app/src/main/assets/libraries/pixi/pixi.min.js", "utf8");
 const pixiVersion = fs.readFileSync("app/src/main/assets/libraries/pixi/VERSION.txt", "utf8");
+const pixiLicense = fs.readFileSync("app/src/main/assets/libraries/pixi/LICENSE.txt", "utf8");
 const styles = fs.readFileSync("app/src/main/assets/web-play/styles.css", "utf8");
 
 function createHarness({ pixi, contextAvailable = true } = {}) {
@@ -121,7 +122,8 @@ async function main() {
   assert.match(html, /connect-src 'none'/, "runtime network access must remain disabled");
   assert.match(vueRuntime, /vue v3\.5\.22/i, "vendored runtime must match the pinned Vue version");
   assert.match(vueVersion, /Vue 3\.5\.22/, "Vue version metadata must match");
-  assert.match(pixiRuntime, /PixiJS|pixi/i, "the generated local PixiJS bundle must exist");
+  assert.ok(pixiRuntime.length > 100000, "the generated PixiJS production bundle must be present");
+  assert.match(pixiLicense, /MIT License/i, "the vendored PixiJS MIT license must be included");
   assert.match(pixiVersion, /PixiJS 8\.22\.0/, "PixiJS version metadata must match");
   assert.match(html, /data-jarrlyy-particle-effects/, "effects mount point must exist");
   assert.doesNotMatch(html, /cdn\.jsdelivr\.net|unpkg\.com/i, "runtime libraries must not load from a CDN");
