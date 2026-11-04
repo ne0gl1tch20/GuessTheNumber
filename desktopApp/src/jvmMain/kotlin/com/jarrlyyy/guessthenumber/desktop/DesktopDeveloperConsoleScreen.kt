@@ -258,7 +258,7 @@ internal fun DesktopDeveloperConsoleScreen(onBack: () -> Unit, onOpenProcessInsp
                 Text("Architecture: ${processSnapshot.architecture} · JVM: ${processSnapshot.javaVersion}")
                 Text("Processors: ${processSnapshot.availableProcessors} · Uptime: ${processSnapshot.uptimeMillis / 1000}s")
                 Text("Heap: ${processSnapshot.heapUsedBytes / (1024 * 1024)} MB used / ${processSnapshot.heapMaxBytes / (1024 * 1024)} MB max")
-                Text("Non-heap: ${processSnapshot.nonHeapUsedBytes / (1024 * 1024)} MB")
+                Text("Non-heap memory: Not exposed by the packaged runtime")
             }
         }
     }
