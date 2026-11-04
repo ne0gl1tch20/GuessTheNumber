@@ -460,7 +460,6 @@ fun main() = application {
                                         when (target) {
                                             DesktopDestination.ARCADE,
                                             DesktopDestination.SAVE_SLOTS,
-                                            DesktopDestination.DEVELOPER_SETTINGS -> popupDestination = target
                                             else -> shell.navigate(target)
                                         }
                                     },
@@ -561,11 +560,18 @@ fun main() = application {
 
                         DesktopDestination.ACTIVITY_HUB -> DesktopActivityHubScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
                         DesktopDestination.LIVE_OPS -> DesktopLiveOpsScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
-                        DesktopDestination.DEVELOPER_CONSOLE -> DesktopDeveloperConsoleScreen(onBack = { shell.navigate(DesktopDestination.MORE) }, onOpenProcessInspector = { shell.navigate(DesktopDestination.PROCESS_INSPECTOR) })
-                        DesktopDestination.PROCESS_INSPECTOR -> DesktopProcessInspectorScreen(onBack = { shell.navigate(DesktopDestination.MORE) })
+                        DesktopDestination.DEVELOPER_SETTINGS,
+                        DesktopDestination.DEVELOPER_CONSOLE,
+                        DesktopDestination.PROCESS_INSPECTOR -> DesktopDeveloperCenterScreen(
+                            initialPanel = when (destination) {
+                                DesktopDestination.DEVELOPER_CONSOLE -> DesktopDeveloperPanel.CONSOLE
+                                DesktopDestination.PROCESS_INSPECTOR -> DesktopDeveloperPanel.PROCESS_INSPECTOR
+                                else -> DesktopDeveloperPanel.SETTINGS
+                            },
+                            onBack = { shell.navigate(DesktopDestination.MORE) }
+                        )
 
                         DesktopDestination.RELICS,
-                        DesktopDestination.DEVELOPER_SETTINGS,
                         DesktopDestination.LUA_TESTING_HUB -> DesktopParityScreen(destination = destination, onBack = { shell.navigate(DesktopDestination.MORE) }, onNavigate = { shell.navigate(it) })
 
                     }
@@ -612,7 +618,6 @@ fun main() = application {
                             title = when (target) {
                             DesktopDestination.ARCADE -> "Arcade"
                             DesktopDestination.SAVE_SLOTS -> "Save Slots"
-                            DesktopDestination.DEVELOPER_SETTINGS -> "Developer Settings"
                             else -> target.label
                         },
                         visible = true,
@@ -638,7 +643,6 @@ fun main() = application {
                                             DesktopDestination.PLAY -> popupDestination = null
                                             DesktopDestination.ARCADE,
                                             DesktopDestination.SAVE_SLOTS,
-                                            DesktopDestination.DEVELOPER_SETTINGS -> popupDestination = next
                                             else -> {
                                                 popupDestination = null
                                                 shell.navigate(next)
@@ -649,17 +653,6 @@ fun main() = application {
                                         popupDestination = null
                                         viewingPlayerProfile = true
                                         editingPlayerProfile = false
-                                    }
-                                )
-                                DesktopDestination.DEVELOPER_SETTINGS -> DesktopDeveloperSettingsScreen(
-                                    onBack = { popupDestination = null },
-                                    onNavigate = { route ->
-                                        popupDestination = null
-                                        when (route) {
-                                            "process_inspector" -> shell.navigate(DesktopDestination.PROCESS_INSPECTOR)
-                                            "advanced_dev_tools" -> shell.navigate(DesktopDestination.DEVELOPER_CONSOLE)
-                                            else -> shell.navigate(DesktopDestination.MORE)
-                                        }
                                     }
                                 )
                                 else -> popupDestination = null
