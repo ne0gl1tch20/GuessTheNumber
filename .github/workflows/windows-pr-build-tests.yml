@@ -29,11 +29,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Install PixiJS vendor dependency
+        shell: pwsh
+        working-directory: tools/pixi-vendor
+        run: npm install --no-package-lock --no-audit --no-fund
       - name: Vendor pinned PixiJS browser bundle
         shell: pwsh
-        run: |
-          npm install --prefix tools/pixi-vendor --no-package-lock --no-audit --no-fund
-          node tools/vendor_pixi.js
+        run: node tools/vendor_pixi.js
 
       - name: Set up Python
         uses: actions/setup-python@v5
