@@ -13,7 +13,9 @@ PixiJS is pinned to **8.22.0** and is copied into the WebView assets as a local 
 To prepare a local Android/Desktop build:
 
 ```sh
-npm install --prefix tools/pixi-vendor --no-audit --no-fund
+cd tools/pixi-vendor
+npm install --no-package-lock --no-audit --no-fund
+cd ../..
 node tools/vendor_pixi.js
 ```
 
