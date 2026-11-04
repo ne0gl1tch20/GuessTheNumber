@@ -18,7 +18,13 @@ data class SeasonalThemeCalendarConfig(
     val winterEndExclusive: MonthDay = MonthDay.of(3, 1),
     /** Explicit, validated date windows supplied by the regional calendar data source. */
     val lunarNewYearWindows: Map<Int, SeasonalDateWindow> = emptyMap()
-)
+) {
+    init {
+        require(regionCode.matches(Regex("[A-Za-z0-9_-]{2,16}"))) { "Region code is invalid." }
+        require(backToSchoolStart != backToSchoolEndExclusive) { "Back-to-school window must have a positive duration." }
+        require(winterStart != winterEndExclusive) { "Winter window must have a positive duration." }
+    }
+}
 
 data class SeasonalDateWindow(
     val start: LocalDate,
@@ -79,7 +85,7 @@ object SeasonalThemeCalendar {
         val isPhilippines = config.regionCode.equals("PH", ignoreCase = true)
 
         recurringWindows
-            .filterNot { it.philippinesOnly } 
+            .filterNot { it.philippinesOnly }
             .plus(recurringWindows.filter { it.philippinesOnly && isPhilippines })
             .forEach { rule ->
                 recurringWindowForDate(rule, date)?.let(active::add)
