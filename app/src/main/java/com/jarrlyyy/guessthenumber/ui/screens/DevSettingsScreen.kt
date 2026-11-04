@@ -783,7 +783,8 @@ fun DevSettingsScreen(
         onNavigate = onNavigate,
         onBack = onBack,
         updateToolsContent = { DeveloperUpdateToolsCard() },
-        audioToolsContent = { JarrlyyDspTestCard() }
+        audioToolsContent = { JarrlyyDspTestCard() },
+        seasonSimulatorContent = { com.jarrlyyy.guessthenumber.shared.ui.SeasonalThemeSimulatorCard() }
     )
 }
 
@@ -1061,3 +1062,4 @@ private fun JarrlyyDspTestCard() {
         }
     }
 }
+

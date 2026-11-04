@@ -8,6 +8,8 @@ import com.jarrlyyy.guessthenumber.desktop.economy.DesktopMinigameDef
 import com.jarrlyyy.guessthenumber.domain.model.GameState
 import com.jarrlyyy.guessthenumber.domain.engine.GameEngine
 import com.jarrlyyy.guessthenumber.shared.domain.TraitGameplayRules
+import com.jarrlyyy.guessthenumber.shared.seasonal.SeasonalThemeCalendar
+import java.time.LocalDate
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -244,6 +246,7 @@ internal fun desktopWebPlayState(
         .put("updateChannel", "debug")
         .put("debugBuild", true)
         .put("initialScreen", initialScreen)
+        .put("seasonalThemes", JSONArray().apply { SeasonalThemeCalendar.activeThemes(LocalDate.now()).forEach { put(it.id) } })
         .put("englishUiStrings", desktopEnglishWebUiStrings())
         .put("uiStrings", uiStrings)
         .put("buyMultiplier", game.buyMultiplier)
