@@ -50,7 +50,7 @@ jobs:
 
       - name: Vendor pinned PixiJS browser bundle
         run: |
-          npm install --prefix tools/pixi-vendor --no-audit --no-fund
+          npm install --prefix tools/pixi-vendor --no-package-lock --no-audit --no-fund
           node tools/vendor_pixi.js
 
       - name: Set up Python
