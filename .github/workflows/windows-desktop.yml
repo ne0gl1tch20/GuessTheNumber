@@ -1,4 +1,5 @@
 name: Windows Desktop CI
+# Keep this workflow path-triggerable for explicit PixiJS runtime validation runs.
 
 on:
   push:
