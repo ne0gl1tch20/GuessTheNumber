@@ -50,6 +50,18 @@ class SeasonalThemeCalendarTest {
     }
 
     @Test
+    fun bundledLunarNewYearCalendarCoversTheOfficialFifteenDayWindow() {
+        assertEquals("lunar_new_year", SeasonalThemeCalendar.primaryTheme(LocalDate.of(2027, 2, 6))?.id)
+        assertTrue(SeasonalThemeCalendar.activeThemes(LocalDate.of(2027, 2, 20)).any {
+            it.id == "lunar_new_year"
+        })
+        assertFalse(SeasonalThemeCalendar.activeThemes(LocalDate.of(2027, 2, 21)).any {
+            it.id == "lunar_new_year"
+        })
+        assertEquals("lunar_new_year", SeasonalThemeCalendar.primaryTheme(LocalDate.of(2028, 1, 26))?.id)
+    }
+
+    @Test
     fun lunarNewYearUsesAnExplicitRegionalCalendarWindow() {
         val start = LocalDate.of(2027, 2, 5)
         val end = LocalDate.of(2027, 2, 8)
