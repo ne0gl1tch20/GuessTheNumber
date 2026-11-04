@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "version": "2bec80238ca74c624dcde53ece1843f772c56e09",
+  "version": "36c0ec1c12d67d6855c75b2f2955c2fc90c1b7f1",
   "minAppVersionCode": 21,
   "files": [
     {
       "path": "web-play/app.js",
-      "sha256": "032f18cf7ec96cf26f5a8614e3c3de930f76517a16e4e4b8e8c09be87bcede21"
+      "sha256": "ff6353be3b0aff2475a9059ba3609b80a837a63a32e2ff3181a88538f51bd448"
     },
     {
       "path": "web-play/icons/guess-the-number.svg",
@@ -21,15 +21,55 @@
     },
     {
       "path": "web-play/index.html",
-      "sha256": "89113d56ecf436041586666636d18d7c3a657982e92e31feb394e97f44dd01cb"
+      "sha256": "0575347f490bad7a5272fb506bd2fa5eebd1c66c5a12817f2cfa393bd526f84a"
     },
     {
       "path": "web-play/menu-studio.js",
       "sha256": "568692c3cb510c4048f69ec9a02781e264d6569efb35594be1e24b88128b2fc2"
     },
     {
+      "path": "web-play/seasonal/back-to-school.svg",
+      "sha256": "5d03e8cfacd467e0670b4edf51e1b5d31e8c68c054294d30656e996f04afb9d6"
+    },
+    {
+      "path": "web-play/seasonal/christmas.svg",
+      "sha256": "369f714278f74ea1589d2e741e0a1c0764ddef271069191d5048716bf5558949"
+    },
+    {
+      "path": "web-play/seasonal/easter.svg",
+      "sha256": "7184a71eaa4c700debd4ebb2207678c02a2ea8eecb9ce60bb46fbd321524ac36"
+    },
+    {
+      "path": "web-play/seasonal/halloween.svg",
+      "sha256": "0da636149f324378aff0bd2789697de54a2e9e00dc695dfce1f10291b975fc50"
+    },
+    {
+      "path": "web-play/seasonal/lunar-new-year.svg",
+      "sha256": "8f9eed14ea927ca64ff9515e3eb5d348b71cc898239879d8e7c3d9457c348461"
+    },
+    {
+      "path": "web-play/seasonal/new-year.svg",
+      "sha256": "7f66a06a303d849fe0d2046699a7d0f4d5d61460baed25f07121ebd262359511"
+    },
+    {
+      "path": "web-play/seasonal/philippine-independence-day.svg",
+      "sha256": "99674b9c4c58724c82a6e1a60436c33092e4ce57ddeafee1e0e729659beb1405"
+    },
+    {
+      "path": "web-play/seasonal/philippine-summer.svg",
+      "sha256": "a60693849e113ba5758b0897c499d29aa08ca0b086de6f68248803503492933f"
+    },
+    {
+      "path": "web-play/seasonal/valentines.svg",
+      "sha256": "abc3076248bba40f209f98777bd78d51291062092aa466f95a4def5444682e23"
+    },
+    {
+      "path": "web-play/seasonal/winter.svg",
+      "sha256": "2a849e9137daaadff019a29cc95b71bef3f90a010bea0dc91f08dda1fee77a63"
+    },
+    {
       "path": "web-play/styles.css",
-      "sha256": "6d569c6f1d12fabe129b49babd4a25f2b69b8fe251562482ff3eac2e7d3f8b3a"
+      "sha256": "79be84f059074abbd03d3f80f9291eab27ac8e26a77c0b10ec2361d69c15f6af"
     },
     {
       "path": "web-play/trait-extension-host.js",
@@ -85,7 +125,7 @@
     },
     {
       "path": "locales/en_us.json",
-      "sha256": "95975143b491c639058281a6dc3cd6b981717f3fb461d44b6c3b384d5500f9ba"
+      "sha256": "ed0a20f827e7c8f4e6dab954e94be311df22aa2834b55dd74949428265844e32"
     },
     {
       "path": "locales/es.json",
@@ -258,6 +298,18 @@
     {
       "path": "libraries/jarrlyyuisdk/typescript/tsconfig.runtime.json",
       "sha256": "edf4ee33851e088cbf367dc6b6c5cd1f082375cb90e8957f37a658ae0132c42a"
+    },
+    {
+      "path": "libraries/pixi/LICENSE.txt",
+      "sha256": "5ce7447bc57f7349ffc48338782fbcabe613696e00712b20d66bc58e780f9473"
+    },
+    {
+      "path": "libraries/pixi/VERSION.txt",
+      "sha256": "ea816b69bff8a32314e1be5eef034d58823f0ce3940d178f3aefe1e1af4a3b1e"
+    },
+    {
+      "path": "libraries/pixi/pixi.min.js",
+      "sha256": "06d9ef9823e743518793083c296d801e752db128cb1f519fbabe37e1259567ea"
     },
     {
       "path": "libraries/vue/LICENSE",
