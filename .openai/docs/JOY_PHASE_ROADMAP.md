@@ -7,6 +7,8 @@ The goal is to make GuessTheNumber feel more rewarding and lively while growing 
 
 **Status note (2026-10-14):** This roadmap tracks intended scope, not proof that every feature is merged. Items marked implemented are supported by the current `master` changelog; partial implementations are labeled as such. Work found only on feature branches must not be marked complete until it lands on `master` and its checks are reviewed.
 
+
+**Seasonal game themes plan:** The asset-first seasonal calendar, regional scheduling, GTN asset mapping, Christmas **Let It Snow** footer control, and shared Android/Windows developer preview are specified in [Seasonal Calendar and Asset-Driven Game Themes](./SEASONAL_GAME_ASSETS_PLAN.md). This expands the existing #67, #69, #70, #72, and #74 scopes; it does not add a duplicate event engine or increase the planned PR count.
 ## Actual game UI migration goal (2026-10-17)
 
 **Product goal:** Migrate the real GuessTheNumber player-facing game screens to a shared HTML/CSS/JavaScript frontend so the game can have a cohesive theme, more game-like layouts, richer visual hierarchy, responsive panels, polished transitions and consistent presentation on Android and Windows. This is a real product UI migration, not a permanent bridge demo or a goal to merely embed a web page inside the app.
