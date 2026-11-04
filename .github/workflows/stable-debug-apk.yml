@@ -32,6 +32,14 @@ jobs:
           ref: ${{ inputs.source_ref || github.event.pull_request.merge_commit_sha || github.sha }}
       - name: Record checked-out source commit
         run: echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Vendor pinned PixiJS browser bundle
+        run: |
+          npm install --prefix tools/pixi-vendor --no-audit --no-fund
+          node tools/vendor_pixi.js
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
