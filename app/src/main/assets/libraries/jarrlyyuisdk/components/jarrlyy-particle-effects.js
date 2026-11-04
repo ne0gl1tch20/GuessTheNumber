@@ -46,8 +46,9 @@ const component={
   async initializeRenderer(){
    const PIXI=window.PIXI;
    if(PIXI&&typeof PIXI.Application==='function'&&typeof PIXI.Graphics==='function'){
+    let app=null;
     try{
-     const app=new PIXI.Application();
+     app=new PIXI.Application();
      await app.init({
       backgroundAlpha:0,
       antialias:false,
@@ -68,7 +69,8 @@ const component={
      window.jarrlyyParticleEffectsReady=true;
      return;
     }catch(_error){
-     if(this.app){this.app.destroy({removeView:true},{children:true});this.app=null;}
+     if(app)app.destroy({removeView:true},{children:true});
+     this.app=null;
     }
    }
    this.initializeCanvasFallback();
@@ -81,7 +83,7 @@ const component={
    this.host.appendChild(canvas);
    this.canvas=canvas;
    this.context=canvas.getContext('2d',{alpha:true});
-   if(!this.context){window.jarrlyyParticleEffectsReady=false;return;}
+   if(!this.context){this.host.removeChild(canvas);this.canvas=null;window.jarrlyyParticleEffectsReady=false;return;}
    window.addEventListener('resize',this.onResize,{passive:true});
    this.resizeFallback();
    window.jarrlyyParticleEffectsRenderer='canvas2d';
