@@ -17,3 +17,7 @@ local.properties
 /debug-signing/debug.keystore
 /gtn-liveops-keys
 /gtn-signing
+
+# Generated PixiJS browser bundle and local npm install
+app/src/main/assets/libraries/pixi/
+tools/pixi-vendor/node_modules/
