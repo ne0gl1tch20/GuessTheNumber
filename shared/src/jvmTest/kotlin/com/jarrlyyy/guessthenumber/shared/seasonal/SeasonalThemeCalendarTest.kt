@@ -43,7 +43,7 @@ class SeasonalThemeCalendarTest {
     }
 
     @Test
-    fun philippinesSummerAndConfiguredSchoolWindowCanOverlap() {
+    fun philippinesSummerEndsBeforeConfiguredSchoolWindowBegins() {
         val active = SeasonalThemeCalendar.activeThemes(LocalDate.of(2027, 6, 15))
         assertTrue(active.any { it.id == "back_to_school" })
         assertTrue(active.none { it.id == "philippine_summer" })
