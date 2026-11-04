@@ -647,7 +647,7 @@ fun main() = application {
                                             DesktopDestination.MORE,
                                             DesktopDestination.PLAY -> popupDestination = null
                                             DesktopDestination.ARCADE,
-                                            DesktopDestination.SAVE_SLOTS,
+                                            DesktopDestination.SAVE_SLOTS -> popupDestination = next
                                             else -> {
                                                 popupDestination = null
                                                 shell.navigate(next)
