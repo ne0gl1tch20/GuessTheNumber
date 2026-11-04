@@ -37,6 +37,7 @@ fun SharedDeveloperSettingsScreen(
     onBack: () -> Unit,
     updateToolsContent: @Composable () -> Unit,
     audioToolsContent: @Composable () -> Unit,
+    seasonSimulatorContent: @Composable () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -67,6 +68,7 @@ fun SharedDeveloperSettingsScreen(
             }
             item { updateToolsContent() }
             item { audioToolsContent() }
+            item { seasonSimulatorContent() }
             item {
                 Card(onClick = { onNavigate("process_inspector") }, modifier = Modifier.fillMaxWidth()) {
                     Row(

@@ -53,3 +53,11 @@ Do not mark any season visually complete until the real Play screen uses the ass
 The shared calendar now bundles Lunar New Year start dates for 2026–2035 from the Hong Kong Observatory's Gregorian-Lunar conversion tables. Each presentation window covers Lunar New Year's Day through day 15. The table is data, not a fixed Gregorian recurrence; refresh it when the Observatory publishes later years.
 
 Source: https://www.hko.gov.hk/en/gts/time/conversion.htm
+
+
+## Implemented seasonal art and encrypted packaging
+
+- Ten original transparent SVG atmosphere overlays live in `app/src/main/assets/web-play/seasonal/`.
+- The archive builder recursively collects the complete `web-play/` group, so these SVGs enter the encrypted Web Play chunk automatically. No plaintext APK asset path or extra Gradle task is needed.
+- Web Play CSS references the SVGs relative to `styles.css`; the existing Content Security Policy permits same-origin images.
+- Android Developer Settings now includes a date-driven season simulator with quick presets, overlap visibility and primary-theme indication. It is preview-only and does not modify game state or trait eligibility.
