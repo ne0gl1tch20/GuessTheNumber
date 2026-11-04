@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "a7c5ad69600ffd749f0496e628d50893961b9440",
+  "version": "2bec80238ca74c624dcde53ece1843f772c56e09",
   "minAppVersionCode": 21,
   "files": [
     {
@@ -21,7 +21,7 @@
     },
     {
       "path": "web-play/index.html",
-      "sha256": "b83ab1b34a7c82fb2b362d2545ecd47d72613d7825a1e3c55f0576f8c1ce8a06"
+      "sha256": "89113d56ecf436041586666636d18d7c3a657982e92e31feb394e97f44dd01cb"
     },
     {
       "path": "web-play/menu-studio.js",
@@ -29,7 +29,7 @@
     },
     {
       "path": "web-play/styles.css",
-      "sha256": "ccfb50435c6697c952e96f3bb77fc8e923df66005ac95d3ca4753e2e0e675bbf"
+      "sha256": "6d569c6f1d12fabe129b49babd4a25f2b69b8fe251562482ff3eac2e7d3f8b3a"
     },
     {
       "path": "web-play/trait-extension-host.js",
@@ -173,7 +173,7 @@
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-particle-effects.js",
-      "sha256": "e5746abd35a475425c1e0e361bd506915d80d71b21c910e1ed9f99efd217a338"
+      "sha256": "8e013d0d7ee249dae087cd7e5d1e1c142e2f7568d877b39a343d0de4a0444660"
     },
     {
       "path": "libraries/jarrlyyuisdk/components/jarrlyy-ui-advanced.js",
