@@ -1,0 +1,12 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    avoid_dynamic_calls: true
+    cancel_subscriptions: true
+    close_sinks: true
+    directives_ordering: true
+    exhaustive_cases: true
+    no_leading_underscores_for_local_identifiers: true
+    prefer_final_locals: true
+    unawaited_futures: true
