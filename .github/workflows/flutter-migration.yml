@@ -6,7 +6,7 @@ on:
       - "flutter/**"
       - ".github/workflows/flutter-migration.yml"
   push:
-    branches: [master]
+    branches: [master, 'feature/**']
     paths:
       - "flutter/**"
       - ".github/workflows/flutter-migration.yml"
